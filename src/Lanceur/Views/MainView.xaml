@@ -1,0 +1,149 @@
+﻿<rxui:ReactiveWindow
+    x:Class="Lanceur.Views.MainView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:rxui="http://reactiveui.net"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:vm="clr-namespace:Lanceur.Views"
+    xmlns:xaml="clr-namespace:Lanceur.Xaml"
+    x:Name="_self"
+    Title="Lanceur"
+    Width="720"
+    x:TypeArguments="vm:MainViewModel"
+    AllowDrop="True"
+    AllowsTransparency="True"
+    Background="Transparent"
+    FocusManager.FocusedElement="{Binding ElementName=QueryTextBox}"
+    ResizeMode="NoResize"
+    ShowInTaskbar="False"
+    SizeToContent="Height"
+    Topmost="True"
+    WindowStartupLocation="Manual"
+    WindowStyle="None"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <Storyboard x:Key="fadeOutStoryBoard">
+            <DoubleAnimation
+                Completed="OnFadeOutStoryBoardCompleted"
+                FillBehavior="HoldEnd"
+                Storyboard.TargetProperty="Opacity"
+                From="1"
+                To="0"
+                Duration="{StaticResource FadeDuration}" />
+        </Storyboard>
+        <Storyboard x:Key="fadeInStoryBoard">
+            <DoubleAnimation
+                Completed="OnFadeInStoryBoardCompleted"
+                FillBehavior="HoldEnd"
+                Storyboard.TargetProperty="Opacity"
+                From="0"
+                To="1"
+                Duration="{StaticResource FadeDuration}" />
+        </Storyboard>
+
+        <!--  TEMPLATES  -->
+        <xaml:QueryResultSelector
+            x:Key="QueryResultSelector"
+            DefaultTemplate="{StaticResource QueryResultTemplate}"
+            DisplayResultTemplate="{StaticResource SimpleQueryResultTemplate}" />
+
+    </Window.Resources>
+    <StackPanel>
+        <!--  ======================================================  -->
+        <!--  SEARCH BOX  -->
+        <!--  ======================================================  -->
+        <Border Height="68" Style="{StaticResource ControlBorderStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    x:Name="QueryTextBox"
+                    Margin="10,0,0,0"
+                    VerticalAlignment="Center"
+                    x:FieldModifier="public"
+                    AutoWordSelection="True"
+                    Canvas.ZIndex="2"
+                    CharacterCasing="Lower"
+                    FontSize="24"
+                    Style="{StaticResource QueryTextBoxStyle}" />
+                <TextBox
+                    x:Name="AutoCompleteBox"
+                    Margin="10,0,0,0"
+                    VerticalAlignment="Center"
+                    x:FieldModifier="public"
+                    AutoWordSelection="True"
+                    Canvas.ZIndex="1"
+                    CharacterCasing="Lower"
+                    FontSize="24"
+                    Foreground="{StaticResource SystemControlBackgroundBaseMediumLowBrush}"
+                    Style="{StaticResource QueryTextBoxStyle}" />
+                <iconPacks:PackIconModern
+                    x:Name="QueryIcon"
+                    Grid.Column="1"
+                    Width="30"
+                    Height="30"
+                    Margin="5,0,15,0"
+                    VerticalAlignment="Center">
+                    <iconPacks:PackIconModern.Style>
+                        <Style TargetType="iconPacks:PackIconModern">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsOnError}" Value="True">
+                                    <Setter Property="Kind" Value="Warning" />
+                                    <Setter Property="Foreground" Value="Orange" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsOnError}" Value="False">
+                                    <Setter Property="Kind" Value="Magnify" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextColourBrush}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </iconPacks:PackIconModern.Style>
+                </iconPacks:PackIconModern>
+            </Grid>
+        </Border>
+
+        <!--  ======================================================  -->
+        <!--  RESULT BOX  -->
+        <!--  ======================================================  -->
+        <Border x:Name="ResultPanel" Style="{StaticResource ControlBorderStyle}">
+            <ListView
+                x:Name="QueryResults"
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                MaxHeight="350"
+                HorizontalContentAlignment="Stretch"
+                Background="Transparent"
+                ItemTemplateSelector="{StaticResource QueryResultSelector}"
+                SelectedIndex="{Binding CurrentAliasIndex}"
+                SelectedItem="{Binding CurrentAlias}" />
+        </Border>
+        <!--  ======================================================  -->
+        <!--  STATUS BOX  -->
+        <!--  ======================================================  -->
+        <Border x:Name="StatusPanel" Style="{StaticResource ControlBorderStyle}">
+            <DockPanel Margin="3" LastChildFill="True">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Left"
+                    Foreground="{StaticResource TextColourBrush}">
+                    <Run x:Name="ResultCounter" />
+                    <Run Text="item(s) found." />
+                </TextBlock>
+                <TextBlock
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Right"
+                    Foreground="{StaticResource TextColourBrush}" />
+                <TextBlock HorizontalAlignment="Right" Foreground="{StaticResource TextColourBrush}">
+                    <Run Text="Session:" />
+                    <Run x:Name="RunSession" FontWeight="Bold" />
+                </TextBlock>
+            </DockPanel>
+        </Border>
+    </StackPanel>
+</rxui:ReactiveWindow>
