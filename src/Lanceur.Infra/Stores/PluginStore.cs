@@ -1,8 +1,9 @@
-﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
+using Lanceur.Core.Plugins.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Lanceur.SharedKernel.Utils;
+using Lanceur.Infra.Plugins;
+using Newtonsoft.Json;
 using Splat;
 
 namespace Lanceur.Infra.Stores
@@ -12,10 +13,10 @@ namespace Lanceur.Infra.Stores
     {
         #region Fields
 
+        private static IEnumerable<ExecutableQueryResult> _plugins = null;
         private readonly IPluginStoreContext _context;
         private readonly ILogService _log;
         private readonly IPluginManager _pluginManager;
-        private static IEnumerable<QueryResult> _plugins = null;
 
         #endregion Fields
 
@@ -41,44 +42,51 @@ namespace Lanceur.Infra.Stores
 
         #region Methods
 
-        private void LoadPlugin()
+        private PluginConfig[] GetPluginsConfig()
+        {
+            var configs = new List<PluginConfig>();
+            var root = _context.RepositoryPath;
+            var files = Directory.EnumerateFiles(root, "plugin.config.json", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                var json = File.ReadAllText(file);
+                var cfg = JsonConvert.DeserializeObject<PluginConfig>(json);
+                configs.Add(cfg);
+            }
+
+            return configs.ToArray();
+        }
+
+        private void LoadPlugins()
         {
             if (_plugins == null)
             {
-                var foundPlugins = new List<QueryResult>();
-                var dlls = FileManager.FindWithExtension(_context.RepositoryPath, ".dll");
+                var configs = GetPluginsConfig();
+                var queryResults = new List<PluginExecutableQueryResult>();
 
-                foreach (var dll in dlls)
+                foreach (var config in configs)
                 {
-                    _log.Trace($"Found DLL '{dll}'. Looking for plugins.");
-                    if (_pluginManager.Exists(dll))
+                    var asm = _pluginManager.LoadPluginAsm($"plugins/{config.Dll}");
+                    var plugins = _pluginManager.CreatePlugin(asm);
+                    foreach (var plugin in plugins)
                     {
-                        var plugins = _pluginManager.GetPluginTypes(dll);
-                        foreach (var plugin in plugins)
-                        {
-                            var queryResult = _pluginManager.Activate(plugin);
-                            if (queryResult is not null)
-                            {
-                                _log.Info($"Found plugin '{(queryResult?.Name ?? "N.A.")}'");
-                                foundPlugins.Add(queryResult);
-                            }
-                            else { _log.Warning($"plugin '{plugin.Name}' is cannot be loaded as a plugin."); }
-                        }
+                        var query = new PluginExecutableQueryResult(plugin);
+                        queryResults.Add(query);
                     }
                 }
-                _plugins = foundPlugins ?? new List<QueryResult>();
+                _plugins = queryResults;
             }
         }
 
         public IEnumerable<QueryResult> GetAll()
         {
-            LoadPlugin();
+            LoadPlugins();
             return _plugins;
         }
 
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
-            LoadPlugin();
+            LoadPlugins();
             var found = from plugin in _plugins
                         where plugin?.Name?.ToLower()?.Contains(query.Name.ToLower()) ?? false
                         select plugin;

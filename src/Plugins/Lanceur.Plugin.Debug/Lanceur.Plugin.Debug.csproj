@@ -4,12 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	  <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj">
-      <CopyLocal>False</CopyLocal>
+		<Private>false</Private>
+		<ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="plugin.config.json">
+		<Private>false</Private>
+		<ExcludeAssets>runtime</ExcludeAssets>
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

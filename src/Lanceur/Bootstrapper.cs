@@ -6,6 +6,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Managers;
+using Lanceur.Infra.Plugins;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Stores;
@@ -68,16 +69,16 @@ namespace Lanceur
             l.Register<IStoreLoader>(() => new StoreLoader());
             l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
             l.Register<ICmdlineProcessor>(() => new CmdlineProcessor());
-            l.Register((Func<IDataService>)(() => new SQLiteDataService(Get<SQLiteConnectionScope>(), Get<ILogService>(), Get<IExecutionManager>(), Get<IConvertionService>())));
+            l.Register<IDataService>(() => new SQLiteDataService(Get<SQLiteConnectionScope>(), Get<ILogService>(), Get<IExecutionManager>(), Get<IConvertionService>()));
             l.Register<IExecutionManager>(() => new ExecutionManager(Get<ILogService>(), Get<IWildcardManager>()));
             l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
-            l.Register((Func<IAppSettingsService>)(() => new SQLiteAppSettingsService(Get<SQLiteConnectionScope>())));
+            l.Register<IAppSettingsService>(() => new SQLiteAppSettingsService(Get<SQLiteConnectionScope>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
             l.Register<ISettingsService>(() => new JsonSettingsService());
             l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
             l.Register<IClipboardService>(() => new WindowsClipboardService());
             l.Register<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
-            l.Register<IPluginManager>(() => new PluginManager());
+            l.Register<IPluginManager>(() => new PluginManager(Get<IPluginStoreContext>()));
             l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>()));
 
             l.Register(() => new SQLiteDatabase(Get<IDataStoreVersionManager>(), Get<ILogService>(), Get<IDataStoreUpdateManager>()));

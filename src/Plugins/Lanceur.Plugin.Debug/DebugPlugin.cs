@@ -1,5 +1,5 @@
-﻿using Lanceur.Core.Models;
-using Lanceur.Core.Plugins;
+﻿using Lanceur.Core.Plugins;
+using Lanceur.Core.Plugins.Models;
 using System.ComponentModel;
 
 namespace Lanceur.Plugin.Debug
@@ -9,22 +9,20 @@ namespace Lanceur.Plugin.Debug
     {
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string? parameters = null)
+        public override Task<IEnumerable<ResultItem>> ExecuteAsync(string? parameters = null)
         {
-            Log.Trace($"Executing plugin '{nameof(DebugPlugin)}'");
-
             var i = 0;
-            IEnumerable<QueryResult> result = new List<QueryResult>()
+            IEnumerable<ResultItem> result = new List<ResultItem>()
             {
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
-                new DisplayQueryResult($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "Carabiner"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
             };
             return Task.FromResult(result);
         }

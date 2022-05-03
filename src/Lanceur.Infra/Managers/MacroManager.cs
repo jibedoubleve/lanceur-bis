@@ -52,7 +52,7 @@ namespace Lanceur.Infra.Managers
                         alias.SetDescription(description);
 
                         macroInstances.Add(name, alias);
-                        _log.Info($"Found macro '{name}' ({description})");
+                        _log.Info($"Found macro '{name}'");
                     }
                 }
                 _macroInstances = macroInstances;

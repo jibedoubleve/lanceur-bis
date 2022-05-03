@@ -1,30 +1,37 @@
-﻿using Lanceur.Core.Models;
-using Lanceur.Core.Services;
-using Splat;
+﻿using Lanceur.Core.Plugins.Models;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace Lanceur.Core.Plugins
 {
-    public abstract class PluginBase : ExecutableQueryResult, IPlugin
+    public abstract class PluginBase : IPlugin
     {
-        #region Fields
-
-        private readonly ILogService _log;
-
-        #endregion Fields
-
         #region Constructors
 
         public PluginBase()
         {
-            _log = Locator.Current.GetService<ILogService>() ?? new TraceLogService();
+            var name = GetType().GetCustomAttributes<PluginAttribute>().FirstOrDefault();
+            var description = GetType().GetCustomAttributes<DescriptionAttribute>().FirstOrDefault();
+            if (name != null) { Name = name.Name; }
+            if (description != null) { Description = description.Description; }
+            Icon = "FunctionVariant";
         }
 
         #endregion Constructors
 
         #region Properties
 
-        protected ILogService Log => _log;
+        protected static IEnumerable<ResultItem> NoResult => new List<ResultItem>();
+        public string Description { get; set; }
+        public string Icon { get; set; }
+        public string Name { get; set; }
 
         #endregion Properties
+
+        #region Methods
+
+        public abstract Task<IEnumerable<ResultItem>> ExecuteAsync(string parameters = null);
+
+        #endregion Methods
     }
 }

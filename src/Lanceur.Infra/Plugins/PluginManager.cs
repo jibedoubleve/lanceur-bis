@@ -1,61 +1,66 @@
-﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Stores;
 using Splat;
-using System.ComponentModel;
 using System.Reflection;
 
-namespace Lanceur.Core.Plugins
+namespace Lanceur.Infra.Plugins
 {
     public class PluginManager : IPluginManager
     {
-        private readonly ILogService _log;
+        #region Fields
 
-        public PluginManager()
+        private readonly ILogService _log;
+        private readonly IPluginStoreContext _pluginStoreContext;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public PluginManager(IPluginStoreContext pluginStoreContext = null, ILogService log = null)
         {
-            _log = Locator.Current.GetService<ILogService>() ?? new TraceLogService();
+            var l = Locator.Current;
+            _pluginStoreContext = pluginStoreContext ?? l.GetService<IPluginStoreContext>();
+            _log = log ?? l.GetService<ILogService>() ?? new TraceLogService();
         }
+
+        #endregion Constructors
+
         #region Methods
 
-        public QueryResult Activate(Type plugin)
+        public IEnumerable<IPlugin> CreatePlugin(Assembly assembly)
         {
-            var instance = Activator.CreateInstance(plugin);
-            var name = (plugin.GetCustomAttribute(typeof(PluginAttribute)) as PluginAttribute)?.Name;
-            var description = (plugin.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
-
-            if (instance is ExecutableQueryResult queryResult)
-            {                
-                queryResult.Icon = "PowerPlugOutline";
-                queryResult.Name = name;
-                queryResult.SetDescription(description);
-                return queryResult;
-            }
-            else { return null; }
-        }
-
-        public bool Exists(string dll) => File.Exists(dll);
-
-        public IEnumerable<Type> GetPluginTypes(string dll)
-        {
-            var asm = Assembly.LoadFile(dll);
-            return File.Exists(dll)
-                ? GetPluginTypes(Assembly.LoadFile(dll))
-                : throw new FileNotFoundException("The plugin dll to load does not exist.", dll);
-        }
-
-        public IEnumerable<Type> GetPluginTypes(Assembly asm)
-        {
-            var results = new List<Type>();
-            try
+            int count = 0;
+            foreach (var type in assembly.GetTypes())
             {
-                var types = from t in asm.GetTypes()
-                            where t.GetCustomAttributes<PluginAttribute>().Any()
-                            select t;
-                results.AddRange(types);
+                if (typeof(IPlugin).IsAssignableFrom(type))
+                {
+                    if (Activator.CreateInstance(type) is IPlugin result)
+                    {
+                        count++;
+                        _log.Info($"Found plugin '{result.Name}'");
+                        yield return result;
+                    }
+                }
             }
-            catch (Exception ex) { _log.Error(ex.Message, ex); }
 
-            return results;
+            if (count == 0)
+            {
+                string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
+                _log.Warning(
+                    $"Can't find any type which implements ICommand in {assembly} from {assembly.Location}.\n" +
+                    $"Available types: {availableTypes}");
+            }
+        }
+
+        public Assembly LoadPluginAsm(string path)
+        {
+            var root = _pluginStoreContext.RepositoryPath;
+            var pluginLocation = Path.GetFullPath(Path.Combine(root, path.Replace('\\', Path.DirectorySeparatorChar)));
+            var ctx = new PluginLoadContext(pluginLocation);
+
+            var filename = Path.GetFileNameWithoutExtension(pluginLocation);
+            return ctx.LoadFromAssemblyName(new AssemblyName(filename));
         }
 
         #endregion Methods

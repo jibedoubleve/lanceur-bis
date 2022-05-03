@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Lanceur.Core.Models
 {
     /// <summary>
-    /// Base of a result displayed after a query. 
+    /// Base of a result displayed after a query.
     /// </summary>
     /// <remarks>
     /// Note that <see cref="INotifyPropertyChanged"/> is partially implemented.
@@ -19,7 +19,15 @@ namespace Lanceur.Core.Models
         private string _name = string.Empty;
         private string _oldName;
 
+        private object _thumbnail;
+
         #endregion Fields
+
+        #region Events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Events
 
         #region Properties
 
@@ -79,8 +87,6 @@ namespace Lanceur.Core.Models
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Thumbnail)));
             }
         }
-        private object _thumbnail;
-        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion Properties
     }

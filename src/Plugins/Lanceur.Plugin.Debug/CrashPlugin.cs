@@ -1,5 +1,5 @@
-﻿using Lanceur.Core.Models;
-using Lanceur.Core.Plugins;
+﻿using Lanceur.Core.Plugins;
+using Lanceur.Core.Plugins.Models;
 using System.ComponentModel;
 
 namespace Lanceur.Plugin.Debug
@@ -9,7 +9,7 @@ namespace Lanceur.Plugin.Debug
     {
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string? parameters = null)
+        public override Task<IEnumerable<ResultItem>> ExecuteAsync(string? parameters = null)
         {
             throw new NotSupportedException("Just throw an error...");
         }
