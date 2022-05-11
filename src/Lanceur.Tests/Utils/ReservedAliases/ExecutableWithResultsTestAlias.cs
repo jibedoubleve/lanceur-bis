@@ -8,7 +8,7 @@ namespace Lanceur.Tests.Utils.ReservedAliases
 
         public static ExecutableWithResultsTestAlias FromName(string name) => new() { Name = name, Query = new Cmdline(name) };
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameter = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             var result = new List<QueryResult>()
             {
