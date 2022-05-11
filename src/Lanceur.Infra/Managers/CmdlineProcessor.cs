@@ -7,7 +7,9 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private static readonly char[] Specials = { '$', '&', '|', '@', '#', '(', ')', '§', '!', '{', '}', '-', '_', '\\', '+', '-', '*', '/', '=', '<', '>', ',', ';', ':', '%' };
+        private static readonly char[] Specials = { 
+            '$', '&', '|', '@', '#', '(', ')', '§', '!', '{', '}', '-', '_', '\\', '+', '-', '*', '/', '=', '<', '>', ',', ';', ':', '%', '?'
+        };
 
         #endregion Fields
 

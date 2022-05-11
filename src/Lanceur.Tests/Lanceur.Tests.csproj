@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="UI\**" />
+	  <EmbeddedResource Remove="UI\**" />
+	  <None Remove="UI\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="Libraries\Scripts\invalid_script.sql" />
 	  <None Remove="Libraries\Scripts\script-0.1.sql" />
 	  <None Remove="Libraries\Scripts\script-0.2.1.sql" />
@@ -37,10 +43,6 @@
 		<ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
 		<ProjectReference Include="..\Lanceur\Lanceur.csproj" />
 		<ProjectReference Include="..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="UI\" />
 	</ItemGroup>
 
 </Project>

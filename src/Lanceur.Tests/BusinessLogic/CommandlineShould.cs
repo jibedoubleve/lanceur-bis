@@ -46,6 +46,9 @@ namespace Lanceur.Tests.BusinessLogic
         [InlineData("", "excel")]
         [InlineData("arg1 arg2", "% arg1 arg2")]
         [InlineData("arg1 arg2", "$arg1 arg2")]
+        [InlineData("arg1 arg2", "? arg1 arg2")]
+        [InlineData("arg1 arg2", "?arg1 arg2")]
+        [InlineData("a?rg2", "arg1 a?rg2")]
         public void HaveArguments(string asExpected, string actual)
         {
             var processor = new CmdlineProcessor();
