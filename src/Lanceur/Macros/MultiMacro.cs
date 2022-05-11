@@ -1,21 +1,20 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Lanceur.Macros
 {
-    [Macro("stat"), Description("Show the usage statistics of Lanceur")]
-    public class StatisticsMacro : ExecutableQueryResult
+    [Macro("multi"), Description("Allow to start multiple alias at once")]
+    public class MultiMacro : ExecutableQueryResult
     {
-        #region Methods
-
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            return NoResultAsync;
+            throw new NotImplementedException();
         }
-
-        #endregion Methods
     }
 }

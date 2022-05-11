@@ -36,7 +36,7 @@ namespace Lanceur.ReservedKeywords
 
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             var sessions = _service.GetSessions();
             return Task.FromResult((IEnumerable<QueryResult>)_converter.ToSessionExecutableQueryResult(sessions));

@@ -77,7 +77,7 @@ namespace Lanceur.Core.Models
             return result;
         }
 
-        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             await ExecutionService?.ExecuteAsync(this);
             OnExecution(this);

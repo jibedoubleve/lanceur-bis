@@ -201,7 +201,7 @@ namespace Lanceur.Views
                     {
                         exp.IsPrivileged = context.RunAsAdmin;
                     }
-                    results = await exec.ExecuteAsync(cmd.Parameters);
+                    results = await exec.ExecuteAsync(cmd);
                     KeepAlive = results.Any();
                 }
                 else

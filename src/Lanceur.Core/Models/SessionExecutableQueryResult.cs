@@ -27,7 +27,7 @@ namespace Lanceur.Core.Models
 
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             _log.Trace($"Change to session '{Name}' with id {Id}");
             _service.SetDefaultSession(Id);

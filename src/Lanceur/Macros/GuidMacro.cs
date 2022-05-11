@@ -13,7 +13,7 @@ namespace Lanceur.ReservedKeywords
     {
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             Clipboard.SetText(Guid.NewGuid().ToString());
             return NoResultAsync;

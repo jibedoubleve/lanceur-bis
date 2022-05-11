@@ -19,11 +19,11 @@
 
         #region Methods
 
-        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             foreach (var alias in Aliases)
             {
-                await alias.ExecuteAsync(parameters);
+                await alias.ExecuteAsync(cmdline);
             }
             return NoResult;
         }

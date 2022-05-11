@@ -26,9 +26,9 @@ namespace Lanceur.ReservedKeywords
             });
         }
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            parameters = parameters.IsNullOrEmpty() ? ScreenRuler.DefaultTopOffset.ToString() : parameters;
+            var parameters = cmdline.Parameters.IsNullOrEmpty() ? ScreenRuler.DefaultTopOffset.ToString() : cmdline.Parameters;
             _ = int.TryParse(parameters, out int offset);
 
             var coordinate = ScreenRuler.GetCenterCoordinate(offset);

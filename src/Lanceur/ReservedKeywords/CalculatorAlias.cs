@@ -39,8 +39,9 @@ namespace Lanceur.ReservedKeywords
 
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
+            var parameters = cmdline.Parameters;
             _log.Trace($"Evaluating: {parameters}");
             var result = parameters.IsNullOrEmpty()
                 ? DisplayQueryResult.SingleFromResult("Not an expression to evaluate.")

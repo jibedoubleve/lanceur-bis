@@ -15,7 +15,7 @@ namespace Lanceur.ReservedKeywords
     {
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             var asm = Assembly.GetExecutingAssembly();
             var version = asm.GetName().Version.ToString();

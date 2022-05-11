@@ -30,9 +30,11 @@
 
         #region Methods
 
-        public abstract Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null);
+        public abstract Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
 
         public void SetDescription(string description) => _description = description;
+
+        public void SetDescription(Cmdline cmdline) => _description = cmdline.Parameters;
 
         #endregion Methods
     }

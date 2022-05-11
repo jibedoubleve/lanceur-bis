@@ -42,10 +42,10 @@ namespace Lanceur.Core.Models
             return results;
         }
 
-        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             return _plugin is not null
-                ? ToQueryResult(await _plugin.ExecuteAsync(parameters))
+                ? ToQueryResult(await _plugin.ExecuteAsync(cmdline.Parameters))
                 : new List<QueryResult>();
         }
 

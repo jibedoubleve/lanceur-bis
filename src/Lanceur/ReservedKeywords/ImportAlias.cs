@@ -11,7 +11,7 @@ namespace Lanceur.ReservedKeywords
     {
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null) => NoResultAsync;
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null) => NoResultAsync;
 
         #endregion Methods
     }

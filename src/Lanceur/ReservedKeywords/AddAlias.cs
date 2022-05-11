@@ -13,13 +13,13 @@ namespace Lanceur.ReservedKeywords
     {
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameter = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            if (parameter is not null)
+            if (cmdline is not null)
             {
                 var view = new SettingsView();
                 view.Show();
-                view.ViewModel.AddAlias.Execute(parameter).Subscribe();
+                view.ViewModel.AddAlias.Execute(cmdline.Parameters).Subscribe();
             }
             return NoResultAsync;
         }

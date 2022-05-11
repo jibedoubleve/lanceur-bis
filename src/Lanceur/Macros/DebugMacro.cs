@@ -51,9 +51,9 @@ namespace Lanceur.Macros
             return NoResult;
         }
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            var cl = CmdlineProcessor.Process(parameters);
+            var cl = CmdlineProcessor.Process(cmdline.Parameters);
 
             var result = cl.Name.ToLower() switch
             {
@@ -71,7 +71,7 @@ namespace Lanceur.Macros
             return Task.FromResult(result);
         }
 
-        private IEnumerable<QueryResult> DumpCache()
+        private static IEnumerable<QueryResult> DumpCache()
         {
             var cache = Locator.Current.GetService<IImageCache>();
             var results = new List<DisplayQueryResult>();

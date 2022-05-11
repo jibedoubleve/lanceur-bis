@@ -13,7 +13,7 @@ namespace Lanceur.ReservedKeywords
     {
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null)
+        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             Application.Current.Shutdown();
             this.Log().Info("Quit the application from alias 'Quit'");

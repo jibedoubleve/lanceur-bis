@@ -6,7 +6,7 @@ namespace Lanceur.Core
     {
         #region Methods
 
-        Task<IEnumerable<QueryResult>> ExecuteAsync(string parameters = null);
+        Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
 
         #endregion Methods
     }
