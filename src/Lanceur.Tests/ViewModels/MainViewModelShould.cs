@@ -51,8 +51,9 @@ namespace Lanceur.Tests.ViewModels
                 storeLoader.Load().Returns(new List<ISearchService> { store });
 
                 var macroMgr = Substitute.For<IMacroManager>();
+                var thumbnailManager = Substitute.For<IThumbnailManager>();
                 macroMgr.Handle(Arg.Any<IEnumerable<QueryResult>>()).Returns(results);
-                var searchService = new SearchService(storeLoader, macroMgr);
+                var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);
                 var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineProcessor());
 
                 //Act
