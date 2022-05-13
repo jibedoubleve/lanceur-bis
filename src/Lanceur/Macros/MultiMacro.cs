@@ -32,9 +32,9 @@ namespace Lanceur.Macros
         {
 
         }
-        public MultiMacro(int delay = 1000, IExecutionManager executionManager = null, ISearchService searchService = null)
+        public MultiMacro(int? delay = null, IExecutionManager executionManager = null, ISearchService searchService = null)
         {
-            _delay = delay;
+            _delay = delay ?? 1_000;
             _executionManager = executionManager ?? Locator.Current.GetService<IExecutionManager>();
             _searchService = searchService ?? Locator.Current.GetService<ISearchService>();
         }

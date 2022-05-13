@@ -7,12 +7,6 @@ namespace Lanceur.Tests.Utils.ReservedAliases
     [ReservedAlias("anothertest"), Description("description")]
     public class ExecutableTestAlias : ExecutableQueryResult
     {
-        #region Properties
-
-        public string Parameters { get; private set; }
-
-        #endregion Properties
-
         #region Methods
 
         public static ExecutableTestAlias FromName(string name) => new() { Name = name, Query = new Cmdline(name) };
