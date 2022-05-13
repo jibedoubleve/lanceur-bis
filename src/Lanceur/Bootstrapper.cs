@@ -68,7 +68,7 @@ namespace Lanceur
             l.Register<ILogService>(() => new NLogService());
             l.Register<IStoreLoader>(() => new StoreLoader());
             l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
-            l.Register<ICmdlineProcessor>(() => new CmdlineProcessor());
+            l.Register<ICmdlineManager>(() => new CmdlineManager());
             l.Register<IDataService>(() => new SQLiteDataService(Get<SQLiteConnectionScope>(), Get<ILogService>(), Get<IExecutionManager>(), Get<IConvertionService>()));
             l.Register<IExecutionManager>(() => new ExecutionManager(Get<ILogService>(), Get<IWildcardManager>()));
             l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));

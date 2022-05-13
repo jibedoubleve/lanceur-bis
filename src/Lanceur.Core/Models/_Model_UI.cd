@@ -31,7 +31,7 @@
   <Class Name="Lanceur.Core.Models.ExecutableQueryResult" Collapsed="true">
     <Position X="5" Y="1.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAAEAAACAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <HashCode>AAAAAAAAAAAgAAAEAAACAAAAAAAAAAAAAIAAAAAAAEA=</HashCode>
       <FileName>Models\ExecutableQueryResult.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />

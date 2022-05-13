@@ -76,7 +76,7 @@ namespace Lanceur.Views
                     {
                         return new MainViewModel.ExecutionContext
                         {
-                            Parameters = x.OriginalSource.GetTextFromTextbox(),
+                            Query = x.OriginalSource.GetTextFromTextbox(),
                             RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control
                         };
                     })

@@ -19,7 +19,7 @@ namespace Lanceur.Utils
                 : string.Empty;
             return new()
             {
-                Parameters = param,
+                Query = param,
                 RunAsAdmin = false,
             };
         }

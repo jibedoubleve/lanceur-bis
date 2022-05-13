@@ -10,8 +10,8 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void ReturnsEmptyOnEmptyCmdline()
         {
-            var processor = new CmdlineProcessor();
-            var line = processor.Process(string.Empty);
+            var processor = new CmdlineManager();
+            var line = processor.BuildFromText(string.Empty);
 
             line.Name.Should().BeEmpty();
             line.Parameters.Should().BeEmpty();
@@ -19,8 +19,8 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void ReturnsEmptyOnNullCmdline()
         {
-            var processor = new CmdlineProcessor();
-            var line = processor.Process(null);
+            var processor = new CmdlineManager();
+            var line = processor.BuildFromText(null);
 
             line.Name.Should().BeEmpty();
             line.Parameters.Should().BeEmpty();
@@ -34,8 +34,8 @@ namespace Lanceur.Tests.BusinessLogic
         [InlineData("$", "$arg1 arg2")]
         public void HaveName(string asExpected, string actual)
         {
-            var processor = new CmdlineProcessor();
-            var line = processor.Process(actual);
+            var processor = new CmdlineManager();
+            var line = processor.BuildFromText(actual);
 
             line.Name.Should().Be(asExpected);
         }
@@ -51,8 +51,8 @@ namespace Lanceur.Tests.BusinessLogic
         [InlineData("a?rg2", "arg1 a?rg2")]
         public void HaveArguments(string asExpected, string actual)
         {
-            var processor = new CmdlineProcessor();
-            var line = processor.Process(actual);
+            var processor = new CmdlineManager();
+            var line = processor.BuildFromText(actual);
 
             line.Parameters.Should().Be(asExpected);
         }

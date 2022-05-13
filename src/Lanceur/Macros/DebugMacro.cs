@@ -31,7 +31,7 @@ namespace Lanceur.Macros
 
         #region Properties
 
-        private static ICmdlineProcessor CmdlineProcessor => Locator.Current.GetService<ICmdlineProcessor>();
+        private static ICmdlineManager CmdlineProcessor => Locator.Current.GetService<ICmdlineManager>();
         private static IConvertionService Converter => Locator.Current.GetService<IConvertionService>();
         private static IMacroManager MacroManager => Locator.Current.GetService<IMacroManager>();
         private static ISearchService SearchService => Locator.Current.GetService<ISearchService>();
@@ -40,7 +40,7 @@ namespace Lanceur.Macros
 
         #region Methods
 
-        private static Cmdline Cmdline(string cmd) => CmdlineProcessor.Process(cmd);
+        private static Cmdline Cmdline(string cmd) => CmdlineProcessor.BuildFromText(cmd);
 
         private static IEnumerable<QueryResult> Echo(Cmdline cl)
         {
@@ -53,7 +53,7 @@ namespace Lanceur.Macros
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            var cl = CmdlineProcessor.Process(cmdline.Parameters);
+            var cl = CmdlineProcessor.BuildFromText(cmdline.Parameters);
 
             var result = cl.Name.ToLower() switch
             {

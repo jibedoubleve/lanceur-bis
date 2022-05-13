@@ -23,7 +23,7 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly ICmdlineProcessor _cmdlineService;
+        private readonly ICmdlineManager _cmdlineManager;
         private readonly ILogService _log;
         private readonly SourceList<QueryResult> _results = new();
         private readonly ISearchService _searchService;
@@ -38,7 +38,7 @@ namespace Lanceur.Views
             IScheduler poolThread = null,
             ILogService log = null,
             ISearchService searchService = null,
-            ICmdlineProcessor cmdlineService = null,
+            ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
             IDataService service = null)
         {
@@ -49,7 +49,7 @@ namespace Lanceur.Views
             notify ??= l.GetService<IUserNotification>();
             _log = log ?? Locator.Current.GetService<ILogService>();
             _searchService = searchService ?? l.GetService<ISearchService>();
-            _cmdlineService = cmdlineService ?? l.GetService<ICmdlineProcessor>();
+            _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
             _service = service ?? l.GetService<IDataService>();
 
             //Command CanExecute
@@ -168,7 +168,7 @@ namespace Lanceur.Views
 
         private string OnAutoCompleteQuery()
         {
-            var @params = _cmdlineService.Process(Query);
+            var @params = _cmdlineManager.BuildFromText(Query);
             var alias = Results?.FirstOrDefault();
 
             return alias?.IsResult ?? false
@@ -179,7 +179,12 @@ namespace Lanceur.Views
         private async Task<SearchContext> OnExecuteAliasAsync(ExecutionContext context)
         {
             context ??= new ExecutionContext();
-            var cmd = _cmdlineService.Process(context.Parameters);
+
+            var cmd = _cmdlineManager.BuildFromText(context.Query);
+            if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
+            {
+                cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
+            }
 
             IEnumerable<QueryResult> results = new List<QueryResult>();
             var scope = new Scope<bool>(x => IsSearchActivated = x, false, true);
@@ -196,6 +201,7 @@ namespace Lanceur.Views
                 {
                     _log.Trace($"Found {results.Count()} element(s)");
                     Query = CurrentAlias is IQueryText t ? t.ToQuery() : CurrentAlias.ToQuery();
+
 
                     if (exec is IExecutableWithPrivilege exp)
                     {
@@ -219,7 +225,7 @@ namespace Lanceur.Views
             if (criterion.IsNullOrWhiteSpace()) { return new(); }
             else
             {
-                var query = _cmdlineService.Process(criterion);
+                var query = _cmdlineManager.BuildFromText(criterion);
                 var results = _searchService.Search(query);
 
                 return new()
@@ -272,7 +278,7 @@ namespace Lanceur.Views
         {
             #region Properties
 
-            public string Parameters { get; set; }
+            public string Query { get; set; }
 
             public bool RunAsAdmin { get; set; }
 
@@ -280,7 +286,7 @@ namespace Lanceur.Views
 
             #region Methods
 
-            public static implicit operator ExecutionContext(string parameters) => new() { Parameters = parameters };
+            public static implicit operator ExecutionContext(string parameters) => new() { Query = parameters };
 
             #endregion Methods
         }

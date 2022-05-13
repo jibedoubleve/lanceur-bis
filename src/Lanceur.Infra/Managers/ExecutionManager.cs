@@ -85,12 +85,6 @@ namespace Lanceur.Infra.Managers
                     _log.Trace("Executing UWP application...");
                     ExecuteUwp(query);
                 }
-                //if (query.IsMacro())
-                //{
-                //    _log.Trace("Executing a Macro...");
-                //    var cmdline = new Cmdline(query.GetMacro(), query.Arguments);
-                //    await query.ExecuteAsync(cmdline);
-                //}
                 else
                 {
                     _log.Trace("Executing process...");

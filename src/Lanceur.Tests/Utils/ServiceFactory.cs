@@ -8,8 +8,9 @@ namespace Lanceur.Tests.Utils
     {
         #region Properties
 
-        public static ICmdlineProcessor CmdLineService => Substitute.For<ICmdlineProcessor>();
+        public static ICmdlineManager CmdLineService => Substitute.For<ICmdlineManager>();
         public static ILogService LogService => Substitute.For<ILogService>();
+        public static IMacroManager MacroManager => Substitute.For<IMacroManager>();
         public static ISearchService SearchService => Substitute.For<ISearchService>();
 
         #endregion Properties

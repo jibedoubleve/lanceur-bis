@@ -1,13 +1,14 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Managers
 {
-    public class CmdlineProcessor : ICmdlineProcessor
+    public class CmdlineManager : ICmdlineManager
     {
         #region Fields
 
-        private static readonly char[] Specials = { 
+        private static readonly char[] Specials = {
             '$', '&', '|', '@', '#', '(', ')', '§', '!', '{', '}', '-', '_', '\\', '+', '-', '*', '/', '=', '<', '>', ',', ';', ':', '%', '?'
         };
 
@@ -24,31 +25,42 @@ namespace Lanceur.Infra.Managers
             else { return false; }
         }
 
-        public Cmdline Process(string cmdLine)
+        public Cmdline Build(string cmdline, ExecutableQueryResult query)
+        {
+            var cmd = BuildFromText(cmdline);
+            if (cmd.Parameters.IsNullOrWhiteSpace())
+            {
+                cmd = BuildFromText(query.ToString());
+            }
+            return cmd;
+        }
+        public Cmdline BuildFromText(string cmdline)
         {
             var name = string.Empty;
             var args = string.Empty;
-            cmdLine ??= string.Empty;
+            cmdline ??= string.Empty;
 
-            if (HasSpecialName(cmdLine))
+            if (HasSpecialName(cmdline))
             {
-                name = cmdLine[0].ToString();
-                args = cmdLine[1..];
+                name = cmdline[0].ToString();
+                args = cmdline[1..];
 
             }
             else
             {
 
-                var elements = cmdLine.Split(' ');
+                var elements = cmdline.Split(' ');
                 if (elements.Length > 0)
                 {
                     name = elements[0];
-                    args = cmdLine[name.Length..];
+                    args = cmdline[name.Length..];
                 }
 
             }
             return new Cmdline(name, args.Trim());
         }
+
+        public Cmdline CloneWithNewParameters(string newParameters, Cmdline cmd) => BuildFromText($"{cmd?.Name} {newParameters}");
 
         #endregion Methods
     }

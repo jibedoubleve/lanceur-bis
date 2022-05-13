@@ -3,11 +3,14 @@ using FluentAssertions;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Managers;
 using Lanceur.Infra.SQLite;
 using Lanceur.Tests.SQLite;
+using Lanceur.Tests.Utils.Macros;
 using Lanceur.Utils;
 using NSubstitute;
 using System.Data.SQLite;
+using System.Reflection;
 using Xunit;
 
 namespace Lanceur.Tests.BusinessLogic
@@ -28,6 +31,35 @@ namespace Lanceur.Tests.BusinessLogic
             var alias = new AliasQueryResult { FileName = $"@{macro}@" };
 
             alias.IsComposite().Should().Be(expected);
+        }
+
+        [Theory]
+        [InlineData("init", "a@z@e@r@t@t")]
+        [InlineData("home", "azerty")]
+        [InlineData("some", "a z e r t y")]
+        public async Task BeExecutable(string name, string parameters)
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            var macroMgr = new MacroManager(asm);
+            var macro = new MultiMacroTest(parameters);
+            var handler = (ExecutableQueryResult)macroMgr.Handle(macro);
+
+            var cmdline = new Cmdline(name, parameters);
+            var results = await handler.ExecuteAsync(cmdline);
+
+            results.ElementAt(0).Name.Should().Be(name);
+            results.ElementAt(0).Description.Should().Be(parameters);
+        }
+
+        [Fact]
+        public void BeExecutableQueryResult()
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            var macroMgr = new MacroManager(asm);
+            var macro = new MultiMacroTest();
+            var result = macroMgr.Handle(macro);
+
+            result.Should().BeAssignableTo<ExecutableQueryResult>();
         }
 
         [Fact]

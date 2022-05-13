@@ -54,7 +54,7 @@ namespace Lanceur.Tests.ViewModels
                 var thumbnailManager = Substitute.For<IThumbnailManager>();
                 macroMgr.Handle(Arg.Any<IEnumerable<QueryResult>>()).Returns(results);
                 var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);
-                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineProcessor());
+                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineManager());
 
                 //Act
                 var @params = "parameters";
@@ -71,7 +71,7 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineProcessor());
+                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineManager());
                 vm.SetResults(5);
                 vm.Query = "1 un";
 
@@ -135,7 +135,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var searchService = Substitute.For<ISearchService>();
-                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineProcessor());
+                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineManager());
 
                 vm.CurrentAlias = new ExecutableWithResultsTestAlias();
                 vm.ExecuteAlias.Execute().Subscribe();
@@ -152,7 +152,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var searchService = Substitute.For<ISearchService>();
-                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineProcessor());
+                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineManager());
 
                 vm.CurrentAlias = new ExecutableWithResultsTestAlias();
                 vm.ExecuteAlias.Execute().Subscribe();
@@ -169,7 +169,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var alias = ExecutableTestAlias.FromName("alias1");
-                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineProcessor());
+                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineManager());
                 vm.CurrentAlias = alias;
                 vm.ExecuteAlias.Execute("alias1 world").Subscribe();
 
@@ -309,7 +309,7 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineProcessor());
+                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineManager());
                 vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName("alias1");
                 vm.ExecuteAlias.Execute().Subscribe();
 

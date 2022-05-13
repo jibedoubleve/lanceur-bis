@@ -2,7 +2,6 @@
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Services;
 using Splat;
 using System.ComponentModel;
 using System.Reflection;
@@ -72,24 +71,35 @@ namespace Lanceur.Infra.Managers
             var results = new List<QueryResult>();
             foreach (var item in collection)
             {
-                if (item is AliasQueryResult src && src.IsMacro())
+                var toAdd = Handle(item);
+                if (toAdd != null)
                 {
-                    if (_macroInstances.ContainsKey(src.GetMacro()))
-                    {
-                        var macro = _macroInstances[src.GetMacro()];
-                        macro.Name = src.Name;
-                        results.Add(macro);
-                    }
-                    else
-                    {
-                        /* Well, this a misconfigured macro, log it and forget it */
-                        _log.Warning($"User has misconfigured a Macro with name '{src.FileName}'. Fix the name of the macro or remove the alias from the database.");
-                    }
+                    results.Add(toAdd);
                 }
-                else { results.Add(item); }
             }
 
             return results;
+        }
+
+        public QueryResult Handle(QueryResult item)
+        {
+            if (item is AliasQueryResult src && src.IsMacro())
+            {
+                if (_macroInstances.ContainsKey(src.GetMacro()))
+                {
+                    var macro = _macroInstances[src.GetMacro()];
+                    macro.Name = src.Name;
+                    macro.Parameters = src.Arguments;
+                    return macro;
+                }
+                else
+                {
+                    /* Well, this a misconfigured macro, log it and forget it */
+                    _log.Warning($"User has misconfigured a Macro with name '{src.FileName}'. Fix the name of the macro or remove the alias from the database.");
+                    return null;
+                }
+            }
+            else { return item; }
         }
 
         #endregion Methods

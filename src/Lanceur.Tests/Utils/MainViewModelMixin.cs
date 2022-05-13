@@ -11,7 +11,7 @@ namespace Lanceur.Tests.Utils
     {
         #region Methods
 
-        public static MainViewModel Build(TestScheduler scheduler, ISearchService searchService = null, ICmdlineProcessor cmdProcessor = null)
+        public static MainViewModel Build(TestScheduler scheduler, ISearchService searchService = null, ICmdlineManager cmdProcessor = null)
         {
             return new MainViewModel(
                 scheduler,

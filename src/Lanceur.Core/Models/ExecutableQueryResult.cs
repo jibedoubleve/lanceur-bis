@@ -26,6 +26,8 @@
 
         public override string Description => _description;
 
+        public string Parameters { get; set; }
+
         #endregion Properties
 
         #region Methods
@@ -34,7 +36,7 @@
 
         public void SetDescription(string description) => _description = description;
 
-        public void SetDescription(Cmdline cmdline) => _description = cmdline.Parameters;
+        public override string ToString() => $"{Name} {Parameters}";
 
         #endregion Methods
     }
