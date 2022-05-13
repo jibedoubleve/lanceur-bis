@@ -24,7 +24,7 @@
 
         public override string ToString()
         {
-            return $"{(Name ?? string.Empty)} {(Parameters ?? string.Empty)}";
+            return $"{(Name ?? string.Empty)} {(Parameters ?? string.Empty)}".Trim();
         }
 
         #endregion Methods

@@ -55,10 +55,14 @@ namespace Lanceur.Core.Models
 
         public string FileName { get; set; }
 
-        public override bool IsPrivileged
+        /// <summary>
+        /// Indicates whether the alias should override the RunAs value and execute
+        /// in priviledge mode (as admin).
+        /// </summary>
+        public override bool IsPrivilegeOverriden
         {
-            get => RunAs == RunAs.Admin;
-            set => RunAs = value ? RunAs.Admin : RunAs.CurrentUser;
+            get;
+            set;
         }
 
         public string Notes { get; set; }

@@ -42,7 +42,7 @@ namespace Lanceur.Infra.Managers
                 WindowStyle = query.StartMode.AsWindowsStyle(),
             };
 
-            if (query.IsPrivileged || query.RunAs == Constants.RunAs.Admin)
+            if (query.IsPrivilegeOverriden || query.RunAs == Constants.RunAs.Admin)
             {
                 psi.Verb = "runas";
                 _log.Info($"Runs '{query.FileName}' as ADMIN");
@@ -61,7 +61,7 @@ namespace Lanceur.Infra.Managers
                 FileName = "explorer.exe",
                 Arguments = file,
             };
-            if (query.IsPrivileged)
+            if (query.IsPrivilegeOverriden)
             {
                 psi.Verb = "runas";
                 _log.Info($"Runs '{query.FileName}' as ADMIN");

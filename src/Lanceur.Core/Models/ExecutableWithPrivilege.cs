@@ -4,7 +4,7 @@
     {
         #region Properties
 
-        public virtual bool IsPrivileged { get; set; } = false;
+        public virtual bool IsPrivilegeOverriden { get; set; } = false;
 
         #endregion Properties
     }

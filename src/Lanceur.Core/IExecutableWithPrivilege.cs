@@ -4,7 +4,7 @@
     {
         #region Properties
 
-        bool IsPrivileged { get; set; }
+        bool IsPrivilegeOverriden { get; set; }
 
         #endregion Properties
     }

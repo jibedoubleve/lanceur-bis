@@ -205,7 +205,7 @@ namespace Lanceur.Views
 
                     if (exec is IExecutableWithPrivilege exp)
                     {
-                        exp.IsPrivileged = context.RunAsAdmin;
+                        exp.IsPrivilegeOverriden = context.RunAsAdmin;
                     }
                     results = await exec.ExecuteAsync(cmd);
                     KeepAlive = results.Any();
