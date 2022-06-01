@@ -12,7 +12,7 @@ namespace Lanceur.Core.Models
     /// that is designed to react on modifications.
     /// </remarks>
     [DebuggerDisplay("{Name} - Desc: {Description}")]
-    public abstract class QueryResult : INotifyPropertyChanged
+    public abstract class QueryResult : ObservableQueryResult
     {
         #region Fields
 
@@ -22,12 +22,6 @@ namespace Lanceur.Core.Models
         private object _thumbnail;
 
         #endregion Fields
-
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
 
         #region Properties
 
@@ -63,7 +57,7 @@ namespace Lanceur.Core.Models
                 // the value. Now, OldName will have the value of the first time
                 // it was set.
                 if (value != null && _oldName == null) { _oldName = value.ToLower(); }
-                _name = value;
+                Set(ref _name, value);
             }
         }
 
@@ -81,11 +75,7 @@ namespace Lanceur.Core.Models
         public object Thumbnail
         {
             get => _thumbnail;
-            set
-            {
-                _thumbnail = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Thumbnail)));
-            }
+            set => Set(ref _thumbnail, value);
         }
 
         #endregion Properties
