@@ -109,11 +109,6 @@ namespace Lanceur.Views
                 .InvokeCommand(Search);
         }
 
-        internal void ActivateCreationMode(string aliasName)
-        {
-            AliasToCreate = AliasQueryResult.FromName(aliasName);
-        }
-        private AliasQueryResult AliasToCreate { get; set; }
         #endregion Constructors
 
         #region Properties
@@ -203,13 +198,7 @@ namespace Lanceur.Views
             SelectedAlias = null;
             _aliases.Clear();
             _aliases.AddRange(x);
-            if (AliasToCreate is not null)
-            {
-                _log.Info($"Prepare to add alias '{AliasToCreate.Name}'");
-                _aliases.Insert(0, AliasToCreate);
-                SelectedAlias = AliasToCreate;
-                AliasToCreate = null;
-            }
+
         }
 
         #endregion Methods
