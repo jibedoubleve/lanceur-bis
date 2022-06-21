@@ -1,6 +1,6 @@
 @startuml
 start
-:Build <b>Commandline</b>;
+:Read <b>Commandline</b>;
 if(is <b>ExecutableQueryResult</b>) is (yes) then
     :Replace alias params with user params;
 else (no)    
@@ -18,7 +18,7 @@ else (no)
         with <b>SearchService</b>.
         end note
     else (no)
-        :Display waring;
+        :Display warning;
     endif
 endif
 stop

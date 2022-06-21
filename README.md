@@ -5,3 +5,4 @@ Lanceur 2 - TDD driven
 
 * [Read Command line](/doc/read-commandline.md)
 * [Execute Command line](/doc/execute-commandline.md)
+* [Search Command line](/doc/search-commandline.md)
