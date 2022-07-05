@@ -1,0 +1,21 @@
+@startuml
+start
+:Enter command line;
+if (is **path**) then (yes)
+    :Open in explorer;
+(no) elseif(is **executable**) then(yes)    
+    :Execute it;    
+else (no)    
+    :Get result in **aliases**;
+    :Get result in **repositories**;
+    :Get result in **plugins**;
+    :Get result in **reserved aliases**;
+    if (result exists) then (yes)
+        :Select result;
+        :Execute result;
+    else (no)
+        :Display error;
+    endif
+endif    
+stop
+@enduml

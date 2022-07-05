@@ -1,0 +1,4 @@
+@startuml
+:Extract command;
+:Extract arguments;
+@enduml

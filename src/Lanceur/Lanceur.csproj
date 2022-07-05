@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows10.0.18362.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\appIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SQL\script-0.1.1.sql" />
+    <None Remove="SQL\script-0.1.sql" />
+    <None Remove="SQL\script-0.2.sql" />
+    <None Remove="SQL\script-0.3.sql" />
+    <None Remove="SQL\script-0.4.1.sql" />
+    <None Remove="SQL\script-0.4.2.sql" />
+    <None Remove="SQL\script-0.4.3.sql" />
+    <None Remove="SQL\script-0.4.sql" />
+    <None Remove="SQL\script-0.5.sql" />
+    <None Remove="SQL\script-0.6.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\appIcon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SQL\script-0.1.1.sql" />
+    <EmbeddedResource Include="SQL\script-0.6.sql" />
+    <EmbeddedResource Include="SQL\script-0.1.sql" />
+    <EmbeddedResource Include="SQL\script-0.2.sql" />
+    <EmbeddedResource Include="SQL\script-0.3.sql" />
+    <EmbeddedResource Include="SQL\script-0.4.sql" />
+    <EmbeddedResource Include="SQL\script-0.5.sql" />
+    <EmbeddedResource Include="SQL\script-0.4.3.sql" />
+    <EmbeddedResource Include="SQL\script-0.4.1.sql" />
+    <EmbeddedResource Include="SQL\script-0.4.2.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.1" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.4" />
+    <PackageReference Include="NHotkey.Wpf" Version="2.1.0" />
+    <PackageReference Include="NLog" Version="4.7.15" />
+    <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.1" />
+    <PackageReference Include="ReactiveUI.Fody" Version="17.1.50" />
+    <PackageReference Include="ReactiveUI.WPF" Version="17.1.50" />
+    <PackageReference Include="ScottPlot.WPF" Version="4.1.41" />
+    <PackageReference Include="Splat.NLog" Version="14.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj" />
+    <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj" />
+    <ProjectReference Include="..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
+    <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
+    <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>
