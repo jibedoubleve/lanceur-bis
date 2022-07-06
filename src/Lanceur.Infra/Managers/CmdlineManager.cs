@@ -8,21 +8,43 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private static readonly char[] Specials = {
-            '$', '&', '|', '@', '#', '(', ')', '§', '!', '{', '}', '-', '_', '\\', '+', '-', '*', '/', '=', '<', '>', ',', ';', ':', '%', '?'
+        private static readonly string[] Specials = {
+            "$", "&", "|", "@", "#", "(", ")", "§", "!", "{", "}", "-", "_", "\\", "+", "-", "*", "/", "=", "<", ">", ",", ";", ":", "%", "?"
         };
 
         #endregion Fields
 
         #region Methods
 
+        private static string GetSpecialName(string cmdline)
+        {
+            if (cmdline.Length > 1 && cmdline[0] == cmdline[1])
+            {
+                return cmdline[..2];
+            }
+            else if (cmdline.Length > 0)
+            {
+                return cmdline[..1];
+            }
+            else { throw new ArgumentException($"Cmdline is too short (length {cmdline?.Length ?? 0})"); }
+        }
+
         private static bool HasSpecialName(string cmdName)
         {
+            cmdName = cmdName.Trim();
+            var res1 = false;
+            var res2 = false;
+
             if (cmdName?.Length > 0)
             {
-                return Specials.Contains(cmdName[0]);
+                res1 = Specials.Contains(cmdName[..1].ToString());
             }
-            else { return false; }
+            if (cmdName?.Length > 1)
+            {
+                res2 = Specials.Contains(cmdName[..2].ToString());
+            }
+
+            return res1 || res2;
         }
 
         public Cmdline Build(string cmdline, ExecutableQueryResult query)
@@ -34,6 +56,7 @@ namespace Lanceur.Infra.Managers
             }
             return cmd;
         }
+
         public Cmdline BuildFromText(string cmdline)
         {
             var name = string.Empty;
@@ -42,20 +65,17 @@ namespace Lanceur.Infra.Managers
 
             if (HasSpecialName(cmdline))
             {
-                name = cmdline[0].ToString();
-                args = cmdline[1..];
-
+                name = GetSpecialName(cmdline);
+                args = cmdline.Substring(name.Length);
             }
             else
             {
-
-                var elements = cmdline.Split(' ');
+                var elements = cmdline.Split(" ");
                 if (elements.Length > 0)
                 {
                     name = elements[0];
                     args = cmdline[name.Length..];
                 }
-
             }
             return new Cmdline(name, args.Trim());
         }
