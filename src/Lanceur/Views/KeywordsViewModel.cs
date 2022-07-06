@@ -23,10 +23,10 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly SourceList<QueryResult> _aliases = new();
-        private readonly IThumbnailManager _thumbnailManager;
         private readonly IDataService _aliasService;
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly ILogService _log;
+        private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
 
@@ -137,6 +137,13 @@ namespace Lanceur.Views
 
         #region Methods
 
+        private IEnumerable<QueryResult> GetAddedAliases()
+        {
+            return from a in _aliases.Items
+                   where a.Id == 0
+                   select a;
+        }
+
         private IEnumerable<QueryResult> OnActivated()
         {
             var results = _aliasService.GetAll();
@@ -198,7 +205,7 @@ namespace Lanceur.Views
             SelectedAlias = null;
             _aliases.Clear();
             _aliases.AddRange(x);
-
+            _aliases.AddRange(GetAddedAliases());
         }
 
         #endregion Methods
