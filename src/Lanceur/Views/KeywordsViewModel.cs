@@ -3,6 +3,7 @@ using DynamicData.Binding;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Managers;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
 using ReactiveUI;
@@ -15,6 +16,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Lanceur.Views
 {
@@ -27,7 +29,7 @@ namespace Lanceur.Views
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly ILogService _log;
         private readonly IThumbnailManager _thumbnailManager;
-
+        private readonly IPackagedAppValidator _packagedAppValidator;
         #endregion Fields
 
         #region Constructors
@@ -38,13 +40,15 @@ namespace Lanceur.Views
             IScheduler uiThread = null,
             IScheduler poolThread = null,
             IUserNotification notify = null,
-            IThumbnailManager thumbnailManager = null)
+            IThumbnailManager thumbnailManager = null,
+            IPackagedAppValidator packagedAppValidator = null)
         {
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
 
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
+            _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
             _log = logService ?? l.GetService<ILogService>(); ;
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDataService>();
@@ -65,7 +69,7 @@ namespace Lanceur.Views
             RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread);
             RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveOrUpdateAlias = ReactiveCommand.Create<AliasQueryResult, Unit>(OnSaveOrUpdateAlias, outputScheduler: uiThread);
+            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnSaveOrUpdateAlias, outputScheduler: uiThread);
             SaveOrUpdateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             _aliases
@@ -182,10 +186,11 @@ namespace Lanceur.Views
             return Unit.Default;
         }
 
-        private Unit OnSaveOrUpdateAlias(AliasQueryResult alias)
+        private async Task<Unit> OnSaveOrUpdateAlias(AliasQueryResult alias)
         {
             var created = alias.Id == 0;
 
+            alias  = await _packagedAppValidator.StandardiseAsync(alias);
             _aliasService.SaveOrUpdate(ref alias);
             Toast.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
             return Unit.Default;

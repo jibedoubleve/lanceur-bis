@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
@@ -14,6 +13,7 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.Models;
 using Lanceur.Ui;
 using Lanceur.Utils;
+using Lanceur.Utils.PackagedApps;
 using Lanceur.Views;
 using ReactiveUI;
 using Splat;
@@ -80,6 +80,8 @@ namespace Lanceur
             l.Register<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
             l.Register<IPluginManager>(() => new PluginManager(Get<IPluginStoreContext>()));
             l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>()));
+            l.Register<IPackagedAppManager>(() => new PackagedAppManager());
+            l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppManager>()));
 
             l.Register(() => new SQLiteDatabase(Get<IDataStoreVersionManager>(), Get<ILogService>(), Get<IDataStoreUpdateManager>()));
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
