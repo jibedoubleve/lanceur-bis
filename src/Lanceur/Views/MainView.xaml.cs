@@ -51,7 +51,6 @@ namespace Lanceur.Views
             DataContext = ViewModel;
 
             Loaded += OnWindowLoaded;
-            KeyDown += OnKeyDownWindow;
             PreviewKeyDown += OnPreviewKeyDown;
             MouseDown += OnWindowMouseDown;
 
@@ -70,10 +69,11 @@ namespace Lanceur.Views
 
                 //Don't forget 'using System.Windows.Controls'
                 QueryTextBox
-                    .Events().KeyDown
+                    .Events().PreviewKeyDown
                     .Where(x => x.Key == Key.Enter)
                     .Select(x =>
                     {
+                        x.Handled = true;
                         return new MainViewModel.ExecutionContext
                         {
                             Query = x.OriginalSource.GetTextFromTextbox(),
@@ -135,32 +135,25 @@ namespace Lanceur.Views
             Visibility = Visibility.Collapsed;
         }
 
-        private void OnKeyDownWindow(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape) { HideControl(force: true); }
-        }
-
         private async void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
+            await Task.Delay(10);
             if (e.Key == Key.Up || e.Key == Key.Down)
             {
                 var collection = QueryResults.ItemsSource.Cast<object>();
 
-                if (collection.CanNavigate() == false) { e.Handled = false; return; }
+                if (collection.CanNavigate() == false) { e.Handled = false; }
+                else
+                {
+                    var idx = e.Key == Key.Down
+                        ? collection.GetNextIndex(QueryResults.SelectedIndex)
+                        : collection.GetPreviousIndex(QueryResults.SelectedIndex);
 
-                var idx = e.Key == Key.Down
-                    ? collection.GetNextIndex(QueryResults.SelectedIndex)
-                    : collection.GetPreviousIndex(QueryResults.SelectedIndex);
-
-                var selectedItem = collection.ElementAt(idx);
-                QueryResults.ScrollIntoView(selectedItem);
+                    var selectedItem = collection.ElementAt(idx);
+                    QueryResults.ScrollIntoView(selectedItem);
+                }
             }
-            else if (e.Key == Key.Enter)
-            {
-                await Task.Delay(10);
-                HideControl();
-            }
-            e.Handled = false;
+            else if (e.Key == Key.Escape) { HideControl(force: true); }
         }
 
         private void OnShowWindow(object sender, HotkeyEventArgs e)
