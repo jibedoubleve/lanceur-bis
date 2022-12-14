@@ -9,7 +9,7 @@
         Task<string> GetPackageUriAsync(string fileName);
 
         Task<bool> IsPackageAsync(string fileName);
-        Task<string> GetIcon(string fileName);
+        Task<string> GetIconAsync(string fileName);
 
         #endregion Methods
     }

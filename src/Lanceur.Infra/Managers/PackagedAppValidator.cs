@@ -35,7 +35,7 @@ namespace Lanceur.Infra.Managers
             {
                 var fileName = alias.FileName;
                 alias.FileName = await _packagedAppManager.GetPackageUriAsync(fileName);
-                alias.Icon = await _packagedAppManager.GetIcon(fileName);
+                alias.Icon = await _packagedAppManager.GetIconAsync(fileName);
             }
             return alias;
         }

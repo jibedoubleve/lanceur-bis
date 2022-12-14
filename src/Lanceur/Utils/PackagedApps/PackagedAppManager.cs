@@ -73,7 +73,7 @@ namespace Lanceur.Utils.PackagedApps
             }
         }
 
-        public async Task<string> GetIcon(string fileName)
+        public async Task<string> GetIconAsync(string fileName)
         {
             var currentPackage = await GetPackageAsync(fileName);
 
