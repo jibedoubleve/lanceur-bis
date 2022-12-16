@@ -29,13 +29,13 @@ namespace Lanceur.Infra.Managers
         /// </summary>
         /// <param name="alias">The alias to standardise</param>
         /// <returns>Standardised alias</returns>
-        public async Task<AliasQueryResult> StandardiseAsync(AliasQueryResult alias)
+        public async Task<AliasQueryResult> FixAsync(AliasQueryResult alias)
         {
-            if (await _packagedAppManager.IsPackageAsync(alias.FileName))
+            var response = await _packagedAppManager.GetPackageInfoAsync(alias.FileName);
+            if (response.IsPackage)
             {
-                var fileName = alias.FileName;
-                alias.FileName = await _packagedAppManager.GetPackageUriAsync(fileName);
-                alias.Icon = await _packagedAppManager.GetIconAsync(fileName);
+                alias.FileName = response.Uri;
+                alias.Icon = await _packagedAppManager.GetIconAsync(response.FileName);
             }
             return alias;
         }

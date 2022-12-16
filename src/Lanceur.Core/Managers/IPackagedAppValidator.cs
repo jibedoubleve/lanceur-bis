@@ -12,7 +12,7 @@ namespace Lanceur.Infra.Managers
         /// </summary>
         /// <param name="alias">The alias to standardise</param>
         /// <returns>Standardised alias</returns>
-        Task<AliasQueryResult> StandardiseAsync(AliasQueryResult alias);
+        Task<AliasQueryResult> FixAsync(AliasQueryResult alias);
 
         #endregion Methods
     }

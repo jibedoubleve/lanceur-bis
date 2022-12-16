@@ -4,7 +4,9 @@ using ModernWpf.Controls;
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 
 namespace Lanceur.Views
 {
@@ -34,7 +36,12 @@ namespace Lanceur.Views
                     interaction.SetOutput(result.AsBool());
                 });
 
+
                 this.OneWayBind(ViewModel, vm => vm.Aliases, v => v.Aliases.ItemsSource).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.BusyMessage, v => v.BusyMessage.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.BusyControl.Visibility).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.AliasList.Visibility, val => val ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible).DisposeWith(d);
+
                 this.Bind(ViewModel, vm => vm.SearchQuery, v => v.QueryBox.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.SelectedAlias, v => v.Aliases.SelectedItem).DisposeWith(d);
 

@@ -4,6 +4,7 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
+using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
 using ReactiveUI;
@@ -16,7 +17,6 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace Lanceur.Views
 {
@@ -26,10 +26,12 @@ namespace Lanceur.Views
 
         private readonly SourceList<QueryResult> _aliases = new();
         private readonly IDataService _aliasService;
+        private readonly Scope<bool> _busyScope;
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly ILogService _log;
-        private readonly IThumbnailManager _thumbnailManager;
         private readonly IPackagedAppValidator _packagedAppValidator;
+        private readonly IThumbnailManager _thumbnailManager;
+
         #endregion Fields
 
         #region Constructors
@@ -43,6 +45,8 @@ namespace Lanceur.Views
             IThumbnailManager thumbnailManager = null,
             IPackagedAppValidator packagedAppValidator = null)
         {
+            _busyScope = new Scope<bool>(b => IsBusy = b, true, false);
+
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
 
@@ -121,12 +125,14 @@ namespace Lanceur.Views
 
         public IObservableCollection<QueryResult> Aliases { get; } = new ObservableCollectionExtended<QueryResult>();
 
+        [Reactive] public string BusyMessage { get; set; }
         public Interaction<string, bool> ConfirmRemove => _confirmRemove;
 
         public ReactiveCommand<string, AliasQueryResult> CreateAlias { get; }
 
         public ReactiveCommand<Unit, AliasQueryResult> DuplicateAlias { get; }
 
+        [Reactive] public bool IsBusy { get; set; }
         public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; }
 
         public ReactiveCommand<AliasQueryResult, Unit> SaveOrUpdateAlias { get; }
@@ -189,9 +195,12 @@ namespace Lanceur.Views
         private async Task<Unit> OnSaveOrUpdateAlias(AliasQueryResult alias)
         {
             var created = alias.Id == 0;
-
-            alias  = await _packagedAppValidator.StandardiseAsync(alias);
-            _aliasService.SaveOrUpdate(ref alias);
+            BusyMessage = "Saving alias...";
+            using (_busyScope.Open())
+            {
+                alias = await _packagedAppValidator.FixAsync(alias);
+                _aliasService.SaveOrUpdate(ref alias);
+            }
             Toast.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
             return Unit.Default;
         }

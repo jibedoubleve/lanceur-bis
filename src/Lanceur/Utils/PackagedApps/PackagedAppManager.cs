@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using Windows.ApplicationModel;
 using Windows.Management.Deployment;
 
@@ -31,12 +32,6 @@ namespace Lanceur.Utils.PackagedApps
 
         #region Methods
 
-        private static string GetInstallationPath(Package package)
-        {
-            var path = package.InstalledLocation.Path;
-            return path;
-        }
-
         private static async Task<Package> GetPackageAsync(string fileName)
         {
             return await Task.Run(() =>
@@ -49,8 +44,8 @@ namespace Lanceur.Utils.PackagedApps
 
                     var packages = new PackageManager().FindPackagesForUser(userId);
                     var results = (from p in packages
-                                   where HasInstallationPath(p)
-                                      && srcDir.StartsWith(GetInstallationPath(p))
+                                   where p.HasInstallationPath()
+                                      && p.IsInDirectory(srcDir)
                                    select p).ToList();
 
                     var currentpackage = results.FirstOrDefault();
@@ -58,19 +53,6 @@ namespace Lanceur.Utils.PackagedApps
                     return currentpackage;
                 }
             });
-        }
-
-        private static bool HasInstallationPath(Package package)
-        {
-            try
-            {
-                var res = package.InstalledLocation.Path;
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         public async Task<string> GetIconAsync(string fileName)
@@ -82,6 +64,13 @@ namespace Lanceur.Utils.PackagedApps
                 : string.Empty;
 
             return result;
+        }
+
+        public async Task<PackageResponse> GetPackageInfoAsync(string fileName)
+        {
+            var uid = await GetPackageUniqueIdAsync(fileName);
+
+            return new PackageResponse(uid, fileName);
         }
 
         public async Task<string> GetPackageUniqueIdAsync(string fileName)
@@ -100,5 +89,11 @@ namespace Lanceur.Utils.PackagedApps
         public async Task<bool> IsPackageAsync(string fileName) => await GetPackageUniqueIdAsync(fileName) != string.Empty;
 
         #endregion Methods
+    }
+
+    public static class PackageMixin
+    {
+        public static bool HasInstallationPath(this Package package) => Directory.Exists(package.InstalledPath);
+        public static bool IsInDirectory(this Package package, string directory) => directory.Contains(package.InstalledPath);
     }
 }
