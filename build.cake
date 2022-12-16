@@ -40,7 +40,7 @@ var target          = Argument("target", "Default");
 var configuration   = Argument("configuration", "Release").ToLower();
 var verbosity       = Argument("verbosity", Verbosity.Minimal);
 
-var binDirectory    = $"./src/Lanceur/bin/{configuration}/net6.0-windows10.0.18362.0/";
+var binDirectory    = $"./src/Lanceur/bin/{configuration}/net6.0-windows10.0.19041.0/";
 var setupIconFile   = $"./src/Lanceur/Assets/appIcon.ico";
 var binDirectoryAbs = MakeAbsolute(Directory(binDirectory)).FullPath + "\\";
 var publishDir      = "./Publish";
