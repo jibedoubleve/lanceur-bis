@@ -4,7 +4,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.modernwpf.com/2019">
 
-    <Duration x:Key="FadeDuration">0:0:0:0.2</Duration>
+    <Duration x:Key="FadeDuration">0:0:0:0.25</Duration>
     <!--  FONTS  -->
     <FontFamily x:Key="TextFontFamily">Segoe UI</FontFamily>
 

@@ -28,8 +28,7 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly IAppSettingsService _settings;
-        private bool closeStoryBoardCompleted = true;
-        private bool openStoryBoardCompleted = true;
+        private bool _isStoryBoardsFree = true;
         public readonly ILogService _log = Locator.Current.GetService<ILogService>();
 
         #endregion Fields
@@ -123,14 +122,14 @@ namespace Lanceur.Views
 
         private void OnFadeInStoryBoardCompleted(object sender, EventArgs e)
         {
-            openStoryBoardCompleted = true;
+            _isStoryBoardsFree = true;
             LogService.Current.Trace("Fade in Storyboard completed...");
             Visibility = Visibility.Visible;
         }
 
         private void OnFadeOutStoryBoardCompleted(object sender, EventArgs e)
         {
-            closeStoryBoardCompleted = true;
+            _isStoryBoardsFree = true;
             LogService.Current.Trace("Fade out Storyboard completed...");
             Visibility = Visibility.Collapsed;
         }
@@ -217,8 +216,9 @@ namespace Lanceur.Views
         public void HideControl(bool force = false)
         {
             if (KeepAlive && !force) { return; }
-            else if (closeStoryBoardCompleted)
+            else if (_isStoryBoardsFree)
             {
+                _isStoryBoardsFree = false;
                 var storyBoard = FindResource("fadeOutStoryBoard") as Storyboard;
                 storyBoard.Begin(this);
                 QueryTextBox.Text = string.Empty;
@@ -229,8 +229,9 @@ namespace Lanceur.Views
         {
             _log?.Info("Window showing");
             ViewModel.Activate.Execute().Subscribe();
-            if (openStoryBoardCompleted)
+            if (_isStoryBoardsFree)
             {
+                _isStoryBoardsFree = false;
                 var storyBoard = FindResource("fadeInStoryBoard") as Storyboard;
                 storyBoard.Begin(this);
 
