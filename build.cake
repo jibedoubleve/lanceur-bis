@@ -114,10 +114,10 @@ Task("inno-setup")
 
 Task("build")
     .Does(() => {  
-        var settings = new DotNetCoreBuildSettings {
+        var settings = new DotNetBuildSettings {
             Configuration = "release"
         };
-        DotNetCoreBuild(solution, settings);        
+        DotNetBuild(solution, settings);        
 });
 
 Task("tests")
@@ -125,9 +125,9 @@ Task("tests")
         var projects = GetFiles("./src/Tests/**/*.csproj");
         foreach(var project in projects)
         {
-            DotNetCoreTest(
+            DotNetTest(
                 project.FullPath,
-                new DotNetCoreTestSettings()
+                new DotNetTestSettings()
                 {
                     Configuration = configuration,
                     NoBuild = true
@@ -144,9 +144,8 @@ Task("release-github")
         var token = EnvironmentVariable("CAKE_PUBLIC_GITHUB_TOKEN");
         var owner = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
         
-        Information("token: {0}", token);
-        Information("owner: {0}", owner);
-        Information("Zip: ");
+        Information("Has token: {0}", !string.IsNullOrEmpty(token));
+        Information("Has owner: {0}", !string.IsNullOrEmpty(owner));
 
         var stg = new GitReleaseManagerCreateSettings 
         {
