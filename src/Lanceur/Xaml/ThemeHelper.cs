@@ -18,7 +18,7 @@ namespace Lanceur.Xaml
 
         #region Methods
 
-        public static bool AppsUseLightTheme()
+        public static bool IsLightTheme()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace Lanceur.Xaml
 
         public static void SetTheme()
         {
-            var isLight = AppsUseLightTheme();
+            var isLight = IsLightTheme();
 
             var theme = isLight ? Light : Dark;
             var themeName = isLight ? LightTheme : DarkThemeTheme;

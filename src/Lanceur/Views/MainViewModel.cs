@@ -1,11 +1,14 @@
-﻿using DynamicData;
+﻿using ControlzEx.Theming;
+using DynamicData;
 using DynamicData.Binding;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Models;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.Xaml;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -234,7 +237,8 @@ namespace Lanceur.Views
                     _log.Trace($"Search: criterion '{criterion}'");
 
                     var query = _cmdlineManager.BuildFromText(criterion);
-                    var results = _searchService.Search(query);
+                    var results = _searchService.Search(query)
+                                                .SetIconForCurrentTheme(isLight: ThemeHelper.IsLightTheme());
 
                     _log.Trace($"Search: criterion '{criterion}' found {results?.Count() ?? 0} element(s)");
                     return new()
