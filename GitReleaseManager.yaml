@@ -1,0 +1,34 @@
+create:
+  include-footer: true
+  footer-heading: Where to get it
+  footer-content: You can download this release from [Lanceur 2.0](https://github.com/jibedoubleve/lanceur-bis/releases/{milestone})
+  footer-includes-milestone: true
+  milestone-replace-text: '{milestone}'
+export:
+  include-created-date-in-title: true
+  created-date-string-format: MMMM dd, yyyy
+  perform-regex-removal: true
+  regex-text: '### Where to get it(\r\n)*You can .*\)'
+  multiline-regex: true
+issue-labels-include:
+- breaking change
+- bug
+- feature
+- feature request
+issue-labels-exclude:
+- documentation
+- pr-feature
+- pr-bugfix
+- internal refactoring
+- duplicate
+- good first issue
+- help wanted
+- invalid
+- question
+- build
+- wontfix
+- to be reviewed
+issue-labels-alias:
+    - name:    Documentation
+      header:  Documentation
+      plural:  Documentation

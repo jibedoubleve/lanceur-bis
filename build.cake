@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS / ADDINS
 ///////////////////////////////////////////////////////////////////////////////
+
 #tool nuget:?package=vswhere&version=3.0.1
 #tool nuget:?package=GitVersion.CommandLine&version=5.10.1
 // #tool xunit.runner.console
@@ -45,6 +46,7 @@ var setupIconFile   = $"./src/Lanceur/Assets/appIcon.ico";
 var binDirectoryAbs = MakeAbsolute(Directory(binDirectory)).FullPath + "\\";
 var publishDir      = "./Publish";
 var zipName         = new FilePath(publishDir + "/Lanceur." + gitVersion.SemVer + ".bin.zip").FullPath;
+var innoSetupName   = new FilePath(publishDir + "/Lanceur." + gitVersion.SemVer + ".setup.exe").FullPath;
 var inno_setup      = "./setup.iss";
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -114,10 +116,10 @@ Task("inno-setup")
 
 Task("build")
     .Does(() => {  
-        var settings = new DotNetCoreBuildSettings {
+        var settings = new DotNetBuildSettings {
             Configuration = "release"
         };
-        DotNetCoreBuild(solution, settings);        
+        DotNetBuild(solution, settings);        
 });
 
 Task("tests")
@@ -125,9 +127,9 @@ Task("tests")
         var projects = GetFiles("./src/Tests/**/*.csproj");
         foreach(var project in projects)
         {
-            DotNetCoreTest(
+            DotNetTest(
                 project.FullPath,
-                new DotNetCoreTestSettings()
+                new DotNetTestSettings()
                 {
                     Configuration = configuration,
                     NoBuild = true
@@ -143,20 +145,29 @@ Task("release-github")
         //https://stackoverflow.com/questions/42761777/hide-services-passwords-in-cake-build
         var token = EnvironmentVariable("CAKE_PUBLIC_GITHUB_TOKEN");
         var owner = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
+
+        var pDir = MakeAbsolute(Directory(publishDir));
+        var fZip = pDir + File(zipName);
+        var fInn = pDir + File(innoSetupName);
         
-        Information("token: {0}", token);
-        Information("owner: {0}", owner);
-        Information("Zip: ");
+        Information("Has token  : {0}", !string.IsNullOrEmpty(token));
+        Information("Has owner  : {0}", !string.IsNullOrEmpty(owner));
+        Information("Zip        : {0}", fZip);
+        Information("Inno setup : {0}", fInn);
+
+        var assets = zipName      + ","
+                   + innoSetupName;
 
         var stg = new GitReleaseManagerCreateSettings 
         {
             Milestone  = gitVersion.MajorMinorPatch,            
             Name       = gitVersion.SemVer,
             Prerelease = gitVersion.SemVer.Contains("alpha"),
-            Assets     = zipName
+            Debug      = false,
+            Assets     = assets
         };
 
-        GitReleaseManagerCreate(token, owner, "project-perdeval-vnext", stg);  
+        GitReleaseManagerCreate(token, owner, "lanceur-bis", stg);  
     });
 
 
