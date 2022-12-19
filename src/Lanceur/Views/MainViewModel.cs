@@ -45,6 +45,8 @@ namespace Lanceur.Views
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
 
+            IsBusyScope = new Scope<bool>(x => IsBusy = x, true, false);
+
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _log = log ?? Locator.Current.GetService<ILogService>();
@@ -85,8 +87,8 @@ namespace Lanceur.Views
 
             this.WhenAnyValue(x => x.Query)
                 .DistinctUntilChanged()
-                .Where(x => IsSearchActivated)
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
+                .Where(x => !IsBusy)
                 .Select(x => x.Trim())
                 .InvokeCommand(SearchAlias);
 
@@ -124,6 +126,8 @@ namespace Lanceur.Views
 
         #region Properties
 
+        private Scope<bool> IsBusyScope { get; init; }
+
         public ReactiveCommand<Unit, SearchContext> Activate { get; }
 
         public ReactiveCommand<Unit, string> AutoCompleteQuery { get; }
@@ -140,7 +144,7 @@ namespace Lanceur.Views
 
         [Reactive] public bool IsOnError { get; set; }
 
-        [Reactive] public bool IsSearchActivated { get; set; } = true;
+        [Reactive] public bool IsBusy { get; set; }
 
         [Reactive] public bool KeepAlive { get; set; }
 
@@ -186,11 +190,10 @@ namespace Lanceur.Views
                 cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
             }
 
-            IEnumerable<QueryResult> results = new List<QueryResult>();
-            var scope = new Scope<bool>(x => IsSearchActivated = x, false, true);
-
-            using (scope.Open())
+            using (IsBusyScope.Open())
             {
+                IEnumerable<QueryResult> results = new List<QueryResult>();
+
                 if (CurrentAlias is null)
                 {
                     _log.Warning("Current QueryResult is null");
@@ -199,14 +202,14 @@ namespace Lanceur.Views
                 }
                 else if (CurrentAlias is IExecutable exec)
                 {
-                    _log.Trace($"Found {results.Count()} element(s)");
                     Query = CurrentAlias is IQueryText t ? t.ToQuery() : CurrentAlias.ToQuery();
-
 
                     if (exec is IExecutableWithPrivilege exp)
                     {
                         exp.IsPrivilegeOverriden = context.RunAsAdmin;
                     }
+
+                    _log.Trace($"Execute alias '{CurrentAlias.Name}'");
                     results = await exec.ExecuteAsync(cmd);
                     KeepAlive = results.Any();
                 }
@@ -216,8 +219,9 @@ namespace Lanceur.Views
                     KeepAlive = true;
                     results = Results;
                 }
+
+                return new() { Results = results };
             }
-            return new() { Results = results };
         }
 
         private SearchContext OnSearchAlias(string criterion)
@@ -225,16 +229,22 @@ namespace Lanceur.Views
             if (criterion.IsNullOrWhiteSpace()) { return new(); }
             else
             {
-                var query = _cmdlineManager.BuildFromText(criterion);
-                var results = _searchService.Search(query);
-
-                return new()
+                using (IsBusyScope.Open())
                 {
-                    Results = results,
-                    CurrentAliasSuggestion = results.Any() && results.ElementAt(0).IsResult
-                        ? results.ElementAt(0)?.Name ?? ""
-                        : "",
-                };
+                    _log.Trace($"Search: criterion '{criterion}'");
+
+                    var query = _cmdlineManager.BuildFromText(criterion);
+                    var results = _searchService.Search(query);
+
+                    _log.Trace($"Search: criterion '{criterion}' found {results?.Count() ?? 0} element(s)");
+                    return new()
+                    {
+                        Results = results,
+                        CurrentAliasSuggestion = results.Any() && results.ElementAt(0).IsResult
+                            ? results.ElementAt(0)?.Name ?? ""
+                            : "",
+                    };
+                }
             }
         }
 
@@ -242,13 +252,11 @@ namespace Lanceur.Views
         {
             if (Results.CanNavigate())
             {
-                CurrentAliasSuggestion = String.Empty;
-                CurrentAliasIndex = Results.GetNextIndex(CurrentAliasIndex);
-                _log.Trace($"Selecting next result. [Index: {CurrentAliasIndex}]");
-
-                var scope = new Scope<bool>(x => IsSearchActivated = x, false, true);
-                using (scope.Open())
+                using (IsBusyScope.Open())
                 {
+                    CurrentAliasSuggestion = String.Empty;
+                    CurrentAliasIndex = Results.GetNextIndex(CurrentAliasIndex);
+                    _log.Trace($"Selecting next result. [Index: {CurrentAliasIndex}]");
                     Query = CurrentAlias is IQueryText t ? t.ToQuery() : CurrentAlias.ToQuery();
                 }
             }
@@ -258,13 +266,11 @@ namespace Lanceur.Views
         {
             if (Results.CanNavigate())
             {
-                CurrentAliasSuggestion = String.Empty;
-                CurrentAliasIndex = Results.GetPreviousIndex(CurrentAliasIndex);
-                _log.Trace($"Selecting previous result. [Index: {CurrentAliasIndex}]");
-
-                var scope = new Scope<bool>(x => IsSearchActivated = x, false, true);
-                using (scope.Open())
+                using (IsBusyScope.Open())
                 {
+                    CurrentAliasSuggestion = String.Empty;
+                    CurrentAliasIndex = Results.GetPreviousIndex(CurrentAliasIndex);
+                    _log.Trace($"Selecting previous result. [Index: {CurrentAliasIndex}]");
                     Query = CurrentAlias is IQueryText t ? t.ToQuery() : CurrentAlias.ToQuery();
                 }
             }

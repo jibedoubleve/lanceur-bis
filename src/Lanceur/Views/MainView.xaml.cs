@@ -58,13 +58,16 @@ namespace Lanceur.Views
             this.WhenActivated(d =>
             {
                 this.Bind(ViewModel, vm => vm.Query, v => v.QueryTextBox.Text).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
+
+                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.QueryTextBox.IsReadOnly).DisposeWith(d);
+
                 this.OneWayBind(ViewModel, vm => vm.CurrentAliasSuggestion, v => v.AutoCompleteBox.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.CurrentSessionName, v => v.RunSession.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results, v => v.QueryResults.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultCounter.Text);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.StatusPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
-                this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
 
                 //Don't forget 'using System.Windows.Controls'
                 QueryTextBox
