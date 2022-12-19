@@ -196,7 +196,7 @@ namespace Lanceur.Views
 
                 if (CurrentAlias is null)
                 {
-                    _log.Warning("Current QueryResult is null");
+                    _log.Warning($"Current QueryResult is null. Query: '{(context?.Query ?? "<EMPTY>")}'");
                     results = DisplayQueryResult.SingleFromResult($"This alias does not exist");
                     KeepAlive = true;
                 }

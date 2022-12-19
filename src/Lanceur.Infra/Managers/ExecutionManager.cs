@@ -31,7 +31,7 @@ namespace Lanceur.Infra.Managers
 
         private void ExecuteProcess(AliasQueryResult query)
         {
-            _log.Debug($"Executing '{query.FileName}' with args '{query.Arguments}'");
+            _log.Debug($"Executing '{query.FileName}' with args '{query?.Query?.Parameters ?? string.Empty}'");
             var psi = new ProcessStartInfo
             {
                 FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
