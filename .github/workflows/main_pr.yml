@@ -1,0 +1,14 @@
+# When a pull request is send, only build and test
+name: CI/CD for release
+on:
+  push:
+    pull_request: [ "main" ]
+jobs:
+  build:
+    name: Build and Test
+    runs-on: windows-latest
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v1
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v1
