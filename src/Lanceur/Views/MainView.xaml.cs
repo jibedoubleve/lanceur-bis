@@ -212,7 +212,7 @@ namespace Lanceur.Views
 
         protected override void OnDeactivated(EventArgs e)
         {
-            _log?.Info("Windows deactivated");
+            _log?.Info("Window deactivated");
             HideControl();
         }
 
