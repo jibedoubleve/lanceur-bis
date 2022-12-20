@@ -1,9 +1,9 @@
 # When a pull request is merged (therefor a push), 
 # execute tests and release the packages in GitHub
-name: CI/CD for release
+name: Release
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 jobs:
   build:
     name: Build and Test
