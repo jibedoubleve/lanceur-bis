@@ -146,9 +146,8 @@ Task("release-github")
         var token = EnvironmentVariable("CAKE_PUBLIC_GITHUB_TOKEN");
         var owner = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
 
-        var pDir = MakeAbsolute(Directory(publishDir));
-        var fZip = pDir + File(zipName);
-        var fInn = pDir + File(innoSetupName);
+        var fZip = MakeAbsolute(File(zipName));
+        var fInn = MakeAbsolute(File(innoSetupName));
         
         Information("Has token  : {0}", !string.IsNullOrEmpty(token));
         Information("Has owner  : {0}", !string.IsNullOrEmpty(owner));
