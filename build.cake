@@ -43,7 +43,6 @@ var verbosity       = Argument("verbosity", Verbosity.Minimal);
 
 var binDirectory    = $"./src/Lanceur/bin/{configuration}/net6.0-windows10.0.19041.0/";
 var setupIconFile   = $"./src/Lanceur/Assets/appIcon.ico";
-var binDirectoryAbs = MakeAbsolute(Directory(binDirectory)).FullPath + "\\";
 var publishDir      = "./Publish";
 var zipName         = new FilePath(publishDir + "/Lanceur." + gitVersion.SemVer + ".bin.zip").FullPath;
 var innoSetupName   = new FilePath(publishDir + "/Lanceur." + gitVersion.SemVer + ".setup.exe").FullPath;
@@ -89,26 +88,27 @@ Task("clean")
 
 Task("zip")
     .Does(()=> {
-        
-        Information("Zip    : {0}", zipName);
-        Information("Bin dir: {0}", binDirectoryAbs);
+        var path = MakeAbsolute(Directory(binDirectory));
+
+        Information("Bin path   : {0}", path);
+        Information("Output dir : {0}", zipName);
 
         EnsureDirectoryExists(Directory(publishDir));
-        Zip(binDirectoryAbs, zipName);
+        Zip(path, zipName);
 });
 
 Task("inno-setup")
     .Does(() => {
-        var path = MakeAbsolute(Directory(binDirectory)).FullPath + "\\";
+        var path = MakeAbsolute(Directory(binDirectory));
 
-        Information("Bin path   : {0}: ", path);
-        Information("Output dir : {0}: ", publishDir);
+        Information("Bin path   : {0}", path);
+        Information("Output dir : {0}", publishDir);
 
         InnoSetup(inno_setup, new InnoSetupSettings { 
             OutputDirectory = publishDir,
             Defines = new Dictionary<string, string> {
                 { "MyAppVersion", gitVersion.SemVer },
-                { "BinDirectory", path },
+                { "BinDirectory", path.FullPath + "/" },
                 { "SetupIconFile", setupIconFile },
             }
         });
@@ -148,14 +148,15 @@ Task("release-github")
 
         var fZip = MakeAbsolute(File(zipName));
         var fInn = MakeAbsolute(File(innoSetupName));
+        var assets = @$"""{fZip}"",  ""{fInn}""";
         
-        Information("Has token  : {0}", !string.IsNullOrEmpty(token));
-        Information("Has owner  : {0}", !string.IsNullOrEmpty(owner));
-        Information("Zip        : {0}", fZip);
-        Information("Inno setup : {0}", fInn);
+        Information("Has token     : {0}", !string.IsNullOrEmpty(token));
+        Information("Has owner     : {0}", !string.IsNullOrEmpty(owner));
+        Information("Zip           : {0}", fZip);
+        Information("Inno setup    : {0}", fInn);
+        Information($"Assets to add: '{assets}'");
 
-        var assets = zipName      + ","
-                   + innoSetupName;
+
 
         var stg = new GitReleaseManagerCreateSettings 
         {
