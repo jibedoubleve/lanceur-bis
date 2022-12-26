@@ -2,7 +2,7 @@
 name: Build & test
 on:
   push:
-    pull_request: [ "master", "develop" ]
+    pull_request: [ "develop" ]
 jobs:
   build:
     name: Build and Test
