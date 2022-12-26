@@ -83,7 +83,8 @@ namespace Lanceur.Views
 
         private IObservable<IRoutableViewModel> OnAddAlias(string aliasName)
         {
-            _keywordVm.CreateAlias.Execute(aliasName).Subscribe();
+            _keywordVm.Activate.Execute(aliasName).Subscribe();
+            _keywordVm.IsActivatable = false;
             return Router.Navigate.Execute(_keywordVm);
         }
 

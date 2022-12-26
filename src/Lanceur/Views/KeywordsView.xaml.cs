@@ -26,7 +26,11 @@ namespace Lanceur.Views
             {
                 LogService.Current.Trace($"Activating {nameof(KeywordsView)}");
                 Disposable
-                    .Create(() => LogService.Current.Trace($"Deactivating {nameof(KeywordsView)}"))
+                    .Create(() =>
+                    {
+                        LogService.Current.Trace($"Deactivating {nameof(KeywordsView)}");
+                        ViewModel.IsActivatable = true;
+                    })
                     .DisposeWith(d);
 
 
@@ -46,11 +50,11 @@ namespace Lanceur.Views
                 this.Bind(ViewModel, vm => vm.SelectedAlias, v => v.Aliases.SelectedItem).DisposeWith(d);
 
                 this.BindCommand(ViewModel, vm => vm.DuplicateAlias, v => v.MenuDuplicate).DisposeWith(d);
-                this.BindCommand(ViewModel, vm => vm.CreateAlias, v => v.BtnCreateAlias).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.Activate, v => v.BtnCreateAlias).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.RemoveAlias, v => v.BtnDeleteAlias, v => v.SelectedAlias).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.SaveOrUpdateAlias, v => v.BtnSaveOrUpdateAlias, v => v.SelectedAlias).DisposeWith(d);
 
-                ViewModel.Activate.Execute().Subscribe();
+                if (ViewModel.IsActivatable) { ViewModel.Activate.Execute().Subscribe(); }
             });
         }
 
