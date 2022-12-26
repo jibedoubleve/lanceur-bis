@@ -187,12 +187,6 @@ namespace Lanceur.Views
         {
             context ??= new ExecutionContext();
 
-            var cmd = _cmdlineManager.BuildFromText(context.Query);
-            if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
-            {
-                cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
-            }
-
             using (IsBusyScope.Open())
             {
                 IEnumerable<QueryResult> results = new List<QueryResult>();
@@ -213,6 +207,13 @@ namespace Lanceur.Views
                     }
 
                     _log.Trace($"Execute alias '{CurrentAlias.Name}'");
+
+                    var cmd = _cmdlineManager.BuildFromText(context.Query);
+                    if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
+                    {
+                        cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
+                    }
+
                     results = await exec.ExecuteAsync(cmd);
                     KeepAlive = results.Any();
                 }
