@@ -199,7 +199,7 @@ namespace Lanceur.Views
                 }
                 else if (CurrentAlias is IExecutable exec)
                 {
-                    Query = CurrentAlias is IQueryText t ? t.ToQuery() : CurrentAlias.ToQuery();
+                    Query = CurrentAlias.ToQuery();
 
                     if (exec is IExecutableWithPrivilege exp)
                     {
@@ -262,7 +262,7 @@ namespace Lanceur.Views
                     CurrentAliasSuggestion = String.Empty;
                     CurrentAliasIndex = Results.GetNextIndex(CurrentAliasIndex);
                     _log.Trace($"Selecting next result. [Index: {CurrentAliasIndex}]");
-                    Query = CurrentAlias is IQueryText t ? t.ToQuery() : CurrentAlias.ToQuery();
+                    Query = CurrentAlias.ToQuery();
                 }
             }
         }
@@ -276,7 +276,7 @@ namespace Lanceur.Views
                     CurrentAliasSuggestion = String.Empty;
                     CurrentAliasIndex = Results.GetPreviousIndex(CurrentAliasIndex);
                     _log.Trace($"Selecting previous result. [Index: {CurrentAliasIndex}]");
-                    Query = CurrentAlias is IQueryText t ? t.ToQuery() : CurrentAlias.ToQuery();
+                    Query = CurrentAlias.ToQuery();
                 }
             }
         }

@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Lanceur.Core.Models.AliasQueryResult" Collapsed="true">
-    <Position X="7.75" Y="5.25" Width="2.25" />
+    <Position X="8.5" Y="5.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAgAAAAAQAgAAAAAAgAAAAAAgQMABAAIAAAgCRAAGA=</HashCode>
       <FileName>Models\AliasQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.CompositeAliasQueryResult" Collapsed="true">
-    <Position X="9" Y="6.75" Width="2.25" />
+    <Position X="9.75" Y="6.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
       <FileName>Models\CompositeAliasQueryResult.cs</FileName>
@@ -31,7 +31,7 @@
   <Class Name="Lanceur.Core.Models.ExecutableQueryResult" Collapsed="true">
     <Position X="5" Y="3" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAAEAAACAAAAAAAAAAAAAIAAAAAAAEA=</HashCode>
+      <HashCode>AAAAAAAAAAAgAAAEAAECAAAAAAAAAAAAAIAAAAAAAEA=</HashCode>
       <FileName>Models\ExecutableQueryResult.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -42,12 +42,12 @@
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAECIAACAAAgAABAAAAACAQAAABAAAgAAAAAAAEAQCA=</HashCode>
+      <HashCode>AAECIAACAAAgAABAAAEACAQAAABAAAgAAAAAAAEAQCA=</HashCode>
       <FileName>Models\QueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.SelectableAliasQueryResult" Collapsed="true">
-    <Position X="6.5" Y="6.75" Width="2.25" />
+    <Position X="7.25" Y="6.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\SelectableAliasQueryResult.cs</FileName>
@@ -61,7 +61,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.ExecutableWithPrivilege" Collapsed="true">
-    <Position X="8" Y="4.25" Width="1.75" />
+    <Position X="8.75" Y="4.25" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\ExecutableWithPrivilege.cs</FileName>
@@ -76,7 +76,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.PluginExecutableQueryResult" Collapsed="true">
-    <Position X="6.25" Y="4.25" Width="1.5" />
+    <Position X="6.25" Y="4.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAEAgAAAAAAAAAAAAAEA=</HashCode>
       <FileName>Models\PluginExecutableQueryResult.cs</FileName>
