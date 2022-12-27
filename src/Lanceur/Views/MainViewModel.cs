@@ -19,6 +19,8 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Windows.Devices.Geolocation;
+using Windows.UI.Composition;
 
 namespace Lanceur.Views
 {
@@ -73,10 +75,10 @@ namespace Lanceur.Views
             ExecuteAlias = ReactiveCommand.CreateFromTask<ExecutionContext, SearchContext>(OnExecuteAliasAsync, canExecuteAlias, outputScheduler: uiThread);
             ExecuteAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SelectNextResult = ReactiveCommand.Create(OnSelectNextResult, outputScheduler: uiThread);
+            SelectNextResult = ReactiveCommand.CreateFromTask(OnSelectNextResult, outputScheduler: uiThread);
             SelectNextResult.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SelectPreviousResult = ReactiveCommand.Create(OnSelectPreviousResult, outputScheduler: uiThread);
+            SelectPreviousResult = ReactiveCommand.CreateFromTask(OnSelectPreviousResult, outputScheduler: uiThread);
             SelectPreviousResult.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             AutoCompleteQuery = ReactiveCommand.Create(OnAutoCompleteQuery, outputScheduler: uiThread);
@@ -91,8 +93,9 @@ namespace Lanceur.Views
             this.WhenAnyValue(x => x.Query)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
-                .Where(x => !IsBusy)
+                .Where(x => !IsBusy && x.IsNullOrWhiteSpace() == false)
                 .Select(x => x.Trim())
+                .Log(this, $"Query changed", s => $"Query: {s}")
                 .InvokeCommand(SearchAlias);
 
             this.WhenAnyValue(x => x.CurrentAliasIndex)
@@ -257,7 +260,7 @@ namespace Lanceur.Views
             }
         }
 
-        private void OnSelectNextResult()
+        private async Task OnSelectNextResult()
         {
             if (Results.CanNavigate())
             {
@@ -266,12 +269,13 @@ namespace Lanceur.Views
                     CurrentAliasSuggestion = String.Empty;
                     CurrentAliasIndex = Results.GetNextIndex(CurrentAliasIndex);
                     _log.Trace($"Selecting next result. [Index: {CurrentAliasIndex}]");
+                    await Task.Delay(50);
                     Query = CurrentAlias.ToQuery();
                 }
             }
         }
 
-        private void OnSelectPreviousResult()
+        private async Task OnSelectPreviousResult()
         {
             if (Results.CanNavigate())
             {
@@ -280,6 +284,7 @@ namespace Lanceur.Views
                     CurrentAliasSuggestion = String.Empty;
                     CurrentAliasIndex = Results.GetPreviousIndex(CurrentAliasIndex);
                     _log.Trace($"Selecting previous result. [Index: {CurrentAliasIndex}]");
+                    await Task.Delay(50);
                     Query = CurrentAlias.ToQuery();
                 }
             }
