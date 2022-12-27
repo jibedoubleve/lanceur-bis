@@ -3,11 +3,13 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Ui;
+using Lanceur.Utils;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lanceur.Macros
@@ -68,6 +70,7 @@ namespace Lanceur.Macros
                     new DebugMacro("cache", "Displays thumbnails in the cache",  Cmdline("debug cache") ),
                 },
             };
+            LogService.Current.Debug($"Executed 'debug {cl.Name.ToLower()}' and found {result.Count()} item(s)");
             return Task.FromResult(result);
         }
 
