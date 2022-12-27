@@ -269,8 +269,8 @@ namespace Lanceur.Views
                     CurrentAliasSuggestion = String.Empty;
                     CurrentAliasIndex = Results.GetNextIndex(CurrentAliasIndex);
                     _log.Trace($"Selecting next result. [Index: {CurrentAliasIndex}]");
-                    await Task.Delay(50);
                     Query = CurrentAlias.ToQuery();
+                    await Task.Delay(50);
                 }
             }
         }
@@ -284,8 +284,8 @@ namespace Lanceur.Views
                     CurrentAliasSuggestion = String.Empty;
                     CurrentAliasIndex = Results.GetPreviousIndex(CurrentAliasIndex);
                     _log.Trace($"Selecting previous result. [Index: {CurrentAliasIndex}]");
-                    await Task.Delay(50);
                     Query = CurrentAlias.ToQuery();
+                    await Task.Delay(50);
                 }
             }
         }
