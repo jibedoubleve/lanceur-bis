@@ -212,7 +212,7 @@ namespace Lanceur.Views
                         exp.IsPrivilegeOverriden = context.RunAsAdmin;
                     }
 
-                    _log.Trace($"Execute alias '{CurrentAlias.Name}'");
+                    _log.Debug($"Execute alias '{CurrentAlias.ToQuery()}'");
                     results = await exec.ExecuteAsync(cmd);
                     KeepAlive = results.Any();
                 }
@@ -223,6 +223,10 @@ namespace Lanceur.Views
                     results = Results;
                 }
 
+                // A small delay to be sure the query changes are not handled after we
+                // return the result. Without delay, we can encounter result override 
+                // and see the result of an outdated query
+                await Task.Delay(50);
                 return new() { Results = results };
             }
         }
