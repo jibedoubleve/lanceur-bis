@@ -78,6 +78,8 @@ namespace Lanceur.Core.Models
             set => Set(ref _thumbnail, value);
         }
 
+        public virtual string ToQuery() => $"{Name}";
+
         #endregion Properties
     }
 }
