@@ -53,6 +53,7 @@ namespace Lanceur.Ui
         }
 
         private static readonly Dictionary<string, ImageSource> _cache = new();
+
         public static ImageSource Get(string path)
         {
             ImageSource image = null;

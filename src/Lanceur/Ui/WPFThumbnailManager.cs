@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.Utils;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -25,22 +26,31 @@ namespace Lanceur.Ui
         #endregion Constructors
 
         #region Methods
-
+        /// <summary>
+        /// Launch a thread to refresh the thumbnails and returns just after. Each time an thumbnail is found
+        /// the alias is updated and (because the alias is reactive) the UI should be updated.
+        /// </summary>
+        /// <remarks>
+        /// All the alias are updated at once to avoid concurency issues.
+        /// </remarks>
+        /// <param name="queries">The list a queries that need to have an updated thumbnail.</param>
         public void RefreshThumbnails(IEnumerable<QueryResult> queries)
         {
-            foreach (var query in queries)
+            var t = Task.Run(() =>
             {
-                if (query is AliasQueryResult alias)
+                foreach (var query in queries)
                 {
-                    var path = alias.FileName;
-                    if (path.IsNullOrEmpty()) { continue; }
-                    else if (_cache.IsInCache(path))
+                    if (query is AliasQueryResult alias)
                     {
-                        alias.Thumbnail = _cache[path];
-                    }
-                    else
-                    {
-                        var task = Task.Run(() =>
+                        var path = alias.FileName;
+                        LogService.Current.Trace($"Refresh thumbnail of '{path}'.");
+
+                        if (path.IsNullOrEmpty()) { continue; }
+                        else if (_cache.IsInCache(path))
+                        {
+                            alias.Thumbnail = _cache[path];
+                        }
+                        else
                         {
                             var imgPath = File.Exists(query.Icon) ? query.Icon : path;
                             var src = ThumbnailLoader.Get(imgPath);
@@ -48,15 +58,15 @@ namespace Lanceur.Ui
                             {
                                 _cache[path] = src;
                             }
-                            return src;
-                        });
-                        task.ContinueWith(t =>
-                        {
-                            alias.Thumbnail = t.Result;
-                        });
+                            alias.Thumbnail = src;
+                        }
                     }
                 }
-            }
+            });
+            t.ContinueWith(t =>
+            {
+                LogService.Current.Warning($"An error occured during the refresh of the icons. ('{t.Exception.Message}')", t.Exception);
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         #endregion Methods

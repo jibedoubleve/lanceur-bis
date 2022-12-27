@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Windows.Media;
 
@@ -8,7 +9,7 @@ namespace Lanceur.Ui
     {
         #region Fields
 
-        private readonly Dictionary<string, ImageSource> _cache = new();
+        private readonly ConcurrentDictionary<string, ImageSource> _cache = new();
 
         #endregion Fields
 

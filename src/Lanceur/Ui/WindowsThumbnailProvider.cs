@@ -87,9 +87,9 @@ namespace Lanceur.Ui
             void Compare(IShellItem psi, uint hint, out int piOrder);
         };
 
-        [ComImportAttribute()]
-        [GuidAttribute("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
-        [InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
+        [ComImport()]
+        [Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         internal interface IShellItemImageFactory
         {
             [PreserveSig]
@@ -129,9 +129,8 @@ namespace Lanceur.Ui
 
             Marshal.ReleaseComObject(nativeShellItem);
 
-            if (hr == HResult.Ok) return hBitmap;
-
-            throw new COMException($"Error while extracting thumbnail for {fileName}", Marshal.GetExceptionForHR((int)hr));
+            if (hr == HResult.Ok) { return hBitmap; }
+            else { throw new COMException($"Error while extracting thumbnail for {fileName}", Marshal.GetExceptionForHR((int)hr)); }
         }
 
         [DllImport("gdi32.dll")]
