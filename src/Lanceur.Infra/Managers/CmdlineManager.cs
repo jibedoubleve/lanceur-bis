@@ -52,7 +52,7 @@ namespace Lanceur.Infra.Managers
             var cmd = BuildFromText(cmdline);
             if (cmd.Parameters.IsNullOrWhiteSpace())
             {
-                cmd = BuildFromText(query.ToString());
+                cmd = BuildFromText(query.ToQuery());
             }
             return cmd;
         }

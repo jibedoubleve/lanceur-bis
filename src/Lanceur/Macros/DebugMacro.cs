@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lanceur.Macros
 {
     [Macro("debug"), Description("Provides some debugging tools. But it is more an easter egg than something else")]
-    public class DebugMacro : ExecutableQueryResult, IQueryText
+    public class DebugMacro : ExecutableQueryResult
     {
         #region Constructors
 
@@ -87,7 +87,7 @@ namespace Lanceur.Macros
             return results;
         }
 
-        public string ToQuery() => $"debug {Query?.Parameters}".Trim().ToLower();
+        public override string ToQuery() => $"debug {Query?.Parameters}".Trim().ToLower();
 
         #endregion Methods
     }
