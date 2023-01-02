@@ -66,7 +66,7 @@ namespace Lanceur.Views
                 .Select(x => true);
 
             //Commands
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
+            Activate = ReactiveCommand.CreateFromTask(OnActivate, outputScheduler: uiThread);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             SearchAlias = ReactiveCommand.Create<string, SearchContext>(OnSearchAlias, outputScheduler: uiThread);
@@ -168,11 +168,18 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private SearchContext OnActivate()
+        private async Task<SearchContext> OnActivate()
         {
+            //Clear the previous results...
+            Results.Clear();
+            CurrentAliasSuggestion = string.Empty;
+
+
+            var sessionName = await Task.Run(() => _service.GetDefaultSession()?.Name ?? "N.A.");
+
             return new()
             {
-                CurrentSessionName = _service.GetDefaultSession()?.Name ?? "N.A."
+                CurrentSessionName = sessionName
             };
         }
 
