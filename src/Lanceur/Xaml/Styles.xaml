@@ -115,7 +115,7 @@
         <Setter Property="BorderThickness" Value="0.5" />
         <Setter Property="CornerRadius" Value="5" />
         <Setter Property="Effect" Value="{StaticResource BorderEffect}" />
-        <Setter Property="Background" Value="{StaticResource SystemControlBackgroundAltHighBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
     </Style>
 
 </ResourceDictionary>
