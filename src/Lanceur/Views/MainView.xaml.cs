@@ -156,6 +156,7 @@ namespace Lanceur.Views
                 }
             }
             else if (e.Key == Key.Escape) { HideControl(force: true); }
+            else if (e.Key == Key.Enter) { HideControl(force: false); }
         }
 
         private void OnShowWindow(object sender, HotkeyEventArgs e)
