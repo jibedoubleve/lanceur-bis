@@ -35,7 +35,7 @@ var branchName = gitVersion.BranchName;
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
-var repoName = "Lanceur Bis";
+var repoName = "lanceur-bis";
 
 var target          = Argument("target", "Default");
 var configuration   = Argument("configuration", "Release").ToLower();
@@ -148,7 +148,7 @@ Task("release-github")
 
         var fZip = MakeAbsolute(File(zipName));
         var fInn = MakeAbsolute(File(innoSetupName));
-        var assets = @$"""{fZip}"",  ""{fInn}""";
+        var assets = $"{fZip},{fInn}";
         
         Information("Has token     : {0}", !string.IsNullOrEmpty(token));
         Information("Has owner     : {0}", !string.IsNullOrEmpty(owner));
@@ -156,18 +156,22 @@ Task("release-github")
         Information("Inno setup    : {0}", fInn);
         Information($"Assets to add: '{assets}'");
 
-
-
-        var stg = new GitReleaseManagerCreateSettings 
-        {
+        /*
+         * Because a bug on GitReleaseManager, 
+         * we have to create an empty release
+         * and then we'll upload the assets
+         */
+        var stg = new GitReleaseManagerCreateSettings {
             Milestone  = gitVersion.MajorMinorPatch,            
             Name       = gitVersion.SemVer,
             Prerelease = gitVersion.SemVer.Contains("alpha"),
-            Debug      = false,
-            Assets     = assets
+            Debug      = true,
+            Verbose    = true,
         };
+        GitReleaseManagerCreate(token, owner, repoName, stg);  
 
-        GitReleaseManagerCreate(token, owner, "lanceur-bis", stg);  
+        stg.Assets= assets;
+        GitReleaseManagerCreate(token, owner, repoName, stg);  
     });
 
 
