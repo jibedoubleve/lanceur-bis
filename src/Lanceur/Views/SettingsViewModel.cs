@@ -95,6 +95,7 @@ namespace Lanceur.Views
             {
                 case "keywordsview":
                     var sessionName = _service.GetDefaultSession()?.FullName ?? "N.A.";
+                    _keywordVm.IsActivatable = true;
                     Title = $"Manage aliases of '{sessionName}'";
                     return Router.Navigate.Execute(_keywordVm);
 
