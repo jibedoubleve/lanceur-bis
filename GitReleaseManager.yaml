@@ -14,7 +14,7 @@ issue-labels-include:
 - breaking change
 - bug
 - feature
-- feature request
+- feature plugin
 issue-labels-exclude:
 - documentation
 - pr-feature

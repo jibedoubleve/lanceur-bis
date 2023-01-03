@@ -5,6 +5,7 @@ on:
   push:
     branches: 
       - master
+      - develop
 jobs:
   build:
     name: Release
