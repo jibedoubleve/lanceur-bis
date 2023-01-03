@@ -203,9 +203,10 @@ namespace Lanceur.Views
 
         private void SetAliases(IEnumerable<QueryResult> x)
         {
-            SelectedAlias = null;
             _aliases.Clear();
             _aliases.AddRange(x);
+
+            SelectedAlias = x?.FirstOrDefault() as AliasQueryResult;
         }
 
         #endregion Methods
