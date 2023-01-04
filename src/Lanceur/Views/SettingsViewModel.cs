@@ -81,12 +81,7 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private IObservable<IRoutableViewModel> OnAddAlias(string aliasName)
-        {
-            _keywordVm.Activate.Execute(aliasName).Subscribe();
-            _keywordVm.IsActivatable = false;
-            return Router.Navigate.Execute(_keywordVm);
-        }
+        private IObservable<IRoutableViewModel> OnAddAlias(string aliasName) => Router.Navigate.Execute(_keywordVm);
 
         private IObservable<IRoutableViewModel> OnPushNavigation(string arg)
         {
@@ -95,7 +90,6 @@ namespace Lanceur.Views
             {
                 case "keywordsview":
                     var sessionName = _service.GetDefaultSession()?.FullName ?? "N.A.";
-                    _keywordVm.IsActivatable = true;
                     Title = $"Manage aliases of '{sessionName}'";
                     return Router.Navigate.Execute(_keywordVm);
 
