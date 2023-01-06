@@ -78,8 +78,7 @@ namespace Lanceur.Views
              * COMMANDS
              */
 
-            var canSearch = this.WhenAnyValue(x => x.SearchQuery).Select(x => !string.IsNullOrWhiteSpace(x));
-            Search = ReactiveCommand.Create<string, IEnumerable<QueryResult>>(OnSearch, canSearch, outputScheduler: uiThread);
+            Search = ReactiveCommand.Create<string, IEnumerable<QueryResult>>(OnSearch, outputScheduler: uiThread);
             Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             DuplicateAlias = ReactiveCommand.Create<Unit, AliasQueryResult>(OnDuplicateAlias, outputScheduler: uiThread);
