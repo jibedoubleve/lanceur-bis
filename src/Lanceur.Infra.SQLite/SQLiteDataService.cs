@@ -167,11 +167,7 @@ namespace Lanceur.Infra.SQLite
             };
         }
 
-        public void Remove(AliasQueryResult alias)
-        {
-            _log.Info($"Removing alias with name '{alias.Name}'");
-            _aliasDbAction.Remove(alias);
-        }
+        public void Remove(AliasQueryResult alias) => _aliasDbAction.Remove(alias);
 
         public void Remove(IEnumerable<SelectableAliasQueryResult> doubloons)
         {

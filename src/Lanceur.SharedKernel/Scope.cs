@@ -22,7 +22,7 @@
 
         #region Properties
 
-        public Action<T> On { get; }
+        private Action<T> On { get; }
 
         #endregion Properties
 
