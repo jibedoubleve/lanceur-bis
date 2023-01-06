@@ -55,8 +55,6 @@ namespace Lanceur.Views
                 this.BindCommand(ViewModel, vm => vm.RemoveAlias, v => v.BtnDeleteAlias, v => v.SelectedAlias).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.SaveOrUpdateAlias, v => v.BtnSaveOrUpdateAlias, v => v.SelectedAlias).DisposeWith(d);
 
-                if (ViewModel.IsActivatable) { ViewModel.Activate.Execute().Subscribe(); }
-
                 this.BindValidation(ViewModel, v => v.BoxFileNameValidation.Text).DisposeWith(d);
             });
         }
