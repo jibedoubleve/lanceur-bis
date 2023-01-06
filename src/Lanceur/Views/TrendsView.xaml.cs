@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Lanceur.Utils;
+using ReactiveUI;
 using ScottPlot;
 using ScottPlot.Statistics.Interpolation;
 using System;
@@ -35,17 +36,20 @@ namespace Lanceur.Views
 
         private static void SetChart(WpfPlot ctrl, IEnumerable<string> days, IEnumerable<double> values)
         {
-            var d = days.ToArray();
-            var v = values.ToArray();
+            if (days.Any() && values.Any())
+            {
+                var d = days.ToArray();
+                var v = values.ToArray();
 
-            ctrl.Plot.Style(ScottPlot.Style.Gray1);
-            double[] positions = Enumerable.Range(0, v.Length).Select(x => (double)x).ToArray();
+                ctrl.Plot.Style(ScottPlot.Style.Gray1);
+                double[] positions = Enumerable.Range(0, v.Length).Select(x => (double)x).ToArray();
 
-            ctrl.Plot.AddBar(v, positions);
-            ctrl.Plot.XTicks(positions, d);
-
-            ctrl.Plot.Legend();
-            ctrl.Refresh();
+                ctrl.Plot.AddBar(v, positions);
+                ctrl.Plot.XTicks(positions, d);
+                ctrl.Plot.Legend();
+                ctrl.Refresh();
+            }
+            else { LogService.Current.Warning("No history to display."); }
         }
 
         #endregion Methods

@@ -21,6 +21,15 @@ namespace Lanceur.Views
                 this.OneWayBind(ViewModel, vm => vm.Doubloons, v => v.Doubloons.ItemsSource).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.RemoveSelected, v => v.BtnRemoveSelected).DisposeWith(d);
 
+                ViewModel.ConfirmRemove.RegisterHandler(async interaction =>
+                {
+                    var value = 0L;
+                    long.TryParse(interaction.Input, out value);
+
+                    var result = await Dialogs.YesNoQuestion($"Do you want to delete {interaction.Input} {(value > 1 ? "aliases" : "alias")}?");
+                    interaction.SetOutput(result.AsBool());
+                });
+
                 ViewModel.Activate.Execute().Subscribe();
             });
         }

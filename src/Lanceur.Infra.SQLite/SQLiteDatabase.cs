@@ -44,7 +44,7 @@ namespace Lanceur.Infra.SQLite
             {
                 CreateDirectory(dbPath);
                 _log.Warning($"Creating a new database in '{dbPath}'");
-                _updater.UpdateFromScractch();
+                _updater.UpdateFromScratch();
                 _updater.SetLatestVersion();
             }
             else

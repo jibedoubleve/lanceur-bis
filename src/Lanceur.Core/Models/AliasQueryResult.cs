@@ -36,6 +36,12 @@ namespace Lanceur.Core.Models
 
     public class AliasQueryResult : ExecutableWithPrivilege
     {
+        #region Fields
+
+        private string _fileName;
+
+        #endregion Fields
+
         #region Properties
 
         internal IExecutionManager ExecutionService { get; set; }
@@ -53,7 +59,11 @@ namespace Lanceur.Core.Models
         /// </summary>
         public long? DuplicateOf { get; set; }
 
-        public string FileName { get; set; }
+        public string FileName
+        {
+            get => _fileName;
+            set => Set(ref _fileName, value);
+        }
 
         /// <summary>
         /// Indicates whether the alias should override the RunAs value and execute

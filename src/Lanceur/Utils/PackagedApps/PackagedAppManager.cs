@@ -94,6 +94,6 @@ namespace Lanceur.Utils.PackagedApps
     public static class PackageMixin
     {
         public static bool HasInstallationPath(this Package package) => Directory.Exists(package.InstalledPath);
-        public static bool IsInDirectory(this Package package, string directory) => directory.Contains(package.InstalledPath);
+        public static bool IsInDirectory(this Package package, string directory) => directory?.Contains(package.InstalledPath) ?? false;
     }
 }
