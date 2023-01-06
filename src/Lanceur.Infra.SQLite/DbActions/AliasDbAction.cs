@@ -169,11 +169,11 @@ namespace Lanceur.Infra.SQLite.DbActions
             {
                 var sql1 = @"delete from alias_usage where id_alias = @id_alias";
                 var cnt = _db.Connection.Execute(sql1, new { id_alias = alias.Id });
-                _log.Trace($"Removed '{cnt}' row(s) from alias_usage. Id: {alias.Id}");
+                _log.Debug($"Removed '{cnt}' row(s) from alias_usage. Id: {alias.Id}");
 
                 var sql2 = @"delete from alias_name where id_alias = @id_alias";
                 cnt = _db.Connection.Execute(sql2, new { id_alias = alias.Id });
-                _log.Trace($"Removed '{cnt}' row(s) from alias_name. Id: {alias.Id}");
+                _log.Debug($"Removed '{cnt}' row(s) from alias_name. Id: {alias.Id}");
 
                 // If alias refers to no other names, remove it.
                 // This query, cleans all alias in this situation.
@@ -187,7 +187,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                       where an.id_alias is null
                     );";
                 _db.Connection.Execute(sql3);
-                _log.Trace($"Removed '{cnt}' row(s) from alias. Id: {alias.Id}");
+                _log.Debug($"Removed '{cnt}' row(s) from alias. Id: {alias.Id}");
             }
         }
 
