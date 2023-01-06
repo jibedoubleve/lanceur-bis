@@ -18,7 +18,8 @@
     AllowDrop="True"
     ShowInTaskbar="True"
     WindowStartupLocation="CenterScreen"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    PreviewKeyUp="OnPreviewKeyUp">
     <Grid>
         <ui:NavigationView
             x:Name="NavigationView"

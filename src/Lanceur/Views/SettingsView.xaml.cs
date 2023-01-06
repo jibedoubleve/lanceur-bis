@@ -3,6 +3,7 @@ using ReactiveUI;
 using Splat;
 using System;
 using System.Reactive.Disposables;
+using System.Windows.Input;
 
 namespace Lanceur.Views
 {
@@ -35,6 +36,11 @@ namespace Lanceur.Views
         {
             var tag = (string)((NavigationViewItem)args.SelectedItem).Tag;
             ViewModel.PushNavigation.Execute(tag).Subscribe();
+        }
+
+        private void OnPreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape) { Close(); }
         }
 
         #endregion Methods
