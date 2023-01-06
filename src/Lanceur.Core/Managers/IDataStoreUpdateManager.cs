@@ -12,7 +12,7 @@
 
         void UpdateFrom(Version version);
 
-        void UpdateFromScractch();
+        void UpdateFromScratch();
 
         #endregion Methods
     }

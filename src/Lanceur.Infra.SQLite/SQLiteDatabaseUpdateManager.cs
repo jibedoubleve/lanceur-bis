@@ -34,7 +34,7 @@ namespace Lanceur.Infra.SQLite
 
         public void UpdateFrom(Version version) => _dbUpdater.UpdateFrom(version);
 
-        public void UpdateFromScractch() => _dbUpdater.UpdateFromScratch();
+        public void UpdateFromScratch() => _dbUpdater.UpdateFromScratch();
 
         #endregion Methods
     }
