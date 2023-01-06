@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Lanceur.Utils;
+using ReactiveUI;
 using ScottPlot;
 using ScottPlot.Statistics.Interpolation;
 using System;
@@ -22,24 +23,28 @@ namespace Lanceur.Views
             {
                 ViewModel.OnRefreshChart = (days, values) =>
                 {
-                    var d = days.ToArray();
-                    var v = values.ToArray();
+                    if (days.Any() && values.Any())
+                    {
+                        var d = days.ToArray();
+                        var v = values.ToArray();
 
-                    History.Plot.XAxis.TickLabelFormat("dd/MM/yyyy", dateTimeFormat: true);
-                    History.Plot.XAxis.Label("Day");
+                        History.Plot.XAxis.TickLabelFormat("dd/MM/yyyy", dateTimeFormat: true);
+                        History.Plot.XAxis.Label("Day");
 
-                    History.Plot.YAxis.Label("Usage count");
-                    History.Plot.YAxis.ManualTickSpacing(5);
-                    History.Plot.Style(ScottPlot.Style.Gray1);
+                        History.Plot.YAxis.Label("Usage count");
+                        History.Plot.YAxis.ManualTickSpacing(5);
+                        History.Plot.Style(ScottPlot.Style.Gray1);
 
 
-                    History.Plot.XAxis.TickLabelNotation(multiplier: true);
-                    History.Plot.YAxis.TickLabelNotation(multiplier: true);
+                        History.Plot.XAxis.TickLabelNotation(multiplier: true);
+                        History.Plot.YAxis.TickLabelNotation(multiplier: true);
 
-                    var scatter = History.Plot.AddScatter(d, v, Color.Crimson, label: "Usage");
-                    scatter.MarkerShape = MarkerShape.none;
-                    History.Plot.Legend();
-                    History.Refresh();
+                        var scatter = History.Plot.AddScatter(d, v, Color.Crimson, label: "Usage");
+                        scatter.MarkerShape = MarkerShape.none;
+                        History.Plot.Legend();
+                        History.Refresh();
+                    }
+                    else { LogService.Current.Warning("No history to display."); }
                 };
 
                 ViewModel.Activate.Execute().Subscribe();
