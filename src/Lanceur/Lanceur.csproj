@@ -47,12 +47,13 @@
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
-    <PackageReference Include="ModernWpfUI" Version="0.9.4" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
     <PackageReference Include="NHotkey.Wpf" Version="2.1.0" />
     <PackageReference Include="NLog" Version="4.7.15" />
     <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.1" />
-    <PackageReference Include="ReactiveUI.Fody" Version="17.1.50" />
-    <PackageReference Include="ReactiveUI.WPF" Version="17.1.50" />
+    <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
+    <PackageReference Include="ReactiveUI.Validation" Version="3.0.22" />
+    <PackageReference Include="ReactiveUI.WPF" Version="18.4.1" />
     <PackageReference Include="ScottPlot.WPF" Version="4.1.41" />
     <PackageReference Include="Splat.NLog" Version="14.2.1" />
   </ItemGroup>

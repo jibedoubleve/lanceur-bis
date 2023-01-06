@@ -9,6 +9,9 @@ using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Validation.Abstractions;
+using ReactiveUI.Validation.Contexts;
+using ReactiveUI.Validation.Extensions;
 using Splat;
 using System;
 using System.Collections.Generic;
@@ -20,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Lanceur.Views
 {
-    public class KeywordsViewModel : RoutableViewModel
+    public class KeywordsViewModel : RoutableViewModel, IValidatableViewModel
     {
         #region Fields
 
@@ -58,6 +61,23 @@ namespace Lanceur.Views
             _aliasService = searchService ?? l.GetService<IDataService>();
             _confirmRemove = Interactions.YesNoQuestion(uiThread);
 
+            /*
+             * VALIDATIONS
+             */
+            var canSaveOrUpdateAlias = this.WhenAnyValue(
+                x => x.SelectedAlias.FileName,
+                x => !string.IsNullOrEmpty(x)
+            );
+            this.ValidationRule(
+                  vm => vm.SelectedAlias.FileName,
+                  canSaveOrUpdateAlias,
+                  "The path to the file shouldn't be empty."
+              );
+
+            /*
+             * COMMANDS
+             */
+
             var canSearch = this.WhenAnyValue(x => x.SearchQuery).Select(x => !string.IsNullOrWhiteSpace(x));
             Search = ReactiveCommand.Create<string, IEnumerable<QueryResult>>(OnSearch, canSearch, outputScheduler: uiThread);
             Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
@@ -71,9 +91,12 @@ namespace Lanceur.Views
             RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread);
             RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnSaveOrUpdateAlias, outputScheduler: uiThread);
+            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnSaveOrUpdateAlias, canSaveOrUpdateAlias, outputScheduler: uiThread);
             SaveOrUpdateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
+            /*
+             * BINDINGS
+             */
             _aliases
                 .Connect()
                 .ObserveOn(uiThread)
@@ -133,6 +156,8 @@ namespace Lanceur.Views
         [Reactive] public string SearchQuery { get; set; }
 
         [Reactive] public AliasQueryResult SelectedAlias { get; set; }
+
+        public ValidationContext ValidationContext { get; } = new ValidationContext();
 
         #endregion Properties
 
