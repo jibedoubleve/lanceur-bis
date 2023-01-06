@@ -100,9 +100,10 @@ namespace Lanceur.Infra.SQLite
                 id        as Id,
                 file_name as Description,
                 file_name as FileName,
-                keywords  as Name
+                name      as Name
             from
-                data_doubloons_v";
+                data_doubloons_v
+            order by file_name";
             var results = DB.Connection.Query<SelectableAliasQueryResult>(sql);
             return results;
         }
