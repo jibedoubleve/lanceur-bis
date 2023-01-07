@@ -8,6 +8,12 @@
 
         #endregion Fields
 
+        #region Properties
+
+        public static Mutex Mutex => _mutex;
+
+        #endregion Properties
+
         #region Methods
 
         public static void ReleaseMutex() => _mutex.ReleaseMutex();

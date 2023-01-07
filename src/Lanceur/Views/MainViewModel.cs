@@ -8,6 +8,7 @@ using Lanceur.Core.Services;
 using Lanceur.Models;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.Ui;
 using Lanceur.Xaml;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -29,6 +30,7 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly ICmdlineManager _cmdlineManager;
+        private readonly IDelay _delay;
         private readonly ILogService _log;
         private readonly SourceList<QueryResult> _results = new();
         private readonly ISearchService _searchService;
@@ -45,7 +47,8 @@ namespace Lanceur.Views
             ISearchService searchService = null,
             ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
-            IDataService service = null)
+            IDataService service = null,
+            IDelay delay = null)
         {
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
@@ -57,6 +60,7 @@ namespace Lanceur.Views
             _log = log ?? Locator.Current.GetService<ILogService>();
             _searchService = searchService ?? l.GetService<ISearchService>();
             _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
+            _delay = delay ?? l.GetService<IDelay>();
             _service = service ?? l.GetService<IDataService>();
 
             //Command CanExecute
@@ -237,7 +241,7 @@ namespace Lanceur.Views
                 // A small delay to be sure the query changes are not handled after we
                 // return the result. Without delay, we can encounter result override 
                 // and see the result of an outdated query
-                await Task.Delay(50);
+                await _delay.Of(50);
                 return new() { Results = results };
             }
         }
@@ -277,7 +281,7 @@ namespace Lanceur.Views
                     CurrentAliasIndex = Results.GetNextIndex(CurrentAliasIndex);
                     _log.Trace($"Selecting next result. [Index: {CurrentAliasIndex}]");
                     Query = CurrentAlias.ToQuery();
-                    await Task.Delay(50);
+                    await _delay.Of(50);
                 }
             }
         }
@@ -292,7 +296,7 @@ namespace Lanceur.Views
                     CurrentAliasIndex = Results.GetPreviousIndex(CurrentAliasIndex);
                     _log.Trace($"Selecting previous result. [Index: {CurrentAliasIndex}]");
                     Query = CurrentAlias.ToQuery();
-                    await Task.Delay(50);
+                    await _delay.Of(50);
                 }
             }
         }

@@ -2,6 +2,7 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Tests.Utils.ReservedAliases;
+using Lanceur.Ui;
 using Lanceur.Views;
 using Microsoft.Reactive.Testing;
 
@@ -18,7 +19,8 @@ namespace Lanceur.Tests.Utils
                 scheduler,
                 ServiceFactory.LogService,
                 searchService ?? ServiceFactory.SearchService,
-                cmdProcessor ?? ServiceFactory.CmdLineService
+                cmdProcessor ?? ServiceFactory.CmdLineService,
+                delay: new DummyDelay()
             );
         }
 

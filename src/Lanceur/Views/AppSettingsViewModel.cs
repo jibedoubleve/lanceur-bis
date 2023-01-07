@@ -2,6 +2,7 @@
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
 using Lanceur.Ui;
+using Lanceur.Utils;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Windows.ApplicationModel.Core;
 
 namespace Lanceur.Views
 {
@@ -23,6 +25,8 @@ namespace Lanceur.Views
         private readonly IAppSettingsService _settings;
         private readonly ISettingsService _stg;
         private readonly IDataService _service;
+        private readonly IDelay _delay;
+        private readonly IAppRestart _restart;
 
         #endregion Fields
 
@@ -34,7 +38,10 @@ namespace Lanceur.Views
             IAppSettingsService settings = null,
             IUserNotification notify = null,
             ISettingsService stg = null,
-            IDataService service = null)
+            IDataService service = null,
+            IDelay delay = null,
+            IAppRestart restart = null
+            )
         {
             var l = Locator.Current;
             _settings = settings ?? l.GetService<IAppSettingsService>();
@@ -42,6 +49,8 @@ namespace Lanceur.Views
             _stg = stg ?? l.GetService<ISettingsService>();
             _service = service ?? l.GetService<IDataService>();
             notify ??= l.GetService<IUserNotification>();
+            _delay = delay ?? l.GetService<IDelay>();
+            _restart = restart ?? l.GetService<IAppRestart>();
 
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
@@ -102,7 +111,7 @@ namespace Lanceur.Views
             return context;
         }
 
-        private void OnSaveSettings()
+        private async void OnSaveSettings()
         {
             //Save DB Path
             _stg[Setting.DbPath] = DbPath;
@@ -113,8 +122,12 @@ namespace Lanceur.Views
             if (CurrentSession is not null) { Context.AppSettings.IdSession = CurrentSession.Id; }
 
             _settings.Save(Context.AppSettings);
-            Toast.Information($"Application settings saved.");
+            var time = TimeSpan.FromSeconds(2);
+            Toast.Information($"Application settings saved. Restart in {time.TotalSeconds} seconds");
+            await _delay.Of(time);
+            _restart.Restart();
         }
+
 
         #endregion Methods
 

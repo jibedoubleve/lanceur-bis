@@ -64,6 +64,9 @@ namespace Lanceur
             l.RegisterLazySingleton(() => new RoutingState());
             l.RegisterLazySingleton<IPluginStoreContext>(() => new PluginStoreContext());
             l.RegisterLazySingleton<IImageCache>(() => new ImageCache());
+            l.RegisterLazySingleton<IDelay>(() => new Delay());
+            l.RegisterLazySingleton<IAppRestart>(() => new AppRestart());
+
 
             l.Register<ILogService>(() => new NLogService());
             l.Register<IStoreLoader>(() => new StoreLoader());
@@ -86,12 +89,6 @@ namespace Lanceur
             l.Register(() => new SQLiteDatabase(Get<IDataStoreVersionManager>(), Get<ILogService>(), Get<IDataStoreUpdateManager>()));
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
             l.Register(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
-
-            //#if DEBUG
-            //            l.Register<IConnectionString>(() => new DebugConnectionString());
-            //#else
-            //            l.Register<IConnectionString>(() => new ConnectionString(Get<ISettingsService>()));
-            //#endif
             l.Register<IConnectionString>(() => new ConnectionString(Get<ISettingsService>()));
 
             l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<SQLiteConnectionScope>())));
