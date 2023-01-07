@@ -114,7 +114,7 @@ namespace Lanceur.Views
         private async void OnSaveSettings()
         {
             //Save DB Path
-            _stg[Setting.DbPath] = DbPath;
+            _stg[Setting.DbPath] = DbPath?.Replace("\"", "");
             _stg.Save();
 
             // Save hotkey & Session
