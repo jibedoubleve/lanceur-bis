@@ -26,14 +26,6 @@ namespace Lanceur.Views
             this.WhenActivated(d =>
             {
                 LogService.Current.Trace($"Activating {nameof(KeywordsView)}");
-                Disposable
-                    .Create(async () =>
-                    {
-                        LogService.Current.Debug($"Deactivating {nameof(KeywordsView)}");
-                        await ViewModel.Clear();
-                    })
-                    .DisposeWith(d);
-
 
                 ViewModel.ConfirmRemove.RegisterHandler(async interaction =>
                 {

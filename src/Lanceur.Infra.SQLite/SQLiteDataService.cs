@@ -218,8 +218,7 @@ namespace Lanceur.Infra.SQLite
                 else
                 {
                     throw new NotSupportedException(
-                        $"Either the id of the alias to handle is not valid (Id: {alias.Id} or "
-                      + $"the duplicated id invalid (Duplicate id {alias.DuplicateOf})");
+                       $"The alias already exists (Name: {alias.Name})");
                 }
             }
         }
