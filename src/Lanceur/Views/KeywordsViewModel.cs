@@ -77,14 +77,13 @@ namespace Lanceur.Views
             /*
              * COMMANDS
              */
-
             Search = ReactiveCommand.Create<string, IEnumerable<QueryResult>>(OnSearch, outputScheduler: uiThread);
             Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             DuplicateAlias = ReactiveCommand.Create<Unit, AliasQueryResult>(OnDuplicateAlias, outputScheduler: uiThread);
             DuplicateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            CreateAlias = ReactiveCommand.Create(OnCreateAliasAsync, outputScheduler: uiThread);
+            CreateAlias = ReactiveCommand.Create(OnCreateAlias, outputScheduler: uiThread);
             CreateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread);
@@ -160,7 +159,7 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private void OnCreateAliasAsync()
+        private void OnCreateAlias()
         {
             var newAlias = AliasQueryResult.EmptyForCreation;
             _aliases.Insert(0, newAlias);
