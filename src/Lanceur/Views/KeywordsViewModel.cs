@@ -18,12 +18,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 namespace Lanceur.Views
 {
-    public class KeywordsViewModel : RoutableViewModel, IValidatableViewModel
+    public class KeywordsViewModel : RoutableViewModel, IValidatableViewModel, IActivatableViewModel
     {
         #region Fields
 
@@ -61,73 +62,81 @@ namespace Lanceur.Views
             _aliasService = searchService ?? l.GetService<IDataService>();
             _confirmRemove = Interactions.YesNoQuestion(uiThread);
 
-            /*
-             * VALIDATIONS
-             */
-            var canSaveOrUpdateAlias = this.WhenAnyValue(
-                x => x.SelectedAlias.FileName,
-                x => !string.IsNullOrEmpty(x)
-            );
-            this.ValidationRule(
-                  vm => vm.SelectedAlias.FileName,
-                  canSaveOrUpdateAlias,
-                  "The path to the file shouldn't be empty."
-              );
+            this.WhenActivated(d =>
+            {
+                /*
+                 * VALIDATIONS
+                 */
+                var canSaveOrUpdateAlias = this.WhenAnyValue(
+                    x => x.SelectedAlias.FileName,
+                    x => !string.IsNullOrEmpty(x)
+                );
+                this.ValidationRule(
+                      vm => vm.SelectedAlias.FileName,
+                      canSaveOrUpdateAlias,
+                      "The path to the file shouldn't be empty."
+                ).DisposeWith(d);
 
-            /*
-             * COMMANDS
-             */
-            Search = ReactiveCommand.Create<string, IEnumerable<QueryResult>>(OnSearch, outputScheduler: uiThread);
-            Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+                /*
+                 * COMMANDS
+                 */
+                Search = ReactiveCommand.Create<string, IEnumerable<QueryResult>>(OnSearch, outputScheduler: uiThread).DisposeWith(d); ;
+                Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            DuplicateAlias = ReactiveCommand.Create<Unit, AliasQueryResult>(OnDuplicateAlias, outputScheduler: uiThread);
-            DuplicateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+                DuplicateAlias = ReactiveCommand.Create<Unit, AliasQueryResult>(OnDuplicateAlias, outputScheduler: uiThread).DisposeWith(d); ;
+                DuplicateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            CreateAlias = ReactiveCommand.Create(OnCreateAlias, outputScheduler: uiThread);
-            CreateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+                CreateAlias = ReactiveCommand.Create(OnCreateAlias, outputScheduler: uiThread).DisposeWith(d); ;
+                CreateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread);
-            RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+                RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread).DisposeWith(d); ;
+                RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnSaveOrUpdateAlias, canSaveOrUpdateAlias, outputScheduler: uiThread);
-            SaveOrUpdateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+                SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnSaveOrUpdateAlias, canSaveOrUpdateAlias, outputScheduler: uiThread).DisposeWith(d); ;
+                SaveOrUpdateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            /*
-             * BINDINGS
-             */
-            _aliases
-                .Connect()
-                .ObserveOn(uiThread)
-                .Bind(Aliases)
-                .Subscribe();
+                /*
+                 * BINDINGS
+                 */
+                _aliases
+                    .Connect()
+                    .ObserveOn(uiThread)
+                    .Bind(Aliases)
+                    .Subscribe()
+                    .DisposeWith(d); ;
 
-            this.WhenAnyObservable(vm => vm.Search)
-                .DistinctUntilChanged()
-                .Log(this, "Setting aliases", c => $"Count {c.Count()}")
-                .Subscribe(SetAliases);
+                this.WhenAnyObservable(vm => vm.Search)
+                    .DistinctUntilChanged()
+                    .Log(this, "Setting aliases", c => $"Count {c.Count()}")
+                    .Subscribe(SetAliases)
+                    .DisposeWith(d); ;
 
-            this.WhenAnyObservable(vm => vm.Search)
-                .Where(x => x.Any())
-                .Select(x => x.ElementAt(0) as AliasQueryResult)
-                .Where(x => x is not null)
-                .Log(this, "Selecting an alias", c => $"Id: {c.Id} - Name: {c.Name}")
-                .BindTo(this, vm => vm.SelectedAlias);
+                this.WhenAnyObservable(vm => vm.Search)
+                    .Where(x => x.Any())
+                    .Select(x => x.ElementAt(0) as AliasQueryResult)
+                    .Where(x => x is not null)
+                    .Log(this, "Selecting an alias", c => $"Id: {c.Id} - Name: {c.Name}")
+                    .BindTo(this, vm => vm.SelectedAlias)
+                    .DisposeWith(d); ;
 
-            this.WhenAnyObservable(vm => vm.DuplicateAlias)
-                .Select(x =>
-                {
-                    _log.Trace($"Duplicated alias '{x.Name}'");
-                    _aliases.Add(x);
-                    return x;
-                })
-                .BindTo(this, vm => vm.SelectedAlias);
+                this.WhenAnyObservable(vm => vm.DuplicateAlias)
+                    .Select(x =>
+                    {
+                        _log.Trace($"Duplicated alias '{x.Name}'");
+                        _aliases.Add(x);
+                        return x;
+                    })
+                    .BindTo(this, vm => vm.SelectedAlias)
+                    .DisposeWith(d); ;
 
-            this.WhenAnyValue(vm => vm.SearchQuery)
-                .DistinctUntilChanged()
-                .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
-                .Select(x => x?.Trim())
-                .Log(this, $"Invoking search.", c => $"With criterion '{c}'")
-                .InvokeCommand(Search);
+                this.WhenAnyValue(vm => vm.SearchQuery)
+                    .DistinctUntilChanged()
+                    .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
+                    .Select(x => x?.Trim())
+                    .Log(this, $"Invoking search.", c => $"With criterion '{c}'")
+                    .InvokeCommand(Search)
+                    .DisposeWith(d); ;
+            });
         }
 
         #endregion Constructors
@@ -135,19 +144,20 @@ namespace Lanceur.Views
         #region Properties
 
         [Reactive] private bool IsSearchActivated { get; set; } = true;
+        public ViewModelActivator Activator { get; } = new ViewModelActivator();
         public IObservableCollection<QueryResult> Aliases { get; } = new ObservableCollectionExtended<QueryResult>();
         [Reactive] public string BusyMessage { get; set; }
         public Interaction<string, bool> ConfirmRemove => _confirmRemove;
-        public ReactiveCommand<Unit, Unit> CreateAlias { get; }
-        public ReactiveCommand<Unit, AliasQueryResult> DuplicateAlias { get; }
+        public ReactiveCommand<Unit, Unit> CreateAlias { get; set; }
+        public ReactiveCommand<Unit, AliasQueryResult> DuplicateAlias { get; set; }
 
         [Reactive] public bool IsBusy { get; set; }
 
-        public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; }
+        public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; set; }
 
-        public ReactiveCommand<AliasQueryResult, Unit> SaveOrUpdateAlias { get; }
+        public ReactiveCommand<AliasQueryResult, Unit> SaveOrUpdateAlias { get; set; }
 
-        public ReactiveCommand<string, IEnumerable<QueryResult>> Search { get; }
+        public ReactiveCommand<string, IEnumerable<QueryResult>> Search { get; set; }
 
         [Reactive] public string SearchQuery { get; set; }
 
