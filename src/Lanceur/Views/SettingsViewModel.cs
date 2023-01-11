@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Services;
+﻿using Lanceur.Core.Models;
+using Lanceur.Core.Services;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -81,7 +82,12 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private IObservable<IRoutableViewModel> OnAddAlias(string aliasName) => Router.Navigate.Execute(_keywordVm);
+        private IObservable<IRoutableViewModel> OnAddAlias(string aliasName)
+        {
+            _keywordVm.AliasToCreate = AliasQueryResult.FromName(aliasName);
+            _log.Debug($"Request creation of alias '{aliasName}'");
+            return Router.Navigate.Execute(_keywordVm);
+        }
 
         private IObservable<IRoutableViewModel> OnPushNavigation(string arg)
         {

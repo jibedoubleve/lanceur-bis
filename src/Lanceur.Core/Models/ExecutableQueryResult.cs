@@ -36,7 +36,7 @@
 
         public void SetDescription(string description) => _description = description;
 
-        public override string ToQuery() => $"{Name} {Parameters}";
+        public override string ToQuery() => $"{Name} {Parameters}".Trim();
 
         #endregion Methods
     }
