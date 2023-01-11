@@ -60,6 +60,20 @@ namespace Lanceur.Infra.Services
 
         #region Methods
 
+        private FileStream OpenFile()
+        {
+            var dir = Path.GetDirectoryName(_filePath);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            var stream = !File.Exists(_filePath)
+                ? File.Create(_filePath)
+                : File.Open(_filePath, FileMode.Open);
+            return stream;
+        }
+
         public void Load()
         {
             var stg = new JsonSettings();
@@ -74,7 +88,7 @@ namespace Lanceur.Infra.Services
                 { nameof(stg.DbPath).ToLower(), stg?.DbPath ?? string.Empty }
             };
 
-            if (!File.Exists(_filePath)) { Save(); }
+            Save();
         }
 
         public void Save()
@@ -84,7 +98,12 @@ namespace Lanceur.Infra.Services
                 DbPath = _settings[Setting.DbPath.ToString().ToLower()]
             };
             var json = JsonConvert.SerializeObject(settings);
-            File.WriteAllText(_filePath, json);
+
+            using (var stream = OpenFile())
+            using (var file = new StreamWriter(stream))
+            {
+                file.Write(json);
+            }
         }
 
         #endregion Methods
