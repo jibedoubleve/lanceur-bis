@@ -162,17 +162,17 @@ namespace Lanceur.Views
 
         public Interaction<string, bool> ConfirmRemove => _confirmRemove;
 
-        public ReactiveCommand<Unit, Unit> CreateAlias { get; set; }
+        public ReactiveCommand<Unit, Unit> CreateAlias { get; private set; }
 
-        public ReactiveCommand<Unit, AliasQueryResult> DuplicateAlias { get; set; }
+        public ReactiveCommand<Unit, AliasQueryResult> DuplicateAlias { get; private set; }
 
         [Reactive] public bool IsBusy { get; set; }
 
-        public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; set; }
+        public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; private set; }
 
-        public ReactiveCommand<AliasQueryResult, Unit> SaveOrUpdateAlias { get; set; }
+        public ReactiveCommand<AliasQueryResult, Unit> SaveOrUpdateAlias { get; private set; }
 
-        public ReactiveCommand<SearchRequest, IEnumerable<QueryResult>> Search { get; set; }
+        public ReactiveCommand<SearchRequest, IEnumerable<QueryResult>> Search { get; private set; }
 
         [Reactive] public string SearchQuery { get; set; }
 

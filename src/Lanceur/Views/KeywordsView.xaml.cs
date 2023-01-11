@@ -42,6 +42,7 @@ namespace Lanceur.Views
                 this.Bind(ViewModel, vm => vm.SearchQuery, v => v.QueryBox.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.SelectedAlias, v => v.Aliases.SelectedItem).DisposeWith(d);
 
+                //Issue 77: Duplicate keyword does not work. Should be fixed
                 //this.BindCommand(ViewModel, vm => vm.DuplicateAlias, v => v.MenuDuplicate).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.CreateAlias, v => v.BtnCreateAlias).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.RemoveAlias, v => v.BtnDeleteAlias, v => v.SelectedAlias).DisposeWith(d);
