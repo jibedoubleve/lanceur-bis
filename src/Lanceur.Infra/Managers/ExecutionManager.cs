@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Managers;
+﻿using Lanceur.Core;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
@@ -28,6 +29,29 @@ namespace Lanceur.Infra.Managers
         #endregion Constructors
 
         #region Methods
+
+        private async Task ExecuteAliasAsync(AliasQueryResult query)
+        {
+            try
+            {
+                if (query.Delay > 0)
+                {
+                    _log.Trace($"Delay of {query.Delay} second(s) before executing the alias");
+                    await Task.Delay(query.Delay * 1000);
+                }
+                if (query.IsUwp())
+                {
+                    _log.Trace("Executing UWP application...");
+                    ExecuteUwp(query);
+                }
+                else
+                {
+                    _log.Trace("Executing process...");
+                    ExecuteProcess(query);
+                }
+            }
+            catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}'", ex); }
+        }
 
         private void ExecuteProcess(AliasQueryResult query)
         {
@@ -71,27 +95,39 @@ namespace Lanceur.Infra.Managers
             Process.Start(psi);
         }
 
-        public async Task ExecuteAsync(AliasQueryResult query)
+        public async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request)
         {
-            try
+            if (request.QueryResult is null)
             {
-                if (query.Delay > 0)
+                return new ExecutionResponse
                 {
-                    _log.Trace($"Delay of {query.Delay} second(s) before executing the alias");
-                    await Task.Delay(query.Delay * 1000);
-                }
-                if (query.IsUwp())
-                {
-                    _log.Trace("Executing UWP application...");
-                    ExecuteUwp(query);
-                }
-                else
-                {
-                    _log.Trace("Executing process...");
-                    ExecuteProcess(query);
-                }
+                    Results = DisplayQueryResult.SingleFromResult($"This alias does not exist"),
+                    HasResult = true,
+                };
             }
-            catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}'", ex); }
+            else if (request.QueryResult is AliasQueryResult alias)
+            {
+                await ExecuteAliasAsync(alias);
+                return ExecutionResponse.NoResult;
+            }
+            else if (request.QueryResult is IExecutable exec)
+            {
+                if (request.QueryResult is IExecutableWithPrivilege exp)
+                {
+                    exp.IsPrivilegeOverriden = request.ExecuteWithPrivilege;
+                }
+                var results = await exec.ExecuteAsync();
+                return new ExecutionResponse
+                {
+                    Results = results,
+                    HasResult = results.Any()
+                };
+            }
+            else
+            {
+                _log.Info($"Alias '{request.QueryResult.Name}', is not executable. Add as a query");
+                return ExecutionResponse.EmptyResult;
+            }
         }
 
         #endregion Methods

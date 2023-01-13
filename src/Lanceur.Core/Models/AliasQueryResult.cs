@@ -93,7 +93,11 @@ namespace Lanceur.Core.Models
 
         public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            await ExecutionManager?.ExecuteAsync(this);
+            await ExecutionManager?.ExecuteAsync(new ExecutionRequest
+            {
+                QueryResult = this,
+                Cmdline = cmdline,
+            });
             OnExecution(this);
             return NoResult;
         }
