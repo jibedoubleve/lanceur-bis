@@ -13,7 +13,7 @@ namespace Lanceur.Core.Utils
             {
                 if (query is AliasQueryResult alias)
                 {
-                    alias.ExecutionService = service;
+                    alias.ExecutionManager = service;
                     alias.OnExecution = onExecution;
                 }
             }
@@ -23,7 +23,7 @@ namespace Lanceur.Core.Utils
         {
             if (query is AliasQueryResult alias)
             {
-                alias.ExecutionService = service;
+                alias.ExecutionManager = service;
                 alias.OnExecution = onExecution;
             }
         }

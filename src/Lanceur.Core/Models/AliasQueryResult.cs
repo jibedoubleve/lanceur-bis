@@ -20,7 +20,7 @@ namespace Lanceur.Core.Models
                 Name = $"Duplicate of {@this.Name}",
                 RunAs = @this.RunAs,
                 WorkingDirectory = @this.WorkingDirectory,
-                ExecutionService = @this.ExecutionService,
+                ExecutionManager = @this.ExecutionManager,
                 StartMode = @this.StartMode,
                 Query = @this.Query,
                 // In case it's already a duplicate of a duplicate,
@@ -44,7 +44,7 @@ namespace Lanceur.Core.Models
 
         #region Properties
 
-        internal IExecutionManager ExecutionService { get; set; }
+        internal IExecutionManager ExecutionManager { get; set; }
         internal Action<AliasQueryResult> OnExecution { get; set; }
         public static AliasQueryResult EmptyForCreation => new() { Name = $"new alias" };
         public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();
@@ -93,7 +93,7 @@ namespace Lanceur.Core.Models
 
         public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            await ExecutionService?.ExecuteAsync(this);
+            await ExecutionManager?.ExecuteAsync(this);
             OnExecution(this);
             return NoResult;
         }
