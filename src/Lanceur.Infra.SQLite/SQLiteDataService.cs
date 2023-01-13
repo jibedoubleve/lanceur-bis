@@ -14,7 +14,7 @@ namespace Lanceur.Infra.SQLite
 
         private readonly AliasDbAction _aliasDbAction;
         private readonly IConvertionService _converter;
-        private readonly IExecutionManager _executionService;
+        private readonly IExecutionManager _executionManager;
         private readonly ILogService _log;
         private readonly MacroDbAction _macroManager;
 
@@ -25,14 +25,14 @@ namespace Lanceur.Infra.SQLite
         public SQLiteDataService(
             SQLiteConnectionScope scope,
             ILogService log,
-            IExecutionManager executionService,
+            IExecutionManager executionManager,
             IConvertionService converter) : base(scope)
         {
             _log = log;
-            _executionService = executionService;
+            _executionManager = executionManager;
             _converter = converter;
-            _aliasDbAction = new AliasDbAction(scope, _log, _executionService);
-            _macroManager = new MacroDbAction(DB, log, executionService, converter);
+            _aliasDbAction = new AliasDbAction(scope, _log, _executionManager);
+            _macroManager = new MacroDbAction(DB, log, executionManager, converter);
         }
 
         #endregion Constructors
@@ -70,7 +70,7 @@ namespace Lanceur.Infra.SQLite
 
             var result = DB.Connection.Query<AliasQueryResult>(sql, arguments);
 
-            result?.Inject(_executionService, alias => SetUsage(alias));
+            result?.Inject(_executionManager, alias => SetUsage(alias));
 
             return result ?? AliasQueryResult.NoResult;
         }
@@ -256,7 +256,7 @@ namespace Lanceur.Infra.SQLite
             var results = DB.Connection.Query<AliasQueryResult>(sql, new { name, idSession });
 
             results = _macroManager.UpgradeToComposite(results);
-            results?.Inject(_executionService, alias => SetUsage(alias));
+            results?.Inject(_executionManager, alias => SetUsage(alias));
             return results ?? AliasQueryResult.NoResult;
         }
 
