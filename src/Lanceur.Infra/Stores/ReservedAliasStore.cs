@@ -2,7 +2,9 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Splat;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Lanceur.Infra.Stores
@@ -13,6 +15,7 @@ namespace Lanceur.Infra.Stores
         #region Fields
 
         private readonly Assembly _assembly;
+        private readonly IDataService _dataService;
         private IEnumerable<QueryResult> _reservedAliases = null;
 
         #endregion Fields
@@ -28,6 +31,7 @@ namespace Lanceur.Infra.Stores
         public ReservedAliasStore()
         {
             _assembly = Assembly.GetEntryAssembly();
+            _dataService = Locator.Current.GetService<IDataService>();
         }
 
         /// <summary>
@@ -37,9 +41,22 @@ namespace Lanceur.Infra.Stores
         /// <remarks>
         /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
         /// </remarks>
-        public ReservedAliasStore(Assembly assembly)
+        public ReservedAliasStore(Assembly assembly) : this(assembly, null)
+        {
+        }
+
+        /// <summary>
+        /// Generate a new instance
+        /// </summary>
+        /// <param name="assembly">The assembly where to search the reseved aliases. </param>
+        /// <param name="dataService">The dataservice used to update usage of the alias</param>
+        /// <remarks>
+        /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
+        /// </remarks>
+        public ReservedAliasStore(Assembly assembly, IDataService dataService)
         {
             _assembly = assembly;
+            _dataService = dataService ?? Locator.Current.GetService<IDataService>();
         }
 
         #endregion Constructors
@@ -68,22 +85,31 @@ namespace Lanceur.Infra.Stores
                 var found = (from t in types
                              where t.GetCustomAttributes<ReservedAliasAttribute>().Any()
                              select t).ToList();
-                var stores = new List<QueryResult>();
+                var foundItems = new List<QueryResult>();
                 foreach (var type in found)
                 {
                     var instance = Activator.CreateInstance(type);
 
                     if (instance is ExecutableQueryResult qr)
                     {
-                        qr.Name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
+                        var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name; ;
+                        var keyword = _dataService.GetKeyword(name);
+
+                        qr.Name = name;
+                        if (keyword is not null)
+                        {
+                            qr.Id = keyword.Id;
+                            qr.Count = keyword.Count;
+                        }
+
                         qr.SetDescription((type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description);
                         qr.Icon = "keylink";
 
-                        stores.Add(qr);
+                        foundItems.Add(qr);
                     }
                 }
 
-                _reservedAliases = stores;
+                _reservedAliases = foundItems;
             }
         }
 
@@ -91,9 +117,14 @@ namespace Lanceur.Infra.Stores
 
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
-            return (from k in ReservedAliases
-                    where k.Name.ToLower().StartsWith(query.Name)
-                    select k).ToList();
+            var result = (from k in ReservedAliases
+                          where k.Name.ToLower().StartsWith(query.Name)
+                          select k).ToList();
+            var orderedResult = _dataService
+                    .RefreshUsage(result)
+                    .OrderByDescending(x => x.Count)
+                    .ThenBy(x => x.Name);
+            return orderedResult;
         }
 
         #endregion Methods

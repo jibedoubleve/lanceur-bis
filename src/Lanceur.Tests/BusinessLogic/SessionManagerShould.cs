@@ -38,7 +38,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var scope = new SQLiteConnectionScope(BuildConnection());
             CreateTableAndPopulate(scope);
-            var service = new SQLiteDataService(scope, Substitute.For<ILogService>(), Substitute.For<IExecutionManager>(), Substitute.For<IConvertionService>());
+            var service = new SQLiteDataService(scope, Substitute.For<ILogService>(), Substitute.For<IConvertionService>());
 
             service.GetSessions().Should().HaveCount(10);
         }

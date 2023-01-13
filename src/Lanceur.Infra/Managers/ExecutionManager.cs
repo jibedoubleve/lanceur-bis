@@ -15,15 +15,17 @@ namespace Lanceur.Infra.Managers
 
         private readonly ILogService _log;
         private readonly IWildcardManager _wildcardManager;
+        private readonly IDataService _dataService;
 
         #endregion Fields
 
         #region Constructors
 
-        public ExecutionManager(ILogService log, IWildcardManager wildcardManager)
+        public ExecutionManager(ILogService log, IWildcardManager wildcardManager, IDataService dataService)
         {
             _log = log;
             _wildcardManager = wildcardManager;
+            _dataService = dataService;
         }
 
         #endregion Constructors
@@ -97,6 +99,8 @@ namespace Lanceur.Infra.Managers
 
         public async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request)
         {
+            _dataService.SetUsage(request.QueryResult);
+
             if (request.QueryResult is null)
             {
                 return new ExecutionResponse
@@ -116,7 +120,7 @@ namespace Lanceur.Infra.Managers
                 {
                     exp.IsPrivilegeOverriden = request.ExecuteWithPrivilege;
                 }
-                var results = await exec.ExecuteAsync();
+                var results = await exec.ExecuteAsync(request.Cmdline);
                 return new ExecutionResponse
                 {
                     Results = results,

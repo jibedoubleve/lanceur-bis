@@ -55,7 +55,7 @@ namespace Lanceur.Macros
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            var cl = CmdlineProcessor.BuildFromText(cmdline.Parameters);
+            var cl = CmdlineProcessor.BuildFromText(cmdline?.Parameters ?? string.Empty);
 
             var result = cl.Name.ToLower() switch
             {

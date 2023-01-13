@@ -97,7 +97,7 @@ namespace Lanceur.Views
             this.WhenAnyValue(x => x.Query)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
-                .Where(x => !IsBusy && x.IsNullOrWhiteSpace() == false)
+                .Where(x => !IsBusy)
                 .Select(x => x.Trim())
                 .Log(this, $"Query changed", s => $"Query: {s}")
                 .InvokeCommand(SearchAlias);
@@ -200,28 +200,30 @@ namespace Lanceur.Views
 
             using (IsBusyScope.Open())
             {
-                Query = CurrentAlias.ToQuery();
-
-                var cmd = _cmdlineManager.BuildFromText(context.Query);
-                if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
+                if (context?.Query.IsNullOrEmpty() ?? true) { return new(); }
+                else
                 {
-                    cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
+                    var cmd = _cmdlineManager.BuildFromText(context.Query);
+                    if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
+                    {
+                        cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
+                    }
+
+                    _log.Debug($"Execute alias '{CurrentAlias.ToQuery()}'");
+                    var response = await _executor.ExecuteAsync(new ExecutionRequest
+                    {
+                        QueryResult = CurrentAlias,
+                        Cmdline = cmd,
+                        ExecuteWithPrivilege = context.RunAsAdmin,
+                    });
+                    KeepAlive = response.HasResult;
+
+                    // A small delay to be sure the query changes are not handled after we
+                    // return the result. Without delay, we can encounter result override
+                    // and see the result of an outdated query
+                    await _delay.Of(50);
+                    return new() { Results = response.Results };
                 }
-
-                _log.Debug($"Execute alias '{CurrentAlias.ToQuery()}'");
-                var response = await _executor.ExecuteAsync(new ExecutionRequest
-                {
-                    QueryResult = CurrentAlias,
-                    Cmdline = cmd,
-                    ExecuteWithPrivilege = context.RunAsAdmin,
-                });
-                KeepAlive = response.HasResult;
-
-                // A small delay to be sure the query changes are not handled after we
-                // return the result. Without delay, we can encounter result override
-                // and see the result of an outdated query
-                await _delay.Of(50);
-                return new() { Results = response.Results };
             }
         }
 

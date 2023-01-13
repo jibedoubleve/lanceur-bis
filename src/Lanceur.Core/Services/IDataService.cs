@@ -41,6 +41,13 @@ namespace Lanceur.Core.Services
         IEnumerable<SelectableAliasQueryResult> GetInvalidAliases();
 
         /// <summary>
+        /// Search into the hidden aliases the one with the specified name and returns its ID
+        /// </summary>
+        /// <param name="name">The name of the hidden alias</param>
+        /// <returns>The ID of this alias or '0' if not found</returns>
+        KeywordUsage GetKeyword(string name);
+
+        /// <summary>
         /// Get list of all the aliases with count greater than 0 and from the specified session
         /// If no session is specified, it'll take the default one
         /// </summary>
@@ -57,6 +64,13 @@ namespace Lanceur.Core.Services
         /// <param name="idSession">The session used to retrieve the usage</param>
         /// <returns>Points of the chart</returns>
         IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, long? idSession = null);
+
+        /// <summary>
+        /// Update the usage of the specified <see cref="QueryResult"/>
+        /// </summary>
+        /// <param name="result">The collection of <see cref="QueryResult"/>to refresh</param>
+        /// <returns></returns>
+        IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result);
 
         void Remove(AliasQueryResult alias);
 
@@ -86,7 +100,12 @@ namespace Lanceur.Core.Services
 
         void SetDefaultSession(long idSession);
 
-        void SetUsage(AliasQueryResult alias);
+        /// <summary>
+        /// Increment counter for execution of an alias. This is the recommended way to
+        /// use counter for an executable alias
+        /// </summary>
+        /// <param name="alias"></param>
+        void SetUsage(QueryResult alias);
 
         void Update(ref Session session);
 
