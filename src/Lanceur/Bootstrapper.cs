@@ -72,8 +72,8 @@ namespace Lanceur
             l.Register<IStoreLoader>(() => new StoreLoader());
             l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
             l.Register<ICmdlineManager>(() => new CmdlineManager());
-            l.Register<IDataService>(() => new SQLiteDataService(Get<SQLiteConnectionScope>(), Get<ILogService>(), Get<IExecutionManager>(), Get<IConvertionService>()));
-            l.Register<IExecutionManager>(() => new ExecutionManager(Get<ILogService>(), Get<IWildcardManager>()));
+            l.Register<IExecutionManager>(() => new ExecutionManager(Get<ILogService>(), Get<IWildcardManager>(), Get<IDataService>()));
+            l.Register<IDataService>(() => new SQLiteDataService(Get<SQLiteConnectionScope>(), Get<ILogService>(), Get<IConvertionService>()));
             l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
             l.Register<IAppSettingsService>(() => new SQLiteAppSettingsService(Get<SQLiteConnectionScope>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());

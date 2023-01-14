@@ -18,11 +18,10 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Constructors
 
-        public MacroDbAction(SQLiteConnectionScope db, ILogService log, IExecutionManager executionService, IConvertionService converter)
+        public MacroDbAction(SQLiteConnectionScope db, ILogService log, IConvertionService converter)
         {
             _db = db;
             _log = log;
-            _executionService = executionService;
             _converter = converter;
         }
 
@@ -34,7 +33,7 @@ namespace Lanceur.Infra.SQLite.DbActions
         {
             if (item.Is(CompositeMacros.Multi))
             {
-                var action = new AliasDbAction(_db, _log, _executionService);
+                var action = new AliasDbAction(_db, _log);
                 var subAliases = new List<AliasQueryResult>();
 
                 int delay = 0;

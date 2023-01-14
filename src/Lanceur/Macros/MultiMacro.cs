@@ -59,7 +59,14 @@ namespace Lanceur.Macros
             {
                 await Task.Delay(_delay);
                 var alias = GetAlias(item);
-                if (alias is not null) { await _executionManager.ExecuteAsync(alias); }
+                if (alias is not null)
+                {
+                    await _executionManager.ExecuteAsync(new ExecutionRequest
+                    {
+                        QueryResult = alias,
+                        Cmdline = cmdline,
+                    });
+                }
             }
 
             return NoResult;

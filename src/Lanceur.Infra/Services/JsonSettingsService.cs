@@ -16,6 +16,7 @@ namespace Lanceur.Infra.Services
     {
         #region Fields
 
+        private static object _locker = new object();
         private readonly string _filePath;
         private Dictionary<string, string> _settings = null;
 
@@ -68,41 +69,46 @@ namespace Lanceur.Infra.Services
                 Directory.CreateDirectory(dir);
             }
 
-            var stream = !File.Exists(_filePath)
-                ? File.Create(_filePath)
-                : File.Open(_filePath, FileMode.Open);
-            return stream;
+            if (File.Exists(_filePath)) { File.Delete(_filePath); }
+
+            return File.Create(_filePath);
         }
 
         public void Load()
         {
-            var stg = new JsonSettings();
-            if (File.Exists(_filePath))
+            lock (_locker)
             {
-                var output = File.ReadAllText(_filePath);
-                stg = JsonConvert.DeserializeObject<JsonSettings>(output);
+                var stg = new JsonSettings();
+                if (File.Exists(_filePath))
+                {
+                    var output = File.ReadAllText(_filePath);
+                    stg = JsonConvert.DeserializeObject<JsonSettings>(output);
+                }
+
+                _settings = new()
+                {
+                    { nameof(stg.DbPath).ToLower(), stg?.DbPath ?? string.Empty }
+                };
+
+                Save();
             }
-
-            _settings = new()
-            {
-                { nameof(stg.DbPath).ToLower(), stg?.DbPath ?? string.Empty }
-            };
-
-            Save();
         }
 
         public void Save()
         {
-            var settings = new JsonSettings
+            lock (_locker)
             {
-                DbPath = _settings[Setting.DbPath.ToString().ToLower()]
-            };
-            var json = JsonConvert.SerializeObject(settings);
+                var settings = new JsonSettings
+                {
+                    DbPath = _settings[Setting.DbPath.ToString().ToLower()]
+                };
+                var json = JsonConvert.SerializeObject(settings);
 
-            using (var stream = OpenFile())
-            using (var file = new StreamWriter(stream))
-            {
-                file.Write(json);
+                using (var stream = OpenFile())
+                using (var file = new StreamWriter(stream))
+                {
+                    file.Write(json);
+                }
             }
         }
 

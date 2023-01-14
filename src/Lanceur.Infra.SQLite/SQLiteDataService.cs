@@ -1,8 +1,6 @@
 ﻿using Dapper;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite.DbActions;
 using System.Text.RegularExpressions;
 
@@ -14,7 +12,6 @@ namespace Lanceur.Infra.SQLite
 
         private readonly AliasDbAction _aliasDbAction;
         private readonly IConvertionService _converter;
-        private readonly IExecutionManager _executionService;
         private readonly ILogService _log;
         private readonly MacroDbAction _macroManager;
 
@@ -25,14 +22,12 @@ namespace Lanceur.Infra.SQLite
         public SQLiteDataService(
             SQLiteConnectionScope scope,
             ILogService log,
-            IExecutionManager executionService,
             IConvertionService converter) : base(scope)
         {
             _log = log;
-            _executionService = executionService;
             _converter = converter;
-            _aliasDbAction = new AliasDbAction(scope, _log, _executionService);
-            _macroManager = new MacroDbAction(DB, log, executionService, converter);
+            _aliasDbAction = new AliasDbAction(scope, _log);
+            _macroManager = new MacroDbAction(DB, log, converter);
         }
 
         #endregion Constructors
@@ -69,9 +64,6 @@ namespace Lanceur.Infra.SQLite
             var arguments = new { idSession };
 
             var result = DB.Connection.Query<AliasQueryResult>(sql, arguments);
-
-            result?.Inject(_executionService, alias => SetUsage(alias));
-
             return result ?? AliasQueryResult.NoResult;
         }
 
@@ -125,6 +117,8 @@ namespace Lanceur.Infra.SQLite
             return _converter.ToSelectableQueryResult(result);
         }
 
+        public KeywordUsage GetKeyword(string name) => _aliasDbAction.GetHiddenKeyword(name);
+
         public IEnumerable<QueryResult> GetMostUsedAliases(long? idSession = null)
         {
             idSession ??= GetDefaultSessionId();
@@ -166,6 +160,8 @@ namespace Lanceur.Infra.SQLite
                 _ => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level"),
             };
         }
+
+        public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => _aliasDbAction.RefreshUsage(result);
 
         public void Remove(AliasQueryResult alias) => _aliasDbAction.Remove(alias);
 
@@ -248,6 +244,7 @@ namespace Lanceur.Infra.SQLite
                 where
                     s.id_session = @idSession
                     and n.Name like @name
+                    and s.hidden = 0
                 order by
                     c.exec_count desc,
                     n.name asc";
@@ -256,7 +253,6 @@ namespace Lanceur.Infra.SQLite
             var results = DB.Connection.Query<AliasQueryResult>(sql, new { name, idSession });
 
             results = _macroManager.UpgradeToComposite(results);
-            results?.Inject(_executionService, alias => SetUsage(alias));
             return results ?? AliasQueryResult.NoResult;
         }
 
@@ -271,7 +267,7 @@ namespace Lanceur.Infra.SQLite
             DB.Connection.Execute(sql, new { idSession });
         }
 
-        public void SetUsage(AliasQueryResult alias) => _aliasDbAction.SetUsage(alias);
+        public void SetUsage(QueryResult alias) => _aliasDbAction.SetUsage(alias);
 
         public void Update(ref Session session)
         {

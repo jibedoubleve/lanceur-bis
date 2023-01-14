@@ -35,8 +35,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var scope = new SQLiteConnectionScope(connection);
             var log = Substitute.For<ILogService>();
-            var exe = Substitute.For<IExecutionManager>();
-            var action = new AliasDbAction(scope, log, exe);
+            var action = new AliasDbAction(scope, log);
             return action;
         }
 
@@ -44,9 +43,8 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var scope = new SQLiteConnectionScope(connection);
             var log = Substitute.For<ILogService>();
-            var exe = Substitute.For<IExecutionManager>();
             var conv = Substitute.For<IConvertionService>();
-            var service = new SQLiteDataService(scope, log, exe, conv);
+            var service = new SQLiteDataService(scope, log, conv);
             return service;
         }
 

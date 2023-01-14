@@ -1,5 +1,4 @@
-﻿using ControlzEx.Theming;
-using DynamicData;
+﻿using DynamicData;
 using DynamicData.Binding;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
@@ -20,8 +19,6 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Windows.Devices.Geolocation;
-using Windows.UI.Composition;
 
 namespace Lanceur.Views
 {
@@ -31,6 +28,7 @@ namespace Lanceur.Views
 
         private readonly ICmdlineManager _cmdlineManager;
         private readonly IDelay _delay;
+        private readonly IExecutionManager _executor;
         private readonly ILogService _log;
         private readonly SourceList<QueryResult> _results = new();
         private readonly ISearchService _searchService;
@@ -48,6 +46,7 @@ namespace Lanceur.Views
             ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
             IDataService service = null,
+            IExecutionManager executor = null,
             IDelay delay = null)
         {
             uiThread ??= RxApp.MainThreadScheduler;
@@ -62,6 +61,7 @@ namespace Lanceur.Views
             _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
             _delay = delay ?? l.GetService<IDelay>();
             _service = service ?? l.GetService<IDataService>();
+            _executor = executor ?? l.GetService<IExecutionManager>();
 
             //Command CanExecute
             var canExecuteAlias = this
@@ -97,7 +97,7 @@ namespace Lanceur.Views
             this.WhenAnyValue(x => x.Query)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
-                .Where(x => !IsBusy && x.IsNullOrWhiteSpace() == false)
+                .Where(x => !IsBusy)
                 .Select(x => x.Trim())
                 .Log(this, $"Query changed", s => $"Query: {s}")
                 .InvokeCommand(SearchAlias);
@@ -152,10 +152,8 @@ namespace Lanceur.Views
 
         public ReactiveCommand<ExecutionContext, SearchContext> ExecuteAlias { get; }
 
-        [Reactive] public bool IsOnError { get; set; }
-
         [Reactive] public bool IsBusy { get; set; }
-
+        [Reactive] public bool IsOnError { get; set; }
         [Reactive] public bool KeepAlive { get; set; }
 
         [Reactive] public string Query { get; set; } = string.Empty;
@@ -177,7 +175,6 @@ namespace Lanceur.Views
             //Clear the previous results...
             Results.Clear();
             CurrentAliasSuggestion = string.Empty;
-
 
             var sessionName = await Task.Run(() => _service.GetDefaultSession()?.Name ?? "N.A.");
 
@@ -203,46 +200,30 @@ namespace Lanceur.Views
 
             using (IsBusyScope.Open())
             {
-                IEnumerable<QueryResult> results = new List<QueryResult>();
-
-                if (CurrentAlias is null)
+                if (context?.Query.IsNullOrEmpty() ?? true) { return new(); }
+                else
                 {
-                    _log.Warning($"Current QueryResult is null. Query: '{(context?.Query ?? "<EMPTY>")}'");
-                    results = DisplayQueryResult.SingleFromResult($"This alias does not exist");
-                    KeepAlive = true;
-                }
-                else if (CurrentAlias is IExecutable exec)
-                {
-                    Query = CurrentAlias.ToQuery();
-
-                    if (exec is IExecutableWithPrivilege exp)
-                    {
-                        exp.IsPrivilegeOverriden = context.RunAsAdmin;
-                    }
-
-                    _log.Debug($"Execute alias '{CurrentAlias.ToQuery()}'");
-
                     var cmd = _cmdlineManager.BuildFromText(context.Query);
                     if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
                     {
                         cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
                     }
 
-                    results = await exec.ExecuteAsync(cmd);
-                    KeepAlive = results.Any();
-                }
-                else
-                {
-                    _log.Info($"Alias '{CurrentAlias.Name}', is not executable. Add as a query");
-                    KeepAlive = true;
-                    results = Results;
-                }
+                    _log.Debug($"Execute alias '{CurrentAlias.ToQuery()}'");
+                    var response = await _executor.ExecuteAsync(new ExecutionRequest
+                    {
+                        QueryResult = CurrentAlias,
+                        Cmdline = cmd,
+                        ExecuteWithPrivilege = context.RunAsAdmin,
+                    });
+                    KeepAlive = response.HasResult;
 
-                // A small delay to be sure the query changes are not handled after we
-                // return the result. Without delay, we can encounter result override 
-                // and see the result of an outdated query
-                await _delay.Of(50);
-                return new() { Results = results };
+                    // A small delay to be sure the query changes are not handled after we
+                    // return the result. Without delay, we can encounter result override
+                    // and see the result of an outdated query
+                    await _delay.Of(50);
+                    return new() { Results = response.Results };
+                }
             }
         }
 

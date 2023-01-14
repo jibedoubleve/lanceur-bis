@@ -12,17 +12,15 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         private readonly SQLiteConnectionScope _db;
         private readonly ILogService _log;
-        private readonly IExecutionManager _executionService;
 
         #endregion Fields
 
         #region Constructors
 
-        public AliasDbAction(SQLiteConnectionScope db, ILogService log, IExecutionManager executionService)
+        public AliasDbAction(SQLiteConnectionScope db, ILogService log)
         {
             _db = db;
             _log = log;
-            _executionService = executionService;
         }
 
         #endregion Constructors
@@ -152,11 +150,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var result = _db.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault();
 
-            if (result is not null)
-            {
-                result.Inject(_executionService, alias => SetUsage(alias));
-                result.Delay = delay;
-            }
+            if (result is not null) { result.Delay = delay; }
 
             return result;
         }
@@ -217,10 +211,9 @@ namespace Lanceur.Infra.SQLite.DbActions
             }
         }
 
-        public void SetUsage(AliasQueryResult alias)
+        public void SetUsage(QueryResult alias)
         {
-            if (alias is null) { throw new ArgumentNullException(nameof(alias)); }
-            else if (alias.Id == 0) { _log.Trace($"Try to set usage to unsupported Alias with this name'{(alias?.Name ?? "N.A.")}'"); }
+            if ((alias?.Id ?? 0) == 0) { _log.Trace($"Try to set usage to unsupported Alias with this name'{(alias?.Name ?? "N.A.")}'"); }
             else
             {
                 var idSession = GetDefaultSessionId();
@@ -301,6 +294,52 @@ namespace Lanceur.Infra.SQLite.DbActions
                     });
                 }
             }
+        }
+
+        public KeywordUsage GetHiddenKeyword(string name)
+        {
+            var sql = @"
+                select 
+	                a.id,
+                    n.name,
+                    (
+    	                select count(id)
+     	                from alias_usage
+      	                where id = a.id
+                    ) as count
+                from
+	                alias a
+                    inner join alias_name n on a.id = n.id_alias
+                where 
+	                hidden = 1
+                    and n.name = @name;";
+            var result = _db.Connection.Query<KeywordUsage>(sql, new { name }).FirstOrDefault();
+
+            return result;
+        }
+
+        internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
+        {
+            var ids = (from r in results
+                       where r.Id != 0
+                       select r);
+            var sql = @"
+                select
+	                id_alias as id,
+	                count
+                from 
+	                stat_usage_per_app_v
+                where id_alias in @ids;";
+
+            var dbResults = _db.Connection.Query<KeywordUsage>(sql, new { ids = results.Select(x => x.Id).ToArray() });
+
+            foreach (var result in results)
+            {
+                result.Count = (from item in dbResults
+                                where item.Id == result.Id
+                                select item.Count).SingleOrDefault();
+            }
+            return results;
         }
 
         #endregion Methods

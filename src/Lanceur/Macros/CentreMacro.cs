@@ -28,7 +28,10 @@ namespace Lanceur.ReservedKeywords
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            var parameters = cmdline.Parameters.IsNullOrEmpty() ? ScreenRuler.DefaultTopOffset.ToString() : cmdline.Parameters;
+            var parameters = cmdline?.Parameters.IsNullOrEmpty() ?? true 
+                ? ScreenRuler.DefaultTopOffset.ToString() 
+                : cmdline.Parameters;
+
             _ = int.TryParse(parameters, out int offset);
 
             var coordinate = ScreenRuler.GetCenterCoordinate(offset);
