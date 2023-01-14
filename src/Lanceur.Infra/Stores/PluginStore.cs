@@ -88,7 +88,7 @@ namespace Lanceur.Infra.Stores
         {
             LoadPlugins();
             var found = from plugin in _plugins
-                        where plugin?.Name?.ToLower()?.Contains(query.Name.ToLower()) ?? false
+                        where plugin?.Name?.ToLower()?.StartsWith(query.Name.ToLower()) ?? false
                         select plugin;
             return found;
         }
