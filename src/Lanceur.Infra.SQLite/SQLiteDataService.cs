@@ -248,6 +248,7 @@ namespace Lanceur.Infra.SQLite
                 where
                     s.id_session = @idSession
                     and n.Name like @name
+                    and s.hidden = 0
                 order by
                     c.exec_count desc,
                     n.name asc";

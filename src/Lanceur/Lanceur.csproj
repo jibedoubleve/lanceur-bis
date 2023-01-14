@@ -20,6 +20,7 @@
     <None Remove="SQL\script-0.5.sql" />
     <None Remove="SQL\script-0.6.sql" />
     <None Remove="SQL\script-0.7.sql" />
+    <None Remove="SQL\script-0.8.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="SQL\script-0.8.sql" />
     <EmbeddedResource Include="SQL\script-0.7.sql" />
     <EmbeddedResource Include="SQL\script-0.1.1.sql" />
     <EmbeddedResource Include="SQL\script-0.6.sql" />
