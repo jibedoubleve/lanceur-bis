@@ -1,5 +1,4 @@
 ﻿using Lanceur.Core;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 
@@ -11,7 +10,6 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         private readonly IConvertionService _converter;
         private readonly SQLiteConnectionScope _db;
-        private readonly IExecutionManager _executionService;
         private readonly ILogService _log;
 
         #endregion Fields
