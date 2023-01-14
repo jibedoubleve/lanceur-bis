@@ -13,7 +13,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using Windows.ApplicationModel.Core;
 
 namespace Lanceur.Views
 {
@@ -22,11 +21,11 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly Interaction<Unit, string> _askFile;
-        private readonly IAppSettingsService _settings;
-        private readonly ISettingsService _stg;
-        private readonly IDataService _service;
         private readonly IDelay _delay;
         private readonly IAppRestart _restart;
+        private readonly IDataService _service;
+        private readonly IAppSettingsService _settings;
+        private readonly ISettingsService _stg;
 
         #endregion Fields
 
@@ -85,19 +84,29 @@ namespace Lanceur.Views
         #endregion Constructors
 
         #region Properties
-        [Reactive] public Session CurrentSession { get; set; }
-        [Reactive] public ObservableCollection<Session> Sessions { get; set; }
+
         [Reactive] private ActivationContext Context { get; set; }
         public ReactiveCommand<Unit, ActivationContext> Activate { get; }
         public Interaction<Unit, string> AskFile => _askFile;
+        [Reactive] public Session CurrentSession { get; set; }
         [Reactive] public string DbPath { get; set; }
         [Reactive] public HotKeySection HotKeySection { get; set; }
+        [Reactive] public double RestartDelay { get; set; }
         public ReactiveCommand<Unit, Unit> SaveSettings { get; }
         public ReactiveCommand<Unit, string> SelectDatabase { get; }
+        [Reactive] public ObservableCollection<Session> Sessions { get; set; }
 
         #endregion Properties
 
         #region Methods
+
+        private TimeSpan GetDelay()
+        {
+            _settings.Save(Context.AppSettings);
+            var delay = int.Parse(_stg[Setting.RestartDelay]);
+            var time = TimeSpan.FromMilliseconds(delay);
+            return time;
+        }
 
         private ActivationContext OnActivate()
         {
@@ -105,6 +114,7 @@ namespace Lanceur.Views
             {
                 AppSettings = _settings.Load(),
                 DbPath = _stg[Setting.DbPath],
+                RestartDelay = int.Parse(_stg[Setting.RestartDelay]),
                 Sessions = _service.GetSessions()
             };
 
@@ -115,19 +125,18 @@ namespace Lanceur.Views
         {
             //Save DB Path
             _stg[Setting.DbPath] = DbPath?.Replace("\"", "");
+            _stg[Setting.RestartDelay] = RestartDelay.ToString();
             _stg.Save();
 
             // Save hotkey & Session
             Context.AppSettings.HotKey = HotKeySection;
             if (CurrentSession is not null) { Context.AppSettings.IdSession = CurrentSession.Id; }
 
-            _settings.Save(Context.AppSettings);
-            var time = TimeSpan.FromSeconds(2);
-            Toast.Information($"Application settings saved. Restart in {time.TotalSeconds} seconds");
+            TimeSpan time = GetDelay();
+            Toast.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
             await _delay.Of(time);
             _restart.Restart();
         }
-
 
         #endregion Methods
 
@@ -139,6 +148,7 @@ namespace Lanceur.Views
 
             public AppSettings AppSettings { get; internal set; }
             public string DbPath { get; internal set; }
+            public double RestartDelay { get; internal set; }
             public IEnumerable<Session> Sessions { get; set; }
 
             #endregion Properties
