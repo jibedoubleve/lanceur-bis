@@ -24,7 +24,7 @@ namespace Lanceur.Views
                     var ofd = new OpenFileDialog()
                     {
                         Title = "Select the database",
-                        Filter = "SQLite|*.sqlite|DB file|*.db|All files|*.*"
+                        Filter = "Databases|*.sqlite;*.db|All files|*.*"
                     };
                     var result = ofd.ShowDialog();
                     var file = (result.HasValue && result.Value) ? ofd.FileName : string.Empty;
