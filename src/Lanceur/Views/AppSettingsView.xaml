@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rxui="http://reactiveui.net"
     xmlns:vm="clr-namespace:Lanceur.Views"
-    d:DesignHeight="450"
+    d:DesignHeight="600"
     d:DesignWidth="500"
     x:TypeArguments="vm:AppSettingsViewModel"
     mc:Ignorable="d">
@@ -55,6 +55,18 @@
                             HorizontalAlignment="Stretch"
                             DisplayMemberPath="FullName" />
                     </HeaderedContentControl>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Miscellaneous">
+                <StackPanel>
+                    <TextBlock Text="{Binding ElementName=SlRestartDelay, Path=Value, StringFormat=Delay before restart after you saved the settings: {0} milliseconds}" />
+                    <Slider
+                        x:Name="SlRestartDelay"
+                        IsSnapToTickEnabled="True"
+                        Maximum="5000"
+                        Minimum="0"
+                        TickFrequency="250"
+                        TickPlacement="BottomRight" />
                 </StackPanel>
             </GroupBox>
         </StackPanel>

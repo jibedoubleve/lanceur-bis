@@ -3,6 +3,7 @@
     public enum Setting
     {
         DbPath,
+        RestartDelay
     }
 
     public interface ISettingsService

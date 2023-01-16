@@ -8,6 +8,7 @@ namespace Lanceur.Infra.Services
         #region Properties
 
         public string DbPath { get; set; } = @"%appdata%\probel\lanceur2\data.sqlite";
+        public int RestartDelay { get; set; } = 500;
 
         #endregion Properties
     }
@@ -87,7 +88,8 @@ namespace Lanceur.Infra.Services
 
                 _settings = new()
                 {
-                    { nameof(stg.DbPath).ToLower(), stg?.DbPath ?? string.Empty }
+                    { nameof(stg.DbPath).ToLower(), stg?.DbPath ?? string.Empty },
+                    { nameof(stg.RestartDelay).ToLower(), stg?.RestartDelay.ToString() ?? "500" },
                 };
 
                 Save();
