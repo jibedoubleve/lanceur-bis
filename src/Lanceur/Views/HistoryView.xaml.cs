@@ -44,7 +44,7 @@ namespace Lanceur.Views
                         History.Plot.Legend();
                         History.Refresh();
                     }
-                    else { LogService.Current.Warning("No history to display."); }
+                    else { AppLogFactory.Get<HistoryView>().Warning("No history to display."); }
                 };
 
                 ViewModel.Activate.Execute().Subscribe();

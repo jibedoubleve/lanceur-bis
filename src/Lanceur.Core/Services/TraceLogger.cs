@@ -10,7 +10,7 @@ namespace Lanceur.Core.Services
     /// It uses <see cref="System.Diagnostics.Trace"/> and also
     /// reflection to log the name of the calling method.
     /// </summary>
-    public class TraceLogService : ILogService
+    public class TraceLogger : IAppLogger
     {
         #region Methods
 

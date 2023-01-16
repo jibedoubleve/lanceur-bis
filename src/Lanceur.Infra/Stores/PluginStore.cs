@@ -1,8 +1,8 @@
 ﻿using Lanceur.Core.Models;
-using Lanceur.Core.Plugins.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Plugins;
+using Lanceur.Infra.Utils;
 using Newtonsoft.Json;
 using Splat;
 
@@ -15,7 +15,7 @@ namespace Lanceur.Infra.Stores
 
         private static IEnumerable<ExecutableQueryResult> _plugins = null;
         private readonly IPluginStoreContext _context;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly IPluginManager _pluginManager;
 
         #endregion Fields
@@ -28,14 +28,14 @@ namespace Lanceur.Infra.Stores
 
         public PluginStore(
             IPluginStoreContext context = null,
-            ILogService logService = null,
+            IAppLoggerFactory logFactory = null,
             IPluginManager pluginManager = null
         )
         {
             var l = Locator.Current;
             _pluginManager = pluginManager ?? l.GetService<IPluginManager>();
             _context = context ?? l.GetService<IPluginStoreContext>();
-            _log = logService ?? l.GetService<ILogService>() ?? new TraceLogService();
+            _log = l.GetLogger<PluginStore>(logFactory);
         }
 
         #endregion Constructors
@@ -90,6 +90,7 @@ namespace Lanceur.Infra.Stores
             var found = from plugin in _plugins
                         where plugin?.Name?.ToLower()?.StartsWith(query.Name.ToLower()) ?? false
                         select plugin;
+            _log.Trace($"Found {found.Count()} plugin(s)");
             return found;
         }
 

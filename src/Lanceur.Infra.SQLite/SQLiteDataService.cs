@@ -12,7 +12,7 @@ namespace Lanceur.Infra.SQLite
 
         private readonly AliasDbAction _aliasDbAction;
         private readonly IConvertionService _converter;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly MacroDbAction _macroManager;
 
         #endregion Fields
@@ -21,13 +21,13 @@ namespace Lanceur.Infra.SQLite
 
         public SQLiteDataService(
             SQLiteConnectionScope scope,
-            ILogService log,
+            IAppLoggerFactory logFactory,
             IConvertionService converter) : base(scope)
         {
-            _log = log;
+            _log = logFactory.GetLogger<SQLiteDataService>();
             _converter = converter;
-            _aliasDbAction = new AliasDbAction(scope, _log);
-            _macroManager = new MacroDbAction(DB, log, converter);
+            _aliasDbAction = new AliasDbAction(scope, logFactory);
+            _macroManager = new MacroDbAction(DB, logFactory, converter);
         }
 
         #endregion Constructors

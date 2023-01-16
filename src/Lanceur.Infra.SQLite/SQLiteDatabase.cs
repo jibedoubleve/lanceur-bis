@@ -8,7 +8,7 @@ namespace Lanceur.Infra.SQLite
     {
         #region Fields
 
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly IDataStoreUpdateManager _updater;
         private readonly IDataStoreVersionManager _versionManager;
 
@@ -18,12 +18,12 @@ namespace Lanceur.Infra.SQLite
 
         public SQLiteDatabase(
             IDataStoreVersionManager versionManager,
-            ILogService logService,
+            IAppLoggerFactory logService,
             IDataStoreUpdateManager updater
             )
         {
             _versionManager = versionManager;
-            _log = logService;
+            _log = logService.GetLogger<SQLiteDatabase>();
             _updater = updater;
         }
 

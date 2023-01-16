@@ -9,10 +9,10 @@ namespace Lanceur.Xaml
     {
         #region Fields
 
-        private static Uri Dark = new Uri("pack://application:,,,/Xaml/Themes/DarkTheme.xaml");
-        private static string DarkThemeTheme = "Dark.Accent1";
-        private static Uri Light = new Uri("pack://application:,,,/Xaml/Themes/LightTheme.xaml");
-        private static string LightTheme = "Light.Accent1";
+        private static readonly Uri Dark = new("pack://application:,,,/Xaml/Themes/DarkTheme.xaml");
+        private static readonly string DarkThemeTheme = "Dark.Accent1";
+        private static readonly Uri Light = new("pack://application:,,,/Xaml/Themes/LightTheme.xaml");
+        private static readonly string LightTheme = "Light.Accent1";
 
         #endregion Fields
 
@@ -32,7 +32,7 @@ namespace Lanceur.Xaml
             }
             catch (Exception ex)
             {
-                LogService.Current.Error(ex.Message, ex);
+                AppLogFactory.Get<ThemeHelper>().Error(ex.Message, ex);
             }
 
             return true;
@@ -57,7 +57,7 @@ namespace Lanceur.Xaml
         {
             #region Fields
 
-            public static readonly CustomLibraryThemeProvider DefaultInstance = new CustomLibraryThemeProvider();
+            public static readonly CustomLibraryThemeProvider DefaultInstance = new();
 
             #endregion Fields
 

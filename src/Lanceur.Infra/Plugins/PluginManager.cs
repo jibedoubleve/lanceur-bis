@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Stores;
+using Lanceur.Infra.Utils;
 using Splat;
 using System.Reflection;
 
@@ -10,18 +11,18 @@ namespace Lanceur.Infra.Plugins
     {
         #region Fields
 
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly IPluginStoreContext _pluginStoreContext;
 
         #endregion Fields
 
         #region Constructors
 
-        public PluginManager(IPluginStoreContext pluginStoreContext = null, ILogService log = null)
+        public PluginManager(IPluginStoreContext pluginStoreContext = null, IAppLoggerFactory logFactory = null)
         {
             var l = Locator.Current;
             _pluginStoreContext = pluginStoreContext ?? l.GetService<IPluginStoreContext>();
-            _log = log ?? l.GetService<ILogService>() ?? new TraceLogService();
+            _log = l.GetLogger<PluginManager>(logFactory);
         }
 
         #endregion Constructors

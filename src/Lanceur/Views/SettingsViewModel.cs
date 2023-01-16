@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -15,7 +16,7 @@ namespace Lanceur.Views
         private readonly HistoryViewModel _historyVm;
         private readonly InvalidAliasViewModel _invalidAliasVm;
         private readonly KeywordsViewModel _keywordVm;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly MostUsedViewModel _mostUsedVm;
         private readonly PluginsViewModel _pluginsViewModel;
         private readonly IDataService _service;
@@ -28,7 +29,7 @@ namespace Lanceur.Views
         #region Constructors
 
         public SettingsViewModel(
-            ILogService log = null,
+            IAppLoggerFactory logFactory = null,
             KeywordsViewModel keywordVm = null,
             SessionsViewModel sessionsVm = null,
             AppSettingsViewModel settingsVm = null,
@@ -41,13 +42,11 @@ namespace Lanceur.Views
             IUserNotification notify = null,
             IDataService service = null)
         {
-            _log ??= log;
-
             var l = Locator.Current;
             Router = l.GetService<RoutingState>();
 
             notify ??= l.GetService<IUserNotification>();
-            _log = log ?? l.GetService<ILogService>();
+            _log = l.GetLogger<SettingsViewModel>(logFactory);
             _keywordVm = keywordVm ?? l.GetService<KeywordsViewModel>();
             _sessionsVm = sessionsVm ?? l.GetService<SessionsViewModel>();
             _settingsVm = settingsVm ?? l.GetService<AppSettingsViewModel>();

@@ -43,7 +43,7 @@ namespace Lanceur.Ui
                     if (query is AliasQueryResult alias)
                     {
                         var path = alias.FileName;
-                        LogService.Current.Trace($"Refresh thumbnail of '{path}'.");
+                        AppLogFactory.Get<WPFThumbnailManager>().Trace($"Refresh thumbnail of '{path}'.");
 
                         if (path.IsNullOrEmpty()) { continue; }
                         else if (_cache.IsInCache(path))
@@ -65,7 +65,7 @@ namespace Lanceur.Ui
             });
             t.ContinueWith(t =>
             {
-                LogService.Current.Warning($"An error occured during the refresh of the icons. ('{t.Exception.Message}')", t.Exception);
+                AppLogFactory.Get<WPFThumbnailManager>().Warning($"An error occured during the refresh of the icons. ('{t.Exception.Message}')", t.Exception);
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
 

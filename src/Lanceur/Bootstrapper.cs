@@ -48,7 +48,7 @@ namespace Lanceur
                    .ConstructUsing(x => new DisplayQueryResult($"@{x}@", "This is a macro", "LinkVariant"));
 
                 cfg.CreateMap<Session, SessionExecutableQueryResult>()
-                   .ConstructUsing(x => new SessionExecutableQueryResult(x.Name, x.Notes, Get<ILogService>(), Get<IDataService>()))
+                   .ConstructUsing(x => new SessionExecutableQueryResult(x.Name, x.Notes, Get<IAppLoggerFactory>(), Get<IDataService>()))
                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
             });
         }
@@ -68,12 +68,12 @@ namespace Lanceur
             l.RegisterLazySingleton<IAppRestart>(() => new AppRestart());
 
 
-            l.Register<ILogService>(() => new NLogService());
+            l.Register<IAppLoggerFactory>(() => new NLoggerFactory());
             l.Register<IStoreLoader>(() => new StoreLoader());
             l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
             l.Register<ICmdlineManager>(() => new CmdlineManager());
-            l.Register<IExecutionManager>(() => new ExecutionManager(Get<ILogService>(), Get<IWildcardManager>(), Get<IDataService>()));
-            l.Register<IDataService>(() => new SQLiteDataService(Get<SQLiteConnectionScope>(), Get<ILogService>(), Get<IConvertionService>()));
+            l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(), Get<IDataService>()));
+            l.Register<IDataService>(() => new SQLiteDataService(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(), Get<IConvertionService>()));
             l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
             l.Register<IAppSettingsService>(() => new SQLiteAppSettingsService(Get<SQLiteConnectionScope>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
@@ -86,7 +86,7 @@ namespace Lanceur
             l.Register<IPackagedAppManager>(() => new PackagedAppManager());
             l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppManager>()));
 
-            l.Register(() => new SQLiteDatabase(Get<IDataStoreVersionManager>(), Get<ILogService>(), Get<IDataStoreUpdateManager>()));
+            l.Register(() => new SQLiteDatabase(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
             l.Register(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
             l.Register<IConnectionString>(() => new ConnectionString(Get<ISettingsService>()));
@@ -130,7 +130,7 @@ namespace Lanceur
             var stg = l.GetService<IConnectionString>();
             var sqlite = l.GetService<SQLiteDatabase>();
 
-            LogService.Current.Trace($"Settings DB path: '{stg.ToString()}'");
+            AppLogFactory.Get(typeof(Bootstrapper)).Trace($"Settings DB path: '{stg.ToString()}'");
 
             sqlite.Update(stg.ToString());
         }

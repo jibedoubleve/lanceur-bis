@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using Lanceur.Ui;
 using ReactiveUI;
 using Splat;
@@ -14,7 +15,7 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly IDataService _service;
 
         #endregion Fields
@@ -24,12 +25,12 @@ namespace Lanceur.Views
         public HistoryViewModel(
             IScheduler uiThread = null,
             IDataService service = null,
-            ILogService log = null,
+            IAppLoggerFactory logFactory = null,
             IUserNotification notify = null)
         {
             var l = Locator.Current;
             _service = service ?? l.GetService<IDataService>();
-            _log = log ?? l.GetService<ILogService>();
+            _log = l.GetLogger<HistoryViewModel>(logFactory);
             notify ??= l.GetService<IUserNotification>();
 
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
