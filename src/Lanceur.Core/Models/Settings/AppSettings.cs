@@ -9,7 +9,7 @@
         public RepositorySection Repository { get; set; } = new RepositorySection();
         public bool ShowAtStartup { get; set; }
         public WindowSection Window { get; set; } = new WindowSection();
-
+        public double RestartDelay { get; set; } = 500;
         #endregion Properties
     }
 }

@@ -8,7 +8,6 @@ namespace Lanceur.Infra.Services
         #region Properties
 
         public string DbPath { get; set; } = @"%appdata%\probel\lanceur2\data.sqlite";
-        public int RestartDelay { get; set; } = 500;
 
         #endregion Properties
     }
@@ -17,7 +16,7 @@ namespace Lanceur.Infra.Services
     {
         #region Fields
 
-        private static object _locker = new object();
+        private static readonly object _locker = new();
         private readonly string _filePath;
         private Dictionary<string, string> _settings = null;
 
@@ -89,7 +88,6 @@ namespace Lanceur.Infra.Services
                 _settings = new()
                 {
                     { nameof(stg.DbPath).ToLower(), stg?.DbPath ?? string.Empty },
-                    { nameof(stg.RestartDelay).ToLower(), stg?.RestartDelay.ToString() ?? "500" },
                 };
 
                 Save();
@@ -106,11 +104,9 @@ namespace Lanceur.Infra.Services
                 };
                 var json = JsonConvert.SerializeObject(settings);
 
-                using (var stream = OpenFile())
-                using (var file = new StreamWriter(stream))
-                {
-                    file.Write(json);
-                }
+                using var stream = OpenFile();
+                using var file = new StreamWriter(stream);
+                file.Write(json);
             }
         }
 

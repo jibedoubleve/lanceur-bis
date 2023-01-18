@@ -69,6 +69,7 @@ namespace Lanceur.Views
                 {
                     DbPath = ctx.DbPath;
                     HotKeySection = ctx.AppSettings.HotKey;
+                    RestartDelay = ctx.AppSettings.RestartDelay;
                     Sessions = new ObservableCollection<Session>(ctx.Sessions);
                     CurrentSession = (from s in Sessions
                                       where s.Id == ctx.AppSettings.IdSession
@@ -103,7 +104,7 @@ namespace Lanceur.Views
         private TimeSpan GetDelay()
         {
             _settings.Save(Context.AppSettings);
-            var delay = int.Parse(_stg[Setting.RestartDelay]);
+            var delay = Context.AppSettings.RestartDelay;
             var time = TimeSpan.FromMilliseconds(delay);
             return time;
         }
@@ -114,7 +115,6 @@ namespace Lanceur.Views
             {
                 AppSettings = _settings.Load(),
                 DbPath = _stg[Setting.DbPath],
-                RestartDelay = int.Parse(_stg[Setting.RestartDelay]),
                 Sessions = _service.GetSessions()
             };
 
@@ -125,10 +125,10 @@ namespace Lanceur.Views
         {
             //Save DB Path
             _stg[Setting.DbPath] = DbPath?.Replace("\"", "");
-            _stg[Setting.RestartDelay] = RestartDelay.ToString();
             _stg.Save();
 
             // Save hotkey & Session
+            Context.AppSettings.RestartDelay = RestartDelay;
             Context.AppSettings.HotKey = HotKeySection;
             if (CurrentSession is not null) { Context.AppSettings.IdSession = CurrentSession.Id; }
 
@@ -148,7 +148,6 @@ namespace Lanceur.Views
 
             public AppSettings AppSettings { get; internal set; }
             public string DbPath { get; internal set; }
-            public double RestartDelay { get; internal set; }
             public IEnumerable<Session> Sessions { get; set; }
 
             #endregion Properties
