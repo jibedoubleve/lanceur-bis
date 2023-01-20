@@ -10,13 +10,13 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         private readonly IConvertionService _converter;
         private readonly SQLiteConnectionScope _db;
-        private readonly ILogService _log;
+        private readonly IAppLoggerFactory _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public MacroDbAction(SQLiteConnectionScope db, ILogService log, IConvertionService converter)
+        public MacroDbAction(SQLiteConnectionScope db, IAppLoggerFactory log, IConvertionService converter)
         {
             _db = db;
             _log = log;

@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Services
 {
-    public interface ILogService
+    public interface IAppLogger
     {
         #region Methods
 

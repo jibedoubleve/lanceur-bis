@@ -4,6 +4,7 @@ using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using Lanceur.Models;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
@@ -29,7 +30,7 @@ namespace Lanceur.Views
         private readonly ICmdlineManager _cmdlineManager;
         private readonly IDelay _delay;
         private readonly IExecutionManager _executor;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly SourceList<QueryResult> _results = new();
         private readonly ISearchService _searchService;
         private readonly IDataService _service;
@@ -41,7 +42,7 @@ namespace Lanceur.Views
         public MainViewModel(
             IScheduler uiThread = null,
             IScheduler poolThread = null,
-            ILogService log = null,
+            IAppLoggerFactory logFactory = null,
             ISearchService searchService = null,
             ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
@@ -56,7 +57,7 @@ namespace Lanceur.Views
 
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
-            _log = log ?? Locator.Current.GetService<ILogService>();
+            _log = Locator.Current.GetLogger<MainViewModel>(logFactory);
             _searchService = searchService ?? l.GetService<ISearchService>();
             _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
             _delay = delay ?? l.GetService<IDelay>();

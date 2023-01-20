@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using Splat;
 using System;
 
@@ -8,15 +9,15 @@ namespace Lanceur.Ui
     {
         #region Fields
 
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public UserNotification(ILogService log = null)
+        public UserNotification(IAppLoggerFactory logFactory = null)
         {
-            _log = log ?? Locator.Current.GetService<ILogService>();
+            _log = Locator.Current.GetLogger<UserNotification>(logFactory);
         }
 
         #endregion Constructors

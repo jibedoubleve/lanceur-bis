@@ -44,6 +44,19 @@ namespace Lanceur.Macros
 
         private static Cmdline Cmdline(string cmd) => CmdlineProcessor.BuildFromText(cmd);
 
+        private static IEnumerable<QueryResult> DumpCache()
+        {
+            var cache = Locator.Current.GetService<IImageCache>();
+            var results = new List<DisplayQueryResult>();
+            foreach (var item in cache)
+            {
+                var key = item.Key;
+                var value = item.Value?.GetType()?.ToString() ?? "NULL";
+                results.Add(new DisplayQueryResult(value, key, "image"));
+            }
+            return results;
+        }
+
         private static IEnumerable<QueryResult> Echo(Cmdline cl)
         {
             new ToastContentBuilder()
@@ -70,21 +83,8 @@ namespace Lanceur.Macros
                     new DebugMacro("cache", "Displays thumbnails in the cache",  Cmdline("debug cache") ),
                 },
             };
-            LogService.Current.Debug($"Executed 'debug {cl.Name.ToLower()}' and found {result.Count()} item(s)");
+            AppLogFactory.Get<DebugMacro>().Debug($"Executed 'debug {cl.Name.ToLower()}' and found {result.Count()} item(s)");
             return Task.FromResult(result);
-        }
-
-        private static IEnumerable<QueryResult> DumpCache()
-        {
-            var cache = Locator.Current.GetService<IImageCache>();
-            var results = new List<DisplayQueryResult>();
-            foreach (var item in cache)
-            {
-                var key = item.Key;
-                var value = item.Value?.GetType()?.ToString() ?? "NULL";
-                results.Add(new DisplayQueryResult(value, key, "image"));
-            }
-            return results;
         }
 
         public override string ToQuery() => $"debug {Query?.Parameters}".Trim().ToLower();

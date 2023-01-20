@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using Lanceur.Models;
 using Lanceur.Ui;
 using ReactiveUI;
@@ -22,9 +23,9 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly IDataService _aliasService;
-        private readonly IThumbnailManager _thumbnailManager;
         private readonly Interaction<string, bool> _confirmRemove;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
+        private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
 
@@ -33,14 +34,14 @@ namespace Lanceur.Views
         public SessionsViewModel(
             IScheduler uiThread = null,
             IScheduler poolThread = null,
-            ILogService logService = null,
+            IAppLoggerFactory logFactory = null,
             IDataService aliasService = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null)
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
-            _log = logService ?? l.GetService<ILogService>();
+            _log = l.GetLogger<SessionsViewModel>(logFactory);
             _aliasService = aliasService ?? l.GetService<IDataService>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
 

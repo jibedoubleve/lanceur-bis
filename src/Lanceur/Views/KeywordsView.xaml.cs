@@ -25,7 +25,7 @@ namespace Lanceur.Views
 
             this.WhenActivated(d =>
             {
-                LogService.Current.Trace($"Activating {nameof(KeywordsView)}");
+                AppLogFactory.Get<KeywordsView>().Trace($"Activating {nameof(KeywordsView)}");
 
                 ViewModel.ConfirmRemove.RegisterHandler(async interaction =>
                 {

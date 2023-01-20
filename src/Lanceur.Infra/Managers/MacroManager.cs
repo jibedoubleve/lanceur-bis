@@ -2,6 +2,7 @@
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using Splat;
 using System.ComponentModel;
 using System.Reflection;
@@ -14,16 +15,16 @@ namespace Lanceur.Infra.Managers
 
         private static Dictionary<string, ExecutableQueryResult> _macroInstances = null;
         private readonly Assembly _asm;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public MacroManager(Assembly asm, ILogService log = null)
+        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null)
         {
             _asm = asm;
-            _log = log ?? Locator.Current.GetService<ILogService>() ?? new TraceLogService();
+            _log = Locator.Current.GetLogger<MacroManager>(logFactory);
         }
 
         #endregion Constructors

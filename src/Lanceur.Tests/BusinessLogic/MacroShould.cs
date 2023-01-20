@@ -172,7 +172,7 @@ namespace Lanceur.Tests.BusinessLogic
 
             public static IDataService GetDataService(SQLiteConnection db)
             {
-                var log = Substitute.For<ILogService>();
+                var log = Substitute.For<IAppLoggerFactory>();
                 var conv = GetConvertionService();
                 var service = new SQLiteDataService(new SQLiteConnectionScope(db), log, conv);
                 return service;

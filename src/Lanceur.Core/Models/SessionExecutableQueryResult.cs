@@ -6,7 +6,7 @@ namespace Lanceur.Core.Models
     {
         #region Fields
 
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly IDataService _service;
 
         #endregion Fields
@@ -16,10 +16,10 @@ namespace Lanceur.Core.Models
         public SessionExecutableQueryResult(
             string name,
             string description,
-            ILogService log,
+            IAppLoggerFactory logFactory,
             IDataService service) : base(name, description)
         {
-            _log = log;
+            _log = logFactory.GetLogger<SessionExecutableQueryResult>();
             _service = service;
         }
 

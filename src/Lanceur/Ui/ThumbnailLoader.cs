@@ -92,7 +92,7 @@ namespace Lanceur.Ui
                     _cache[path] = image;
                 }
             }
-            catch (Exception ex) { LogService.Current.Warning($"Failed to extract thumbnail for {path}", ex); }
+            catch (Exception ex) { AppLogFactory.Get(typeof(ThumbnailLoader)).Warning($"Failed to extract thumbnail for {path}", ex); }
 
             //Return the value event if null;
             return image;
