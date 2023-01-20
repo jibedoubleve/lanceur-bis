@@ -131,7 +131,15 @@
                     </StackPanel>
                     <StackPanel>
                         <HeaderedContentControl Header="Name">
-                            <TextBox Margin="5" Text="{Binding ElementName=Aliases, Path=SelectedItem.Name, UpdateSourceTrigger=PropertyChanged}" />
+                            <StackPanel>
+                                <TextBox Margin="5" Text="{Binding ElementName=Aliases, Path=SelectedItem.Name, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock
+                                    x:Name="BoxNameValidation"
+                                    Margin="5,0,0,0"
+                                    FontSize="13"
+                                    Foreground="Red"
+                                    Visibility="{Binding ElementName=BoxNameValidation, Path=Text, Converter={StaticResource StringToVisibilityConverter}}" />
+                            </StackPanel>
                         </HeaderedContentControl>
                         <HeaderedContentControl Header="File name">
                             <Grid>

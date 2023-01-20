@@ -48,7 +48,9 @@ namespace Lanceur.Views
                 this.BindCommand(ViewModel, vm => vm.RemoveAlias, v => v.BtnDeleteAlias, v => v.SelectedAlias).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.SaveOrUpdateAlias, v => v.BtnSaveOrUpdateAlias, v => v.SelectedAlias).DisposeWith(d);
 
-                this.BindValidation(ViewModel, v => v.BoxFileNameValidation.Text).DisposeWith(d);
+                //Validations
+                this.BindValidation(ViewModel, vm => vm.ValidationFileName, v => v.BoxFileNameValidation.Text).DisposeWith(d);
+                this.BindValidation(ViewModel, vm => vm.ValidationAliasExists, v => v.BoxNameValidation.Text).DisposeWith(d);
             });
         }
 
