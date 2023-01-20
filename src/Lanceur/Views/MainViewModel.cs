@@ -209,7 +209,7 @@ namespace Lanceur.Views
                         cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
                     }
 
-                    _log.Debug($"Execute alias '{CurrentAlias.ToQuery()}'");
+                    _log.Debug($"Execute alias '{(context?.Query ?? "<EMPTY>")}'");
                     var response = await _executor.ExecuteAsync(new ExecutionRequest
                     {
                         QueryResult = CurrentAlias,
