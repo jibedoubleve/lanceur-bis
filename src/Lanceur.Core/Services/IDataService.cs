@@ -66,6 +66,13 @@ namespace Lanceur.Core.Services
         IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, long? idSession = null);
 
         /// <summary>
+        /// Hydrate the macro with its <c>id</c> and <c>count</c>. This method will try to find the 
+        /// macro by using its name  that should be something like '@it_s_name@'
+        /// </summary>
+        /// <param name="alias">Macro to hydrate</param>
+        void HydrateMacro(QueryResult alias);
+
+        /// <summary>
         /// Update the usage of the specified <see cref="QueryResult"/>
         /// </summary>
         /// <param name="result">The collection of <see cref="QueryResult"/>to refresh</param>

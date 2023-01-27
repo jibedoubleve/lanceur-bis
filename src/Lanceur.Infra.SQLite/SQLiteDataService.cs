@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.SQLite
 {
-    public class SQLiteDataService : SQLiteServiceBase, IDataService
+    public partial class SQLiteDataService : SQLiteServiceBase, IDataService
     {
         #region Fields
 
@@ -159,6 +159,30 @@ namespace Lanceur.Infra.SQLite
                 Per.Month => action.PerMonth(idSession.Value),
                 _ => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level"),
             };
+        }
+
+        public void HydrateMacro(QueryResult alias)
+        {
+            var sql = @"
+            select
+	            a.id        as Item1,
+                count(a.id) as Item2
+            from
+	            alias a
+                inner join alias_usage au on a.id = au.id_alias
+            where
+	            file_name like @name
+            group by
+	            a.id  ";
+
+            var results = DB.Connection.Query<Tuple<int, int>>(sql, new { name = alias.Name });
+
+            if (results.Count() == 1)
+            {
+                var item = results.ElementAt(0);
+                alias.Id = item.Item1;
+                alias.Count = item.Item2;
+            }
         }
 
         public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => _aliasDbAction.RefreshUsage(result);
