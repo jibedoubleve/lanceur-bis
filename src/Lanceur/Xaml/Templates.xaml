@@ -46,7 +46,7 @@
                         Grid.Row="1"
                         VerticalAlignment="Center"
                         FontSize="11"
-                        Foreground="{StaticResource TextColourBrush}"
+                        Foreground="{DynamicResource TextColourBrush}"
                         Text="{Binding Description, Converter={StaticResource QueryDescriptionConverter}}" />
                     <TextBlock
                         Grid.Row="1"
@@ -54,7 +54,7 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         FontSize="9"
-                        Foreground="{StaticResource TextColourBrush}">
+                        Foreground="{DynamicResource TextColourBrush}">
                         <Run Text="Count:" />
                         <Run Text="{Binding Count}" />
                     </TextBlock>
@@ -141,7 +141,7 @@
                         Grid.Row="1"
                         VerticalAlignment="Center"
                         FontSize="11"
-                        Foreground="{StaticResource TextColourBrush}"
+                        Foreground="{DynamicResource TextColourBrush}"
                         Text="{Binding Description, Converter={StaticResource QueryDescriptionConverter}}" />
                 </Grid>
             </DockPanel>
@@ -193,7 +193,7 @@
                             Grid.Row="1"
                             VerticalAlignment="Center"
                             FontSize="11"
-                            Foreground="{StaticResource TextColourBrush}"
+                            Foreground="{DynamicResource TextColourBrush}"
                             Text="{Binding Description, Converter={StaticResource QueryDescriptionConverter}}" />
                     </Grid>
                 </DockPanel>
@@ -238,7 +238,7 @@
                         Grid.Column="1"
                         VerticalAlignment="Bottom"
                         FontSize="9"
-                        Foreground="{StaticResource TextColourBrush}">
+                        Foreground="{DynamicResource TextColourBrush}">
                         <Run Text="Count:" />
                         <Run Text="{Binding Count}" />
                     </TextBlock>
