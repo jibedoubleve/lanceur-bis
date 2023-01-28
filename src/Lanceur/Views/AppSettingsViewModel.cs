@@ -103,7 +103,6 @@ namespace Lanceur.Views
 
         private TimeSpan GetDelay()
         {
-            _settings.Save(Context.AppSettings);
             var delay = Context.AppSettings.RestartDelay;
             var time = TimeSpan.FromMilliseconds(delay);
             return time;
@@ -123,14 +122,17 @@ namespace Lanceur.Views
 
         private async void OnSaveSettings()
         {
-            //Save DB Path
+            //Save DB Path in property file
             _stg[Setting.DbPath] = DbPath?.Replace("\"", "");
             _stg.Save();
 
-            // Save hotkey & Session
+            // Save hotkey & Session in DB
             Context.AppSettings.RestartDelay = RestartDelay;
             Context.AppSettings.HotKey = HotKeySection;
             if (CurrentSession is not null) { Context.AppSettings.IdSession = CurrentSession.Id; }
+
+            //Save settings
+            _settings.Save(Context.AppSettings);
 
             TimeSpan time = GetDelay();
             Toast.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
