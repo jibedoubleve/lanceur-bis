@@ -1,4 +1,5 @@
 ﻿using ControlzEx.Theming;
+using Lanceur.Core.Services;
 using Lanceur.Utils;
 using Microsoft.Win32;
 using System;
@@ -14,7 +15,7 @@ namespace Lanceur.Xaml
         private const string DarkTheme = "Dark.Accent1";
         private const string LightTheme = "Light.Accent1";
         private static Application _app;
-
+        private static readonly IAppLogger _log = AppLogFactory.Get<ThemeManager>();
         private static ThemeManager _instance;
 
         #endregion Fields
@@ -89,7 +90,7 @@ namespace Lanceur.Xaml
         {
             object value = Registry.GetValue(@"HKEY_CURRENT_USER\Software\\Microsoft\Windows\\CurrentVersion\Themes\\Personalize", "AppsUseLightTheme", null);
 
-            LogService.Current.Debug($"Actual theme is: '{(Convert.ToBoolean(value) ? "LIGHT" : "DARK")}'");
+            _log.Debug($"Actual theme is: '{(Convert.ToBoolean(value) ? "LIGHT" : "DARK")}'");
 
             return value is null
                 ? Themes.Light
@@ -110,7 +111,7 @@ namespace Lanceur.Xaml
                 _ => throw new NotSupportedException($"The theme '{theme}' is not supported!")
             };
 
-            LogService.Current.Debug($"Applying theme '{themeToApply}'. Asekd theme is '{theme}'");
+            _log.Debug($"Applying theme '{themeToApply}'. Asekd theme is '{theme}'");
             ControlzEx.Theming.ThemeManager.Current.ChangeTheme(_app, themeToApply);
         }
 
