@@ -1,4 +1,5 @@
-﻿using DynamicData;
+﻿using ControlzEx.Standard;
+using DynamicData;
 using DynamicData.Binding;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -13,6 +14,7 @@ using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Abstractions;
 using ReactiveUI.Validation.Contexts;
 using ReactiveUI.Validation.Extensions;
+using ReactiveUI.Validation.Helpers;
 using Splat;
 using System;
 using System.Collections.Generic;
@@ -72,79 +74,9 @@ namespace Lanceur.Views
                     AliasToCreate = null;
                 }).DisposeWith(d);
 
-                /*
-                 * VALIDATIONS
-                 */
-                var canSaveOrUpdateAlias = this.WhenAnyValue(
-                    x => x.SelectedAlias.FileName,
-                    x => !string.IsNullOrEmpty(x)
-                );
-
-                this.ValidationRule(
-                      vm => vm.SelectedAlias.FileName,
-                      canSaveOrUpdateAlias,
-                      "The path to the file shouldn't be empty."
-                ).DisposeWith(d);
-
-                /*
-                 * COMMANDS
-                 */
-                Search = ReactiveCommand.Create<SearchRequest, IEnumerable<QueryResult>>(OnSearch, outputScheduler: uiThread).DisposeWith(d);
-                Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
-
-                DuplicateAlias = ReactiveCommand.Create<Unit, AliasQueryResult>(OnDuplicateAlias, outputScheduler: uiThread).DisposeWith(d);
-                DuplicateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
-
-                CreateAlias = ReactiveCommand.Create(OnCreateAlias, outputScheduler: uiThread).DisposeWith(d);
-                CreateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
-
-                RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread).DisposeWith(d);
-                RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
-
-                SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnSaveOrUpdateAliasAsync, canSaveOrUpdateAlias, outputScheduler: uiThread).DisposeWith(d);
-                SaveOrUpdateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
-
-                /*
-                 * BINDINGS
-                 */
-                _aliases
-                    .Connect()
-                    .ObserveOn(uiThread)
-                    .Bind(Aliases)
-                    .Subscribe()
-                    .DisposeWith(d);
-
-                this.WhenAnyObservable(vm => vm.Search)
-                    .DistinctUntilChanged()
-                    .Log(this, "Setting aliases", c => $"Count {c.Count()}")
-                    .Subscribe(SetAliases)
-                    .DisposeWith(d);
-
-                this.WhenAnyObservable(vm => vm.Search)
-                    .Where(x => x.Any())
-                    .Select(x => x.ElementAt(0) as AliasQueryResult)
-                    .Where(x => x is not null)
-                    .Log(this, "Selecting an alias", c => $"Id: {c.Id} - Name: {c.Name}")
-                    .BindTo(this, vm => vm.SelectedAlias)
-                    .DisposeWith(d);
-
-                this.WhenAnyObservable(vm => vm.DuplicateAlias)
-                    .Select(x =>
-                    {
-                        _log.Trace($"Duplicated alias '{x.Name}'");
-                        _aliases.Add(x);
-                        return x;
-                    })
-                    .BindTo(this, vm => vm.SelectedAlias)
-                    .DisposeWith(d);
-
-                this.WhenAnyValue(vm => vm.SearchQuery)
-                    .DistinctUntilChanged()
-                    .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
-                    .Select(x => new SearchRequest(x?.Trim(), AliasToCreate))
-                    .Log(this, $"Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{(c?.AliasToCreate?.Name ?? "<EMPTY>")}'")
-                    .InvokeCommand(Search)
-                    .DisposeWith(d);
+                SetupValidations(d);
+                SetupCommands(uiThread, notify, d);
+                SetupBindings(uiThread, d);
             });
         }
 
@@ -159,6 +91,7 @@ namespace Lanceur.Views
         public IObservableCollection<QueryResult> Aliases { get; } = new ObservableCollectionExtended<QueryResult>();
 
         [Reactive] public AliasQueryResult AliasToCreate { get; set; }
+
         [Reactive] public string BusyMessage { get; set; }
 
         public Interaction<string, bool> ConfirmRemove => _confirmRemove;
@@ -178,7 +111,12 @@ namespace Lanceur.Views
         [Reactive] public string SearchQuery { get; set; }
 
         [Reactive] public AliasQueryResult SelectedAlias { get; set; }
+
+        public ValidationHelper ValidationAliasExists { get; private set; }
+
         public ValidationContext ValidationContext { get; } = new ValidationContext();
+
+        public ValidationHelper ValidationFileName { get; private set; }
 
         #endregion Properties
 
@@ -254,6 +192,98 @@ namespace Lanceur.Views
         {
             _aliases.Clear();
             _aliases.AddRange(x);
+        }
+
+        private void SetupBindings(IScheduler uiThread, CompositeDisposable d)
+        {
+            _aliases
+                .Connect()
+                .ObserveOn(uiThread)
+                .Bind(Aliases)
+                .Subscribe()
+                .DisposeWith(d);
+
+            this.WhenAnyObservable(vm => vm.Search)
+                .DistinctUntilChanged()
+                .Log(this, "Setting aliases", c => $"Count {c.Count()}")
+                .Subscribe(SetAliases)
+                .DisposeWith(d);
+
+            this.WhenAnyObservable(vm => vm.Search)
+                .Where(x => x.Any())
+                .Select(x => x.ElementAt(0) as AliasQueryResult)
+                .Where(x => x is not null)
+                .Log(this, "Selecting an alias", c => $"Id: {c.Id} - Name: {c.Name}")
+                .BindTo(this, vm => vm.SelectedAlias)
+                .DisposeWith(d);
+
+            this.WhenAnyObservable(vm => vm.DuplicateAlias)
+                .Select(x =>
+                {
+                    _log.Trace($"Duplicated alias '{x.Name}'");
+                    _aliases.Add(x);
+                    return x;
+                })
+                .BindTo(this, vm => vm.SelectedAlias)
+                .DisposeWith(d);
+
+            this.WhenAnyValue(vm => vm.SearchQuery)
+                .DistinctUntilChanged()
+                .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
+                .Select(x => new SearchRequest(x?.Trim(), AliasToCreate))
+                .Log(this, $"Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{(c?.AliasToCreate?.Name ?? "<EMPTY>")}'")
+                .InvokeCommand(Search)
+                .DisposeWith(d);
+        }
+
+        private void SetupCommands(IScheduler uiThread, IUserNotification notify, CompositeDisposable d)
+        {
+            Search = ReactiveCommand.Create<SearchRequest, IEnumerable<QueryResult>>(OnSearch, outputScheduler: uiThread).DisposeWith(d);
+            Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            DuplicateAlias = ReactiveCommand.Create<Unit, AliasQueryResult>(OnDuplicateAlias, outputScheduler: uiThread).DisposeWith(d);
+            DuplicateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            CreateAlias = ReactiveCommand.Create(OnCreateAlias, outputScheduler: uiThread).DisposeWith(d);
+            CreateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread).DisposeWith(d);
+            RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnSaveOrUpdateAliasAsync, this.IsValid(), outputScheduler: uiThread).DisposeWith(d);
+            SaveOrUpdateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+        }
+
+        private void SetupValidations(CompositeDisposable d)
+        {
+            var fileNameExists = this.WhenAnyValue(
+                x => x.SelectedAlias.FileName,
+                x => !x.IsNullOrEmpty()
+            );
+            var nameExists = this.WhenAnyValue(
+                x => x.SelectedAlias.Name,
+                x => x.SelectedAlias.Id,
+                (x, y) =>
+                {
+                    return y == 0
+                        ? _aliasService.GetExact(x) == null && !x.IsNullOrWhiteSpace()
+                        : x.IsNullOrEmpty() == false;
+                }
+            );
+
+            ValidationFileName = this.ValidationRule(
+                   vm => vm.SelectedAlias.FileName,
+                   fileNameExists,
+                   "The path to the file shouldn't be empty."
+             );
+            ValidationFileName.DisposeWith(d);
+
+            ValidationAliasExists = this.ValidationRule(
+                   vm => vm.SelectedAlias.Name,
+                   nameExists,
+                   "Alias same already exists or is empty."
+             );
+            ValidationAliasExists.DisposeWith(d);
         }
 
         public async Task Clear()
