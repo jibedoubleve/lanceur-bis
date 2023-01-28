@@ -73,6 +73,7 @@ namespace Lanceur.Infra.Services
                 results.AddRange(res);
             }
 
+            // Remember the query
             foreach (var result in results) { result.Query = query; }
 
             if (results.Any())
@@ -86,8 +87,14 @@ namespace Lanceur.Infra.Services
 
                 // Updgrade alias to executable macro and return the result
                 var toReturn = _macroManager.Handle(results);
+
+                //Refresh the thumbnails
                 _thumbnailManager.RefreshThumbnails(toReturn);
-                return toReturn;
+
+                // Order the list and return the result
+                return toReturn
+                        .OrderByDescending(e => e.Count)
+                        .ThenBy(e => e.Name);
             }
             else { return DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline"); }
         }

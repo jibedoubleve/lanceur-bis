@@ -15,7 +15,7 @@ namespace Lanceur.Infra.SQLite
             "IdSession",
             "ShowAtStartup",
             "HotKey.Key",
-            "HotKey.ModifierKeys",
+            "HotKey.ModifierKey",
             "Repository.ScoreLimit",
             "Window.Position.Left",
             "Window.Position.Top",
@@ -97,7 +97,8 @@ namespace Lanceur.Infra.SQLite
 
             foreach (var item in Keys)
             {
-                DB.Connection.Execute(sql, new { key = item, value = settings.GetPropValue(item) });
+                var value = settings.GetPropValue(item);
+                DB.Connection.Execute(sql, new { key = item, value });
             }
         }
 
