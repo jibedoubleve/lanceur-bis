@@ -11,16 +11,16 @@ namespace Lanceur.Infra.SQLite.DbActions
         #region Fields
 
         private readonly SQLiteConnectionScope _db;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public AliasDbAction(SQLiteConnectionScope db, ILogService log)
+        public AliasDbAction(SQLiteConnectionScope db, IAppLoggerFactory logFactory)
         {
             _db = db;
-            _log = log;
+            _log = logFactory.GetLogger<AliasDbAction>();
         }
 
         #endregion Constructors

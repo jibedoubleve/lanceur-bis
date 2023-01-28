@@ -13,17 +13,17 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private readonly ILogService _log;
-        private readonly IWildcardManager _wildcardManager;
         private readonly IDataService _dataService;
+        private readonly IAppLogger _log;
+        private readonly IWildcardManager _wildcardManager;
 
         #endregion Fields
 
         #region Constructors
 
-        public ExecutionManager(ILogService log, IWildcardManager wildcardManager, IDataService dataService)
+        public ExecutionManager(IAppLoggerFactory logFactory, IWildcardManager wildcardManager, IDataService dataService)
         {
-            _log = log;
+            _log = logFactory.GetLogger<ExecutionManager>();
             _wildcardManager = wildcardManager;
             _dataService = dataService;
         }

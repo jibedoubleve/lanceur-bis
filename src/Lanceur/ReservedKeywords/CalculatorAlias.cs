@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Splat;
 using System;
@@ -16,23 +17,23 @@ namespace Lanceur.ReservedKeywords
         #region Fields
 
         private readonly ICalculatorService _calculator;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public CalculatorAlias(ICalculatorService calculator, ILogService log)
+        public CalculatorAlias(ICalculatorService calculator, IAppLoggerFactory log)
         {
             _calculator = calculator;
-            _log = log;
+            _log = log.GetLogger<CalculatorAlias>();
         }
 
         public CalculatorAlias()
         {
             var l = Locator.Current;
             _calculator = l.GetService<ICalculatorService>();
-            _log = l.GetService<ILogService>();
+            _log = l.GetLogger<CalculatorAlias>();
         }
 
         #endregion Constructors

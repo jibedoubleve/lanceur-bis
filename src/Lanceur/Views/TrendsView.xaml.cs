@@ -49,7 +49,7 @@ namespace Lanceur.Views
                 ctrl.Plot.Legend();
                 ctrl.Refresh();
             }
-            else { LogService.Current.Warning("No history to display."); }
+            else { AppLogFactory.Get<TrendsView>().Warning("No history to display."); }
         }
 
         #endregion Methods

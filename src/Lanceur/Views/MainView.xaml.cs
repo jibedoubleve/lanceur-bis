@@ -1,5 +1,6 @@
 ﻿using Lanceur.Converters.Reactive;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
 using NHotkey;
@@ -29,21 +30,19 @@ namespace Lanceur.Views
 
         private readonly IAppSettingsService _settings;
         private bool _isStoryBoardsFree = true;
-        public readonly ILogService _log = Locator.Current.GetService<ILogService>();
+        public readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public MainView() : this(null, null)
-        {
-        }
+        public MainView() : this(null, null) { }
 
-        public MainView(ILogService log = null, IAppSettingsService settings = null)
+        public MainView(IAppLoggerFactory factory = null, IAppSettingsService settings = null)
         {
             InitializeComponent();
 
-            _log ??= log;
+            _log = Locator.Current.GetLogger<MainView>(factory);
 
             ViewModel = Locator.Current.GetService<MainViewModel>();
             _settings = settings ?? Locator.Current.GetService<IAppSettingsService>();
@@ -126,14 +125,14 @@ namespace Lanceur.Views
         private void OnFadeInStoryBoardCompleted(object sender, EventArgs e)
         {
             _isStoryBoardsFree = true;
-            LogService.Current.Trace("Fade in Storyboard completed...");
+            _log.Trace("Fade in Storyboard completed...");
             Visibility = Visibility.Visible;
         }
 
         private void OnFadeOutStoryBoardCompleted(object sender, EventArgs e)
         {
             _isStoryBoardsFree = true;
-            LogService.Current.Trace("Fade out Storyboard completed...");
+            _log.Trace("Fade out Storyboard completed...");
             Visibility = Visibility.Collapsed;
         }
 

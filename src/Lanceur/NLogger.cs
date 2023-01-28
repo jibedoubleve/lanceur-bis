@@ -4,20 +4,19 @@ using System;
 
 namespace Lanceur
 {
-    internal class NLogService : ILogService
+    internal class NLogger : IAppLogger
     {
         #region Fields
 
-        private const string DEFAULT_NAME = "Default";
         private readonly Logger _logger;
 
         #endregion Fields
 
         #region Constructors
 
-        public NLogService(string loggerName = DEFAULT_NAME)
+        public NLogger(Type sourceType)
         {
-            _logger = LogManager.GetLogger(loggerName ?? DEFAULT_NAME);
+            _logger = LogManager.GetLogger(sourceType.FullName);
         }
 
         #endregion Constructors

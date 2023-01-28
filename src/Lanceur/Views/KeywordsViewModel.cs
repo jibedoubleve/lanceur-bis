@@ -5,6 +5,7 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
+using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
@@ -34,7 +35,7 @@ namespace Lanceur.Views
         private readonly IDataService _aliasService;
         private readonly Scope<bool> _busyScope;
         private readonly Interaction<string, bool> _confirmRemove;
-        private readonly ILogService _log;
+        private readonly IAppLogger _log;
         private readonly IPackagedAppValidator _packagedAppValidator;
         private readonly IThumbnailManager _thumbnailManager;
 
@@ -43,7 +44,7 @@ namespace Lanceur.Views
         #region Constructors
 
         public KeywordsViewModel(
-            ILogService logService = null,
+            IAppLoggerFactory logFactory = null,
             IDataService searchService = null,
             IScheduler uiThread = null,
             IScheduler poolThread = null,
@@ -59,7 +60,7 @@ namespace Lanceur.Views
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
-            _log = logService ?? l.GetService<ILogService>(); ;
+            _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDataService>();
             _confirmRemove = Interactions.YesNoQuestion(uiThread);

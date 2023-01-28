@@ -2,6 +2,7 @@
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Utils;
 using Splat;
 using System.ComponentModel;
 using System.Reflection;
@@ -14,16 +15,18 @@ namespace Lanceur.Infra.Managers
 
         private static Dictionary<string, ExecutableQueryResult> _macroInstances = null;
         private readonly Assembly _asm;
-        private readonly ILogService _log;
+        private readonly IDataService _dataService;
+        private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public MacroManager(Assembly asm, ILogService log = null)
+        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null, IDataService dataService = null)
         {
             _asm = asm;
-            _log = log ?? Locator.Current.GetService<ILogService>() ?? new TraceLogService();
+            _log = Locator.Current.GetLogger<MacroManager>(logFactory);
+            _dataService = Locator.Current.GetService<IDataService>();
         }
 
         #endregion Constructors
@@ -49,6 +52,8 @@ namespace Lanceur.Infra.Managers
 
                         var description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
                         alias.SetDescription(description);
+                        
+                        _dataService.HydrateMacro(alias);
 
                         macroInstances.Add(name, alias);
                         _log.Info($"Found macro '{name}'");
@@ -94,7 +99,7 @@ namespace Lanceur.Infra.Managers
                 }
                 else
                 {
-                    /* Well, this a misconfigured macro, log it and forget it */
+                    /* Well, this is a misconfigured macro, log it and forget it */
                     _log.Warning($"User has misconfigured a Macro with name '{src.FileName}'. Fix the name of the macro or remove the alias from the database.");
                     return null;
                 }

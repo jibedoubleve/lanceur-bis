@@ -15,10 +15,11 @@ namespace Lanceur.Infra.SQLite
             "IdSession",
             "ShowAtStartup",
             "HotKey.Key",
-            "HotKey.ModifierKeys",
+            "HotKey.ModifierKey",
             "Repository.ScoreLimit",
             "Window.Position.Left",
             "Window.Position.Top",
+            "RestartDelay",
         };
 
         #endregion Fields
@@ -33,6 +34,15 @@ namespace Lanceur.Infra.SQLite
 
         #region Methods
 
+        private static bool Any(List<KeyValue> values, string key) => values.Any(x => x.Key == key);
+
+        public void Edit(Action<AppSettings> edit)
+        {
+            var stg = Load();
+            edit(stg);
+            Save(stg);
+        }
+
         public AppSettings Load()
         {
             var sql = @"
@@ -41,17 +51,9 @@ namespace Lanceur.Infra.SQLite
                 s_value as Value
             from settings
             where
-	            s_key in (
-                  'IdSession',
-	              'ShowAtStartup',
-                  'HotKey.Key',
-	              'HotKey.ModifierKeys',
-	              'Repository.ScoreLimit',
-	              'Window.Position.Left',
-	              'Window.Position.Top'
-                );";
+	            s_key in @keys";
 
-            var values = DB.Connection.Query<KeyValue>(sql).ToList();
+            var values = DB.Connection.Query<KeyValue>(sql, new { keys = Keys }).ToList();
 
             if (values != null)
             {
@@ -81,31 +83,24 @@ namespace Lanceur.Infra.SQLite
 
                 key = Keys[i++];
                 if (Any(values, key)) { settings.Window.Position.Top = values.Where(x => x.Key == key).First().Value.CastToDouble(); }
+
+                key = Keys[i++];
+                if (Any(values, key)) { settings.RestartDelay = values.Where(x => x.Key == key).First().Value.CastToDouble(); }
                 return settings;
             }
             else { return new(); }
         }
 
-        private static bool Any(List<KeyValue> values, string key) => values.Any(x => x.Key == key);
-
         public void Save(AppSettings settings)
         {
             var sql = "update settings set s_value = @value where s_key = @key";
-            DB.Connection.Execute(sql, new { key = "IdSession", value = settings.IdSession });
-            DB.Connection.Execute(sql, new { key = "HotKey.Key", value = settings.HotKey.Key });
-            DB.Connection.Execute(sql, new { key = "HotKey.ModifierKeys", value = settings.HotKey.ModifierKey });
-            DB.Connection.Execute(sql, new { key = "Repository.ScoreLimit", value = settings.Repository.ScoreLimit });
-            DB.Connection.Execute(sql, new { key = "Window.Position.Left", value = settings.Window.Position.Left });
-            DB.Connection.Execute(sql, new { key = "Window.Position.Top", value = settings.Window.Position.Top });
-            DB.Connection.Execute(sql, new { key = "ShowAtStartup", value = settings.ShowAtStartup });
-        }
-        public void Edit(Action<AppSettings> edit)
-        {
-            var stg = Load();
-            edit(stg);
-            Save(stg);
-        }
 
+            foreach (var item in Keys)
+            {
+                var value = settings.GetPropValue(item);
+                DB.Connection.Execute(sql, new { key = item, value });
+            }
+        }
 
         #endregion Methods
 
