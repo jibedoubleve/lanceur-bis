@@ -53,8 +53,6 @@ namespace Lanceur.Views
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
 
-            IsBusyScope = new Scope<bool>(x => IsBusy = x, true, false);
-
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _log = Locator.Current.GetLogger<MainViewModel>(logFactory);
@@ -94,6 +92,16 @@ namespace Lanceur.Views
                 .ObserveOn(uiThread)
                 .Bind(Results)
                 .Subscribe();
+
+            Observable.CombineLatest(
+                this.WhenAnyObservable(x => x.ExecuteAlias.IsExecuting),
+                this.WhenAnyObservable(x => x.SearchAlias.IsExecuting),
+                this.WhenAnyObservable(x => x.SelectNextResult.IsExecuting),
+                this.WhenAnyObservable(x => x.SelectPreviousResult.IsExecuting))
+                .DistinctUntilChanged()
+                .Select(x => x.Where(x => x).Any())
+                .Log(this, $"IsBusy changed.", s => $"New value: {s}.")
+                .BindTo(this, vm => vm.IsBusy);
 
             this.WhenAnyValue(x => x.Query)
                 .DistinctUntilChanged()
@@ -136,8 +144,6 @@ namespace Lanceur.Views
         #endregion Constructors
 
         #region Properties
-
-        private Scope<bool> IsBusyScope { get; init; }
 
         public ReactiveCommand<Unit, SearchContext> Activate { get; }
 
@@ -199,32 +205,29 @@ namespace Lanceur.Views
         {
             context ??= new ExecutionContext();
 
-            using (IsBusyScope.Open())
+            if (context?.Query.IsNullOrEmpty() ?? true) { return new(); }
+            else
             {
-                if (context?.Query.IsNullOrEmpty() ?? true) { return new(); }
-                else
+                var cmd = _cmdlineManager.BuildFromText(context.Query);
+                if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
                 {
-                    var cmd = _cmdlineManager.BuildFromText(context.Query);
-                    if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
-                    {
-                        cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
-                    }
-
-                    _log.Debug($"Execute alias '{(context?.Query ?? "<EMPTY>")}'");
-                    var response = await _executor.ExecuteAsync(new ExecutionRequest
-                    {
-                        QueryResult = CurrentAlias,
-                        Cmdline = cmd,
-                        ExecuteWithPrivilege = context.RunAsAdmin,
-                    });
-                    KeepAlive = response.HasResult;
-
-                    // A small delay to be sure the query changes are not handled after we
-                    // return the result. Without delay, we can encounter result override
-                    // and see the result of an outdated query
-                    await _delay.Of(50);
-                    return new() { Results = response.Results };
+                    cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
                 }
+
+                _log.Debug($"Execute alias '{(context?.Query ?? "<EMPTY>")}'");
+                var response = await _executor.ExecuteAsync(new ExecutionRequest
+                {
+                    QueryResult = CurrentAlias,
+                    Cmdline = cmd,
+                    ExecuteWithPrivilege = context.RunAsAdmin,
+                });
+                KeepAlive = response.HasResult;
+
+                // A small delay to be sure the query changes are not handled after we
+                // return the result. Without delay, we can encounter result override
+                // and see the result of an outdated query
+                await _delay.Of(50);
+                return new() { Results = response.Results };
             }
         }
 
@@ -233,23 +236,20 @@ namespace Lanceur.Views
             if (criterion.IsNullOrWhiteSpace()) { return new(); }
             else
             {
-                using (IsBusyScope.Open())
+                _log.Trace($"Search: criterion '{criterion}'");
+
+                var query = _cmdlineManager.BuildFromText(criterion);
+                var results = _searchService.Search(query)
+                                            .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
+
+                _log.Trace($"Search: criterion '{criterion}' found {results?.Count() ?? 0} element(s)");
+                return new()
                 {
-                    _log.Trace($"Search: criterion '{criterion}'");
-
-                    var query = _cmdlineManager.BuildFromText(criterion);
-                    var results = _searchService.Search(query)
-                                                .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
-
-                    _log.Trace($"Search: criterion '{criterion}' found {results?.Count() ?? 0} element(s)");
-                    return new()
-                    {
-                        Results = results,
-                        CurrentAliasSuggestion = results.Any() && results.ElementAt(0).IsResult
-                            ? results.ElementAt(0)?.Name ?? ""
-                            : "",
-                    };
-                }
+                    Results = results,
+                    CurrentAliasSuggestion = results.Any() && results.ElementAt(0).IsResult
+                        ? results.ElementAt(0)?.Name ?? ""
+                        : "",
+                };
             }
         }
 
@@ -257,14 +257,11 @@ namespace Lanceur.Views
         {
             if (Results.CanNavigate())
             {
-                using (IsBusyScope.Open())
-                {
-                    CurrentAliasSuggestion = String.Empty;
-                    CurrentAliasIndex = Results.GetNextIndex(CurrentAliasIndex);
-                    _log.Trace($"Selecting next result. [Index: {CurrentAliasIndex}]");
-                    Query = CurrentAlias.ToQuery();
-                    await _delay.Of(50);
-                }
+                CurrentAliasSuggestion = String.Empty;
+                CurrentAliasIndex = Results.GetNextIndex(CurrentAliasIndex);
+                _log.Trace($"Selecting next result. [Index: {CurrentAliasIndex}]");
+                Query = CurrentAlias.ToQuery();
+                await _delay.Of(50);
             }
         }
 
@@ -272,14 +269,11 @@ namespace Lanceur.Views
         {
             if (Results.CanNavigate())
             {
-                using (IsBusyScope.Open())
-                {
-                    CurrentAliasSuggestion = String.Empty;
-                    CurrentAliasIndex = Results.GetPreviousIndex(CurrentAliasIndex);
-                    _log.Trace($"Selecting previous result. [Index: {CurrentAliasIndex}]");
-                    Query = CurrentAlias.ToQuery();
-                    await _delay.Of(50);
-                }
+                CurrentAliasSuggestion = String.Empty;
+                CurrentAliasIndex = Results.GetPreviousIndex(CurrentAliasIndex);
+                _log.Trace($"Selecting previous result. [Index: {CurrentAliasIndex}]");
+                Query = CurrentAlias.ToQuery();
+                await _delay.Of(50);
             }
         }
 

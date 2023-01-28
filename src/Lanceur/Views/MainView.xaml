@@ -57,6 +57,10 @@
         <!--  ======================================================  -->
         <Border Height="68" Style="{StaticResource ControlBorderStyle}">
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
@@ -104,6 +108,12 @@
                         </Style>
                     </iconPacks:PackIconModern.Style>
                 </iconPacks:PackIconModern>
+                <ProgressBar
+                    x:Name="progressBar"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Margin="3"
+                    IsIndeterminate="True" />
             </Grid>
         </Border>
 
@@ -115,7 +125,7 @@
                 x:Name="QueryResults"
                 Grid.Row="1"
                 Grid.ColumnSpan="2"
-                MaxHeight="350"
+                MaxHeight="{StaticResource ResultBoxHeight}"
                 HorizontalContentAlignment="Stretch"
                 Background="Transparent"
                 ItemTemplateSelector="{StaticResource QueryResultSelector}"

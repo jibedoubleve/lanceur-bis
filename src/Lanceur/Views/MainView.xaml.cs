@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 namespace Lanceur.Views
@@ -59,8 +60,7 @@ namespace Lanceur.Views
                 this.Bind(ViewModel, vm => vm.Query, v => v.QueryTextBox.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
 
-                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.QueryTextBox.IsReadOnly).DisposeWith(d);
-
+                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.progressBar.Visibility, x => x ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.CurrentAliasSuggestion, v => v.AutoCompleteBox.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.CurrentSessionName, v => v.RunSession.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results, v => v.QueryResults.ItemsSource).DisposeWith(d);
