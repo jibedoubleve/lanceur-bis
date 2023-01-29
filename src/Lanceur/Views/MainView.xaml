@@ -109,7 +109,7 @@
                     </iconPacks:PackIconModern.Style>
                 </iconPacks:PackIconModern>
                 <ProgressBar
-                    x:Name="progressBar"
+                    x:Name="ProgressBar"
                     Grid.Row="1"
                     Grid.ColumnSpan="2"
                     Margin="3"
@@ -151,7 +151,7 @@
                     Foreground="{StaticResource TextColourBrush}" />
                 <TextBlock HorizontalAlignment="Right" Foreground="{StaticResource TextColourBrush}">
                     <Run Text="Session:" />
-                    <Run x:Name="RunSession" FontWeight="Bold" />
+                    <Run x:Name="CurrentSessionName" FontWeight="Bold" />
                 </TextBlock>
             </DockPanel>
         </Border>

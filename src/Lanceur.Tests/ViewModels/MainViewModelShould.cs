@@ -77,7 +77,7 @@ namespace Lanceur.Tests.ViewModels
 
                 scheduler.AdvanceBy(TimeSpan.FromMilliseconds(110).Ticks);
 
-                vm.AutoCompleteQuery.Execute().Subscribe();
+                vm.AutoComplete.Execute().Subscribe();
 
                 scheduler.AdvanceBy(TimeSpan.FromMilliseconds(110).Ticks);
 
