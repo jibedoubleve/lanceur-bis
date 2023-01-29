@@ -124,7 +124,7 @@ Task("build")
 
 Task("tests")
     .Does(()=>{
-        var projects = GetFiles("./src/Tests/**/*.csproj");
+        var projects = GetFiles("./src/**/*.csproj");
         foreach(var project in projects)
         {
             DotNetTest(
