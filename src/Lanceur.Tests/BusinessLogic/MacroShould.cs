@@ -90,7 +90,7 @@ namespace Lanceur.Tests.BusinessLogic
 
             //Assert
             results.Should().HaveCount(1);
-            ((AliasQueryResult)results.ElementAt(0)).IsMacro().Should().BeTrue();
+            results.ElementAt(0).IsMacro().Should().BeTrue();
         }
 
         [Theory]
@@ -181,14 +181,14 @@ namespace Lanceur.Tests.BusinessLogic
             public static string SqlForAliases()
             {
                 return @"
-                insert into alias (id, file_name, arguments, id_session) values (1, '@multi@', '@alias2@@alias3', 1);
-                insert into alias_name (id, id_alias, name) values (1, 1 , 'alias1');
+                insert into alias (id, file_name, arguments, id_session) values (1000, '@multi@', '@alias2@@alias3', 1);
+                insert into alias_name (id, id_alias, name) values (1000, 1000, 'alias1');
 
-                insert into alias (id, file_name, id_session) values (2, 'c:\dummy\dummy.exe', 1);
-                insert into alias_name (id, id_alias, name) values (2, 2, 'alias2');
+                insert into alias (id, file_name, id_session) values (2000, 'c:\dummy\dummy.exe', 1);
+                insert into alias_name (id, id_alias, name) values (2000, 2000, 'alias2');
 
-                insert into alias (id, file_name, id_session) values (3, 'c:\dummy\dummy.exe', 1);
-                insert into alias_name (id, id_alias, name) values (3, 3, 'alias3');";
+                insert into alias (id, file_name, id_session) values (3000, 'c:\dummy\dummy.exe', 1);
+                insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');";
             }
 
             #endregion Methods
