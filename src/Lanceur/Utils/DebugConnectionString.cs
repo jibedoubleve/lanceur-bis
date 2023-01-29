@@ -14,7 +14,10 @@ namespace Lanceur.Utils
         private static string _connectionString;
 
         #endregion Fields
+        public DebugConnectionString()
+        {
 
+        }
         #region Methods
 
         public override string ToString()
