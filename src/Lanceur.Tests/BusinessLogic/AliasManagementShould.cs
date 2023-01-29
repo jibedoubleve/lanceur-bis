@@ -53,9 +53,9 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // ARRANGE
             var sql = @"
-                insert into alias_name(id, name, id_alias) values (1, 'noname', null);
-                insert into alias_name(id, name, id_alias) values (2, 'noname', null);
-                insert into alias_name(id, name, id_alias) values (3, 'noname', null);";
+                insert into alias_name(id, name, id_alias) values (1000, 'noname', null);
+                insert into alias_name(id, name, id_alias) values (2000, 'noname', null);
+                insert into alias_name(id, name, id_alias) values (3000, 'noname', null);";
 
             var connection = BuildFreshDB(sql);
             var action = BuildAliasDbAction(connection);
@@ -73,13 +73,13 @@ namespace Lanceur.Tests.BusinessLogic
             var sql2 = "select count(*) from alias";
             var sql3 = "select count(*) from alias_name";
 
-            alias1.Id.Should().Be(1);
-            alias2.Id.Should().Be(2);
-            alias3.Id.Should().Be(3);
+            alias1.Id.Should().Be(7 + 1);
+            alias2.Id.Should().Be(7 + 2);
+            alias3.Id.Should().Be(7 + 3);
 
 
-            connection.ExecuteScalar<int>(sql2).Should().Be(3);
-            connection.ExecuteScalar<int>(sql3).Should().Be(6);
+            connection.ExecuteScalar<int>(sql2).Should().Be(7 + 3);
+            connection.ExecuteScalar<int>(sql3).Should().Be(7 + 6);
         }
 
         [Fact]
@@ -104,9 +104,9 @@ namespace Lanceur.Tests.BusinessLogic
 
             // ARRANGE
             var sql = @"
-                insert into alias_name(id, name, id_alias) values (1, 'noname', null);
-                insert into alias_name(id, name, id_alias) values (2, 'noname', null);
-                insert into alias_name(id, name, id_alias) values (3, 'noname', null);";
+                insert into alias_name(id, name, id_alias) values (1000, 'noname', null);
+                insert into alias_name(id, name, id_alias) values (2000, 'noname', null);
+                insert into alias_name(id, name, id_alias) values (3000, 'noname', null);";
 
             var connection = BuildFreshDB(sql);
             var service = BuildDataService(connection);
@@ -124,12 +124,12 @@ namespace Lanceur.Tests.BusinessLogic
             var sql2 = "select count(*) from alias;";
             var sql3 = "select count(*) from alias_name;";
 
-            alias1.Id.Should().Be(1);
-            alias2.Id.Should().Be(2);
-            alias3.Id.Should().Be(3);
+            alias1.Id.Should().Be(7 + 1);
+            alias2.Id.Should().Be(7 + 2);
+            alias3.Id.Should().Be(7 + 3);
 
-            connection.ExecuteScalar<int>(sql2).Should().Be(3);
-            connection.ExecuteScalar<int>(sql3).Should().Be(6);
+            connection.ExecuteScalar<int>(sql2).Should().Be(7 + 3);
+            connection.ExecuteScalar<int>(sql3).Should().Be(7 + 6);
         }
 
         [Fact]
@@ -149,8 +149,8 @@ namespace Lanceur.Tests.BusinessLogic
             var sql2 = "select count(*) from alias";
             var sql3 = "select count(*) from alias_name";
 
-            connection.ExecuteScalar<int>(sql2).Should().Be(0);
-            connection.ExecuteScalar<int>(sql3).Should().Be(0);
+            connection.ExecuteScalar<int>(sql2).Should().Be(7); // Default alias are in the DB
+            connection.ExecuteScalar<int>(sql3).Should().Be(7);
         }
 
         [Fact]
@@ -175,8 +175,8 @@ namespace Lanceur.Tests.BusinessLogic
             var sql3 = "select count(*) from alias_name";
 
             alias1.Id.Should().BeGreaterThan(0);
-            connection.ExecuteScalar<int>(sql2).Should().Be(2);
-            connection.ExecuteScalar<int>(sql3).Should().Be(2);
+            connection.ExecuteScalar<int>(sql2).Should().Be(9);
+            connection.ExecuteScalar<int>(sql3).Should().Be(9);
         }
 
         [Fact]

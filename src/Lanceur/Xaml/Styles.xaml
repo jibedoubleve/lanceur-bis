@@ -10,6 +10,7 @@
 
     <!--  SIZES  -->
     <sys:Double x:Key="DefaultIconSize">35</sys:Double>
+    <sys:Double x:Key="ResultBoxHeight">350</sys:Double>
 
     <!--  NOT MAHAPPS STYLES  -->
     <Style x:Key="DefaultTextBox" TargetType="TextBox" />

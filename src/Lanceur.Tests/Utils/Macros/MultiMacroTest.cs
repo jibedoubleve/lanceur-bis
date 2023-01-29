@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.SharedKernel.Mixins;
 using System.ComponentModel;
 
 namespace Lanceur.Tests.Utils.Macros
@@ -11,6 +12,7 @@ namespace Lanceur.Tests.Utils.Macros
 
         public MultiMacroTest(string parameters = null)
         {
+            Name = Guid.NewGuid().ToString();
             Parameters = parameters;
         }
 

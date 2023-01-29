@@ -5,6 +5,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
+using System;
 using System.Diagnostics;
 
 namespace Lanceur.Infra.Managers
@@ -32,7 +33,7 @@ namespace Lanceur.Infra.Managers
 
         #region Methods
 
-        private async Task ExecuteAliasAsync(AliasQueryResult query)
+        private async Task<IEnumerable<QueryResult>> ExecuteAliasAsync(AliasQueryResult query)
         {
             try
             {
@@ -44,18 +45,18 @@ namespace Lanceur.Infra.Managers
                 if (query.IsUwp())
                 {
                     _log.Trace("Executing UWP application...");
-                    ExecuteUwp(query);
+                    return ExecuteUwp(query);
                 }
                 else
                 {
                     _log.Trace("Executing process...");
-                    ExecuteProcess(query);
+                    return ExecuteProcess(query);
                 }
             }
             catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}'", ex); }
         }
 
-        private void ExecuteProcess(AliasQueryResult query)
+        private IEnumerable<QueryResult> ExecuteProcess(AliasQueryResult query)
         {
             _log.Debug($"Executing '{query.FileName}' with args '{query?.Query?.Parameters ?? string.Empty}'");
             var psi = new ProcessStartInfo
@@ -63,9 +64,11 @@ namespace Lanceur.Infra.Managers
                 FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
                 Verb = "open",
                 Arguments = _wildcardManager.HandleArgument(query.Arguments, query.Query.Parameters),
-                UseShellExecute = true,
+                UseShellExecute = false,
                 WorkingDirectory = query.WorkingDirectory,
                 WindowStyle = query.StartMode.AsWindowsStyle(),
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
             };
 
             if (query.IsPrivilegeOverriden || query.RunAs == Constants.RunAs.Admin)
@@ -74,11 +77,11 @@ namespace Lanceur.Infra.Managers
                 _log.Info($"Runs '{query.FileName}' as ADMIN");
             }
 
-            using var ps = new Process { StartInfo = psi };
-            ps.Start();
+            using var process = Process.Start(psi);
+            return QueryResult.NoResult;
         }
 
-        private void ExecuteUwp(AliasQueryResult query)
+        private IEnumerable<QueryResult> ExecuteUwp(AliasQueryResult query)
         {
             // https://stackoverflow.com/questions/42521332/launching-a-windows-10-store-app-from-c-sharp-executable
             var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
@@ -95,6 +98,8 @@ namespace Lanceur.Infra.Managers
 
             _log.Debug($"Executing packaged application'{file}'");
             Process.Start(psi);
+
+            return QueryResult.NoResult;
         }
 
         public async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request)
@@ -111,8 +116,8 @@ namespace Lanceur.Infra.Managers
             }
             else if (request.QueryResult is AliasQueryResult alias)
             {
-                await ExecuteAliasAsync(alias);
-                return ExecutionResponse.NoResult;
+                var results = await ExecuteAliasAsync(alias);
+                return ExecutionResponse.FromResults(results);
             }
             else if (request.QueryResult is IExecutable exec)
             {
@@ -121,11 +126,7 @@ namespace Lanceur.Infra.Managers
                     exp.IsPrivilegeOverriden = request.ExecuteWithPrivilege;
                 }
                 var results = await exec.ExecuteAsync(request.Cmdline);
-                return new ExecutionResponse
-                {
-                    Results = results,
-                    HasResult = results.Any()
-                };
+                return ExecutionResponse.FromResults(results);
             }
             else
             {

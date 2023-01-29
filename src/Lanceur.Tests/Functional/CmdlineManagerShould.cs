@@ -26,8 +26,7 @@ namespace Lanceur.Tests.Functional
 
         [Theory]
         [InlineData("ini", "un deux trois", "un deux trois")]
-        [InlineData("ini un deux trois", "quatre cinq", "un deux trois")]
-        [InlineData("ini", "quatre cinq", "quatre cinq")]
+        [InlineData("ini sept huit neuf", "dix onze", "sept huit neuf")]
         public void BuildCommandWithParameters(string cmdline, string macroParams, string expected)
         {
             expected ??= string.Empty;

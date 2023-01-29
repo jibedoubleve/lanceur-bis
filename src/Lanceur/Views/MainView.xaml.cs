@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 namespace Lanceur.Views
@@ -59,10 +60,9 @@ namespace Lanceur.Views
                 this.Bind(ViewModel, vm => vm.Query, v => v.QueryTextBox.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
 
-                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.QueryTextBox.IsReadOnly).DisposeWith(d);
-
+                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.ProgressBar.Visibility, x => x ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.CurrentAliasSuggestion, v => v.AutoCompleteBox.Text).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.CurrentSessionName, v => v.RunSession.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.CurrentSessionName, v => v.CurrentSessionName.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results, v => v.QueryResults.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultCounter.Text);
@@ -75,13 +75,23 @@ namespace Lanceur.Views
                     .Select(x =>
                     {
                         x.Handled = true;
-                        return new MainViewModel.ExecutionContext
+                        return new MainViewModel.ExecutionRequest
                         {
                             Query = x.OriginalSource.GetTextFromTextbox(),
                             RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control
                         };
                     })
                     .InvokeCommand(ViewModel, vm => vm.ExecuteAlias);
+
+                QueryTextBox
+                .Events().PreviewKeyDown
+                .Where(x => x.Key == Key.Tab)
+                .Select(x =>
+                {
+                    x.Handled = true;
+                    return Unit.Default;
+                })
+                .InvokeCommand(ViewModel, vm => vm.AutoComplete);
 
                 QueryTextBox
                     .Events().PreviewKeyDown
@@ -94,16 +104,6 @@ namespace Lanceur.Views
                     .Where(x => x.Key == Key.Down)
                     .Select(x => Unit.Default)
                     .InvokeCommand(ViewModel, vm => vm.SelectNextResult);
-
-                QueryTextBox
-                    .Events().PreviewKeyDown
-                    .Where(x => x.Key == Key.Tab)
-                    .Select(x =>
-                    {
-                        x.Handled = true;
-                        return Unit.Default;
-                    })
-                    .InvokeCommand(ViewModel, vm => vm.AutoCompleteQuery);
 
                 QueryResults
                     .Events().PreviewMouseLeftButtonUp

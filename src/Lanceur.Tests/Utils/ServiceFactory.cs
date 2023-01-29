@@ -12,6 +12,7 @@ namespace Lanceur.Tests.Utils
         public static IAppLoggerFactory LogService => Substitute.For<IAppLoggerFactory>();
         public static IMacroManager MacroManager => Substitute.For<IMacroManager>();
         public static ISearchService SearchService => Substitute.For<ISearchService>();
+        public static IDataService DataService => Substitute.For<IDataService>();
 
         #endregion Properties
     }

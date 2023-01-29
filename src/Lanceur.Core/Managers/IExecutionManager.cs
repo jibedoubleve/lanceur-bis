@@ -14,28 +14,47 @@ namespace Lanceur.Core.Managers
     public class ExecutionRequest
     {
         #region Properties
-        public QueryResult QueryResult { get; set; }
+
         public Cmdline Cmdline { get; set; }
         public bool ExecuteWithPrivilege { get; set; }
+        public QueryResult QueryResult { get; set; }
 
         #endregion Properties
     }
 
     public class ExecutionResponse
     {
-        public IEnumerable<QueryResult> Results { get; set; }
-        public bool HasResult { get; set; }
+        #region Properties
 
         public static ExecutionResponse EmptyResult => new()
         {
             HasResult = true,
             Results = new List<QueryResult>()
         };
+
         public static ExecutionResponse NoResult => new()
         {
             HasResult = false,
             Results = new List<QueryResult>()
         };
 
+        public bool HasResult { get; set; }
+
+        public IEnumerable<QueryResult> Results { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
+        public static ExecutionResponse FromResults(IEnumerable<QueryResult> results)
+        {
+            return new ExecutionResponse
+            {
+                Results = results,
+                HasResult = results.Any(),
+            };
+        }
+
+        #endregion Methods
     }
 }
