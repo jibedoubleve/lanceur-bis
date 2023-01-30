@@ -64,11 +64,9 @@ namespace Lanceur.Infra.Managers
                 FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
                 Verb = "open",
                 Arguments = _wildcardManager.HandleArgument(query.Arguments, query.Query.Parameters),
-                UseShellExecute = false,
+                UseShellExecute = true,
                 WorkingDirectory = query.WorkingDirectory,
                 WindowStyle = query.StartMode.AsWindowsStyle(),
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
             };
 
             if (query.IsPrivilegeOverriden || query.RunAs == Constants.RunAs.Admin)
@@ -77,7 +75,7 @@ namespace Lanceur.Infra.Managers
                 _log.Info($"Runs '{query.FileName}' as ADMIN");
             }
 
-            using var process = Process.Start(psi);
+            using var _ = Process.Start(psi);
             return QueryResult.NoResult;
         }
 
