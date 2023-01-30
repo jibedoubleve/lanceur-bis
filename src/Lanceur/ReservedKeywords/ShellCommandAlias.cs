@@ -13,7 +13,7 @@ namespace Lanceur.ReservedKeywords
     {
         #region Methods
 
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+        private IEnumerable<QueryResult> Execute(Cmdline cmdline)
         {
             var psi = new ProcessStartInfo
             {
@@ -34,13 +34,18 @@ namespace Lanceur.ReservedKeywords
             var resultOutput = error.IsNullOrWhiteSpace()
                 ? output
                 : error;
-            var r = new List<DisplayQueryResult> {
-                new DisplayQueryResult(
-                    name: null,
-                    description: resultOutput
-                )
-            };
-            return Task.FromResult<IEnumerable<QueryResult>>(r);
+            return new List<DisplayQueryResult>
+                {
+                    new DisplayQueryResult(
+                        name: null,
+                        description: resultOutput
+                    )
+                };
+        }
+
+        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+        {
+            return await Task.Run(() => Execute(cmdline));
         }
 
         #endregion Methods
