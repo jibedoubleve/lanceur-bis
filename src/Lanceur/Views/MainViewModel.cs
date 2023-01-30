@@ -95,10 +95,7 @@ namespace Lanceur.Views
                 .Subscribe();
 
             Observable.CombineLatest(
-                this.WhenAnyObservable(vm => vm.ExecuteAlias.IsExecuting),
-                this.WhenAnyObservable(vm => vm.SearchAlias.IsExecuting),
-                this.WhenAnyObservable(vm => vm.SelectNextResult.IsExecuting),
-                this.WhenAnyObservable(vm => vm.SelectPreviousResult.IsExecuting))
+                this.WhenAnyObservable(vm => vm.ExecuteAlias.IsExecuting))
                 .DistinctUntilChanged()
                 .Select(x => x.Where(x => x).Any())
                 .Log(this, $"IsBusy changed.", s => $"New value: {s}.")
