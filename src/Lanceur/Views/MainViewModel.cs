@@ -76,10 +76,10 @@ namespace Lanceur.Views
             Activate = ReactiveCommand.CreateFromTask(OnActivate, outputScheduler: uiThread);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SearchAlias = ReactiveCommand.CreateFromTask<string, SearchResponse>(OnSearchAliasAsync, outputScheduler: uiThread);
+            SearchAlias = ReactiveCommand.CreateFromTask<string, AliasResponse>(OnSearchAliasAsync, outputScheduler: uiThread);
             SearchAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            ExecuteAlias = ReactiveCommand.CreateFromTask<ExecutionRequest, SearchResponse>(OnExecuteAliasAsync, canExecuteAlias, outputScheduler: uiThread);
+            ExecuteAlias = ReactiveCommand.CreateFromTask<ExecutionRequest, AliasResponse>(OnExecuteAliasAsync, canExecuteAlias, outputScheduler: uiThread);
             ExecuteAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             SelectNextResult = ReactiveCommand.CreateFromTask(OnSelectNextResult, outputScheduler: uiThread);
@@ -159,7 +159,7 @@ namespace Lanceur.Views
 
         #region Properties
 
-        public ReactiveCommand<Unit, SearchResponse> Activate { get; }
+        public ReactiveCommand<Unit, AliasResponse> Activate { get; }
 
         public ReactiveCommand<Unit, string> AutoComplete { get; }
 
@@ -171,7 +171,7 @@ namespace Lanceur.Views
 
         [Reactive] public string CurrentSessionName { get; set; }
 
-        public ReactiveCommand<ExecutionRequest, SearchResponse> ExecuteAlias { get; }
+        public ReactiveCommand<ExecutionRequest, AliasResponse> ExecuteAlias { get; }
 
         [Reactive] public bool IsBusy { get; set; }
         [Reactive] public bool IsOnError { get; set; }
@@ -181,7 +181,7 @@ namespace Lanceur.Views
 
         public IObservableCollection<QueryResult> Results { get; } = new ObservableCollectionExtended<QueryResult>();
 
-        public ReactiveCommand<string, SearchResponse> SearchAlias { get; }
+        public ReactiveCommand<string, AliasResponse> SearchAlias { get; }
 
         public ReactiveCommand<Unit, string> SelectNextResult { get; }
 
@@ -191,13 +191,13 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private async Task<SearchResponse> OnActivate()
+        private async Task<AliasResponse> OnActivate()
         {
             var sessionName = await Task.Run(() => _service.GetDefaultSession()?.Name ?? "N.A.");
             return new() { CurrentSessionName = sessionName, };
         }
 
-        private async Task<SearchResponse> OnExecuteAliasAsync(ExecutionRequest request)
+        private async Task<AliasResponse> OnExecuteAliasAsync(ExecutionRequest request)
         {
             _log.Trace($"Executing '{nameof(OnExecuteAliasAsync)}'");
             request ??= new ExecutionRequest();
@@ -231,10 +231,10 @@ namespace Lanceur.Views
             }
         }
 
-        private async Task<SearchResponse> OnSearchAliasAsync(string criterion)
+        private async Task<AliasResponse> OnSearchAliasAsync(string criterion)
         {
             _log.Trace($"Executing '{nameof(OnSearchAliasAsync)}'");
-            if (criterion.IsNullOrWhiteSpace()) { return new SearchResponse(); }
+            if (criterion.IsNullOrWhiteSpace()) { return new AliasResponse(); }
             else
             {
 
@@ -307,7 +307,7 @@ namespace Lanceur.Views
             #endregion Methods
         }
 
-        public class SearchResponse
+        public class AliasResponse
         {
             #region Properties
 
