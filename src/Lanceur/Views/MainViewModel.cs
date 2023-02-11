@@ -116,6 +116,7 @@ namespace Lanceur.Views
 
             this.WhenAnyValue(vm => vm.Query)
                 .DistinctUntilChanged()
+                .Where(x => !x.IsNullOrWhiteSpace())
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
                 .Where(x => !IsBusy)
                 .Select(x => x.Trim())
@@ -219,10 +220,7 @@ namespace Lanceur.Views
                     ExecuteWithPrivilege = request.RunAsAdmin,
                 });
 
-                // A small delay to be sure the query changes are not handled after we
-                // return the result. Without delay, we can encounter result override
-                // and see the result of an outdated query
-                await _delay.Of(50);
+                _log.Trace($"Execution of '{request.Query}' returned {(response?.Results?.Count() ?? 0)} result(s).");
                 return new()
                 {
                     Results = response.Results,

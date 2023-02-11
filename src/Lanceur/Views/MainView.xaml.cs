@@ -68,6 +68,11 @@ namespace Lanceur.Views
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultCounter.Text);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.StatusPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
 
+                ViewModel.WhenAnyValue(vm => vm.KeepAlive)
+                         .Where(v => v == false)
+                         .Log(ViewModel, $"Hiding control.", v => $"KeepAlive = {v}")
+                         .Subscribe(_ => HideControl());
+
                 //Don't forget 'using System.Windows.Controls'
                 QueryTextBox
                     .Events().PreviewKeyDown
@@ -136,9 +141,8 @@ namespace Lanceur.Views
             Visibility = Visibility.Collapsed;
         }
 
-        private async void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            await Task.Delay(10);
             if (e.Key == Key.Up || e.Key == Key.Down)
             {
                 var collection = QueryResults.ItemsSource.Cast<object>();
@@ -154,8 +158,7 @@ namespace Lanceur.Views
                     QueryResults.ScrollIntoView(selectedItem);
                 }
             }
-            else if (e.Key == Key.Escape) { HideControl(force: true); }
-            else if (e.Key == Key.Enter) { HideControl(force: false); }
+            else if (e.Key == Key.Escape) { HideControl(); }
         }
 
         private void OnShowWindow(object sender, HotkeyEventArgs e)
@@ -216,10 +219,9 @@ namespace Lanceur.Views
             HideControl();
         }
 
-        public void HideControl(bool force = false)
+        public void HideControl()
         {
-            if (KeepAlive && !force) { return; }
-            else if (_isStoryBoardsFree)
+            if (_isStoryBoardsFree)
             {
                 _isStoryBoardsFree = false;
                 var storyBoard = FindResource("fadeOutStoryBoard") as Storyboard;
