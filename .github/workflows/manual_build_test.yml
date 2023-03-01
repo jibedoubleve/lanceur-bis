@@ -1,5 +1,5 @@
 # When a pull request is send, only build and test
-name: Build & test
+name: (manual) Build & test
 on:
   workflow_dispatch:
     types:
