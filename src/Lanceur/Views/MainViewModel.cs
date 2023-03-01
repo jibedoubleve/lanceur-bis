@@ -85,7 +85,7 @@ namespace Lanceur.Views
             var canExecuteAlias = Observable.CombineLatest(
                 isExecutable,
                 isSearchFree
-            ).Where(x => x.Where(y => y).Any())
+            ).Where(x => x.Where(y => !y).Any() == false)
              .Select(x => true); ;
 
             ExecuteAlias = ReactiveCommand.CreateFromTask<ExecutionRequest, AliasResponse>(OnExecuteAliasAsync, canExecuteAlias, outputScheduler: uiThread);
