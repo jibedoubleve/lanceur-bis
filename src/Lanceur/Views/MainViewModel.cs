@@ -9,7 +9,6 @@ using Lanceur.Models;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
 using Lanceur.Xaml;
-using NLog.Targets;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -19,8 +18,8 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace Lanceur.Views
 {
@@ -35,6 +34,7 @@ namespace Lanceur.Views
         private readonly SourceList<QueryResult> _results = new();
         private readonly ISearchService _searchService;
         private readonly IDataService _service;
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         #endregion Fields
 
@@ -63,12 +63,6 @@ namespace Lanceur.Views
             _service = service ?? l.GetService<IDataService>();
             _executor = executor ?? l.GetService<IExecutionManager>();
 
-            //Command CanExecute
-            var canExecuteAlias = this
-                .WhenAnyValue(x => x.CurrentAlias)
-                .Where(x => x != null && x is IExecutable)
-                .Select(x => true);
-
             //Commands
             AutoComplete = ReactiveCommand.Create(OnAutoComplete, outputScheduler: uiThread);
             AutoComplete.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
@@ -76,10 +70,25 @@ namespace Lanceur.Views
             Activate = ReactiveCommand.CreateFromTask(OnActivate, outputScheduler: uiThread);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SearchAlias = ReactiveCommand.CreateFromTask<string, SearchResponse>(OnSearchAliasAsync, outputScheduler: uiThread);
+            SearchAlias = ReactiveCommand.CreateFromTask<string, AliasResponse>(OnSearchAliasAsync, outputScheduler: uiThread);
             SearchAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            ExecuteAlias = ReactiveCommand.CreateFromTask<ExecutionRequest, SearchResponse>(OnExecuteAliasAsync, canExecuteAlias, outputScheduler: uiThread);
+            //CanExecute for ExecuteAlias
+            var isExecutable = this
+                    .WhenAnyValue(x => x.CurrentAlias)
+                    .Select(x => x != null && x is IExecutable);
+
+            var isSearchFree = SearchAlias
+                    .IsExecuting
+                    .Select(x => !x);
+
+            var canExecuteAlias = Observable.CombineLatest(
+                isExecutable,
+                isSearchFree
+            ).Where(x => x.Where(y => !y).Any() == false)
+             .Select(x => true); ;
+
+            ExecuteAlias = ReactiveCommand.CreateFromTask<ExecutionRequest, AliasResponse>(OnExecuteAliasAsync, canExecuteAlias, outputScheduler: uiThread);
             ExecuteAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             SelectNextResult = ReactiveCommand.CreateFromTask(OnSelectNextResult, outputScheduler: uiThread);
@@ -95,11 +104,11 @@ namespace Lanceur.Views
                 .Subscribe();
 
             Observable.CombineLatest(
-                this.WhenAnyObservable(vm => vm.ExecuteAlias.IsExecuting))
-                .DistinctUntilChanged()
-                .Select(x => x.Where(x => x).Any())
-                .Log(this, $"IsBusy changed.", s => $"New value: {s}.")
-                .BindTo(this, vm => vm.IsBusy);
+                this.WhenAnyObservable(vm => vm.ExecuteAlias.IsExecuting),
+                this.WhenAnyObservable(vm => vm.SearchAlias.IsExecuting)
+            ).DistinctUntilChanged()
+             .Select(x => x.Where(x => x).Any())
+             .BindTo(this, vm => vm.IsBusy);
 
             this.WhenAnyObservable(
                 vm => vm.SelectNextResult,
@@ -115,16 +124,12 @@ namespace Lanceur.Views
                 .BindTo(this, vm => vm.Query);
 
             this.WhenAnyValue(vm => vm.Query)
-                .DistinctUntilChanged()
-                .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
-                .Where(x => !IsBusy)
+                .Throttle(TimeSpan.FromMilliseconds(100))
+                .Where(x => !x.IsNullOrWhiteSpace())
                 .Select(x => x.Trim())
-                .Log(this, $"Query changed", s => $"Query: {s}")
                 .InvokeCommand(SearchAlias);
 
             this.WhenAnyValue(vm => vm.CurrentAliasIndex)
-                .DistinctUntilChanged()
-                .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
                 .Select(x =>
                 {
                     if (Results.Count == 0) { return null; }
@@ -153,13 +158,11 @@ namespace Lanceur.Views
                 });
         }
 
-        private string OnAutoComplete() => CurrentAlias.Name;
-
         #endregion Constructors
 
         #region Properties
 
-        public ReactiveCommand<Unit, SearchResponse> Activate { get; }
+        public ReactiveCommand<Unit, AliasResponse> Activate { get; }
 
         public ReactiveCommand<Unit, string> AutoComplete { get; }
 
@@ -171,17 +174,19 @@ namespace Lanceur.Views
 
         [Reactive] public string CurrentSessionName { get; set; }
 
-        public ReactiveCommand<ExecutionRequest, SearchResponse> ExecuteAlias { get; }
+        public ReactiveCommand<ExecutionRequest, AliasResponse> ExecuteAlias { get; }
 
         [Reactive] public bool IsBusy { get; set; }
+
         [Reactive] public bool IsOnError { get; set; }
+
         [Reactive] public bool KeepAlive { get; set; }
 
         [Reactive] public string Query { get; set; } = string.Empty;
 
         public IObservableCollection<QueryResult> Results { get; } = new ObservableCollectionExtended<QueryResult>();
 
-        public ReactiveCommand<string, SearchResponse> SearchAlias { get; }
+        public ReactiveCommand<string, AliasResponse> SearchAlias { get; }
 
         public ReactiveCommand<Unit, string> SelectNextResult { get; }
 
@@ -191,15 +196,16 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private async Task<SearchResponse> OnActivate()
+        private async Task<AliasResponse> OnActivate()
         {
             var sessionName = await Task.Run(() => _service.GetDefaultSession()?.Name ?? "N.A.");
             return new() { CurrentSessionName = sessionName, };
         }
 
-        private async Task<SearchResponse> OnExecuteAliasAsync(ExecutionRequest request)
+        private string OnAutoComplete() => CurrentAlias.Name;
+
+        private async Task<AliasResponse> OnExecuteAliasAsync(ExecutionRequest request)
         {
-            _log.Trace($"Executing '{nameof(OnExecuteAliasAsync)}'");
             request ??= new ExecutionRequest();
 
             if (request?.Query.IsNullOrEmpty() ?? true) { return new(); }
@@ -219,10 +225,7 @@ namespace Lanceur.Views
                     ExecuteWithPrivilege = request.RunAsAdmin,
                 });
 
-                // A small delay to be sure the query changes are not handled after we
-                // return the result. Without delay, we can encounter result override
-                // and see the result of an outdated query
-                await _delay.Of(50);
+                _log.Trace($"Execution of '{request.Query}' returned {(response?.Results?.Count() ?? 0)} result(s).");
                 return new()
                 {
                     Results = response.Results,
@@ -231,22 +234,20 @@ namespace Lanceur.Views
             }
         }
 
-        private async Task<SearchResponse> OnSearchAliasAsync(string criterion)
+        private async Task<AliasResponse> OnSearchAliasAsync(string criterion)
         {
-            _log.Trace($"Executing '{nameof(OnSearchAliasAsync)}'");
-            if (criterion.IsNullOrWhiteSpace()) { return new SearchResponse(); }
+            if (criterion.IsNullOrWhiteSpace()) { return new AliasResponse(); }
             else
             {
-
                 var query = _cmdlineManager.BuildFromText(criterion);
                 var results = await Task.Run(() =>
                 {
-                    _log.Trace($"Search: criterion '{criterion}'");
+                    _log.Debug($"Search: criterion '{criterion}'");
                     return _searchService.Search(query)
                         .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
                 });
 
-                _log.Trace($"Search: criterion '{criterion}' found {results?.Count() ?? 0} element(s)");
+                _log.Trace($"Search: Found {results?.Count() ?? 0} element(s)");
                 return new()
                 {
                     Results = results,
@@ -290,6 +291,18 @@ namespace Lanceur.Views
 
         #region Classes
 
+        public class AliasResponse
+        {
+            #region Properties
+
+            public string CurrentAliasSuggestion { get; set; }
+            public string CurrentSessionName { get; set; }
+            public bool KeepAlive { get; set; }
+            public IEnumerable<QueryResult> Results { get; set; } = new List<QueryResult>();
+
+            #endregion Properties
+        }
+
         public class ExecutionRequest
         {
             #region Properties
@@ -305,18 +318,6 @@ namespace Lanceur.Views
             public static implicit operator ExecutionRequest(string parameters) => new() { Query = parameters };
 
             #endregion Methods
-        }
-
-        public class SearchResponse
-        {
-            #region Properties
-
-            public string CurrentAliasSuggestion { get; set; }
-            public string CurrentSessionName { get; set; }
-            public bool KeepAlive { get; set; }
-            public IEnumerable<QueryResult> Results { get; set; } = new List<QueryResult>();
-
-            #endregion Properties
         }
 
         #endregion Classes
