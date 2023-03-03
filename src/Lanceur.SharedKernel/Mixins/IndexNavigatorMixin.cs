@@ -26,7 +26,7 @@
             if (current < -1 || current >= max) { throw new IndexOutOfRangeException("Cannot navigate to previous index when index if out of range."); }
             else if (max == 0) { throw new IndexOutOfRangeException("Cannot navigate to previous index in empty collection."); }
             else if (max == 1) { return current <= -1 ? 0 : current; }
-            else if (current == 0) { return max - 1; }
+            else if (new int[] { -1, 0 }.Contains(current)) { return max - 1; }
             else { return current - 1; }
         }
 

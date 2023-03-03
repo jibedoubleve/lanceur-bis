@@ -41,17 +41,18 @@ public class IndexNavigatorShould
     }
 
     [Theory]
+    [InlineData(-1, 0)]
     [InlineData(0, 1)]
     [InlineData(1, 2)]
     [InlineData(2, 3)]
     [InlineData(3, 4)]
     [InlineData(4, 5)]
     [InlineData(5, 0)]
-    public void GetNextIndex(int next, int expected)
+    public void GetNextIndex(int current, int next)
     {
         var list = new List<int>() { 0, 1, 2, 3, 4, 5 };
 
-        list[list.GetNextIndex(next)].Should().Be(expected);
+        list[list.GetNextIndex(current)].Should().Be(next);
     }
 
     [Fact]
@@ -84,11 +85,12 @@ public class IndexNavigatorShould
     [InlineData(2, 1)]
     [InlineData(1, 0)]
     [InlineData(0, 5)]
-    public void GetPreviousIndex(int next, int expected)
+    [InlineData(-1, 5)]
+    public void GetPreviousIndex(int current, int previous)
     {
         var list = new List<int>() { 0, 1, 2, 3, 4, 5 };
 
-        list[list.GetPreviousIndex(next)].Should().Be(expected);
+        list[list.GetPreviousIndex(current)].Should().Be(previous);
     }
 
     [Fact]

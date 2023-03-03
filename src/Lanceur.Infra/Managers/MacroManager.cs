@@ -22,7 +22,7 @@ namespace Lanceur.Infra.Managers
 
         #region Constructors
 
-        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null, IDataService dataService = null)
+        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null)
         {
             _asm = asm;
             _log = Locator.Current.GetLogger<MacroManager>(logFactory);
@@ -56,7 +56,7 @@ namespace Lanceur.Infra.Managers
                         _dataService.HydrateMacro(alias);
 
                         macroInstances.Add(name, alias);
-                        _log.Info($"Found macro '{name}'");
+                        _log.Trace($"Found macro '{name}'");
                     }
                 }
                 _macroInstances = macroInstances;

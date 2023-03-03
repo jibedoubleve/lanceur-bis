@@ -320,7 +320,6 @@ namespace Lanceur.Tests.ViewModels
                 scheduler.AdvanceBy(TimeSpan.FromMilliseconds(11).Ticks);
 
                 vm.CurrentAlias.Name.Should().Be("name1");
-                vm.CurrentAliasIndex.Should().Be(0);
             });
         }
 
