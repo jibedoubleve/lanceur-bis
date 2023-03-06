@@ -1,4 +1,5 @@
 ﻿using Lanceur.Converters.Reactive;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
@@ -61,12 +62,18 @@ namespace Lanceur.Views
                 this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
 
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.ProgressBar.Visibility, x => x ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.CurrentAliasSuggestion, v => v.AutoCompleteBox.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.CurrentSessionName, v => v.CurrentSessionName.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results, v => v.QueryResults.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultCounter.Text);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.StatusPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
+
+                this.OneWayBind(ViewModel, vm => vm.CurrentAlias, v => v.AutoCompleteBox.Text, x =>
+                {
+                    return (x is ExecutableQueryResult)
+                        ? x?.Name ?? string.Empty
+                        : string.Empty;
+                }).DisposeWith(d);
 
                 ViewModel.WhenAnyValue(vm => vm.KeepAlive)
                          .Where(v => v == false)
@@ -97,18 +104,6 @@ namespace Lanceur.Views
                     return Unit.Default;
                 })
                 .InvokeCommand(ViewModel, vm => vm.AutoComplete);
-
-                QueryTextBox
-                    .Events().PreviewKeyDown
-                    .Where(x => x.Key == Key.Up)
-                    .Select(x => Unit.Default)
-                    .InvokeCommand(ViewModel, vm => vm.SelectPreviousResult);
-
-                QueryTextBox
-                    .Events().PreviewKeyDown
-                    .Where(x => x.Key == Key.Down)
-                    .Select(x => Unit.Default)
-                    .InvokeCommand(ViewModel, vm => vm.SelectNextResult);
 
                 QueryResults
                     .Events().PreviewMouseLeftButtonUp
@@ -155,6 +150,8 @@ namespace Lanceur.Views
                         : collection.GetPreviousIndex(QueryResults.SelectedIndex);
 
                     var selectedItem = collection.ElementAt(idx);
+
+                    QueryResults.SelectedItem = selectedItem;
                     QueryResults.ScrollIntoView(selectedItem);
                 }
             }

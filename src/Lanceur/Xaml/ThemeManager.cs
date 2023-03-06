@@ -89,9 +89,6 @@ namespace Lanceur.Xaml
         public static Themes GetTheme()
         {
             object value = Registry.GetValue(@"HKEY_CURRENT_USER\Software\\Microsoft\Windows\\CurrentVersion\Themes\\Personalize", "AppsUseLightTheme", null);
-
-            _log.Debug($"Actual theme is: '{(Convert.ToBoolean(value) ? "LIGHT" : "DARK")}'");
-
             return value is null
                 ? Themes.Light
                 : Convert.ToBoolean(value)
@@ -111,7 +108,7 @@ namespace Lanceur.Xaml
                 _ => throw new NotSupportedException($"The theme '{theme}' is not supported!")
             };
 
-            _log.Debug($"Applying theme '{themeToApply}'. Asekd theme is '{theme}'");
+            _log.Trace($"Applying theme '{themeToApply}'. Asekd theme is '{theme}'");
             ControlzEx.Theming.ThemeManager.Current.ChangeTheme(_app, themeToApply);
         }
 

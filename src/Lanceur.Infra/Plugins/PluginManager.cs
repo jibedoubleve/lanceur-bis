@@ -39,7 +39,7 @@ namespace Lanceur.Infra.Plugins
                     if (Activator.CreateInstance(type) is IPlugin result)
                     {
                         count++;
-                        _log.Info($"Found plugin '{result.Name}'");
+                        _log.Trace($"Found plugin '{result.Name}'");
                         yield return result;
                     }
                 }

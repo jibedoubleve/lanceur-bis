@@ -1,9 +1,12 @@
-﻿namespace Lanceur.SharedKernel.Mixins
+﻿using System.Collections.ObjectModel;
+
+namespace Lanceur.SharedKernel.Mixins
 {
     public static class CollectionMixin
-    {        /// <summary>
+    {
         #region Methods
 
+        /// <summary>
         /// Move the specified item to the specified index
         /// </summary>
         /// <param name="list">List of items where items will be moved</param>
@@ -24,6 +27,8 @@
                 }
             }
         }
+
+        public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> enumerable) => new(enumerable);
 
         #endregion Methods
     }

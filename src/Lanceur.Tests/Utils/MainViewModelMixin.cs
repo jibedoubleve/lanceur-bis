@@ -1,8 +1,6 @@
 ﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Tests.Utils.ReservedAliases;
-using Lanceur.Ui;
 using Lanceur.Views;
 using Microsoft.Reactive.Testing;
 
@@ -19,8 +17,7 @@ namespace Lanceur.Tests.Utils
                 scheduler,
                 ServiceFactory.LogService,
                 searchService ?? ServiceFactory.SearchService,
-                cmdProcessor ?? ServiceFactory.CmdLineService,
-                delay: new DummyDelay()
+                cmdProcessor ?? ServiceFactory.CmdLineService
             );
         }
 
@@ -30,7 +27,6 @@ namespace Lanceur.Tests.Utils
             {
                 vm.Results.Add(NotExecutableTestAlias.FromName($"{i + 1}/{count}"));
             }
-            vm.CurrentAliasIndex = 0;
             vm.CurrentAlias = vm.Results.Count == 0 ? null : vm.Results[0];
         }
 
