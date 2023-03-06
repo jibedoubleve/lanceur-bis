@@ -34,8 +34,6 @@ namespace Lanceur.Infra.SQLite
 
         #region Methods
 
-        private static bool Any(List<KeyValue> values, string key) => values.Any(x => x.Key == key);
-
         public void Edit(Action<AppSettings> edit)
         {
             var stg = Load();
@@ -53,39 +51,40 @@ namespace Lanceur.Infra.SQLite
             where
 	            s_key in @keys";
 
-            var values = DB.Connection.Query<KeyValue>(sql, new { keys = Keys }).ToList();
-
-            if (values != null)
+            var s = DB.Connection
+                .Query(sql, new { keys = Keys })
+                .ToDictionary(
+                    row => (string)row.Key,
+                    row => (object)row.Value
+                );
+            if (s != null)
             {
                 var settings = new AppSettings();
+                s.TryGetValue("IdSession", out var val);
+                settings.IdSession = val.CastToInt();
 
-                int i = 0;
-                var key = Keys[i++];
-                if (Any(values, key)) { settings.IdSession = values.Where(x => x.Key == key).First().Value.CastToInt(); }
+                s.TryGetValue("ShowAtStartup", out val);
+                settings.ShowAtStartup = val.CastToBool();
 
-                key = Keys[i++];
-                if (Any(values, key)) { settings.ShowAtStartup = values.Where(x => x.Key == key).First().Value.CastToBool(); }
+                s.TryGetValue("HotKey.Key", out var key);
+                s.TryGetValue("HotKey.ModifierKey", out var mod);
+                settings.HotKey = new HotKeySection(
+                     key.CastToInt(),
+                     mod.CastToInt()
+                );
 
-                key = Keys[i++];
-                var key2 = Keys[i++];
-                if (Any(values, key) && Any(values, key2))
-                {
-                    var k = values.Where(x => x.Key == key).First().Value.CastToInt();
-                    var m = values.Where(x => x.Key == key2).First().Value.CastToInt();
-                    settings.HotKey = new HotKeySection(m, k);
-                }
+                s.TryGetValue("Repository.ScoreLimit", out val);
+                settings.Repository.ScoreLimit = val.CastToInt();
 
-                key = Keys[i++];
-                if (Any(values, key)) { settings.Repository.ScoreLimit = values.Where(x => x.Key == key).First().Value.CastToInt(); }
+                s.TryGetValue("Window.Position.Left", out val);
+                settings.Window.Position.Left = val.CastToInt();
 
-                key = Keys[i++];
-                if (Any(values, key)) { settings.Window.Position.Left = values.Where(x => x.Key == key).First().Value.CastToDouble(); }
+                s.TryGetValue("Window.Position.Top", out val);
+                settings.Window.Position.Top = val.CastToInt();
 
-                key = Keys[i++];
-                if (Any(values, key)) { settings.Window.Position.Top = values.Where(x => x.Key == key).First().Value.CastToDouble(); }
+                s.TryGetValue("RestartDelay", out val);
+                settings.RestartDelay = val.CastToInt();
 
-                key = Keys[i++];
-                if (Any(values, key)) { settings.RestartDelay = values.Where(x => x.Key == key).First().Value.CastToDouble(); }
                 return settings;
             }
             else { return new(); }
