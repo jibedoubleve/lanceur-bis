@@ -9,6 +9,10 @@ namespace Lanceur.SharedKernel.Mixins
 
         public static bool CastToBool(this string @this, bool @default = default) => bool.TryParse(@this, out bool result) ? result : @default;
 
+        public static bool CastToBool(this object @this, bool @default = default) => $"{@this}".CastToBool(@default);
+
+        public static double CastToDouble(this object @this, double @default = default, IFormatProvider provider = null) => $"{@this}".CastToDouble(@default, provider);
+
         public static double CastToDouble(this string @this, double @default = default, IFormatProvider provider = null)
         {
             provider ??= new CultureInfo("en-US");
@@ -17,7 +21,11 @@ namespace Lanceur.SharedKernel.Mixins
 
         public static int CastToInt(this string @this, int @default = default) => int.TryParse(@this, out int result) ? result : @default;
 
+        public static int CastToInt(this object @this, int @default = default) => $"{@this}".CastToInt(@default);
+
         public static long CastToLong(this string @this, long @default = default) => long.TryParse(@this, out long result) ? result : @default;
+
+        public static string CastToString(this object @this, string @default = default) => @this is not null ? $"{@this}" : @default;
 
         public static string ExtractPathFromSQLiteCString(this string value)
         {
