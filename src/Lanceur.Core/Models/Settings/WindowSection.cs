@@ -5,7 +5,6 @@
         #region Properties
 
         public PositionSection Position { get; set; } = new PositionSection();
-        public int ScoreLimit { get; set; }
 
         #endregion Properties
     }

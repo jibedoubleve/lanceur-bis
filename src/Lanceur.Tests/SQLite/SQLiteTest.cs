@@ -23,6 +23,7 @@ namespace Lanceur.Tests.SQLite
             return conn;
         }
 
+
         protected static SQLiteConnection BuildFreshDB(string sql = null)
         {
             var db = BuildConnection();

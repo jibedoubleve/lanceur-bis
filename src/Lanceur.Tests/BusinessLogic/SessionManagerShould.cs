@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using FluentAssertions;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.SharedKernel.Mixins;
