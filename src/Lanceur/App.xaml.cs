@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Services;
+﻿using Lanceur.Controls;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Xaml;
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -14,6 +15,12 @@ namespace Lanceur
     /// </summary>
     public partial class App : Application
     {
+        #region Fields
+
+        private NotifyIconAdapter _notifyIcon;
+
+        #endregion Fields
+
         #region Constructors
 
         public App()
@@ -40,6 +47,8 @@ namespace Lanceur
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            _notifyIcon ??= new NotifyIconAdapter();
+
             ThemeManager.Current.SetTheme();
 
             if (!SingleInstance.WaitOne())
