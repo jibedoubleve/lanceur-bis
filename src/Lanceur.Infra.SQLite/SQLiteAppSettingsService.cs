@@ -77,10 +77,10 @@ namespace Lanceur.Infra.SQLite
                 settings.Repository.ScoreLimit = val.CastToInt();
 
                 s.TryGetValue("Window.Position.Left", out val);
-                settings.Window.Position.Left = val.CastToInt();
+                settings.Window.Position.Left = val.CastToDouble();
 
                 s.TryGetValue("Window.Position.Top", out val);
-                settings.Window.Position.Top = val.CastToInt();
+                settings.Window.Position.Top = val.CastToDouble();
 
                 s.TryGetValue("RestartDelay", out val);
                 settings.RestartDelay = val.CastToInt();
