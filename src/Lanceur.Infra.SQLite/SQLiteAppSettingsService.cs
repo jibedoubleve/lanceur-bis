@@ -69,8 +69,8 @@ namespace Lanceur.Infra.SQLite
                 s.TryGetValue("HotKey.Key", out var key);
                 s.TryGetValue("HotKey.ModifierKey", out var mod);
                 settings.HotKey = new HotKeySection(
-                     key.CastToInt(),
-                     mod.CastToInt()
+                     mod.CastToInt(),
+                     key.CastToInt()
                 );
 
                 s.TryGetValue("Repository.ScoreLimit", out val);
