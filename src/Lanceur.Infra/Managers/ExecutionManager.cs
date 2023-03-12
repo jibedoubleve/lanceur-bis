@@ -85,14 +85,22 @@ namespace Lanceur.Infra.Managers
             var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
             var psi = new ProcessStartInfo()
             {
-                FileName = file,                
             };
+
             if (query.IsPrivilegeOverriden)
             {
+                psi.FileName = file;
                 //https://stackoverflow.com/a/23199505/389529
                 psi.UseShellExecute = true;
                 psi.Verb = "runas";
                 _log.Info($"Runs '{query.FileName}' as ADMIN");
+            }
+            else
+            {
+                psi.FileName = $"explorer.exe";
+                psi.Arguments = file;
+                psi.UseShellExecute = false;
+                _log.Info($"Runs '{query.FileName}'");
             }
 
             _log.Debug($"Executing packaged application'{file}'");
