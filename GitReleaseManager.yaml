@@ -17,8 +17,6 @@ issue-labels-include:
 - feature plugin
 issue-labels-exclude:
 - documentation
-- pr-feature
-- pr-bugfix
 - internal refactoring
 - duplicate
 - good first issue
