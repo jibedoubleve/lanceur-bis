@@ -85,11 +85,12 @@ namespace Lanceur.Infra.Managers
             var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
             var psi = new ProcessStartInfo()
             {
-                FileName = "explorer.exe",
-                Arguments = file,
+                FileName = file,                
             };
             if (query.IsPrivilegeOverriden)
             {
+                //https://stackoverflow.com/a/23199505/389529
+                psi.UseShellExecute = true;
                 psi.Verb = "runas";
                 _log.Info($"Runs '{query.FileName}' as ADMIN");
             }
@@ -112,19 +113,18 @@ namespace Lanceur.Infra.Managers
                     HasResult = true,
                 };
             }
-            else if (request.QueryResult is AliasQueryResult alias)
-            {
-                var results = await ExecuteAliasAsync(alias);
-                return ExecutionResponse.FromResults(results);
-            }
             else if (request.QueryResult is IExecutable exec)
             {
                 if (request.QueryResult is IExecutableWithPrivilege exp)
                 {
                     exp.IsPrivilegeOverriden = request.ExecuteWithPrivilege;
                 }
-                var results = await exec.ExecuteAsync(request.Cmdline);
-                return ExecutionResponse.FromResults(results);
+
+                var result = (request.QueryResult is AliasQueryResult alias)
+                    ? await ExecuteAliasAsync(alias)
+                    : await exec.ExecuteAsync();
+
+                return ExecutionResponse.FromResults(result);
             }
             else
             {
