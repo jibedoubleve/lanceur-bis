@@ -8,7 +8,7 @@ namespace Lanceur.Core.Services
 
         IEnumerable<QueryResult> GetAll();
 
-        IEnumerable<QueryResult> Search(Cmdline query);
+        IEnumerable<QueryResult> Search(string query);
 
         #endregion Methods
     }

@@ -28,7 +28,6 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly ICmdlineManager _cmdlineManager;
         private readonly IExecutionManager _executor;
         private readonly IAppLogger _log;
         private readonly ISearchService _searchService;
@@ -43,7 +42,6 @@ namespace Lanceur.Views
             IScheduler poolThread = null,
             IAppLoggerFactory logFactory = null,
             ISearchService searchService = null,
-            ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
             IDataService service = null,
             IExecutionManager executor = null)
@@ -55,7 +53,6 @@ namespace Lanceur.Views
             notify ??= l.GetService<IUserNotification>();
             _log = Locator.Current.GetLogger<MainViewModel>(logFactory);
             _searchService = searchService ?? l.GetService<ISearchService>();
-            _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
             _service = service ?? l.GetService<IDataService>();
             _executor = executor ?? l.GetService<IExecutionManager>();
 
@@ -100,11 +97,7 @@ namespace Lanceur.Views
             ).BindTo(this, vm => vm.CurrentAlias);
 
             this.WhenAnyObservable(vm => vm.AutoComplete)
-                .Select(x =>
-                {
-                    var param = _cmdlineManager.BuildFromText(Query);
-                    return new Cmdline(x, param.Parameters).ToString();
-                })
+                .Select(x => x)
                 .BindTo(this, vm => vm.Query);
 
             this.WhenAnyValue(vm => vm.Query)
@@ -180,7 +173,7 @@ namespace Lanceur.Views
             else
             {
                 _log.Debug($"Execute alias '{(request?.Query ?? "<EMPTY>")}'");
-                var response = await _executor.ExecuteAsync(new Core.Managers.ExecutionRequest
+                var response = await _executor.ExecuteAsync(new ExecutionRequest
                 {
                     QueryResult = CurrentAlias,
                     ExecuteWithPrivilege = request.RunAsAdmin,
@@ -200,11 +193,10 @@ namespace Lanceur.Views
             if (criterion.IsNullOrWhiteSpace()) { return new AliasResponse(); }
             else
             {
-                var query = _cmdlineManager.BuildFromText(criterion);
                 var results = await Task.Run(() =>
                 {
                     _log.Debug($"Search: criterion '{criterion}'");
-                    return _searchService.Search(query)
+                    return _searchService.Search(criterion)
                         .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
                 });
 

@@ -84,11 +84,11 @@ namespace Lanceur.Infra.Stores
             return _plugins;
         }
 
-        public IEnumerable<QueryResult> Search(Cmdline query)
+        public IEnumerable<QueryResult> Search(string query)
         {
             LoadPlugins();
             var found = from plugin in _plugins
-                        where plugin?.Name?.ToLower()?.StartsWith(query.Name.ToLower()) ?? false
+                        where plugin?.Name?.ToLower()?.StartsWith(query.ToLower()) ?? false
                         select plugin;
             _log.Trace($"Found {found.Count()} plugin(s)");
             return found;

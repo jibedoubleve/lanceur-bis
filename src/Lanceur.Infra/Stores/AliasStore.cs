@@ -31,7 +31,7 @@ namespace Lanceur.Infra.Stores
 
         public IEnumerable<QueryResult> GetAll() => _aliasService.GetAll();
 
-        public IEnumerable<QueryResult> Search(Cmdline query) => _aliasService.Search(query.Name);
+        public IEnumerable<QueryResult> Search(string query) => _aliasService.Search(query);
 
         #endregion Methods
     }

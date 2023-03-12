@@ -44,9 +44,8 @@ namespace Lanceur.Macros
 
         private AliasQueryResult GetAlias(string item)
         {
-            var cmdline = new Cmdline(item);
             var macro = _searchService
-                .Search(cmdline)
+                .Search(item)
                 .FirstOrDefault();
             return macro as AliasQueryResult;
         }

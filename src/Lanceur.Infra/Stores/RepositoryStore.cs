@@ -14,7 +14,7 @@ namespace Lanceur.Infra.Stores
             return new List<QueryResult>();
         }
 
-        public IEnumerable<QueryResult> Search(Cmdline query)
+        public IEnumerable<QueryResult> Search(string query)
         {
             return new List<QueryResult>();
         }

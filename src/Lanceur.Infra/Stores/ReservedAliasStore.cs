@@ -115,10 +115,10 @@ namespace Lanceur.Infra.Stores
 
         public IEnumerable<QueryResult> GetAll() => ReservedAliases;
 
-        public IEnumerable<QueryResult> Search(Cmdline query)
+        public IEnumerable<QueryResult> Search(string query)
         {
             var result = (from k in ReservedAliases
-                          where k.Name.ToLower().StartsWith(query.Name)
+                          where k.Name.ToLower().StartsWith(query)
                           select k).ToList();
             var orderedResult = _dataService
                     .RefreshUsage(result)

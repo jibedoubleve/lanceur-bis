@@ -14,6 +14,7 @@ namespace Lanceur.Infra.Services
 
         private readonly IMacroManager _macroManager;
         private readonly IThumbnailManager _thumbnailManager;
+        private readonly ICmdlineManager _cmdlineManager;
         private readonly IStoreLoader _storeLoader;
         private IEnumerable<ISearchService> _stores;
 
@@ -21,12 +22,13 @@ namespace Lanceur.Infra.Services
 
         #region Constructors
 
-        public SearchService(IStoreLoader storeLoader = null, IMacroManager macroManager = null, IThumbnailManager thumbnailManager = null)
+        public SearchService(IStoreLoader storeLoader = null, IMacroManager macroManager = null, IThumbnailManager thumbnailManager = null, ICmdlineManager cmdlineManager = null)
         {
             var l = Locator.Current;
             _storeLoader = storeLoader ?? new StoreLoader();
             _macroManager = macroManager ?? l.GetService<IMacroManager>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
+            _cmdlineManager = cmdlineManager ?? l.GetService<ICmdlineManager>();
         }
 
         #endregion Constructors
@@ -37,7 +39,7 @@ namespace Lanceur.Infra.Services
         {
             get
             {
-                if (_stores == null) { _stores = _storeLoader.Load(); }
+                _stores ??= _storeLoader.Load();
                 return _stores;
             }
         }
@@ -62,7 +64,7 @@ namespace Lanceur.Infra.Services
             return toReturn;
         }
 
-        public IEnumerable<QueryResult> Search(Cmdline query)
+        public IEnumerable<QueryResult> Search(string query)
         {
             if (query == null) { return new List<QueryResult>(); }
 
@@ -74,14 +76,15 @@ namespace Lanceur.Infra.Services
             }
 
             // Remember the query
-            foreach (var result in results) { result.Query = query; }
+            var cmdline = _cmdlineManager.BuildFromText(query);
+            foreach (var result in results) { result.Query = cmdline; }
 
             if (results.Any())
             {
                 // If there's an exact match, promote it to the top
                 // of the list.
                 var match = (from r in results
-                             where r.Name == query.Name
+                             where r.Name == query
                              select r).FirstOrDefault();
                 if (match is not null) { results.Move(match, 0); }
 

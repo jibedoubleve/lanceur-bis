@@ -54,9 +54,8 @@ namespace Lanceur.Tests.BusinessLogic
               .ReturnsForAnyArgs(x => x.Args()[0] as IEnumerable<QueryResult>);
 
             var store = GetStore(ds, type: typeof(MainViewModel));
-            var query = new Cmdline(criterion);
 
-            store.Search(query).Should().HaveCount(1);
+            store.Search(criterion).Should().HaveCount(1);
         }
 
         [Fact]
@@ -67,9 +66,7 @@ namespace Lanceur.Tests.BusinessLogic
               .Returns(new List<QueryResult>() { new ExecutableTestAlias() });
 
             var store = GetStore(dataService: ds);
-            var query = new Cmdline("anothertest");
-
-            store.Search(query).Should().HaveCount(1); ;
+            store.Search("anothertest").Should().HaveCount(1); ;
         }
 
         #endregion Methods

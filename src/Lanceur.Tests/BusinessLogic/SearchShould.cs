@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Models;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Utils;
@@ -15,7 +16,10 @@ namespace Lanceur.Tests.BusinessLogic
         private static SearchService BuildSearchService(IStoreLoader loader = null)
         {
             loader ??= new DebugStoreLoader();
-            var service = new SearchService(loader);
+            var service = new SearchService(
+                storeLoader: loader,
+                cmdlineManager: new CmdlineManager()
+            );
             return service;
         }
 
@@ -31,9 +35,7 @@ namespace Lanceur.Tests.BusinessLogic
         public void ReturnValues()
         {
             var service = BuildSearchService();
-            var query = new Cmdline("code");
-
-            var result = service.Search(query);
+            var result = service.Search("code");
 
             result.Should().HaveCount(1);
             result.ElementAt(0).IsResult.Should().BeFalse();

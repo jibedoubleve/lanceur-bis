@@ -28,7 +28,7 @@ namespace Lanceur.Tests.ViewModels
                 var searchService = Substitute.For<ISearchService>();
 
                 searchService
-                    .Search(Arg.Any<Cmdline>())
+                    .Search(Arg.Any<string>())
                     .Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
 
                 var vm = MainViewModelHelper.Build(scheduler, searchService);
@@ -49,7 +49,7 @@ namespace Lanceur.Tests.ViewModels
                 //Arrange
                 var results = new List<ExecutableQueryResult> { new ExecutableTestAlias() };
                 var store = Substitute.For<ISearchService>();
-                store.Search(Arg.Any<Cmdline>()).Returns(results);
+                store.Search(Arg.Any<string>()).Returns(results);
 
                 var storeLoader = Substitute.For<IStoreLoader>();
                 storeLoader.Load().Returns(new List<ISearchService> { store });
@@ -297,7 +297,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var searchService = Substitute.For<ISearchService>();
-                searchService.Search(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
+                searchService.Search(Arg.Any<string>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
                 var vm = MainViewModelHelper.Build(scheduler, searchService);
 
                 vm.SearchAlias.Execute("__").Subscribe();
