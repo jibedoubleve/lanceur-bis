@@ -23,7 +23,7 @@ public partial class KeywordsViewModel : ObservableObject
 
     [ObservableProperty] private ObservableCollection<AliasQueryResult> _aliases = new();
     private readonly IAliasManagementService _aliasManagementService;
-    private IList<AliasQueryResult> _bufferedAliases = Array.Empty<AliasQueryResult>();
+    private IList<AliasQueryResult> _cachedAliases = Array.Empty<AliasQueryResult>();
     private readonly ILogger<KeywordsViewModel> _logger;
     private AliasQueryResult? _selectedAlias;
     private readonly IThumbnailService _thumbnailService;
@@ -101,8 +101,8 @@ public partial class KeywordsViewModel : ObservableObject
 
         var names = message?.Cmdline?.Parameters;
         var newAlias = names is null
-            ? new() { Name = names, Synonyms = names }
-            : AliasQueryResult.EmptyForCreation;
+            ? AliasQueryResult.EmptyForCreation
+            : new() { Name = names, Synonyms = names };
             
         _logger.LogTrace("Creating new alias with name '{Name}'", names);
         Aliases.Insert(0, newAlias);
@@ -212,7 +212,7 @@ public partial class KeywordsViewModel : ObservableObject
     private async Task OnLoadAliases()
     {
         var result = await Task.Run(() => _aliasManagementService.GetAll());
-        _bufferedAliases = result.ToList();
+        _cachedAliases = result.ToList();
 
         /* If the list of aliases already contains a new alias (with Id = 0),
          * then add the loaded aliases from the database to the existing list.
@@ -221,16 +221,16 @@ public partial class KeywordsViewModel : ObservableObject
          */
         if (Aliases is [{ Id: 0 }])
         {
-            Aliases.AddRange(_bufferedAliases);
+            Aliases.AddRange(_cachedAliases);
         }
         else
         {
-            SelectedAlias = _bufferedAliases.Reselect(SelectedAlias);
-            Aliases = new(_bufferedAliases);
+            SelectedAlias = _cachedAliases.Reselect(SelectedAlias);
+            Aliases = new(_cachedAliases);
         }
 
-        _thumbnailService.UpdateThumbnails(_bufferedAliases);
-        _logger.LogTrace("Loaded {Count} alias(es)", _bufferedAliases.Count);
+        _thumbnailService.UpdateThumbnails(_cachedAliases);
+        _logger.LogTrace("Loaded {Count} alias(es)", _cachedAliases.Count);
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
@@ -266,7 +266,7 @@ public partial class KeywordsViewModel : ObservableObject
     private void OnSearch(string criterion)
     {
         criterion = criterion.ToLower();
-        var aliases = _bufferedAliases.Where(x => x.Name.ToLower().StartsWith(criterion))
+        var aliases = _cachedAliases.Where(x => x.Name.ToLower().StartsWith(criterion))
                                       .ToArray();
 
         _logger.LogTrace("Found {Count} alias(es) with criterion {Criterion}", aliases.Length, criterion);
