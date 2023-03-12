@@ -5,19 +5,26 @@
         #region Methods
 
         /// <summary>
-        /// Replace wildcards in text <paramref name="aliasParam"/> with <paramref name="userParam"/>
-        /// and return the parameters to be applied in the execution of the alias.
-        /// If the alias does not have parameter configured, then returns the user parameters
-        /// contained into <paramref name="userParam"/>
+        /// Will go through all the replacement actions and execute them. 
+        /// A replacement action is implementing <see cref="IReplacement"/>. 
+        /// If the specified <paramref name="text"/> is null, then return the
+        /// <paramref name="replacement"/>
         /// </summary>
-        /// <param name="aliasParam">The parameters as specified in the Alias</param>
-        /// <param name="userParam">The parameters specified by the user in the Query</param>
+        /// <param name="text">The parameters as specified in the Alias</param>
+        /// <param name="replacement">The parameters specified by the user in the Query</param>
         /// <returns>
         /// The parameters to apply to the execution of the alias
         /// </returns>
-        string HandleArgument(string aliasParam, string userParam);
+        string ReplaceOrReplacementOnNull(string text, string replacement);
 
-        string Replace(string text, string param);
+        /// <summary>
+        /// Will go through all the replacement actions and execute them. 
+        /// A replacement action is implementing <see cref="IReplacement"/>
+        /// </summary>
+        /// <param name="text">The text where the replacement will take place</param>
+        /// <param name="replacement">The replacement text</param>
+        /// <returns></returns>
+        string Replace(string text, string replacement);
 
         #endregion Methods
     }

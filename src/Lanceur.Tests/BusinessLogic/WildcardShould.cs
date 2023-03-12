@@ -59,7 +59,7 @@ namespace Lanceur.Tests.BusinessLogic
             var clipboard = Substitute.For<IClipboardService>();
             var mgr = new ReplacementCollection(clipboard);
 
-            mgr.HandleArgument(aliasParam, userParam).Should().Be(expected);
+            mgr.ReplaceOrReplacementOnNull(aliasParam, userParam).Should().Be(expected);
         }
 
         #endregion Methods

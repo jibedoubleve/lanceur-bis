@@ -35,18 +35,20 @@ namespace Lanceur.Infra.Wildcards
 
         #region Methods
 
-        public string HandleArgument(string aliasParam, string userParam)
+        /// <inheritdoc />
+        public string ReplaceOrReplacementOnNull(string text, string withThis)
         {
-            return aliasParam.IsNullOrWhiteSpace()
-                ? userParam
-                : Replace(aliasParam, userParam);
+            return text.IsNullOrWhiteSpace()
+                ? withThis
+                : Replace(text, withThis);
         }
 
-        public string Replace(string text, string param)
+        /// <inheritdoc />
+        public string Replace(string text, string withThis)
         {
             foreach (var replacement in _replacements)
             {
-                text = replacement.Replace(text, param);
+                text = replacement.Replace(text, withThis);
             }
 
             return text;

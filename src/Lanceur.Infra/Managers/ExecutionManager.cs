@@ -63,7 +63,7 @@ namespace Lanceur.Infra.Managers
             {
                 FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
                 Verb = "open",
-                Arguments = _wildcardManager.HandleArgument(query.Arguments, query.Query.Parameters),
+                Arguments = _wildcardManager.ReplaceOrReplacementOnNull(query.Arguments, query.Query.Parameters),
                 UseShellExecute = true,
                 WorkingDirectory = query.WorkingDirectory,
                 WindowStyle = query.StartMode.AsWindowsStyle(),
@@ -85,7 +85,7 @@ namespace Lanceur.Infra.Managers
             var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
             var psi = new ProcessStartInfo()
             {
-                FileName = file,                
+                FileName = file,
             };
             if (query.IsPrivilegeOverriden)
             {
