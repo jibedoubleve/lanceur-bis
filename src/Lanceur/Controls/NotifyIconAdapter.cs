@@ -9,7 +9,7 @@ namespace Lanceur.Controls
     {
         #region Fields
 
-        private NotifyIcon _notifyIcon;
+        private readonly NotifyIcon _notifyIcon;
 
         #endregion Fields
 
