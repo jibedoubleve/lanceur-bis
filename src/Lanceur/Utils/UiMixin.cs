@@ -12,7 +12,7 @@ namespace Lanceur.Utils
         {
             return source is TextBox tb ? tb.Text : string.Empty;
         }
-        public static ExecutionRequest GetQueryFromDataContext(this object source)
+        public static AliasExecutionRequest GetQueryFromDataContext(this object source)
         {
             var param = source is FrameworkElement e && e?.DataContext is QueryResult result
                 ? result?.Query?.ToString() ?? string.Empty
