@@ -130,7 +130,7 @@ namespace Lanceur.Infra.Managers
 
                 var result = (request.QueryResult is AliasQueryResult alias)
                     ? await ExecuteAliasAsync(alias)
-                    : await exec.ExecuteAsync();
+                    : await exec.ExecuteAsync(request.Cmdline);
 
                 return ExecutionResponse.FromResults(result);
             }
