@@ -77,11 +77,6 @@ namespace Lanceur.Views
                 .ObserveOn(uiThread)
                 .BindTo(this, vm => vm.Aliases);
 
-            this.WhenAnyObservable(vm => vm.SaveSession)
-                .ObserveOn(uiThread)
-                .Where(ctx => ctx is not null)
-                .Subscribe(ctx => Sessions.Add(ctx));
-
             this.WhenAnyObservable(vm => vm.RemoveSession)
                 .ObserveOn(uiThread)
                 .Where(ctx => ctx is not null)
