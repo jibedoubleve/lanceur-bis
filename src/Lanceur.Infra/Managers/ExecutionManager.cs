@@ -83,16 +83,22 @@ namespace Lanceur.Infra.Managers
         {
             // https://stackoverflow.com/questions/42521332/launching-a-windows-10-store-app-from-c-sharp-executable
             var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
-            var psi = new ProcessStartInfo()
-            {
-                FileName = file,
-            };
+            var psi = new ProcessStartInfo();
+
             if (query.IsPrivilegeOverriden)
             {
+                psi.FileName = file;
                 //https://stackoverflow.com/a/23199505/389529
                 psi.UseShellExecute = true;
                 psi.Verb = "runas";
                 _log.Info($"Runs '{query.FileName}' as ADMIN");
+            }
+            else
+            {
+                psi.FileName = $"explorer.exe";
+                psi.Arguments = file;
+                psi.UseShellExecute = false;
+                _log.Info($"Runs '{query.FileName}'");
             }
 
             _log.Debug($"Executing packaged application'{file}'");
@@ -122,7 +128,7 @@ namespace Lanceur.Infra.Managers
 
                 var result = (request.QueryResult is AliasQueryResult alias)
                     ? await ExecuteAliasAsync(alias)
-                    : await exec.ExecuteAsync();
+                    : await exec.ExecuteAsync(request.Cmdline);
 
                 return ExecutionResponse.FromResults(result);
             }
