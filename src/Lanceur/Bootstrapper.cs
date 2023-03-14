@@ -67,6 +67,12 @@ namespace Lanceur
             l.RegisterLazySingleton<IDelay>(() => new Delay());
             l.RegisterLazySingleton<IAppRestart>(() => new AppRestart());
 
+#if DEBUG
+            l.Register<ISettingsService>(() => new MemorySettingsService());
+#else
+            l.Register<ISettingsService>(() => new JsonSettingsService());
+#endif
+
 
             l.Register<IAppLoggerFactory>(() => new NLoggerFactory());
             l.Register<IStoreLoader>(() => new StoreLoader());
@@ -77,7 +83,6 @@ namespace Lanceur
             l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
             l.Register<IAppSettingsService>(() => new SQLiteAppSettingsService(Get<SQLiteConnectionScope>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
-            l.Register<ISettingsService>(() => new JsonSettingsService());
             l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
             l.Register<IClipboardService>(() => new WindowsClipboardService());
             l.Register<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
