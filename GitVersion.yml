@@ -1,9 +1,8 @@
 assembly-versioning-scheme: MajorMinorPatchTag
-next-version: 2.1.0
+next-version: 2.2.0
 branches:
   master:
     mode: ContinuousDeployment
-    tag: rc
     increment: Patch
     prevent-increment-of-merged-branch-version: true
     track-merge-target: false
@@ -14,12 +13,3 @@ branches:
     increment: Patch
     prevent-increment-of-merged-branch-version: true
     track-merge-target: true  
-  feature:
-    regex: ^feature/*
-    mode: ContinuousDeployment
-    tag: alpha.{BranchName}
-    increment: Patch
-    prevent-increment-of-merged-branch-version: true
-    track-merge-target: true
-  pull-request:
-    mode: ContinuousDelivery

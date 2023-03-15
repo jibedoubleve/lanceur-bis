@@ -1,6 +1,6 @@
 
 /* ----------------------------------------------------------------------------
- * Build script for Perdeval vNext
+ * Build script for Lanceur Bis
  * ----------------------------------------------------------------------------
  * This script uses environment variables. To run correctly, this script needs
  * these variables to be set: 
@@ -13,7 +13,6 @@
 
 #tool nuget:?package=vswhere&version=3.0.1
 #tool nuget:?package=GitVersion.CommandLine&version=5.10.1
-// #tool xunit.runner.console
 #tool nuget:?package=GitReleaseManager&version=0.13.0
 
 #addin nuget:?package=Cake.Figlet&version=2.0.1
@@ -28,6 +27,7 @@ var solution = "./Lanceur.sln";
 GitVersion gitVersion = GitVersion(new GitVersionSettings 
 { 
     OutputType = GitVersionOutput.Json,
+    Verbosity = GitVersionVerbosity.Verbose,        
     ArgumentCustomization = args => args.Append("/updateprojectfiles")
 });
 var branchName = gitVersion.BranchName;
@@ -176,9 +176,9 @@ Task("release-github")
 
 
 Task("default")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Build")
-    .IsDependentOn("Tests");
+    .IsDependentOn("clean")
+    .IsDependentOn("build")
+    .IsDependentOn("tests");
 
 Task("bin")
     .IsDependentOn("default")
