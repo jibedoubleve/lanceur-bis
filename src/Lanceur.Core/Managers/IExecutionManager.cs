@@ -14,7 +14,6 @@ namespace Lanceur.Core.Managers
     public class ExecutionRequest
     {
         #region Properties
-
         public Cmdline Cmdline { get; set; }
         public bool ExecuteWithPrivilege { get; set; }
         public QueryResult QueryResult { get; set; }

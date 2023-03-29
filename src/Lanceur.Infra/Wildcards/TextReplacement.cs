@@ -10,11 +10,11 @@
 
         #region Methods
 
-        public string Replace(string text, string param)
+        public string Replace(string text, string with)
         {
             return text
-                    ?.Replace(Wildcard.ToLower(), param ?? "")
-                    ?.Replace(Wildcard.ToUpper(), param ?? "")
+                    ?.Replace(Wildcard.ToLower(), with ?? "")
+                    ?.Replace(Wildcard.ToUpper(), with ?? "")
                     ?? "";
         }
 

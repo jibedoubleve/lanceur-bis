@@ -66,7 +66,7 @@ namespace Lanceur.Infra.Managers
             if (HasSpecialName(cmdline))
             {
                 name = GetSpecialName(cmdline);
-                args = cmdline.Substring(name.Length);
+                args = cmdline[name.Length..];
             }
             else
             {

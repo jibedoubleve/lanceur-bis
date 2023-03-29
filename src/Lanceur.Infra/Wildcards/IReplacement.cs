@@ -10,7 +10,14 @@
 
         #region Methods
 
-        string Replace(string text, string param);
+        /// <summary>
+        /// Replace off the occurence of <see cref="Wildcard"/> with
+        /// <paramref name="replacement"/> in the specified <paramref name="text"/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="replacement"></param>
+        /// <returns></returns>
+        string Replace(string text, string replacement);
 
         #endregion Methods
     }

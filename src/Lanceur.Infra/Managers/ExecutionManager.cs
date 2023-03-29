@@ -63,7 +63,7 @@ namespace Lanceur.Infra.Managers
             {
                 FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
                 Verb = "open",
-                Arguments = _wildcardManager.HandleArgument(query.Arguments, query.Query.Parameters),
+                Arguments = _wildcardManager.ReplaceOrReplacementOnNull(query.Arguments, query.Query.Parameters),
                 UseShellExecute = true,
                 WorkingDirectory = query.WorkingDirectory,
                 WindowStyle = query.StartMode.AsWindowsStyle(),
@@ -83,9 +83,7 @@ namespace Lanceur.Infra.Managers
         {
             // https://stackoverflow.com/questions/42521332/launching-a-windows-10-store-app-from-c-sharp-executable
             var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
-            var psi = new ProcessStartInfo()
-            {
-            };
+            var psi = new ProcessStartInfo();
 
             if (query.IsPrivilegeOverriden)
             {

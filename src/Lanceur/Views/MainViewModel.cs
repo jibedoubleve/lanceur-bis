@@ -84,7 +84,7 @@ namespace Lanceur.Views
             ).Where(x => x.Where(y => !y).Any() == false)
              .Select(x => true); ;
 
-            ExecuteAlias = ReactiveCommand.CreateFromTask<ExecutionRequest, AliasResponse>(OnExecuteAliasAsync, canExecuteAlias, outputScheduler: uiThread);
+            ExecuteAlias = ReactiveCommand.CreateFromTask<AliasExecutionRequest, AliasResponse>(OnExecuteAliasAsync, canExecuteAlias, outputScheduler: uiThread);
             ExecuteAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             Observable.CombineLatest(
@@ -141,7 +141,7 @@ namespace Lanceur.Views
 
         [Reactive] public string CurrentSessionName { get; set; }
 
-        public ReactiveCommand<ExecutionRequest, AliasResponse> ExecuteAlias { get; }
+        public ReactiveCommand<AliasExecutionRequest, AliasResponse> ExecuteAlias { get; }
 
         [Reactive] public bool IsBusy { get; set; }
 
@@ -172,24 +172,17 @@ namespace Lanceur.Views
 
         private string OnAutoComplete() => CurrentAlias?.Name ?? string.Empty;
 
-        private async Task<AliasResponse> OnExecuteAliasAsync(ExecutionRequest request)
+        private async Task<AliasResponse> OnExecuteAliasAsync(AliasExecutionRequest request)
         {
-            request ??= new ExecutionRequest();
+            request ??= new AliasExecutionRequest();
 
             if (request?.Query.IsNullOrEmpty() ?? true) { return new(); }
             else
             {
-                var cmd = _cmdlineManager.BuildFromText(request.Query);
-                if (cmd.Parameters.IsNullOrWhiteSpace() && CurrentAlias is ExecutableQueryResult e)
-                {
-                    cmd = _cmdlineManager.CloneWithNewParameters(e.Parameters, cmd);
-                }
-
                 _log.Debug($"Execute alias '{(request?.Query ?? "<EMPTY>")}'");
                 var response = await _executor.ExecuteAsync(new Core.Managers.ExecutionRequest
                 {
                     QueryResult = CurrentAlias,
-                    Cmdline = cmd,
                     ExecuteWithPrivilege = request.RunAsAdmin,
                 });
 
@@ -239,7 +232,7 @@ namespace Lanceur.Views
             #endregion Properties
         }
 
-        public class ExecutionRequest
+        public class AliasExecutionRequest
         {
             #region Properties
 
@@ -251,7 +244,7 @@ namespace Lanceur.Views
 
             #region Methods
 
-            public static implicit operator ExecutionRequest(string query) => new() { Query = query };
+            public static implicit operator AliasExecutionRequest(string query) => new() { Query = query };
 
             #endregion Methods
         }

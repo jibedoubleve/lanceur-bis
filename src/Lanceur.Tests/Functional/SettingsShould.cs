@@ -14,8 +14,8 @@ namespace Lanceur.Tests.Functional
 
         private static void Assert(Action<IAppSettingsService> assert)
         {
-            var connection = BuildFreshDB();
-            var scope = new SQLiteConnectionScope(connection);
+            using var connection = BuildFreshDB();
+            using var scope = new SQLiteConnectionScope(connection);
             var settingRepository = new SQLiteAppSettingsService(scope);
 
             assert(settingRepository);

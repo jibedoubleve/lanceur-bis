@@ -87,7 +87,7 @@ namespace Lanceur.Views
                     .Select(x =>
                     {
                         x.Handled = true;
-                        return new MainViewModel.ExecutionRequest
+                        return new MainViewModel.AliasExecutionRequest
                         {
                             Query = x.OriginalSource.GetTextFromTextbox(),
                             RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control

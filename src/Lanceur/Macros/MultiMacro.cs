@@ -64,7 +64,6 @@ namespace Lanceur.Macros
                     await _executionManager.ExecuteAsync(new ExecutionRequest
                     {
                         QueryResult = alias,
-                        Cmdline = cmdline,
                     });
                 }
             }
