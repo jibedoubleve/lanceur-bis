@@ -1,25 +1,11 @@
-﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Services;
-using Lanceur.Tests.Utils.ReservedAliases;
+﻿using Lanceur.Tests.Utils.ReservedAliases;
 using Lanceur.Views;
-using Microsoft.Reactive.Testing;
 
 namespace Lanceur.Tests.Utils
 {
-    internal static class MainViewModelHelper
+    public static class MainViewModelMixin
     {
         #region Methods
-
-        public static MainViewModel Build(TestScheduler scheduler, ISearchService searchService = null, ICmdlineManager cmdProcessor = null)
-        {
-            return new MainViewModel(
-                scheduler,
-                scheduler,
-                ServiceFactory.LogService,
-                searchService ?? ServiceFactory.SearchService,
-                cmdProcessor ?? ServiceFactory.CmdLineService
-            );
-        }
 
         public static void SetResults(this MainViewModel vm, int count)
         {

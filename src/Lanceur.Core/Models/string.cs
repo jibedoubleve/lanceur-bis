@@ -1,10 +1,10 @@
 ﻿namespace Lanceur.Core.Models
 {
-    public class Cmdline
+    public class @string
     {
         #region Constructors
 
-        public Cmdline(string name, string parameters = "")
+        public @string(string name, string parameters = "")
         {
             Name = name ?? string.Empty;
             Parameters = parameters ?? string.Empty;
@@ -14,15 +14,13 @@
 
         #region Properties
 
-        public static Cmdline Empty => new(string.Empty, string.Empty);
+        public static @string Empty => new(string.Empty, string.Empty);
         public string Name { get; }
         public string Parameters { get; }
 
         #endregion Properties
 
         #region Methods
-
-        public static explicit operator string(Cmdline cmdline) => cmdline.ToString();
 
         public override string ToString()
         {

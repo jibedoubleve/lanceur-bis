@@ -9,10 +9,11 @@ namespace Lanceur.Tests.Utils
         #region Properties
 
         public static ICmdlineManager CmdLineService => Substitute.For<ICmdlineManager>();
+        public static IDataService DataService => Substitute.For<IDataService>();
+        public static IExecutionManager ExecutionManager => Substitute.For<IExecutionManager>();
         public static IAppLoggerFactory LogService => Substitute.For<IAppLoggerFactory>();
         public static IMacroManager MacroManager => Substitute.For<IMacroManager>();
         public static ISearchService SearchService => Substitute.For<ISearchService>();
-        public static IDataService DataService => Substitute.For<IDataService>();
 
         #endregion Properties
     }

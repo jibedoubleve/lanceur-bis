@@ -13,13 +13,21 @@ namespace Lanceur.Tests.Functional
     {
         #region Methods
 
-        [Fact]
-        public async Task ExecuteMultiMacro()
+        [Theory]
+        [InlineData("ini", "thb@joplin@spotify")]
+        public async Task ExecuteMultiMacro(string cmd, string parameters)
         {
+            var cmdline = new Cmdline(cmd, parameters);
+            var cmdlineManager = Substitute.For<ICmdlineManager>();
+            cmdlineManager
+                .BuildFromText((string)cmdline)
+                .Returns(cmdline);
+
             var mgr = new ExecutionManager(
                 Substitute.For<IAppLoggerFactory>(),
                 Substitute.For<IWildcardManager>(),
-                Substitute.For<IDataService>()
+                Substitute.For<IDataService>(),
+                cmdlineManager
             );
 
             var macro = Substitute.For<MultiMacro>();
@@ -31,7 +39,7 @@ namespace Lanceur.Tests.Functional
 
             var request = new ExecutionRequest
             {
-                Cmdline = new Cmdline("ini", "thb@joplin@spotify"),
+                Query = (string)cmdline,
                 ExecuteWithPrivilege = false,
                 QueryResult = macro
             };
