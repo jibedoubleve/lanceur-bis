@@ -1,35 +1,61 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
+using Lanceur.Schedulers;
+using Lanceur.Tests.Logging;
 using Lanceur.Views;
-using Microsoft.Reactive.Testing;
 using NSubstitute;
+using Splat;
+using System.Reactive.Concurrency;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Utils
 {
-    internal static class Builder
+    internal class Builder
     {
-        #region Methods
+        #region Fields
 
-        public static IExecutionManager BuildExecutionManager(IAppLoggerFactory logService = null, IWildcardManager wildcardManager = null, IDataService dataService = null, ICmdlineManager cmdlineManager = null)
+        private ITestOutputHelper _output;
+        private IScheduler _scheduler;
+
+        #endregion Fields
+
+        #region Constructors
+
+        private Builder(ITestOutputHelper output)
         {
-            logService ??= Substitute.For<IAppLoggerFactory>();
-            wildcardManager ??= Substitute.For<IWildcardManager>();
-            dataService ??= Substitute.For<IDataService>();
-            cmdlineManager ??= new CmdlineManager();//Substitute.For<ICmdlineManager>();
-            return new ExecutionManager(logService, wildcardManager, dataService, cmdlineManager);
+            _output = output;
         }
 
-        public static MainViewModel BuildMainViewModel(TestScheduler scheduler, ISearchService searchService = null, IExecutionManager executor = null)
+        #endregion Constructors
+
+        #region Methods
+
+        public static Builder With(ITestOutputHelper output) => new(output);
+
+        public MainViewModel BuildMainViewModel(ISearchService searchService = null, IExecutionManager executor = null)
         {
+            ArgumentNullException.ThrowIfNull(nameof(_scheduler));
+            ArgumentNullException.ThrowIfNull(nameof(_output));
+
+            Locator.CurrentMutable.UnregisterAll<ILogger>();
+            var logger = new TestReactiveUiLogger(_output);
+            Locator.CurrentMutable.RegisterConstant(logger, typeof(ILogger));
+
             return new MainViewModel(
-                uiThread: scheduler,
-                poolThread: scheduler,
-                logFactory: ServiceFactory.LogService,
-                searchService: searchService ?? ServiceFactory.SearchService,
+                schedulerProvider: new TestSchedulerProvider(_scheduler),
+                logFactory: new XUnitLoggerFactory(_output),
+                searchService: searchService ?? Substitute.For<ISearchService>(),
                 cmdlineService: new CmdlineManager(),
-                executor: executor ?? ServiceFactory.ExecutionManager
+                executor: executor ?? Substitute.For<IExecutionManager>(),
+                notify: Substitute.For<IUserNotification>()
             );
+        }
+
+        public Builder With(IScheduler scheduler)
+        {
+            _scheduler = scheduler;
+            return this;
         }
 
         #endregion Methods

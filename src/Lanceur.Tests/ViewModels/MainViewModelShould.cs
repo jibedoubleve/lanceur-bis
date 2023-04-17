@@ -1,71 +1,104 @@
-﻿using FluentAssertions;
+﻿using DynamicData;
+using FluentAssertions;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.ReservedKeywords;
+using Lanceur.Tests.Logging;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.ReservedAliases;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
-using ReactiveUI;
 using ReactiveUI.Testing;
+using Splat;
+using System.DirectoryServices;
 using System.Reactive.Concurrency;
 using Xunit;
+using Xunit.Abstractions;
+using static Lanceur.Views.MainViewModel;
 
 namespace Lanceur.Tests.ViewModels
 {
     public partial class MainViewModelShould : ReactiveTest
     {
+        #region Fields
+
+        private readonly ITestOutputHelper _output;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public MainViewModelShould(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
+        #endregion Constructors
+
         #region Methods
 
-        [Fact(Skip = "Should be fixed ASAP")]
+        [Fact]
         public void AddResultsAfterSearch()
         {
             new TestScheduler().With(scheduler =>
             {
+                _output.Arrange();
                 var searchService = Substitute.For<ISearchService>();
-
                 searchService
                     .Search(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
 
-                var vm = Builder.BuildMainViewModel(scheduler, searchService);
+                var vm = Builder.With(_output)
+                                .With(scheduler)
+                                .BuildMainViewModel(searchService);
 
-                vm.SearchAlias.Execute("__").Subscribe();
+                _output.Act();
+                vm.SearchAlias.Execute("...").Subscribe();
+                scheduler.Start();
 
-                scheduler.AdvanceBy(2_000);
-
+                _output.Assert();
                 vm.Results.Count.Should().Be(2);
             });
         }
 
-        [Fact(Skip = "Should be fixed ASAP")]
+        [Fact]
         public void AddResultsWithParametersAfterSearch()
         {
             new TestScheduler().With(scheduler =>
             {
                 //Arrange
+                _output.Arrange();
                 var results = new List<ExecutableQueryResult> { new ExecutableTestAlias() };
                 var store = Substitute.For<ISearchService>();
-                store.Search(Arg.Any<Cmdline>()).Returns(results);
+                store.Search(Arg.Any<Cmdline>())
+                     .Returns(results);
 
                 var storeLoader = Substitute.For<IStoreLoader>();
                 storeLoader.Load().Returns(new List<ISearchService> { store });
 
                 var macroMgr = Substitute.For<IMacroManager>();
-                var thumbnailManager = Substitute.For<IThumbnailManager>();
                 macroMgr.Handle(Arg.Any<IEnumerable<QueryResult>>()).Returns(results);
+
+                var thumbnailManager = Substitute.For<IThumbnailManager>();
                 var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);
-                var vm = Builder.BuildMainViewModel(scheduler, searchService);
+
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(searchService);
 
                 //Act
+                _output.Act();
                 var @params = "parameters";
                 vm.SearchAlias.Execute("Search " + @params).Subscribe();
+                scheduler.Start();
 
                 //Assert
-                scheduler.AdvanceBy(2_000);
+                _output.Assert();
+                vm.Results.Count.Should().BeGreaterThan(0);
                 vm.Results.ElementAt(0)?.Query.Parameters.Should().Be(@params);
             });
         }
@@ -75,16 +108,20 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder.BuildMainViewModel(scheduler);
+                _output.Arrange();
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
+
                 vm.SetResults(5);
                 vm.Query = "1 un";
 
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(110).Ticks);
-
+                _output.Act();
                 vm.AutoComplete.Execute().Subscribe();
 
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(110).Ticks);
-
+                scheduler.Start();
+                _output.Assert();
                 vm.Query.Should().Be("1/5 un");
             });
         }
@@ -94,7 +131,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder.BuildMainViewModel(scheduler);
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
 
                 scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new NotExecutableTestAlias());
 
@@ -116,7 +156,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder.BuildMainViewModel(scheduler);
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
 
                 scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new ExecutableTestAlias());
 
@@ -133,53 +176,93 @@ namespace Lanceur.Tests.ViewModels
             });
         }
 
-        [Fact(Skip = "Should be fixed ASAP")]
-        public void ExecuteAnExecutableQueryResultWithParameters()
+        [Fact]
+        public void HaveMultipleResultsWhenExecutingAlias()
         {
             new TestScheduler().With(scheduler =>
             {
-                var searchService = Substitute.For<ISearchService>();
-                var vm = Builder.BuildMainViewModel(scheduler, searchService);
+                // ARRANGE
+                var searchService = Substitute.For<IExecutionManager>();
+                searchService
+                    .ExecuteAsync(Arg.Any<ExecutionRequest>())
+                    .Returns(new ExecutionResponse
+                    {
+                        Results = new List<QueryResult>
+                        {
+                            ExecutableTestAlias.Random(),
+                            ExecutableTestAlias.Random(),
+                        },
+                        HasResult = true
+                    });
 
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(executor: searchService);
+
+                // ACT
                 vm.CurrentAlias = new ExecutableWithResultsTestAlias();
-                vm.ExecuteAlias.Execute().Subscribe();
+                vm.ExecuteAlias.Execute("Some query").Subscribe();
 
-                scheduler.AdvanceBy(1_000);
+                scheduler.Start();
 
+                // ASSERT
                 vm.Results.Count.Should().Be(2);
             });
         }
 
-        [Fact(Skip = "Should be fixed ASAP")]
-        public void ExecuteAnExecutableQueryResultWithResults()
+        [Fact]
+        public void HaveNoResultsWhenExecutingEmptyQuery()
         {
             new TestScheduler().With(scheduler =>
             {
-                var searchService = Substitute.For<ISearchService>();
-                var vm = Builder.BuildMainViewModel(scheduler, searchService);
+                // ARRANGE
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
 
+                // ACT
                 vm.CurrentAlias = new ExecutableWithResultsTestAlias();
                 vm.ExecuteAlias.Execute().Subscribe();
 
-                scheduler.AdvanceBy(1_000);
+                scheduler.Start();
 
-                vm.Results.Count.Should().Be(2);
+                // ASSERT
+                vm.Results.Count.Should().Be(0);
             });
         }
 
-        [Fact(Skip = "Should be fixed ASAP")]
-        public void ExecuteResultWithParameter()
+        [Fact]
+        public void HaveResultWhenExecutingAlias()
         {
             new TestScheduler().With(scheduler =>
             {
+                // ARRANGE
                 var alias = ExecutableTestAlias.FromName("alias1");
-                var vm = Builder.BuildMainViewModel(scheduler);
+
+                var executor = Substitute.For<IExecutionManager>();
+                executor
+                    .ExecuteAsync(Arg.Any<ExecutionRequest>())
+                    .Returns(new ExecutionResponse
+                    {
+                        Results = new List<QueryResult> { ExecutableTestAlias.FromName("world") },
+                        HasResult = true
+                    });
+
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(executor: executor);
+
+                // ACT
                 vm.CurrentAlias = alias;
-                vm.ExecuteAlias.Execute("alias1 world").Subscribe();
+                vm.ExecuteAlias.Execute("alias1").Subscribe();
 
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(11).Ticks);
+                scheduler.Start();
 
-                (vm.CurrentAlias as ExecutableTestAlias)?.Should().Be("world");
+                // ASSERT
+                vm.CurrentAlias.Name.Should().Be("world");
             });
         }
 
@@ -188,7 +271,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder.BuildMainViewModel(scheduler);
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
 
                 vm.SearchAlias.Execute("").Subscribe();
 
@@ -203,7 +289,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder.BuildMainViewModel(scheduler);
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
 
                 vm.SearchAlias.Execute().Subscribe();
 
@@ -218,7 +307,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder.BuildMainViewModel(scheduler);
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
 
                 vm.SearchAlias.Execute(" ").Subscribe();
 
@@ -234,12 +326,26 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
+                // ARRANGE
                 var calculator = new CodingSebCalculatorService();
                 var log = Substitute.For<IAppLoggerFactory>();
 
-                var executor = Builder.BuildExecutionManager();
-                var vm = Builder.BuildMainViewModel(scheduler, executor: executor);
+                var executor = Substitute.For<IExecutionManager>();
+                executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                        .Returns(new ExecutionResponse
+                        {
+                            Results = new List<QueryResult>()
+                            {
+                                new NotExecutableTestAlias(),
+                            }
+                        });
 
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(executor: executor);
+
+                // ACT
                 vm.Query = expression;
                 vm.CurrentAlias = new CalculatorAlias(calculator, log);
 
@@ -248,6 +354,7 @@ namespace Lanceur.Tests.ViewModels
 
                 scheduler.AdvanceBy(2);// 1 tick for the command execution
                                        // and 1 tick for the CurrentAlias
+                                       // ASSERT
                 vm.CurrentAlias?.Name?.Should().Be(result);
             });
         }
@@ -258,76 +365,49 @@ namespace Lanceur.Tests.ViewModels
             //https://stackoverflow.com/questions/49338867/unit-testing-viewmodel-property-bound-to-reactivecommand-isexecuting
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder.BuildMainViewModel(scheduler);
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
 
-                scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.Query = "a");
-                scheduler.Schedule(TimeSpan.FromTicks(15), () => vm.Query += "b");
-                scheduler.Schedule(TimeSpan.FromTicks(25), () => vm.Query += "c");
-                scheduler.Schedule(TimeSpan.FromTicks(35), () => vm.Query += "d");
-                scheduler.Schedule(TimeSpan.FromTicks(45), () => vm.Query += "e");
-
-                var results = scheduler.Start(
-                    () => vm.WhenAnyValue(x => x.Query),
-                    created: 0,
-                    subscribed: 1,
-                    disposed: 50
-                );
-
-                results.Messages.AssertEqual(
-                    OnNext(01, "a"),
-                    OnNext(15, "ab"),
-                    OnNext(25, "abc"),
-                    OnNext(35, "abcd"),
-                    OnNext(45, "abcde")
-                );
-            });
-        }
-
-        [Fact(Skip = "Should be fixed ASAP")]
-        public void SearchWhenCriterionChanges()
-        {
-            //https://stackoverflow.com/questions/49338867/unit-testing-viewmodel-property-bound-to-reactivecommand-isexecuting
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = Builder.BuildMainViewModel(scheduler);
-
-                scheduler.Schedule(TimeSpan.FromMilliseconds(00), () => vm.Query = "a");
-                scheduler.Schedule(TimeSpan.FromMilliseconds(50), () => vm.Query = "b");
-                scheduler.Schedule(TimeSpan.FromMilliseconds(51), () => vm.Query = "b");
-                scheduler.Schedule(TimeSpan.FromMilliseconds(52), () => vm.Query = "b");
-                scheduler.Schedule(TimeSpan.FromMilliseconds(80), () => vm.Query = "c");
+                scheduler.Schedule(() => vm.Query = "a");
+                scheduler.Schedule(TimeSpan.FromTicks(200), () => vm.Query += "b");
+                scheduler.Schedule(TimeSpan.FromTicks(300), () => vm.Query += "c");
+                scheduler.Schedule(TimeSpan.FromTicks(400), () => vm.Query += "d");
 
                 var results = scheduler.Start(
                     () => vm.SearchAlias.IsExecuting,
                     created: 0,
-                    subscribed: 1,
-                    disposed: TimeSpan.FromMilliseconds(1000).Ticks);
+                    subscribed: 100,
+                    disposed: TimeSpan.FromMilliseconds(1_000).Ticks);
 
                 results.Messages.AssertEqual(
-                    OnNext(1, false),
-                    OnNext(TimeSpan.FromMilliseconds(10).Ticks + 2, true),
-                    OnNext(TimeSpan.FromMilliseconds(10).Ticks + 4, false),
-                    OnNext(TimeSpan.FromMilliseconds(60).Ticks + 1, true),
-                    OnNext(TimeSpan.FromMilliseconds(60).Ticks + 3, false),
-                    OnNext(TimeSpan.FromMilliseconds(90).Ticks + 1, true),
-                    OnNext(TimeSpan.FromMilliseconds(90).Ticks + 3, false)
+                    OnNext(100, false),
+                    OnNext(TimeSpan.FromMilliseconds(100).Ticks + 402, true),
+                    OnNext(TimeSpan.FromMilliseconds(100).Ticks + 404, false)
                 );
             });
         }
 
-        [Fact(Skip = "Should be fixed ASAP")]
+        [Fact]
         public void SelectFirstAsCurrentResultsAfterSearch()
         {
             new TestScheduler().With(scheduler =>
             {
+                // ARRANGE
                 var searchService = Substitute.For<ISearchService>();
                 searchService.Search(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
-                var vm = Builder.BuildMainViewModel(scheduler, searchService);
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(searchService);
 
+                // ACT
                 vm.SearchAlias.Execute("__").Subscribe();
 
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(11).Ticks);
+                scheduler.Start();
 
+                // ASSERT
                 vm.CurrentAlias.Should().NotBeNull();
             });
         }
@@ -338,17 +418,29 @@ namespace Lanceur.Tests.ViewModels
             var aliasName = "alias1";
             new TestScheduler().With(scheduler =>
             {
-                var executor = Builder.BuildExecutionManager();
-                var vm = Builder.BuildMainViewModel(scheduler, executor: executor);
+                // ARRANGE
+                var executor = Substitute.For<IExecutionManager>();
+                executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                        .Returns(new ExecutionResponse
+                        {
+                            Results = new List<QueryResult>() {
+                                ExecutableWithResultsTestAlias.FromName(aliasName)
+                            }
+                        });
 
-                vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName(aliasName);
-                scheduler.AdvanceBy(1);
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(executor: executor);
+
+                // ACT
+                vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName("some random name");
 
                 vm.ExecuteAlias.Execute(aliasName).Subscribe();
-                scheduler.AdvanceBy(2); // 1 tick for the command execution
-                                        // and 1 tick for the CurrentAlias
+                scheduler.Start();
 
-                vm.CurrentAlias.Name.Should().Be("name1");
+                vm.CurrentAlias.Should().NotBeNull();
+                vm.CurrentAlias.Name.Should().Be(aliasName);
             });
         }
 

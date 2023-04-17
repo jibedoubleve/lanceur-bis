@@ -9,7 +9,7 @@ namespace Lanceur.Tests.Functional
     {
         #region Methods
 
-        [Fact(Skip = "Should be fixed ASAP")]
+        [Fact(Skip = "This test depends on the state of the machine where the tests run")]
         public void HaveExistingDebugDatabase()
         {
             var pattern = "Data Source=(.*);Version=3";
