@@ -1,13 +1,10 @@
-﻿using DynamicData;
-using DynamicData.Binding;
-using Lanceur.Core;
+﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.Models;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.Ui;
 using Lanceur.Xaml;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -19,7 +16,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Lanceur.Views
@@ -180,8 +176,9 @@ namespace Lanceur.Views
             else
             {
                 _log.Debug($"Execute alias '{(request?.Query ?? "<EMPTY>")}'");
-                var response = await _executor.ExecuteAsync(new Core.Managers.ExecutionRequest
+                var response = await _executor.ExecuteAsync(new ExecutionRequest
                 {
+                    Query = Query,
                     QueryResult = CurrentAlias,
                     ExecuteWithPrivilege = request.RunAsAdmin,
                 });

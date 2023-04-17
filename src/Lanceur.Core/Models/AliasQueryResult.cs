@@ -96,7 +96,7 @@ namespace Lanceur.Core.Models
             await ExecutionManager?.ExecuteAsync(new ExecutionRequest
             {
                 QueryResult = this,
-                Cmdline = cmdline,
+                Query = (string)cmdline,
             });
             OnExecution(this);
             return NoResult;

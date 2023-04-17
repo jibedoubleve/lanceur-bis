@@ -15,6 +15,7 @@ namespace Lanceur.Infra.Managers
         #region Fields
 
         private readonly IDataService _dataService;
+        private readonly ICmdlineManager _cmdlineManager;
         private readonly IAppLogger _log;
         private readonly IWildcardManager _wildcardManager;
 
@@ -22,11 +23,12 @@ namespace Lanceur.Infra.Managers
 
         #region Constructors
 
-        public ExecutionManager(IAppLoggerFactory logFactory, IWildcardManager wildcardManager, IDataService dataService)
+        public ExecutionManager(IAppLoggerFactory logFactory, IWildcardManager wildcardManager, IDataService dataService, ICmdlineManager cmdlineManager)
         {
             _log = logFactory.GetLogger<ExecutionManager>();
             _wildcardManager = wildcardManager;
             _dataService = dataService;
+            _cmdlineManager = cmdlineManager;
         }
 
         #endregion Constructors
@@ -128,7 +130,7 @@ namespace Lanceur.Infra.Managers
 
                 var result = (request.QueryResult is AliasQueryResult alias)
                     ? await ExecuteAliasAsync(alias)
-                    : await exec.ExecuteAsync(request.Cmdline);
+                    : await exec.ExecuteAsync(_cmdlineManager.BuildFromText(request.Query));
 
                 return ExecutionResponse.FromResults(result);
             }

@@ -9,7 +9,7 @@ namespace Lanceur.Tests.Functional
     {
         #region Methods
 
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
+        [Fact(Skip = "Should be fixed ASAP")]
         public void HaveExistingDebugDatabase()
         {
             var pattern = "Data Source=(.*);Version=3";
