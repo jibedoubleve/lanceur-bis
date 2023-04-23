@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Lanceur.Core.Formatters;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.Formatters;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Plugins;
 using Lanceur.Infra.Services;
@@ -90,6 +92,8 @@ namespace Lanceur
             l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>()));
             l.Register<IPackagedAppManager>(() => new PackagedAppManager());
             l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppManager>()));
+            //Formatters
+            l.Register<IStringFormatter>(() => new DefaultStringFormatter());
 
             l.Register(() => new SQLiteDatabase(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
