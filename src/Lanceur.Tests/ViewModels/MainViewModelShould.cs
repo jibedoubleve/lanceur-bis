@@ -341,16 +341,13 @@ namespace Lanceur.Tests.ViewModels
                     .With(scheduler)
                     .BuildMainViewModel(executor: executor);
 
-                // ACT
                 vm.Query = expression;
                 vm.CurrentAlias = new CalculatorAlias(calculator, log);
 
-                scheduler.AdvanceBy(1);
+                // ACT
                 vm.ExecuteAlias.Execute(expression).Subscribe();
 
-                scheduler.AdvanceBy(2);// 1 tick for the command execution
-                                       // and 1 tick for the CurrentAlias
-                                       // ASSERT
+                scheduler.Start();
                 vm.CurrentAlias?.Name?.Should().Be(result);
             });
         }
