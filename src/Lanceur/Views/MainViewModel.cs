@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lanceur.Views
@@ -128,10 +129,6 @@ namespace Lanceur.Views
                 .BindTo(this, vm => vm.Results);
 
             obs.Select(r => r.KeepAlive)
-                .BindTo(this, vm => vm.KeepAlive);
-
-            this.WhenAnyObservable(vm => vm.SearchAlias, vm => vm.ExecuteAlias)
-                .Select(r => r.KeepAlive)
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .BindTo(this, vm => vm.KeepAlive);
 
@@ -215,6 +212,7 @@ namespace Lanceur.Views
                 var query = _cmdlineManager.BuildFromText(criterion);
 
                 _log.Debug($"Search: criterion '{criterion}'");
+
                 var results = _searchService
                         .Search(query)
                         .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);

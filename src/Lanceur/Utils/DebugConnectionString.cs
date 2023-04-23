@@ -1,5 +1,4 @@
 ﻿using Lanceur.Core.Utils;
-using Lanceur.Infra.Stores;
 using Lanceur.SharedKernel.Mixins;
 using System;
 
@@ -9,16 +8,29 @@ namespace Lanceur.Utils
     {
         #region Fields
 
-        private readonly string _dbPath = @"%appdata%\probel\lanceur2\data.sqlite";
         //private string _dbPath = @"%appdata%\probel\Lanceur\debug_data.db";
         private static string _connectionString;
 
+        private readonly string _dbPath = @"%appdata%\probel\lanceur2\data.sqlite";
+
         #endregion Fields
+
+        #region Constructors
+
+        private DebugConnectionString(string dbPath)
+        {
+            _dbPath = dbPath;
+        }
+
         public DebugConnectionString()
         {
-
         }
+
+        #endregion Constructors
+
         #region Methods
+
+        public static DebugConnectionString FromFile(string dbPath) => new(dbPath);
 
         public override string ToString()
         {
