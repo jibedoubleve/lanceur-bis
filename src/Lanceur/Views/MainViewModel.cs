@@ -1,4 +1,5 @@
-﻿using Lanceur.Core;
+﻿using Humanizer.DateTimeHumanizeStrategy;
+using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -16,7 +17,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lanceur.Views
@@ -55,7 +55,8 @@ namespace Lanceur.Views
             _service = service ?? l.GetService<IDataService>();
             _executor = executor ?? l.GetService<IExecutionManager>();
 
-            //Commands
+            #region Commands
+
             AutoComplete = ReactiveCommand.Create(OnAutoComplete);
             AutoComplete.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
@@ -64,6 +65,12 @@ namespace Lanceur.Views
 
             SearchAlias = ReactiveCommand.CreateFromTask<string, AliasResponse>(OnSearchAliasAsync, outputScheduler: _schedulers.MainThreadScheduler);
             SearchAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            SelectNextResult = ReactiveCommand.Create(OnSelectNextResult, outputScheduler: _schedulers.MainThreadScheduler);
+            SelectNextResult.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            SelectPreviousResult = ReactiveCommand.Create(OnSelectPreviousResult, outputScheduler: _schedulers.MainThreadScheduler);
+            SelectPreviousResult.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             //CanExecute for ExecuteAlias
             var isExecutable = this
@@ -83,6 +90,8 @@ namespace Lanceur.Views
             ExecuteAlias = ReactiveCommand.CreateFromTask<AliasExecutionRequest, AliasResponse>(OnExecuteAliasAsync, canExecuteAlias, _schedulers.MainThreadScheduler);
             ExecuteAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
+            #endregion Commands
+
             Observable.CombineLatest(
                 this.WhenAnyObservable(vm => vm.ExecuteAlias.IsExecuting),
                 this.WhenAnyObservable(vm => vm.SearchAlias.IsExecuting)
@@ -92,10 +101,17 @@ namespace Lanceur.Views
              .ObserveOn(_schedulers.MainThreadScheduler)
              .BindTo(this, vm => vm.IsBusy);
 
-            this.WhenAnyObservable(
+            #region Navigation
+
+            var nav = this.WhenAnyObservable(
                 vm => vm.SelectNextResult,
                 vm => vm.SelectPreviousResult
-            ).BindTo(this, vm => vm.CurrentAlias);
+            ).Log(this, "Navigation occured", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
+             .ObserveOn(_schedulers.MainThreadScheduler);
+
+            nav.Select(x => x).BindTo(this, vm => vm.CurrentAlias);
+
+            #endregion Navigation
 
             this.WhenAnyObservable(vm => vm.AutoComplete)
                 .Select(x =>
@@ -109,7 +125,7 @@ namespace Lanceur.Views
                 .Throttle(TimeSpan.FromMilliseconds(100), _schedulers.TaskpoolScheduler)
                 .Select(x => x.Trim())
                 .Where(x => !x.IsNullOrWhiteSpace())
-                .Log(this, "Query changed.", x => $"{x}")
+                .Log(this, "Query changed.", x => $"'{x}'")
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .InvokeCommand(this, vm => vm.SearchAlias);
 
@@ -120,9 +136,15 @@ namespace Lanceur.Views
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .BindTo(this, vm => vm.CurrentAlias);
 
+            #region on Search & on Execute
+
             var obs = this
                 .WhenAnyObservable(vm => vm.SearchAlias, vm => vm.ExecuteAlias)
                 .ObserveOn(_schedulers.MainThreadScheduler);
+
+            obs.Select(r => r.Results?.ElementAt(0))
+                .Log(this, "Settings current alias", x => $"'{(x?.Name ?? "<NULL>")}'")
+                .BindTo(this, vm => vm.CurrentAlias);
 
             obs.Select(r => r.Results.ToObservableCollection())
                 .Log(this, "New results.", x => $"{x?.Count ?? -1} element(s)")
@@ -131,6 +153,8 @@ namespace Lanceur.Views
             obs.Select(r => r.KeepAlive)
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .BindTo(this, vm => vm.KeepAlive);
+
+            #endregion on Search & on Execute
 
             this.WhenAnyObservable(vm => vm.Activate)
                 .Subscribe(x => CurrentSessionName = x.CurrentSessionName);
@@ -226,6 +250,28 @@ namespace Lanceur.Views
             }
         }
 
+        private QueryResult OnSelectNextResult()
+        {
+            if (!Results.CanNavigate()) { return null; }
+
+            var currentIndex = Results.IndexOf(CurrentAlias);
+            var nextAlias = Results.GetNextItem(currentIndex);
+            _log.Trace($"Selecting next result. [Index: {nextAlias?.Name}]");
+
+            return nextAlias;
+        }
+
+        private QueryResult OnSelectPreviousResult()
+        {
+            if (!Results.CanNavigate()) { return null; }
+
+            var currentIndex = Results.IndexOf(CurrentAlias);
+            var nextAlias = Results.GetPreviousItem(currentIndex);
+            _log.Trace($"Selecting previous result. [Index: {nextAlias?.Name}]");
+
+            return nextAlias;
+        }
+
         #endregion Methods
 
         #region Classes
@@ -262,6 +308,16 @@ namespace Lanceur.Views
             public static implicit operator Task<AliasResponse>(AliasResponse src) => Task.FromResult(src);
 
             #endregion Methods
+        }
+
+        public class NavigationResponse
+        {
+            #region Properties
+
+            public QueryResult CurrentAlias { get; set; }
+            public string Query { get; set; }
+
+            #endregion Properties
         }
 
         #endregion Classes

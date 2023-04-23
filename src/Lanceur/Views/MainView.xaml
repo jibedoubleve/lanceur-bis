@@ -128,8 +128,7 @@
                 MaxHeight="{StaticResource ResultBoxHeight}"
                 HorizontalContentAlignment="Stretch"
                 Background="Transparent"
-                SelectedItem="{Binding CurrentAlias, Mode=OneWay}"
-                ItemTemplateSelector="{StaticResource QueryResultSelector}"/>
+                ItemTemplateSelector="{StaticResource QueryResultSelector}" />
         </Border>
         <!--  ======================================================  -->
         <!--  STATUS BOX  -->
