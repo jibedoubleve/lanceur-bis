@@ -1,5 +1,4 @@
-﻿using DynamicData;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -12,12 +11,9 @@ using Lanceur.Tests.Utils.ReservedAliases;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
-using Splat;
-using System.DirectoryServices;
 using System.Reactive.Concurrency;
 using Xunit;
 using Xunit.Abstractions;
-using static Lanceur.Views.MainViewModel;
 
 namespace Lanceur.Tests.ViewModels
 {
@@ -212,6 +208,60 @@ namespace Lanceur.Tests.ViewModels
         }
 
         [Fact]
+        public void HaveNoResultOnEmptyQuery()
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
+
+                vm.SearchAlias.Execute("").Subscribe();
+
+                scheduler.AdvanceBy(1_000);
+
+                vm.Results.Count.Should().Be(0);
+            });
+        }
+
+        [Fact]
+        public void HaveNoResultOnNullQuery()
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
+
+                vm.SearchAlias.Execute().Subscribe();
+
+                scheduler.AdvanceBy(1_000);
+
+                vm.Results.Count.Should().Be(0);
+            });
+        }
+
+        [Fact]
+        public void HaveNoResultOnWhiteSpaceQuery()
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel();
+
+                vm.SearchAlias.Execute(" ").Subscribe();
+
+                scheduler.AdvanceBy(1_000);
+
+                vm.Results.Count.Should().Be(0);
+            });
+        }
+
+        [Fact]
         public void HaveNoResultsWhenExecutingEmptyQuery()
         {
             new TestScheduler().With(scheduler =>
@@ -263,60 +313,6 @@ namespace Lanceur.Tests.ViewModels
 
                 // ASSERT
                 vm.CurrentAlias.Name.Should().Be("world");
-            });
-        }
-
-        [Fact]
-        public void HaveNoResultOnEmptyQuery()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = Builder
-                    .With(_output)
-                    .With(scheduler)
-                    .BuildMainViewModel();
-
-                vm.SearchAlias.Execute("").Subscribe();
-
-                scheduler.AdvanceBy(1_000);
-
-                vm.Results.Count.Should().Be(0);
-            });
-        }
-
-        [Fact]
-        public void HaveNoResultOnNullQuery()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = Builder
-                    .With(_output)
-                    .With(scheduler)
-                    .BuildMainViewModel();
-
-                vm.SearchAlias.Execute().Subscribe();
-
-                scheduler.AdvanceBy(1_000);
-
-                vm.Results.Count.Should().Be(0);
-            });
-        }
-
-        [Fact]
-        public void HaveNoResultOnWhiteSpaceQuery()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = Builder
-                    .With(_output)
-                    .With(scheduler)
-                    .BuildMainViewModel();
-
-                vm.SearchAlias.Execute(" ").Subscribe();
-
-                scheduler.AdvanceBy(1_000);
-
-                vm.Results.Count.Should().Be(0);
             });
         }
 
