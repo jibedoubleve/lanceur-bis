@@ -135,7 +135,7 @@ namespace Lanceur
             var stg = l.GetService<IConnectionString>();
             var sqlite = l.GetService<SQLiteDatabase>();
 
-            AppLogFactory.Get(typeof(Bootstrapper)).Trace($"Settings DB path: '{stg.ToString()}'");
+            AppLogFactory.Get<Bootstrapper>().Trace($"Settings DB path: '{stg.ToString()}'");
 
             sqlite.Update(stg.ToString());
         }

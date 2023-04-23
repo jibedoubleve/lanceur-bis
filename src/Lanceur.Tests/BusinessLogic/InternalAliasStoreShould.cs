@@ -29,14 +29,14 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void ReturnCountOfReservedKeywords()
         {
-            var store = GetStore(ServiceFactory.DataService);
+            var store = GetStore(Substitute.For<IDataService>());
             store.ReservedAliases.Should().HaveCount(1); ;
         }
 
         [Fact]
         public void ReturnExpectedCountOfAliasesFromLanceur()
         {
-            var store = GetStore(ServiceFactory.DataService, type: typeof(MainViewModel));
+            var store = GetStore(Substitute.For<IDataService>(), type: typeof(MainViewModel));
             store.ReservedAliases.Should().HaveCount(8);
         }
 
@@ -49,7 +49,7 @@ namespace Lanceur.Tests.BusinessLogic
         [InlineData("version")]
         public void ReturnSpecifiedReservedAliasFromLanceur(string criterion)
         {
-            var ds = ServiceFactory.DataService;
+            var ds = Substitute.For<IDataService>();
             ds.RefreshUsage(Arg.Any<IEnumerable<QueryResult>>())
               .ReturnsForAnyArgs(x => x.Args()[0] as IEnumerable<QueryResult>);
 
