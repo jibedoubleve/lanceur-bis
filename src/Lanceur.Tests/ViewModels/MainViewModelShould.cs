@@ -173,6 +173,88 @@ namespace Lanceur.Tests.ViewModels
         }
 
         [Fact]
+        public void ExecuteSelectedAliasWhenGoToNext()
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var names = new string[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4", };
+                var searchService = Substitute.For<ISearchService>();
+                searchService.Search(Arg.Any<Cmdline>())
+                        .Returns(
+                            new List<QueryResult>()
+                            {
+                                ExecutableTestAlias.FromName(names[0]),
+                                ExecutableTestAlias.FromName(names[1]),
+                                ExecutableTestAlias.FromName(names[2]),
+                                ExecutableTestAlias.FromName(names[3]),
+                            },
+                            new List<QueryResult>()
+                            {
+                                ExecutableTestAlias.FromName(names[1]),
+                            }
+                        );
+
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(searchService: searchService);
+
+                // ACT
+                vm.Query = "random_query";
+                scheduler.Start();
+
+                vm.SelectNextResult?.Execute().Subscribe();
+                scheduler.Start();
+
+                // ASSERT
+                vm.CurrentAlias.Should().NotBeNull();
+                vm.CurrentAlias.Name.Should().Be(names[1]);
+            });
+        }
+
+        [Fact]
+        public void ExecuteSelectedAliasWhenGoToPrevious()
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var names = new string[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4", };
+                var searchService = Substitute.For<ISearchService>();
+                searchService.Search(Arg.Any<Cmdline>())
+                        .Returns(
+                            new List<QueryResult>()
+                            {
+                                ExecutableTestAlias.FromName(names[0]),
+                                ExecutableTestAlias.FromName(names[1]),
+                                ExecutableTestAlias.FromName(names[2]),
+                                ExecutableTestAlias.FromName(names[3]),
+                            },
+                            new List<QueryResult>()
+                            {
+                                ExecutableTestAlias.FromName(names[3]),
+                            }
+                        );
+
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(searchService: searchService);
+
+                // ACT
+                vm.Query = "random_query";
+                scheduler.Start();
+
+                vm.SelectPreviousResult?.Execute().Subscribe();
+                scheduler.Start();
+
+                // ASSERT
+                vm.CurrentAlias.Should().NotBeNull();
+                vm.CurrentAlias.Name.Should().Be(names[3]);
+            });
+        }
+
+        [Fact]
         public void HaveMultipleResultsWhenExecutingAlias()
         {
             new TestScheduler().With(scheduler =>
@@ -341,16 +423,13 @@ namespace Lanceur.Tests.ViewModels
                     .With(scheduler)
                     .BuildMainViewModel(executor: executor);
 
-                // ACT
                 vm.Query = expression;
                 vm.CurrentAlias = new CalculatorAlias(calculator, log);
 
-                scheduler.AdvanceBy(1);
+                // ACT
                 vm.ExecuteAlias.Execute(expression).Subscribe();
 
-                scheduler.AdvanceBy(2);// 1 tick for the command execution
-                                       // and 1 tick for the CurrentAlias
-                                       // ASSERT
+                scheduler.Start();
                 vm.CurrentAlias?.Name?.Should().Be(result);
             });
         }

@@ -63,6 +63,8 @@ namespace Lanceur.Views
 
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.ProgressBar.Visibility, x => x ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.CurrentSessionName, v => v.CurrentSessionName.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.CurrentAlias, v => v.QueryResults.SelectedItem).DisposeWith(d);
+
                 this.OneWayBind(ViewModel, vm => vm.Results, v => v.QueryResults.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultCounter.Text);
@@ -78,8 +80,10 @@ namespace Lanceur.Views
                 ViewModel.WhenAnyValue(vm => vm.KeepAlive)
                          .Where(v => v == false)
                          .Log(ViewModel, $"Hiding control.", v => $"KeepAlive = {v}")
-                         .Subscribe(_ => HideControl());
+                         .Subscribe(_ => HideControl())
+                         .DisposeWith(d);
 
+                #region QueryTextBox
                 //Don't forget 'using System.Windows.Controls'
                 QueryTextBox
                     .Events().PreviewKeyDown
@@ -93,22 +97,53 @@ namespace Lanceur.Views
                             RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control
                         };
                     })
-                    .InvokeCommand(ViewModel, vm => vm.ExecuteAlias);
+                    .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
+                    .DisposeWith(d);
 
                 QueryTextBox
-                .Events().PreviewKeyDown
-                .Where(x => x.Key == Key.Tab)
-                .Select(x =>
-                {
-                    x.Handled = true;
-                    return Unit.Default;
-                })
-                .InvokeCommand(ViewModel, vm => vm.AutoComplete);
+                    .Events().PreviewKeyDown
+                    .Where(x => x.Key == Key.Tab)
+                    .Select(x =>
+                    {
+                        x.Handled = true;
+                        return Unit.Default;
+                    })
+                    .InvokeCommand(ViewModel, vm => vm.AutoComplete)
+                    .DisposeWith(d);
+                #endregion QueryTextBox
+
+                #region Navigation
+
+                QueryTextBox
+                    .Events().PreviewKeyDown
+                    .Where(x => x.Key == Key.Down)
+                    .Select(x =>
+                    {
+                        x.Handled = true;
+                        return Unit.Default;
+                    })
+                    .InvokeCommand(ViewModel, vm => vm.SelectNextResult)
+                    .DisposeWith(d);
+
+                QueryTextBox
+                    .Events().PreviewKeyDown
+                    .Where(x => x.Key == Key.Up)
+                    .Select(x =>
+                    {
+                        x.Handled = true;
+                        return Unit.Default;
+                    })
+                    .InvokeCommand(ViewModel, vm => vm.SelectPreviousResult)
+                    .DisposeWith(d);
+
+                #endregion
 
                 QueryResults
                     .Events().PreviewMouseLeftButtonUp
                     .Select(x => x.OriginalSource.GetQueryFromDataContext())
-                    .InvokeCommand(ViewModel, vm => vm.ExecuteAlias);
+                    .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
+                    .DisposeWith(d);
+
             });
         }
 
