@@ -116,7 +116,7 @@ namespace Lanceur.Views
 
                 QueryTextBox
                     .Events().PreviewKeyDown
-                    .Where(Xaml => Xaml.Key == Key.Down)
+                    .Where(x => x.Key == Key.Down)
                     .Select(x =>
                     {
                         x.Handled = true;
@@ -127,7 +127,7 @@ namespace Lanceur.Views
 
                 QueryTextBox
                     .Events().PreviewKeyDown
-                    .Where(Xaml => Xaml.Key == Key.Up)
+                    .Where(x => x.Key == Key.Up)
                     .Select(x =>
                     {
                         x.Handled = true;

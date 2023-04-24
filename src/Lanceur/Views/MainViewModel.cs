@@ -1,5 +1,4 @@
-﻿using Humanizer.DateTimeHumanizeStrategy;
-using Lanceur.Core;
+﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -107,9 +106,8 @@ namespace Lanceur.Views
                 vm => vm.SelectNextResult,
                 vm => vm.SelectPreviousResult
             ).Log(this, "Navigation occured", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
-             .ObserveOn(_schedulers.MainThreadScheduler);
-
-            nav.Select(x => x).BindTo(this, vm => vm.CurrentAlias);
+             .ObserveOn(_schedulers.MainThreadScheduler)
+             .Select(x => x).BindTo(this, vm => vm.CurrentAlias);
 
             #endregion Navigation
 
@@ -266,10 +264,10 @@ namespace Lanceur.Views
             if (!Results.CanNavigate()) { return null; }
 
             var currentIndex = Results.IndexOf(CurrentAlias);
-            var nextAlias = Results.GetPreviousItem(currentIndex);
-            _log.Trace($"Selecting previous result. [Index: {nextAlias?.Name}]");
+            var previousAlias = Results.GetPreviousItem(currentIndex);
+            _log.Trace($"Selecting previous result. [Index: {previousAlias?.Name}]");
 
-            return nextAlias;
+            return previousAlias;
         }
 
         #endregion Methods
