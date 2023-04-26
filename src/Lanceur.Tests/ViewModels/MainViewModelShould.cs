@@ -3,7 +3,9 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
+using Lanceur.Macros;
 using Lanceur.ReservedKeywords;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.Utils;
@@ -11,6 +13,7 @@ using Lanceur.Tests.Utils.ReservedAliases;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
+using Splat;
 using System.Reactive.Concurrency;
 using Xunit;
 using Xunit.Abstractions;
@@ -516,6 +519,43 @@ namespace Lanceur.Tests.ViewModels
 
                 vm.CurrentAlias.Should().NotBeNull();
                 vm.CurrentAlias.Name.Should().Be(aliasName);
+            });
+        }
+
+        [Fact]
+        public void ShowAutoCompleteWhenCalingDebugMacro()
+        {
+            Locator.CurrentMutable.Register<ICmdlineManager>(() => new CmdlineManager());
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var searchService = Substitute.For<ISearchService>();
+                searchService.Search(Arg.Any<Cmdline>())
+                        .Returns(
+                            new List<QueryResult>()
+                            {
+                               new DebugMacro(){ Name = "debug" }
+                            }
+                        );
+
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(
+                        searchService: searchService,
+                        executor: new DebugMacroExecutor()
+                    );
+
+                // ACT
+                vm.Query = "random_query";
+                scheduler.Start();
+
+                vm.ExecuteAlias.Execute("random_query").Subscribe(); // Execute first result
+                scheduler.Start();
+
+                // ASSERT
+                vm.CurrentAlias.Should().NotBeNull();
+                vm.CurrentAlias?.Name.Should().Be("debug all"); // I know the first result in debug is 'debug all'
             });
         }
 

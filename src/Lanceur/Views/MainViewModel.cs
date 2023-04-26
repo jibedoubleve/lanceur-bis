@@ -130,7 +130,7 @@ namespace Lanceur.Views
             this.WhenAnyValue(vm => vm.Results)
                 .Where(x => x is not null)
                 .Select(x => x.FirstOrDefault())
-                .Log(this, "Current alias.", x => $"'{(x?.Name ?? "<NULL>")}'")
+                .Log(this, "Results changed.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .BindTo(this, vm => vm.CurrentAlias);
 
@@ -138,10 +138,10 @@ namespace Lanceur.Views
 
             var obs = this
                 .WhenAnyObservable(vm => vm.SearchAlias, vm => vm.ExecuteAlias)
-                .ObserveOn(_schedulers.MainThreadScheduler);
+                .ObserveOn(_schedulers.MainThreadScheduler);            
 
-            obs.Select(r => r.Results?.ElementAt(0))
-                .Log(this, "Settings current alias", x => $"'{(x?.Name ?? "<NULL>")}'")
+            obs.Select(r => r?.Results?.ElementAt(0))
+                .Log(this, "Command 'ExecuteAlias' or 'SearchAlias' triggered." , x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
                 .BindTo(this, vm => vm.CurrentAlias);
 
             obs.Select(r => r.Results.ToObservableCollection())
