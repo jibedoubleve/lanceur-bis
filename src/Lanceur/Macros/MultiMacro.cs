@@ -66,21 +66,21 @@ namespace Lanceur.Macros
         {
             var items = Parameters?.Split('@') ?? Array.Empty<string>();
 
-            TaskHelper.RunBackground(async () =>
+            foreach (var item in items)
             {
-                foreach (var item in items)
+                await Task.Delay(_delay);
+                var alias = GetAlias(item);
+                if (alias is not null)
                 {
-                    await Task.Delay(_delay);
-                    var alias = GetAlias(item);
-                    if (alias is not null)
+#pragma warning disable 4014
+                    //Hide warning
+                    await _executionManager.ExecuteAsync(new ExecutionRequest
                     {
-                        await _executionManager.ExecuteAsync(new ExecutionRequest
-                        {
-                            QueryResult = alias,
-                        });
-                    }
+                        QueryResult = alias,
+                    }).ConfigureAwait(false);
+#pragma warning disable 4014
                 }
-            });
+            }
 
             return await NoResultAsync;
         }
