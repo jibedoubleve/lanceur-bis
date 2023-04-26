@@ -1,4 +1,4 @@
-﻿namespace Lanceur.Utils
+﻿namespace Lanceur.Utils.ConnectionStrings
 {
     public abstract class BaseConnectionString
     {

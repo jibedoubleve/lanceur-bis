@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Lanceur.Utils;
+using Lanceur.Utils.ConnectionStrings;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Xunit;

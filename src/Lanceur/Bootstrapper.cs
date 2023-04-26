@@ -15,6 +15,7 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.Models;
 using Lanceur.Ui;
 using Lanceur.Utils;
+using Lanceur.Utils.ConnectionStrings;
 using Lanceur.Utils.PackagedApps;
 using Lanceur.Views;
 using ReactiveUI;

@@ -87,7 +87,6 @@ namespace Lanceur.Macros
             return Task.FromResult(result);
         }
 
-        [Obsolete("Still used?")]
         public override string ToQuery() => $"debug {Query?.Parameters}".Trim().ToLower();
 
         #endregion Methods

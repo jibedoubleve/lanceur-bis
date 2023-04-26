@@ -2,7 +2,7 @@
 using Lanceur.SharedKernel.Mixins;
 using System;
 
-namespace Lanceur.Utils
+namespace Lanceur.Utils.ConnectionStrings
 {
     public class DebugConnectionString : BaseConnectionString, IConnectionString
     {

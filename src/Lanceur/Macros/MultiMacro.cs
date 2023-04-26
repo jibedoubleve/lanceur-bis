@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Splat;
 using System;
@@ -24,11 +25,20 @@ namespace Lanceur.Macros
         #endregion Fields
 
         #region Constructors
+
 #if DEBUG
-        public MultiMacro() : this(0, null, null) { }
+
+
+        public MultiMacro() : this(0, null, null)
+        {
+        }
+
 #else
 
-        public MultiMacro() : this(null, null, null) { }
+        public MultiMacro() : this(null, null, null)
+        {
+        }
+
 #endif
 
         public MultiMacro(int? delay = null, IExecutionManager executionManager = null, ISearchService searchService = null)

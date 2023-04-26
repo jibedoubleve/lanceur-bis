@@ -2,10 +2,11 @@
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Stores;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.Utils;
 using System;
 using System.IO;
 
-namespace Lanceur.Utils
+namespace Lanceur.Utils.ConnectionStrings
 {
     public class ConnectionString : BaseConnectionString, IConnectionString
     {

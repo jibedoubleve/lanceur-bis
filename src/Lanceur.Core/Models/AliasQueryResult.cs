@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Managers;
+using Lanceur.Core.Requests;
 using Lanceur.SharedKernel.Mixins;
 using static Lanceur.SharedKernel.Constants;
 
