@@ -122,7 +122,7 @@ namespace Lanceur.Infra.Managers
                     HasResult = true,
                 };
             }
-            else if (request.QueryResult is IExecutable exec)
+            if (request.QueryResult is IExecutable exec)
             {
                 if (request.QueryResult is IExecutableWithPrivilege exp)
                 {
@@ -133,13 +133,12 @@ namespace Lanceur.Infra.Managers
                     ? await ExecuteAliasAsync(alias)
                     : await exec.ExecuteAsync(_cmdlineManager.BuildFromText(request.Query));
 
+
                 return ExecutionResponse.FromResults(result);
             }
-            else
-            {
-                _log.Info($"Alias '{request.QueryResult.Name}', is not executable. Add as a query");
-                return ExecutionResponse.EmptyResult;
-            }
+
+            _log.Info($"Alias '{request.QueryResult.Name}', is not executable. Add as a query");
+            return ExecutionResponse.EmptyResult;
         }
 
         #endregion Methods

@@ -36,7 +36,7 @@ namespace Lanceur.Core.Models
     }
 
     public class AliasQueryResult : ExecutableWithPrivilege
-    {
+    {       
         #region Fields
 
         private string _fileName;

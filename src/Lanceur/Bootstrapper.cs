@@ -20,7 +20,6 @@ using Lanceur.Utils.PackagedApps;
 using Lanceur.Views;
 using ReactiveUI;
 using Splat;
-using Splat.NLog;
 using System;
 using System.Data.SQLite;
 using System.Reflection;
@@ -60,8 +59,8 @@ namespace Lanceur
         {
             var l = Locator.CurrentMutable;
 
-            //  then in your service locator initialisation
-            l.UseNLogWithWrappingFullLogger();
+            Locator.CurrentMutable.RegisterConstant(new ReactiveUILogger() { Level = LogLevel.Debug }, typeof(ILogger));
+
             l.RegisterLazySingleton<IMapper>(() => new Mapper(GetAutoMapperCfg()));
             l.RegisterLazySingleton<IUserNotification>(() => new UserNotification());
             l.RegisterLazySingleton(() => new RoutingState());
