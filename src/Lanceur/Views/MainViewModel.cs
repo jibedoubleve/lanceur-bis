@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.Models;
@@ -11,7 +12,6 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Lanceur.Views
 {
-    public class MainViewModel : ReactiveObject
+    public partial class MainViewModel : ReactiveObject
     {
         #region Fields
 
@@ -138,10 +138,10 @@ namespace Lanceur.Views
 
             var obs = this
                 .WhenAnyObservable(vm => vm.SearchAlias, vm => vm.ExecuteAlias)
-                .ObserveOn(_schedulers.MainThreadScheduler);            
+                .ObserveOn(_schedulers.MainThreadScheduler);
 
             obs.Select(r => r?.Results?.ElementAt(0))
-                .Log(this, "Command 'ExecuteAlias' or 'SearchAlias' triggered." , x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
+                .Log(this, "Command 'ExecuteAlias' or 'SearchAlias' triggered.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
                 .BindTo(this, vm => vm.CurrentAlias);
 
             obs.Select(r => r.Results.ToObservableCollection())
@@ -271,53 +271,5 @@ namespace Lanceur.Views
         }
 
         #endregion Methods
-
-        #region Classes
-
-        public class AliasExecutionRequest
-        {
-            #region Properties
-
-            public string Query { get; set; }
-
-            public bool RunAsAdmin { get; set; }
-
-            #endregion Properties
-
-            #region Methods
-
-            public static implicit operator AliasExecutionRequest(string query) => new() { Query = query };
-
-            #endregion Methods
-        }
-
-        public class AliasResponse
-        {
-            #region Properties
-
-            public string CurrentSessionName { get; set; }
-            public bool KeepAlive { get; set; }
-            public IEnumerable<QueryResult> Results { get; set; } = new List<QueryResult>();
-
-            #endregion Properties
-
-            #region Methods
-
-            public static implicit operator Task<AliasResponse>(AliasResponse src) => Task.FromResult(src);
-
-            #endregion Methods
-        }
-
-        public class NavigationResponse
-        {
-            #region Properties
-
-            public QueryResult CurrentAlias { get; set; }
-            public string Query { get; set; }
-
-            #endregion Properties
-        }
-
-        #endregion Classes
     }
 }

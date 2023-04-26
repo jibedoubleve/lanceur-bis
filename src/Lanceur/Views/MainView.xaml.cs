@@ -1,5 +1,6 @@
 ﻿using Lanceur.Converters.Reactive;
 using Lanceur.Core.Models;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
@@ -91,7 +92,7 @@ namespace Lanceur.Views
                     .Select(x =>
                     {
                         x.Handled = true;
-                        return new MainViewModel.AliasExecutionRequest
+                        return new AliasExecutionRequest
                         {
                             Query = x.OriginalSource.GetTextFromTextbox(),
                             RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control

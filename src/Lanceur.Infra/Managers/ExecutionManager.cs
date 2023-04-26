@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel;
