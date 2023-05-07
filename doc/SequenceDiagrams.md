@@ -20,25 +20,21 @@ vm ->> +exec: ExecuteAsync
     alt is Executable
         rect rgb(212, 253, 205	)
         alt is AliasQueryResult?
-            exec ->>  +qr: ExecuteAsync();
-            note right of qr: Parameter handling<br>can differ from<br>QueryResult to another
-            qr ->>  qr: Execute behaviour
-            qr -->> -exec: ExecutionResponse
-            exec -->> -vm: ExecutionResponse
-        else
-            exec ->>  +exec: ExecuteAliasAsync
-            note right of exec: call ExecuteProcess
             exec ->> +wcm: replace wildcards with values
             note right of wcm: Takes user parameters.<br>If none, use the parameters<br>specified in the alias
             wcm -->> -exec: Parameters
             exec ->>  exec: Process.Start()
-            exec -->> -vm: ExecutionResponse
+        else
+            exec ->>  +qr: ExecuteAsync();
+            note right of qr: Parameter handling<br>can differ from<br>QueryResult to another
+            qr ->> -qr: Execute behaviour
         end
         end
     else
-        exec -->> exec: ExecuteResponse
+        exec -->> exec: Build ExecuteResponse
         note right of exec: If request.QueryResult is null,<br>returns "Alias does not exist".<br>Else returns an EmptyResult  
     end
+    exec -->> -vm: ExecutionResponse
 ```
 
 # Search an alias from a command line
