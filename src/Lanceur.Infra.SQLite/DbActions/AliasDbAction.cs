@@ -73,7 +73,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var id = _db.Connection.ExecuteScalar<long>(sql, new
             {
-                alias.Arguments,
+                Arguments = alias.Parameters,
                 alias.FileName,
                 alias.Notes,
                 alias.RunAs,
@@ -248,7 +248,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             _db.Connection.Execute(sql, new
             {
-                alias.Arguments,
+                alias.Parameters,
                 alias.FileName,
                 alias.Notes,
                 alias.RunAs,

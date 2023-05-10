@@ -1,10 +1,10 @@
 ﻿namespace Lanceur.Core.Models
 {
-    public abstract class ExecutableWithPrivilege : ExecutableQueryResult, IExecutableWithPrivilege
+    public abstract class ExecutableWithPrivilege : SelfExecutableQueryResult, IElevated
     {
         #region Properties
 
-        public virtual bool IsPrivilegeOverriden { get; set; } = false;
+        public virtual bool IsElevated { get; set; } = false;
 
         #endregion Properties
     }

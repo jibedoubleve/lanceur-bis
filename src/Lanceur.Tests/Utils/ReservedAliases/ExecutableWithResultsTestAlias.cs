@@ -2,7 +2,7 @@
 
 namespace Lanceur.Tests.Utils.ReservedAliases
 {
-    public class ExecutableWithResultsTestAlias : ExecutableQueryResult
+    public class ExecutableWithResultsTestAlias : SelfExecutableQueryResult
     {
         #region Methods
 

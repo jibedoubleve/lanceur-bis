@@ -9,7 +9,7 @@ using System.Windows;
 namespace Lanceur.ReservedKeywords
 {
     [Macro("guid"), Description("Creates a guid and save it into the clipboard")]
-    public class GuidMacro : ExecutableQueryResult
+    public class GuidMacro : SelfExecutableQueryResult
     {
         #region Methods
 

@@ -73,7 +73,7 @@ namespace Lanceur.Views
 
                 this.OneWayBind(ViewModel, vm => vm.CurrentAlias, v => v.AutoCompleteBox.Text, x =>
                 {
-                    return (x is ExecutableQueryResult)
+                    return (x is SelfExecutableQueryResult)
                         ? x?.Name ?? string.Empty
                         : string.Empty;
                 }).DisposeWith(d);

@@ -11,7 +11,7 @@ using System.Windows;
 namespace Lanceur.ReservedKeywords
 {
     [ReservedAlias("version"), Description("Indicates the version of the application")]
-    public class VersionAlias : ExecutableQueryResult
+    public class VersionAlias : SelfExecutableQueryResult
     {
         #region Methods
 

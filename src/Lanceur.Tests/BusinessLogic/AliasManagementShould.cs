@@ -22,7 +22,7 @@ namespace Lanceur.Tests.BusinessLogic
             return new AliasQueryResult()
             {
                 Name = name ?? Guid.NewGuid().ToString(),
-                Arguments = string.Empty,
+                Parameters = string.Empty,
                 FileName = @"C:\Users\jibedoubleve\AppData\Local\Programs\beekeeper-studio\Beekeeper Studioeuh.exe",
                 RunAs = runAs,
                 StartMode = StartMode.Default,

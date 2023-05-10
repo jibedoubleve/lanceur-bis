@@ -66,13 +66,13 @@ namespace Lanceur.Infra.Managers
             {
                 FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
                 Verb = "open",
-                Arguments = _wildcardManager.ReplaceOrReplacementOnNull(query.Arguments, query.Query.Parameters),
+                Arguments = _wildcardManager.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters),
                 UseShellExecute = true,
                 WorkingDirectory = query.WorkingDirectory,
                 WindowStyle = query.StartMode.AsWindowsStyle(),
             };
 
-            if (query.IsPrivilegeOverriden || query.RunAs == Constants.RunAs.Admin)
+            if (query.IsElevated || query.RunAs == Constants.RunAs.Admin)
             {
                 psi.Verb = "runas";
                 _log.Info($"Runs '{query.FileName}' as ADMIN");
@@ -88,7 +88,7 @@ namespace Lanceur.Infra.Managers
             var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
             var psi = new ProcessStartInfo();
 
-            if (query.IsPrivilegeOverriden)
+            if (query.IsElevated)
             {
                 psi.FileName = file;
                 //https://stackoverflow.com/a/23199505/389529
@@ -112,9 +112,7 @@ namespace Lanceur.Infra.Managers
 
         public async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request)
         {
-            _dataService.SetUsage(request.QueryResult);
-
-            if (request.QueryResult is null)
+            if (request is null)
             {
                 return new ExecutionResponse
                 {
@@ -122,23 +120,29 @@ namespace Lanceur.Infra.Managers
                     HasResult = true,
                 };
             }
-            if (request.QueryResult is IExecutable exec)
+            if (request is not ISelfExecutable)
             {
-                if (request.QueryResult is IExecutableWithPrivilege exp)
-                {
-                    exp.IsPrivilegeOverriden = request.ExecuteWithPrivilege;
-                }
-
-                var result = (request.QueryResult is AliasQueryResult alias)
-                    ? await ExecuteAliasAsync(alias)
-                    : await exec.ExecuteAsync(_cmdlineManager.BuildFromText(request.Query));
-
-
-                return ExecutionResponse.FromResults(result);
+                _log.Info($"Alias '{request.QueryResult.Name}', is not executable. Add as a query");
+                return ExecutionResponse.EmptyResult;
             }
 
-            _log.Info($"Alias '{request.QueryResult.Name}', is not executable. Add as a query");
-            return ExecutionResponse.EmptyResult;
+            _dataService.SetUsage(request.QueryResult);
+            switch (request.QueryResult)
+            {
+                case AliasQueryResult alias:
+                    alias.IsElevated = request.ExecuteWithPrivilege;
+                    return ExecutionResponse.FromResults(
+                          await ExecuteAliasAsync(alias)
+                    );
+                case ISelfExecutable exec:
+                    exec.IsElevated = request.ExecuteWithPrivilege;
+                    return ExecutionResponse.FromResults(
+                        await exec.ExecuteAsync(_cmdlineManager.BuildFromText(request.Query))
+                    );
+                default: throw new NotSupportedException($"Cannot execute query result '{(request.QueryResult?.Name ?? "<EMPTY>")}'");
+            }
+
+
         }
 
         #endregion Methods

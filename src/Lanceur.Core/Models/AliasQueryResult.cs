@@ -1,6 +1,4 @@
-﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Requests;
-using Lanceur.SharedKernel.Mixins;
+﻿using Lanceur.SharedKernel.Mixins;
 using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Core.Models
@@ -13,7 +11,7 @@ namespace Lanceur.Core.Models
         {
             return new AliasQueryResult
             {
-                Arguments = @this.Arguments,
+                Parameters = @this.Parameters,
                 Count = @this.Count,
                 FileName = @this.FileName,
                 Icon = @this.Icon,
@@ -21,7 +19,6 @@ namespace Lanceur.Core.Models
                 Name = $"Duplicate of {@this.Name}",
                 RunAs = @this.RunAs,
                 WorkingDirectory = @this.WorkingDirectory,
-                ExecutionManager = @this.ExecutionManager,
                 StartMode = @this.StartMode,
                 Query = @this.Query,
                 // In case it's already a duplicate of a duplicate,
@@ -35,8 +32,8 @@ namespace Lanceur.Core.Models
         #endregion Methods
     }
 
-    public class AliasQueryResult : ExecutableWithPrivilege
-    {       
+    public class AliasQueryResult : ExecutableQueryResult, IElevated
+    {
         #region Fields
 
         private string _fileName;
@@ -45,14 +42,19 @@ namespace Lanceur.Core.Models
 
         #region Properties
 
-        internal IExecutionManager ExecutionManager { get; set; }
-        internal Action<AliasQueryResult> OnExecution { get; set; }
         public static AliasQueryResult EmptyForCreation => new() { Name = $"new alias" };
+
         public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();
-        public string Arguments { get; set; }
+
+        public string Parameters { get; set; }
 
         public int Delay { get; set; }
-        public override string Description => Notes.IsNullOrWhiteSpace() ? FileName : Notes;
+
+        public override string Description
+        {
+            get => Notes.IsNullOrWhiteSpace() ? FileName : Notes;
+            set => Notes = value;
+        }
 
         /// <summary>
         /// If this <see cref="AliasQueryResult"/> is a ducplicate from another
@@ -70,38 +72,25 @@ namespace Lanceur.Core.Models
         /// Indicates whether the alias should override the RunAs value and execute
         /// in priviledge mode (as admin).
         /// </summary>
-        public override bool IsPrivilegeOverriden
+        public bool IsElevated
         {
-            get;
-            set;
+            get => RunAs.Admin == RunAs;
+            set => RunAs = value ? RunAs.Admin : RunAs.CurrentUser;
         }
 
         public string Notes { get; set; }
+
         public RunAs RunAs { get; set; } = RunAs.CurrentUser;
+
         public StartMode StartMode { get; set; } = StartMode.Default;
+
         public string WorkingDirectory { get; set; }
 
         #endregion Properties
 
         #region Methods
 
-        public static AliasQueryResult FromName(string aliasName, string description = null)
-        {
-            var result = new AliasQueryResult() { Name = aliasName };
-            if (description is not null) { result.SetDescription(description); }
-            return result;
-        }
-
-        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
-        {
-            await ExecutionManager?.ExecuteAsync(new ExecutionRequest
-            {
-                QueryResult = this,
-                Query = (string)cmdline,
-            });
-            OnExecution(this);
-            return NoResult;
-        }
+        public static AliasQueryResult FromName(string aliasName) => new AliasQueryResult() { Name = aliasName };
 
         #endregion Methods
     }

@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace Lanceur.Tests.Utils.ReservedAliases
 {
     [ReservedAlias("anothertest"), Description("description")]
-    public class ExecutableTestAlias : ExecutableQueryResult
+    public class ExecutableTestAlias : SelfExecutableQueryResult
     {
         #region Constructors
 

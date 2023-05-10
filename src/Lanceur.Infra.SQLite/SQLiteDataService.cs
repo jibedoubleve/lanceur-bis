@@ -44,7 +44,7 @@ namespace Lanceur.Infra.SQLite
                     n.Name        as OldName,
                     s.Id          as Id,
                     s.id          as Id,
-                    s.arguments   as Arguments,
+                    s.arguments   as Parameters,
                     s.file_name   as FileName,
                     s.notes       as Notes,
                     s.run_as      as RunAs,
@@ -61,9 +61,9 @@ namespace Lanceur.Infra.SQLite
                 order by
                     c.exec_count desc,
                     n.name asc";
-            var arguments = new { idSession };
+            var parameters = new { idSession };
 
-            var result = DB.Connection.Query<AliasQueryResult>(sql, arguments);
+            var result = DB.Connection.Query<AliasQueryResult>(sql, parameters);
             return result ?? AliasQueryResult.NoResult;
         }
 
@@ -253,7 +253,7 @@ namespace Lanceur.Infra.SQLite
                     n.Name        as OldName,
                     s.Id          as Id,
                     s.id          as Id,
-                    s.arguments   as Arguments,
+                    s.arguments   as Parameters,
                     s.file_name   as FileName,
                     s.notes       as Notes,
                     s.run_as      as RunAs,

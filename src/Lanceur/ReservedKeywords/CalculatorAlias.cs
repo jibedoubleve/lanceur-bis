@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Lanceur.ReservedKeywords
 {
     [ReservedAlias("="), Description("Evaluate expressions such as quick calculations")]
-    public class CalculatorAlias : ExecutableQueryResult
+    public class CalculatorAlias : SelfExecutableQueryResult
     {
         #region Fields
 

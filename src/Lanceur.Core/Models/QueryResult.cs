@@ -28,7 +28,7 @@ namespace Lanceur.Core.Models
         public static IEnumerable<QueryResult> NoResult => new List<QueryResult>();
         public static Task<IEnumerable<QueryResult>> NoResultAsync => Task.FromResult(NoResult);
         public int Count { get; set; } = 0;
-        public virtual string Description { get; }
+        public virtual string Description { get; set; }
 
         /// <summary>
         /// Fall back for <see cref="Thumbnail"/>. This property is expected to
@@ -78,8 +78,12 @@ namespace Lanceur.Core.Models
             set => Set(ref _thumbnail, value);
         }
 
+        #endregion Properties
+
+        #region Methods
+
         public virtual string ToQuery() => $"{Name}";
 
-        #endregion Properties
+        #endregion Methods
     }
 }
