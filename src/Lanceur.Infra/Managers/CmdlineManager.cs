@@ -47,7 +47,7 @@ namespace Lanceur.Infra.Managers
             return res1 || res2;
         }
 
-        public Cmdline Build(string cmdline, SelfExecutableQueryResult query)
+        public Cmdline Build(string cmdline, ExecutableQueryResult query)
         {
             var cmd = BuildFromText(cmdline);
             if (cmd.Parameters.IsNullOrWhiteSpace())

@@ -46,8 +46,6 @@ namespace Lanceur.Core.Models
 
         public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();
 
-        public string Parameters { get; set; }
-
         public int Delay { get; set; }
 
         public override string Description

@@ -120,7 +120,7 @@ namespace Lanceur.Infra.Managers
                     HasResult = true,
                 };
             }
-            if (request is not ISelfExecutable)
+            if (request is not IExecutable)
             {
                 _log.Info($"Alias '{request.QueryResult.Name}', is not executable. Add as a query");
                 return ExecutionResponse.EmptyResult;
@@ -141,8 +141,6 @@ namespace Lanceur.Infra.Managers
                     );
                 default: throw new NotSupportedException($"Cannot execute query result '{(request.QueryResult?.Name ?? "<EMPTY>")}'");
             }
-
-
         }
 
         #endregion Methods
