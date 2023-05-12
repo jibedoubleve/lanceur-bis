@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Managers;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.ReservedAliases;
 using Microsoft.Reactive.Testing;
@@ -144,6 +147,75 @@ namespace Lanceur.Tests.ViewModels
                 // ASSERT
                 vm.CurrentAlias.Should().NotBeNull();
                 vm.CurrentAlias.Name.Should().Be(names[3]);
+            });
+        }
+
+        [Fact]
+        public void NotExecuteWhenNoResult()
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var logFactory = Substitute.For<IAppLoggerFactory>();
+                var wildcardManager = Substitute.For<IWildcardManager>();
+                var dataService = Substitute.For<IDataService>();
+                var cmdlineManager = Substitute.For<ICmdlineManager>();
+
+                var executionManager = new ExecutionManager(
+                    logFactory,
+                    wildcardManager,
+                    dataService,
+                    cmdlineManager
+                );
+
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(executor: executionManager);
+
+                // ACT
+
+                var request = new AliasExecutionRequest
+                {
+                    Query = "dummy query"
+                };
+                var act = () => vm.ExecuteAlias.Execute(request).Subscribe();
+
+                scheduler.Start();
+
+                // ASSERT
+                act.Should().NotThrow();
+            });
+        }
+        [Fact]
+        public void NotCallExecutionManagerWhenNoResult()
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var logFactory = Substitute.For<IAppLoggerFactory>();
+                var wildcardManager = Substitute.For<IWildcardManager>();
+                var dataService = Substitute.For<IDataService>();
+                var cmdlineManager = Substitute.For<ICmdlineManager>();
+                var executionManager = Substitute.For<IExecutionManager>();
+
+                var vm = Builder
+                    .With(_output)
+                    .With(scheduler)
+                    .BuildMainViewModel(executor: executionManager);
+
+                // ACT
+
+                var request = new AliasExecutionRequest
+                {
+                    Query = "dummy query"
+                };
+                vm.ExecuteAlias.Execute(request).Subscribe();
+
+                scheduler.Start();
+
+                // ASSERT
+                executionManager.DidNotReceive().ExecuteAsync(Arg.Any<ExecutionRequest>());
             });
         }
 

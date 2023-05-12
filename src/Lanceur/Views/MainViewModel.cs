@@ -206,24 +206,23 @@ namespace Lanceur.Views
             request ??= new AliasExecutionRequest();
 
             if (request?.Query.IsNullOrEmpty() ?? true) { return new(); }
-            else
+            if (CurrentAlias is null) { return new(); }
+
+            _log.Debug($"Execute alias '{(request?.Query ?? "<EMPTY>")}'");
+
+            var response = await _executor.ExecuteAsync(new ExecutionRequest
             {
-                _log.Debug($"Execute alias '{(request?.Query ?? "<EMPTY>")}'");
+                Query = Query,
+                QueryResult = CurrentAlias,
+                ExecuteWithPrivilege = request.RunAsAdmin,
+            });
 
-                var response = await _executor.ExecuteAsync(new ExecutionRequest
-                {
-                    Query = Query,
-                    QueryResult = CurrentAlias,
-                    ExecuteWithPrivilege = request.RunAsAdmin,
-                });
-
-                _log.Trace($"Execution of '{request.Query}' returned {(response?.Results?.Count() ?? 0)} result(s).");
-                return new()
-                {
-                    Results = response.Results,
-                    KeepAlive = response.HasResult
-                };
-            }
+            _log.Trace($"Execution of '{request.Query}' returned {(response?.Results?.Count() ?? 0)} result(s).");
+            return new()
+            {
+                Results = response.Results,
+                KeepAlive = response.HasResult
+            };
         }
 
         private Task<AliasResponse> OnSearchAliasAsync(string criterion)

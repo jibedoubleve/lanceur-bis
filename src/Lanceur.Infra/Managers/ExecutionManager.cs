@@ -24,7 +24,12 @@ namespace Lanceur.Infra.Managers
 
         #region Constructors
 
-        public ExecutionManager(IAppLoggerFactory logFactory, IWildcardManager wildcardManager, IDataService dataService, ICmdlineManager cmdlineManager)
+        public ExecutionManager(
+            IAppLoggerFactory logFactory,
+            IWildcardManager wildcardManager,
+            IDataService dataService,
+            ICmdlineManager cmdlineManager
+        )
         {
             _log = logFactory.GetLogger<ExecutionManager>();
             _wildcardManager = wildcardManager;
@@ -114,18 +119,20 @@ namespace Lanceur.Infra.Managers
         {
             if (request is null)
             {
+                _log.Trace($"The execution request is null.");
                 return new ExecutionResponse
                 {
                     Results = DisplayQueryResult.SingleFromResult($"This alias does not exist"),
                     HasResult = true,
                 };
             }
-            if (request is not IExecutable)
+            if (request.QueryResult is not IExecutable)
             {
-                _log.Info($"Alias '{request.QueryResult.Name}', is not executable. Add as a query");
+                _log.Trace($"Alias '{(request?.QueryResult?.Name ?? "<EMPTY>")}', is not executable. Return 'EmptyResult'.");
                 return ExecutionResponse.EmptyResult;
             }
 
+            _log.Info($"Executing alias '{request.QueryResult.Name}'");
             _dataService.SetUsage(request.QueryResult);
             switch (request.QueryResult)
             {
