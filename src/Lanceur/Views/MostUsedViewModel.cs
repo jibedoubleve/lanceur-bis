@@ -2,11 +2,11 @@
 using Lanceur.Core.Services;
 using Lanceur.Ui;
 using ReactiveUI;
-using System;
+using ReactiveUI.Fody.Helpers;
 using Splat;
+using System;
 using System.Collections.Generic;
 using System.Reactive;
-using ReactiveUI.Fody.Helpers;
 
 namespace Lanceur.Views
 {
@@ -22,7 +22,7 @@ namespace Lanceur.Views
 
         public MostUsedViewModel(IDataService service = null, IUserNotification notify = null)
         {
-            var l = Splat.Locator.Current;
+            var l = Locator.Current;
             _service = service ?? l.GetService<IDataService>();
             notify ??= l.GetService<IUserNotification>();
 
@@ -33,14 +33,24 @@ namespace Lanceur.Views
                 .BindTo(this, vm => vm.Aliases);
         }
 
+        #endregion Constructors
+
+        #region Properties
+
+        public ReactiveCommand<Unit, IEnumerable<QueryResult>> Activate { get; }
+
+        [Reactive] public IEnumerable<QueryResult> Aliases { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
         private IEnumerable<QueryResult> OnActivate()
         {
             var result = _service.GetMostUsedAliases();
             return result;
         }
 
-        [Reactive]public IEnumerable<QueryResult> Aliases { get; set; }
-        public ReactiveCommand<Unit, IEnumerable<QueryResult>> Activate { get; }
-        #endregion Constructors
+        #endregion Methods
     }
 }
