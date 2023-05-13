@@ -203,43 +203,39 @@ namespace Lanceur.Infra.SQLite
         }
 
         /// <summary>
-        /// Create a new alias if its id is '0' to the specified session (if not specified, to the default session)
-        /// If the id exists, it'll update with the new information
+        ///     Create a new alias if its id is '0' to the specified session (if not specified, to the default session)
+        ///     If the id exists, it'll update with the new information
         /// </summary>
         /// <param name="alias">The alias to create or update</param>
         /// <param name="idSession">
-        /// If the alias has to be created, it'll be linked to this session. This argument is ignored if the alias
-        /// needs to be updated. If not specified, the default session is selected.
+        ///     If the alias has to be created, it'll be linked to this session. This argument is ignored if the alias
+        ///     needs to be updated. If not specified, the default session is selected.
         /// </param>
-        /// <returns>The id of the updated/created alias</returns>
+        /// <returns>
+        ///     The id of the updated/created alias
+        /// </returns>
         public void SaveOrUpdate(ref AliasQueryResult alias, long? idSession = null)
         {
+            if (alias == null) { throw new ArgumentNullException(nameof(alias), $"Cannot save NULL alias."); }
+            if (alias.Name == null) { throw new ArgumentNullException(nameof(alias.Name), "Cannot create or update alias with no name."); }
+            if (alias.Id < 0) { throw new NotSupportedException($"The alias has an unexpected id. (Name: {alias.Name})"); }
+            
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
-            if (alias == null) { throw new ArgumentNullException(nameof(alias), $"Cannot save NULL alias."); }
-            else if (alias.Name == null) { throw new ArgumentNullException(nameof(alias.Name), "Cannot create or update alias with no name."); }
-            else
+            if (alias.DuplicateOf.HasValue)
             {
-                if (alias.DuplicateOf.HasValue)
-                {
-                    _log.Info($"Save a duplicated alias. (Duplicate of: {alias.DuplicateOf})");
-                    _aliasDbAction.Duplicate(alias);
-                }
-                else if (alias.Id == 0 && !_aliasDbAction.CheckNameExists(alias, idSession.Value))
-                {
-                    _aliasDbAction.Create(ref alias, idSession.Value);
-                    _log.Info($"Create new alias. (Id: {alias.Id})");
-                }
-                else if (alias.Id > 0)
-                {
-                    _log.Info($"Updating alias. (Id: {alias.Id})");
-                    _aliasDbAction.Update(alias);
-                }
-                else
-                {
-                    throw new NotSupportedException(
-                       $"The alias already exists (Name: {alias.Name})");
-                }
+                _log.Info($"Saving a duplicated alias. (Duplicate of: {alias.DuplicateOf})");
+                _aliasDbAction.Duplicate(alias);
+            }
+            else if (alias.Id == 0 && !_aliasDbAction.CheckNameExists(alias, idSession.Value))
+            {
+                _aliasDbAction.Create(ref alias, idSession.Value);
+                _log.Info($"Just created new alias. (Id: {alias.Id})");
+            }
+            else if (alias.Id > 0)
+            {
+                _log.Info($"Updating alias. (Id: {alias.Id})");
+                _aliasDbAction.Update(alias);
             }
         }
 

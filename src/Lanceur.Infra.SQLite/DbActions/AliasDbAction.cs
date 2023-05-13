@@ -69,7 +69,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @icon,
                     @workingDirectory
                 );
-                select last_insert_rowid() from alias where rowid = 1";
+                select last_insert_rowid() from alias limit 1;";
 
             var id = _db.Connection.ExecuteScalar<long>(sql, new
             {
