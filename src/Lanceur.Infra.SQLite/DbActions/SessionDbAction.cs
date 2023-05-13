@@ -26,7 +26,7 @@ namespace Lanceur.Infra.SQLite.DbActions
         {
             var sql = @"
             insert into alias_session (name, notes) values (@name, @notes);
-            select last_insert_rowid();";
+            select last_insert_rowid() limit 1;";
             var id = _db.Connection.ExecuteScalar<long>(sql, new { session.Name, session.Notes });
             session.Id = id;
         }
