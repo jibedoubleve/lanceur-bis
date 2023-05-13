@@ -39,7 +39,8 @@ namespace Lanceur.Controls
 
         public bool Visible
         {
-            get => _notifyIcon.Visible; set => _notifyIcon.Visible = value;
+            get => _notifyIcon.Visible;
+            set => _notifyIcon.Visible = value;
         }
 
         #endregion Properties

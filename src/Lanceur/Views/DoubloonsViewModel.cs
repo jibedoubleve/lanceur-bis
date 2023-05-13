@@ -11,7 +11,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lanceur.Views
@@ -21,6 +20,7 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly Interaction<string, bool> _confirmRemove;
+        private readonly INotification _notification;
         private readonly IDataService _service;
         private readonly IThumbnailManager _thumbnailManager;
 
@@ -33,12 +33,14 @@ namespace Lanceur.Views
             IScheduler poolThread = null,
             IUserNotification notify = null,
             IDataService service = null,
-            IThumbnailManager thumbnailManager = null)
+            IThumbnailManager thumbnailManager = null,
+            INotification notification = null)
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _service = service ?? l.GetService<IDataService>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
+            _notification = notification ?? l.GetService<INotification>();
             _confirmRemove = Interactions.YesNoQuestion(uiThread);
 
             uiThread ??= RxApp.MainThreadScheduler;
@@ -87,7 +89,7 @@ namespace Lanceur.Views
             {
                 foreach (var item in toDel) { Doubloons.Remove(item); }
                 _service.Remove(toDel);
-                Toast.Information($"Removed {toDel.Count} alias(es).");
+                _notification.Information($"Removed {toDel.Count} alias(es).");
             }
         }
 

@@ -22,6 +22,7 @@ namespace Lanceur.Views
 
         private readonly Interaction<Unit, string> _askFile;
         private readonly IDelay _delay;
+        private readonly INotification _nofification;
         private readonly IAppRestart _restart;
         private readonly IDataService _service;
         private readonly IAppSettingsService _settings;
@@ -32,14 +33,15 @@ namespace Lanceur.Views
         #region Constructors
 
         public AppSettingsViewModel(
-            IScheduler uiThread = null,
+                    IScheduler uiThread = null,
             IScheduler poolThread = null,
             IAppSettingsService settings = null,
             IUserNotification notify = null,
             ISettingsService stg = null,
             IDataService service = null,
             IDelay delay = null,
-            IAppRestart restart = null
+            IAppRestart restart = null,
+            INotification nofification = null
             )
         {
             var l = Locator.Current;
@@ -50,7 +52,7 @@ namespace Lanceur.Views
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();
-
+            _nofification = nofification ?? l.GetService<INotification>();
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
 
@@ -135,7 +137,8 @@ namespace Lanceur.Views
             _settings.Save(Context.AppSettings);
 
             TimeSpan time = GetDelay();
-            Toast.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
+
+            _nofification.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
             await _delay.Of(time);
             _restart.Restart();
         }

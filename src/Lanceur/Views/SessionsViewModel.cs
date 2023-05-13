@@ -26,6 +26,7 @@ namespace Lanceur.Views
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
         private readonly IThumbnailManager _thumbnailManager;
+        private readonly INotification _notification;
 
         #endregion Fields
 
@@ -37,14 +38,15 @@ namespace Lanceur.Views
             IAppLoggerFactory logFactory = null,
             IDataService aliasService = null,
             IUserNotification notify = null,
-            IThumbnailManager thumbnailManager = null)
+            IThumbnailManager thumbnailManager = null,
+            INotification notification = null)
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _log = l.GetLogger<SessionsViewModel>(logFactory);
             _aliasService = aliasService ?? l.GetService<IDataService>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
-
+            _notification = notification ?? l.GetService<INotification>();
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
 
@@ -154,7 +156,7 @@ namespace Lanceur.Views
             {
                 _aliasService.Remove(session.ToEntity());
                 _log.Trace($"Removed session with id '{session?.Id ?? -1}'");
-                Toast.Information($"Session '{session.Name}' removed.");
+                _notification.Information($"Session '{session.Name}' removed.");
                 return session;
             }
             else { return null; }
@@ -170,7 +172,7 @@ namespace Lanceur.Views
                 _aliasService.Update(ref entity);
 
                 session.Id = entity.Id;
-                Toast.Information($"Session '{session.Name}' updated.");
+                _notification.Information($"Session '{session.Name}' updated.");
                 return session;
             }
             else
