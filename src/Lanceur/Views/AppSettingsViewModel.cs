@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using Lanceur.Utils;
 using ReactiveUI;
@@ -11,7 +12,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace Lanceur.Views
@@ -24,6 +24,7 @@ namespace Lanceur.Views
         private readonly IDelay _delay;
         private readonly INotification _nofification;
         private readonly IAppRestart _restart;
+        private readonly ISchedulerProvider _schedulers;
         private readonly IDataService _service;
         private readonly IAppSettingsService _settings;
         private readonly ISettingsService _stg;
@@ -33,8 +34,7 @@ namespace Lanceur.Views
         #region Constructors
 
         public AppSettingsViewModel(
-                    IScheduler uiThread = null,
-            IScheduler poolThread = null,
+            ISchedulerProvider schedulers = null,
             IAppSettingsService settings = null,
             IUserNotification notify = null,
             ISettingsService stg = null,
@@ -45,28 +45,28 @@ namespace Lanceur.Views
             )
         {
             var l = Locator.Current;
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _settings = settings ?? l.GetService<IAppSettingsService>();
-            _askFile = Interactions.SelectFile(uiThread);
+
+            _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
             _stg = stg ?? l.GetService<ISettingsService>();
             _service = service ?? l.GetService<IDataService>();
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();
             _nofification = nofification ?? l.GetService<INotification>();
-            uiThread ??= RxApp.MainThreadScheduler;
-            poolThread ??= RxApp.TaskpoolScheduler;
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveSettings = ReactiveCommand.Create(OnSaveSettings, outputScheduler: uiThread);
+            SaveSettings = ReactiveCommand.Create(OnSaveSettings, outputScheduler: _schedulers.MainThreadScheduler);
             SaveSettings.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SelectDatabase = ReactiveCommand.CreateFromTask(async () => await AskFile.Handle(Unit.Default), outputScheduler: uiThread);
+            SelectDatabase = ReactiveCommand.CreateFromTask(async () => await AskFile.Handle(Unit.Default), outputScheduler: _schedulers.MainThreadScheduler);
             SelectDatabase.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
-                .ObserveOn(uiThread)
+                .ObserveOn(_schedulers.MainThreadScheduler)
                 .Subscribe(ctx =>
                 {
                     DbPath = ctx.DbPath;
@@ -80,7 +80,7 @@ namespace Lanceur.Views
                 });
 
             this.WhenAnyObservable(vm => vm.SelectDatabase)
-                .ObserveOn(uiThread)
+                .ObserveOn(_schedulers.MainThreadScheduler)
                 .BindTo(this, vm => vm.DbPath);
         }
 

@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using ReactiveUI;
 using Splat;
@@ -7,13 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 
 namespace Lanceur.Views
 {
     public class TrendsViewModel : RoutableViewModel
     {
         #region Fields
+
+        private readonly ISchedulerProvider _schedulers;
 
         private readonly IDataService _service;
 
@@ -22,15 +24,16 @@ namespace Lanceur.Views
         #region Constructors
 
         public TrendsViewModel(
-            IScheduler uiThread = null,
+            ISchedulerProvider schedulers = null,
             IDataService service = null,
             IUserNotification notify = null)
         {
             var l = Locator.Current;
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _service = service ?? l.GetService<IDataService>();
             notify ??= l.GetService<IUserNotification>();
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
         }
 

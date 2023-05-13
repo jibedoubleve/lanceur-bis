@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -9,7 +10,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
@@ -21,6 +21,7 @@ namespace Lanceur.Views
 
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly INotification _notification;
+        private readonly ISchedulerProvider _schedulers;
         private readonly IDataService _service;
         private readonly IThumbnailManager _thumbnailManager;
 
@@ -29,8 +30,7 @@ namespace Lanceur.Views
         #region Constructors
 
         public DoubloonsViewModel(
-            IScheduler uiThread = null,
-            IScheduler poolThread = null,
+            ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IDataService service = null,
             IThumbnailManager thumbnailManager = null,
@@ -38,18 +38,16 @@ namespace Lanceur.Views
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _service = service ?? l.GetService<IDataService>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _notification = notification ?? l.GetService<INotification>();
-            _confirmRemove = Interactions.YesNoQuestion(uiThread);
+            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 
-            uiThread ??= RxApp.MainThreadScheduler;
-            poolThread ??= RxApp.TaskpoolScheduler;
-
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: uiThread);
+            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: _schedulers.MainThreadScheduler);
             RemoveSelected.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)

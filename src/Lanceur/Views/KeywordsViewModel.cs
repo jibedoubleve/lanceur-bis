@@ -6,6 +6,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Utils;
+using Lanceur.Schedulers;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
@@ -36,8 +37,9 @@ namespace Lanceur.Views
         private readonly Scope<bool> _busyScope;
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
-        private readonly IPackagedAppValidator _packagedAppValidator;
         private readonly INotification _notification;
+        private readonly IPackagedAppValidator _packagedAppValidator;
+        private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
@@ -47,17 +49,14 @@ namespace Lanceur.Views
         public KeywordsViewModel(
             IAppLoggerFactory logFactory = null,
             IDataService searchService = null,
-            IScheduler uiThread = null,
-            IScheduler poolThread = null,
+            ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
             IPackagedAppValidator packagedAppValidator = null,
             INotification notification = null)
         {
             _busyScope = new Scope<bool>(b => IsBusy = b, true, false);
-
-            uiThread ??= RxApp.MainThreadScheduler;
-            poolThread ??= RxApp.TaskpoolScheduler;
+            _schedulers = schedulers ?? Locator.Current.GetService<ISchedulerProvider>();
 
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
@@ -66,7 +65,8 @@ namespace Lanceur.Views
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDataService>();
-            _confirmRemove = Interactions.YesNoQuestion(uiThread);
+            _schedulers = schedulers;
+            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 
             this.WhenActivated(d =>
             {
@@ -78,8 +78,8 @@ namespace Lanceur.Views
                 }).DisposeWith(d);
 
                 SetupValidations(d);
-                SetupCommands(uiThread, notify, d);
-                SetupBindings(uiThread, d);
+                SetupCommands(_schedulers.MainThreadScheduler, notify, d);
+                SetupBindings(_schedulers.MainThreadScheduler, d);
             });
         }
 

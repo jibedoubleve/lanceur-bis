@@ -3,6 +3,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.Models;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -12,7 +13,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
@@ -25,16 +25,16 @@ namespace Lanceur.Views
         private readonly IDataService _aliasService;
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
-        private readonly IThumbnailManager _thumbnailManager;
         private readonly INotification _notification;
+        private readonly ISchedulerProvider _schedulers;
+        private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
 
         #region Constructors
 
         public SessionsViewModel(
-            IScheduler uiThread = null,
-            IScheduler poolThread = null,
+            ISchedulerProvider schedulers = null,
             IAppLoggerFactory logFactory = null,
             IDataService aliasService = null,
             IUserNotification notify = null,
@@ -44,29 +44,28 @@ namespace Lanceur.Views
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _log = l.GetLogger<SessionsViewModel>(logFactory);
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _aliasService = aliasService ?? l.GetService<IDataService>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _notification = notification ?? l.GetService<INotification>();
-            uiThread ??= RxApp.MainThreadScheduler;
-            poolThread ??= RxApp.TaskpoolScheduler;
 
-            _confirmRemove = Interactions.YesNoQuestion(uiThread);
+            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 
-            Activate = ReactiveCommand.Create<Unit, ActivationContext>(OnActivate, outputScheduler: uiThread);
+            Activate = ReactiveCommand.Create<Unit, ActivationContext>(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            LoadAliases = ReactiveCommand.Create<long, IEnumerable<QueryResult>>(OnLoadAliases, outputScheduler: uiThread);
+            LoadAliases = ReactiveCommand.Create<long, IEnumerable<QueryResult>>(OnLoadAliases, outputScheduler: _schedulers.MainThreadScheduler);
             LoadAliases.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            var canUseSession = this.WhenAnyValue(x => x.CurrentSession).Select(x => x is not null).ObserveOn(uiThread);
-            SaveSession = ReactiveCommand.Create<SessionModel, SessionModel>(OnSaveSession, canUseSession, outputScheduler: uiThread);
+            var canUseSession = this.WhenAnyValue(x => x.CurrentSession).Select(x => x is not null).ObserveOn(_schedulers.MainThreadScheduler);
+            SaveSession = ReactiveCommand.Create<SessionModel, SessionModel>(OnSaveSession, canUseSession, outputScheduler: _schedulers.MainThreadScheduler);
             SaveSession.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            RemoveSession = ReactiveCommand.CreateFromTask<SessionModel, SessionModel>(OnRemoveSessionAsync, canUseSession, outputScheduler: uiThread);
+            RemoveSession = ReactiveCommand.CreateFromTask<SessionModel, SessionModel>(OnRemoveSessionAsync, canUseSession, outputScheduler: _schedulers.MainThreadScheduler);
             RemoveSession.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
-                .ObserveOn(uiThread)
+                .ObserveOn(_schedulers.MainThreadScheduler)
                 .Subscribe(ctx =>
                 {
                     Sessions = ctx.Sessions ?? new();
@@ -76,11 +75,11 @@ namespace Lanceur.Views
                 });
 
             this.WhenAnyObservable(vm => vm.LoadAliases)
-                .ObserveOn(uiThread)
+                .ObserveOn(_schedulers.MainThreadScheduler)
                 .BindTo(this, vm => vm.Aliases);
 
             this.WhenAnyObservable(vm => vm.RemoveSession)
-                .ObserveOn(uiThread)
+                .ObserveOn(_schedulers.MainThreadScheduler)
                 .Where(ctx => ctx is not null)
                 .Subscribe(session =>
                 {
