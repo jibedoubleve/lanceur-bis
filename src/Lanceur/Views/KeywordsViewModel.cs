@@ -37,6 +37,7 @@ namespace Lanceur.Views
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
         private readonly IPackagedAppValidator _packagedAppValidator;
+        private readonly INotification _notification;
         private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
@@ -50,7 +51,8 @@ namespace Lanceur.Views
             IScheduler poolThread = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
-            IPackagedAppValidator packagedAppValidator = null)
+            IPackagedAppValidator packagedAppValidator = null,
+            INotification notification = null)
         {
             _busyScope = new Scope<bool>(b => IsBusy = b, true, false);
 
@@ -60,6 +62,7 @@ namespace Lanceur.Views
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
+            _notification = notification ?? l.GetService<INotification>(); ;
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDataService>();
@@ -146,11 +149,11 @@ namespace Lanceur.Views
                     _log.Info($"User removed alias '{alias.Name}'");
                     _aliasService.Remove(alias);
 
-                    if (_aliases.Remove(alias)) { Toast.Information($"Removed alias '{alias.Name}'."); }
+                    if (_aliases.Remove(alias)) { _notification.Information($"Removed alias '{alias.Name}'."); }
                     else
                     {
                         var msg = $"Impossible to remove the alias '{alias.Name}'";
-                        Toast.Warning(msg);
+                        _notification.Warning(msg);
                         _log.Warning(msg);
                     }
                 }
@@ -168,7 +171,7 @@ namespace Lanceur.Views
                 alias = await _packagedAppValidator.FixAsync(alias);
                 _aliasService.SaveOrUpdate(ref alias);
             }
-            Toast.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
+            _notification.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
             return Unit.Default;
         }
 

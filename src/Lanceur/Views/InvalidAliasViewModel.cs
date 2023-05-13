@@ -20,16 +20,18 @@ namespace Lanceur.Views
 
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IDataService _service;
+        private readonly INotification _notificataion;
 
         #endregion Fields
 
         #region Constructors
 
         public InvalidAliasViewModel(
-                    IScheduler uiThread = null,
+            IScheduler uiThread = null,
             IScheduler poolThread = null,
             IUserNotification notify = null,
-            IDataService service = null)
+            IDataService service = null,
+            INotification notificataion = null)
         {
             uiThread ??= RxApp.MainThreadScheduler;
             poolThread ??= RxApp.TaskpoolScheduler;
@@ -37,6 +39,7 @@ namespace Lanceur.Views
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _service = service ?? l.GetService<IDataService>();
+            _notificataion = notificataion ?? l.GetService<INotification>();
             _confirmRemove = Interactions.YesNoQuestion(uiThread);
 
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
@@ -81,7 +84,7 @@ namespace Lanceur.Views
             {
                 foreach (var item in toDel) { InvalidAliases.Remove(item); }
                 _service.Remove(toDel);
-                Toast.Information($"Removed {toDel.Count} alias(es).");
+                _notificataion.Information($"Removed {toDel.Count} alias(es).");
             }
         }
 

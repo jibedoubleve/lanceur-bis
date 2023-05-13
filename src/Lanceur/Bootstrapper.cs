@@ -108,6 +108,9 @@ namespace Lanceur
         private static void RegisterViewModels()
         {
             var l = Locator.CurrentMutable;
+            // Misc
+            l.RegisterLazySingleton<INotification>(() => new ToastNotification());
+            //Views
             l.RegisterLazySingleton(() => new MainViewModel());
             l.RegisterLazySingleton(() => new SettingsViewModel());
             l.RegisterLazySingleton(() => new KeywordsViewModel());
