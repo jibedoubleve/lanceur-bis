@@ -26,12 +26,12 @@
     <EmbeddedResource Include="Libraries\Scripts\script-0.1.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.9.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
-    <PackageReference Include="NSubstitute" Version="4.4.0" />
-    <PackageReference Include="ReactiveUI.Testing" Version="18.4.1" />
-    <PackageReference Include="xunit" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+    <PackageReference Include="FluentAssertions" Version="6.9.*" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.*" />
+    <PackageReference Include="NSubstitute" Version="4.4.*" />
+    <PackageReference Include="ReactiveUI.Testing" Version="18.4.*" />
+    <PackageReference Include="xunit" Version="2.4.*" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.*">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
