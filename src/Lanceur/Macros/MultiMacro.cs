@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lanceur.Macros
 {
     [Macro("multi"), Description("Allow to start multiple alias at once")]
-    public class MultiMacro : ExecutableQueryResult
+    public class MultiMacro : SelfExecutableQueryResult
     {
         #region Fields
 

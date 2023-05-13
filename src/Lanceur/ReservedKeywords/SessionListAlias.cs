@@ -10,7 +10,7 @@ namespace Lanceur.ReservedKeywords
 {
 
     [ReservedAlias("sessions"), Description("list sessions")]
-    public class SessionListAlias : ExecutableQueryResult
+    public class SessionListAlias : SelfExecutableQueryResult
     {
         #region Fields
 

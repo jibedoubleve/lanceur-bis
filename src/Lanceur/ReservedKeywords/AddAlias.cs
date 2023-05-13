@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Lanceur.ReservedKeywords
 {
     [ReservedAlias("add"), Description("Add a new alias")]
-    public class AddAlias : ExecutableQueryResult
+    public class AddAlias : SelfExecutableQueryResult
     {
         #region Methods
 

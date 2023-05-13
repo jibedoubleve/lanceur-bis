@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Lanceur.Core;
 using Lanceur.Core.Models;
 using Xunit;
 
@@ -18,7 +17,7 @@ namespace Lanceur.Tests.Models
         {
             var item = new AliasQueryResult() { FileName = $"@{name}@" };
 
-            item.Is(CompositeMacros.Multi).Should().Be(expected);
+            item.IsComposite().Should().Be(expected);
         }
 
         #endregion Methods

@@ -13,7 +13,7 @@ namespace Lanceur.Infra.Stores
     {
         #region Fields
 
-        private static IEnumerable<ExecutableQueryResult> _plugins = null;
+        private static IEnumerable<SelfExecutableQueryResult> _plugins = null;
         private readonly IPluginStoreContext _context;
         private readonly IAppLogger _log;
         private readonly IPluginManager _pluginManager;

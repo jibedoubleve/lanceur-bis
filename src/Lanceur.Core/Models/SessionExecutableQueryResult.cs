@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Models
 {
-    public class SessionExecutableQueryResult : ExecutableQueryResult
+    public class SessionExecutableQueryResult : SelfExecutableQueryResult
     {
         #region Fields
 

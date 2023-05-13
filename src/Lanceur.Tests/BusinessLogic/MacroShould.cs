@@ -42,7 +42,7 @@ namespace Lanceur.Tests.BusinessLogic
             var asm = Assembly.GetExecutingAssembly();
             var macroMgr = new MacroManager(asm);
             var macro = new MultiMacroTest(parameters);
-            var handler = (ExecutableQueryResult)macroMgr.Handle(macro);
+            var handler = (SelfExecutableQueryResult)macroMgr.Handle(macro);
 
             var cmdline = new Cmdline(name, parameters);
             var results = await handler.ExecuteAsync(cmdline);
@@ -59,7 +59,7 @@ namespace Lanceur.Tests.BusinessLogic
             var macro = new MultiMacroTest();
             var result = macroMgr.Handle(macro);
 
-            result.Should().BeAssignableTo<ExecutableQueryResult>();
+            result.Should().BeAssignableTo<SelfExecutableQueryResult>();
         }
 
         [Fact]

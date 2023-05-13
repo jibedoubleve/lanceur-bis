@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Lanceur.ReservedKeywords
 {
     [Macro("centre"), Description("Center Lanceur in the middle of the screen")]
-    public class CentreMacro : ExecutableQueryResult
+    public class CentreMacro : SelfExecutableQueryResult
     {
         #region Methods
 

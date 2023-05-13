@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lanceur.Macros
 {
     [Macro("debug"), Description("Provides some debugging tools. But it is more an easter egg than something else")]
-    public class DebugMacro : ExecutableQueryResult
+    public class DebugMacro : SelfExecutableQueryResult
     {
         #region Constructors
 
@@ -23,7 +23,7 @@ namespace Lanceur.Macros
         {
             Name = name;
             Query = query;
-            SetDescription(description);
+            Description = description;
         }
 
         public DebugMacro()

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Lanceur.Macros
 {
     [Macro("stat"), Description("Show the usage statistics of Lanceur")]
-    public class StatisticsMacro : ExecutableQueryResult
+    public class StatisticsMacro : SelfExecutableQueryResult
     {
         #region Methods
 

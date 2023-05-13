@@ -90,7 +90,7 @@ namespace Lanceur.Infra.Stores
                 {
                     var instance = Activator.CreateInstance(type);
 
-                    if (instance is ExecutableQueryResult qr)
+                    if (instance is SelfExecutableQueryResult qr)
                     {
                         var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name; ;
                         var keyword = _dataService.GetKeyword(name);
@@ -102,7 +102,7 @@ namespace Lanceur.Infra.Stores
                             qr.Count = keyword.Count;
                         }
 
-                        qr.SetDescription((type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description);
+                        qr.Description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
                         qr.Icon = "keylink";
 
                         foundItems.Add(qr);

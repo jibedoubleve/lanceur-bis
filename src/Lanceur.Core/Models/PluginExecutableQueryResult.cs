@@ -3,7 +3,7 @@ using Lanceur.Core.Plugins.Models;
 
 namespace Lanceur.Core.Models
 {
-    public class PluginExecutableQueryResult : ExecutableQueryResult
+    public class PluginExecutableQueryResult : SelfExecutableQueryResult
     {
         #region Fields
 

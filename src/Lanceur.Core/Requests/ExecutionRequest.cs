@@ -7,7 +7,7 @@ namespace Lanceur.Core.Requests
         #region Properties
         public string Query { get; set; }
         public bool ExecuteWithPrivilege { get; set; }
-        public QueryResult QueryResult { get; set; }
+        public QueryResult QueryResult { get; set; } 
 
         #endregion Properties
     }
