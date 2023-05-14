@@ -10,6 +10,7 @@ using Lanceur.ReservedKeywords;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.ReservedAliases;
 using Microsoft.Reactive.Testing;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using NSubstitute;
 using ReactiveUI.Testing;
 using Splat;
@@ -61,9 +62,10 @@ namespace Lanceur.Tests.ViewModels
                         });
 
                 var vm = Builder
-                    .With(_output)
+                .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(executor: executor);
+                    .With(executor)
+                    .BuildMainViewModel();
 
                 vm.Query = expression;
 
@@ -82,7 +84,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
                     .BuildMainViewModel();
 
@@ -114,9 +116,10 @@ namespace Lanceur.Tests.ViewModels
                 var searchService = Substitute.For<ISearchService>();
                 searchService.Search(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(searchService);
+                    .With(searchService)
+                    .BuildMainViewModel();
 
                 // ACT
                 vm.SearchAlias.Execute("__").Subscribe();
@@ -145,9 +148,10 @@ namespace Lanceur.Tests.ViewModels
                         });
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(executor: executor);
+                    .With(executor)
+                    .BuildMainViewModel();
 
                 // ACT
                 vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName("some random name");
@@ -177,12 +181,11 @@ namespace Lanceur.Tests.ViewModels
                         );
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(
-                        searchService: searchService,
-                        executor: new DebugMacroExecutor()
-                    );
+                    .With(searchService)
+                    .With(new DebugMacroExecutor())
+                    .BuildMainViewModel();
 
                 // ACT
                 vm.Query = "random_query";

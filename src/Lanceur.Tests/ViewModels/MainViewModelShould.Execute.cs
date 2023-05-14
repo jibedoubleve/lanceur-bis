@@ -24,7 +24,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
                     .BuildMainViewModel();
 
@@ -49,7 +49,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
                     .BuildMainViewModel();
 
@@ -92,9 +92,10 @@ namespace Lanceur.Tests.ViewModels
                         );
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(searchService: searchService);
+                    .With(searchService)
+                    .BuildMainViewModel();
 
                 // ACT
                 vm.Query = "random_query";
@@ -133,9 +134,10 @@ namespace Lanceur.Tests.ViewModels
                         );
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(searchService: searchService);
+                    .With(searchService)
+                    .BuildMainViewModel();
 
                 // ACT
                 vm.Query = "random_query";
@@ -169,9 +171,10 @@ namespace Lanceur.Tests.ViewModels
                 );
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(executor: executionManager);
+                    .With(executionManager)
+                    .BuildMainViewModel();
 
                 // ACT
 
@@ -200,9 +203,10 @@ namespace Lanceur.Tests.ViewModels
                 var executionManager = Substitute.For<IExecutionManager>();
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(executor: executionManager);
+                    .With(executionManager)
+                    .BuildMainViewModel();
 
                 // ACT
 

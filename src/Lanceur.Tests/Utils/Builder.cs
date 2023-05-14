@@ -15,8 +15,11 @@ namespace Lanceur.Tests.Utils
     {
         #region Fields
 
+        private IExecutionManager _executionManager;
         private ITestOutputHelper _output;
-        private IScheduler _scheduler;
+        private ISchedulerProvider _schedulerProvider;
+        private ISearchService _searchService;
+        private bool _useLocator;
 
         #endregion Fields
 
@@ -31,30 +34,50 @@ namespace Lanceur.Tests.Utils
 
         #region Methods
 
-        public static Builder With(ITestOutputHelper output) => new(output);
+        public static Builder Build(ITestOutputHelper output) => new(output);
 
-        public MainViewModel BuildMainViewModel(ISearchService searchService = null, IExecutionManager executor = null)
+        public MainViewModel BuildMainViewModel()
         {
-            ArgumentNullException.ThrowIfNull(nameof(_scheduler));
             ArgumentNullException.ThrowIfNull(nameof(_output));
+
+            if (!_useLocator) { ArgumentNullException.ThrowIfNull(nameof(_schedulerProvider)); }
+            else { _schedulerProvider = Locator.Current.GetService<ISchedulerProvider>(); }
 
             Locator.CurrentMutable.UnregisterAll<ILogger>();
             var logger = new TestReactiveUiLogger(_output);
             Locator.CurrentMutable.RegisterConstant(logger, typeof(ILogger));
 
             return new MainViewModel(
-                schedulerProvider: new TestSchedulerProvider(_scheduler),
+                schedulerProvider: _schedulerProvider,
                 logFactory: new XUnitLoggerFactory(_output),
-                searchService: searchService ?? Substitute.For<ISearchService>(),
+                searchService: _searchService ?? Substitute.For<ISearchService>(),
                 cmdlineService: new CmdlineManager(),
-                executor: executor ?? Substitute.For<IExecutionManager>(),
+                executor: _executionManager ?? Substitute.For<IExecutionManager>(),
                 notify: Substitute.For<IUserNotification>()
             );
         }
 
+        public Builder UseLocator()
+        {
+            _useLocator = true;
+            return this;
+        }
+
+        public Builder With(ISearchService searchService)
+        {
+            _searchService = searchService;
+            return this;
+        }
+
+        public Builder With(IExecutionManager executionManager)
+        {
+            _executionManager = executionManager;
+            return this;
+        }
+
         public Builder With(IScheduler scheduler)
         {
-            _scheduler = scheduler;
+            _schedulerProvider = new TestSchedulerProvider(scheduler);
             return this;
         }
 

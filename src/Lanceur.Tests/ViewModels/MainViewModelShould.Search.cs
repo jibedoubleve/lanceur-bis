@@ -30,9 +30,10 @@ namespace Lanceur.Tests.ViewModels
                     .Search(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
 
-                var vm = Builder.With(_output)
+                var vm = Builder.Build(_output)
                                 .With(scheduler)
-                                .BuildMainViewModel(searchService);
+                                .With(searchService)
+                                .BuildMainViewModel();
 
                 _output.Act();
                 vm.SearchAlias.Execute("...").Subscribe();
@@ -65,9 +66,10 @@ namespace Lanceur.Tests.ViewModels
                 var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(searchService);
+                    .With(searchService)
+                    .BuildMainViewModel();
 
                 //Act
                 _output.Act();
@@ -89,7 +91,7 @@ namespace Lanceur.Tests.ViewModels
             {
                 _output.Arrange();
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
                     .BuildMainViewModel();
 
@@ -111,8 +113,8 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var searchService = Substitute.For<IExecutionManager>();
-                searchService
+                var executionManager = Substitute.For<IExecutionManager>();
+                executionManager
                     .ExecuteAsync(Arg.Any<ExecutionRequest>())
                     .Returns(new ExecutionResponse
                     {
@@ -125,9 +127,10 @@ namespace Lanceur.Tests.ViewModels
                     });
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(executor: searchService);
+                    .With(executionManager)
+                    .BuildMainViewModel();
 
                 // ACT
                 vm.CurrentAlias = new ExecutableWithResultsTestAlias();
@@ -146,7 +149,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
                     .BuildMainViewModel();
 
@@ -164,7 +167,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
                     .BuildMainViewModel();
 
@@ -182,7 +185,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
                     .BuildMainViewModel();
 
@@ -201,7 +204,7 @@ namespace Lanceur.Tests.ViewModels
             {
                 // ARRANGE
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
                     .BuildMainViewModel();
 
@@ -234,9 +237,10 @@ namespace Lanceur.Tests.ViewModels
                     });
 
                 var vm = Builder
-                    .With(_output)
+                    .Build(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(executor: executor);
+                    .With(executor)
+                    .BuildMainViewModel();
 
                 // ACT
                 vm.CurrentAlias = alias;
