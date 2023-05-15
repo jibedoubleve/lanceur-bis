@@ -13,6 +13,7 @@ using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Models;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using Lanceur.Utils;
 using Lanceur.Utils.ConnectionStrings;
@@ -22,6 +23,7 @@ using ReactiveUI;
 using Splat;
 using System;
 using System.Data.SQLite;
+using System.Reactive.Concurrency;
 using System.Reflection;
 
 namespace Lanceur
@@ -75,7 +77,7 @@ namespace Lanceur
             l.Register<ISettingsService>(() => new JsonSettingsService());
 #endif
 
-
+            l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
             l.Register<IAppLoggerFactory>(() => new NLoggerFactory());
             l.Register<IStoreLoader>(() => new StoreLoader());
             l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));

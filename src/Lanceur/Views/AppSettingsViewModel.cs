@@ -37,8 +37,8 @@ namespace Lanceur.Views
             ISchedulerProvider schedulers = null,
             IAppSettingsService settings = null,
             IUserNotification notify = null,
-            ISettingsService stg = null,
-            IDataService service = null,
+            ISettingsService settingService = null,
+            IDataService dataService = null,
             IDelay delay = null,
             IAppRestart restart = null,
             INotification nofification = null
@@ -49,8 +49,8 @@ namespace Lanceur.Views
             _settings = settings ?? l.GetService<IAppSettingsService>();
 
             _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
-            _stg = stg ?? l.GetService<ISettingsService>();
-            _service = service ?? l.GetService<IDataService>();
+            _stg = settingService ?? l.GetService<ISettingsService>();
+            _service = dataService ?? l.GetService<IDataService>();
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();

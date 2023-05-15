@@ -155,7 +155,7 @@ namespace Lanceur.Tests.ViewModels
 
                 vm.SearchAlias.Execute("").Subscribe();
 
-                scheduler.AdvanceBy(1_000);
+                scheduler.Start();
 
                 vm.Results.Count.Should().Be(0);
             });
@@ -173,7 +173,7 @@ namespace Lanceur.Tests.ViewModels
 
                 vm.SearchAlias.Execute().Subscribe();
 
-                scheduler.AdvanceBy(1_000);
+                scheduler.Start();
 
                 vm.Results.Count.Should().Be(0);
             });
@@ -191,7 +191,7 @@ namespace Lanceur.Tests.ViewModels
 
                 vm.SearchAlias.Execute(" ").Subscribe();
 
-                scheduler.AdvanceBy(1_000);
+                scheduler.Start();
 
                 vm.Results.Count.Should().Be(0);
             });
