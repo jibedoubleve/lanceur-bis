@@ -30,10 +30,11 @@ namespace Lanceur.Tests.ViewModels
                     .Search(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
 
-                var vm = Builder.Build(_output)
-                                .With(scheduler)
-                                .With(searchService)
-                                .BuildMainViewModel();
+                var vm = new MainViewModelBuilder()
+                        .With(_output)
+                        .With(scheduler)
+                        .With(searchService)
+                        .Build();
 
                 _output.Act();
                 vm.SearchAlias.Execute("...").Subscribe();
@@ -65,11 +66,11 @@ namespace Lanceur.Tests.ViewModels
                 var thumbnailManager = Substitute.For<IThumbnailManager>();
                 var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
                     .With(searchService)
-                    .BuildMainViewModel();
+                    .Build();
 
                 //Act
                 _output.Act();
@@ -90,10 +91,10 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 _output.Arrange();
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 vm.SetResults(5);
                 vm.Query = "1 un";
@@ -126,11 +127,11 @@ namespace Lanceur.Tests.ViewModels
                         HasResult = true
                     });
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
                     .With(executionManager)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
                 vm.CurrentAlias = new ExecutableWithResultsTestAlias();
@@ -148,10 +149,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 vm.SearchAlias.Execute("").Subscribe();
 
@@ -166,10 +167,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 vm.SearchAlias.Execute().Subscribe();
 
@@ -184,10 +185,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 vm.SearchAlias.Execute(" ").Subscribe();
 
@@ -203,10 +204,10 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
                 vm.CurrentAlias = new ExecutableWithResultsTestAlias();
@@ -236,11 +237,11 @@ namespace Lanceur.Tests.ViewModels
                         HasResult = true
                     });
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
                     .With(executor)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
                 vm.CurrentAlias = alias;

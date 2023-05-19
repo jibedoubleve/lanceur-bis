@@ -5,13 +5,12 @@ using Lanceur.Schedulers;
 using Lanceur.Tests.Logging;
 using Lanceur.Views;
 using NSubstitute;
-using Splat;
 using System.Reactive.Concurrency;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Utils
 {
-    internal class Builder
+    internal class MainViewModelBuilder
     {
         #region Fields
 
@@ -19,33 +18,16 @@ namespace Lanceur.Tests.Utils
         private ITestOutputHelper _output;
         private ISchedulerProvider _schedulerProvider;
         private ISearchService _searchService;
-        private bool _useLocator;
 
         #endregion Fields
 
-        #region Constructors
-
-        private Builder(ITestOutputHelper output)
-        {
-            _output = output;
-        }
-
-        #endregion Constructors
-
         #region Methods
 
-        public static Builder Build(ITestOutputHelper output) => new(output);
-
-        public MainViewModel BuildMainViewModel()
+        public MainViewModel Build()
         {
             ArgumentNullException.ThrowIfNull(nameof(_output));
 
-            if (!_useLocator) { ArgumentNullException.ThrowIfNull(nameof(_schedulerProvider)); }
-            else { _schedulerProvider = Locator.Current.GetService<ISchedulerProvider>(); }
-
-            Locator.CurrentMutable.UnregisterAll<ILogger>();
-            var logger = new TestReactiveUiLogger(_output);
-            Locator.CurrentMutable.RegisterConstant(logger, typeof(ILogger));
+            ArgumentNullException.ThrowIfNull(nameof(_schedulerProvider));
 
             return new MainViewModel(
                 schedulerProvider: _schedulerProvider,
@@ -57,25 +39,25 @@ namespace Lanceur.Tests.Utils
             );
         }
 
-        public Builder UseLocator()
+        public MainViewModelBuilder With(ITestOutputHelper output)
         {
-            _useLocator = true;
+            _output = output;
             return this;
         }
 
-        public Builder With(ISearchService searchService)
+        public MainViewModelBuilder With(ISearchService searchService)
         {
             _searchService = searchService;
             return this;
         }
 
-        public Builder With(IExecutionManager executionManager)
+        public MainViewModelBuilder With(IExecutionManager executionManager)
         {
             _executionManager = executionManager;
             return this;
         }
 
-        public Builder With(IScheduler scheduler)
+        public MainViewModelBuilder With(IScheduler scheduler)
         {
             _schedulerProvider = new TestSchedulerProvider(scheduler);
             return this;

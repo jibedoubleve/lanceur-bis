@@ -16,10 +16,10 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ASSERT
                 vm.CurrentAlias.Should().BeNull();

@@ -6,11 +6,9 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Macros;
-using Lanceur.ReservedKeywords;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.ReservedAliases;
 using Microsoft.Reactive.Testing;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using NSubstitute;
 using ReactiveUI.Testing;
 using Splat;
@@ -39,8 +37,6 @@ namespace Lanceur.Tests.ViewModels
 
         #region Methods
 
-
-
         [Theory]
         [InlineData("=8*5", "40")]
         public void HaveResultWhenQueryIsArithmetic(string expression, string result)
@@ -61,11 +57,11 @@ namespace Lanceur.Tests.ViewModels
                             }
                         });
 
-                var vm = Builder
-                .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
                     .With(executor)
-                    .BuildMainViewModel();
+                    .Build();
 
                 vm.Query = expression;
 
@@ -83,10 +79,10 @@ namespace Lanceur.Tests.ViewModels
             //https://stackoverflow.com/questions/49338867/unit-testing-viewmodel-property-bound-to-reactivecommand-isexecuting
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 scheduler.Schedule(() => vm.Query = "a");
                 scheduler.Schedule(TimeSpan.FromTicks(200), () => vm.Query += "b");
@@ -115,11 +111,11 @@ namespace Lanceur.Tests.ViewModels
                 // ARRANGE
                 var searchService = Substitute.For<ISearchService>();
                 searchService.Search(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
                     .With(searchService)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
                 vm.SearchAlias.Execute("__").Subscribe();
@@ -147,11 +143,11 @@ namespace Lanceur.Tests.ViewModels
                             }
                         });
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
                     .With(executor)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
                 vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName("some random name");
@@ -180,12 +176,12 @@ namespace Lanceur.Tests.ViewModels
                             }
                         );
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
                     .With(searchService)
                     .With(new DebugMacroExecutor())
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
                 vm.Query = "random_query";

@@ -23,10 +23,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new NotExecutableTestAlias());
 
@@ -48,10 +48,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new ExecutableTestAlias());
 
@@ -91,11 +91,11 @@ namespace Lanceur.Tests.ViewModels
                             }
                         );
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()                    
+                    .With(_output)
                     .With(scheduler)
                     .With(searchService)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
                 vm.Query = "random_query";
@@ -133,11 +133,11 @@ namespace Lanceur.Tests.ViewModels
                             }
                         );
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()                    
+                    .With(_output)
                     .With(scheduler)
                     .With(searchService)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
                 vm.Query = "random_query";
@@ -170,11 +170,11 @@ namespace Lanceur.Tests.ViewModels
                     cmdlineManager
                 );
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()                    
+                    .With(_output)
                     .With(scheduler)
                     .With(executionManager)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
 
@@ -202,11 +202,11 @@ namespace Lanceur.Tests.ViewModels
                 var cmdlineManager = Substitute.For<ICmdlineManager>();
                 var executionManager = Substitute.For<IExecutionManager>();
 
-                var vm = Builder
-                    .Build(_output)
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
                     .With(scheduler)
                     .With(executionManager)
-                    .BuildMainViewModel();
+                    .Build();
 
                 // ACT
 
