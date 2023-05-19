@@ -254,12 +254,13 @@ namespace Lanceur.Views
 
         public void HideControl()
         {
+            QueryTextBox.Text = string.Empty;
+
             if (_isStoryBoardsFree)
             {
                 _isStoryBoardsFree = false;
                 var storyBoard = FindResource("fadeOutStoryBoard") as Storyboard;
                 storyBoard.Begin(this);
-                QueryTextBox.Text = string.Empty;
             }
         }
 
