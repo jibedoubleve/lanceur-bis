@@ -107,7 +107,8 @@ namespace Lanceur.Views
                 vm => vm.SelectPreviousResult
             ).Log(this, "Navigation occured", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
              .ObserveOn(_schedulers.MainThreadScheduler)
-             .Select(x => x).BindTo(this, vm => vm.CurrentAlias);
+             .Select(x => x)
+             .BindTo(this, vm => vm.CurrentAlias);
 
             #endregion Navigation
 
@@ -126,6 +127,16 @@ namespace Lanceur.Views
                 .Log(this, "Query changed.", x => $"'{x}'")
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .InvokeCommand(this, vm => vm.SearchAlias);
+
+            this.WhenAnyValue(vm => vm.Query)
+                .Where(x => string.IsNullOrEmpty(x))
+                .Log(this, "Query is empty, clearing the view.", x => $"'{x}'")
+                .Subscribe(_ =>
+                {
+                    Query = string.Empty;
+                    CurrentAlias = null;
+                    Results.Clear();
+                });
 
             this.WhenAnyValue(vm => vm.Results)
                 .Where(x => x is not null)
