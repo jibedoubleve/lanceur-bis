@@ -23,10 +23,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder
+                var vm = new MainViewModelBuilder()
                     .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new NotExecutableTestAlias());
 
@@ -48,10 +48,10 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                var vm = Builder
+                var vm = new MainViewModelBuilder()
                     .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
                 scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new ExecutableTestAlias());
 
@@ -91,10 +91,11 @@ namespace Lanceur.Tests.ViewModels
                             }
                         );
 
-                var vm = Builder
+                var vm = new MainViewModelBuilder()                    
                     .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(searchService: searchService);
+                    .With(searchService)
+                    .Build();
 
                 // ACT
                 vm.Query = "random_query";
@@ -132,10 +133,11 @@ namespace Lanceur.Tests.ViewModels
                             }
                         );
 
-                var vm = Builder
+                var vm = new MainViewModelBuilder()                    
                     .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(searchService: searchService);
+                    .With(searchService)
+                    .Build();
 
                 // ACT
                 vm.Query = "random_query";
@@ -168,10 +170,11 @@ namespace Lanceur.Tests.ViewModels
                     cmdlineManager
                 );
 
-                var vm = Builder
+                var vm = new MainViewModelBuilder()                    
                     .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(executor: executionManager);
+                    .With(executionManager)
+                    .Build();
 
                 // ACT
 
@@ -199,10 +202,11 @@ namespace Lanceur.Tests.ViewModels
                 var cmdlineManager = Substitute.For<ICmdlineManager>();
                 var executionManager = Substitute.For<IExecutionManager>();
 
-                var vm = Builder
+                var vm = new MainViewModelBuilder()
                     .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel(executor: executionManager);
+                    .With(executionManager)
+                    .Build();
 
                 // ACT
 

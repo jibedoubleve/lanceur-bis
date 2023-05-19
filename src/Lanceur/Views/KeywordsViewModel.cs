@@ -65,7 +65,7 @@ namespace Lanceur.Views
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDataService>();
-            _schedulers = schedulers;
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 
             this.WhenActivated(d =>

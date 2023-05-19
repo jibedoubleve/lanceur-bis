@@ -15,13 +15,13 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                //Arrange
-                var vm = Builder
+                // ARRANGE
+                var vm = new MainViewModelBuilder()
                     .With(_output)
                     .With(scheduler)
-                    .BuildMainViewModel();
+                    .Build();
 
-                //Assert
+                // ASSERT
                 vm.CurrentAlias.Should().BeNull();
             });
         }
