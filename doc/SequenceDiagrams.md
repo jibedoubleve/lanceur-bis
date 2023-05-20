@@ -18,7 +18,7 @@ participant wcm  as WildcardManager
 
 vm ->> +exec: ExecuteAsync
     alt is Executable
-        rect rgb(212, 253, 205	)
+        rect rgb(137, 152, 36)
         alt is AliasQueryResult?
             exec ->>  +qr: ExecuteAsync();
             note right of qr: Parameter handling<br>can differ from<br>QueryResult to another
@@ -72,7 +72,7 @@ src ->> +sld: Load()
 sld -->> -src: Stores
 
 loop For each store
-rect rgb(212, 253, 205	)
+rect rgb(137, 152, 36)
     src ->> +str: Search()
     str -->> -src: Append results
 end
