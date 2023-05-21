@@ -3,6 +3,7 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
+using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Utils;
 using Lanceur.Models;
 using Lanceur.Schedulers;
@@ -24,12 +25,13 @@ namespace Lanceur.Views
     {
         #region Fields
 
+        private readonly IAppConfigService _appConfigService;
         private readonly ICmdlineManager _cmdlineManager;
         private readonly IExecutionManager _executor;
         private readonly IAppLogger _log;
         private readonly ISchedulerProvider _schedulers;
         private readonly ISearchService _searchService;
-        private readonly IDataService _service;
+        private readonly IDataService _dataService;
 
         #endregion Fields
 
@@ -41,8 +43,9 @@ namespace Lanceur.Views
             ISearchService searchService = null,
             ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
-            IDataService service = null,
-            IExecutionManager executor = null)
+            IDataService dataService = null,
+            IExecutionManager executor = null,
+            IAppConfigService appConfigService = null)
         {
             _schedulers = schedulerProvider ?? new RxAppSchedulerProvider();
 
@@ -51,15 +54,16 @@ namespace Lanceur.Views
             _log = Locator.Current.GetLogger<MainViewModel>(logFactory);
             _searchService = searchService ?? l.GetService<ISearchService>();
             _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
-            _service = service ?? l.GetService<IDataService>();
+            _dataService = dataService ?? l.GetService<IDataService>();
             _executor = executor ?? l.GetService<IExecutionManager>();
+            _appConfigService = appConfigService ?? l.GetService<IAppConfigService>();
 
             #region Commands
 
             AutoComplete = ReactiveCommand.Create(OnAutoComplete);
             AutoComplete.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            Activate = ReactiveCommand.CreateFromTask(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             SearchAlias = ReactiveCommand.CreateFromTask<string, AliasResponse>(OnSearchAliasAsync, outputScheduler: _schedulers.MainThreadScheduler);
@@ -165,8 +169,18 @@ namespace Lanceur.Views
 
             #endregion on Search & on Execute
 
-            this.WhenAnyObservable(vm => vm.Activate)
-                .Subscribe(x => CurrentSessionName = x.CurrentSessionName);
+            var activated = this
+                .WhenAnyObservable(vm => vm.Activate)
+                .DistinctUntilChanged()
+                .ObserveOn(_schedulers.MainThreadScheduler);
+
+            activated.Select(x => x.CurrentSessionName)
+                     .Log(this, "Activated: get current session name", x => $"Session name: '{x}'")
+                     .BindTo(this, vm => vm.CurrentSessionName);
+
+            activated.Select(x => x.Results.ToObservableCollection())
+                     .Log(this, "Activated: set all results", x => $"Found {x.Count} item(s)")
+                     .BindTo(this, vm => vm.Results);
         }
 
         #endregion Constructors
@@ -203,11 +217,22 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private async Task<AliasResponse> OnActivate()
+        private AliasResponse OnActivate()
         {
-            _log.Info("Activating ViewModel");
-            var sessionName = await Task.Run(() => _service.GetDefaultSession()?.Name ?? "N.A.");
-            return new() { CurrentSessionName = sessionName, };
+            var sessionName = _dataService.GetDefaultSession()?.Name ?? "N.A.";
+
+            var aliases = _appConfigService.Current.Window.ShowResult
+                ? _searchService.GetAll()
+                : Array.Empty<AliasQueryResult>();
+
+            aliases.SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
+
+            _log.Trace($"{(_appConfigService.Current.Window.ShowResult ? $"View activation: show all {aliases?.Count() ?? 0} result(s)" : "View activation: display nothing")}");
+            return new()
+            {
+                CurrentSessionName = sessionName,
+                Results = aliases
+            };
         }
 
         private string OnAutoComplete() => CurrentAlias?.Name ?? string.Empty;
@@ -238,24 +263,32 @@ namespace Lanceur.Views
 
         private Task<AliasResponse> OnSearchAliasAsync(string criterion)
         {
-            if (criterion.IsNullOrWhiteSpace()) { return new AliasResponse(); }
-            else
+            var showResult = _appConfigService.Current.Window.ShowResult;
+            if (criterion.IsNullOrWhiteSpace() && showResult) { return new AliasResponse(); }
+            if (criterion.IsNullOrWhiteSpace() && !showResult)
             {
-                var query = _cmdlineManager.BuildFromText(criterion);
-
-                _log.Debug($"Search: criterion '{criterion}'");
-
-                var results = _searchService
-                        .Search(query)
-                        .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
-
-                _log.Trace($"Search: Found {results?.Count() ?? 0} element(s)");
-                return new AliasResponse()
+                var all = _searchService.GetAll().SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
+                return new AliasResponse
                 {
-                    Results = results,
-                    KeepAlive = results.Any()
+                    Results = all,
+                    KeepAlive = all.Any()
                 };
             }
+
+            var query = _cmdlineManager.BuildFromText(criterion);
+
+            _log.Debug($"Search: criterion '{criterion}'");
+
+            var results = _searchService
+                    .Search(query)
+                    .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
+
+            _log.Trace($"Search: Found {results?.Count() ?? 0} element(s)");
+            return new AliasResponse()
+            {
+                Results = results,
+                KeepAlive = results.Any()
+            };
         }
 
         private QueryResult OnSelectNextResult()

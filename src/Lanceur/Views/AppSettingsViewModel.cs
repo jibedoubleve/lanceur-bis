@@ -97,6 +97,7 @@ namespace Lanceur.Views
         public ReactiveCommand<Unit, Unit> SaveSettings { get; }
         public ReactiveCommand<Unit, string> SelectDatabase { get; }
         [Reactive] public ObservableCollection<Session> Sessions { get; set; }
+        [Reactive] public bool ShowResult { get; set; }
 
         #endregion Properties
 
@@ -128,8 +129,10 @@ namespace Lanceur.Views
             _databaseConfigService.Save();
 
             // Save hotkey & Session in DB
+            _appConfigService.Current.Window.ShowResult = ShowResult;
             _appConfigService.Current.RestartDelay = RestartDelay;
             _appConfigService.Current.HotKey = HotKeySection;
+            _appConfigService.Current.Window.ShowAtStartup = ShowResult;
             if (CurrentSession is not null) { _appConfigService.Current.IdSession = CurrentSession.Id; }
 
             //Save settings

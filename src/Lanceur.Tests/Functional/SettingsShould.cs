@@ -77,7 +77,17 @@ namespace Lanceur.Tests.Functional
             var scope = new SQLiteConnectionScope(conn);
             var settings = new SQLiteAppConfigService(scope);
 
-            settings.Current.ShowAtStartup.Should().BeTrue();
+            settings.Current.Window.ShowAtStartup.Should().BeTrue();
+        }
+
+        [Fact]
+        public void HaveDefaultShowResult()
+        {
+            var conn = BuildFreshDB();
+            var scope = new SQLiteConnectionScope(conn);
+            var settings = new SQLiteAppConfigService(scope);
+
+            settings.Current.Window.ShowResult.Should().BeFalse();
         }
 
         [Theory]

@@ -33,9 +33,9 @@
                     </HeaderedContentControl>
                     <HeaderedContentControl Margin="5" Header="Show all?">
                         <ui:ToggleSwitch
-                            x:Name="DefaultResultToggle"
-                            OffContent="Show no result by devfault"
-                            OnContent="Show all results by default" />
+                            x:Name="ShowResultToggle"
+                            OffContent="Don't show result when showing search box"
+                            OnContent="Show all result when showing search box" />
                     </HeaderedContentControl>
                 </StackPanel>
             </GroupBox>

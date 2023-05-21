@@ -1,5 +1,7 @@
 ﻿using Lanceur.Core.Managers;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
+using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Managers;
 using Lanceur.Schedulers;
 using Lanceur.Tests.Logging;
@@ -14,20 +16,32 @@ namespace Lanceur.Tests.Utils
     {
         #region Fields
 
+        private IAppConfigService _appConfigService;
         private IExecutionManager _executionManager;
         private ITestOutputHelper _output;
         private ISchedulerProvider _schedulerProvider;
         private ISearchService _searchService;
+        private IDataService _dataService;
 
         #endregion Fields
 
         #region Methods
 
+        internal MainViewModelBuilder With(IAppConfigService appConfigService)
+        {
+            _appConfigService = appConfigService;
+            return this;
+        }
+
         public MainViewModel Build()
         {
-            ArgumentNullException.ThrowIfNull(nameof(_output));
+            ArgumentNullException.ThrowIfNull(_output);
+            ArgumentNullException.ThrowIfNull(_schedulerProvider);
 
-            ArgumentNullException.ThrowIfNull(nameof(_schedulerProvider));
+            var appConfigService = Substitute.For<IAppConfigService>();
+            appConfigService.Current.Returns(new AppConfig());
+
+            var dataService = Substitute.For<IDataService>();
 
             return new MainViewModel(
                 schedulerProvider: _schedulerProvider,
@@ -35,8 +49,10 @@ namespace Lanceur.Tests.Utils
                 searchService: _searchService ?? Substitute.For<ISearchService>(),
                 cmdlineService: new CmdlineManager(),
                 executor: _executionManager ?? Substitute.For<IExecutionManager>(),
-                notify: Substitute.For<IUserNotification>()
-            );
+                notify: Substitute.For<IUserNotification>(),
+                appConfigService: _appConfigService ?? appConfigService,
+                dataService: _dataService ?? dataService
+            ) ;
         }
 
         public MainViewModelBuilder With(ITestOutputHelper output)
@@ -60,6 +76,12 @@ namespace Lanceur.Tests.Utils
         public MainViewModelBuilder With(IScheduler scheduler)
         {
             _schedulerProvider = new TestSchedulerProvider(scheduler);
+            return this;
+        }
+
+        public MainViewModelBuilder With(IDataService dataService)
+        {
+            _dataService = dataService;
             return this;
         }
 

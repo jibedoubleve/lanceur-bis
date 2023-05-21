@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services.Config;
+using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite
@@ -47,14 +48,16 @@ namespace Lanceur.Infra.SQLite
         {
             var sql = @"
                 select
-                    s_key   as Key,
                     s_value as Value
                 from settings
                 where s_key = 'json';";
             var s = DB.Connection
-                      .Query<AppConfig>(sql)
+                      .Query<string>(sql)
                       .FirstOrDefault();
-            _current = s ?? new AppConfig();
+
+            _current = s.IsNullOrEmpty() 
+                ? new AppConfig() 
+                : JsonConvert.DeserializeObject<AppConfig>(s);
         }
 
         public void Save()

@@ -1,8 +1,10 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
+using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Macros;
@@ -36,6 +38,49 @@ namespace Lanceur.Tests.ViewModels
         #endregion Constructors
 
         #region Methods
+
+        [Theory]
+        [InlineData(true, 5)]
+        [InlineData(false, 0)]
+        public void ShowResultWhenConfigured(bool showResult, int expectedCount)
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var settings = Substitute.For<IAppConfigService>();
+                settings.Current.Returns(new AppConfig
+                {
+                    Window = new WindowSection()
+                    {
+                        ShowResult = showResult
+                    }
+                });
+
+                var dataService = Substitute.For<IDataService>();
+                dataService.GetAll().Returns(new AliasQueryResult[]
+                {
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult()
+                });
+
+                var vm = new MainViewModelBuilder()
+                            .With(_output)
+                            .With(scheduler)
+                            .With(settings)
+                            .With(dataService)
+                            .Build();
+
+                // ACT
+                vm.Activate.Execute().Subscribe();
+
+                // ASSERT
+                scheduler.Start();
+                vm.Results.Should().HaveCount(expectedCount);
+            });
+        }
 
         [Theory]
         [InlineData("=8*5", "40")]
