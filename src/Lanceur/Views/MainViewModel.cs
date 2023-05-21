@@ -155,17 +155,18 @@ namespace Lanceur.Views
                 .WhenAnyObservable(vm => vm.SearchAlias, vm => vm.ExecuteAlias)
                 .ObserveOn(_schedulers.MainThreadScheduler);
 
-            obs.Select(r => r?.Results?.ElementAt(0))
-                .Log(this, "Command 'ExecuteAlias' or 'SearchAlias' triggered.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
-                .BindTo(this, vm => vm.CurrentAlias);
+            obs.Where(r => (r?.Results?.Count() ?? 0) > 0)
+               .Select(r => r?.Results?.ElementAt(0))
+               .Log(this, "Command 'ExecuteAlias' or 'SearchAlias' triggered.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
+               .BindTo(this, vm => vm.CurrentAlias);
 
             obs.Select(r => r.Results.ToObservableCollection())
-                .Log(this, "New results.", x => $"{x?.Count ?? -1} element(s)")
-                .BindTo(this, vm => vm.Results);
+               .Log(this, "New results.", x => $"{x?.Count ?? -1} element(s)")
+               .BindTo(this, vm => vm.Results);
 
             obs.Select(r => r.KeepAlive)
-                .ObserveOn(_schedulers.MainThreadScheduler)
-                .BindTo(this, vm => vm.KeepAlive);
+               .ObserveOn(_schedulers.MainThreadScheduler)
+               .BindTo(this, vm => vm.KeepAlive);
 
             #endregion on Search & on Execute
 
