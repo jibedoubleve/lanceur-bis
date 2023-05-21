@@ -237,7 +237,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             var sql = @"
                 update alias
                 set
-                    arguments   = @arguments,
+                    arguments   = @parameters,
                     file_name   = @fileName,
                     notes       = @notes,
                     run_as      = @runAs,

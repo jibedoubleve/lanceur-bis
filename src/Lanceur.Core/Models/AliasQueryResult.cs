@@ -70,7 +70,7 @@ namespace Lanceur.Core.Models
         /// Indicates whether the alias should override the RunAs value and execute
         /// in priviledge mode (as admin).
         /// </summary>
-        public bool IsElevated
+        public override bool IsElevated
         {
             get => RunAs.Admin == RunAs;
             set => RunAs = value ? RunAs.Admin : RunAs.CurrentUser;

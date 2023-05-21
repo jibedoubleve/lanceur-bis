@@ -173,7 +173,7 @@
                             <TextBox
                                 x:Name="BoxArguments"
                                 Margin="5"
-                                Text="{Binding ElementName=Aliases, Path=SelectedItem.Arguments, UpdateSourceTrigger=PropertyChanged}" />
+                                Text="{Binding ElementName=Aliases, Path=SelectedItem.Parameters, UpdateSourceTrigger=PropertyChanged}" />
                         </HeaderedContentControl>
                         <HeaderedContentControl Header="RunAs">
                             <ComboBox

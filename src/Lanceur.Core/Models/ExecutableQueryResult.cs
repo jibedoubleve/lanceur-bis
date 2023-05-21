@@ -4,7 +4,7 @@
     {
         #region Properties
 
-        public bool IsElevated { get; set; }
+        public virtual bool IsElevated { get; set; }
 
         public string Parameters { get; set; }
 
