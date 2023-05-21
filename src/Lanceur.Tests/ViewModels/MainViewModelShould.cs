@@ -56,8 +56,8 @@ namespace Lanceur.Tests.ViewModels
                     }
                 });
 
-                var dataService = Substitute.For<IDataService>();
-                dataService.GetAll().Returns(new AliasQueryResult[]
+                var searchService = Substitute.For<ISearchService>();
+                searchService.GetAll().Returns(new AliasQueryResult[]
                 {
                     new AliasQueryResult(),
                     new AliasQueryResult(),
@@ -70,7 +70,7 @@ namespace Lanceur.Tests.ViewModels
                             .With(_output)
                             .With(scheduler)
                             .With(settings)
-                            .With(dataService)
+                            .With(searchService)
                             .Build();
 
                 // ACT

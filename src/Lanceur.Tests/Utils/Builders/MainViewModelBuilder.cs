@@ -21,7 +21,6 @@ namespace Lanceur.Tests.Utils
         private ITestOutputHelper _output;
         private ISchedulerProvider _schedulerProvider;
         private ISearchService _searchService;
-        private IDataService _dataService;
 
         #endregion Fields
 
@@ -41,8 +40,6 @@ namespace Lanceur.Tests.Utils
             var appConfigService = Substitute.For<IAppConfigService>();
             appConfigService.Current.Returns(new AppConfig());
 
-            var dataService = Substitute.For<IDataService>();
-
             return new MainViewModel(
                 schedulerProvider: _schedulerProvider,
                 logFactory: new XUnitLoggerFactory(_output),
@@ -51,8 +48,8 @@ namespace Lanceur.Tests.Utils
                 executor: _executionManager ?? Substitute.For<IExecutionManager>(),
                 notify: Substitute.For<IUserNotification>(),
                 appConfigService: _appConfigService ?? appConfigService,
-                dataService: _dataService ?? dataService
-            ) ;
+                dataService: Substitute.For<IDataService>()
+            );
         }
 
         public MainViewModelBuilder With(ITestOutputHelper output)
@@ -76,12 +73,6 @@ namespace Lanceur.Tests.Utils
         public MainViewModelBuilder With(IScheduler scheduler)
         {
             _schedulerProvider = new TestSchedulerProvider(scheduler);
-            return this;
-        }
-
-        public MainViewModelBuilder With(IDataService dataService)
-        {
-            _dataService = dataService;
             return this;
         }
 
