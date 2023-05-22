@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Lanceur.Core.Models.Settings.AppSettings">
+    <Position X="8.75" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAKAEAAAAAAAAAAAAAAAAgAAAAAAAAAACAAAAgA=</HashCode>
+      <FileName>Models\Settings\AppSettings.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="HotKey" />
+      <Property Name="Repository" />
+      <Property Name="Window" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.HotKeySection">
+    <Position X="11.75" Y="0.75" Width="1.5" />
+    <Members>
+      <Property Name="Empty" Hidden="true" />
+      <Method Name="HotKeySection" Hidden="true" />
+      <Method Name="ToString" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQEAAIAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Settings\HotKeySection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.PositionSection" Collapsed="true">
+    <Position X="6.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Models\Settings\PositionSection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.RepositorySection">
+    <Position X="11.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Models\Settings\RepositorySection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.WindowSection">
+    <Position X="6.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Settings\WindowSection.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Position" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

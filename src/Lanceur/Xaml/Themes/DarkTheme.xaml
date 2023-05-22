@@ -7,7 +7,7 @@
     <SolidColorBrush x:Key="TextColourBrush" Color="#A2A5A5" />
     <!--  Metadata  -->
     <system:String x:Key="Theme.Name">Dark.Accent1</system:String>
-    <system:String x:Key="Theme.Origin">PowerToysRun</system:String>
+    <system:String x:Key="Theme.Origin">Lanceur</system:String>
     <system:String x:Key="Theme.DisplayName">Accent1 (Dark)</system:String>
     <system:String x:Key="Theme.BaseColorScheme">Dark</system:String>
     <system:String x:Key="Theme.ColorScheme">Accent1</system:String>

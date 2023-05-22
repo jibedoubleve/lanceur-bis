@@ -2,6 +2,7 @@
 using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
+using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Managers;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
@@ -33,8 +34,8 @@ namespace Lanceur.Tests.ViewModels
             l.Register(() => Substitute.For<IPackagedAppValidator>());
             l.Register(() => Substitute.For<ICmdlineManager>());
             l.Register(() => Substitute.For<IExecutionManager>());
-            l.Register(() => Substitute.For<IAppSettingsService>());
-            l.Register(() => Substitute.For<ISettingsService>());
+            l.Register(() => Substitute.For<IAppConfigService>());
+            l.Register(() => Substitute.For<IDatabaseConfigService>());
             l.Register(() => Substitute.For<ISearchService>());
         }
 

@@ -38,6 +38,7 @@ namespace Lanceur.Views
                 this.Bind(ViewModel, vm => vm.DbPath, v => v.TbDatabasePath.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.RestartDelay, v => v.SlRestartDelay.Value).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.HotKeySection, v => v.BoxHotKey.HotKey, v => v.ToMahAppHotKey(), vm => vm.ToHotKeySection()).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.ShowResult, v => v.ShowResultToggle.IsOn);
 
                 this.BindCommand(ViewModel, vm => vm.SaveSettings, v => v.BtnSaveSettings);
                 this.BindCommand(ViewModel, vm => vm.SelectDatabase, v => v.BtnSelectDatabase);

@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
+using Lanceur.Core.Services.Config;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
 using Splat;
@@ -18,7 +18,7 @@ namespace Lanceur.ReservedKeywords
 
         private static void Save(Coordinate coordinate)
         {
-            var stg = Locator.Current.GetService<IAppSettingsService>();
+            var stg = Locator.Current.GetService<IAppConfigService>();
             stg.Edit(s =>
             {
                 s.Window.Position.Left = coordinate.X;

@@ -1,5 +1,7 @@
 ﻿using Lanceur.Core.Managers;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
+using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Managers;
 using Lanceur.Schedulers;
 using Lanceur.Tests.Logging;
@@ -14,6 +16,7 @@ namespace Lanceur.Tests.Utils
     {
         #region Fields
 
+        private IAppConfigService _appConfigService;
         private IExecutionManager _executionManager;
         private ITestOutputHelper _output;
         private ISchedulerProvider _schedulerProvider;
@@ -23,11 +26,19 @@ namespace Lanceur.Tests.Utils
 
         #region Methods
 
+        internal MainViewModelBuilder With(IAppConfigService appConfigService)
+        {
+            _appConfigService = appConfigService;
+            return this;
+        }
+
         public MainViewModel Build()
         {
-            ArgumentNullException.ThrowIfNull(nameof(_output));
+            ArgumentNullException.ThrowIfNull(_output);
+            ArgumentNullException.ThrowIfNull(_schedulerProvider);
 
-            ArgumentNullException.ThrowIfNull(nameof(_schedulerProvider));
+            var appConfigService = Substitute.For<IAppConfigService>();
+            appConfigService.Current.Returns(new AppConfig());
 
             return new MainViewModel(
                 schedulerProvider: _schedulerProvider,
@@ -35,7 +46,9 @@ namespace Lanceur.Tests.Utils
                 searchService: _searchService ?? Substitute.For<ISearchService>(),
                 cmdlineService: new CmdlineManager(),
                 executor: _executionManager ?? Substitute.For<IExecutionManager>(),
-                notify: Substitute.For<IUserNotification>()
+                notify: Substitute.For<IUserNotification>(),
+                appConfigService: _appConfigService ?? appConfigService,
+                dataService: Substitute.For<IDataService>()
             );
         }
 

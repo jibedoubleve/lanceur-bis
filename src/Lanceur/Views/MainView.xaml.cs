@@ -2,6 +2,7 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
+using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
@@ -14,7 +15,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -23,7 +23,6 @@ using System.Windows.Media.Animation;
 
 namespace Lanceur.Views
 {
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -31,7 +30,7 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppSettingsService _settings;
+        private readonly IAppConfigService _settings;
         private bool _isStoryBoardsFree = true;
         public readonly IAppLogger _log;
 
@@ -39,16 +38,18 @@ namespace Lanceur.Views
 
         #region Constructors
 
-        public MainView() : this(null, null) { }
+        public MainView() : this(null, null)
+        {
+        }
 
-        public MainView(IAppLoggerFactory factory = null, IAppSettingsService settings = null)
+        public MainView(IAppLoggerFactory factory = null, IAppConfigService settings = null)
         {
             InitializeComponent();
 
             _log = Locator.Current.GetLogger<MainView>(factory);
 
             ViewModel = Locator.Current.GetService<MainViewModel>();
-            _settings = settings ?? Locator.Current.GetService<IAppSettingsService>();
+            _settings = settings ?? Locator.Current.GetService<IAppConfigService>();
             DataContext = ViewModel;
 
             Loaded += OnWindowLoaded;
@@ -85,6 +86,7 @@ namespace Lanceur.Views
                          .DisposeWith(d);
 
                 #region QueryTextBox
+
                 //Don't forget 'using System.Windows.Controls'
                 QueryTextBox
                     .Events().PreviewKeyDown
@@ -111,6 +113,7 @@ namespace Lanceur.Views
                     })
                     .InvokeCommand(ViewModel, vm => vm.AutoComplete)
                     .DisposeWith(d);
+
                 #endregion QueryTextBox
 
                 #region Navigation
@@ -137,14 +140,13 @@ namespace Lanceur.Views
                     .InvokeCommand(ViewModel, vm => vm.SelectPreviousResult)
                     .DisposeWith(d);
 
-                #endregion
+                #endregion Navigation
 
                 QueryResults
                     .Events().PreviewMouseLeftButtonUp
                     .Select(x => x.OriginalSource.GetQueryFromDataContext())
                     .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
                     .DisposeWith(d);
-
             });
         }
 
@@ -216,7 +218,7 @@ namespace Lanceur.Views
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             //TODO value from settings
-            var stg = _settings.Load();
+            var stg = _settings.Current;
             var hk = stg.HotKey;
             SetShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);
 

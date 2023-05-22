@@ -17,7 +17,7 @@
 
         #region Properties
 
-        public static HotKeySection Empty => new();
+        public static HotKeySection Default => new(3, 18);
         public int Key { get; }
         public int ModifierKey { get; }
 

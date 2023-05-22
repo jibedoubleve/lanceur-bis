@@ -1,8 +1,6 @@
-﻿using Lanceur.Core.Services;
+﻿using Lanceur.Core.Services.Config;
 using Lanceur.Core.Utils;
-using Lanceur.Infra.Stores;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.Utils;
 using System;
 using System.IO;
 
@@ -18,9 +16,11 @@ namespace Lanceur.Utils.ConnectionStrings
 
         #region Constructors
 
-        public ConnectionString(ISettingsService stg)
+        // TODO: STG-Provide settings instead of service
+        public ConnectionString(IDatabaseConfigService stg)
         {
-            _dbPath = Environment.ExpandEnvironmentVariables(stg[Setting.DbPath]);
+            var s = stg.Current;
+            _dbPath = Environment.ExpandEnvironmentVariables(s.DbPath);
         }
 
         public ConnectionString(string path = null)
