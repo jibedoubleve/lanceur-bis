@@ -1,4 +1,5 @@
-﻿using Lanceur.Ui;
+﻿using Lanceur.Converters.Reactive;
+using Lanceur.Ui;
 using Lanceur.Utils;
 using ModernWpf.Controls;
 using ReactiveUI;
@@ -37,7 +38,7 @@ namespace Lanceur.Views
                 this.OneWayBind(ViewModel, vm => vm.Aliases, v => v.Aliases.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.BusyMessage, v => v.BusyMessage.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.BusyControl.Visibility).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.AliasList.Visibility, val => val ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.AliasList.Visibility, val => val.ToVisibilityInverted()).DisposeWith(d);
 
                 this.Bind(ViewModel, vm => vm.SearchQuery, v => v.QueryBox.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.SelectedAlias, v => v.Aliases.SelectedItem).DisposeWith(d);

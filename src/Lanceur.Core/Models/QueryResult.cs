@@ -12,7 +12,7 @@ namespace Lanceur.Core.Models
     /// that is designed to react on modifications.
     /// </remarks>
     [DebuggerDisplay("{Name} - Desc: {Description}")]
-    public abstract class QueryResult : ObservableQueryResult
+    public abstract class QueryResult : ObservableModel
     {
         #region Fields
 
@@ -81,6 +81,8 @@ namespace Lanceur.Core.Models
         #endregion Properties
 
         #region Methods
+
+        public override int GetHashCode() => (Count, Description, Icon, Id, IsResult, Name, OldName, Query, Thumbnail).GetHashCode();
 
         public virtual string ToQuery() => $"{Name}";
 

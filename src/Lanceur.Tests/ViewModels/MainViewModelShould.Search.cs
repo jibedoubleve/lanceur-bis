@@ -97,7 +97,7 @@ namespace Lanceur.Tests.ViewModels
                     .Build();
 
                 vm.SetResults(5);
-                vm.Query = "1 un";
+                vm.Query.Value = "1 un";
 
                 _output.Act();
                 vm.AutoComplete.Execute().Subscribe();

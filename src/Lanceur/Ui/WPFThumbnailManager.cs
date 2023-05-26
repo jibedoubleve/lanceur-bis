@@ -43,7 +43,6 @@ namespace Lanceur.Ui
                     if (query is AliasQueryResult alias)
                     {
                         var path = alias.FileName;
-                        AppLogFactory.Get<WPFThumbnailManager>().Trace($"Refresh thumbnail of '{path}'.");
 
                         if (path.IsNullOrEmpty()) { continue; }
                         else if (_cache.IsInCache(path))

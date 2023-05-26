@@ -108,7 +108,7 @@ namespace Lanceur.Tests.ViewModels
                     .With(executor)
                     .Build();
 
-                vm.Query = expression;
+                vm.Query.Value = expression;
 
                 // ACT
                 vm.ExecuteAlias.Execute(expression).Subscribe();
@@ -129,10 +129,10 @@ namespace Lanceur.Tests.ViewModels
                     .With(scheduler)
                     .Build();
 
-                scheduler.Schedule(() => vm.Query = "a");
-                scheduler.Schedule(TimeSpan.FromTicks(200), () => vm.Query += "b");
-                scheduler.Schedule(TimeSpan.FromTicks(300), () => vm.Query += "c");
-                scheduler.Schedule(TimeSpan.FromTicks(400), () => vm.Query += "d");
+                scheduler.Schedule(() => vm.Query.Value = "a");
+                scheduler.Schedule(TimeSpan.FromTicks(200), () => vm.Query.Value += "b");
+                scheduler.Schedule(TimeSpan.FromTicks(300), () => vm.Query.Value += "c");
+                scheduler.Schedule(TimeSpan.FromTicks(400), () => vm.Query.Value += "d");
 
                 var results = scheduler.Start(
                     () => vm.SearchAlias.IsExecuting,
@@ -229,7 +229,7 @@ namespace Lanceur.Tests.ViewModels
                     .Build();
 
                 // ACT
-                vm.Query = "random_query";
+                vm.Query.Value = "random_query";
                 scheduler.Start();
 
                 vm.ExecuteAlias.Execute("random_query").Subscribe(); // Execute first result

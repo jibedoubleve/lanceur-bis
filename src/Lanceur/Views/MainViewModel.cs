@@ -27,11 +27,11 @@ namespace Lanceur.Views
 
         private readonly IAppConfigService _appConfigService;
         private readonly ICmdlineManager _cmdlineManager;
+        private readonly IDataService _dataService;
         private readonly IExecutionManager _executor;
         private readonly IAppLogger _log;
         private readonly ISchedulerProvider _schedulers;
         private readonly ISearchService _searchService;
-        private readonly IDataService _dataService;
 
         #endregion Fields
 
@@ -66,7 +66,8 @@ namespace Lanceur.Views
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SearchAlias = ReactiveCommand.CreateFromTask<string, AliasResponse>(OnSearchAliasAsync, outputScheduler: _schedulers.MainThreadScheduler);
+            var canSearch = Query.WhenAnyValue(x => x.IsActive);
+            SearchAlias = ReactiveCommand.CreateFromTask<string, AliasResponse>(OnSearchAliasAsync, canSearch, outputScheduler: _schedulers.MainThreadScheduler);
             SearchAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             SelectNextResult = ReactiveCommand.Create(OnSelectNextResult, outputScheduler: _schedulers.MainThreadScheduler);
@@ -109,10 +110,19 @@ namespace Lanceur.Views
             var nav = this.WhenAnyObservable(
                 vm => vm.SelectNextResult,
                 vm => vm.SelectPreviousResult
-            ).Log(this, "Navigation occured", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
+            )
              .ObserveOn(_schedulers.MainThreadScheduler)
-             .Select(x => x)
-             .BindTo(this, vm => vm.CurrentAlias);
+             .Where(x => x is not null);
+
+            nav.Select(x => x.Result).BindTo(this, vm => vm.CurrentAlias);
+
+            nav.Where(x => x.Result?.Query?.Name is not null)
+               .Log(this, "Navigation occured", x => $"Current alias: '{(x?.Result?.Name ?? "<NULL>")}' is {(x.IsActive ? "ACTIVE" : "INACTIVE")}")
+               .Subscribe(x =>
+               {
+                   Query.IsActive = x.IsActive;
+                   Query.Value = x.Result.Name;
+               });
 
             #endregion Navigation
 
@@ -124,7 +134,9 @@ namespace Lanceur.Views
                 })
                 .BindTo(this, vm => vm.Query);
 
-            this.WhenAnyValue(vm => vm.Query)
+            #region Query
+
+            this.WhenAnyValue(vm => vm.Query.Value)
                 .Throttle(TimeSpan.FromMilliseconds(100), _schedulers.TaskpoolScheduler)
                 .Select(x => x.Trim())
                 .Where(x => !x.IsNullOrWhiteSpace())
@@ -132,15 +144,18 @@ namespace Lanceur.Views
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .InvokeCommand(this, vm => vm.SearchAlias);
 
-            this.WhenAnyValue(vm => vm.Query)
+            this.WhenAnyValue(vm => vm.Query.Value)
                 .Where(x => string.IsNullOrEmpty(x))
                 .Log(this, "Query is empty, clearing the view.", x => $"'{x}'")
                 .Subscribe(_ =>
                 {
-                    Query = string.Empty;
+                    Query.Value = string.Empty;
+                    Query.IsActive = true;
                     CurrentAlias = null;
                     Results.Clear();
                 });
+
+            #endregion Query
 
             this.WhenAnyValue(vm => vm.Results)
                 .Where(x => x is not null)
@@ -176,12 +191,18 @@ namespace Lanceur.Views
                 .ObserveOn(_schedulers.MainThreadScheduler);
 
             activated.Select(x => x.CurrentSessionName)
-                     .Log(this, "Activated: get current session name", x => $"Session name: '{x}'")
+                     .Log(this, "Activated: get current session name.", x => $"Session name: '{x}'.")
                      .BindTo(this, vm => vm.CurrentSessionName);
 
             activated.Select(x => x.Results.ToObservableCollection())
-                     .Log(this, "Activated: set all results", x => $"Found {x.Count} item(s)")
+                     .Log(this, "Activated: set all results.", x => $"Found {x.Count} item(s).")
                      .BindTo(this, vm => vm.Results);
+
+            activated.Select(x => x.Results)
+                     .Where(x => x.Count() > 0)
+                     .Select(x => x.First())
+                     .Log(this, "Activated: Select current alias.", x => $"Current alias is '{x.Name}'.")
+                     .BindTo(this, vm => vm.CurrentAlias);
         }
 
         #endregion Constructors
@@ -189,34 +210,32 @@ namespace Lanceur.Views
         #region Properties
 
         public ReactiveCommand<Unit, AliasResponse> Activate { get; }
-
         public ReactiveCommand<Unit, string> AutoComplete { get; }
-
         [Reactive] public QueryResult CurrentAlias { get; set; }
-
         [Reactive] public string CurrentSessionName { get; set; }
-
         public ReactiveCommand<AliasExecutionRequest, AliasResponse> ExecuteAlias { get; }
-
         [Reactive] public bool IsBusy { get; set; }
-
         [Reactive] public bool IsOnError { get; set; }
-
         [Reactive] public bool KeepAlive { get; set; }
-
-        [Reactive] public string Query { get; set; } = string.Empty;
-
+        public QueryViewModel Query { get; init; } = QueryViewModel.Empty;
         [Reactive] public ObservableCollection<QueryResult> Results { get; set; } = new();
-
         public ReactiveCommand<string, AliasResponse> SearchAlias { get; }
-
-        public ReactiveCommand<Unit, QueryResult> SelectNextResult { get; }
-
-        public ReactiveCommand<Unit, QueryResult> SelectPreviousResult { get; }
+        public ReactiveCommand<Unit, NavigationResponse> SelectNextResult { get; }
+        public ReactiveCommand<Unit, NavigationResponse> SelectPreviousResult { get; }
+        [Reactive] public string Suggestion { get; set; }
 
         #endregion Properties
 
         #region Methods
+
+        private QueryResult GetCurrentAlias()
+        {
+            var hash = CurrentAlias?.GetHashCode() ?? 0;
+            var currentAlias = (from r in Results
+                                where r.GetHashCode() == hash
+                                select r).SingleOrDefault();
+            return currentAlias;
+        }
 
         private AliasResponse OnActivate()
         {
@@ -241,11 +260,8 @@ namespace Lanceur.Views
         private async Task<AliasResponse> OnExecuteAliasAsync(AliasExecutionRequest request)
         {
             request ??= new AliasExecutionRequest();
-
-            if (request?.Query.IsNullOrEmpty() ?? true) { return new(); }
+            
             if (CurrentAlias is null) { return new(); }
-
-            _log.Debug($"Execute alias '{(request?.Query ?? "<EMPTY>")}'");
 
             var response = await _executor.ExecuteAsync(new ExecutionRequest
             {
@@ -292,28 +308,55 @@ namespace Lanceur.Views
             };
         }
 
-        private QueryResult OnSelectNextResult()
+        private NavigationResponse OnSelectNextResult()
         {
             if (!Results.CanNavigate()) { return null; }
 
-            var currentIndex = Results.IndexOf(CurrentAlias);
+            var currentIndex = Results.IndexOf(GetCurrentAlias());
             var nextAlias = Results.GetNextItem(currentIndex);
             _log.Trace($"Selecting next result. [Index: {nextAlias?.Name}]");
 
-            return nextAlias;
+            return NavigationResponse.InactiveFromResult(nextAlias);
         }
 
-        private QueryResult OnSelectPreviousResult()
+        private NavigationResponse OnSelectPreviousResult()
         {
             if (!Results.CanNavigate()) { return null; }
 
-            var currentIndex = Results.IndexOf(CurrentAlias);
+            var currentIndex = Results.IndexOf(GetCurrentAlias());
             var previousAlias = Results.GetPreviousItem(currentIndex);
             _log.Trace($"Selecting previous result. [Index: {previousAlias?.Name}]");
 
-            return previousAlias;
+            return NavigationResponse.InactiveFromResult(previousAlias);
         }
 
         #endregion Methods
+
+        #region Classes
+
+        public class NavigationResponse
+        {
+            #region Constructors
+
+            private NavigationResponse(QueryResult result, bool isActive) => (Result, IsActive) = (result, isActive);
+
+            #endregion Constructors
+
+            #region Properties
+
+            public bool IsActive { get; init; }
+
+            public QueryResult Result { get; init; }
+
+            #endregion Properties
+
+            #region Methods
+
+            public static NavigationResponse InactiveFromResult(QueryResult result) => new(result, false);
+
+            #endregion Methods
+        }
+
+        #endregion Classes
     }
 }

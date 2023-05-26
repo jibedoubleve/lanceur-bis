@@ -128,8 +128,8 @@ namespace Lanceur.Infra.Managers
             }
             if (request.QueryResult is not IExecutable)
             {
-                _log.Trace($"Alias '{(request?.QueryResult?.Name ?? "<EMPTY>")}', is not executable. Return 'EmptyResult'.");
-                return ExecutionResponse.EmptyResult;
+                _log.Trace($"Alias '{(request?.QueryResult?.Name ?? "<EMPTY>")}', is not executable. Return '{nameof(ExecutionResponse.NoResult)}'.");
+                return ExecutionResponse.NoResult;
             }
 
             _log.Info($"Executing alias '{request.QueryResult.Name}'");

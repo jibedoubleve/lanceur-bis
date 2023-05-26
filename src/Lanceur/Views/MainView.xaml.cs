@@ -42,7 +42,7 @@ namespace Lanceur.Views
         {
         }
 
-        public MainView(IAppLoggerFactory factory = null, IAppConfigService settings = null)
+        public MainView(IAppLoggerFactory factory, IAppConfigService settings)
         {
             InitializeComponent();
 
@@ -60,7 +60,7 @@ namespace Lanceur.Views
 
             this.WhenActivated(d =>
             {
-                this.Bind(ViewModel, vm => vm.Query, v => v.QueryTextBox.Text).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.Query.Value, v => v.QueryTextBox.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
 
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.ProgressBar.Visibility, x => x ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
@@ -72,12 +72,7 @@ namespace Lanceur.Views
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultCounter.Text);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.StatusPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
 
-                this.OneWayBind(ViewModel, vm => vm.CurrentAlias, v => v.AutoCompleteBox.Text, x =>
-                {
-                    return (x is ExecutableQueryResult)
-                        ? x?.Name ?? string.Empty
-                        : string.Empty;
-                }).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Suggestion, v => v.AutoCompleteBox.Text).DisposeWith(d);
 
                 ViewModel.WhenAnyValue(vm => vm.KeepAlive)
                          .Where(v => v == false)

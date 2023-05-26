@@ -98,7 +98,7 @@ namespace Lanceur.Tests.ViewModels
                     .Build();
 
                 // ACT
-                vm.Query = "random_query";
+                vm.Query.Value = "random_query";
                 scheduler.Start();
 
                 vm.SelectNextResult?.Execute().Subscribe();
@@ -140,7 +140,7 @@ namespace Lanceur.Tests.ViewModels
                     .Build();
 
                 // ACT
-                vm.Query = "random_query";
+                vm.Query.Value = "random_query";
                 scheduler.Start();
 
                 vm.SelectPreviousResult?.Execute().Subscribe();
