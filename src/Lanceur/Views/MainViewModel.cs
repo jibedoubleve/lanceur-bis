@@ -260,13 +260,13 @@ namespace Lanceur.Views
         private async Task<AliasResponse> OnExecuteAliasAsync(AliasExecutionRequest request)
         {
             request ??= new AliasExecutionRequest();
-            
-            if (CurrentAlias is null) { return new(); }
+
+            if (CurrentAlias is null && request.AliasToExecute is null) { return new(); }
 
             var response = await _executor.ExecuteAsync(new ExecutionRequest
             {
                 Query = Query,
-                QueryResult = CurrentAlias,
+                QueryResult = request.AliasToExecute,
                 ExecuteWithPrivilege = request.RunAsAdmin,
             });
 

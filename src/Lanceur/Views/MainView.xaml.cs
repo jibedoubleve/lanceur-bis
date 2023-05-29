@@ -11,6 +11,7 @@ using NHotkey.Wpf;
 using ReactiveUI;
 using Splat;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -88,10 +89,13 @@ namespace Lanceur.Views
                     .Where(x => x.Key == Key.Enter)
                     .Select(x =>
                     {
+                        var vm = x.OriginalSource
+                                  .GetParentDataSource<MainViewModel>();
                         x.Handled = true;
                         return new AliasExecutionRequest
                         {
                             Query = x.OriginalSource.GetTextFromTextbox(),
+                            AliasToExecute = vm.CurrentAlias,
                             RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control
                         };
                     })
@@ -139,7 +143,23 @@ namespace Lanceur.Views
 
                 QueryResults
                     .Events().PreviewMouseLeftButtonUp
-                    .Select(x => x.OriginalSource.GetQueryFromDataContext())
+                    .Select(x =>
+                    {
+                        var context = x.OriginalSource as FrameworkElement;
+                        var alias = context?.DataContext as QueryResult;
+                        var source = (x.Source as ListView).ItemsSource as IEnumerable<QueryResult>;
+
+                        var currentAlias = (from s in source
+                                            where s.GetHashCode() == alias.GetHashCode()
+                                            select s).FirstOrDefault();
+
+                        return new AliasExecutionRequest
+                        {
+                            Query = alias?.Name ?? string.Empty,
+                            AliasToExecute = currentAlias,
+                            RunAsAdmin = false,
+                        };
+                    })
                     .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
                     .DisposeWith(d);
             });
