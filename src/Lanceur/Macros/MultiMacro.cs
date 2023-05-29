@@ -3,12 +3,10 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.Utils;
 using Splat;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -73,8 +71,8 @@ namespace Lanceur.Macros
                 if (alias is not null)
                 {
 #pragma warning disable 4014
-                    //Hide warning
-                    await _executionManager.ExecuteAsync(new ExecutionRequest
+                    //https://stackoverflow.com/a/20364016/389529
+                    _executionManager.ExecuteAsync(new ExecutionRequest
                     {
                         QueryResult = alias,
                     }).ConfigureAwait(false);
