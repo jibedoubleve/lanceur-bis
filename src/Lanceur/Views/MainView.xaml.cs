@@ -6,6 +6,7 @@ using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
+using Lanceur.Views.Helpers;
 using NHotkey;
 using NHotkey.Wpf;
 using ReactiveUI;
@@ -92,12 +93,10 @@ namespace Lanceur.Views
                         var vm = x.OriginalSource
                                   .GetParentDataSource<MainViewModel>();
                         x.Handled = true;
-                        return new AliasExecutionRequest
-                        {
-                            Query = x.OriginalSource.GetTextFromTextbox(),
-                            AliasToExecute = vm.CurrentAlias,
-                            RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control
-                        };
+                        return vm.BuildExecutionRequest(
+                            x.OriginalSource.GetTextFromTextbox(),
+                            Keyboard.Modifiers == ModifierKeys.Control
+                        );
                     })
                     .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
                     .DisposeWith(d);

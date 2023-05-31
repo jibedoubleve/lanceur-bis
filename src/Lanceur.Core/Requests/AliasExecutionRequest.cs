@@ -12,10 +12,5 @@ namespace Lanceur.Core.Requests
 
         #endregion Properties
 
-        #region Methods
-
-        public static implicit operator AliasExecutionRequest(string query) => new() { Query = query };
-
-        #endregion Methods
     }
 }

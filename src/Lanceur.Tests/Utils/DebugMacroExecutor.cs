@@ -21,7 +21,7 @@ namespace Lanceur.Tests.Utils
             }
             else
             {
-                Assert.True(false, "Request not containing a 'DebugMAcro'");
+                Assert.True(false, "Request not containing a 'DebugMacro'");
                 return null;
             }
         }

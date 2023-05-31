@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
@@ -10,6 +11,7 @@ using Lanceur.Infra.Services;
 using Lanceur.Macros;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.ReservedAliases;
+using Lanceur.Views.Helpers;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
@@ -111,7 +113,8 @@ namespace Lanceur.Tests.ViewModels
                 vm.Query.Value = expression;
 
                 // ACT
-                vm.ExecuteAlias.Execute(expression).Subscribe();
+                var request = new AliasExecutionRequest { Query = expression };
+                vm.ExecuteAlias.Execute(request).Subscribe();
 
                 scheduler.Start();
                 vm.CurrentAlias?.Name?.Should().Be(result);
@@ -197,7 +200,8 @@ namespace Lanceur.Tests.ViewModels
                 // ACT
                 vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName("some random name");
 
-                vm.ExecuteAlias.Execute(aliasName).Subscribe();
+                var request = vm.BuildExecutionRequest(aliasName);
+                vm.ExecuteAlias.Execute(request).Subscribe();
                 scheduler.Start();
 
                 vm.CurrentAlias.Should().NotBeNull();
@@ -232,12 +236,16 @@ namespace Lanceur.Tests.ViewModels
                 vm.Query.Value = "random_query";
                 scheduler.Start();
 
-                vm.ExecuteAlias.Execute("random_query").Subscribe(); // Execute first result
+                var request = vm.BuildExecutionRequest("random_query");
+                vm.ExecuteAlias.Execute(request).Subscribe(); // Execute first result
                 scheduler.Start();
 
                 // ASSERT
-                vm.CurrentAlias.Should().NotBeNull();
-                vm.CurrentAlias?.Name.Should().Be("debug all"); // I know the first result in debug is 'debug all'
+                using (new AssertionScope())
+                {
+                    vm.CurrentAlias.Should().NotBeNull();
+                    vm.CurrentAlias?.Name.Should().Be("debug all"); // I know the first result in debug is 'debug all'
+                }
             });
         }
 

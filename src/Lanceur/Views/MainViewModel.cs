@@ -132,7 +132,7 @@ namespace Lanceur.Views
                     var param = _cmdlineManager.BuildFromText(Query);
                     return new Cmdline(x, param.Parameters).ToString();
                 })
-                .BindTo(this, vm => vm.Query);
+                .BindTo(Query, query => query.Value);
 
             #region Query
 
@@ -261,7 +261,7 @@ namespace Lanceur.Views
         {
             request ??= new AliasExecutionRequest();
 
-            if (CurrentAlias is null && request.AliasToExecute is null) { return new(); }
+            if (request.AliasToExecute is null) { return new(); }
 
             var response = await _executor.ExecuteAsync(new ExecutionRequest
             {
@@ -273,8 +273,8 @@ namespace Lanceur.Views
             _log.Trace($"Execution of '{request.Query}' returned {(response?.Results?.Count() ?? 0)} result(s).");
             return new()
             {
-                Results = response.Results,
-                KeepAlive = response.HasResult
+                Results = response?.Results ?? Array.Empty<QueryResult>(),
+                KeepAlive = response?.HasResult ?? false
             };
         }
 
