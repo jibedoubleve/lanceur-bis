@@ -1,12 +1,13 @@
 ﻿using Dapper;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.SQLite
 {
-    public partial class SQLiteDataService : SQLiteServiceBase, IDataService
+    public partial class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     {
         #region Fields
 
@@ -19,12 +20,12 @@ namespace Lanceur.Infra.SQLite
 
         #region Constructors
 
-        public SQLiteDataService(
+        public SQLiteRepository(
             SQLiteConnectionScope scope,
             IAppLoggerFactory logFactory,
             IConvertionService converter) : base(scope)
         {
-            _log = logFactory.GetLogger<SQLiteDataService>();
+            _log = logFactory.GetLogger<SQLiteRepository>();
             _converter = converter;
             _aliasDbAction = new AliasDbAction(scope, logFactory);
             _macroManager = new MacroDbAction(DB, logFactory, converter);
@@ -219,7 +220,7 @@ namespace Lanceur.Infra.SQLite
             if (alias == null) { throw new ArgumentNullException(nameof(alias), $"Cannot save NULL alias."); }
             if (alias.Name == null) { throw new ArgumentNullException(nameof(alias.Name), "Cannot create or update alias with no name."); }
             if (alias.Id < 0) { throw new NotSupportedException($"The alias has an unexpected id. (Name: {alias.Name})"); }
-            
+
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
             if (alias.DuplicateOf.HasValue)

@@ -1,7 +1,8 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Managers;
 using Lanceur.Schedulers;
 using Lanceur.Tests.Logging;
@@ -16,7 +17,7 @@ namespace Lanceur.Tests.Utils
     {
         #region Fields
 
-        private IAppConfigService _appConfigService;
+        private IAppConfigRepository _appConfigService;
         private IExecutionManager _executionManager;
         private ITestOutputHelper _output;
         private ISchedulerProvider _schedulerProvider;
@@ -26,7 +27,7 @@ namespace Lanceur.Tests.Utils
 
         #region Methods
 
-        internal MainViewModelBuilder With(IAppConfigService appConfigService)
+        internal MainViewModelBuilder With(IAppConfigRepository appConfigService)
         {
             _appConfigService = appConfigService;
             return this;
@@ -37,7 +38,7 @@ namespace Lanceur.Tests.Utils
             ArgumentNullException.ThrowIfNull(_output);
             ArgumentNullException.ThrowIfNull(_schedulerProvider);
 
-            var appConfigService = Substitute.For<IAppConfigService>();
+            var appConfigService = Substitute.For<IAppConfigRepository>();
             appConfigService.Current.Returns(new AppConfig());
 
             return new MainViewModel(
@@ -48,7 +49,7 @@ namespace Lanceur.Tests.Utils
                 executor: _executionManager ?? Substitute.For<IExecutionManager>(),
                 notify: Substitute.For<IUserNotification>(),
                 appConfigService: _appConfigService ?? appConfigService,
-                dataService: Substitute.For<IDataService>()
+                dataService: Substitute.For<IDbRepository>()
             );
         }
 

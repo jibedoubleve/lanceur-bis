@@ -1,10 +1,10 @@
 ﻿namespace Lanceur.Infra.SQLite
 {
-    public abstract class SQLiteServiceBase : IDisposable
+    public abstract class SQLiteRepositoryBase : IDisposable
     {
         #region Constructors
 
-        protected SQLiteServiceBase(SQLiteConnectionScope scope)
+        protected SQLiteRepositoryBase(SQLiteConnectionScope scope)
         {
             DB = scope;
         }

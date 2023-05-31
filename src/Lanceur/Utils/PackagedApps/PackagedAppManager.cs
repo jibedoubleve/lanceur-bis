@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Managers;
+using Lanceur.Core.Responses;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

@@ -1,4 +1,4 @@
-﻿namespace Lanceur.Core.Managers
+﻿namespace Lanceur.Core.Responses
 {
     public class PackageResponse
     {

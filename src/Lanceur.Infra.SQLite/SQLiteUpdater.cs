@@ -4,7 +4,7 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite
 {
-    public class SQLiteDatabase
+    public class SQLiteUpdater
     {
         #region Fields
 
@@ -16,14 +16,14 @@ namespace Lanceur.Infra.SQLite
 
         #region Constructors
 
-        public SQLiteDatabase(
+        public SQLiteUpdater(
             IDataStoreVersionManager versionManager,
             IAppLoggerFactory logService,
             IDataStoreUpdateManager updater
             )
         {
             _versionManager = versionManager;
-            _log = logService.GetLogger<SQLiteDatabase>();
+            _log = logService.GetLogger<SQLiteUpdater>();
             _updater = updater;
         }
 

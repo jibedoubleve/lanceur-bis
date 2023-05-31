@@ -3,6 +3,7 @@ using DynamicData;
 using DynamicData.Binding;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Utils;
@@ -33,7 +34,7 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly SourceList<QueryResult> _aliases = new();
-        private readonly IDataService _aliasService;
+        private readonly IDbRepository _aliasService;
         private readonly Scope<bool> _busyScope;
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
@@ -48,7 +49,7 @@ namespace Lanceur.Views
 
         public KeywordsViewModel(
             IAppLoggerFactory logFactory = null,
-            IDataService searchService = null,
+            IDbRepository searchService = null,
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
@@ -64,7 +65,7 @@ namespace Lanceur.Views
             _notification = notification ?? l.GetService<INotification>(); ;
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
-            _aliasService = searchService ?? l.GetService<IDataService>();
+            _aliasService = searchService ?? l.GetService<IDbRepository>();
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 

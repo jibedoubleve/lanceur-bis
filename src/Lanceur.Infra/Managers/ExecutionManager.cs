@@ -1,12 +1,12 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
-using System;
 using System.Diagnostics;
 
 namespace Lanceur.Infra.Managers
@@ -15,8 +15,8 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private readonly IDataService _dataService;
         private readonly ICmdlineManager _cmdlineManager;
+        private readonly IDbRepository _dataService;
         private readonly IAppLogger _log;
         private readonly IWildcardManager _wildcardManager;
 
@@ -27,7 +27,7 @@ namespace Lanceur.Infra.Managers
         public ExecutionManager(
             IAppLoggerFactory logFactory,
             IWildcardManager wildcardManager,
-            IDataService dataService,
+            IDbRepository dataService,
             ICmdlineManager cmdlineManager
         )
         {
@@ -141,11 +141,13 @@ namespace Lanceur.Infra.Managers
                     return ExecutionResponse.FromResults(
                           await ExecuteAliasAsync(alias)
                     );
+
                 case ISelfExecutable exec:
                     exec.IsElevated = request.ExecuteWithPrivilege;
                     return ExecutionResponse.FromResults(
                         await exec.ExecuteAsync(_cmdlineManager.BuildFromText(request.Query))
                     );
+
                 default: throw new NotSupportedException($"Cannot execute query result '{(request.QueryResult?.Name ?? "<EMPTY>")}'");
             }
         }

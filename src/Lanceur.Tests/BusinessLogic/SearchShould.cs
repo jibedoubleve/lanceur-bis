@@ -60,7 +60,7 @@ namespace Lanceur.Tests.BusinessLogic
             using var db = BuildFreshDB(sql);
             using var scope = new SQLiteConnectionScope(db);
 
-            var action = new SQLiteDataService(scope, _testLoggerFactory, converter);
+            var action = new SQLiteRepository(scope, _testLoggerFactory, converter);
 
             // act
             var results = action.GetAll();

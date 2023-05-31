@@ -1,6 +1,6 @@
-﻿namespace Lanceur.Core.Services.Config
+﻿namespace Lanceur.Core.Repositories.Config
 {
-    public interface IConfigService<TConfig>
+    public interface IConfigRepository<TConfig>
     {
         #region Properties
 

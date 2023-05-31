@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.Models;
@@ -22,7 +23,7 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IDataService _aliasService;
+        private readonly IDbRepository _aliasService;
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
         private readonly INotification _notification;
@@ -36,7 +37,7 @@ namespace Lanceur.Views
         public SessionsViewModel(
             ISchedulerProvider schedulers = null,
             IAppLoggerFactory logFactory = null,
-            IDataService aliasService = null,
+            IDbRepository aliasService = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
             INotification notification = null)
@@ -45,7 +46,7 @@ namespace Lanceur.Views
             notify ??= l.GetService<IUserNotification>();
             _log = l.GetLogger<SessionsViewModel>(logFactory);
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _aliasService = aliasService ?? l.GetService<IDataService>();
+            _aliasService = aliasService ?? l.GetService<IDbRepository>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _notification = notification ?? l.GetService<INotification>();
 

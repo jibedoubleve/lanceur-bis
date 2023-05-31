@@ -40,12 +40,12 @@ namespace Lanceur.Tests.BusinessLogic
             return action;
         }
 
-        private static SQLiteDataService BuildDataService(SQLiteConnection connection)
+        private static SQLiteRepository BuildDataService(SQLiteConnection connection)
         {
             var scope = new SQLiteConnectionScope(connection);
             var log = Substitute.For<IAppLoggerFactory>();
             var conv = Substitute.For<IConvertionService>();
-            var service = new SQLiteDataService(scope, log, conv);
+            var service = new SQLiteRepository(scope, log, conv);
             return service;
         }
 

@@ -1,11 +1,12 @@
 ﻿using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Config;
+using Lanceur.Infra.Services;
 using Newtonsoft.Json;
 
-namespace Lanceur.Infra.Services
+namespace Lanceur.Infra.Repositories
 {
-    public class JsonDatabaseConfigService : IDatabaseConfigService
+    public class JsonDatabaseConfigRepository : IDatabaseConfigRepository
     {
         #region Fields
 
@@ -17,7 +18,7 @@ namespace Lanceur.Infra.Services
 
         #region Constructors
 
-        public JsonDatabaseConfigService(string path = null)
+        public JsonDatabaseConfigRepository(string path = null)
         {
             path ??= @"%appdata%\probel\lanceur2\settings.json";
             _filePath = Environment.ExpandEnvironmentVariables(path);

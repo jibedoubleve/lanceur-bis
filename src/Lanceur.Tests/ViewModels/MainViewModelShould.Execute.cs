@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
@@ -91,7 +92,7 @@ namespace Lanceur.Tests.ViewModels
                             }
                         );
 
-                var vm = new MainViewModelBuilder()                    
+                var vm = new MainViewModelBuilder()
                     .With(_output)
                     .With(scheduler)
                     .With(searchService)
@@ -133,7 +134,7 @@ namespace Lanceur.Tests.ViewModels
                             }
                         );
 
-                var vm = new MainViewModelBuilder()                    
+                var vm = new MainViewModelBuilder()
                     .With(_output)
                     .With(scheduler)
                     .With(searchService)
@@ -153,44 +154,6 @@ namespace Lanceur.Tests.ViewModels
         }
 
         [Fact]
-        public void NotExecuteWhenNoResult()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                // ARRANGE
-                var logFactory = Substitute.For<IAppLoggerFactory>();
-                var wildcardManager = Substitute.For<IWildcardManager>();
-                var dataService = Substitute.For<IDataService>();
-                var cmdlineManager = Substitute.For<ICmdlineManager>();
-
-                var executionManager = new ExecutionManager(
-                    logFactory,
-                    wildcardManager,
-                    dataService,
-                    cmdlineManager
-                );
-
-                var vm = new MainViewModelBuilder()                    
-                    .With(_output)
-                    .With(scheduler)
-                    .With(executionManager)
-                    .Build();
-
-                // ACT
-
-                var request = new AliasExecutionRequest
-                {
-                    Query = "dummy query"
-                };
-                var act = () => vm.ExecuteAlias.Execute(request).Subscribe();
-
-                scheduler.Start();
-
-                // ASSERT
-                act.Should().NotThrow();
-            });
-        }
-        [Fact]
         public void NotCallExecutionManagerWhenNoResult()
         {
             new TestScheduler().With(scheduler =>
@@ -198,7 +161,7 @@ namespace Lanceur.Tests.ViewModels
                 // ARRANGE
                 var logFactory = Substitute.For<IAppLoggerFactory>();
                 var wildcardManager = Substitute.For<IWildcardManager>();
-                var dataService = Substitute.For<IDataService>();
+                var dataService = Substitute.For<IDbRepository>();
                 var cmdlineManager = Substitute.For<ICmdlineManager>();
                 var executionManager = Substitute.For<IExecutionManager>();
 
@@ -220,6 +183,45 @@ namespace Lanceur.Tests.ViewModels
 
                 // ASSERT
                 executionManager.DidNotReceive().ExecuteAsync(Arg.Any<ExecutionRequest>());
+            });
+        }
+
+        [Fact]
+        public void NotExecuteWhenNoResult()
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var logFactory = Substitute.For<IAppLoggerFactory>();
+                var wildcardManager = Substitute.For<IWildcardManager>();
+                var dataService = Substitute.For<IDbRepository>();
+                var cmdlineManager = Substitute.For<ICmdlineManager>();
+
+                var executionManager = new ExecutionManager(
+                    logFactory,
+                    wildcardManager,
+                    dataService,
+                    cmdlineManager
+                );
+
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
+                    .With(scheduler)
+                    .With(executionManager)
+                    .Build();
+
+                // ACT
+
+                var request = new AliasExecutionRequest
+                {
+                    Query = "dummy query"
+                };
+                var act = () => vm.ExecuteAlias.Execute(request).Subscribe();
+
+                scheduler.Start();
+
+                // ASSERT
+                act.Should().NotThrow();
             });
         }
 

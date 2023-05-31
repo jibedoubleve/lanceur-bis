@@ -1,9 +1,10 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Utils;
 using Lanceur.Models;
 using Lanceur.Schedulers;
@@ -25,9 +26,9 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppConfigService _appConfigService;
+        private readonly IAppConfigRepository _appConfigService;
         private readonly ICmdlineManager _cmdlineManager;
-        private readonly IDataService _dataService;
+        private readonly IDbRepository _dbRepository;
         private readonly IExecutionManager _executor;
         private readonly IAppLogger _log;
         private readonly ISchedulerProvider _schedulers;
@@ -43,9 +44,9 @@ namespace Lanceur.Views
             ISearchService searchService = null,
             ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
-            IDataService dataService = null,
+            IDbRepository dataService = null,
             IExecutionManager executor = null,
-            IAppConfigService appConfigService = null)
+            IAppConfigRepository appConfigService = null)
         {
             _schedulers = schedulerProvider ?? new RxAppSchedulerProvider();
 
@@ -54,9 +55,9 @@ namespace Lanceur.Views
             _log = Locator.Current.GetLogger<MainViewModel>(logFactory);
             _searchService = searchService ?? l.GetService<ISearchService>();
             _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
-            _dataService = dataService ?? l.GetService<IDataService>();
+            _dbRepository = dataService ?? l.GetService<IDbRepository>();
             _executor = executor ?? l.GetService<IExecutionManager>();
-            _appConfigService = appConfigService ?? l.GetService<IAppConfigService>();
+            _appConfigService = appConfigService ?? l.GetService<IAppConfigRepository>();
 
             #region Commands
 
@@ -239,7 +240,7 @@ namespace Lanceur.Views
 
         private AliasResponse OnActivate()
         {
-            var sessionName = _dataService.GetDefaultSession()?.Name ?? "N.A.";
+            var sessionName = _dbRepository.GetDefaultSession()?.Name ?? "N.A.";
 
             var aliases = _appConfigService.Current.Window.ShowResult
                 ? _searchService.GetAll()

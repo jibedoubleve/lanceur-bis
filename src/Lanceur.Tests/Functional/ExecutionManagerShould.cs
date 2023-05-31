@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
@@ -27,7 +28,7 @@ namespace Lanceur.Tests.Functional
             var mgr = new ExecutionManager(
                 Substitute.For<IAppLoggerFactory>(),
                 Substitute.For<IWildcardManager>(),
-                Substitute.For<IDataService>(),
+                Substitute.For<IDbRepository>(),
                 cmdlineManager
             );
 

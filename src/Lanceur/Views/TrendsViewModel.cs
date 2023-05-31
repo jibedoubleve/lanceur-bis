@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
@@ -17,7 +18,7 @@ namespace Lanceur.Views
 
         private readonly ISchedulerProvider _schedulers;
 
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
@@ -25,12 +26,12 @@ namespace Lanceur.Views
 
         public TrendsViewModel(
             ISchedulerProvider schedulers = null,
-            IDataService service = null,
+            IDbRepository service = null,
             IUserNotification notify = null)
         {
             var l = Locator.Current;
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _service = service ?? l.GetService<IDataService>();
+            _service = service ?? l.GetService<IDbRepository>();
             notify ??= l.GetService<IUserNotification>();
 
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);

@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Services
+namespace Lanceur.Core.Repositories
 {
     public enum Per
     {
@@ -10,7 +10,7 @@ namespace Lanceur.Core.Services
         Month,
     }
 
-    public interface IDataService
+    public interface IDbRepository
     {
         #region Methods
 

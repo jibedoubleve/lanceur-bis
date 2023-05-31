@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Services;
+﻿using Lanceur.Core.Repositories;
+using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Stores;
 using NSubstitute;
@@ -14,7 +15,7 @@ namespace Lanceur.Tests.Utils
         {
             var results = new List<ISearchService>
             {
-                new ReservedAliasStore(Assembly.GetExecutingAssembly(), Substitute.For<IDataService>())
+                new ReservedAliasStore(Assembly.GetExecutingAssembly(), Substitute.For<IDbRepository>())
             };
             return results;
         }
