@@ -1,9 +1,10 @@
 ﻿using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Infra.Services;
 
-namespace Lanceur.Infra.Services
+namespace Lanceur.Infra.Repositories
 {
-    public class MemoryDatabaseConfigService : IDatabaseConfigRepository
+    public class MemoryDatabaseConfigRepository : IDatabaseConfigRepository
     {
         #region Fields
 
@@ -13,7 +14,7 @@ namespace Lanceur.Infra.Services
 
         #region Constructors
 
-        static MemoryDatabaseConfigService()
+        static MemoryDatabaseConfigRepository()
         {
             var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             var path = Path.Combine(desktop, "debug.sqlite");

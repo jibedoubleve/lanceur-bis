@@ -1,12 +1,9 @@
 ﻿using FluentAssertions;
-using FluentAssertions.Numeric;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
+using Lanceur.Core.Repositories;
 using Lanceur.Infra.Stores;
-using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.ReservedAliases;
 using Lanceur.Views;
-using NLog.LayoutRenderers;
 using NSubstitute;
 using System.Reflection;
 using Xunit;

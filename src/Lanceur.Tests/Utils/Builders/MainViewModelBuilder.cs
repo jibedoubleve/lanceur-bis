@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;

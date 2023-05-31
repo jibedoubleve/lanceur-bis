@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Services;
+﻿using Lanceur.Core.Repositories;
+using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Stores;
 using NSubstitute;

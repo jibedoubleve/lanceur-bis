@@ -2,6 +2,7 @@
 using Lanceur.Core.Formatters;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
@@ -9,6 +10,7 @@ using Lanceur.Core.Utils;
 using Lanceur.Infra.Formatters;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Plugins;
+using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Stores;
@@ -72,9 +74,9 @@ namespace Lanceur
             l.RegisterLazySingleton<IAppRestart>(() => new AppRestart());
 
 #if DEBUG
-            l.Register<IDatabaseConfigRepository>(() => new MemoryDatabaseConfigService());
+            l.Register<IDatabaseConfigRepository>(() => new MemoryDatabaseConfigRepository());
 #else
-            l.Register<IDatabaseConfigService>(() => new JsonDatabaseConfigService());
+            l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
 #endif
 
             l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());

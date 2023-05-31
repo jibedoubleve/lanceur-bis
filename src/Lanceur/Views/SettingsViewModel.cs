@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using ReactiveUI;

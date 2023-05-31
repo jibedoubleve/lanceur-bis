@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Tests.SQLite;
@@ -25,7 +26,7 @@ namespace Lanceur.Tests.Functional
         public void CreateFileWhenNotExists()
         {
             var file = Path.GetTempFileName();
-            var stg = new JsonDatabaseConfigService(file);
+            var stg = new JsonDatabaseConfigRepository(file);
             File.Delete(file);
 
             var value = stg.Current.DbPath;
@@ -37,7 +38,7 @@ namespace Lanceur.Tests.Functional
         public void GetAndSetData()
         {
             var file = Path.GetTempFileName();
-            var stg = new JsonDatabaseConfigService(file);
+            var stg = new JsonDatabaseConfigRepository(file);
             var expected = "undeuxtrois";
 
             stg.Current.DbPath = expected;
@@ -110,7 +111,7 @@ namespace Lanceur.Tests.Functional
         public void SaveJsonData()
         {
             var file = Path.GetTempFileName();
-            var stg = new JsonDatabaseConfigService(file);
+            var stg = new JsonDatabaseConfigRepository(file);
 
             stg.Current.DbPath = "undeuxtrois";
             stg.Save();
