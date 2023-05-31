@@ -1,12 +1,12 @@
 ﻿using Dapper;
 using Lanceur.Core.Models.Settings;
-using Lanceur.Core.Services.Config;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite
 {
-    public class SQLiteAppConfigService : SQLiteServiceBase, IAppConfigService
+    public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigRepository
     {
         #region Fields
 
@@ -16,7 +16,7 @@ namespace Lanceur.Infra.SQLite
 
         #region Constructors
 
-        public SQLiteAppConfigService(SQLiteConnectionScope scope) : base(scope)
+        public SQLiteAppConfigRepository(SQLiteConnectionScope scope) : base(scope)
         {
         }
 

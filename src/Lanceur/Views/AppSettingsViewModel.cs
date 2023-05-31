@@ -1,7 +1,8 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Config;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
 using Lanceur.Utils;
@@ -21,14 +22,14 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppConfigService _appConfigService;
+        private readonly IAppConfigRepository _appConfigService;
         private readonly Interaction<Unit, string> _askFile;
-        private readonly IDatabaseConfigService _databaseConfigService;
+        private readonly IDatabaseConfigRepository _databaseConfigService;
         private readonly IDelay _delay;
         private readonly INotification _nofification;
         private readonly IAppRestart _restart;
         private readonly ISchedulerProvider _schedulers;
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
@@ -36,10 +37,10 @@ namespace Lanceur.Views
 
         public AppSettingsViewModel(
             ISchedulerProvider schedulers = null,
-            IAppConfigService appConfigService = null,
+            IAppConfigRepository appConfigService = null,
             IUserNotification notify = null,
-            IDatabaseConfigService databaseConfigService = null,
-            IDataService dataService = null,
+            IDatabaseConfigRepository databaseConfigService = null,
+            IDbRepository dataService = null,
             IDelay delay = null,
             IAppRestart restart = null,
             INotification nofification = null
@@ -47,11 +48,11 @@ namespace Lanceur.Views
         {
             var l = Locator.Current;
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _appConfigService = appConfigService ?? l.GetService<IAppConfigService>();
+            _appConfigService = appConfigService ?? l.GetService<IAppConfigRepository>();
 
             _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
-            _databaseConfigService = databaseConfigService ?? l.GetService<IDatabaseConfigService>();
-            _service = dataService ?? l.GetService<IDataService>();
+            _databaseConfigService = databaseConfigService ?? l.GetService<IDatabaseConfigRepository>();
+            _service = dataService ?? l.GetService<IDbRepository>();
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();

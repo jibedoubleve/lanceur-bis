@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Models.Settings;
-using Lanceur.Core.Services.Config;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Tests.SQLite;
@@ -12,11 +12,11 @@ namespace Lanceur.Tests.Functional
     {
         #region Methods
 
-        private static void WithConfiguration(Action<IAppConfigService> assert)
+        private static void WithConfiguration(Action<IAppConfigRepository> assert)
         {
             using var connection = BuildFreshDB();
             using var scope = new SQLiteConnectionScope(connection);
-            var settingRepository = new SQLiteAppConfigService(scope);
+            var settingRepository = new SQLiteAppConfigRepository(scope);
 
             assert(settingRepository);
         }
@@ -75,7 +75,7 @@ namespace Lanceur.Tests.Functional
         {
             var conn = BuildFreshDB();
             var scope = new SQLiteConnectionScope(conn);
-            var settings = new SQLiteAppConfigService(scope);
+            var settings = new SQLiteAppConfigRepository(scope);
 
             settings.Current.Window.ShowAtStartup.Should().BeTrue();
         }
@@ -85,7 +85,7 @@ namespace Lanceur.Tests.Functional
         {
             var conn = BuildFreshDB();
             var scope = new SQLiteConnectionScope(conn);
-            var settings = new SQLiteAppConfigService(scope);
+            var settings = new SQLiteAppConfigRepository(scope);
 
             settings.Current.Window.ShowResult.Should().BeFalse();
         }

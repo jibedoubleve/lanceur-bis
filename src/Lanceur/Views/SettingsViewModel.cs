@@ -19,7 +19,7 @@ namespace Lanceur.Views
         private readonly IAppLogger _log;
         private readonly MostUsedViewModel _mostUsedVm;
         private readonly PluginsViewModel _pluginsViewModel;
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
         private readonly SessionsViewModel _sessionsVm;
         private readonly TrendsViewModel _trendsVm;
         public readonly AppSettingsViewModel _settingsVm;
@@ -40,7 +40,7 @@ namespace Lanceur.Views
             HistoryViewModel historyViewModel = null,
             PluginsViewModel pluginsViewModel = null,
             IUserNotification notify = null,
-            IDataService service = null)
+            IDbRepository service = null)
         {
             var l = Locator.Current;
             Router = l.GetService<RoutingState>();
@@ -56,7 +56,7 @@ namespace Lanceur.Views
             _mostUsedVm = mostUsedViewModel ?? l.GetService<MostUsedViewModel>();
             _historyVm = historyViewModel ?? l.GetService<HistoryViewModel>();
             _pluginsViewModel = pluginsViewModel ?? l.GetService<PluginsViewModel>();
-            _service = service ?? l.GetService<IDataService>();
+            _service = service ?? l.GetService<IDbRepository>();
 
             PushNavigation = ReactiveCommand.CreateFromObservable<string, IRoutableViewModel>(OnPushNavigation);
             PushNavigation.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));

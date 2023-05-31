@@ -3,9 +3,9 @@ using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Macros;
@@ -49,7 +49,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var settings = Substitute.For<IAppConfigService>();
+                var settings = Substitute.For<IAppConfigRepository>();
                 settings.Current.Returns(new AppConfig
                 {
                     Window = new WindowSection()

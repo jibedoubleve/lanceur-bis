@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
@@ -22,7 +23,7 @@ namespace Lanceur.Views
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly INotification _notificataion;
         private readonly ISchedulerProvider _schedulers;
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
@@ -32,13 +33,13 @@ namespace Lanceur.Views
             ISchedulerProvider schedulers = null,
             IScheduler poolThread = null,
             IUserNotification notify = null,
-            IDataService service = null,
+            IDbRepository service = null,
             INotification notificataion = null)
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _service = service ?? l.GetService<IDataService>();
+            _service = service ?? l.GetService<IDbRepository>();
             _notificataion = notificataion ?? l.GetService<INotification>();
             _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 

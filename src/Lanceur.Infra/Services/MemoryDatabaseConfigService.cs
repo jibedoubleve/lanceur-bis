@@ -1,9 +1,9 @@
 ﻿using Lanceur.Core.Models.Settings;
-using Lanceur.Core.Services.Config;
+using Lanceur.Core.Repositories.Config;
 
 namespace Lanceur.Infra.Services
 {
-    public class MemoryDatabaseConfigService : IDatabaseConfigService
+    public class MemoryDatabaseConfigService : IDatabaseConfigRepository
     {
         #region Fields
 

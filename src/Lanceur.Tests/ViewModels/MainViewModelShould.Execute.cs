@@ -160,7 +160,7 @@ namespace Lanceur.Tests.ViewModels
                 // ARRANGE
                 var logFactory = Substitute.For<IAppLoggerFactory>();
                 var wildcardManager = Substitute.For<IWildcardManager>();
-                var dataService = Substitute.For<IDataService>();
+                var dataService = Substitute.For<IDbRepository>();
                 var cmdlineManager = Substitute.For<ICmdlineManager>();
 
                 var executionManager = new ExecutionManager(
@@ -198,7 +198,7 @@ namespace Lanceur.Tests.ViewModels
                 // ARRANGE
                 var logFactory = Substitute.For<IAppLoggerFactory>();
                 var wildcardManager = Substitute.For<IWildcardManager>();
-                var dataService = Substitute.For<IDataService>();
+                var dataService = Substitute.For<IDbRepository>();
                 var cmdlineManager = Substitute.For<ICmdlineManager>();
                 var executionManager = Substitute.For<IExecutionManager>();
 

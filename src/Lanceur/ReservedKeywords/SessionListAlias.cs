@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Splat;
 using System.Collections.Generic;
@@ -8,14 +9,13 @@ using System.Threading.Tasks;
 
 namespace Lanceur.ReservedKeywords
 {
-
     [ReservedAlias("sessions"), Description("list sessions")]
     public class SessionListAlias : SelfExecutableQueryResult
     {
         #region Fields
 
         private readonly IConvertionService _converter;
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
@@ -25,10 +25,10 @@ namespace Lanceur.ReservedKeywords
         {
         }
 
-        public SessionListAlias(IDataService service = null, IConvertionService converter = null)
+        public SessionListAlias(IDbRepository service = null, IConvertionService converter = null)
         {
             var l = Locator.Current;
-            _service = service ?? l.GetService<IDataService>();
+            _service = service ?? l.GetService<IDbRepository>();
             _converter = converter ?? l.GetService<IConvertionService>();
         }
 

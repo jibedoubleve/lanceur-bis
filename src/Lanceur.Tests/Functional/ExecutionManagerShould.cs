@@ -27,7 +27,7 @@ namespace Lanceur.Tests.Functional
             var mgr = new ExecutionManager(
                 Substitute.For<IAppLoggerFactory>(),
                 Substitute.For<IWildcardManager>(),
-                Substitute.For<IDataService>(),
+                Substitute.For<IDbRepository>(),
                 cmdlineManager
             );
 

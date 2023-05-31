@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Services;
+﻿using Lanceur.Core.Repositories;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
@@ -17,7 +18,7 @@ namespace Lanceur.Views
 
         private readonly IAppLogger _log;
         private readonly ISchedulerProvider _schedulers;
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
@@ -25,13 +26,13 @@ namespace Lanceur.Views
 
         public HistoryViewModel(
             ISchedulerProvider schedulers = null,
-            IDataService service = null,
+            IDbRepository service = null,
             IAppLoggerFactory logFactory = null,
             IUserNotification notify = null)
         {
             var l = Locator.Current;
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _service = service ?? l.GetService<IDataService>();
+            _service = service ?? l.GetService<IDbRepository>();
             _log = l.GetLogger<HistoryViewModel>(logFactory);
             notify ??= l.GetService<IUserNotification>();
 

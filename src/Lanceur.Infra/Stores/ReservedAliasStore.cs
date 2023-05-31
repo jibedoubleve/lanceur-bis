@@ -1,10 +1,10 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Splat;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace Lanceur.Infra.Stores
@@ -15,7 +15,7 @@ namespace Lanceur.Infra.Stores
         #region Fields
 
         private readonly Assembly _assembly;
-        private readonly IDataService _dataService;
+        private readonly IDbRepository _dataService;
         private IEnumerable<QueryResult> _reservedAliases = null;
 
         #endregion Fields
@@ -31,7 +31,7 @@ namespace Lanceur.Infra.Stores
         public ReservedAliasStore()
         {
             _assembly = Assembly.GetEntryAssembly();
-            _dataService = Locator.Current.GetService<IDataService>();
+            _dataService = Locator.Current.GetService<IDbRepository>();
         }
 
         /// <summary>
@@ -53,10 +53,10 @@ namespace Lanceur.Infra.Stores
         /// <remarks>
         /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
         /// </remarks>
-        public ReservedAliasStore(Assembly assembly, IDataService dataService)
+        public ReservedAliasStore(Assembly assembly, IDbRepository dataService)
         {
             _assembly = assembly;
-            _dataService = dataService ?? Locator.Current.GetService<IDataService>();
+            _dataService = dataService ?? Locator.Current.GetService<IDbRepository>();
         }
 
         #endregion Constructors

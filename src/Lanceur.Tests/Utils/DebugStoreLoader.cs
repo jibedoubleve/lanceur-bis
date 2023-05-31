@@ -14,7 +14,7 @@ namespace Lanceur.Tests.Utils
         {
             var results = new List<ISearchService>
             {
-                new ReservedAliasStore(Assembly.GetExecutingAssembly(), Substitute.For<IDataService>())
+                new ReservedAliasStore(Assembly.GetExecutingAssembly(), Substitute.For<IDbRepository>())
             };
             return results;
         }

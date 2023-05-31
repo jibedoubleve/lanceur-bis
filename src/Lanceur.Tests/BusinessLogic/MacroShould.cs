@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using FluentAssertions;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.SQLite;
@@ -170,11 +170,11 @@ namespace Lanceur.Tests.BusinessLogic
                 return new AutoMapperConverter(new Mapper(cfg));
             }
 
-            public static IDataService GetDataService(SQLiteConnection db)
+            public static IDbRepository GetDataService(SQLiteConnection db)
             {
                 var log = Substitute.For<IAppLoggerFactory>();
                 var conv = GetConvertionService();
-                var service = new SQLiteDataService(new SQLiteConnectionScope(db), log, conv);
+                var service = new SQLiteRepository(new SQLiteConnectionScope(db), log, conv);
                 return service;
             }
 

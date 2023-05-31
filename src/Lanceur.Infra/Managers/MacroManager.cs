@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Splat;
@@ -15,7 +16,7 @@ namespace Lanceur.Infra.Managers
 
         private static Dictionary<string, SelfExecutableQueryResult> _macroInstances = null;
         private readonly Assembly _asm;
-        private readonly IDataService _dataService;
+        private readonly IDbRepository _dataService;
         private readonly IAppLogger _log;
 
         #endregion Fields
@@ -26,7 +27,7 @@ namespace Lanceur.Infra.Managers
         {
             _asm = asm;
             _log = Locator.Current.GetLogger<MacroManager>(logFactory);
-            _dataService = Locator.Current.GetService<IDataService>();
+            _dataService = Locator.Current.GetService<IDbRepository>();
         }
 
         #endregion Constructors

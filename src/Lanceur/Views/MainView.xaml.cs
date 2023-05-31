@@ -1,8 +1,8 @@
 ﻿using Lanceur.Converters.Reactive;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
@@ -32,7 +32,7 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppConfigService _settings;
+        private readonly IAppConfigRepository _settings;
         private bool _isStoryBoardsFree = true;
         public readonly IAppLogger _log;
 
@@ -44,14 +44,14 @@ namespace Lanceur.Views
         {
         }
 
-        public MainView(IAppLoggerFactory factory, IAppConfigService settings)
+        public MainView(IAppLoggerFactory factory, IAppConfigRepository settings)
         {
             InitializeComponent();
 
             _log = Locator.Current.GetLogger<MainView>(factory);
 
             ViewModel = Locator.Current.GetService<MainViewModel>();
-            _settings = settings ?? Locator.Current.GetService<IAppConfigService>();
+            _settings = settings ?? Locator.Current.GetService<IAppConfigRepository>();
             DataContext = ViewModel;
 
             Loaded += OnWindowLoaded;

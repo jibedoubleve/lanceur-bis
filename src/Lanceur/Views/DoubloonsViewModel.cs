@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
@@ -22,7 +23,7 @@ namespace Lanceur.Views
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly INotification _notification;
         private readonly ISchedulerProvider _schedulers;
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
         private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
@@ -32,14 +33,14 @@ namespace Lanceur.Views
         public DoubloonsViewModel(
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
-            IDataService service = null,
+            IDbRepository service = null,
             IThumbnailManager thumbnailManager = null,
             INotification notification = null)
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _service = service ?? l.GetService<IDataService>();
+            _service = service ?? l.GetService<IDbRepository>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _notification = notification ?? l.GetService<INotification>();
             _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);

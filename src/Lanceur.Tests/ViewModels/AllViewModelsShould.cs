@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Managers;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
@@ -23,7 +23,7 @@ namespace Lanceur.Tests.ViewModels
         {
             var l = Locator.CurrentMutable;
             l.Register(() => Substitute.For<IAppLoggerFactory>());
-            l.Register(() => Substitute.For<IDataService>());
+            l.Register(() => Substitute.For<IDbRepository>());
             l.Register(() => Substitute.For<ISchedulerProvider>());
             l.Register(() => Substitute.For<IUserNotification>());
             l.Register(() => Substitute.For<IThumbnailManager>());
@@ -34,8 +34,8 @@ namespace Lanceur.Tests.ViewModels
             l.Register(() => Substitute.For<IPackagedAppValidator>());
             l.Register(() => Substitute.For<ICmdlineManager>());
             l.Register(() => Substitute.For<IExecutionManager>());
-            l.Register(() => Substitute.For<IAppConfigService>());
-            l.Register(() => Substitute.For<IDatabaseConfigService>());
+            l.Register(() => Substitute.For<IAppConfigRepository>());
+            l.Register(() => Substitute.For<IDatabaseConfigRepository>());
             l.Register(() => Substitute.For<ISearchService>());
         }
 

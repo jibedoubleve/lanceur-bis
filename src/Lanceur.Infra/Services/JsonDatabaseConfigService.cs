@@ -1,11 +1,11 @@
 ﻿using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Config;
 using Newtonsoft.Json;
 
 namespace Lanceur.Infra.Services
 {
-    public class JsonDatabaseConfigService : IDatabaseConfigService
+    public class JsonDatabaseConfigService : IDatabaseConfigRepository
     {
         #region Fields
 

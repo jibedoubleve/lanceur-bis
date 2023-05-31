@@ -1,8 +1,8 @@
 ﻿using Lanceur.Core.Models.Settings;
 
-namespace Lanceur.Core.Services.Config
+namespace Lanceur.Core.Repositories.Config
 {
-    public interface IAppConfigService : IConfigService<AppConfig>
+    public interface IAppConfigRepository : IConfigRepository<AppConfig>
     {
         #region Methods
 
