@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
@@ -8,6 +9,7 @@ using Lanceur.Infra.Services;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.ReservedAliases;
+using Lanceur.Views.Helpers;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
@@ -90,21 +92,39 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
+                var query = "1 un";
+                var searchService = Substitute.For<ISearchService>();
+                var results = MainViewModelTestHelper.BuildResults(5);
+
+
+                searchService
+                    .Search(Arg.Any<Cmdline>())
+                    .Returns(new List<QueryResult> { results.First() });
+
                 _output.Arrange();
                 var vm = new MainViewModelBuilder()
                     .With(_output)
                     .With(scheduler)
+                    .With(searchService)
                     .Build();
 
-                vm.SetResults(5);
-                vm.Query = "1 un";
+                vm.SetResults(results);
 
                 _output.Act();
+
+                vm.Query.Value = query;
+                scheduler.Start();
+
                 vm.AutoComplete.Execute().Subscribe();
 
                 scheduler.Start();
+
                 _output.Assert();
-                vm.Query.Should().Be("1/5 un");
+                using (new AssertionScope())
+                {
+                    vm.Results.Should().HaveCount(1);
+                    vm.Query.Value.Should().Be("1/5 un");
+                }
             });
         }
 
@@ -135,7 +155,8 @@ namespace Lanceur.Tests.ViewModels
 
                 // ACT
                 vm.CurrentAlias = new ExecutableWithResultsTestAlias();
-                vm.ExecuteAlias.Execute("Some query").Subscribe();
+                var request = vm.BuildExecutionRequest("Some query");
+                vm.ExecuteAlias.Execute(request).Subscribe();
 
                 scheduler.Start();
 
@@ -245,7 +266,8 @@ namespace Lanceur.Tests.ViewModels
 
                 // ACT
                 vm.CurrentAlias = alias;
-                vm.ExecuteAlias.Execute("alias1").Subscribe();
+                var request = vm.BuildExecutionRequest("alias1");
+                vm.ExecuteAlias.Execute(request).Subscribe();
 
                 scheduler.Start();
 

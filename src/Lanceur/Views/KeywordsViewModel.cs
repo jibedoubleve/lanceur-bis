@@ -87,8 +87,6 @@ namespace Lanceur.Views
 
         #region Properties
 
-        [Reactive] private bool IsSearchActivated { get; set; } = true;
-
         public ViewModelActivator Activator { get; } = new ViewModelActivator();
 
         public IObservableCollection<QueryResult> Aliases { get; } = new ObservableCollectionExtended<QueryResult>();
@@ -291,14 +289,10 @@ namespace Lanceur.Views
 
         public async Task Clear()
         {
-            var scope = new Scope<bool>(t => IsSearchActivated = t, false, true);
-            using (scope.Open())
-            {
-                SearchQuery = null;
-                SelectedAlias = null;
-                Aliases.Clear();
-                await Task.Delay(50);
-            }
+            SearchQuery = null;
+            SelectedAlias = null;
+            Aliases.Clear();
+            await Task.Delay(50);
         }
 
         #endregion Methods

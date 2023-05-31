@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Lanceur.Core.Models
 {
-    public class ObservableQueryResult : INotifyPropertyChanged
+    public class ObservableModel : INotifyPropertyChanged
     {
         #region Events
 

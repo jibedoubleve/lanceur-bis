@@ -6,11 +6,13 @@ using Lanceur.Core.Services.Config;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
+using Lanceur.Views.Helpers;
 using NHotkey;
 using NHotkey.Wpf;
 using ReactiveUI;
 using Splat;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -42,7 +44,7 @@ namespace Lanceur.Views
         {
         }
 
-        public MainView(IAppLoggerFactory factory = null, IAppConfigService settings = null)
+        public MainView(IAppLoggerFactory factory, IAppConfigService settings)
         {
             InitializeComponent();
 
@@ -60,7 +62,7 @@ namespace Lanceur.Views
 
             this.WhenActivated(d =>
             {
-                this.Bind(ViewModel, vm => vm.Query, v => v.QueryTextBox.Text).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.Query.Value, v => v.QueryTextBox.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
 
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.ProgressBar.Visibility, x => x ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
@@ -72,12 +74,7 @@ namespace Lanceur.Views
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultCounter.Text);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.StatusPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
 
-                this.OneWayBind(ViewModel, vm => vm.CurrentAlias, v => v.AutoCompleteBox.Text, x =>
-                {
-                    return (x is ExecutableQueryResult)
-                        ? x?.Name ?? string.Empty
-                        : string.Empty;
-                }).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Suggestion, v => v.AutoCompleteBox.Text).DisposeWith(d);
 
                 ViewModel.WhenAnyValue(vm => vm.KeepAlive)
                          .Where(v => v == false)
@@ -93,12 +90,13 @@ namespace Lanceur.Views
                     .Where(x => x.Key == Key.Enter)
                     .Select(x =>
                     {
+                        var vm = x.OriginalSource
+                                  .GetParentDataSource<MainViewModel>();
                         x.Handled = true;
-                        return new AliasExecutionRequest
-                        {
-                            Query = x.OriginalSource.GetTextFromTextbox(),
-                            RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control
-                        };
+                        return vm.BuildExecutionRequest(
+                            x.OriginalSource.GetTextFromTextbox(),
+                            Keyboard.Modifiers == ModifierKeys.Control
+                        );
                     })
                     .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
                     .DisposeWith(d);
@@ -144,7 +142,23 @@ namespace Lanceur.Views
 
                 QueryResults
                     .Events().PreviewMouseLeftButtonUp
-                    .Select(x => x.OriginalSource.GetQueryFromDataContext())
+                    .Select(x =>
+                    {
+                        var context = x.OriginalSource as FrameworkElement;
+                        var alias = context?.DataContext as QueryResult;
+                        var source = (x.Source as ListView).ItemsSource as IEnumerable<QueryResult>;
+
+                        var currentAlias = (from s in source
+                                            where s.GetHashCode() == alias.GetHashCode()
+                                            select s).FirstOrDefault();
+
+                        return new AliasExecutionRequest
+                        {
+                            Query = alias?.Name ?? string.Empty,
+                            AliasToExecute = currentAlias,
+                            RunAsAdmin = false,
+                        };
+                    })
                     .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
                     .DisposeWith(d);
             });
