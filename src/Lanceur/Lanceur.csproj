@@ -55,7 +55,7 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.*" />
     <PackageReference Include="ModernWpfUI" Version="0.9.*" />
     <PackageReference Include="NHotkey.Wpf" Version="2.1.*" />
-    <PackageReference Include="NLog" Version="5.1.1" />
+    <PackageReference Include="NLog" Version="5.2.*" />
     <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.*" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.*" />
     <PackageReference Include="ReactiveUI.Validation" Version="3.0.*" />
