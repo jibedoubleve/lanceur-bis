@@ -166,23 +166,23 @@ namespace Lanceur.Infra.SQLite
         {
             var sql = @"
             select
-	            a.id        as Item1,
-                count(a.id) as Item2
+	            a.id        as Id,
+                count(a.id) as Count
             from
 	            alias a
                 inner join alias_usage au on a.id = au.id_alias
             where
 	            file_name like @name
             group by
-	            a.id  ";
+	            a.id;";
 
-            var results = DB.Connection.Query<Tuple<int, int>>(sql, new { name = alias.Name });
+            var results = DB.Connection.Query<dynamic>(sql, new { name = alias.Name });
 
             if (results.Count() == 1)
             {
                 var item = results.ElementAt(0);
-                alias.Id = item.Item1;
-                alias.Count = item.Item2;
+                alias.Id = item.Id;
+                alias.Count = (int)item.Count;
             }
         }
 
