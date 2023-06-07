@@ -1,27 +1,21 @@
-﻿using Lanceur.Core.Models;
+﻿using Lanceur.Views;
 using System.Windows;
 using System.Windows.Controls;
-using static Lanceur.Views.MainViewModel;
+using System.Windows.Media;
 
 namespace Lanceur.Utils
 {
     internal static class UiMixin
     {
         #region Methods
+        public static T GetParentDataSource<T>(this object source)
+        {
+            var parent = VisualTreeHelper.GetParent(source as DependencyObject);
+            return (T)(parent as FrameworkElement)?.DataContext;
+        }
         public static string GetTextFromTextbox(this object source)
         {
             return source is TextBox tb ? tb.Text : string.Empty;
-        }
-        public static ExecutionRequest GetQueryFromDataContext(this object source)
-        {
-            var param = source is FrameworkElement e && e?.DataContext is QueryResult result
-                ? result?.Query?.ToString() ?? string.Empty
-                : string.Empty;
-            return new()
-            {
-                Query = param,
-                RunAsAdmin = false,
-            };
         }
 
         #endregion Methods

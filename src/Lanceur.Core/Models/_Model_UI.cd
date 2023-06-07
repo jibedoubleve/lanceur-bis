@@ -1,105 +1,119 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Lanceur.Core.Models.AliasQueryResult">
-    <Position X="9.25" Y="9.25" Width="2.25" />
+    <Position X="11.5" Y="8.5" Width="2.25" />
     <Members>
       <Field Name="_fileName" Hidden="true" />
-      <Method Name="ExecuteAsync" Hidden="true" />
-      <Method Name="FromName" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAgAAAAAQAgAAQAgAgAAAAAAgQMABAAIAAAACRAAGA=</HashCode>
+      <HashCode>AAAgAAAAAQAgAQQAAAAAAAAAAgQMAAAAAAAAACRAACA=</HashCode>
       <FileName>Models\AliasQueryResult.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="1.273" />
   </Class>
-  <Class Name="Lanceur.Core.Models.CompositeAliasQueryResult" Collapsed="true">
-    <Position X="10.75" Y="13.5" Width="2.25" />
+  <Class Name="Lanceur.Core.Models.CompositeAliasQueryResult">
+    <Position X="12.75" Y="13" Width="2.25" />
+    <Members>
+      <Method Name="CompositeAliasQueryResult" Hidden="true" />
+    </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\CompositeAliasQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.DisplayQueryResult" Collapsed="true">
-    <Position X="1" Y="6" Width="1.75" />
+  <Class Name="Lanceur.Core.Models.DisplayQueryResult">
+    <Position X="2.75" Y="6.25" Width="2" />
+    <Members>
+      <Field Name="_description" Hidden="true" />
+      <Method Name="DisplayQueryResult" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAgAAAEAAAAAEAAAABAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\DisplayQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.DisplayUsageQueryResult" Collapsed="true">
-    <Position X="3" Y="6" Width="2" />
+  <Class Name="Lanceur.Core.Models.DisplayUsageQueryResult">
+    <Position X="0.5" Y="6.25" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAEAAAA=</HashCode>
       <FileName>Models\DisplayUsageQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.ExecutableQueryResult">
-    <Position X="7.25" Y="6" Width="1.75" />
+  <Class Name="Lanceur.Core.Models.SelfExecutableQueryResult">
+    <Position X="6" Y="8.5" Width="3" />
     <Members>
-      <Field Name="_description" Hidden="true" />
-      <Method Name="ExecutableQueryResult" Hidden="true" />
-      <Method Name="ExecuteAsync" Hidden="true" />
-      <Method Name="SetDescription" Hidden="true" />
-      <Method Name="ToQuery" Hidden="true" />
+      <Method Name="SelfExecutableQueryResult" Hidden="true" />
     </Members>
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAAEAAECAAAAAAAAAAAAAIAAAAAAAEA=</HashCode>
-      <FileName>Models\ExecutableQueryResult.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="Lanceur.Core.Models.QueryResult">
-    <Position X="4.25" Y="1.5" Width="1.5" />
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
-      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Models\SelfExecutableQueryResult.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="2.076" />
+  </Class>
+  <Class Name="Lanceur.Core.Models.QueryResult">
+    <Position X="3.5" Y="1.5" Width="1.5" />
+    <Members>
+      <Field Name="_name" Hidden="true" />
+      <Field Name="_oldName" Hidden="true" />
+      <Field Name="_thumbnail" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
       <HashCode>AAECIAACAAAgAABAAAEACAQAAABAAAgAAAAAAAEAQCA=</HashCode>
       <FileName>Models\QueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.SelectableAliasQueryResult" Collapsed="true">
-    <Position X="7.75" Y="13.5" Width="2.25" />
+  <Class Name="Lanceur.Core.Models.SelectableAliasQueryResult">
+    <Position X="10.25" Y="13" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\SelectableAliasQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.SessionExecutableQueryResult" Collapsed="true">
-    <Position X="4.5" Y="8" Width="2.25" />
+  <Class Name="Lanceur.Core.Models.SessionExecutableQueryResult">
+    <Position X="5" Y="13" Width="2.25" />
+    <Members>
+      <Field Name="_log" Hidden="true" />
+      <Field Name="_service" Hidden="true" />
+      <Method Name="SessionExecutableQueryResult" Hidden="true" />
+    </Members>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAEAQAAAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
       <FileName>Models\SessionExecutableQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.ExecutableWithPrivilege" Collapsed="true">
-    <Position X="9.5" Y="8" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Models\ExecutableWithPrivilege.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="Lanceur.Core.Models.PluginQueryResult" Collapsed="true">
-    <Position X="5.25" Y="6" Width="1.75" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAACAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Models\PluginQueryResult.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Lanceur.Core.Models.PluginExecutableQueryResult" Collapsed="true">
-    <Position X="7" Y="8" Width="2.25" />
+  <Class Name="Lanceur.Core.Models.PluginExecutableQueryResult">
+    <Position X="7.5" Y="13" Width="2.5" />
+    <Members>
+      <Field Name="_plugin" Hidden="true" />
+      <Method Name="PluginExecutableQueryResult" Hidden="true" />
+    </Members>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAAEAgAAAAAAAAAAAAAEA=</HashCode>
       <FileName>Models\PluginExecutableQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.ObservableQueryResult" Collapsed="true">
-    <Position X="4" Y="0.5" Width="2" />
+    <Position X="3.25" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAABAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\ObservableQueryResult.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Lanceur.Core.Models.ExecutableQueryResult">
+    <Position X="9.25" Y="6.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>Models\ExecutableQueryResult.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>

@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Splat;
@@ -10,7 +11,7 @@ namespace Lanceur.Infra.Stores
     {
         #region Fields
 
-        private readonly IDataService _aliasService;
+        private readonly IDbRepository _aliasService;
 
         #endregion Fields
 
@@ -20,9 +21,9 @@ namespace Lanceur.Infra.Stores
         {
         }
 
-        public AliasStore(IDataService aliasService)
+        public AliasStore(IDbRepository aliasService)
         {
-            _aliasService = aliasService ?? Locator.Current.GetService<IDataService>();
+            _aliasService = aliasService ?? Locator.Current.GetService<IDbRepository>();
         }
 
         #endregion Constructors

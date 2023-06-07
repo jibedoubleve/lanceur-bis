@@ -7,6 +7,7 @@
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rxui="http://reactiveui.net"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:vm="clr-namespace:Lanceur.Views"
     d:DesignHeight="600"
     d:DesignWidth="500"
@@ -29,6 +30,12 @@
                             Margin="5"
                             BorderBrush="{StaticResource DialogBorderBrush}"
                             BorderThickness="1" />
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Margin="5" Header="Show all?">
+                        <ui:ToggleSwitch
+                            x:Name="ShowResultToggle"
+                            OffContent="Don't show result when showing search box"
+                            OnContent="Show all result when showing search box" />
                     </HeaderedContentControl>
                 </StackPanel>
             </GroupBox>

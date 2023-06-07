@@ -17,12 +17,9 @@ namespace Lanceur.Core.Models
         }
 
 
-        public static bool Is(this AliasQueryResult @this, CompositeMacros macro) => @this.FileName.ToLower().Contains($"@{macro.ToLowerString()}@".ToLower());
+        private static bool Is(this AliasQueryResult @this, CompositeMacros macro) => @this.FileName.ToLower().Contains($"@{macro.ToLowerString()}@".ToLower());
 
-        public static bool IsComposite(this AliasQueryResult @this)
-        {
-            return @this.Is(CompositeMacros.Multi);
-        }
+        public static bool IsComposite(this AliasQueryResult @this) => @this.Is(CompositeMacros.Multi);
 
         public static bool IsMacro(this AliasQueryResult @this) => !GetMacro(@this).IsNullOrEmpty();
 

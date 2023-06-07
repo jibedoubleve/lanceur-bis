@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Lanceur.ReservedKeywords
 {
     [ReservedAlias("import"), Description("Import aliases from Slickrun")]
-    public class ImportAlias : ExecutableQueryResult
+    public class ImportAlias : SelfExecutableQueryResult
     {
         #region Methods
 

@@ -1,19 +1,22 @@
 ﻿using Lanceur.Converters.Reactive;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
+using Lanceur.Views.Helpers;
 using NHotkey;
 using NHotkey.Wpf;
 using ReactiveUI;
 using Splat;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,7 +25,6 @@ using System.Windows.Media.Animation;
 
 namespace Lanceur.Views
 {
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -30,7 +32,7 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppSettingsService _settings;
+        private readonly IAppConfigRepository _settings;
         private bool _isStoryBoardsFree = true;
         public readonly IAppLogger _log;
 
@@ -38,16 +40,18 @@ namespace Lanceur.Views
 
         #region Constructors
 
-        public MainView() : this(null, null) { }
+        public MainView() : this(null, null)
+        {
+        }
 
-        public MainView(IAppLoggerFactory factory = null, IAppSettingsService settings = null)
+        public MainView(IAppLoggerFactory factory, IAppConfigRepository settings)
         {
             InitializeComponent();
 
             _log = Locator.Current.GetLogger<MainView>(factory);
 
             ViewModel = Locator.Current.GetService<MainViewModel>();
-            _settings = settings ?? Locator.Current.GetService<IAppSettingsService>();
+            _settings = settings ?? Locator.Current.GetService<IAppConfigRepository>();
             DataContext = ViewModel;
 
             Loaded += OnWindowLoaded;
@@ -58,27 +62,27 @@ namespace Lanceur.Views
 
             this.WhenActivated(d =>
             {
-                this.Bind(ViewModel, vm => vm.Query, v => v.QueryTextBox.Text).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.Query.Value, v => v.QueryTextBox.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
 
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.ProgressBar.Visibility, x => x ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.CurrentSessionName, v => v.CurrentSessionName.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.CurrentAlias, v => v.QueryResults.SelectedItem).DisposeWith(d);
+
                 this.OneWayBind(ViewModel, vm => vm.Results, v => v.QueryResults.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.ResultCounter.Text);
                 this.OneWayBind(ViewModel, vm => vm.Results.Count, v => v.StatusPanel.Visibility, x => x.ToVisibility()).DisposeWith(d);
 
-                this.OneWayBind(ViewModel, vm => vm.CurrentAlias, v => v.AutoCompleteBox.Text, x =>
-                {
-                    return (x is ExecutableQueryResult)
-                        ? x?.Name ?? string.Empty
-                        : string.Empty;
-                }).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Suggestion, v => v.AutoCompleteBox.Text).DisposeWith(d);
 
                 ViewModel.WhenAnyValue(vm => vm.KeepAlive)
                          .Where(v => v == false)
                          .Log(ViewModel, $"Hiding control.", v => $"KeepAlive = {v}")
-                         .Subscribe(_ => HideControl());
+                         .Subscribe(_ => HideControl())
+                         .DisposeWith(d);
+
+                #region QueryTextBox
 
                 //Don't forget 'using System.Windows.Controls'
                 QueryTextBox
@@ -86,29 +90,77 @@ namespace Lanceur.Views
                     .Where(x => x.Key == Key.Enter)
                     .Select(x =>
                     {
+                        var vm = x.OriginalSource
+                                  .GetParentDataSource<MainViewModel>();
                         x.Handled = true;
-                        return new MainViewModel.ExecutionRequest
-                        {
-                            Query = x.OriginalSource.GetTextFromTextbox(),
-                            RunAsAdmin = Keyboard.Modifiers == ModifierKeys.Control
-                        };
+                        return vm.BuildExecutionRequest(
+                            x.OriginalSource.GetTextFromTextbox(),
+                            Keyboard.Modifiers == ModifierKeys.Control
+                        );
                     })
-                    .InvokeCommand(ViewModel, vm => vm.ExecuteAlias);
+                    .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
+                    .DisposeWith(d);
 
                 QueryTextBox
-                .Events().PreviewKeyDown
-                .Where(x => x.Key == Key.Tab)
-                .Select(x =>
-                {
-                    x.Handled = true;
-                    return Unit.Default;
-                })
-                .InvokeCommand(ViewModel, vm => vm.AutoComplete);
+                    .Events().PreviewKeyDown
+                    .Where(x => x.Key == Key.Tab)
+                    .Select(x =>
+                    {
+                        x.Handled = true;
+                        return Unit.Default;
+                    })
+                    .InvokeCommand(ViewModel, vm => vm.AutoComplete)
+                    .DisposeWith(d);
+
+                #endregion QueryTextBox
+
+                #region Navigation
+
+                QueryTextBox
+                    .Events().PreviewKeyDown
+                    .Where(x => x.Key == Key.Down)
+                    .Select(x =>
+                    {
+                        x.Handled = true;
+                        return Unit.Default;
+                    })
+                    .InvokeCommand(ViewModel, vm => vm.SelectNextResult)
+                    .DisposeWith(d);
+
+                QueryTextBox
+                    .Events().PreviewKeyDown
+                    .Where(x => x.Key == Key.Up)
+                    .Select(x =>
+                    {
+                        x.Handled = true;
+                        return Unit.Default;
+                    })
+                    .InvokeCommand(ViewModel, vm => vm.SelectPreviousResult)
+                    .DisposeWith(d);
+
+                #endregion Navigation
 
                 QueryResults
                     .Events().PreviewMouseLeftButtonUp
-                    .Select(x => x.OriginalSource.GetQueryFromDataContext())
-                    .InvokeCommand(ViewModel, vm => vm.ExecuteAlias);
+                    .Select(x =>
+                    {
+                        var context = x.OriginalSource as FrameworkElement;
+                        var alias = context?.DataContext as QueryResult;
+                        var source = (x.Source as ListView).ItemsSource as IEnumerable<QueryResult>;
+
+                        var currentAlias = (from s in source
+                                            where s.GetHashCode() == alias.GetHashCode()
+                                            select s).FirstOrDefault();
+
+                        return new AliasExecutionRequest
+                        {
+                            Query = alias?.Name ?? string.Empty,
+                            AliasToExecute = currentAlias,
+                            RunAsAdmin = false,
+                        };
+                    })
+                    .InvokeCommand(ViewModel, vm => vm.ExecuteAlias)
+                    .DisposeWith(d);
             });
         }
 
@@ -180,7 +232,7 @@ namespace Lanceur.Views
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
             //TODO value from settings
-            var stg = _settings.Load();
+            var stg = _settings.Current;
             var hk = stg.HotKey;
             SetShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);
 
@@ -218,12 +270,13 @@ namespace Lanceur.Views
 
         public void HideControl()
         {
+            QueryTextBox.Text = string.Empty;
+
             if (_isStoryBoardsFree)
             {
                 _isStoryBoardsFree = false;
                 var storyBoard = FindResource("fadeOutStoryBoard") as Storyboard;
                 storyBoard.Begin(this);
-                QueryTextBox.Text = string.Empty;
             }
         }
 

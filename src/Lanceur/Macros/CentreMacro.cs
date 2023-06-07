@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
 using Splat;
@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 namespace Lanceur.ReservedKeywords
 {
     [Macro("centre"), Description("Center Lanceur in the middle of the screen")]
-    public class CentreMacro : ExecutableQueryResult
+    public class CentreMacro : SelfExecutableQueryResult
     {
         #region Methods
 
         private static void Save(Coordinate coordinate)
         {
-            var stg = Locator.Current.GetService<IAppSettingsService>();
+            var stg = Locator.Current.GetService<IAppConfigRepository>();
             stg.Edit(s =>
             {
                 s.Window.Position.Left = coordinate.X;

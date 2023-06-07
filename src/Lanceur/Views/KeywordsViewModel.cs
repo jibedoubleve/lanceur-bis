@@ -3,9 +3,11 @@ using DynamicData;
 using DynamicData.Binding;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Utils;
+using Lanceur.Schedulers;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
@@ -32,11 +34,13 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly SourceList<QueryResult> _aliases = new();
-        private readonly IDataService _aliasService;
+        private readonly IDbRepository _aliasService;
         private readonly Scope<bool> _busyScope;
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
+        private readonly INotification _notification;
         private readonly IPackagedAppValidator _packagedAppValidator;
+        private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
@@ -45,25 +49,25 @@ namespace Lanceur.Views
 
         public KeywordsViewModel(
             IAppLoggerFactory logFactory = null,
-            IDataService searchService = null,
-            IScheduler uiThread = null,
-            IScheduler poolThread = null,
+            IDbRepository searchService = null,
+            ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
-            IPackagedAppValidator packagedAppValidator = null)
+            IPackagedAppValidator packagedAppValidator = null,
+            INotification notification = null)
         {
             _busyScope = new Scope<bool>(b => IsBusy = b, true, false);
-
-            uiThread ??= RxApp.MainThreadScheduler;
-            poolThread ??= RxApp.TaskpoolScheduler;
+            _schedulers = schedulers ?? Locator.Current.GetService<ISchedulerProvider>();
 
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
+            _notification = notification ?? l.GetService<INotification>(); ;
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
-            _aliasService = searchService ?? l.GetService<IDataService>();
-            _confirmRemove = Interactions.YesNoQuestion(uiThread);
+            _aliasService = searchService ?? l.GetService<IDbRepository>();
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
+            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 
             this.WhenActivated(d =>
             {
@@ -75,16 +79,14 @@ namespace Lanceur.Views
                 }).DisposeWith(d);
 
                 SetupValidations(d);
-                SetupCommands(uiThread, notify, d);
-                SetupBindings(uiThread, d);
+                SetupCommands(_schedulers.MainThreadScheduler, notify, d);
+                SetupBindings(_schedulers.MainThreadScheduler, d);
             });
         }
 
         #endregion Constructors
 
         #region Properties
-
-        [Reactive] private bool IsSearchActivated { get; set; } = true;
 
         public ViewModelActivator Activator { get; } = new ViewModelActivator();
 
@@ -146,11 +148,11 @@ namespace Lanceur.Views
                     _log.Info($"User removed alias '{alias.Name}'");
                     _aliasService.Remove(alias);
 
-                    if (_aliases.Remove(alias)) { Toast.Information($"Removed alias '{alias.Name}'."); }
+                    if (_aliases.Remove(alias)) { _notification.Information($"Removed alias '{alias.Name}'."); }
                     else
                     {
                         var msg = $"Impossible to remove the alias '{alias.Name}'";
-                        Toast.Warning(msg);
+                        _notification.Warning(msg);
                         _log.Warning(msg);
                     }
                 }
@@ -168,7 +170,7 @@ namespace Lanceur.Views
                 alias = await _packagedAppValidator.FixAsync(alias);
                 _aliasService.SaveOrUpdate(ref alias);
             }
-            Toast.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
+            _notification.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
             return Unit.Default;
         }
 
@@ -288,14 +290,10 @@ namespace Lanceur.Views
 
         public async Task Clear()
         {
-            var scope = new Scope<bool>(t => IsSearchActivated = t, false, true);
-            using (scope.Open())
-            {
-                SearchQuery = null;
-                SelectedAlias = null;
-                Aliases.Clear();
-                await Task.Delay(50);
-            }
+            SearchQuery = null;
+            SelectedAlias = null;
+            Aliases.Clear();
+            await Task.Delay(50);
         }
 
         #endregion Methods

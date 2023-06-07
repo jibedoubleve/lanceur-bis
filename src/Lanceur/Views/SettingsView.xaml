@@ -16,10 +16,10 @@
     ui:WindowHelper.UseModernWindowStyle="True"
     x:TypeArguments="vm:SettingsViewModel"
     AllowDrop="True"
+    PreviewKeyUp="OnPreviewKeyUp"
     ShowInTaskbar="True"
     WindowStartupLocation="CenterScreen"
-    mc:Ignorable="d"
-    PreviewKeyUp="OnPreviewKeyUp">
+    mc:Ignorable="d">
     <Grid>
         <ui:NavigationView
             x:Name="NavigationView"

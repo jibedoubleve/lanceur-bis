@@ -1,6 +1,9 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using Lanceur.Utils;
 using ReactiveUI;
@@ -11,7 +14,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace Lanceur.Views
@@ -20,51 +22,53 @@ namespace Lanceur.Views
     {
         #region Fields
 
+        private readonly IAppConfigRepository _appConfigService;
         private readonly Interaction<Unit, string> _askFile;
+        private readonly IDatabaseConfigRepository _databaseConfigService;
         private readonly IDelay _delay;
+        private readonly INotification _nofification;
         private readonly IAppRestart _restart;
-        private readonly IDataService _service;
-        private readonly IAppSettingsService _settings;
-        private readonly ISettingsService _stg;
+        private readonly ISchedulerProvider _schedulers;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
         #region Constructors
 
         public AppSettingsViewModel(
-            IScheduler uiThread = null,
-            IScheduler poolThread = null,
-            IAppSettingsService settings = null,
+            ISchedulerProvider schedulers = null,
+            IAppConfigRepository appConfigService = null,
             IUserNotification notify = null,
-            ISettingsService stg = null,
-            IDataService service = null,
+            IDatabaseConfigRepository databaseConfigService = null,
+            IDbRepository dataService = null,
             IDelay delay = null,
-            IAppRestart restart = null
+            IAppRestart restart = null,
+            INotification nofification = null
             )
         {
             var l = Locator.Current;
-            _settings = settings ?? l.GetService<IAppSettingsService>();
-            _askFile = Interactions.SelectFile(uiThread);
-            _stg = stg ?? l.GetService<ISettingsService>();
-            _service = service ?? l.GetService<IDataService>();
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
+            _appConfigService = appConfigService ?? l.GetService<IAppConfigRepository>();
+
+            _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
+            _databaseConfigService = databaseConfigService ?? l.GetService<IDatabaseConfigRepository>();
+            _service = dataService ?? l.GetService<IDbRepository>();
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();
+            _nofification = nofification ?? l.GetService<INotification>();
 
-            uiThread ??= RxApp.MainThreadScheduler;
-            poolThread ??= RxApp.TaskpoolScheduler;
-
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveSettings = ReactiveCommand.Create(OnSaveSettings, outputScheduler: uiThread);
+            SaveSettings = ReactiveCommand.Create(OnSaveSettings, outputScheduler: _schedulers.MainThreadScheduler);
             SaveSettings.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SelectDatabase = ReactiveCommand.CreateFromTask(async () => await AskFile.Handle(Unit.Default), outputScheduler: uiThread);
+            SelectDatabase = ReactiveCommand.CreateFromTask(async () => await AskFile.Handle(Unit.Default), outputScheduler: _schedulers.MainThreadScheduler);
             SelectDatabase.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
-                .ObserveOn(uiThread)
+                .ObserveOn(_schedulers.MainThreadScheduler)
                 .Subscribe(ctx =>
                 {
                     DbPath = ctx.DbPath;
@@ -74,11 +78,10 @@ namespace Lanceur.Views
                     CurrentSession = (from s in Sessions
                                       where s.Id == ctx.AppSettings.IdSession
                                       select s).SingleOrDefault();
-                    Context = ctx;
                 });
 
             this.WhenAnyObservable(vm => vm.SelectDatabase)
-                .ObserveOn(uiThread)
+                .ObserveOn(_schedulers.MainThreadScheduler)
                 .BindTo(this, vm => vm.DbPath);
         }
 
@@ -86,7 +89,6 @@ namespace Lanceur.Views
 
         #region Properties
 
-        [Reactive] private ActivationContext Context { get; set; }
         public ReactiveCommand<Unit, ActivationContext> Activate { get; }
         public Interaction<Unit, string> AskFile => _askFile;
         [Reactive] public Session CurrentSession { get; set; }
@@ -96,6 +98,7 @@ namespace Lanceur.Views
         public ReactiveCommand<Unit, Unit> SaveSettings { get; }
         public ReactiveCommand<Unit, string> SelectDatabase { get; }
         [Reactive] public ObservableCollection<Session> Sessions { get; set; }
+        [Reactive] public bool ShowResult { get; set; }
 
         #endregion Properties
 
@@ -103,7 +106,7 @@ namespace Lanceur.Views
 
         private TimeSpan GetDelay()
         {
-            var delay = Context.AppSettings.RestartDelay;
+            var delay = _appConfigService.Current.RestartDelay;
             var time = TimeSpan.FromMilliseconds(delay);
             return time;
         }
@@ -112,8 +115,8 @@ namespace Lanceur.Views
         {
             var context = new ActivationContext()
             {
-                AppSettings = _settings.Load(),
-                DbPath = _stg[Setting.DbPath],
+                AppSettings = _appConfigService.Current,
+                DbPath = _databaseConfigService.Current.DbPath,
                 Sessions = _service.GetSessions()
             };
 
@@ -123,19 +126,22 @@ namespace Lanceur.Views
         private async void OnSaveSettings()
         {
             //Save DB Path in property file
-            _stg[Setting.DbPath] = DbPath?.Replace("\"", "");
-            _stg.Save();
+            _databaseConfigService.Current.DbPath = DbPath?.Replace("\"", "");
+            _databaseConfigService.Save();
 
             // Save hotkey & Session in DB
-            Context.AppSettings.RestartDelay = RestartDelay;
-            Context.AppSettings.HotKey = HotKeySection;
-            if (CurrentSession is not null) { Context.AppSettings.IdSession = CurrentSession.Id; }
+            _appConfigService.Current.Window.ShowResult = ShowResult;
+            _appConfigService.Current.RestartDelay = RestartDelay;
+            _appConfigService.Current.HotKey = HotKeySection;
+            _appConfigService.Current.Window.ShowAtStartup = ShowResult;
+            if (CurrentSession is not null) { _appConfigService.Current.IdSession = CurrentSession.Id; }
 
             //Save settings
-            _settings.Save(Context.AppSettings);
+            _appConfigService.Save();
 
             TimeSpan time = GetDelay();
-            Toast.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
+
+            _nofification.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
             await _delay.Of(time);
             _restart.Restart();
         }
@@ -148,7 +154,7 @@ namespace Lanceur.Views
         {
             #region Properties
 
-            public AppSettings AppSettings { get; internal set; }
+            public AppConfig AppSettings { get; internal set; }
             public string DbPath { get; internal set; }
             public IEnumerable<Session> Sessions { get; set; }
 

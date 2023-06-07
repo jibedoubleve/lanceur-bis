@@ -69,11 +69,11 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @icon,
                     @workingDirectory
                 );
-                select last_insert_rowid() from alias where rowid = 1";
+                select last_insert_rowid() from alias limit 1;";
 
             var id = _db.Connection.ExecuteScalar<long>(sql, new
             {
-                alias.Arguments,
+                Arguments = alias.Parameters,
                 alias.FileName,
                 alias.Notes,
                 alias.RunAs,
@@ -237,7 +237,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             var sql = @"
                 update alias
                 set
-                    arguments   = @arguments,
+                    arguments   = @parameters,
                     file_name   = @fileName,
                     notes       = @notes,
                     run_as      = @runAs,
@@ -248,7 +248,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             _db.Connection.Execute(sql, new
             {
-                alias.Arguments,
+                alias.Parameters,
                 alias.FileName,
                 alias.Notes,
                 alias.RunAs,

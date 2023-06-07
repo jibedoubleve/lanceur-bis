@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Lanceur.ReservedKeywords
 {
     [ReservedAlias("="), Description("Evaluate expressions such as quick calculations")]
-    public class CalculatorAlias : ExecutableQueryResult
+    public class CalculatorAlias : SelfExecutableQueryResult
     {
         #region Fields
 
@@ -42,12 +42,15 @@ namespace Lanceur.ReservedKeywords
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
+            if (cmdline == null) { return Task.FromResult(DisplayQueryResult.SingleFromResult("Expression to evaluate is empty.")); }
+
             var parameters = cmdline.Parameters;
             _log.Trace($"Evaluating: {parameters}");
-            var result = parameters.IsNullOrEmpty()
-                ? DisplayQueryResult.SingleFromResult("Not an expression to evaluate.")
-                : DisplayQueryResult.SingleFromResult(_calculator.Evaluate(parameters), parameters);
-            return Task.FromResult(result);
+            return Task.FromResult(
+                parameters.IsNullOrEmpty()
+                    ? DisplayQueryResult.SingleFromResult("Not an expression to evaluate.")
+                    : DisplayQueryResult.SingleFromResult(_calculator.Evaluate(parameters), parameters)
+            );
         }
 
         #endregion Methods

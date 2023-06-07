@@ -1,12 +1,13 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Ui;
 using ReactiveUI;
-using System;
+using ReactiveUI.Fody.Helpers;
 using Splat;
+using System;
 using System.Collections.Generic;
 using System.Reactive;
-using ReactiveUI.Fody.Helpers;
 
 namespace Lanceur.Views
 {
@@ -14,16 +15,16 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
         #region Constructors
 
-        public MostUsedViewModel(IDataService service = null, IUserNotification notify = null)
+        public MostUsedViewModel(IDbRepository service = null, IUserNotification notify = null)
         {
-            var l = Splat.Locator.Current;
-            _service = service ?? l.GetService<IDataService>();
+            var l = Locator.Current;
+            _service = service ?? l.GetService<IDbRepository>();
             notify ??= l.GetService<IUserNotification>();
 
             Activate = ReactiveCommand.Create(OnActivate);
@@ -33,14 +34,24 @@ namespace Lanceur.Views
                 .BindTo(this, vm => vm.Aliases);
         }
 
+        #endregion Constructors
+
+        #region Properties
+
+        public ReactiveCommand<Unit, IEnumerable<QueryResult>> Activate { get; }
+
+        [Reactive] public IEnumerable<QueryResult> Aliases { get; set; }
+
+        #endregion Properties
+
+        #region Methods
+
         private IEnumerable<QueryResult> OnActivate()
         {
             var result = _service.GetMostUsedAliases();
             return result;
         }
 
-        [Reactive]public IEnumerable<QueryResult> Aliases { get; set; }
-        public ReactiveCommand<Unit, IEnumerable<QueryResult>> Activate { get; }
-        #endregion Constructors
+        #endregion Methods
     }
 }

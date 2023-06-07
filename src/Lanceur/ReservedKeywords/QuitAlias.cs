@@ -9,7 +9,7 @@ using System.Windows;
 namespace Lanceur.ReservedKeywords
 {
     [ReservedAlias("quit"), Description("Quit lanceur")]
-    public class QuitAlias : ExecutableQueryResult
+    public class QuitAlias : SelfExecutableQueryResult
     {
         #region Methods
 

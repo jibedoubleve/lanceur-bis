@@ -4,7 +4,8 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.modernwpf.com/2019">
 
-    <Duration x:Key="FadeDuration">0:0:0:0.25</Duration>
+    <Duration x:Key="FadeInDuration">0:0:0:0.03</Duration>
+    <Duration x:Key="FadeOutDuration">0:0:0:0.25</Duration>
     <!--  FONTS  -->
     <FontFamily x:Key="TextFontFamily">Segoe UI</FontFamily>
 
@@ -29,10 +30,10 @@
 
     <DropShadowEffect
         x:Key="BorderEffect"
-        BlurRadius="7"
-        Direction="315"
-        ShadowDepth="2"
-        Color="Gray" />
+        BlurRadius="32"
+        Opacity="0.28"
+        ShadowDepth="2" />
+
     <Style x:Key="QueryTextBoxStyle" TargetType="{x:Type TextBox}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
@@ -111,12 +112,12 @@
     </Style>
 
     <Style x:Key="ControlBorderStyle" TargetType="Border">
-        <Setter Property="BorderBrush" Value="Gray" />
-        <Setter Property="Margin" Value="0,8,0,0" />
-        <Setter Property="BorderThickness" Value="0.5" />
-        <Setter Property="CornerRadius" Value="5" />
-        <Setter Property="Effect" Value="{StaticResource BorderEffect}" />
-        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SystemBaseMediumLowBrush}" />
+        <Setter Property="Margin" Value="0,10,0,0" />
+        <Setter Property="BorderThickness" Value=".7" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Effect" Value="{DynamicResource BorderEffect}" />
+        <Setter Property="Background" Value="{DynamicResource SystemChromeLow}" />
     </Style>
 
     <!--  VALIDATION  -->

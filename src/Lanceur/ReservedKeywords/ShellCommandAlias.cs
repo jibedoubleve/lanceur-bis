@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Lanceur.ReservedKeywords
 {
     [ReservedAlias(">"), Description("execute the parameters in PowerShell")]
-    internal class ShellCommandAlias : ExecutableQueryResult
+    internal class ShellCommandAlias : SelfExecutableQueryResult
     {
         #region Methods
 

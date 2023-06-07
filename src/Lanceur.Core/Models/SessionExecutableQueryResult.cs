@@ -1,13 +1,14 @@
-﻿using Lanceur.Core.Services;
+﻿using Lanceur.Core.Repositories;
+using Lanceur.Core.Services;
 
 namespace Lanceur.Core.Models
 {
-    public class SessionExecutableQueryResult : ExecutableQueryResult
+    public class SessionExecutableQueryResult : SelfExecutableQueryResult
     {
         #region Fields
 
         private readonly IAppLogger _log;
-        private readonly IDataService _service;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
@@ -17,7 +18,7 @@ namespace Lanceur.Core.Models
             string name,
             string description,
             IAppLoggerFactory logFactory,
-            IDataService service) : base(name, description)
+            IDbRepository service) : base(name, description)
         {
             _log = logFactory.GetLogger<SessionExecutableQueryResult>();
             _service = service;

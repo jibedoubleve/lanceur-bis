@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lanceur.Macros
 {
     [Macro("debug"), Description("Provides some debugging tools. But it is more an easter egg than something else")]
-    public class DebugMacro : ExecutableQueryResult
+    public class DebugMacro : SelfExecutableQueryResult
     {
         #region Constructors
 
@@ -23,7 +23,7 @@ namespace Lanceur.Macros
         {
             Name = name;
             Query = query;
-            SetDescription(description);
+            Description = description;
         }
 
         public DebugMacro()
@@ -77,10 +77,10 @@ namespace Lanceur.Macros
                 "all" => SearchService.GetAll(),
                 "macro" => Converter.ToQueryResult(MacroManager.GetAll()),
                 _ => new List<QueryResult> {
-                    new DebugMacro("all" ,  "List all the aliases",  Cmdline("debug all") ),
-                    new DebugMacro("echo", "Echo some text in a message box. (This is useless!)",  Cmdline("debug echo") ),
-                    new DebugMacro("macro", "Provide the list of all macros",  Cmdline("debug macro") ),
-                    new DebugMacro("cache", "Displays thumbnails in the cache",  Cmdline("debug cache") ),
+                    new DebugMacro("debug all" ,  "List all the aliases",  Cmdline("debug all") ),
+                    new DebugMacro("debug echo", "Echo some text in a message box. (This is useless!)",  Cmdline("debug echo") ),
+                    new DebugMacro("debug macro", "Provide the list of all macros",  Cmdline("debug macro") ),
+                    new DebugMacro("debug cache", "Displays thumbnails in the cache",  Cmdline("debug cache") ),
                 },
             };
             AppLogFactory.Get<DebugMacro>().Debug($"Executed 'debug {cl.Name.ToLower()}' and found {result.Count()} item(s)");

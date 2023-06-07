@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Splat;
@@ -13,9 +14,9 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private static Dictionary<string, ExecutableQueryResult> _macroInstances = null;
+        private static Dictionary<string, SelfExecutableQueryResult> _macroInstances = null;
         private readonly Assembly _asm;
-        private readonly IDataService _dataService;
+        private readonly IDbRepository _dataService;
         private readonly IAppLogger _log;
 
         #endregion Fields
@@ -26,7 +27,7 @@ namespace Lanceur.Infra.Managers
         {
             _asm = asm;
             _log = Locator.Current.GetLogger<MacroManager>(logFactory);
-            _dataService = Locator.Current.GetService<IDataService>();
+            _dataService = Locator.Current.GetService<IDbRepository>();
         }
 
         #endregion Constructors
@@ -41,18 +42,18 @@ namespace Lanceur.Infra.Managers
                 var found = from t in types
                             where t.GetCustomAttributes<MacroAttribute>().Any()
                             select t;
-                var macroInstances = new Dictionary<string, ExecutableQueryResult>();
+                var macroInstances = new Dictionary<string, SelfExecutableQueryResult>();
                 foreach (var type in found)
                 {
                     var instance = Activator.CreateInstance(type);
-                    if (instance is ExecutableQueryResult alias)
+                    if (instance is SelfExecutableQueryResult alias)
                     {
                         var name = alias.Name = (type.GetCustomAttribute(typeof(MacroAttribute)) as MacroAttribute)?.Name;
                         name = name.ToUpper().Replace("@", string.Empty);
 
                         var description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
-                        alias.SetDescription(description);
-                        
+                        alias.Description = description;
+
                         _dataService.HydrateMacro(alias);
 
                         macroInstances.Add(name, alias);
@@ -94,7 +95,7 @@ namespace Lanceur.Infra.Managers
                 {
                     var macro = _macroInstances[src.GetMacro()];
                     macro.Name = src.Name;
-                    macro.Parameters = src.Arguments;
+                    macro.Parameters = src.Parameters;
                     return macro;
                 }
                 else

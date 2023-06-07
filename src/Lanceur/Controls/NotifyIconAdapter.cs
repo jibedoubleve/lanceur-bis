@@ -9,7 +9,7 @@ namespace Lanceur.Controls
     {
         #region Fields
 
-        private NotifyIcon _notifyIcon;
+        private readonly NotifyIcon _notifyIcon;
 
         #endregion Fields
 
@@ -39,7 +39,8 @@ namespace Lanceur.Controls
 
         public bool Visible
         {
-            get => _notifyIcon.Visible; set => _notifyIcon.Visible = value;
+            get => _notifyIcon.Visible;
+            set => _notifyIcon.Visible = value;
         }
 
         #endregion Properties

@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Splat;
 using System;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace Lanceur.Macros
 {
     [Macro("multi"), Description("Allow to start multiple alias at once")]
-    public class MultiMacro : ExecutableQueryResult
+    public class MultiMacro : SelfExecutableQueryResult
     {
         #region Fields
 
@@ -24,11 +25,19 @@ namespace Lanceur.Macros
         #endregion Fields
 
         #region Constructors
+
 #if DEBUG
-        public MultiMacro() : this(0, null, null) { }
+
+        public MultiMacro() : this(0, null, null)
+        {
+        }
+
 #else
 
-        public MultiMacro() : this(null, null, null) { }
+        public MultiMacro() : this(null, null, null)
+        {
+        }
+
 #endif
 
         public MultiMacro(int? delay = null, IExecutionManager executionManager = null, ISearchService searchService = null)
@@ -53,7 +62,7 @@ namespace Lanceur.Macros
 
         public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            var items = cmdline?.Parameters?.Split('@') ?? Array.Empty<string>();
+            var items = Parameters?.Split('@') ?? Array.Empty<string>();
 
             foreach (var item in items)
             {
@@ -61,15 +70,17 @@ namespace Lanceur.Macros
                 var alias = GetAlias(item);
                 if (alias is not null)
                 {
-                    await _executionManager.ExecuteAsync(new ExecutionRequest
+#pragma warning disable 4014
+                    //https://stackoverflow.com/a/20364016/389529
+                    _executionManager.ExecuteAsync(new ExecutionRequest
                     {
                         QueryResult = alias,
-                        Cmdline = cmdline,
-                    });
+                    }).ConfigureAwait(false);
+#pragma warning disable 4014
                 }
             }
 
-            return NoResult;
+            return await NoResultAsync;
         }
 
         #endregion Methods

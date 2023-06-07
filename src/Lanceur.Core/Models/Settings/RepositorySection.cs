@@ -4,6 +4,7 @@
     {
         #region Properties
 
+        public static RepositorySection Default => new();
         public int ScoreLimit { get; set; }
 
         #endregion Properties

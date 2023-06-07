@@ -1,230 +1,123 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
-using Lanceur.Core.Stores;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
+using Lanceur.Macros;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.ReservedAliases;
+using Lanceur.Views.Helpers;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
-using ReactiveUI;
 using ReactiveUI.Testing;
+using Splat;
 using System.Reactive.Concurrency;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels
 {
     public partial class MainViewModelShould : ReactiveTest
     {
+        #region Fields
+
+        private readonly ITestOutputHelper _output;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public MainViewModelShould(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
+        #endregion Constructors
+
         #region Methods
 
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
-        public void AddResultsAfterSearch()
+        [Theory]
+        [InlineData(true, 5)]
+        [InlineData(false, 0)]
+        public void ShowResultWhenConfigured(bool showResult, int expectedCount)
         {
             new TestScheduler().With(scheduler =>
             {
+                // ARRANGE
+                var settings = Substitute.For<IAppConfigRepository>();
+                settings.Current.Returns(new AppConfig
+                {
+                    Window = new WindowSection()
+                    {
+                        ShowResult = showResult
+                    }
+                });
+
                 var searchService = Substitute.For<ISearchService>();
+                searchService.GetAll().Returns(new AliasQueryResult[]
+                {
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult()
+                });
 
-                searchService
-                    .Search(Arg.Any<Cmdline>())
-                    .Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
+                var vm = new MainViewModelBuilder()
+                            .With(_output)
+                            .With(scheduler)
+                            .With(settings)
+                            .With(searchService)
+                            .Build();
 
-                var vm = MainViewModelHelper.Build(scheduler, searchService);
+                // ACT
+                vm.Activate.Execute().Subscribe();
 
-                vm.SearchAlias.Execute("__").Subscribe();
-
-                scheduler.AdvanceBy(2_000);
-
-                vm.Results.Count.Should().Be(2);
+                // ASSERT
+                scheduler.Start();
+                vm.Results.Should().HaveCount(expectedCount);
             });
         }
 
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
-        public void AddResultsWithParametersAfterSearch()
+        [Theory]
+        [InlineData("=8*5", "40")]
+        public void HaveResultWhenQueryIsArithmetic(string expression, string result)
         {
             new TestScheduler().With(scheduler =>
             {
-                //Arrange
-                var results = new List<ExecutableQueryResult> { new ExecutableTestAlias() };
-                var store = Substitute.For<ISearchService>();
-                store.Search(Arg.Any<Cmdline>()).Returns(results);
+                // ARRANGE
+                var calculator = new CodingSebCalculatorService();
+                var log = Substitute.For<IAppLoggerFactory>();
 
-                var storeLoader = Substitute.For<IStoreLoader>();
-                storeLoader.Load().Returns(new List<ISearchService> { store });
+                var executor = Substitute.For<IExecutionManager>();
+                executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                        .Returns(new ExecutionResponse
+                        {
+                            Results = new List<QueryResult>()
+                            {
+                                new NotExecutableTestAlias(),
+                            }
+                        });
 
-                var macroMgr = Substitute.For<IMacroManager>();
-                var thumbnailManager = Substitute.For<IThumbnailManager>();
-                macroMgr.Handle(Arg.Any<IEnumerable<QueryResult>>()).Returns(results);
-                var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);
-                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineManager());
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
+                    .With(scheduler)
+                    .With(executor)
+                    .Build();
 
-                //Act
-                var @params = "parameters";
-                vm.SearchAlias.Execute("Search " + @params).Subscribe();
+                vm.Query.Value = expression;
 
-                //Assert
-                scheduler.AdvanceBy(2_000);
-                vm.Results.ElementAt(0)?.Query.Parameters.Should().Be(@params);
-            });
-        }
+                // ACT
+                var request = new AliasExecutionRequest { Query = expression };
+                vm.ExecuteAlias.Execute(request).Subscribe();
 
-        [Fact]
-        public void AutoCompleteQueryWithArguments()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineManager());
-                vm.SetResults(5);
-                vm.Query = "1 un";
-
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(110).Ticks);
-
-                vm.AutoComplete.Execute().Subscribe();
-
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(110).Ticks);
-
-                vm.Query.Should().Be("1/5 un");
-            });
-        }
-
-        [Fact]
-        public void ExecuteA_NOT_ExecutableQueryResult()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = MainViewModelHelper.Build(scheduler);
-
-                scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new NotExecutableTestAlias());
-
-                var results = scheduler.Start(
-                    () => vm.ExecuteAlias.CanExecute,
-                    created: 0,
-                    subscribed: 1,
-                    disposed: 50
-                );
-
-                results.Messages.AssertEqual(
-                    OnNext(01, false)
-                );
-            });
-        }
-
-        [Fact]
-        public void ExecuteAnExecutableQueryResult()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = MainViewModelHelper.Build(scheduler);
-
-                scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new ExecutableTestAlias());
-
-                var results = scheduler.Start(
-                    () => vm.ExecuteAlias.CanExecute,
-                    created: 0,
-                    subscribed: 1,
-                    disposed: 50
-                );
-
-                results.Messages.AssertEqual(
-                    OnNext(01, true)
-                );
-            });
-        }
-
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
-        public void ExecuteAnExecutableQueryResultWithParameters()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var searchService = Substitute.For<ISearchService>();
-                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineManager());
-
-                vm.CurrentAlias = new ExecutableWithResultsTestAlias();
-                vm.ExecuteAlias.Execute().Subscribe();
-
-                scheduler.AdvanceBy(1_000);
-
-                vm.Results.Count.Should().Be(2);
-            });
-        }
-
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
-        public void ExecuteAnExecutableQueryResultWithResults()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var searchService = Substitute.For<ISearchService>();
-                var vm = MainViewModelHelper.Build(scheduler, searchService, cmdProcessor: new CmdlineManager());
-
-                vm.CurrentAlias = new ExecutableWithResultsTestAlias();
-                vm.ExecuteAlias.Execute().Subscribe();
-
-                scheduler.AdvanceBy(1_000);
-
-                vm.Results.Count.Should().Be(2);
-            });
-        }
-
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
-        public void ExecuteResultWithParameter()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var alias = ExecutableTestAlias.FromName("alias1");
-                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineManager());
-                vm.CurrentAlias = alias;
-                vm.ExecuteAlias.Execute("alias1 world").Subscribe();
-
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(11).Ticks);
-
-                (vm.CurrentAlias as ExecutableTestAlias)?.Should().Be("world");
-            });
-        }
-
-        [Fact]
-        public void HaveNoResultOnEmptyQuery()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = MainViewModelHelper.Build(scheduler);
-
-                vm.SearchAlias.Execute("").Subscribe();
-
-                scheduler.AdvanceBy(1_000);
-
-                vm.Results.Count.Should().Be(0);
-            });
-        }
-
-        [Fact]
-        public void HaveNoResultOnNullQuery()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = MainViewModelHelper.Build(scheduler);
-
-                vm.SearchAlias.Execute().Subscribe();
-
-                scheduler.AdvanceBy(1_000);
-
-                vm.Results.Count.Should().Be(0);
-            });
-        }
-
-        [Fact]
-        public void HaveNoResultOnWhiteSpaceQuery()
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = MainViewModelHelper.Build(scheduler);
-
-                vm.SearchAlias.Execute(" ").Subscribe();
-
-                scheduler.AdvanceBy(1_000);
-
-                vm.Results.Count.Should().Be(0);
+                scheduler.Start();
+                vm.CurrentAlias?.Name?.Should().Be(result);
             });
         }
 
@@ -234,92 +127,125 @@ namespace Lanceur.Tests.ViewModels
             //https://stackoverflow.com/questions/49338867/unit-testing-viewmodel-property-bound-to-reactivecommand-isexecuting
             new TestScheduler().With(scheduler =>
             {
-                var vm = MainViewModelHelper.Build(scheduler);
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
+                    .With(scheduler)
+                    .Build();
 
-                scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.Query = "a");
-                scheduler.Schedule(TimeSpan.FromTicks(15), () => vm.Query += "b");
-                scheduler.Schedule(TimeSpan.FromTicks(25), () => vm.Query += "c");
-                scheduler.Schedule(TimeSpan.FromTicks(35), () => vm.Query += "d");
-                scheduler.Schedule(TimeSpan.FromTicks(45), () => vm.Query += "e");
-
-                var results = scheduler.Start(
-                    () => vm.WhenAnyValue(x => x.Query),
-                    created: 0,
-                    subscribed: 1,
-                    disposed: 50
-                );
-
-                results.Messages.AssertEqual(
-                    OnNext(01, "a"),
-                    OnNext(15, "ab"),
-                    OnNext(25, "abc"),
-                    OnNext(35, "abcd"),
-                    OnNext(45, "abcde")
-                );
-            });
-        }
-
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
-        public void SearchWhenCriterionChanges()
-        {
-            //https://stackoverflow.com/questions/49338867/unit-testing-viewmodel-property-bound-to-reactivecommand-isexecuting
-            new TestScheduler().With(scheduler =>
-            {
-                var vm = MainViewModelHelper.Build(scheduler);
-
-                scheduler.Schedule(TimeSpan.FromMilliseconds(00), () => vm.Query = "a");
-                scheduler.Schedule(TimeSpan.FromMilliseconds(50), () => vm.Query = "b");
-                scheduler.Schedule(TimeSpan.FromMilliseconds(51), () => vm.Query = "b");
-                scheduler.Schedule(TimeSpan.FromMilliseconds(52), () => vm.Query = "b");
-                scheduler.Schedule(TimeSpan.FromMilliseconds(80), () => vm.Query = "c");
+                scheduler.Schedule(() => vm.Query.Value = "a");
+                scheduler.Schedule(TimeSpan.FromTicks(200), () => vm.Query.Value += "b");
+                scheduler.Schedule(TimeSpan.FromTicks(300), () => vm.Query.Value += "c");
+                scheduler.Schedule(TimeSpan.FromTicks(400), () => vm.Query.Value += "d");
 
                 var results = scheduler.Start(
                     () => vm.SearchAlias.IsExecuting,
                     created: 0,
-                    subscribed: 1,
-                    disposed: TimeSpan.FromMilliseconds(1000).Ticks);
+                    subscribed: 100,
+                    disposed: TimeSpan.FromMilliseconds(1_000).Ticks);
 
                 results.Messages.AssertEqual(
-                    OnNext(1, false),
-                    OnNext(TimeSpan.FromMilliseconds(10).Ticks + 2, true),
-                    OnNext(TimeSpan.FromMilliseconds(10).Ticks + 4, false),
-                    OnNext(TimeSpan.FromMilliseconds(60).Ticks + 1, true),
-                    OnNext(TimeSpan.FromMilliseconds(60).Ticks + 3, false),
-                    OnNext(TimeSpan.FromMilliseconds(90).Ticks + 1, true),
-                    OnNext(TimeSpan.FromMilliseconds(90).Ticks + 3, false)
+                    OnNext(100, false),
+                    OnNext(TimeSpan.FromMilliseconds(100).Ticks + 402, true),
+                    OnNext(TimeSpan.FromMilliseconds(100).Ticks + 404, false)
                 );
             });
         }
 
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
+        [Fact]
         public void SelectFirstAsCurrentResultsAfterSearch()
         {
             new TestScheduler().With(scheduler =>
             {
+                // ARRANGE
                 var searchService = Substitute.For<ISearchService>();
                 searchService.Search(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
-                var vm = MainViewModelHelper.Build(scheduler, searchService);
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
+                    .With(scheduler)
+                    .With(searchService)
+                    .Build();
 
+                // ACT
                 vm.SearchAlias.Execute("__").Subscribe();
 
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(11).Ticks);
+                scheduler.Start();
 
+                // ASSERT
                 vm.CurrentAlias.Should().NotBeNull();
             });
         }
 
-        [Fact(Skip = "Too complicated to fix and it'll be replaced by SpecFlow")]
+        [Fact]
         public void SelectFirstAsResultsAfterExecutionWithResults()
         {
+            var aliasName = "alias1";
             new TestScheduler().With(scheduler =>
             {
-                var vm = MainViewModelHelper.Build(scheduler, cmdProcessor: new CmdlineManager());
-                vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName("alias1");
-                vm.ExecuteAlias.Execute().Subscribe();
+                // ARRANGE
+                var executor = Substitute.For<IExecutionManager>();
+                executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                        .Returns(new ExecutionResponse
+                        {
+                            Results = new List<QueryResult>() {
+                                ExecutableWithResultsTestAlias.FromName(aliasName)
+                            }
+                        });
 
-                scheduler.AdvanceBy(TimeSpan.FromMilliseconds(11).Ticks);
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
+                    .With(scheduler)
+                    .With(executor)
+                    .Build();
 
-                vm.CurrentAlias.Name.Should().Be("name1");
+                // ACT
+                vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName("some random name");
+
+                var request = vm.BuildExecutionRequest(aliasName);
+                vm.ExecuteAlias.Execute(request).Subscribe();
+                scheduler.Start();
+
+                vm.CurrentAlias.Should().NotBeNull();
+                vm.CurrentAlias.Name.Should().Be(aliasName);
+            });
+        }
+
+        [Fact]
+        public void ShowAutoCompleteWhenCalingDebugMacro()
+        {
+            Locator.CurrentMutable.Register<ICmdlineManager>(() => new CmdlineManager());
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var searchService = Substitute.For<ISearchService>();
+                searchService.Search(Arg.Any<Cmdline>())
+                        .Returns(
+                            new List<QueryResult>()
+                            {
+                               new DebugMacro(){ Name = "debug" }
+                            }
+                        );
+
+                var vm = new MainViewModelBuilder()
+                    .With(_output)
+                    .With(scheduler)
+                    .With(searchService)
+                    .With(new DebugMacroExecutor())
+                    .Build();
+
+                // ACT
+                vm.Query.Value = "random_query";
+                scheduler.Start();
+
+                var request = vm.BuildExecutionRequest("random_query");
+                vm.ExecuteAlias.Execute(request).Subscribe(); // Execute first result
+                scheduler.Start();
+
+                // ASSERT
+                using (new AssertionScope())
+                {
+                    vm.CurrentAlias.Should().NotBeNull();
+                    vm.CurrentAlias?.Name.Should().Be("debug all"); // I know the first result in debug is 'debug all'
+                }
             });
         }
 

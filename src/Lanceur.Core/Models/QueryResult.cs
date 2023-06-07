@@ -12,7 +12,7 @@ namespace Lanceur.Core.Models
     /// that is designed to react on modifications.
     /// </remarks>
     [DebuggerDisplay("{Name} - Desc: {Description}")]
-    public abstract class QueryResult : ObservableQueryResult
+    public abstract class QueryResult : ObservableModel
     {
         #region Fields
 
@@ -28,7 +28,7 @@ namespace Lanceur.Core.Models
         public static IEnumerable<QueryResult> NoResult => new List<QueryResult>();
         public static Task<IEnumerable<QueryResult>> NoResultAsync => Task.FromResult(NoResult);
         public int Count { get; set; } = 0;
-        public virtual string Description { get; }
+        public virtual string Description { get; set; }
 
         /// <summary>
         /// Fall back for <see cref="Thumbnail"/>. This property is expected to
@@ -78,8 +78,14 @@ namespace Lanceur.Core.Models
             set => Set(ref _thumbnail, value);
         }
 
+        #endregion Properties
+
+        #region Methods
+
+        public override int GetHashCode() => (Count, Description, Icon, Id, IsResult, Name, OldName, Query, Thumbnail).GetHashCode();
+
         public virtual string ToQuery() => $"{Name}";
 
-        #endregion Properties
+        #endregion Methods
     }
 }

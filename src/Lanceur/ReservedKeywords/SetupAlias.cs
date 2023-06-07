@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Lanceur.ReservedKeywords
 {
     [ReservedAlias("setup"), Description("Open the setup page")]
-    public class SetupAlias : ExecutableQueryResult
+    public class SetupAlias : SelfExecutableQueryResult
     {
         #region Methods
 

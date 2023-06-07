@@ -4,7 +4,7 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite
 {
-    public class SQLiteVersionManager : SQLiteServiceBase, IDataStoreVersionManager
+    public class SQLiteVersionManager : SQLiteRepositoryBase, IDataStoreVersionManager
     {
         #region Constructors
 

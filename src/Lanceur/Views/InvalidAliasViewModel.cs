@@ -1,5 +1,7 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -19,30 +21,32 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly Interaction<string, bool> _confirmRemove;
-        private readonly IDataService _service;
+        private readonly INotification _notificataion;
+        private readonly ISchedulerProvider _schedulers;
+        private readonly IDbRepository _service;
 
         #endregion Fields
 
         #region Constructors
 
         public InvalidAliasViewModel(
-                    IScheduler uiThread = null,
+            ISchedulerProvider schedulers = null,
             IScheduler poolThread = null,
             IUserNotification notify = null,
-            IDataService service = null)
+            IDbRepository service = null,
+            INotification notificataion = null)
         {
-            uiThread ??= RxApp.MainThreadScheduler;
-            poolThread ??= RxApp.TaskpoolScheduler;
-
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
-            _service = service ?? l.GetService<IDataService>();
-            _confirmRemove = Interactions.YesNoQuestion(uiThread);
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
+            _service = service ?? l.GetService<IDbRepository>();
+            _notificataion = notificataion ?? l.GetService<INotification>();
+            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: uiThread);
+            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: _schedulers.MainThreadScheduler);
             RemoveSelected.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
@@ -81,7 +85,7 @@ namespace Lanceur.Views
             {
                 foreach (var item in toDel) { InvalidAliases.Remove(item); }
                 _service.Remove(toDel);
-                Toast.Information($"Removed {toDel.Count} alias(es).");
+                _notificataion.Information($"Removed {toDel.Count} alias(es).");
             }
         }
 

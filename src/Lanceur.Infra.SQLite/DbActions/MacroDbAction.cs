@@ -27,27 +27,32 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Methods
 
-        private AliasQueryResult GetComposite(AliasQueryResult item)
+        /// <summary>
+        /// If the specified <see cref="AliasQueryResult"/> is composite
+        /// this method will hydrate and create a <see cref="CompositeAliasQueryResult"/>;
+        /// otherwise it'll return <paramref name="item"/>
+        /// </summary>
+        /// <param name="item">The <see cref="QueryResult"/> to hydrate</param>
+        /// <returns>The hydrated <see cref="QueryResult"/> or <paramref name="item"/></returns>
+        private AliasQueryResult Hydrate(AliasQueryResult item)
         {
-            if (item.Is(CompositeMacros.Multi))
+            if (!item.IsComposite()) { return item; }
+
+            var action = new AliasDbAction(_db, _log);
+            var subAliases = new List<AliasQueryResult>();
+
+            int delay = 0;
+            foreach (var name in item?.Parameters?.Split("@") ?? Array.Empty<string>())
             {
-                var action = new AliasDbAction(_db, _log);
-                var subAliases = new List<AliasQueryResult>();
-
-                int delay = 0;
-                foreach (var name in item?.Arguments?.Split("@") ?? Array.Empty<string>())
+                if (name == string.Empty) { delay++; }
+                else
                 {
-                    if (name == string.Empty) { delay++; }
-                    else
-                    {
-                        subAliases.Add(item: action.GetExact(name, delay: delay));
-                        delay = 1;
-                    }
+                    subAliases.Add(item: action.GetExact(name, delay: delay));
+                    delay = 1;
                 }
-
-                return _converter.ToAliasQueryResultComposite(item, subAliases);
             }
-            else { return item; }
+
+            return _converter.ToAliasQueryResultComposite(item, subAliases);
         }
 
         /// <summary>
@@ -65,7 +70,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             foreach (var item in collection)
             {
-                items.Add(item.IsComposite() ? GetComposite(item) : item);
+                items.Add(Hydrate(item));
             }
             return items;
         }

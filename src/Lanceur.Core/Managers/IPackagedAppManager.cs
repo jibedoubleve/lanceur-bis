@@ -1,4 +1,6 @@
-﻿namespace Lanceur.Core.Managers
+﻿using Lanceur.Core.Responses;
+
+namespace Lanceur.Core.Managers
 {
     public interface IPackagedAppManager
     {

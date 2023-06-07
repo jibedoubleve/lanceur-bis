@@ -1,6 +1,8 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -9,9 +11,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lanceur.Views
@@ -21,7 +21,9 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly Interaction<string, bool> _confirmRemove;
-        private readonly IDataService _service;
+        private readonly INotification _notification;
+        private readonly ISchedulerProvider _schedulers;
+        private readonly IDbRepository _service;
         private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
@@ -29,25 +31,24 @@ namespace Lanceur.Views
         #region Constructors
 
         public DoubloonsViewModel(
-            IScheduler uiThread = null,
-            IScheduler poolThread = null,
+            ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
-            IDataService service = null,
-            IThumbnailManager thumbnailManager = null)
+            IDbRepository service = null,
+            IThumbnailManager thumbnailManager = null,
+            INotification notification = null)
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
-            _service = service ?? l.GetService<IDataService>();
+            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
+            _service = service ?? l.GetService<IDbRepository>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
-            _confirmRemove = Interactions.YesNoQuestion(uiThread);
+            _notification = notification ?? l.GetService<INotification>();
+            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
 
-            uiThread ??= RxApp.MainThreadScheduler;
-            poolThread ??= RxApp.TaskpoolScheduler;
-
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: uiThread);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: uiThread);
+            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: _schedulers.MainThreadScheduler);
             RemoveSelected.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
@@ -87,7 +88,7 @@ namespace Lanceur.Views
             {
                 foreach (var item in toDel) { Doubloons.Remove(item); }
                 _service.Remove(toDel);
-                Toast.Information($"Removed {toDel.Count} alias(es).");
+                _notification.Information($"Removed {toDel.Count} alias(es).");
             }
         }
 

@@ -1,23 +1,29 @@
 ﻿using AutoMapper;
+using Lanceur.Core.Formatters;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.Formatters;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Plugins;
+using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Models;
+using Lanceur.Schedulers;
 using Lanceur.Ui;
 using Lanceur.Utils;
+using Lanceur.Utils.ConnectionStrings;
 using Lanceur.Utils.PackagedApps;
 using Lanceur.Views;
 using ReactiveUI;
 using Splat;
-using Splat.NLog;
 using System;
 using System.Data.SQLite;
 using System.Reflection;
@@ -48,7 +54,7 @@ namespace Lanceur
                    .ConstructUsing(x => new DisplayQueryResult($"@{x}@", "This is a macro", "LinkVariant"));
 
                 cfg.CreateMap<Session, SessionExecutableQueryResult>()
-                   .ConstructUsing(x => new SessionExecutableQueryResult(x.Name, x.Notes, Get<IAppLoggerFactory>(), Get<IDataService>()))
+                   .ConstructUsing(x => new SessionExecutableQueryResult(x.Name, x.Notes, Get<IAppLoggerFactory>(), Get<IDbRepository>()))
                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
             });
         }
@@ -57,8 +63,8 @@ namespace Lanceur
         {
             var l = Locator.CurrentMutable;
 
-            //  then in your service locator initialisation
-            l.UseNLogWithWrappingFullLogger();
+            Locator.CurrentMutable.RegisterConstant(new ReactiveUILogger() { Level = LogLevel.Debug }, typeof(ILogger));
+
             l.RegisterLazySingleton<IMapper>(() => new Mapper(GetAutoMapperCfg()));
             l.RegisterLazySingleton<IUserNotification>(() => new UserNotification());
             l.RegisterLazySingleton(() => new RoutingState());
@@ -67,17 +73,22 @@ namespace Lanceur
             l.RegisterLazySingleton<IDelay>(() => new Delay());
             l.RegisterLazySingleton<IAppRestart>(() => new AppRestart());
 
+#if DEBUG
+            l.Register<IDatabaseConfigRepository>(() => new MemoryDatabaseConfigRepository());
+#else
+            l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
+#endif
 
+            l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
             l.Register<IAppLoggerFactory>(() => new NLoggerFactory());
             l.Register<IStoreLoader>(() => new StoreLoader());
             l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
             l.Register<ICmdlineManager>(() => new CmdlineManager());
-            l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(), Get<IDataService>()));
-            l.Register<IDataService>(() => new SQLiteDataService(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(), Get<IConvertionService>()));
+            l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(), Get<IDbRepository>(), Get<ICmdlineManager>()));
+            l.Register<IDbRepository>(() => new SQLiteRepository(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(), Get<IConvertionService>()));
             l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
-            l.Register<IAppSettingsService>(() => new SQLiteAppSettingsService(Get<SQLiteConnectionScope>()));
+            l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<SQLiteConnectionScope>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
-            l.Register<ISettingsService>(() => new JsonSettingsService());
             l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
             l.Register<IClipboardService>(() => new WindowsClipboardService());
             l.Register<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
@@ -85,11 +96,13 @@ namespace Lanceur
             l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>()));
             l.Register<IPackagedAppManager>(() => new PackagedAppManager());
             l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppManager>()));
+            //Formatters
+            l.Register<IStringFormatter>(() => new DefaultStringFormatter());
 
-            l.Register(() => new SQLiteDatabase(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
+            l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
             l.Register(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
-            l.Register<IConnectionString>(() => new ConnectionString(Get<ISettingsService>()));
+            l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
 
             l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<SQLiteConnectionScope>())));
             l.Register((Func<IDataStoreUpdateManager>)(() =>
@@ -99,6 +112,9 @@ namespace Lanceur
         private static void RegisterViewModels()
         {
             var l = Locator.CurrentMutable;
+            // Misc
+            l.RegisterLazySingleton<INotification>(() => new ToastNotification());
+            //Views
             l.RegisterLazySingleton(() => new MainViewModel());
             l.RegisterLazySingleton(() => new SettingsViewModel());
             l.RegisterLazySingleton(() => new KeywordsViewModel());
@@ -128,9 +144,9 @@ namespace Lanceur
 
             var l = Locator.Current;
             var stg = l.GetService<IConnectionString>();
-            var sqlite = l.GetService<SQLiteDatabase>();
+            var sqlite = l.GetService<SQLiteUpdater>();
 
-            AppLogFactory.Get(typeof(Bootstrapper)).Trace($"Settings DB path: '{stg.ToString()}'");
+            AppLogFactory.Get<Bootstrapper>().Trace($"Settings DB path: '{stg.ToString()}'");
 
             sqlite.Update(stg.ToString());
         }

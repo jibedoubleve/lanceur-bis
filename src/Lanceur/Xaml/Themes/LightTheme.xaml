@@ -8,14 +8,16 @@
 
     <!--  Metadata  -->
     <system:String x:Key="Theme.Name">Light.Accent1</system:String>
-    <system:String x:Key="Theme.Origin">PowerToysRun</system:String>
+    <system:String x:Key="Theme.Origin">Lanceur</system:String>
     <system:String x:Key="Theme.DisplayName">Accent1 (Light)</system:String>
     <system:String x:Key="Theme.BaseColorScheme">Light</system:String>
     <system:String x:Key="Theme.ColorScheme">Accent1</system:String>
-    <Color x:Key="Theme.PrimaryAccentColor">White</Color>
     <system:Boolean x:Key="Theme.IsHighContrast">False</system:Boolean>
 
-    <Color x:Key="SystemBaseMediumLowColor">#66000000</Color>
+    <Color x:Key="Theme.PrimaryAccentColor">White</Color>
+    <Color x:Key="SystemBaseMediumLowColor">#999999</Color>
+
+    <SolidColorBrush x:Key="SystemBaseMediumLowBrush" Color="{DynamicResource SystemBaseMediumLowColor}" />
     <SolidColorBrush
         x:Key="SystemChromeLow"
         options:Freeze="True"

@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace Lanceur.Tests.Utils.Macros
 {
     [Macro("multi"), Description("Allow to start multiple alias at once")]
-    public class MultiMacroTest : ExecutableQueryResult
+    public class MultiMacroTest : SelfExecutableQueryResult
     {
         #region Constructors
 

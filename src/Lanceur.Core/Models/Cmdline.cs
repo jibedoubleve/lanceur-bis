@@ -22,6 +22,8 @@
 
         #region Methods
 
+        public static explicit operator string(Cmdline cmdline) => cmdline.ToString();
+
         public override string ToString()
         {
             return $"{(Name ?? string.Empty)} {(Parameters ?? string.Empty)}".Trim();
