@@ -96,7 +96,7 @@ namespace Lanceur.Tests.BusinessLogic
         [Theory]
         [InlineData(0, 1)]
         [InlineData(1, 2)]
-        public void HaveDelayOnFirstElement(int index, int count)
+        public void HaveDelayOnFirstElement(int index, int delay)
         {
             // Arrange
             string sql = Cfg.SqlForAliases();
@@ -108,7 +108,7 @@ namespace Lanceur.Tests.BusinessLogic
 
             // Assert
             var composite = (results.ElementAt(0) as CompositeAliasQueryResult);
-            composite.Aliases.ElementAt(index).Delay.Should().Be(count);
+            composite.Aliases.ElementAt(index).Delay.Should().Be(delay);
         }
 
         [Fact]

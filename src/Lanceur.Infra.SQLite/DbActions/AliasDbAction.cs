@@ -1,8 +1,7 @@
 ﻿using Dapper;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Core.Utils;
+using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
@@ -27,6 +26,30 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Methods
 
+        internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
+        {
+            var ids = (from r in results
+                       where r.Id != 0
+                       select r);
+            var sql = @"
+                select
+	                id_alias as id,
+	                count
+                from
+	                stat_usage_per_app_v
+                where id_alias in @ids;";
+
+            var dbResults = _db.Connection.Query<KeywordUsage>(sql, new { ids = results.Select(x => x.Id).ToArray() });
+
+            foreach (var result in results)
+            {
+                result.Count = (from item in dbResults
+                                where item.Id == result.Id
+                                select item.Count).SingleOrDefault();
+            }
+            return results;
+        }
+
         public bool CheckNameExists(AliasQueryResult alias, long idSession)
         {
             var sql = @"
@@ -44,6 +67,24 @@ namespace Lanceur.Infra.SQLite.DbActions
                 idSession
             });
             return count > 0;
+        }
+
+        public ExistingNameResponse CheckNameExists(string[] names, long idSession)
+        {
+            var sql = @"
+                select an.name
+                from
+                	alias_name an
+                	inner join alias a on a.id = an.id_alias
+                where 
+                    an.name in @names
+                    and a.id_session = @idSession";
+
+            var result = _db.Connection
+                            .Query<string>(sql, new { names, idSession })
+                            .ToArray();
+
+            return new(result);
         }
 
         public long Create(ref AliasQueryResult alias, long idSession)
@@ -83,9 +124,14 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.WorkingDirectory
             });
 
-            alias.Id = id;
+            // Create synonyms
+            sql = @"insert into alias_name (id_alias, name) values (@id, @name)";
+            foreach (var name in alias.Synonyms.SplitCsv())
+            {
+                _db.Connection.ExecuteScalar<long>(sql, new { id, name });
+            }
 
-            Duplicate(alias);
+            alias.Id = id;
 
             // Return either the id of the created Alias or
             // return the id of the just updated allias (which
@@ -95,22 +141,6 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public void Dispose() => _db.Dispose();
 
-        public void Duplicate(AliasQueryResult alias)
-        {
-            //Create the alias name
-            var sql2 = @"insert into alias_name (id_alias, name) values (@idAlias, @name);";
-            _db.Connection.Execute(sql2, new
-            {
-                idAlias = alias.DuplicateOf ?? alias.Id,
-                alias.Name,
-            });
-
-            if (alias.Id == 0)
-            {
-                alias.DuplicateOf = null; //It's not a duplicate anymore, we've created it in the DB
-            }
-        }
-
         public long GetDefaultSessionId()
         {
             var sql = "select s_value from settings where lower(s_key) = 'idsession'";
@@ -118,39 +148,65 @@ namespace Lanceur.Infra.SQLite.DbActions
             return result;
         }
 
-        public AliasQueryResult GetExact(string name, long? idSession = null, int delay = 0)
+        /// <summary>
+        /// Get the a first alias with the exact name. In case of multiple aliases
+        /// with same name, the one with greater counter is selected.        
+        /// </summary>
+        /// <param name="name">The alias' exact name to find.</param>
+        /// <param name="idSession">The session where the search occurs.</param>
+        /// <param name="delay">Indicates a delay to set.</param>
+        /// <returns>The exact match or <c>null</c> if not found.</returns>
+        public AliasQueryResult GetExact(string name, long? idSession = null)
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
             var sql = @"
                 select
                     n.Name        as Name,
-                    n.Name        as OldName,
-                    s.Id          as Id,
-                    s.id          as Id,
-                    s.arguments   as Arguments,
-                    s.file_name   as FileName,
-                    s.notes       as Notes,
-                    s.run_as      as RunAs,
-                    s.start_mode  as StartMode,
-                    s.working_dir as WorkingDirectory,
-                    s.icon        as Icon,
+                    s.synonyms    as Synonyms,
+                    a.Id          as Id,
+                    a.arguments   as Arguments,
+                    a.file_name   as FileName,
+                    a.notes       as Notes,
+                    a.run_as      as RunAs,
+                    a.start_mode  as StartMode,
+                    a.working_dir as WorkingDirectory,
+                    a.icon        as Icon,
                     c.exec_count  as Count
                 from
-                    alias s
-                    left join alias_name n on s.id = n.id_alias
-                    left join stat_execution_count_v c on c.id_keyword = s.id
+                    alias a
+                    left join alias_name n on a.id = n.id_alias
+                    left join stat_execution_count_v c on c.id_keyword = a.id
+                    inner join data_alias_synonyms_v s on s.id_alias = a.id
                 where
-                    s.id_session = @idSession
+                    a.id_session = @idSession
                     and n.Name = @name
                 order by
                     c.exec_count desc,
                     n.name asc";
             var arguments = new { idSession, name };
 
-            var result = _db.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault();
+            return _db.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault();
+        }
 
-            if (result is not null) { result.Delay = delay; }
+        public KeywordUsage GetHiddenKeyword(string name)
+        {
+            var sql = @"
+                select
+	                a.id,
+                    n.name,
+                    (
+    	                select count(id)
+     	                from alias_usage
+      	                where id = a.id
+                    ) as count
+                from
+	                alias a
+                    inner join alias_name n on a.id = n.id_alias
+                where
+	                hidden = 1
+                    and n.name = @name;";
+            var result = _db.Connection.Query<KeywordUsage>(sql, new { name }).FirstOrDefault();
 
             return result;
         }
@@ -158,31 +214,28 @@ namespace Lanceur.Infra.SQLite.DbActions
         public void Remove(AliasQueryResult alias)
         {
             if (alias == null) { throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias."); }
-            else if (alias.Name == null) { throw new ArgumentNullException(nameof(alias.Name), "Cannot delete alias with no name."); }
-            else
-            {
-                var sql1 = @"delete from alias_usage where id_alias = @id_alias";
-                var cnt = _db.Connection.Execute(sql1, new { id_alias = alias.Id });
-                _log.Debug($"Removed '{cnt}' row(s) from alias_usage. Id: {alias.Id}");
 
-                var sql2 = @"delete from alias_name where id_alias = @id_alias";
-                cnt = _db.Connection.Execute(sql2, new { id_alias = alias.Id });
-                _log.Debug($"Removed '{cnt}' row(s) from alias_name. Id: {alias.Id}");
+            var sql1 = @"delete from alias_usage where id_alias = @id_alias";
+            var cnt = _db.Connection.Execute(sql1, new { id_alias = alias.Id });
+            _log.Debug($"Removed '{cnt}' row(s) from alias_usage. Id: {alias.Id}");
 
-                // If alias refers to no other names, remove it.
-                // This query, cleans all alias in this situation.
-                var sql3 = @"
+            var sql2 = @"delete from alias_name where id_alias = @id_alias";
+            cnt = _db.Connection.Execute(sql2, new { id_alias = alias.Id });
+            _log.Debug($"Removed '{cnt}' row(s) from alias_name. Id: {alias.Id}");
+
+            // If alias refers to no other names, remove it.
+            // This query, cleans all alias in this situation.
+            var sql3 = @"
                     delete from alias
                     where id in (
                       select a.id
-                      from 
+                      from
                           alias a
                           left join alias_name an on a.id = an.id_alias
                       where an.id_alias is null
                     );";
-                _db.Connection.Execute(sql3);
-                _log.Debug($"Removed '{cnt}' row(s) from alias. Id: {alias.Id}");
-            }
+            _db.Connection.Execute(sql3);
+            _log.Debug($"Removed '{cnt}' row(s) from alias. Id: {alias.Id}");
         }
 
         public void Remove(IEnumerable<SelectableAliasQueryResult> alias)
@@ -202,7 +255,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     delete from alias
                     where id in (
                       select a.id
-                      from 
+                      from
                           alias a
                           left join alias_name an on a.id = an.id_alias
                       where an.id_alias is null
@@ -264,82 +317,16 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public void UpdateName(AliasQueryResult alias)
         {
-            if (alias.HasChangedName())
+            //Remove all names
+            var sql = @"delete from alias_name where id_alias = @id";
+            _db.Connection.Execute(sql, new { id = alias.Id });
+
+            //Recreate new names
+            sql = @"insert into alias_name (id_alias, name) values (@id, @name)";
+            foreach (var name in alias.Synonyms.SplitCsv())
             {
-                var sql = @"
-                select id
-                from alias_name
-                where
-	                id_alias = @id
-                    and lower(name) = lower(@name)";
-                var id = _db.Connection.Query<long?>(sql, new
-                {
-                    id = alias.Id,
-                    name = alias.OldName
-                }).FirstOrDefault();
-
-                if (id.HasValue)
-                {
-                    sql = @"
-                    update alias_name
-                    set
-                        name = lower(@name)
-                    where
-                        id = @id;";
-
-                    _db.Connection.Execute(sql, new
-                    {
-                        id,
-                        name = alias.Name
-                    });
-                }
+                _db.Connection.Execute(sql, new { id = alias.Id, name });
             }
-        }
-
-        public KeywordUsage GetHiddenKeyword(string name)
-        {
-            var sql = @"
-                select 
-	                a.id,
-                    n.name,
-                    (
-    	                select count(id)
-     	                from alias_usage
-      	                where id = a.id
-                    ) as count
-                from
-	                alias a
-                    inner join alias_name n on a.id = n.id_alias
-                where 
-	                hidden = 1
-                    and n.name = @name;";
-            var result = _db.Connection.Query<KeywordUsage>(sql, new { name }).FirstOrDefault();
-
-            return result;
-        }
-
-        internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
-        {
-            var ids = (from r in results
-                       where r.Id != 0
-                       select r);
-            var sql = @"
-                select
-	                id_alias as id,
-	                count
-                from 
-	                stat_usage_per_app_v
-                where id_alias in @ids;";
-
-            var dbResults = _db.Connection.Query<KeywordUsage>(sql, new { ids = results.Select(x => x.Id).ToArray() });
-
-            foreach (var result in results)
-            {
-                result.Count = (from item in dbResults
-                                where item.Id == result.Id
-                                select item.Count).SingleOrDefault();
-            }
-            return results;
         }
 
         #endregion Methods

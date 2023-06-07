@@ -3,40 +3,13 @@ using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Core.Models
 {
-    public static class AliasQueryResultMixin
-    {
-        #region Methods
-
-        public static AliasQueryResult Duplicate(this AliasQueryResult @this)
-        {
-            return new AliasQueryResult
-            {
-                Parameters = @this.Parameters,
-                Count = @this.Count,
-                FileName = @this.FileName,
-                Icon = @this.Icon,
-                Notes = @this.Notes,
-                Name = $"Duplicate of {@this.Name}",
-                RunAs = @this.RunAs,
-                WorkingDirectory = @this.WorkingDirectory,
-                StartMode = @this.StartMode,
-                Query = @this.Query,
-                // In case it's already a duplicate of a duplicate,
-                // go recursively all the way down to the original
-                DuplicateOf = @this.DuplicateOf ?? @this.Id
-            };
-        }
-
-        public static bool HasChangedName(this AliasQueryResult @this) => @this.Name?.ToLower() != @this.OldName.ToLower();
-
-        #endregion Methods
-    }
-
     public class AliasQueryResult : ExecutableQueryResult, IElevated
     {
         #region Fields
 
         private string _fileName;
+
+        private string _synonyms;
 
         #endregion Fields
 
@@ -53,12 +26,6 @@ namespace Lanceur.Core.Models
             get => Notes.IsNullOrWhiteSpace() ? FileName : Notes;
             set => Notes = value;
         }
-
-        /// <summary>
-        /// If this <see cref="AliasQueryResult"/> is a ducplicate from another
-        /// alias, this contains its ID. Otherwise contains <c>NULL</c>
-        /// </summary>
-        public long? DuplicateOf { get; set; }
 
         public string FileName
         {
@@ -82,13 +49,23 @@ namespace Lanceur.Core.Models
 
         public StartMode StartMode { get; set; } = StartMode.Default;
 
+        /// <summary>
+        /// Get or set a string representing all the name this alias has.
+        /// It should be a coma separated list of names.
+        /// </summary>
+        public string Synonyms
+        {
+            get => _synonyms;
+            set => Set(ref _synonyms, value);
+        }
+
         public string WorkingDirectory { get; set; }
 
         #endregion Properties
 
         #region Methods
 
-        public static AliasQueryResult FromName(string aliasName) => new AliasQueryResult() { Name = aliasName };
+        public static AliasQueryResult FromName(string aliasName) => new AliasQueryResult() { Name = aliasName, Synonyms = aliasName };
 
         #endregion Methods
     }

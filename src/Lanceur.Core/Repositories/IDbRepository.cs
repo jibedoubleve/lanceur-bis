@@ -15,6 +15,14 @@ namespace Lanceur.Core.Repositories
         #region Methods
 
         /// <summary>
+        /// Checks whether the specified names exists in the database for the specified session
+        /// </summary>
+        /// <param name="names"></param>
+        /// <param name="idSession"></param>
+        /// <returns></returns>
+        public ExistingNameResponse CheckNamesExist(string[] names, long? idSession = null);
+
+        /// <summary>
         /// Get all the aliases
         /// </summary>
         /// <param name="idSession">The session linked to the aliases. If null, it'll take the default session</param>
@@ -66,7 +74,7 @@ namespace Lanceur.Core.Repositories
         IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, long? idSession = null);
 
         /// <summary>
-        /// Hydrate the macro with its <c>id</c> and <c>count</c>. This method will try to find the 
+        /// Hydrate the macro with its <c>id</c> and <c>count</c>. This method will try to find the
         /// macro by using its name  that should be something like '@it_s_name@'
         /// </summary>
         /// <param name="alias">Macro to hydrate</param>
