@@ -23,18 +23,13 @@ namespace Lanceur.Tests.BusinessLogic
             return store;
         }
 
-        [Fact]
-        public void ReturnCountOfReservedKeywords()
+        [Theory]
+        [InlineData(default(Type), 1)]
+        [InlineData(typeof(MainViewModel), 7)]
+        public void ReturnExpectedCountOfReservedKeywords(Type type, int count)
         {
-            var store = GetStore(Substitute.For<IDbRepository>());
-            store.ReservedAliases.Should().HaveCount(1); ;
-        }
-
-        [Fact]
-        public void ReturnExpectedCountOfAliasesFromLanceur()
-        {
-            var store = GetStore(Substitute.For<IDbRepository>(), type: typeof(MainViewModel));
-            store.ReservedAliases.Should().HaveCount(8);
+            var store = GetStore(Substitute.For<IDbRepository>(), type);
+            store.ReservedAliases.Should().HaveCount(count);
         }
 
         [Theory]
