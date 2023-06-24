@@ -59,7 +59,11 @@ namespace Lanceur.Infra.Services
                 ? _macroManager.Handle(results)
                 : results;
             _thumbnailManager.RefreshThumbnails(toReturn);
-            return toReturn;
+
+            // Order the list and return the result
+            return toReturn
+                    .OrderByDescending(e => e.Count)
+                    .ThenBy(e => e.Name);
         }
 
         public IEnumerable<QueryResult> Search(Cmdline query)

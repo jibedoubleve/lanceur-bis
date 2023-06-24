@@ -3,6 +3,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
+using Lanceur.SharedKernel.Mixins;
 using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.SQLite
@@ -15,6 +16,7 @@ namespace Lanceur.Infra.SQLite
         private readonly IConvertionService _converter;
         private readonly IAppLogger _log;
         private readonly MacroDbAction _macroManager;
+        private readonly SetUsageDbAction _setUsageDbAction;
 
         #endregion Fields
 
@@ -29,6 +31,7 @@ namespace Lanceur.Infra.SQLite
             _converter = converter;
             _aliasDbAction = new AliasDbAction(scope, logFactory);
             _macroManager = new MacroDbAction(DB, logFactory, converter);
+            _setUsageDbAction = new SetUsageDbAction(DB, logFactory);
         }
 
         #endregion Constructors
@@ -66,6 +69,7 @@ namespace Lanceur.Infra.SQLite
                     inner join data_alias_synonyms_v s on s.id_alias = a.id
                 where
                     a.id_session = @idSession
+                    and a.hidden = 0
                 order by
                     c.exec_count desc,
                     an.name asc";
@@ -110,7 +114,7 @@ namespace Lanceur.Infra.SQLite
 
         /// <summary>
         /// Get the a first alias with the exact name. In case of multiple aliases
-        /// with same name, the one with greater counter is selected.        
+        /// with same name, the one with greater counter is selected.
         /// </summary>
         /// <param name="name">The alias' exact name to find.</param>
         /// <param name="idSession">The session where the search occurs.</param>
@@ -299,7 +303,24 @@ namespace Lanceur.Infra.SQLite
             DB.Connection.Execute(sql, new { idSession });
         }
 
-        public void SetUsage(QueryResult alias) => _aliasDbAction.SetUsage(alias);
+        public void SetUsage(QueryResult alias)
+        {
+            if (alias is null)
+            {
+                _log.Info("Impossible to set usage: alias is null.;");
+                return;
+            }
+            if (alias.Name.IsNullOrEmpty())
+            {
+                _log.Info("Impossible to set usage: alias name is empty.");
+                return;
+            }
+
+            var idSession = GetDefaultSessionId();
+            _setUsageDbAction.SetUsage(ref alias, idSession);
+        }
+
+        public void SetUsage(string aliasName) => SetUsage(new AliasQueryResult() { Name = aliasName });
 
         public void Update(ref Session session)
         {

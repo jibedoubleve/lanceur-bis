@@ -16,6 +16,7 @@ namespace Lanceur.Infra.Stores
         private static IEnumerable<SelfExecutableQueryResult> _plugins = null;
         private readonly IPluginStoreContext _context;
         private readonly IAppLogger _log;
+        private readonly IAppLoggerFactory _logFactory;
         private readonly IPluginManager _pluginManager;
 
         #endregion Fields
@@ -35,7 +36,9 @@ namespace Lanceur.Infra.Stores
             var l = Locator.Current;
             _pluginManager = pluginManager ?? l.GetService<IPluginManager>();
             _context = context ?? l.GetService<IPluginStoreContext>();
-            _log = l.GetLogger<PluginStore>(logFactory);
+
+            _logFactory = logFactory ?? l.GetService<IAppLoggerFactory>();
+            _log = l.GetLogger<PluginStore>(_logFactory);
         }
 
         #endregion Constructors
@@ -70,7 +73,7 @@ namespace Lanceur.Infra.Stores
                     var plugins = _pluginManager.CreatePlugin(asm);
                     foreach (var plugin in plugins)
                     {
-                        var query = new PluginExecutableQueryResult(plugin);
+                        var query = new PluginExecutableQueryResult(plugin, _logFactory);
                         queryResults.Add(query);
                     }
                 }

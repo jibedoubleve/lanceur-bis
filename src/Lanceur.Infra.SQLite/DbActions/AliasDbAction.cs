@@ -9,6 +9,30 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
+        private const string s_CreateAliasNameSql = @"insert into alias_name (id_alias, name) values (@id, @name)";
+        private const string s_CreateAliasSql = @"
+                insert into alias (
+                    arguments,
+                    file_name,
+                    notes,
+                    run_as,
+                    start_mode,
+                    working_dir,
+                    id_session,
+                    icon,
+                    hidden
+                ) values (
+                    @arguments,
+                    @fileName,
+                    @notes,
+                    @runAs,
+                    @startMode,
+                    @workingDirectory,
+                    @idSession,
+                    @icon,
+                    @isHidden
+                );
+                select last_insert_rowid() from alias limit 1;";
         private readonly SQLiteConnectionScope _db;
         private readonly IAppLogger _log;
 
@@ -76,7 +100,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 from
                 	alias_name an
                 	inner join alias a on a.id = an.id_alias
-                where 
+                where
                     an.name in @names
                     and a.id_session = @idSession";
 
@@ -89,46 +113,27 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Create(ref AliasQueryResult alias, long idSession)
         {
-            //Create the alias
-            var sql = @"
-                insert into alias (
-                    arguments,
-                    file_name,
-                    notes,
-                    run_as,
-                    start_mode,
-                    id_session,
-                    icon,
-                    working_dir
-                ) values (
-                    @arguments,
-                    @fileName,
-                    @notes,
-                    @runAs,
-                    @startMode,
-                    @idSession,
-                    @icon,
-                    @workingDirectory
-                );
-                select last_insert_rowid() from alias limit 1;";
-
-            var id = _db.Connection.ExecuteScalar<long>(sql, new
+            var id = _db.Connection.ExecuteScalar<long>(s_CreateAliasSql, new
             {
                 Arguments = alias.Parameters,
                 alias.FileName,
                 alias.Notes,
                 alias.RunAs,
                 alias.StartMode,
+                alias.WorkingDirectory,
                 idSession,
                 alias.Icon,
-                alias.WorkingDirectory
+                alias.IsHidden
             });
 
             // Create synonyms
-            sql = @"insert into alias_name (id_alias, name) values (@id, @name)";
             foreach (var name in alias.Synonyms.SplitCsv())
             {
-                _db.Connection.ExecuteScalar<long>(sql, new { id, name });
+                _db.Connection.ExecuteScalar<long>(s_CreateAliasNameSql, new
+                {
+                    id,
+                    name
+                });
             }
 
             alias.Id = id;
@@ -137,6 +142,20 @@ namespace Lanceur.Infra.SQLite.DbActions
             // return the id of the just updated allias (which
             // should be the same as the one specified as arg
             return id;
+        }
+
+        public void CreateInvisible(ref QueryResult alias)
+        {
+            var aliasQR = new AliasQueryResult
+            {
+                Name = alias.Name,
+                FileName = alias.Name,
+                Synonyms = alias.Name,
+                IsHidden = true,
+                Icon = "PageHidden"
+            };
+            var idSession = GetDefaultSessionId();
+            alias.Id = Create(ref aliasQR, idSession);
         }
 
         public void Dispose() => _db.Dispose();
@@ -150,13 +169,13 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         /// <summary>
         /// Get the a first alias with the exact name. In case of multiple aliases
-        /// with same name, the one with greater counter is selected.        
+        /// with same name, the one with greater counter is selected.
         /// </summary>
         /// <param name="name">The alias' exact name to find.</param>
         /// <param name="idSession">The session where the search occurs.</param>
         /// <param name="delay">Indicates a delay to set.</param>
         /// <returns>The exact match or <c>null</c> if not found.</returns>
-        public AliasQueryResult GetExact(string name, long? idSession = null)
+        public AliasQueryResult GetExact(string name, long? idSession = null, bool includeHidden = false)
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
@@ -172,7 +191,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                     a.start_mode  as StartMode,
                     a.working_dir as WorkingDirectory,
                     a.icon        as Icon,
-                    c.exec_count  as Count
+                    c.exec_count  as Count,
+                    a.hidden      as IsHidden
                 from
                     alias a
                     left join alias_name n on a.id = n.id_alias
@@ -181,10 +201,13 @@ namespace Lanceur.Infra.SQLite.DbActions
                 where
                     a.id_session = @idSession
                     and n.Name = @name
+                    and hidden in @hidden
                 order by
                     c.exec_count desc,
                     n.name asc";
-            var arguments = new { idSession, name };
+
+            var hidden = includeHidden ? new int[] { 0, 1 } : 0.ToEnumerable();
+            var arguments = new { idSession, name, hidden };
 
             return _db.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault();
         }
@@ -261,27 +284,6 @@ namespace Lanceur.Infra.SQLite.DbActions
                       where an.id_alias is null
                     );";
                 _db.Connection.Execute(sql3);
-            }
-        }
-
-        public void SetUsage(QueryResult alias)
-        {
-            if ((alias?.Id ?? 0) == 0) { _log.Trace($"Try to set usage to unsupported Alias with this name'{(alias?.Name ?? "N.A.")}'"); }
-            else
-            {
-                var idSession = GetDefaultSessionId();
-                var sql = @"
-                    insert into alias_usage (
-                        id_alias,
-                        id_session,
-                        time_stamp
-
-                    ) values (
-                        @idAlias,
-                        @idSession,
-                        @now
-                    )";
-                _db.Connection.Execute(sql, new { idAlias = alias.Id, idSession, now = DateTime.Now });
             }
         }
 

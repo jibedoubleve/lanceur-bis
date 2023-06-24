@@ -43,6 +43,7 @@ namespace Lanceur.Core.Models
             set => RunAs = value ? RunAs.Admin : RunAs.CurrentUser;
         }
 
+        public bool IsHidden { get; set; } = false;
         public string Notes { get; set; }
 
         public RunAs RunAs { get; set; } = RunAs.CurrentUser;

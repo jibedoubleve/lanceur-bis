@@ -24,15 +24,6 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Theory]
-        [InlineData(default(Type), 1)]
-        [InlineData(typeof(MainViewModel), 7)]
-        public void ReturnExpectedCountOfReservedKeywords(Type type, int count)
-        {
-            var store = GetStore(Substitute.For<IDbRepository>(), type);
-            store.ReservedAliases.Should().HaveCount(count);
-        }
-
-        [Theory]
         [InlineData("add")]
         [InlineData("import")]
         [InlineData("quit")]

@@ -11,7 +11,6 @@ namespace Lanceur.Tests.BusinessLogic
 
         [Theory]
         [InlineData("lkj")]
-        [InlineData("sqrt(9)")] // Case sensitive
         public void ReturnResultOnError(string expression)
         {
             var calculator = new CodingSebCalculatorService();
@@ -29,6 +28,7 @@ namespace Lanceur.Tests.BusinessLogic
         [InlineData("2-3", "-1")]
         [InlineData("9/3", "3")]
         [InlineData("Sqrt(9)", "3")]
+        [InlineData("sqrt(9)", "3")]
         public void ReturnResultOnSuccess(string expression, string expected)
         {
             var calculator = new CodingSebCalculatorService();
