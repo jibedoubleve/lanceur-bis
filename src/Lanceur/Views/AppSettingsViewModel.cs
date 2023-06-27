@@ -23,13 +23,12 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppConfigRepository _appConfigRepository;
         private readonly Interaction<Unit, string> _askFile;
-        private readonly IDatabaseConfigRepository _databaseConfigRepository;
         private readonly IDelay _delay;
         private readonly INotification _nofification;
         private readonly IAppRestart _restart;
         private readonly ISchedulerProvider _schedulers;
+        private readonly ISettingsFacade _settingsFacade;
         private readonly IDbRepository _service;
 
         #endregion Fields
@@ -38,9 +37,8 @@ namespace Lanceur.Views
 
         public AppSettingsViewModel(
             ISchedulerProvider schedulers = null,
-            IAppConfigRepository appConfigService = null,
             IUserNotification notify = null,
-            IDatabaseConfigRepository databaseConfigService = null,
+            ISettingsFacade settingsFacade = null,
             IDbRepository dataService = null,
             IDelay delay = null,
             IAppRestart restart = null,
@@ -49,15 +47,13 @@ namespace Lanceur.Views
         {
             var l = Locator.Current;
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _appConfigRepository = appConfigService ?? l.GetService<IAppConfigRepository>();
-
             _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
-            _databaseConfigRepository = databaseConfigService ?? l.GetService<IDatabaseConfigRepository>();
             _service = dataService ?? l.GetService<IDbRepository>();
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();
             _nofification = nofification ?? l.GetService<INotification>();
+            _settingsFacade = settingsFacade ?? l.GetService<ISettingsFacade>();
 
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
@@ -109,17 +105,17 @@ namespace Lanceur.Views
 
         private TimeSpan GetDelay()
         {
-            var delay = _appConfigRepository.Current.RestartDelay;
+            var delay = _settingsFacade.Application.RestartDelay;
             var time = TimeSpan.FromMilliseconds(delay);
             return time;
         }
 
         private ActivationContext OnActivate()
         {
-            var appSettings = _appConfigRepository.Current;
-            var dbPath = _databaseConfigRepository.Current.DbPath;
+            var appSettings = _settingsFacade.Application;
+            var dbPath = _settingsFacade.Database.DbPath;
 
-            var settingsMemento = SettingsMementoManager.InitialState(appSettings, dbPath);
+            var settingsMemento = SettingsMementoManager.InitialState(_settingsFacade);
 
             var context = new ActivationContext()
             {
@@ -135,20 +131,19 @@ namespace Lanceur.Views
         private async void OnSaveSettings()
         {
             //Save DB Path in property file
-            _databaseConfigRepository.Current.DbPath = DbPath?.Replace("\"", "");
-            _databaseConfigRepository.Save();
+            _settingsFacade.Database.DbPath = DbPath?.Replace("\"", "");
 
             // Save hotkey & Session in DB
-            _appConfigRepository.Current.Window.ShowResult = ShowResult;
-            _appConfigRepository.Current.RestartDelay = RestartDelay;
-            _appConfigRepository.Current.HotKey = HotKeySection;
-            _appConfigRepository.Current.Window.ShowAtStartup = ShowResult;
-            if (CurrentSession is not null) { _appConfigRepository.Current.IdSession = CurrentSession.Id; }
+            _settingsFacade.Application.Window.ShowResult = ShowResult;
+            _settingsFacade.Application.RestartDelay = RestartDelay;
+            _settingsFacade.Application.HotKey = HotKeySection;
+            _settingsFacade.Application.Window.ShowAtStartup = ShowResult;
+            if (CurrentSession is not null) { _settingsFacade.Application.IdSession = CurrentSession.Id; }
 
             //Save settings
-            _appConfigRepository.Save();
+            _settingsFacade.Save();
 
-            if (SettingsMemento.HasStateChanged(_appConfigRepository.Current, _databaseConfigRepository.Current.DbPath))
+            if (SettingsMemento.HasStateChanged(_settingsFacade))
             {
                 TimeSpan time = GetDelay();
 

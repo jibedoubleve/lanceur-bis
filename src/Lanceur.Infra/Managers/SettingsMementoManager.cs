@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories.Config;
 
 namespace Lanceur.Infra.Managers
 {
@@ -21,11 +22,11 @@ namespace Lanceur.Infra.Managers
 
         #region Methods
 
-        private static int GetStateHash(AppConfig state, string dbPath) => (state.HotKey, dbPath).GetHashCode();
+        private static int GetStateHash(AppConfig appCfg, IDatabaseConfig dbCfg) => (appCfg.HotKey, dbCfg.DbPath).GetHashCode();
 
-        public static SettingsMementoManager InitialState(AppConfig initialState, string dbPath) => new(GetStateHash(initialState, dbPath));
+        public static SettingsMementoManager InitialState(ISettingsFacade settings) => new(GetStateHash(settings.Application, settings.Database));
 
-        public bool HasStateChanged(AppConfig newState, string dbPath) => GetStateHash(newState, dbPath) != _stateHash;
+        public bool HasStateChanged(ISettingsFacade settings) => GetStateHash(settings.Application, settings.Database) != _stateHash;
 
         #endregion Methods
     }

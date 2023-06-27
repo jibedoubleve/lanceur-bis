@@ -1,4 +1,6 @@
-﻿namespace Lanceur.Core.Models.Settings
+﻿using System.Text.Json.Serialization;
+
+namespace Lanceur.Core.Models.Settings
 {
     public class AppConfig
     {
@@ -9,6 +11,7 @@
         public RepositorySection Repository { get; set; } = RepositorySection.Default;
         public double RestartDelay { get; set; } = 500;
         public WindowSection Window { get; set; } = WindowSection.Default;
+
         #endregion Properties
     }
 }

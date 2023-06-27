@@ -30,7 +30,7 @@ using System.Reflection;
 
 namespace Lanceur
 {
-    internal class Bootstrapper
+    public class Bootstrapper
     {
         #region Fields
 
@@ -78,6 +78,8 @@ namespace Lanceur
 #else
             l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
 #endif
+            l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<SQLiteConnectionScope>()));
+            l.Register<ISettingsFacade>(() => new SettingsFacade(Get<IDatabaseConfigRepository>(), Get<IAppConfigRepository>()));
 
             l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
             l.Register<IAppLoggerFactory>(() => new NLoggerFactory());
@@ -87,7 +89,6 @@ namespace Lanceur
             l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(), Get<IDbRepository>(), Get<ICmdlineManager>()));
             l.Register<IDbRepository>(() => new SQLiteRepository(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(), Get<IConvertionService>()));
             l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
-            l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<SQLiteConnectionScope>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
             l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
             l.Register<IClipboardService>(() => new WindowsClipboardService());
