@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Lanceur.Core.Models.Settings.AppSettings">
-    <Position X="8.75" Y="1" Width="1.5" />
+  <Class Name="Lanceur.Core.Models.Settings.AppConfig">
+    <Position X="4.25" Y="1" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAKAEAAAAAAAAAAAAAAAAgAAAAAAAAAACAAAAgA=</HashCode>
-      <FileName>Models\Settings\AppSettings.cs</FileName>
+      <HashCode>AAAAAAKAAAAAAAAAAAAAAAAAAgAAAAAAAAAACAAAAgA=</HashCode>
+      <FileName>Models\Settings\AppConfig.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="HotKey" />
@@ -13,35 +13,34 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Lanceur.Core.Models.Settings.HotKeySection">
-    <Position X="11.75" Y="0.75" Width="1.5" />
+    <Position X="4.5" Y="5.25" Width="1.5" />
     <Members>
-      <Property Name="Empty" Hidden="true" />
       <Method Name="HotKeySection" Hidden="true" />
       <Method Name="ToString" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQEAAIAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAQEAAAAMAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Settings\HotKeySection.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.Settings.PositionSection" Collapsed="true">
-    <Position X="6.25" Y="3" Width="1.5" />
+  <Class Name="Lanceur.Core.Models.Settings.PositionSection">
+    <Position X="1.25" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAACAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAIAAAACAAAAAAAAAA=</HashCode>
       <FileName>Models\Settings\PositionSection.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.Settings.RepositorySection">
-    <Position X="11.75" Y="2.25" Width="1.5" />
+    <Position X="6.5" Y="5.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
       <FileName>Models\Settings\RepositorySection.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.Settings.WindowSection">
-    <Position X="6.25" Y="1.25" Width="1.5" />
+    <Position X="1.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAEAAAAAAgAAAAIQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Settings\WindowSection.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
