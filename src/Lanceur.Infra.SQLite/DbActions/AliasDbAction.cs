@@ -9,32 +9,6 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
-        private const string s_CreateAliasNameSql = @"insert into alias_name (id_alias, name) values (@id, @name)";
-
-        private const string s_CreateAliasSql = @"
-                insert into alias (
-                    arguments,
-                    file_name,
-                    notes,
-                    run_as,
-                    start_mode,
-                    working_dir,
-                    id_session,
-                    icon,
-                    hidden
-                ) values (
-                    @arguments,
-                    @fileName,
-                    @notes,
-                    @runAs,
-                    @startMode,
-                    @workingDirectory,
-                    @idSession,
-                    @icon,
-                    @isHidden
-                );
-                select last_insert_rowid() from alias limit 1;";
-
         private readonly SQLiteConnectionScope _db;
         private readonly IAppLogger _log;
 
@@ -71,9 +45,9 @@ namespace Lanceur.Infra.SQLite.DbActions
             var ids = (from r in results
                        where r.Id != 0
                        select r);
-            var sql = @"
+            var sql = @$"
                 select
-	                id_alias as id,
+	                id_alias as {nameof(KeywordUsage.Id)},
 	                count
                 from
 	                stat_usage_per_app_v
@@ -129,7 +103,30 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Create(ref AliasQueryResult alias, long idSession)
         {
-            var id = _db.Connection.ExecuteScalar<long>(s_CreateAliasSql, new
+            const string sqlAlias = @"
+                insert into alias (
+                    arguments,
+                    file_name,
+                    notes,
+                    run_as,
+                    start_mode,
+                    working_dir,
+                    id_session,
+                    icon,
+                    hidden
+                ) values (
+                    @arguments,
+                    @fileName,
+                    @notes,
+                    @runAs,
+                    @startMode,
+                    @workingDirectory,
+                    @idSession,
+                    @icon,
+                    @isHidden
+                );
+                select last_insert_rowid() from alias limit 1;";
+            var id = _db.Connection.ExecuteScalar<long>(sqlAlias, new
             {
                 Arguments = alias.Parameters,
                 alias.FileName,
@@ -143,9 +140,10 @@ namespace Lanceur.Infra.SQLite.DbActions
             });
 
             // Create synonyms
+            const string sqlSynonyms = @"insert into alias_name (id_alias, name) values (@id, @name)";
             foreach (var name in alias.Synonyms.SplitCsv())
             {
-                _db.Connection.ExecuteScalar<long>(s_CreateAliasNameSql, new
+                _db.Connection.ExecuteScalar<long>(sqlSynonyms, new
                 {
                     id,
                     name
@@ -195,20 +193,20 @@ namespace Lanceur.Infra.SQLite.DbActions
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
-            var sql = @"
+            var sql = @$"
                 select
-                    n.Name        as Name,
-                    s.synonyms    as Synonyms,
-                    a.Id          as Id,
-                    a.arguments   as Arguments,
-                    a.file_name   as FileName,
-                    a.notes       as Notes,
-                    a.run_as      as RunAs,
-                    a.start_mode  as StartMode,
-                    a.working_dir as WorkingDirectory,
-                    a.icon        as Icon,
-                    c.exec_count  as Count,
-                    a.hidden      as IsHidden
+                    n.Name        as {nameof(AliasQueryResult.Name)},
+                    s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
+                    a.Id          as {nameof(AliasQueryResult.Id)},
+                    a.arguments   as {nameof(AliasQueryResult.Parameters)},
+                    a.file_name   as {nameof(AliasQueryResult.FileName)},
+                    a.notes       as {nameof(AliasQueryResult.Notes)},
+                    a.run_as      as {nameof(AliasQueryResult.RunAs)},
+                    a.start_mode  as {nameof(AliasQueryResult.StartMode)},
+                    a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
+                    a.icon        as {nameof(AliasQueryResult.Icon)},
+                    c.exec_count  as {nameof(AliasQueryResult.Count)},
+                    a.hidden      as {nameof(AliasQueryResult.IsHidden)}
                 from
                     alias a
                     left join alias_name n on a.id = n.id_alias
