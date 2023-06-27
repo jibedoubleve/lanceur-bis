@@ -48,21 +48,21 @@ namespace Lanceur.Infra.SQLite
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
-            var sql = @"
+            var sql = @$"
                 select
-                    an.Name       as Name,
-                    a.Id          as Id,
-                    a.id          as Id,
-                    a.arguments   as Parameters,
-                    a.file_name   as FileName,
-                    a.notes       as Notes,
-                    a.run_as      as RunAs,
-                    a.start_mode  as StartMode,
-                    a.working_dir as WorkingDirectory,
-                    a.icon        as Icon,
-                    c.exec_count  as Count,
-                    s.synonyms    as Synonyms,
-                    s.Synonyms    as SynomymsPrevious
+                    an.Name       as {nameof(AliasQueryResult.Name)},
+                    a.Id          as {nameof(AliasQueryResult.Id)},
+                    a.id          as {nameof(AliasQueryResult.Id)},
+                    a.arguments   as {nameof(AliasQueryResult.Parameters)},
+                    a.file_name   as {nameof(AliasQueryResult.FileName)},
+                    a.notes       as {nameof(AliasQueryResult.Notes)},
+                    a.run_as      as {nameof(AliasQueryResult.RunAs)},
+                    a.start_mode  as {nameof(AliasQueryResult.StartMode)},
+                    a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
+                    a.icon        as {nameof(AliasQueryResult.Icon)},
+                    c.exec_count  as {nameof(AliasQueryResult.Count)},
+                    s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
+                    s.Synonyms    as {nameof(AliasQueryResult.SynomymsPreviousState)}
                 from
                     alias a
                     left join alias_name an on a.id = an.id_alias
@@ -83,11 +83,11 @@ namespace Lanceur.Infra.SQLite
         public Session GetDefaultSession()
         {
             var id = GetDefaultSessionId();
-            var sql = @"
+            var sql = @$"
                 select
-	                id    as Id,
-	                name  as Name,
-                    notes as Notes
+	                id    as {nameof(Session.Id)},
+	                name  as {nameof(Session.Name)},
+                    notes as {nameof(Session.Notes)}
                 from
 	                alias_session
                 where
@@ -100,12 +100,12 @@ namespace Lanceur.Infra.SQLite
 
         public IEnumerable<QueryResult> GetDoubloons()
         {
-            var sql = @"
+            var sql = @$"
             select
-                id        as Id,
-                file_name as Description,
-                file_name as FileName,
-                name      as Name
+                id        as {nameof(SelectableAliasQueryResult.Id)},
+                file_name as {nameof(SelectableAliasQueryResult.Description)},
+                file_name as {nameof(SelectableAliasQueryResult.FileName)},
+                name      as {nameof(SelectableAliasQueryResult.Name)}
             from
                 data_doubloons_v
             order by file_name";
@@ -143,10 +143,10 @@ namespace Lanceur.Infra.SQLite
         public IEnumerable<QueryResult> GetMostUsedAliases(long? idSession = null)
         {
             idSession ??= GetDefaultSessionId();
-            var sql = @"
+            var sql = @$"
                 select
-	                keywords   as name,
-                    exec_count as count
+	                keywords   as {nameof(DisplayUsageQueryResult.Name)},
+                    exec_count as {nameof(DisplayUsageQueryResult.Count)}
                 from
                     stat_execution_count_v
                 where
@@ -158,11 +158,11 @@ namespace Lanceur.Infra.SQLite
 
         public IEnumerable<Session> GetSessions()
         {
-            var sql = @"
+            var sql = @$"
             select
-	            id    as Id,
-                name  as Name,
-                notes as Notes
+	            id    as {nameof(Session.Id)},
+                name  as {nameof(Session.Name)},
+                notes as {nameof(Session.Notes)}
             from alias_session";
             var result = DB.Connection.Query<Session>(sql);
             return result;
@@ -184,10 +184,10 @@ namespace Lanceur.Infra.SQLite
 
         public void HydrateMacro(QueryResult alias)
         {
-            var sql = @"
+            var sql = @$"
             select
-	            a.id        as Id,
-                count(a.id) as Count
+	            a.id        as {nameof(QueryResult.Id)},
+                count(a.id) as {nameof(QueryResult.Count)}
             from
 	            alias a
                 inner join alias_usage au on a.id = au.id_alias
@@ -259,21 +259,21 @@ namespace Lanceur.Infra.SQLite
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
-            var sql = @"
+            var sql = @$"
                 select
-                    an.Name       as Name,
-                    a.Id          as Id,
-                    a.id          as Id,
-                    a.arguments   as Parameters,
-                    a.file_name   as FileName,
-                    a.notes       as Notes,
-                    a.run_as      as RunAs,
-                    a.start_mode  as StartMode,
-                    a.working_dir as WorkingDirectory,
-                    a.icon        as Icon,
-                    c.exec_count  as Count,
-                    s.synonyms    as Synonyms,
-                    s.Synonyms    as SynomymsPrevious
+                    an.Name       as {nameof(AliasQueryResult.Name)},
+                    a.Id          as {nameof(AliasQueryResult.Id)},
+                    a.id          as {nameof(AliasQueryResult.Id)},
+                    a.arguments   as {nameof(AliasQueryResult.Parameters)},
+                    a.file_name   as {nameof(AliasQueryResult.FileName)},
+                    a.notes       as {nameof(AliasQueryResult.Notes)},
+                    a.run_as      as {nameof(AliasQueryResult.RunAs)},
+                    a.start_mode  as {nameof(AliasQueryResult.StartMode)},
+                    a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
+                    a.icon        as {nameof(AliasQueryResult.Icon)},
+                    c.exec_count  as {nameof(AliasQueryResult.Count)},
+                    s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
+                    s.Synonyms    as {nameof(AliasQueryResult.SynomymsPreviousState)}
                 from
                     alias a
                     left join alias_name an on a.id = an.id_alias
