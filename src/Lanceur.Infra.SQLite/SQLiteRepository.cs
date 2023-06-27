@@ -61,7 +61,8 @@ namespace Lanceur.Infra.SQLite
                     a.working_dir as WorkingDirectory,
                     a.icon        as Icon,
                     c.exec_count  as Count,
-                    s.synonyms    as Synonyms
+                    s.synonyms    as Synonyms,
+                    s.Synonyms    as SynomymsPrevious
                 from
                     alias a
                     left join alias_name an on a.id = an.id_alias
@@ -271,7 +272,8 @@ namespace Lanceur.Infra.SQLite
                     a.working_dir as WorkingDirectory,
                     a.icon        as Icon,
                     c.exec_count  as Count,
-                    s.synonyms    as Synonyms
+                    s.synonyms    as Synonyms,
+                    s.Synonyms    as SynomymsPrevious
                 from
                     alias a
                     left join alias_name an on a.id = an.id_alias

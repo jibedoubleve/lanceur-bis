@@ -251,7 +251,7 @@ namespace Lanceur.Views
                 x => !x.IsNullOrEmpty()
             );
             var nameExists = this.WhenAnyValue(
-                x => x.SelectedAlias.Synonyms,
+                x => x.SelectedAlias.SynonymsNextState,
                 x => _aliasService.CheckNamesExist(x.SplitCsv())
             );
 
@@ -270,7 +270,7 @@ namespace Lanceur.Views
                    {
                        return (response.Exists == false && !response.ExistingNames.Any())
                         ? "The names should not be empty"
-                        : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Count() <= 1 ? "is" : "are")} already used as alias.";
+                        : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.";
                    }
              );
             ValidationAliasExists.DisposeWith(d);

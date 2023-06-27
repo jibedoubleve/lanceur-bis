@@ -44,11 +44,17 @@ namespace Lanceur.Core.Models
         }
 
         public bool IsHidden { get; set; } = false;
+
         public string Notes { get; set; }
 
         public RunAs RunAs { get; set; } = RunAs.CurrentUser;
 
         public StartMode StartMode { get; set; } = StartMode.Default;
+
+        /// <summary>
+        /// Synonyms present when the entity was loaded
+        /// </summary>
+        public string SynomymsPreviousState { get; set; }
 
         /// <summary>
         /// Get or set a string representing all the name this alias has.
@@ -57,7 +63,21 @@ namespace Lanceur.Core.Models
         public string Synonyms
         {
             get => _synonyms;
-            set => Set(ref _synonyms, value);
+            set
+            {
+                Set(ref _synonyms, value);
+                OnPropertyChanged(nameof(SynonymsNextState));
+            }
+        }
+
+        /// <summary>
+        /// New synonyms added when updated
+        /// </summary>
+        public string SynonymsNextState
+        {
+            get => (from n in Synonyms.SplitCsv()
+                    where !SynomymsPreviousState.SplitCsv().Contains(n)
+                    select n).ToArray().JoinCsv();
         }
 
         public string WorkingDirectory { get; set; }

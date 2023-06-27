@@ -10,6 +10,7 @@ namespace Lanceur.Infra.SQLite.DbActions
         #region Fields
 
         private const string s_CreateAliasNameSql = @"insert into alias_name (id_alias, name) values (@id, @name)";
+
         private const string s_CreateAliasSql = @"
                 insert into alias (
                     arguments,
@@ -33,6 +34,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @isHidden
                 );
                 select last_insert_rowid() from alias limit 1;";
+
         private readonly SQLiteConnectionScope _db;
         private readonly IAppLogger _log;
 
@@ -49,6 +51,20 @@ namespace Lanceur.Infra.SQLite.DbActions
         #endregion Constructors
 
         #region Methods
+
+        private void UpdateName(AliasQueryResult alias)
+        {
+            //Remove all names
+            var sql = @"delete from alias_name where id_alias = @id";
+            _db.Connection.Execute(sql, new { id = alias.Id });
+
+            //Recreate new names
+            sql = @"insert into alias_name (id_alias, name) values (@id, @name)";
+            foreach (var name in alias.Synonyms.SplitCsv())
+            {
+                _db.Connection.Execute(sql, new { id = alias.Id, name });
+            }
+        }
 
         internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
         {
@@ -314,21 +330,8 @@ namespace Lanceur.Infra.SQLite.DbActions
             });
 
             UpdateName(alias);
+            alias.SynomymsPreviousState = alias.Synonyms;
             return alias.Id;
-        }
-
-        public void UpdateName(AliasQueryResult alias)
-        {
-            //Remove all names
-            var sql = @"delete from alias_name where id_alias = @id";
-            _db.Connection.Execute(sql, new { id = alias.Id });
-
-            //Recreate new names
-            sql = @"insert into alias_name (id_alias, name) values (@id, @name)";
-            foreach (var name in alias.Synonyms.SplitCsv())
-            {
-                _db.Connection.Execute(sql, new { id = alias.Id, name });
-            }
         }
 
         #endregion Methods
