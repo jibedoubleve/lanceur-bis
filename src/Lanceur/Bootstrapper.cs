@@ -75,7 +75,7 @@ namespace Lanceur
             l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
 #endif
             l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<SQLiteConnectionScope>()));
-            l.Register<ISettingsFacade>(() => new SettingsFacade(Get<IDatabaseConfigRepository>(), Get<IAppConfigRepository>()));
+            l.RegisterLazySingleton<ISettingsFacade>(() => new SettingsFacade(Get<IDatabaseConfigRepository>(), Get<IAppConfigRepository>()));
 
             l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
             l.Register<IAppLoggerFactory>(() => new NLoggerFactory());
