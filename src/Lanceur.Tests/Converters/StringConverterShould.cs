@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
 using Lanceur.Converters;
 using Lanceur.Infra.Formatters;
+using Lanceur.Tests.Utils;
+using NSubstitute;
+using Splat;
 using Xunit;
 
 namespace Lanceur.Tests.Converters
@@ -51,6 +54,7 @@ namespace Lanceur.Tests.Converters
         [Fact]
         public void FailWhenFormatterNotInIOC()
         {
+            using var scope = new LocatorDesactivator();
             Assert.Throws<ArgumentNullException>(() =>
             {
                 new QueryDescriptionConverter();
