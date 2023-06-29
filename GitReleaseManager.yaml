@@ -26,7 +26,7 @@ issue-labels-exclude:
 - build
 - wontfix
 - to be investigated
-- to be analysed
+- analysed
 issue-labels-alias:
     - name:    Documentation
       header:  Documentation
