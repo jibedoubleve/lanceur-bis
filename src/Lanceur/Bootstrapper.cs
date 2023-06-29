@@ -17,11 +17,13 @@ using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Models;
 using Lanceur.Schedulers;
+using Lanceur.Scripts;
 using Lanceur.Ui;
 using Lanceur.Utils;
 using Lanceur.Utils.ConnectionStrings;
 using Lanceur.Utils.PackagedApps;
 using Lanceur.Views;
+using ModernWpf;
 using ReactiveUI;
 using Splat;
 using System;
@@ -30,14 +32,8 @@ using System.Reflection;
 
 namespace Lanceur
 {
-    internal class Bootstrapper
+    public class Bootstrapper
     {
-        #region Fields
-
-        private const string DbScriptEmbededResourcePattern = @"Lanceur\.SQL\.script-(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*.sql";
-
-        #endregion Fields
-
         #region Methods
 
         private static T Get<T>() => Locator.Current.GetService<T>();
@@ -78,6 +74,8 @@ namespace Lanceur
 #else
             l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
 #endif
+            l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<SQLiteConnectionScope>()));
+            l.RegisterLazySingleton<ISettingsFacade>(() => new SettingsFacade(Get<IDatabaseConfigRepository>(), Get<IAppConfigRepository>()));
 
             l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
             l.Register<IAppLoggerFactory>(() => new NLoggerFactory());
@@ -87,7 +85,6 @@ namespace Lanceur
             l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(), Get<IDbRepository>(), Get<ICmdlineManager>()));
             l.Register<IDbRepository>(() => new SQLiteRepository(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(), Get<IConvertionService>()));
             l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
-            l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<SQLiteConnectionScope>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
             l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
             l.Register<IClipboardService>(() => new WindowsClipboardService());
@@ -105,8 +102,15 @@ namespace Lanceur
             l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
 
             l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<SQLiteConnectionScope>())));
+
             l.Register((Func<IDataStoreUpdateManager>)(() =>
-                new SQLiteDatabaseUpdateManager(Get<IDataStoreVersionManager>(), Get<SQLiteConnectionScope>(), Assembly.GetExecutingAssembly(), DbScriptEmbededResourcePattern)));
+                new SQLiteDatabaseUpdateManager(
+                    Get<IDataStoreVersionManager>(),
+                    Get<SQLiteConnectionScope>(),
+                    ScriptRepository.Asm,
+                    ScriptRepository.DbScriptEmbededResourcePattern)
+                )
+            );
         }
 
         private static void RegisterViewModels()

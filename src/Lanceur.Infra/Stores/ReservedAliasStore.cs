@@ -61,19 +61,6 @@ namespace Lanceur.Infra.Stores
 
         #endregion Constructors
 
-        #region Properties
-
-        public IEnumerable<QueryResult> ReservedAliases
-        {
-            get
-            {
-                if (_reservedAliases == null) { LoadAliases(); }
-                return _reservedAliases;
-            }
-        }
-
-        #endregion Properties
-
         #region Methods
 
         private void LoadAliases()
@@ -113,13 +100,18 @@ namespace Lanceur.Infra.Stores
             }
         }
 
-        public IEnumerable<QueryResult> GetAll() => ReservedAliases;
+        public IEnumerable<QueryResult> GetAll()
+        {
+            if (_reservedAliases == null) { LoadAliases(); }
+            return _dataService.RefreshUsage(_reservedAliases);
+        }
 
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
-            var result = (from k in ReservedAliases
+            var result = (from k in GetAll()
                           where k.Name.ToLower().StartsWith(query.Name)
                           select k).ToList();
+
             var orderedResult = _dataService
                     .RefreshUsage(result)
                     .OrderByDescending(x => x.Count)

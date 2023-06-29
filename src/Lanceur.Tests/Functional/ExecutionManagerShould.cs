@@ -22,7 +22,7 @@ namespace Lanceur.Tests.Functional
             var cmdline = new Cmdline(cmd, parameters);
             var cmdlineManager = Substitute.For<ICmdlineManager>();
             cmdlineManager
-                .BuildFromText((string)cmdline)
+                .BuildFromText(cmdline.ToString())
                 .Returns(cmdline);
 
             var mgr = new ExecutionManager(
@@ -41,7 +41,7 @@ namespace Lanceur.Tests.Functional
 
             var request = new ExecutionRequest
             {
-                Query = (string)cmdline,
+                Query = cmdline.ToString(),
                 ExecuteWithPrivilege = false,
                 QueryResult = macro
             };

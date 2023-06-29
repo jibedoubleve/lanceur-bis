@@ -26,7 +26,7 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppConfigRepository _appConfigService;
+        private readonly ISettingsFacade _settingsFacade;
         private readonly ICmdlineManager _cmdlineManager;
         private readonly IDbRepository _dbRepository;
         private readonly IExecutionManager _executor;
@@ -46,7 +46,7 @@ namespace Lanceur.Views
             IUserNotification notify = null,
             IDbRepository dataService = null,
             IExecutionManager executor = null,
-            IAppConfigRepository appConfigService = null)
+            ISettingsFacade appConfigService = null)
         {
             _schedulers = schedulerProvider ?? new RxAppSchedulerProvider();
 
@@ -57,7 +57,7 @@ namespace Lanceur.Views
             _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
             _dbRepository = dataService ?? l.GetService<IDbRepository>();
             _executor = executor ?? l.GetService<IExecutionManager>();
-            _appConfigService = appConfigService ?? l.GetService<IAppConfigRepository>();
+            _settingsFacade = appConfigService ?? l.GetService<ISettingsFacade>();
 
             #region Commands
 
@@ -242,13 +242,13 @@ namespace Lanceur.Views
         {
             var sessionName = _dbRepository.GetDefaultSession()?.Name ?? "N.A.";
 
-            var aliases = _appConfigService.Current.Window.ShowResult
+            var aliases = _settingsFacade.Application.Window.ShowResult
                 ? _searchService.GetAll()
                 : Array.Empty<AliasQueryResult>();
 
             aliases.SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
 
-            _log.Trace($"{(_appConfigService.Current.Window.ShowResult ? $"View activation: show all {aliases?.Count() ?? 0} result(s)" : "View activation: display nothing")}");
+            _log.Trace($"{(_settingsFacade.Application.Window.ShowResult ? $"View activation: show all {aliases?.Count() ?? 0} result(s)" : "View activation: display nothing")}");
             return new()
             {
                 CurrentSessionName = sessionName,
@@ -281,7 +281,7 @@ namespace Lanceur.Views
 
         private Task<AliasResponse> OnSearchAliasAsync(string criterion)
         {
-            var showResult = _appConfigService.Current.Window.ShowResult;
+            var showResult = _settingsFacade.Application.Window.ShowResult;
             if (criterion.IsNullOrWhiteSpace() && showResult) { return new AliasResponse(); }
             if (criterion.IsNullOrWhiteSpace() && !showResult)
             {

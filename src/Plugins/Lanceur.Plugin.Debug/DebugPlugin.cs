@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace Lanceur.Plugin.Debug
 {
-    [Plugin("pdeb"), Description("Plugin just used for plugin debugging.")]
+    [Plugin("debug"), Description("Plugin just used for plugin debugging.")]
     public class DebugPlugin : PluginBase
     {
         #region Methods

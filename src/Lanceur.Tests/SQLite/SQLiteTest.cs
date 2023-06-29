@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Lanceur.Scripts;
 using Lanceur.Views;
 using System.Data.SQLite;
 using System.Reflection;
@@ -27,9 +28,7 @@ namespace Lanceur.Tests.SQLite
         protected static SQLiteConnection BuildFreshDB(string sql = null)
         {
             var db = BuildConnection();
-            var asm = Assembly.GetAssembly(typeof(MainView));
-            var pattern = @"Lanceur\.SQL\.script-(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*.sql";
-            var updater = new DatabaseUpdater(db, asm, pattern);
+            var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbededResourcePattern);
             updater.UpdateFromScratch();
 
             if (sql is not null) { db.Execute(sql); }

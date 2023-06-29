@@ -3,6 +3,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
+using Lanceur.SharedKernel.Mixins;
 using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.SQLite
@@ -15,6 +16,7 @@ namespace Lanceur.Infra.SQLite
         private readonly IConvertionService _converter;
         private readonly IAppLogger _log;
         private readonly MacroDbAction _macroManager;
+        private readonly SetUsageDbAction _setUsageDbAction;
 
         #endregion Fields
 
@@ -29,39 +31,49 @@ namespace Lanceur.Infra.SQLite
             _converter = converter;
             _aliasDbAction = new AliasDbAction(scope, logFactory);
             _macroManager = new MacroDbAction(DB, logFactory, converter);
+            _setUsageDbAction = new SetUsageDbAction(DB, logFactory);
         }
 
         #endregion Constructors
 
         #region Methods
 
+        public ExistingNameResponse CheckNamesExist(string[] names, long? idSession = null)
+        {
+            if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
+            return _aliasDbAction.CheckNameExists(names, idSession.Value);
+        }
+
         public IEnumerable<AliasQueryResult> GetAll(long? idSession = null)
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
-            var sql = @"
+            var sql = @$"
                 select
-                    n.Name        as Name,
-                    n.Name        as OldName,
-                    s.Id          as Id,
-                    s.id          as Id,
-                    s.arguments   as Parameters,
-                    s.file_name   as FileName,
-                    s.notes       as Notes,
-                    s.run_as      as RunAs,
-                    s.start_mode  as StartMode,
-                    s.working_dir as WorkingDirectory,
-                    s.icon        as Icon,
-                    c.exec_count  as Count
+                    an.Name       as {nameof(AliasQueryResult.Name)},
+                    a.Id          as {nameof(AliasQueryResult.Id)},
+                    a.id          as {nameof(AliasQueryResult.Id)},
+                    a.arguments   as {nameof(AliasQueryResult.Parameters)},
+                    a.file_name   as {nameof(AliasQueryResult.FileName)},
+                    a.notes       as {nameof(AliasQueryResult.Notes)},
+                    a.run_as      as {nameof(AliasQueryResult.RunAs)},
+                    a.start_mode  as {nameof(AliasQueryResult.StartMode)},
+                    a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
+                    a.icon        as {nameof(AliasQueryResult.Icon)},
+                    c.exec_count  as {nameof(AliasQueryResult.Count)},
+                    s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
+                    s.Synonyms    as {nameof(AliasQueryResult.SynomymsPreviousState)}
                 from
-                    alias s
-                    left join alias_name n on s.id = n.id_alias
-                    left join stat_execution_count_v c on c.id_keyword = s.id
+                    alias a
+                    left join alias_name an on a.id = an.id_alias
+                    left join stat_execution_count_v c on c.id_keyword = a.id
+                    inner join data_alias_synonyms_v s on s.id_alias = a.id
                 where
-                    s.id_session = @idSession
+                    a.id_session = @idSession
+                    and a.hidden = 0
                 order by
                     c.exec_count desc,
-                    n.name asc";
+                    an.name asc";
             var parameters = new { idSession };
 
             var result = DB.Connection.Query<AliasQueryResult>(sql, parameters);
@@ -71,11 +83,11 @@ namespace Lanceur.Infra.SQLite
         public Session GetDefaultSession()
         {
             var id = GetDefaultSessionId();
-            var sql = @"
+            var sql = @$"
                 select
-	                id    as Id,
-	                name  as Name,
-                    notes as Notes
+	                id    as {nameof(Session.Id)},
+	                name  as {nameof(Session.Name)},
+                    notes as {nameof(Session.Notes)}
                 from
 	                alias_session
                 where
@@ -88,12 +100,12 @@ namespace Lanceur.Infra.SQLite
 
         public IEnumerable<QueryResult> GetDoubloons()
         {
-            var sql = @"
+            var sql = @$"
             select
-                id        as Id,
-                file_name as Description,
-                file_name as FileName,
-                name      as Name
+                id        as {nameof(SelectableAliasQueryResult.Id)},
+                file_name as {nameof(SelectableAliasQueryResult.Description)},
+                file_name as {nameof(SelectableAliasQueryResult.FileName)},
+                name      as {nameof(SelectableAliasQueryResult.Name)}
             from
                 data_doubloons_v
             order by file_name";
@@ -101,6 +113,14 @@ namespace Lanceur.Infra.SQLite
             return results;
         }
 
+        /// <summary>
+        /// Get the a first alias with the exact name. In case of multiple aliases
+        /// with same name, the one with greater counter is selected.
+        /// </summary>
+        /// <param name="name">The alias' exact name to find.</param>
+        /// <param name="idSession">The session where the search occurs.</param>
+        /// <param name="delay">Indicates a delay to set.</param>
+        /// <returns>The exact match or <c>null</c> if not found.</returns>
         public AliasQueryResult GetExact(string name, long? idSession = null) => _aliasDbAction.GetExact(name, idSession);
 
         public IEnumerable<SelectableAliasQueryResult> GetInvalidAliases()
@@ -123,10 +143,10 @@ namespace Lanceur.Infra.SQLite
         public IEnumerable<QueryResult> GetMostUsedAliases(long? idSession = null)
         {
             idSession ??= GetDefaultSessionId();
-            var sql = @"
+            var sql = @$"
                 select
-	                keywords   as name,
-                    exec_count as count
+	                keywords   as {nameof(DisplayUsageQueryResult.Name)},
+                    exec_count as {nameof(DisplayUsageQueryResult.Count)}
                 from
                     stat_execution_count_v
                 where
@@ -138,11 +158,11 @@ namespace Lanceur.Infra.SQLite
 
         public IEnumerable<Session> GetSessions()
         {
-            var sql = @"
+            var sql = @$"
             select
-	            id    as Id,
-                name  as Name,
-                notes as Notes
+	            id    as {nameof(Session.Id)},
+                name  as {nameof(Session.Name)},
+                notes as {nameof(Session.Notes)}
             from alias_session";
             var result = DB.Connection.Query<Session>(sql);
             return result;
@@ -164,10 +184,10 @@ namespace Lanceur.Infra.SQLite
 
         public void HydrateMacro(QueryResult alias)
         {
-            var sql = @"
+            var sql = @$"
             select
-	            a.id        as Id,
-                count(a.id) as Count
+	            a.id        as {nameof(QueryResult.Id)},
+                count(a.id) as {nameof(QueryResult.Count)}
             from
 	            alias a
                 inner join alias_usage au on a.id = au.id_alias
@@ -218,20 +238,15 @@ namespace Lanceur.Infra.SQLite
         public void SaveOrUpdate(ref AliasQueryResult alias, long? idSession = null)
         {
             if (alias == null) { throw new ArgumentNullException(nameof(alias), $"Cannot save NULL alias."); }
-            if (alias.Name == null) { throw new ArgumentNullException(nameof(alias.Name), "Cannot create or update alias with no name."); }
+            if (alias.Synonyms == null) { throw new ArgumentNullException(nameof(alias.Name), "Cannot create or update alias with no name."); }
             if (alias.Id < 0) { throw new NotSupportedException($"The alias has an unexpected id. (Name: {alias.Name})"); }
 
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
-            if (alias.DuplicateOf.HasValue)
-            {
-                _log.Info($"Saving a duplicated alias. (Duplicate of: {alias.DuplicateOf})");
-                _aliasDbAction.Duplicate(alias);
-            }
-            else if (alias.Id == 0 && !_aliasDbAction.CheckNameExists(alias, idSession.Value))
+            if (alias.Id == 0 && !_aliasDbAction.CheckNameExists(alias, idSession.Value))
             {
                 _aliasDbAction.Create(ref alias, idSession.Value);
-                _log.Info($"Just created new alias. (Id: {alias.Id})");
+                _log.Info($"Created new alias. (Id: {alias.Id})");
             }
             else if (alias.Id > 0)
             {
@@ -244,31 +259,33 @@ namespace Lanceur.Infra.SQLite
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
 
-            var sql = @"
+            var sql = @$"
                 select
-                    n.Name        as Name,
-                    n.Name        as OldName,
-                    s.Id          as Id,
-                    s.id          as Id,
-                    s.arguments   as Parameters,
-                    s.file_name   as FileName,
-                    s.notes       as Notes,
-                    s.run_as      as RunAs,
-                    s.start_mode  as StartMode,
-                    s.working_dir as WorkingDirectory,
-                    s.icon        as Icon,
-                    c.exec_count  as Count
+                    an.Name       as {nameof(AliasQueryResult.Name)},
+                    a.Id          as {nameof(AliasQueryResult.Id)},
+                    a.id          as {nameof(AliasQueryResult.Id)},
+                    a.arguments   as {nameof(AliasQueryResult.Parameters)},
+                    a.file_name   as {nameof(AliasQueryResult.FileName)},
+                    a.notes       as {nameof(AliasQueryResult.Notes)},
+                    a.run_as      as {nameof(AliasQueryResult.RunAs)},
+                    a.start_mode  as {nameof(AliasQueryResult.StartMode)},
+                    a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
+                    a.icon        as {nameof(AliasQueryResult.Icon)},
+                    c.exec_count  as {nameof(AliasQueryResult.Count)},
+                    s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
+                    s.Synonyms    as {nameof(AliasQueryResult.SynomymsPreviousState)}
                 from
-                    alias s
-                    left join alias_name n on s.id = n.id_alias
-                    left join stat_execution_count_v c on c.id_keyword = s.id
+                    alias a
+                    left join alias_name an on a.id = an.id_alias
+                    left join stat_execution_count_v c on c.id_keyword = a.id
+                    inner join data_alias_synonyms_v s on s.id_alias = a.id
                 where
-                    s.id_session = @idSession
-                    and n.Name like @name
-                    and s.hidden = 0
+                    a.id_session = @idSession
+                    and an.Name like @name
+                    and a.hidden = 0
                 order by
                     c.exec_count desc,
-                    n.name asc";
+                    an.name asc";
 
             name = $"{name ?? string.Empty}%";
             var results = DB.Connection.Query<AliasQueryResult>(sql, new { name, idSession });
@@ -288,7 +305,24 @@ namespace Lanceur.Infra.SQLite
             DB.Connection.Execute(sql, new { idSession });
         }
 
-        public void SetUsage(QueryResult alias) => _aliasDbAction.SetUsage(alias);
+        public void SetUsage(QueryResult alias)
+        {
+            if (alias is null)
+            {
+                _log.Info("Impossible to set usage: alias is null.;");
+                return;
+            }
+            if (alias.Name.IsNullOrEmpty())
+            {
+                _log.Info("Impossible to set usage: alias name is empty.");
+                return;
+            }
+
+            var idSession = GetDefaultSessionId();
+            _setUsageDbAction.SetUsage(ref alias, idSession);
+        }
+
+        public void SetUsage(string aliasName) => SetUsage(new AliasQueryResult() { Name = aliasName });
 
         public void Update(ref Session session)
         {

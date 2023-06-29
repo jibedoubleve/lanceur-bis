@@ -47,7 +47,10 @@ namespace Lanceur.Infra.SQLite.DbActions
                 if (name == string.Empty) { delay++; }
                 else
                 {
-                    subAliases.Add(item: action.GetExact(name, delay: delay));
+                    var alias = action.GetExact(name);
+                    alias.Delay = delay;
+
+                    subAliases.Add(alias);
                     delay = 1;
                 }
             }

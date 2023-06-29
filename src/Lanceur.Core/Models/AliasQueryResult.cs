@@ -3,40 +3,13 @@ using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Core.Models
 {
-    public static class AliasQueryResultMixin
-    {
-        #region Methods
-
-        public static AliasQueryResult Duplicate(this AliasQueryResult @this)
-        {
-            return new AliasQueryResult
-            {
-                Parameters = @this.Parameters,
-                Count = @this.Count,
-                FileName = @this.FileName,
-                Icon = @this.Icon,
-                Notes = @this.Notes,
-                Name = $"Duplicate of {@this.Name}",
-                RunAs = @this.RunAs,
-                WorkingDirectory = @this.WorkingDirectory,
-                StartMode = @this.StartMode,
-                Query = @this.Query,
-                // In case it's already a duplicate of a duplicate,
-                // go recursively all the way down to the original
-                DuplicateOf = @this.DuplicateOf ?? @this.Id
-            };
-        }
-
-        public static bool HasChangedName(this AliasQueryResult @this) => @this.Name?.ToLower() != @this.OldName.ToLower();
-
-        #endregion Methods
-    }
-
     public class AliasQueryResult : ExecutableQueryResult, IElevated
     {
         #region Fields
 
         private string _fileName;
+
+        private string _synonyms;
 
         #endregion Fields
 
@@ -54,12 +27,6 @@ namespace Lanceur.Core.Models
             set => Notes = value;
         }
 
-        /// <summary>
-        /// If this <see cref="AliasQueryResult"/> is a ducplicate from another
-        /// alias, this contains its ID. Otherwise contains <c>NULL</c>
-        /// </summary>
-        public long? DuplicateOf { get; set; }
-
         public string FileName
         {
             get => _fileName;
@@ -76,11 +43,42 @@ namespace Lanceur.Core.Models
             set => RunAs = value ? RunAs.Admin : RunAs.CurrentUser;
         }
 
+        public bool IsHidden { get; set; } = false;
+
         public string Notes { get; set; }
 
         public RunAs RunAs { get; set; } = RunAs.CurrentUser;
 
         public StartMode StartMode { get; set; } = StartMode.Default;
+
+        /// <summary>
+        /// Synonyms present when the entity was loaded
+        /// </summary>
+        public string SynomymsPreviousState { get; set; }
+
+        /// <summary>
+        /// Get or set a string representing all the name this alias has.
+        /// It should be a coma separated list of names.
+        /// </summary>
+        public string Synonyms
+        {
+            get => _synonyms;
+            set
+            {
+                Set(ref _synonyms, value);
+                OnPropertyChanged(nameof(SynonymsNextState));
+            }
+        }
+
+        /// <summary>
+        /// New synonyms added when updated
+        /// </summary>
+        public string SynonymsNextState
+        {
+            get => (from n in Synonyms.SplitCsv()
+                    where !SynomymsPreviousState.SplitCsv().Contains(n)
+                    select n).ToArray().JoinCsv();
+        }
 
         public string WorkingDirectory { get; set; }
 
@@ -88,7 +86,7 @@ namespace Lanceur.Core.Models
 
         #region Methods
 
-        public static AliasQueryResult FromName(string aliasName) => new AliasQueryResult() { Name = aliasName };
+        public static AliasQueryResult FromName(string aliasName) => new AliasQueryResult() { Name = aliasName, Synonyms = aliasName };
 
         #endregion Methods
     }

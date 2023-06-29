@@ -3,6 +3,7 @@ using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Managers;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
 using Lanceur.Utils;
@@ -22,13 +23,12 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppConfigRepository _appConfigService;
         private readonly Interaction<Unit, string> _askFile;
-        private readonly IDatabaseConfigRepository _databaseConfigService;
         private readonly IDelay _delay;
         private readonly INotification _nofification;
         private readonly IAppRestart _restart;
         private readonly ISchedulerProvider _schedulers;
+        private readonly ISettingsFacade _settingsFacade;
         private readonly IDbRepository _service;
 
         #endregion Fields
@@ -37,9 +37,8 @@ namespace Lanceur.Views
 
         public AppSettingsViewModel(
             ISchedulerProvider schedulers = null,
-            IAppConfigRepository appConfigService = null,
             IUserNotification notify = null,
-            IDatabaseConfigRepository databaseConfigService = null,
+            ISettingsFacade settingsFacade = null,
             IDbRepository dataService = null,
             IDelay delay = null,
             IAppRestart restart = null,
@@ -48,15 +47,13 @@ namespace Lanceur.Views
         {
             var l = Locator.Current;
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _appConfigService = appConfigService ?? l.GetService<IAppConfigRepository>();
-
             _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
-            _databaseConfigService = databaseConfigService ?? l.GetService<IDatabaseConfigRepository>();
             _service = dataService ?? l.GetService<IDbRepository>();
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();
             _nofification = nofification ?? l.GetService<INotification>();
+            _settingsFacade = settingsFacade ?? l.GetService<ISettingsFacade>();
 
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
@@ -69,15 +66,16 @@ namespace Lanceur.Views
 
             this.WhenAnyObservable(vm => vm.Activate)
                 .ObserveOn(_schedulers.MainThreadScheduler)
-                .Subscribe(ctx =>
+                .Subscribe(response =>
                 {
-                    DbPath = ctx.DbPath;
-                    HotKeySection = ctx.AppSettings.HotKey;
-                    RestartDelay = ctx.AppSettings.RestartDelay;
-                    Sessions = new ObservableCollection<Session>(ctx.Sessions);
+                    DbPath = response.DbPath;
+                    HotKeySection = response.AppSettings.HotKey;
+                    RestartDelay = response.AppSettings.RestartDelay;
+                    Sessions = new ObservableCollection<Session>(response.Sessions);
                     CurrentSession = (from s in Sessions
-                                      where s.Id == ctx.AppSettings.IdSession
+                                      where s.Id == response.AppSettings.IdSession
                                       select s).SingleOrDefault();
+                    SettingsMemento = response.SettingsMemento;
                 });
 
             this.WhenAnyObservable(vm => vm.SelectDatabase)
@@ -89,6 +87,7 @@ namespace Lanceur.Views
 
         #region Properties
 
+        private SettingsMementoManager SettingsMemento { get; set; }
         public ReactiveCommand<Unit, ActivationContext> Activate { get; }
         public Interaction<Unit, string> AskFile => _askFile;
         [Reactive] public Session CurrentSession { get; set; }
@@ -106,18 +105,24 @@ namespace Lanceur.Views
 
         private TimeSpan GetDelay()
         {
-            var delay = _appConfigService.Current.RestartDelay;
+            var delay = _settingsFacade.Application.RestartDelay;
             var time = TimeSpan.FromMilliseconds(delay);
             return time;
         }
 
         private ActivationContext OnActivate()
         {
+            var appSettings = _settingsFacade.Application;
+            var dbPath = _settingsFacade.Database.DbPath;
+
+            var settingsMemento = SettingsMementoManager.InitialState(_settingsFacade);
+
             var context = new ActivationContext()
             {
-                AppSettings = _appConfigService.Current,
-                DbPath = _databaseConfigService.Current.DbPath,
-                Sessions = _service.GetSessions()
+                AppSettings = appSettings,
+                DbPath = dbPath,
+                Sessions = _service.GetSessions(),
+                SettingsMemento = settingsMemento
             };
 
             return context;
@@ -126,24 +131,27 @@ namespace Lanceur.Views
         private async void OnSaveSettings()
         {
             //Save DB Path in property file
-            _databaseConfigService.Current.DbPath = DbPath?.Replace("\"", "");
-            _databaseConfigService.Save();
+            _settingsFacade.Database.DbPath = DbPath?.Replace("\"", "");
 
             // Save hotkey & Session in DB
-            _appConfigService.Current.Window.ShowResult = ShowResult;
-            _appConfigService.Current.RestartDelay = RestartDelay;
-            _appConfigService.Current.HotKey = HotKeySection;
-            _appConfigService.Current.Window.ShowAtStartup = ShowResult;
-            if (CurrentSession is not null) { _appConfigService.Current.IdSession = CurrentSession.Id; }
+            _settingsFacade.Application.Window.ShowResult = ShowResult;
+            _settingsFacade.Application.RestartDelay = RestartDelay;
+            _settingsFacade.Application.HotKey = HotKeySection;
+            _settingsFacade.Application.Window.ShowAtStartup = ShowResult;
+            if (CurrentSession is not null) { _settingsFacade.Application.IdSession = CurrentSession.Id; }
 
             //Save settings
-            _appConfigService.Save();
+            _settingsFacade.Save();
 
-            TimeSpan time = GetDelay();
+            if (SettingsMemento.HasStateChanged(_settingsFacade))
+            {
+                TimeSpan time = GetDelay();
 
-            _nofification.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
-            await _delay.Of(time);
-            _restart.Restart();
+                _nofification.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
+                await _delay.Of(time);
+                _restart.Restart();
+            }
+            else { _nofification.Information("Saved configuration."); }
         }
 
         #endregion Methods
@@ -157,6 +165,7 @@ namespace Lanceur.Views
             public AppConfig AppSettings { get; internal set; }
             public string DbPath { get; internal set; }
             public IEnumerable<Session> Sessions { get; set; }
+            public SettingsMementoManager SettingsMemento { get; set; }
 
             #endregion Properties
         }

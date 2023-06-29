@@ -4,7 +4,7 @@
     {
         #region Methods
 
-        public string Evaluate(string expression);
+        (bool IsError, string Result) Evaluate(string expression);
 
         #endregion Methods
     }
