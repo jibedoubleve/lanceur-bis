@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanceur.Plugin.Debug", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanceur.Core.Plugins", "src\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj", "{CA64AB30-E7B7-4741-8752-36287B138B7F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Scripts", "Lanceur.Scripts\Lanceur.Scripts.csproj", "{06D3F091-AE38-4054-BE3A-2828C307764B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{CA64AB30-E7B7-4741-8752-36287B138B7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA64AB30-E7B7-4741-8752-36287B138B7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA64AB30-E7B7-4741-8752-36287B138B7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06D3F091-AE38-4054-BE3A-2828C307764B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06D3F091-AE38-4054-BE3A-2828C307764B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06D3F091-AE38-4054-BE3A-2828C307764B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06D3F091-AE38-4054-BE3A-2828C307764B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,43 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="SQL\script-0.1.1.sql" />
-    <None Remove="SQL\script-0.1.sql" />
-    <None Remove="SQL\script-0.10.sql" />
-    <None Remove="SQL\script-0.2.sql" />
-    <None Remove="SQL\script-0.3.sql" />
-    <None Remove="SQL\script-0.4.1.sql" />
-    <None Remove="SQL\script-0.4.2.sql" />
-    <None Remove="SQL\script-0.4.3.sql" />
-    <None Remove="SQL\script-0.4.sql" />
-    <None Remove="SQL\script-0.5.sql" />
-    <None Remove="SQL\script-0.6.sql" />
-    <None Remove="SQL\script-0.7.sql" />
-    <None Remove="SQL\script-0.8.sql" />
-    <None Remove="SQL\script-0.9.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Resource Include="Assets\appIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="SQL\script-0.10.sql" />
-    <EmbeddedResource Include="SQL\script-0.9.sql" />
-    <EmbeddedResource Include="SQL\script-0.8.sql" />
-    <EmbeddedResource Include="SQL\script-0.7.sql" />
-    <EmbeddedResource Include="SQL\script-0.1.1.sql" />
-    <EmbeddedResource Include="SQL\script-0.6.sql" />
-    <EmbeddedResource Include="SQL\script-0.1.sql" />
-    <EmbeddedResource Include="SQL\script-0.2.sql" />
-    <EmbeddedResource Include="SQL\script-0.3.sql" />
-    <EmbeddedResource Include="SQL\script-0.4.sql" />
-    <EmbeddedResource Include="SQL\script-0.5.sql" />
-    <EmbeddedResource Include="SQL\script-0.4.3.sql" />
-    <EmbeddedResource Include="SQL\script-0.4.1.sql" />
-    <EmbeddedResource Include="SQL\script-0.4.2.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
     <ProjectReference Include="..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj" />
     <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj" />
     <ProjectReference Include="..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />

@@ -13,13 +13,15 @@ namespace Lanceur.Core.Models
 
         #region Methods
 
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (EqualityComparer<T>.Default.Equals(storage, value)) { return false; }
             else
             {
                 storage = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                OnPropertyChanged(propertyName);
                 return true;
             }
         }

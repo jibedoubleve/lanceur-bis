@@ -47,6 +47,23 @@ namespace Lanceur.SharedKernel.Mixins
 
         public static bool IsUwp(this string value) => value?.StartsWith("package:") ?? false;
 
+        public static string JoinCsv(this string[] strings)
+        {
+            if (strings is null) { return string.Empty; }
+
+            return string.Join(", ", strings);
+        }
+
+        public static string[] SplitCsv(this string str)
+        {
+            if (str is null) { return Array.Empty<string>(); }
+
+            return
+                 str.Split(",")
+                    .Select(n => n.Trim())
+                    .ToArray();
+        }
+
         public static string ToLowerString(this object value) => value?.ToString()?.ToLower();
 
         #endregion Methods

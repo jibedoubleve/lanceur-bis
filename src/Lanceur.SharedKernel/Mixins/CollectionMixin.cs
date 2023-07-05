@@ -28,6 +28,15 @@ namespace Lanceur.SharedKernel.Mixins
             }
         }
 
+        public static IEnumerable<T> ToEnumerable<T>(this T item)
+        {
+            var collection = new List<T>
+            {
+                item
+            };
+            return collection;
+        }
+
         public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> enumerable) => new(enumerable);
 
         #endregion Methods

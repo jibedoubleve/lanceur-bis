@@ -16,9 +16,6 @@ namespace Lanceur.Core.Models
     {
         #region Fields
 
-        private string _name = string.Empty;
-        private string _oldName;
-
         private object _thumbnail;
 
         #endregion Fields
@@ -29,6 +26,8 @@ namespace Lanceur.Core.Models
         public static Task<IEnumerable<QueryResult>> NoResultAsync => Task.FromResult(NoResult);
         public int Count { get; set; } = 0;
         public virtual string Description { get; set; }
+
+        public virtual string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Fall back for <see cref="Thumbnail"/>. This property is expected to
@@ -47,21 +46,6 @@ namespace Lanceur.Core.Models
         /// item used to provide information to the user.
         /// </summary>
         public virtual bool IsResult => true;
-
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                // First time you set the name of the QueryResult, it'll save
-                // the value. Now, OldName will have the value of the first time
-                // it was set.
-                if (value != null && _oldName == null) { _oldName = value.ToLower(); }
-                Set(ref _name, value);
-            }
-        }
-
-        public string OldName => _oldName;
 
         public Cmdline Query { get; set; } = Cmdline.Empty;
 
@@ -82,7 +66,7 @@ namespace Lanceur.Core.Models
 
         #region Methods
 
-        public override int GetHashCode() => (Count, Description, Icon, Id, IsResult, Name, OldName, Query, Thumbnail).GetHashCode();
+        public override int GetHashCode() => (Count, Description, Icon, Id, IsResult, Name, Query, Thumbnail).GetHashCode();
 
         public virtual string ToQuery() => $"{Name}";
 

@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Execution;
 using Lanceur.Core.Models;
+using Lanceur.SharedKernel.Mixins;
 using Xunit;
 
 namespace Lanceur.Tests.Models
@@ -15,10 +17,7 @@ namespace Lanceur.Tests.Models
         }
 
         [Fact]
-        public void HaveEmptyNameByDefault()
-        {
-            new TestQueryResult().Name.Should().BeEmpty();
-        }
+        public void HaveEmptyNameByDefault() => new TestQueryResult().Name.Should().BeEmpty();
 
         [Fact]
         public void HaveEmptyQueryByDefault()
@@ -33,29 +32,23 @@ namespace Lanceur.Tests.Models
             new TestQueryResult().Count.Should().Be(0);
         }
 
-        [Theory]
-        [InlineData("", "bonjour tout le monde")]
-        [InlineData("hello world", "bonjour tout le monde")]
-        public void HaveOldNameUnchangedWhenUpdateName(string expected, string actual)
-        {
-            var query = new TestQueryResult()
-            {
-                Name = expected
-            };
-            query.Name = actual;
-            query.OldName.Should().Be(expected);
-        }
-
         [Fact]
-        public void HaveOldNameChangedWhenNullWasProvidedTheFirstTime()
+        public void HaveTrimmedResultInSynonyms()
         {
-            var name = "bonjour tout le monde";
-            var query = new TestQueryResult() { Name = null };
-            query.Name = name;
+            // arrange
+            var synonyms = "un, deux,trois,quatre,cinq";
+            var queryResult = new AliasQueryResult() { Synonyms = synonyms };
 
-            query.OldName.Should().Be(name);
+            // act
+            var names = queryResult.Synonyms.SplitCsv();
 
-
+            // assert
+            using (new AssertionScope())
+            {
+                names.Should().HaveCount(5);
+                names.Select(x => x.Should().NotStartWith(" "));
+                names.Select(x => x.Should().NotEndWith(" "));
+            }
         }
 
         #endregion Methods

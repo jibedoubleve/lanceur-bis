@@ -7,15 +7,20 @@ namespace Lanceur.Infra.Services
     {
         #region Methods
 
-        public string Evaluate(string expression)
+        public (bool IsError, string Result) Evaluate(string expression)
         {
             try
             {
-                var evaluator = new ExpressionEvaluator();
+                var evaluator = new ExpressionEvaluator
+                {
+                    OptionCaseSensitiveEvaluationActive = false,
+                    OptionForceIntegerNumbersEvaluationsAsDoubleByDefault = true
+                };
+
                 var result = evaluator.Evaluate(expression);
-                return result.ToString();
+                return (false, result.ToString());
             }
-            catch (Exception ex) { return ex.Message; }
+            catch (Exception ex) { return (true, ex.Message); }
         }
 
         #endregion Methods

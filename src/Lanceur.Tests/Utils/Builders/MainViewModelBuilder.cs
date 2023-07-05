@@ -17,7 +17,7 @@ namespace Lanceur.Tests.Utils
     {
         #region Fields
 
-        private IAppConfigRepository _appConfigService;
+        private ISettingsFacade _appConfigService;
         private IExecutionManager _executionManager;
         private ITestOutputHelper _output;
         private ISchedulerProvider _schedulerProvider;
@@ -27,9 +27,9 @@ namespace Lanceur.Tests.Utils
 
         #region Methods
 
-        internal MainViewModelBuilder With(IAppConfigRepository appConfigService)
+        internal MainViewModelBuilder With(ISettingsFacade settingsFacade)
         {
-            _appConfigService = appConfigService;
+            _appConfigService = settingsFacade;
             return this;
         }
 
@@ -38,8 +38,8 @@ namespace Lanceur.Tests.Utils
             ArgumentNullException.ThrowIfNull(_output);
             ArgumentNullException.ThrowIfNull(_schedulerProvider);
 
-            var appConfigService = Substitute.For<IAppConfigRepository>();
-            appConfigService.Current.Returns(new AppConfig());
+            var settingsFacade = Substitute.For<ISettingsFacade>();
+            settingsFacade.Application.Returns(new AppConfig());
 
             return new MainViewModel(
                 schedulerProvider: _schedulerProvider,
@@ -48,7 +48,7 @@ namespace Lanceur.Tests.Utils
                 cmdlineService: new CmdlineManager(),
                 executor: _executionManager ?? Substitute.For<IExecutionManager>(),
                 notify: Substitute.For<IUserNotification>(),
-                appConfigService: _appConfigService ?? appConfigService,
+                appConfigService: _appConfigService ?? settingsFacade,
                 dataService: Substitute.For<IDbRepository>()
             );
         }

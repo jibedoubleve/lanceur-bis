@@ -85,14 +85,7 @@
                         BorderBrush="{StaticResource DialogBorderBrush}"
                         BorderThickness="1"
                         ItemTemplate="{StaticResource MinimalQueryResultTemplate}"
-                        SelectionChanged="OnAliasSelectionChanged">
-                        <!--  Issue 77: Duplicate keyword does not work. Should be fixed  -->
-                        <!--<ListView.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem x:Name="MenuDuplicate" Header="Duplicate" />
-                            </ContextMenu>
-                        </ListView.ContextMenu>-->
-                    </ListView>
+                        SelectionChanged="OnAliasSelectionChanged" />
                     <Button
                         x:Name="BtnCreateAlias"
                         Grid.Row="1"
@@ -130,9 +123,9 @@
                         </Button>
                     </StackPanel>
                     <StackPanel>
-                        <HeaderedContentControl Header="Name">
+                        <HeaderedContentControl Header="Names (separate with coma)">
                             <StackPanel>
-                                <TextBox Margin="5" Text="{Binding ElementName=Aliases, Path=SelectedItem.Name, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBox Margin="5" Text="{Binding ElementName=Aliases, Path=SelectedItem.Synonyms, UpdateSourceTrigger=PropertyChanged}" />
                                 <TextBlock
                                     x:Name="BoxNameValidation"
                                     Margin="5,0,0,0"

@@ -49,8 +49,8 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var settings = Substitute.For<IAppConfigRepository>();
-                settings.Current.Returns(new AppConfig
+                var settings = Substitute.For<ISettingsFacade>();
+                settings.Application.Returns(new AppConfig
                 {
                     Window = new WindowSection()
                     {
