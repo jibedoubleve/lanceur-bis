@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
@@ -46,7 +47,7 @@ namespace Lanceur.Infra.Stores
 
         #region Methods
 
-        public PluginConfiguration[] GetPluginConfigurations()
+        public IPluginConfiguration[] GetPluginConfigurations()
         {
             var configs = new List<PluginConfiguration>();
             var root = _context.RepositoryPath;

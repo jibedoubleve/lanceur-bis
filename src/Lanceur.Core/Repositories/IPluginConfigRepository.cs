@@ -10,7 +10,7 @@ namespace Lanceur.Core.Repositories
         /// Get the configuration of all plugins installed
         /// </summary>
         /// <returns>The list of all configuration</returns>
-        PluginConfiguration[] GetPluginConfigurations();
+        IPluginConfiguration[] GetPluginConfigurations();
 
         #endregion Methods
     }

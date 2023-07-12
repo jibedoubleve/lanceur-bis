@@ -247,7 +247,7 @@
         </Border>
     </DataTemplate>
     <DataTemplate x:Key="PluginConfigurationTemplate" DataType="{x:Type m:PluginConfiguration}">
-        <StackPanel>
+        <StackPanel Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel Margin="5" Orientation="Horizontal">
                 <TextBlock
                     DockPanel.Dock="Top"
@@ -265,7 +265,10 @@
                 Margin="5"
                 FontSize="11"
                 Text="{Binding Author, StringFormat=Author: {0}}" />
-            <Button Margin="5" Content="Delete" />
+            <Button
+                Margin="5"
+                Command="{Binding Uninstall}"
+                Content="Delete" />
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>

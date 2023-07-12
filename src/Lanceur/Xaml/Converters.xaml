@@ -11,4 +11,5 @@
     <conv:StringToRunAsConverter x:Key="StringToRunAsConverter" />
     <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
     <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 </ResourceDictionary>

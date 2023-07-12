@@ -3,6 +3,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
+using Lanceur.Views.Helpers;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -54,7 +55,7 @@ namespace Lanceur.Views
         #region Properties
 
         public ReactiveCommand<Unit, ActivationContext> Activate { get; private set; }
-        [Reactive] public ObservableCollection<PluginConfiguration> PluginConfigurations { get; set; }
+        [Reactive] public ObservableCollection<PluginConfigurationViewModel> PluginConfigurations { get; set; }
 
         #endregion Properties
 
@@ -82,7 +83,7 @@ namespace Lanceur.Views
         {
             #region Properties
 
-            public IEnumerable<PluginConfiguration> PluginConfigurations { get; internal set; }
+            public IEnumerable<PluginConfigurationViewModel> PluginConfigurations { get; internal set; }
 
             #endregion Properties
         }
