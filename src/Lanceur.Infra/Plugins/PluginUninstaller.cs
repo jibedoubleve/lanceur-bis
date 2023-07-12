@@ -25,13 +25,12 @@ namespace Lanceur.Infra.Plugins
 
         #region Methods
 
-        private async Task<IEnumerable<UninstallCandidate>> Load()
+        public async Task<IEnumerable<UninstallCandidate>> GetCandidatesAsync()
         {
             if (!File.Exists(_file)) { return Array.Empty<UninstallCandidate>(); }
 
             var json = await File.ReadAllTextAsync(_file);
             return JsonConvert.DeserializeObject<IEnumerable<UninstallCandidate>>(json);
-
         }
 
         private async Task Save(IEnumerable<UninstallCandidate> candidates)
@@ -42,9 +41,9 @@ namespace Lanceur.Infra.Plugins
 
         public async Task SubscribeForUninstallAsync(IPluginConfiguration pluginConfiguration)
         {
-            var candidates = (await Load()).ToList();
+            var candidates = (await GetCandidatesAsync()).ToList();
             var alreadyCandidate = (from c in candidates
-                                    where c.Path == pluginConfiguration.Dll.GetDirectoryName()
+                                    where c.Directory == pluginConfiguration.Dll.GetDirectoryName()
                                     select c).Any();
 
             if (alreadyCandidate) { return; }
@@ -63,25 +62,6 @@ namespace Lanceur.Infra.Plugins
 
         #region Classes
 
-        public class UninstallCandidate
-        {
-            #region Constructors
-
-            public UninstallCandidate(string path)
-            {
-                Path = path;
-                IsOnError = false;
-            }
-
-            #endregion Constructors
-
-            #region Properties
-
-            public bool IsOnError { get; set; } = false;
-            public string Path { get; }
-
-            #endregion Properties
-        }
 
         #endregion Classes
     }

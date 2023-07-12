@@ -1,7 +1,9 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
+using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
 using Lanceur.Views.Mixins;
 using ReactiveUI;
@@ -10,8 +12,10 @@ using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Lanceur.Views
 {
@@ -22,6 +26,7 @@ namespace Lanceur.Views
         private readonly IPluginConfigRepository _pluginConfigRepository;
 
         private readonly ISchedulerProvider _schedulers;
+        private readonly IPluginUninstaller _uninstaller;
 
         #endregion Fields
 
@@ -30,6 +35,7 @@ namespace Lanceur.Views
         public PluginsViewModel(
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
+            IPluginUninstaller uninstaller = null,
             IPluginConfigRepository pluginConfigRepository = null)
         {
             var l = Locator.Current;
@@ -37,9 +43,10 @@ namespace Lanceur.Views
             notify ??= l.GetService<IUserNotification>();
 
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
+            _uninstaller = uninstaller ?? l.GetService<IPluginUninstaller>();
             _pluginConfigRepository = pluginConfigRepository ?? l.GetService<IPluginConfigRepository>();
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
+            Activate = ReactiveCommand.CreateFromTask(OnActivateAsync, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
@@ -61,15 +68,27 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private ActivationContext OnActivate()
+        private async Task<ActivationContext> OnActivateAsync()
         {
-            var pluginConfigurations = _pluginConfigRepository
+            // Get all installed plugins
+            var allPluginConfigurations = _pluginConfigRepository
                 .GetPluginConfigurations()
                 .ToViewModel();
 
+            // Get all candidates for uninstall
+            // and remove them from the list
+            var candidates = await _uninstaller.GetCandidatesAsync();
+
+            var pluginConfigurations = (from p in allPluginConfigurations
+                                        where !(from c in candidates
+                                                select c.Directory
+                                        ).Contains(p.Dll.GetDirectoryName())
+                                        select p).ToList();
+
+
             var context = new ActivationContext()
             {
-                PluginConfigurations = pluginConfigurations
+                PluginConfigurations = pluginConfigurations.ToViewModel()
             };
 
             return context;

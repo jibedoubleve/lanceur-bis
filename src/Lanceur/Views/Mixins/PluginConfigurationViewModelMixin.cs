@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Lanceur.Core.Models;
+using System.Collections.Generic;
 
 namespace Lanceur.Views.Mixins
 {
@@ -28,9 +29,9 @@ namespace Lanceur.Views.Mixins
 
         #region Methods
 
-        public static PluginConfigurationViewModel[] ToViewModel(this IPluginConfiguration[] pluginConfigurations)
+        public static PluginConfigurationViewModel[] ToViewModel(this IEnumerable<IPluginConfiguration> pluginConfigurations)
         {
-            return _mapper.Map<IPluginConfiguration[], PluginConfigurationViewModel[]>(pluginConfigurations);
+            return _mapper.Map<IEnumerable<IPluginConfiguration>, PluginConfigurationViewModel[]>(pluginConfigurations);
         }
 
         public static PluginConfigurationViewModel ToViewModel(this IPluginConfiguration pluginConfiguration)

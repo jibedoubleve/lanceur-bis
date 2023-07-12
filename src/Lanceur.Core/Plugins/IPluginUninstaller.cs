@@ -6,6 +6,8 @@ namespace Lanceur.Core.Plugins
     {
         #region Methods
 
+        Task<IEnumerable<UninstallCandidate>> GetCandidatesAsync();
+
         Task SubscribeForUninstallAsync(IPluginConfiguration pluginConfiguration);
 
         Task UninstallAsync();
