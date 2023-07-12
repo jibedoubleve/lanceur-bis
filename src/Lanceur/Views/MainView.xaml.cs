@@ -6,7 +6,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
-using Lanceur.Views.Helpers;
+using Lanceur.Views.Mixins;
 using NHotkey;
 using NHotkey.Wpf;
 using ReactiveUI;

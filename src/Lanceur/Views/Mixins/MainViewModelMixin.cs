@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Requests;
 
-namespace Lanceur.Views.Helpers
+namespace Lanceur.Views.Mixins
 {
     public static class MainViewModelMixin
     {

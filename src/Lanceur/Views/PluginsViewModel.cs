@@ -3,7 +3,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
-using Lanceur.Views.Helpers;
+using Lanceur.Views.Mixins;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;

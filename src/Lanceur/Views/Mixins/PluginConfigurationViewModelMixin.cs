@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Views.Helpers
+namespace Lanceur.Views.Mixins
 {
     public static class PluginConfigurationViewModelMixin
     {
