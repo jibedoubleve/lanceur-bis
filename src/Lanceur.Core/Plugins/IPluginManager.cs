@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Plugins;
 using System.Reflection;
 
-namespace Lanceur.Infra.Plugins
+namespace Lanceur.Core.Plugins
 {
     public interface IPluginManager
     {

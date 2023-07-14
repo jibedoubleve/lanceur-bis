@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Lanceur.Ui;
+using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
 
@@ -19,7 +20,17 @@ namespace Lanceur.Views
             {
                 this.OneWayBind(ViewModel, vm => vm.PluginConfigurations, v => v.PluginConfigurations.ItemsSource).DisposeWith(d);
 
-                ViewModel.Activate.Execute().Subscribe();
+                ViewModel.Activate.Execute().Subscribe(x =>
+                {
+                    foreach (var plugin in x.PluginConfigurations)
+                    {
+                        plugin.ConfirmRemove.RegisterHandler(async interaction =>
+                        {
+                            var result = await Dialogs.YesNoQuestion($"Do you want to uninstall the plugin '{interaction.Input}'?");
+                            interaction.SetOutput(result.AsBool());
+                        });
+                    }
+                });
             });
 
         }

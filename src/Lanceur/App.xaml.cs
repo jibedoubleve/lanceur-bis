@@ -1,4 +1,5 @@
 ﻿using Lanceur.Controls;
+using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Xaml;
@@ -56,6 +57,12 @@ namespace Lanceur
                 var notify = Locator.Current.GetService<IUserNotification>();
                 notify.Warning("An instance of Lanceur is already running.");
                 Environment.Exit(0);
+            }
+
+            var uninstaller = Locator.Current.GetService<IPluginUninstaller>();
+            if (uninstaller.HasCandidateForUninstall())
+            {
+                uninstaller.UninstallAsync();
             }
         }
 
