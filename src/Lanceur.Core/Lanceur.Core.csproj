@@ -1,18 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj" />
-    <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Config\" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj" />
+		<ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
+	</ItemGroup>
 
 </Project>

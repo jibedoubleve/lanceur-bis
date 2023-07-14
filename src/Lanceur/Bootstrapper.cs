@@ -93,9 +93,14 @@ namespace Lanceur
             l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>()));
             l.Register<IPackagedAppManager>(() => new PackagedAppManager());
             l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppManager>()));
-            //Formatters
+
+            // Formatters
             l.Register<IStringFormatter>(() => new DefaultStringFormatter());
 
+            // Plugins
+            l.Register<IPluginConfigRepository>(() => new PluginStore());
+
+            // SQLite
             l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
             l.Register(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));

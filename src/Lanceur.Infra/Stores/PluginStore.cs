@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Plugins;
@@ -9,7 +10,7 @@ using Splat;
 namespace Lanceur.Infra.Stores
 {
     [Store]
-    public class PluginStore : ISearchService
+    public class PluginStore : ISearchService, IPluginConfigRepository
     {
         #region Fields
 
@@ -45,15 +46,15 @@ namespace Lanceur.Infra.Stores
 
         #region Methods
 
-        private PluginConfig[] GetPluginsConfig()
+        public PluginConfiguration[] GetPluginConfigurations()
         {
-            var configs = new List<PluginConfig>();
+            var configs = new List<PluginConfiguration>();
             var root = _context.RepositoryPath;
             var files = Directory.EnumerateFiles(root, "plugin.config.json", SearchOption.AllDirectories);
             foreach (var file in files)
             {
                 var json = File.ReadAllText(file);
-                var cfg = JsonConvert.DeserializeObject<PluginConfig>(json);
+                var cfg = JsonConvert.DeserializeObject<PluginConfiguration>(json);
                 configs.Add(cfg);
             }
 
@@ -64,7 +65,7 @@ namespace Lanceur.Infra.Stores
         {
             if (_plugins == null)
             {
-                var configs = GetPluginsConfig();
+                var configs = GetPluginConfigurations();
                 var queryResults = new List<PluginExecutableQueryResult>();
 
                 foreach (var config in configs)

@@ -1,16 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Lanceur.Core.Models
+﻿namespace Lanceur.Core.Models
 {
     /// <summary>
     /// Represents the configuration of a plugin
     /// </summary>
-    public class PluginConfig
+    public class PluginConfiguration
     {
+        #region Properties
+
+        public Version AppMinVersion { get; set; }
+
+        public string Author { get; set; }
+        public string Description { get; set; }
         public string Dll { get; set; }
+        public string Help { get; set; }
+        public string Name { get; set; }
+
+        public Version PluginVersion { get; set; }
+
+        #endregion Properties
     }
 }
