@@ -2,6 +2,7 @@
 using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
+using Microsoft.Win32;
 
 namespace Lanceur.Views
 {
@@ -18,7 +19,23 @@ namespace Lanceur.Views
 
             this.WhenActivated(d =>
             {
-                this.OneWayBind(ViewModel, vm => vm.PluginConfigurations, v => v.PluginConfigurations.ItemsSource).DisposeWith(d);
+                ViewModel.AskFile.RegisterHandler(interaction =>
+                {
+                    var ofd = new OpenFileDialog()
+                    {
+                        Title = "Select the plugin package",
+                        Filter = "Plugin package|*.lpk|All files|*.*"
+                    };
+                    var result = ofd.ShowDialog();
+                    var file = (result.HasValue && result.Value) ? ofd.FileName : string.Empty;
+                    interaction.SetOutput(file);
+                });
+
+
+                this.OneWayBind(ViewModel, vm => vm.PluginConfigurations, v => v.PluginConfigurations.ItemsSource).DisposeWith(d);                
+
+                this.BindCommand(ViewModel, vm => vm.Restart, v => v.BtnRestart).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.InstallPlugin, v => v.BtnInstallPlugin).DisposeWith(d);
 
                 ViewModel.Activate.Execute().Subscribe(x =>
                 {
