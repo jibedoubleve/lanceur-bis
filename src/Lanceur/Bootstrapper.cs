@@ -100,7 +100,7 @@ namespace Lanceur
 
             // Plugins
             l.Register<IPluginConfigRepository>(() => new PluginStore());
-            l.Register<IPluginUninstaller>(() => new PluginUninstaller());
+            l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
 
             // SQLite
             l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));

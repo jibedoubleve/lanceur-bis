@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Plugins;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 
@@ -9,7 +10,9 @@ namespace Lanceur.Infra.Plugins
     {
         #region Fields
 
-        private static readonly string _file;
+        private static readonly string _uninstallManifest = Environment.ExpandEnvironmentVariables(@"%appdata%\probel\lanceur2\.plugin-uninstall");
+        private static readonly string _pluginRootDir;
+        private readonly IAppLogger _log;
 
         #endregion Fields
 
@@ -17,27 +20,40 @@ namespace Lanceur.Infra.Plugins
 
         static PluginUninstaller()
         {
-            var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Lanceur2");
-            _file = Path.Combine(dir, ".plugin-uninstall");
+            _pluginRootDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Lanceur2");
+        }
+
+        public PluginUninstaller(IAppLoggerFactory loggerFactory)
+        {
+            ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
+            _log = loggerFactory.GetLogger<PluginUninstaller>();
         }
 
         #endregion Constructors
 
         #region Methods
 
+        private static async Task Save(IEnumerable<UninstallCandidate> candidates)
+        {
+            if (!candidates.Any() && File.Exists(_uninstallManifest))
+            {
+                File.Delete(_uninstallManifest);
+                return;
+            }
+
+            var json = JsonConvert.SerializeObject(candidates);
+            await File.WriteAllTextAsync(_uninstallManifest, json);
+        }
+
         public async Task<IEnumerable<UninstallCandidate>> GetCandidatesAsync()
         {
-            if (!File.Exists(_file)) { return Array.Empty<UninstallCandidate>(); }
+            if (!File.Exists(_uninstallManifest)) { return Array.Empty<UninstallCandidate>(); }
 
-            var json = await File.ReadAllTextAsync(_file);
+            var json = await File.ReadAllTextAsync(_uninstallManifest);
             return JsonConvert.DeserializeObject<IEnumerable<UninstallCandidate>>(json);
         }
 
-        private async Task Save(IEnumerable<UninstallCandidate> candidates)
-        {
-            var json = JsonConvert.SerializeObject(candidates);
-            await File.WriteAllTextAsync(_file, json);
-        }
+        public bool HasCandidateForUninstall() => File.Exists(_uninstallManifest);
 
         public async Task SubscribeForUninstallAsync(IPluginConfiguration pluginConfiguration)
         {
@@ -53,16 +69,30 @@ namespace Lanceur.Infra.Plugins
             await Save(candidates);
         }
 
-        public Task UninstallAsync()
+        public async Task UninstallAsync()
         {
-            throw new NotImplementedException();
+            var retryCandidates = new List<UninstallCandidate>();
+
+            foreach (var candidate in await GetCandidatesAsync())
+            {
+                var directory = Path.Combine(_pluginRootDir, "Plugins", candidate.Directory.Trim('\\'));
+                if (Directory.Exists(directory))
+                {
+                    try
+                    {
+                        _log.Info($"Removing plugin at '{candidate.Directory}'");
+                        Directory.Delete(directory, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.Error($"Failed to uninstall plugin at '{candidate.Directory}'", ex);
+                        retryCandidates.Add(candidate);
+                    }
+                }
+            }
+            await Save(retryCandidates);
         }
 
         #endregion Methods
-
-        #region Classes
-
-
-        #endregion Classes
     }
 }

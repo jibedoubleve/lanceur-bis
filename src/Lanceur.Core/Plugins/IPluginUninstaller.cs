@@ -12,6 +12,8 @@ namespace Lanceur.Core.Plugins
 
         Task UninstallAsync();
 
+        bool HasCandidateForUninstall();
+
         #endregion Methods
     }
 }
