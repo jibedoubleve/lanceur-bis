@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
+    <ProjectReference Include="..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
     <ProjectReference Include="..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj" />
     <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj" />
     <ProjectReference Include="..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
