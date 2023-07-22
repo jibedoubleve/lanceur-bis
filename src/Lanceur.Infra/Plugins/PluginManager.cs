@@ -41,7 +41,7 @@ namespace Lanceur.Infra.Plugins
             {
                 string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
                 _log.Warning(
-                    $"Can't find any type which implements ICommand in {assembly} from {assembly.Location}.\n" +
+                    $"Can't find any type which implements {nameof(IPlugin)} in {assembly} from {assembly.Location}.\n" +
                     $"Available types: {availableTypes}");
             }
 
