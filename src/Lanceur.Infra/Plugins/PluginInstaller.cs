@@ -27,21 +27,12 @@ namespace Lanceur.Infra.Plugins
 
         #region Methods
 
-        private static string GetExtractPath(PluginConfiguration manifest)
-        {
-            return Path.Combine(
-                            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                            @"lanceur2/Plugins",
-                            Path.GetDirectoryName(manifest.Dll).Trim('\\')
-                        );
-        }
-
-        private static void InstallFiles(ZipArchive zip, string extractPath)
+        private static void InstallFiles(string destination, ZipArchive zip)
         {
             foreach (var entry in zip.Entries)
             {
                 // Gets the full path to ensure that relative segments are removed.
-                string destinationPath = Path.GetFullPath(Path.Combine(extractPath, entry.FullName));
+                string destinationPath = Path.GetFullPath(Path.Combine(destination, entry.FullName));
 
                 var directory = Path.GetDirectoryName(destinationPath);
                 if (!Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
@@ -69,8 +60,9 @@ namespace Lanceur.Infra.Plugins
             var json = reader.ReadToEnd();
             var manifest = JsonConvert.DeserializeObject<PluginConfiguration>(json);
 
-            var extractPath = GetExtractPath(manifest);
-            InstallFiles(zip, extractPath);
+            InstallFiles(
+                new PluginDirectory(manifest).Path,
+                zip);
 
             return manifest;
         }

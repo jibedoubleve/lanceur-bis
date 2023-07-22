@@ -15,6 +15,7 @@ namespace Lanceur.Tests.Logging
 
         public BaseLogger(ITestOutputHelper output)
         {
+            ArgumentNullException.ThrowIfNull(nameof(output));
             _output = output;
         }
 
