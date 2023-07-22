@@ -31,27 +31,21 @@ namespace Lanceur.Infra.Plugins
 
         public IEnumerable<IPlugin> CreatePlugin(Assembly assembly)
         {
-            int count = 0;
-            foreach (var type in assembly.GetTypes())
-            {
-                if (typeof(IPlugin).IsAssignableFrom(type))
-                {
-                    if (Activator.CreateInstance(type) is IPlugin result)
-                    {
-                        count++;
-                        _log.Trace($"Found plugin '{result.Name}'");
-                        yield return result;
-                    }
-                }
-            }
+            var plugins = assembly
+                .GetTypes()
+                .Where(type => typeof(IPlugin).IsAssignableFrom(type))
+                .Select(type => Activator.CreateInstance(type) as IPlugin)
+                .Where(plugin => plugin is not null);
 
-            if (count == 0)
+            if (plugins.Any())
             {
                 string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
                 _log.Warning(
                     $"Can't find any type which implements ICommand in {assembly} from {assembly.Location}.\n" +
                     $"Available types: {availableTypes}");
             }
+
+            return plugins;
         }
 
         public Assembly LoadPluginAsm(string path)
