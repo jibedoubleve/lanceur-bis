@@ -75,13 +75,13 @@ namespace Lanceur.Infra.Plugins
 
             foreach (var candidate in await GetCandidatesAsync())
             {
-                var directory = Path.Combine(_pluginRootDir, "Plugins", candidate.Directory.Trim('\\'));
-                if (Directory.Exists(directory))
+                var directory = new PluginDirectory(candidate.Directory);
+                if (directory.Exists())
                 {
                     try
                     {
                         _log.Info($"Removing plugin at '{candidate.Directory}'");
-                        Directory.Delete(directory, true);
+                        directory.Delete();
                     }
                     catch (Exception ex)
                     {

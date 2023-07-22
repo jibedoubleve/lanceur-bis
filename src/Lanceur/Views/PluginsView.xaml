@@ -6,12 +6,33 @@
     xmlns:local="clr-namespace:Lanceur.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rxui="http://reactiveui.net"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:vm="clr-namespace:Lanceur.Views"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:TypeArguments="vm:PluginsViewModel"
     mc:Ignorable="d">
-    <ScrollViewer>
-        <ItemsControl x:Name="PluginConfigurations" ItemTemplate="{DynamicResource PluginConfigurationTemplate}" />
-    </ScrollViewer>
+    <DockPanel LastChildFill="True">
+        <StackPanel
+            HorizontalAlignment="Right"
+            DockPanel.Dock="Bottom"
+            Orientation="Horizontal">
+            <Button
+                x:Name="BtnInstallPlugin"
+                Width="{StaticResource SettingsButtonWidth}"
+                Margin="{StaticResource SettingsButtonMargin}"
+                Style="{StaticResource AccentButtonStyle}">
+                Install plugin
+            </Button>
+            <Button
+                x:Name="BtnRestart"
+                Width="{StaticResource SettingsButtonWidth}"
+                Margin="{StaticResource SettingsButtonMargin}">
+                Restart
+            </Button>
+        </StackPanel>
+        <ScrollViewer>
+            <ItemsControl x:Name="PluginConfigurations" ItemTemplate="{DynamicResource PluginConfigurationTemplate}" />
+        </ScrollViewer>
+    </DockPanel>
 </rxui:ReactiveUserControl>

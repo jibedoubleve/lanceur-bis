@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:Lanceur.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rxui="http://reactiveui.net"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:vm="clr-namespace:Lanceur.Views"
     d:DesignHeight="450"
     d:DesignWidth="500"
@@ -74,15 +75,15 @@
             Orientation="Horizontal">
             <Button
                 x:Name="BtnSaveSession"
-                Width="100"
-                Margin="10"
+                Width="{StaticResource SettingsButtonWidth}"
+                Margin="{StaticResource SettingsButtonMargin}"
                 HorizontalAlignment="Right"
                 Content="Save"
                 Style="{StaticResource AccentButtonStyle}" />
             <Button
                 x:Name="BtnRemoveSession"
-                Width="100"
-                Margin="0,10,10,10"
+                Width="{StaticResource SettingsButtonWidth}"
+                Margin="{StaticResource SettingsButtonMargin}"
                 Content="Delete" />
         </StackPanel>
     </Grid>

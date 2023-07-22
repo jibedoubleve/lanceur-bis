@@ -83,7 +83,7 @@
                         x:Name="Aliases"
                         Margin="5,0,0,5"
                         BorderBrush="{StaticResource DialogBorderBrush}"
-                        BorderThickness="1"
+                        BorderThickness="2"
                         ItemTemplate="{StaticResource MinimalQueryResultTemplate}"
                         SelectionChanged="OnAliasSelectionChanged" />
                     <Button
@@ -98,10 +98,9 @@
             </Grid>
             <Border
                 Grid.Column="1"
-                Margin="5"
-                Padding="10"
+                Margin="0"
+                Padding="0"
                 BorderBrush="{StaticResource DialogBorderBrush}"
-                BorderThickness=".75"
                 Visibility="{Binding SelectedItem, ElementName=Aliases, Converter={StaticResource NullToVisibilityConverter}}">
                 <DockPanel>
                     <StackPanel
@@ -110,19 +109,19 @@
                         Orientation="Horizontal">
                         <Button
                             x:Name="BtnSaveOrUpdateAlias"
-                            Width="120"
-                            Margin="5"
+                            Width="{StaticResource SettingsButtonWidth}"
+                            Margin="{StaticResource SettingsButtonMargin}"
                             Style="{StaticResource AccentButtonStyle}">
                             Save or update
                         </Button>
                         <Button
                             x:Name="BtnDeleteAlias"
-                            Width="120"
-                            Margin="5">
+                            Width="{StaticResource SettingsButtonWidth}"
+                            Margin="{StaticResource SettingsButtonMargin}">
                             Delete
                         </Button>
                     </StackPanel>
-                    <StackPanel>
+                    <StackPanel Margin="15">
                         <HeaderedContentControl Header="Names (separate with coma)">
                             <StackPanel>
                                 <TextBox Margin="5" Text="{Binding ElementName=Aliases, Path=SelectedItem.Synonyms, UpdateSourceTrigger=PropertyChanged}" />

@@ -25,7 +25,7 @@ namespace Lanceur.Views
 
         private readonly Interaction<Unit, string> _askFile;
         private readonly IDelay _delay;
-        private readonly INotification _nofification;
+        private readonly INotification _notification;
         private readonly IAppRestart _restart;
         private readonly ISchedulerProvider _schedulers;
         private readonly ISettingsFacade _settingsFacade;
@@ -52,7 +52,7 @@ namespace Lanceur.Views
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();
-            _nofification = nofification ?? l.GetService<INotification>();
+            _notification = nofification ?? l.GetService<INotification>();
             _settingsFacade = settingsFacade ?? l.GetService<ISettingsFacade>();
 
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
@@ -147,11 +147,11 @@ namespace Lanceur.Views
             {
                 TimeSpan time = GetDelay();
 
-                _nofification.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
+                _notification.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
                 await _delay.Of(time);
                 _restart.Restart();
             }
-            else { _nofification.Information("Saved configuration."); }
+            else { _notification.Information("Saved configuration."); }
         }
 
         #endregion Methods

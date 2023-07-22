@@ -5,6 +5,7 @@ using Lanceur.Core.Services;
 using Lanceur.Schedulers;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
+using Lanceur.Utils;
 using Lanceur.Views.Mixins;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -23,8 +24,11 @@ namespace Lanceur.Views
     {
         #region Fields
 
+        private readonly Interaction<Unit, string> _askFile;
+        private readonly INotification _notification;
         private readonly IPluginConfigRepository _pluginConfigRepository;
-
+        private readonly IPluginInstaller _pluginInstaller;
+        private readonly IAppRestart _restart;
         private readonly ISchedulerProvider _schedulers;
         private readonly IPluginUninstaller _uninstaller;
 
@@ -36,7 +40,10 @@ namespace Lanceur.Views
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IPluginUninstaller uninstaller = null,
-            IPluginConfigRepository pluginConfigRepository = null)
+            IPluginConfigRepository pluginConfigRepository = null,
+            INotification notification = null,
+            IAppRestart restart = null,
+            IPluginInstaller pluginInstaller = null)
         {
             var l = Locator.Current;
 
@@ -45,15 +52,32 @@ namespace Lanceur.Views
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _uninstaller = uninstaller ?? l.GetService<IPluginUninstaller>();
             _pluginConfigRepository = pluginConfigRepository ?? l.GetService<IPluginConfigRepository>();
+            _notification = notification ?? l.GetService<INotification>();
+            _restart = restart ?? l.GetService<IAppRestart>();
+            _pluginInstaller = pluginInstaller ?? l.GetService<IPluginInstaller>();
+            _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
 
             Activate = ReactiveCommand.CreateFromTask(OnActivateAsync, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            InstallPlugin = ReactiveCommand.CreateFromTask(OnInstallPlugin, outputScheduler: _schedulers.MainThreadScheduler);
+            InstallPlugin.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            Restart = ReactiveCommand.Create(OnRestart, outputScheduler: _schedulers.MainThreadScheduler);
+            Restart.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .Subscribe(response =>
                 {
                     PluginConfigurations = new(response.PluginConfigurations);
+                });
+
+            this.WhenAnyObservable(vm => vm.InstallPlugin)
+                .ObserveOn(_schedulers.MainThreadScheduler)
+                .Subscribe(response =>
+                {
+                    PluginConfigurations.Add(response.ToViewModel());
                 });
         }
 
@@ -62,7 +86,11 @@ namespace Lanceur.Views
         #region Properties
 
         public ReactiveCommand<Unit, ActivationContext> Activate { get; private set; }
+        public Interaction<Unit, string> AskFile => _askFile;
+        public ReactiveCommand<Unit, IPluginConfiguration> InstallPlugin { get; set; }
         [Reactive] public ObservableCollection<PluginConfigurationViewModel> PluginConfigurations { get; set; }
+
+        public ReactiveCommand<Unit, Unit> Restart { get; }
 
         #endregion Properties
 
@@ -85,7 +113,6 @@ namespace Lanceur.Views
                                         ).Contains(p.Dll.GetDirectoryName())
                                         select p).ToList();
 
-
             var context = new ActivationContext()
             {
                 PluginConfigurations = pluginConfigurations.ToViewModel()
@@ -93,6 +120,16 @@ namespace Lanceur.Views
 
             return context;
         }
+
+        private async Task<IPluginConfiguration> OnInstallPlugin()
+        {
+            var packagePath = await _askFile.Handle(Unit.Default);
+            var config = _pluginInstaller.Install(packagePath);
+            _notification.Information($"Install plugin at '{packagePath}'");
+            return config;
+        }
+
+        private void OnRestart() => _restart.Restart();
 
         #endregion Methods
 
