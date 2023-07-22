@@ -41,7 +41,7 @@ namespace Lanceur.Infra.Plugins
             }
         }
 
-        public IPluginConfiguration Install(string packagePath)
+        public IPluginManifest Install(string packagePath)
         {
             using var zip = ZipFile.OpenRead(packagePath);
             var config = (from entry in zip.Entries
@@ -58,7 +58,7 @@ namespace Lanceur.Infra.Plugins
             using var reader = new StreamReader(stream);
 
             var json = reader.ReadToEnd();
-            var manifest = JsonConvert.DeserializeObject<PluginConfiguration>(json);
+            var manifest = JsonConvert.DeserializeObject<PluginManifest>(json);
 
             InstallFiles(
                 new PluginDirectory(manifest).Path,

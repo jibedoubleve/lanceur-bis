@@ -26,7 +26,7 @@ namespace Lanceur.Views
 
         private readonly Interaction<Unit, string> _askFile;
         private readonly INotification _notification;
-        private readonly IPluginConfigRepository _pluginConfigRepository;
+        private readonly IPluginManifestRepository _pluginManifestRepository;
         private readonly IPluginInstaller _pluginInstaller;
         private readonly IAppRestart _restart;
         private readonly ISchedulerProvider _schedulers;
@@ -40,7 +40,7 @@ namespace Lanceur.Views
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IPluginUninstaller uninstaller = null,
-            IPluginConfigRepository pluginConfigRepository = null,
+            IPluginManifestRepository pluginConfigRepository = null,
             INotification notification = null,
             IAppRestart restart = null,
             IPluginInstaller pluginInstaller = null)
@@ -51,7 +51,7 @@ namespace Lanceur.Views
 
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _uninstaller = uninstaller ?? l.GetService<IPluginUninstaller>();
-            _pluginConfigRepository = pluginConfigRepository ?? l.GetService<IPluginConfigRepository>();
+            _pluginManifestRepository = pluginConfigRepository ?? l.GetService<IPluginManifestRepository>();
             _notification = notification ?? l.GetService<INotification>();
             _restart = restart ?? l.GetService<IAppRestart>();
             _pluginInstaller = pluginInstaller ?? l.GetService<IPluginInstaller>();
@@ -70,14 +70,14 @@ namespace Lanceur.Views
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .Subscribe(response =>
                 {
-                    PluginConfigurations = new(response.PluginConfigurations);
+                    PluginManifests = new(response.PluginManifests);
                 });
 
             this.WhenAnyObservable(vm => vm.InstallPlugin)
                 .ObserveOn(_schedulers.MainThreadScheduler)
                 .Subscribe(response =>
                 {
-                    PluginConfigurations.Add(response.ToViewModel());
+                    PluginManifests.Add(response.ToViewModel());
                 });
         }
 
@@ -87,8 +87,8 @@ namespace Lanceur.Views
 
         public ReactiveCommand<Unit, ActivationContext> Activate { get; private set; }
         public Interaction<Unit, string> AskFile => _askFile;
-        public ReactiveCommand<Unit, IPluginConfiguration> InstallPlugin { get; set; }
-        [Reactive] public ObservableCollection<PluginConfigurationViewModel> PluginConfigurations { get; set; }
+        public ReactiveCommand<Unit, IPluginManifest> InstallPlugin { get; set; }
+        [Reactive] public ObservableCollection<PluginManifestViewModel> PluginManifests { get; set; }
 
         public ReactiveCommand<Unit, Unit> Restart { get; }
 
@@ -99,15 +99,15 @@ namespace Lanceur.Views
         private async Task<ActivationContext> OnActivateAsync()
         {
             // Get all installed plugins
-            var allPluginConfigurations = _pluginConfigRepository
-                .GetPluginConfigurations()
+            var allPluginManifests = _pluginManifestRepository
+                .GetPluginManifests()
                 .ToViewModel();
 
             // Get all candidates for uninstall
             // and remove them from the list
             var candidates = await _uninstaller.GetCandidatesAsync();
 
-            var pluginConfigurations = (from p in allPluginConfigurations
+            var pluginConfigurations = (from p in allPluginManifests
                                         where !(from c in candidates
                                                 select c.Directory
                                         ).Contains(p.Dll.GetDirectoryName())
@@ -115,13 +115,13 @@ namespace Lanceur.Views
 
             var context = new ActivationContext()
             {
-                PluginConfigurations = pluginConfigurations.ToViewModel()
+                PluginManifests = pluginConfigurations.ToViewModel()
             };
 
             return context;
         }
 
-        private async Task<IPluginConfiguration> OnInstallPlugin()
+        private async Task<IPluginManifest> OnInstallPlugin()
         {
             var packagePath = await _askFile.Handle(Unit.Default);
             var config = _pluginInstaller.Install(packagePath);
@@ -139,7 +139,7 @@ namespace Lanceur.Views
         {
             #region Properties
 
-            public IEnumerable<PluginConfigurationViewModel> PluginConfigurations { get; internal set; }
+            public IEnumerable<PluginManifestViewModel> PluginManifests { get; internal set; }
 
             #endregion Properties
         }

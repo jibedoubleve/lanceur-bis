@@ -8,7 +8,7 @@ namespace Lanceur.Core.Plugins
 
         Task<IEnumerable<UninstallCandidate>> GetCandidatesAsync();
 
-        Task SubscribeForUninstallAsync(IPluginConfiguration pluginConfiguration);
+        Task SubscribeForUninstallAsync(IPluginManifest pluginManifest);
 
         Task UninstallAsync();
 

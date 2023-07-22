@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Models
 {
-    public interface IPluginConfiguration
+    public interface IPluginManifest
     {
         Version AppMinVersion { get; set; }
         string Author { get; set; }

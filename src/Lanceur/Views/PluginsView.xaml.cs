@@ -32,14 +32,14 @@ namespace Lanceur.Views
                 });
 
 
-                this.OneWayBind(ViewModel, vm => vm.PluginConfigurations, v => v.PluginConfigurations.ItemsSource).DisposeWith(d);                
+                this.OneWayBind(ViewModel, vm => vm.PluginManifests, v => v.PluginManifests.ItemsSource).DisposeWith(d);                
 
                 this.BindCommand(ViewModel, vm => vm.Restart, v => v.BtnRestart).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.InstallPlugin, v => v.BtnInstallPlugin).DisposeWith(d);
 
                 ViewModel.Activate.Execute().Subscribe(x =>
                 {
-                    foreach (var plugin in x.PluginConfigurations)
+                    foreach (var plugin in x.PluginManifests)
                     {
                         plugin.ConfirmRemove.RegisterHandler(async interaction =>
                         {

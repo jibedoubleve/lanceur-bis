@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Lanceur.Views
 {
-    public class PluginConfigurationViewModel : ReactiveObject, IPluginConfiguration
+    public class PluginManifestViewModel : ReactiveObject, IPluginManifest
     {
         #region Fields
 
@@ -25,7 +25,7 @@ namespace Lanceur.Views
 
         #region Constructors
 
-        public PluginConfigurationViewModel(
+        public PluginManifestViewModel(
             ISchedulerProvider schedulerProvider = null,
             IUserNotification notify = null,
             IPluginUninstaller pluginUninstaller = null)

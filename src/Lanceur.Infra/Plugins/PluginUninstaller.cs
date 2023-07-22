@@ -55,16 +55,16 @@ namespace Lanceur.Infra.Plugins
 
         public bool HasCandidateForUninstall() => File.Exists(_uninstallManifest);
 
-        public async Task SubscribeForUninstallAsync(IPluginConfiguration pluginConfiguration)
+        public async Task SubscribeForUninstallAsync(IPluginManifest pluginManifest)
         {
             var candidates = (await GetCandidatesAsync()).ToList();
             var alreadyCandidate = (from c in candidates
-                                    where c.Directory == pluginConfiguration.Dll.GetDirectoryName()
+                                    where c.Directory == pluginManifest.Dll.GetDirectoryName()
                                     select c).Any();
 
             if (alreadyCandidate) { return; }
 
-            candidates.Add(new UninstallCandidate(pluginConfiguration.Dll.GetDirectoryName()));
+            candidates.Add(new UninstallCandidate(pluginManifest.Dll.GetDirectoryName()));
 
             await Save(candidates);
         }
