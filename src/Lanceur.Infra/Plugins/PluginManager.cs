@@ -29,8 +29,19 @@ namespace Lanceur.Infra.Plugins
 
         #region Methods
 
-        public IEnumerable<IPlugin> CreatePlugin(Assembly assembly)
+        private Assembly LoadPluginAsm(string path)
         {
+            var root = _pluginStoreContext.RepositoryPath;
+            var pluginLocation = Path.GetFullPath(Path.Combine(root, path.Replace('\\', Path.DirectorySeparatorChar)));
+            var ctx = new PluginLoadContext(pluginLocation);
+
+            var filename = Path.GetFileNameWithoutExtension(pluginLocation);
+            return ctx.LoadFromAssemblyName(new AssemblyName(filename));
+        }
+
+        public IEnumerable<IPlugin> CreatePlugin(string path)
+        {
+            var assembly = LoadPluginAsm(path);
             var plugins = assembly
                 .GetTypes()
                 .Where(type => typeof(IPlugin).IsAssignableFrom(type))
@@ -46,16 +57,6 @@ namespace Lanceur.Infra.Plugins
             }
 
             return plugins;
-        }
-
-        public Assembly LoadPluginAsm(string path)
-        {
-            var root = _pluginStoreContext.RepositoryPath;
-            var pluginLocation = Path.GetFullPath(Path.Combine(root, path.Replace('\\', Path.DirectorySeparatorChar)));
-            var ctx = new PluginLoadContext(pluginLocation);
-
-            var filename = Path.GetFileNameWithoutExtension(pluginLocation);
-            return ctx.LoadFromAssemblyName(new AssemblyName(filename));
         }
 
         #endregion Methods

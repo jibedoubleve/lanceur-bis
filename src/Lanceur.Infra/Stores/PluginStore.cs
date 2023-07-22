@@ -67,19 +67,11 @@ namespace Lanceur.Infra.Stores
             if (_plugins == null)
             {
                 var configs = GetPluginConfigurations();
-                var queryResults = new List<PluginExecutableQueryResult>();
 
-                foreach (var config in configs)
-                {
-                    var asm = _pluginManager.LoadPluginAsm($"plugins/{config.Dll}");
-                    var plugins = _pluginManager.CreatePlugin(asm);
-                    foreach (var plugin in plugins)
-                    {
-                        var query = new PluginExecutableQueryResult(plugin, _logFactory);
-                        queryResults.Add(query);
-                    }
-                }
-                _plugins = queryResults;
+                _plugins = configs
+                    .SelectMany(x => _pluginManager.CreatePlugin($"plugins/{x.Dll}"))
+                    .Select(x => new PluginExecutableQueryResult(x, _logFactory))
+                    .ToList();
             }
         }
 
