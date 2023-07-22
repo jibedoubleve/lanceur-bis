@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Repositories
 {
-    public interface IPluginConfigRepository
+    public interface IPluginManifestRepository
     {
         #region Methods
 
@@ -10,7 +10,7 @@ namespace Lanceur.Core.Repositories
         /// Get the configuration of all plugins installed
         /// </summary>
         /// <returns>The list of all configuration</returns>
-        IPluginConfiguration[] GetPluginConfigurations();
+        IPluginManifest[] GetPluginManifests();
 
         #endregion Methods
     }

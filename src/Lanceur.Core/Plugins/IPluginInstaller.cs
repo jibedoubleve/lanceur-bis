@@ -6,7 +6,7 @@ namespace Lanceur.Core.Plugins
     {
         #region Methods
 
-        IPluginConfiguration Install(string packagePath);
+        IPluginManifest Install(string packagePath);
 
         #endregion Methods
     }

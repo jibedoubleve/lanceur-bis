@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the configuration of a plugin
     /// </summary>
-    public class PluginConfiguration : IPluginConfiguration
+    public class PluginManifest : IPluginManifest
     {
         #region Properties
 

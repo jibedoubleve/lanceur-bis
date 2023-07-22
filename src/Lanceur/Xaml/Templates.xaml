@@ -246,7 +246,7 @@
             </DockPanel>
         </Border>
     </DataTemplate>
-    <DataTemplate x:Key="PluginConfigurationTemplate" DataType="{x:Type m:PluginConfiguration}">
+    <DataTemplate x:Key="PluginManifestTemplate" DataType="{x:Type m:PluginManifest}">
         <StackPanel Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel Margin="5" Orientation="Horizontal">
                 <TextBlock

@@ -30,7 +30,7 @@ namespace Lanceur.Infra.Plugins
             Path = IoPath.Combine(Root, directory.Trim(TRIM_CHARS));
         }
 
-        public PluginDirectory(IPluginConfiguration manifest)
+        public PluginDirectory(IPluginManifest manifest)
         {
             Path = IoPath.Combine(
                 Root,

@@ -11,7 +11,7 @@ using Splat;
 namespace Lanceur.Infra.Stores
 {
     [Store]
-    public class PluginStore : ISearchService, IPluginConfigRepository
+    public class PluginStore : ISearchService, IPluginManifestRepository
     {
         #region Fields
 
@@ -47,15 +47,15 @@ namespace Lanceur.Infra.Stores
 
         #region Methods
 
-        public IPluginConfiguration[] GetPluginConfigurations()
+        public IPluginManifest[] GetPluginManifests()
         {
-            var configs = new List<PluginConfiguration>();
+            var configs = new List<PluginManifest>();
             var root = _context.RepositoryPath;
             var files = Directory.EnumerateFiles(root, "plugin.config.json", SearchOption.AllDirectories);
             foreach (var file in files)
             {
                 var json = File.ReadAllText(file);
-                var cfg = JsonConvert.DeserializeObject<PluginConfiguration>(json);
+                var cfg = JsonConvert.DeserializeObject<PluginManifest>(json);
                 configs.Add(cfg);
             }
 
@@ -66,20 +66,12 @@ namespace Lanceur.Infra.Stores
         {
             if (_plugins == null)
             {
-                var configs = GetPluginConfigurations();
-                var queryResults = new List<PluginExecutableQueryResult>();
+                var configs = GetPluginManifests();
 
-                foreach (var config in configs)
-                {
-                    var asm = _pluginManager.LoadPluginAsm($"plugins/{config.Dll}");
-                    var plugins = _pluginManager.CreatePlugin(asm);
-                    foreach (var plugin in plugins)
-                    {
-                        var query = new PluginExecutableQueryResult(plugin, _logFactory);
-                        queryResults.Add(query);
-                    }
-                }
-                _plugins = queryResults;
+                _plugins = configs
+                    .SelectMany(x => _pluginManager.CreatePlugin($"plugins/{x.Dll}"))
+                    .Select(x => new PluginExecutableQueryResult(x, _logFactory))
+                    .ToList();
             }
         }
 

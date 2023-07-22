@@ -32,7 +32,7 @@
             </Button>
         </StackPanel>
         <ScrollViewer>
-            <ItemsControl x:Name="PluginConfigurations" ItemTemplate="{DynamicResource PluginConfigurationTemplate}" />
+            <ItemsControl x:Name="PluginManifests" ItemTemplate="{DynamicResource PluginManifestTemplate}" />
         </ScrollViewer>
     </DockPanel>
 </rxui:ReactiveUserControl>

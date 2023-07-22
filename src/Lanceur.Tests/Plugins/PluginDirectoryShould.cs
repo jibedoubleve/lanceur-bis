@@ -59,7 +59,7 @@ namespace Lanceur.Tests.Plugins
             _output.WriteLine($"Plugin dir  : {dir}");
             _output.WriteLine($"Full path   : {expectedDirectory}");
 
-            var manifest = Substitute.For<IPluginConfiguration>();
+            var manifest = Substitute.For<IPluginManifest>();
             manifest.Dll.Returns(@$"{dir}/plugin.dll");
 
             // Act

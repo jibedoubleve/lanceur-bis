@@ -7,9 +7,7 @@ namespace Lanceur.Core.Plugins
     {
         #region Methods
 
-        IEnumerable<IPlugin> CreatePlugin(Assembly assembly);
-
-        Assembly LoadPluginAsm(string path);
+        IEnumerable<IPlugin> CreatePlugin(string assemblyPath);
 
         #endregion Methods
     }

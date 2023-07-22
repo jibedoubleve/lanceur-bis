@@ -99,7 +99,7 @@ namespace Lanceur
             l.Register<IStringFormatter>(() => new DefaultStringFormatter());
 
             // Plugins
-            l.Register<IPluginConfigRepository>(() => new PluginStore());
+            l.Register<IPluginManifestRepository>(() => new PluginStore());
             l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
             l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>()));
 
