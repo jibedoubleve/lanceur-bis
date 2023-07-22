@@ -17,21 +17,17 @@
             HorizontalAlignment="Right"
             DockPanel.Dock="Bottom"
             Orientation="Horizontal">
-            <StackPanel.Resources>
-                <sys:Double x:Key="Width">110</sys:Double>
-                <Thickness x:Key="Margin">0 10 10 10</Thickness>
-            </StackPanel.Resources>
             <Button
                 x:Name="BtnInstallPlugin"
-                Width="{StaticResource Width}"
-                Margin="{StaticResource Margin}"
+                Width="{StaticResource SettingsButtonWidth}"
+                Margin="{StaticResource SettingsButtonMargin}"
                 Style="{StaticResource AccentButtonStyle}">
                 Install plugin
             </Button>
             <Button
                 x:Name="BtnRestart"
-                Width="{StaticResource Width}"
-                Margin="{StaticResource Margin}">
+                Width="{StaticResource SettingsButtonWidth}"
+                Margin="{StaticResource SettingsButtonMargin}">
                 Restart
             </Button>
         </StackPanel>
