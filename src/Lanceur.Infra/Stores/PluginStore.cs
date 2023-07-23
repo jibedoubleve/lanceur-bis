@@ -71,7 +71,7 @@ namespace Lanceur.Infra.Stores
 
                 _plugins = configs
                     .Where(manifest => _appVersion >= manifest.AppMinVersion)
-                    .SelectMany(manifest => _pluginManager.CreatePlugin($"plugins/{manifest.Dll}"))
+                    .SelectMany(manifest => _pluginManager.CreatePlugin(manifest.Dll))
                     .Select(x => new PluginExecutableQueryResult(x, _logFactory))
                     .ToList();
             }

@@ -10,18 +10,11 @@ namespace Lanceur.Infra.Plugins
     {
         #region Fields
 
-        private static readonly string _uninstallManifest = Environment.ExpandEnvironmentVariables(@"%appdata%\probel\lanceur2\.plugin-uninstall");
-        private static readonly string _pluginRootDir;
         private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
-
-        static PluginUninstaller()
-        {
-            _pluginRootDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"Lanceur2");
-        }
 
         public PluginUninstaller(IAppLoggerFactory loggerFactory)
         {
@@ -35,36 +28,36 @@ namespace Lanceur.Infra.Plugins
 
         private static async Task Save(IEnumerable<UninstallCandidate> candidates)
         {
-            if (!candidates.Any() && File.Exists(_uninstallManifest))
+            if (!candidates.Any() && File.Exists(PluginLocation.UninstallManifest))
             {
-                File.Delete(_uninstallManifest);
+                File.Delete(PluginLocation.UninstallManifest);
                 return;
             }
 
             var json = JsonConvert.SerializeObject(candidates);
-            await File.WriteAllTextAsync(_uninstallManifest, json);
+            await File.WriteAllTextAsync(PluginLocation.UninstallManifest, json);
         }
 
         public async Task<IEnumerable<UninstallCandidate>> GetCandidatesAsync()
         {
-            if (!File.Exists(_uninstallManifest)) { return Array.Empty<UninstallCandidate>(); }
+            if (!File.Exists(PluginLocation.UninstallManifest)) { return Array.Empty<UninstallCandidate>(); }
 
-            var json = await File.ReadAllTextAsync(_uninstallManifest);
+            var json = await File.ReadAllTextAsync(PluginLocation.UninstallManifest);
             return JsonConvert.DeserializeObject<IEnumerable<UninstallCandidate>>(json);
         }
 
-        public bool HasCandidateForUninstall() => File.Exists(_uninstallManifest);
+        public bool HasCandidateForUninstall() => File.Exists(PluginLocation.UninstallManifest);
 
-        public async Task SubscribeForUninstallAsync(IPluginManifest pluginManifest)
+        public async Task SubscribeForUninstallAsync(IPluginManifest manifest)
         {
             var candidates = (await GetCandidatesAsync()).ToList();
             var alreadyCandidate = (from c in candidates
-                                    where c.Directory == pluginManifest.Dll.GetDirectoryName()
+                                    where c.Directory == manifest.Dll.GetDirectoryName()
                                     select c).Any();
 
             if (alreadyCandidate) { return; }
 
-            candidates.Add(new UninstallCandidate(pluginManifest.Dll.GetDirectoryName()));
+            candidates.Add(new UninstallCandidate(manifest.Dll.GetDirectoryName()));
 
             await Save(candidates);
         }
@@ -75,7 +68,7 @@ namespace Lanceur.Infra.Plugins
 
             foreach (var candidate in await GetCandidatesAsync())
             {
-                var directory = new PluginDirectory(candidate.Directory);
+                var directory = PluginLocation.FromDirectory(candidate.Directory);
                 if (directory.Exists())
                 {
                     try

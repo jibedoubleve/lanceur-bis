@@ -26,24 +26,34 @@ namespace Lanceur.Tests.Plugins
 
         #region Methods
 
-        [Fact]
-        public void BeInMyDocuments()
+        [Theory]
+        [InlineData(true, "directory/plugin.dll")]
+        [InlineData(true, "/directory/plugin.dll")]
+        [InlineData(false, "directory")]
+        [InlineData(false, "directory/")]
+        [InlineData(false, "/directory")]
+        public void BeInMyDocuments(bool isFile, string dir)
         {
             // Arrange
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = "directory;";
+            var expectedDirectory = new DirectoryInfo(Path.Combine(myDocuments, PluginLocation.RelativePath, dir.Trim('\\', '/'))).FullName;
 
-            var expectedDirectory = new DirectoryInfo(Path.Combine(myDocuments, PluginDirectory.RelativePath, dir));
+            if (isFile)
+            {
+                expectedDirectory = Path.GetDirectoryName(expectedDirectory);
+            }
 
             _output.WriteLine($"My Documents: {myDocuments}");
             _output.WriteLine($"Plugin dir  : {dir}");
             _output.WriteLine($"Full path   : {expectedDirectory}");
 
             // Act
-            var path = new PluginDirectory(dir);
+            var path = isFile
+                ? PluginLocation.FromFile(dir)
+                : PluginLocation.FromDirectory(dir);
 
             // Assert
-            path.Directory.FullName.Should().Be(expectedDirectory.FullName);
+            path.Directory.FullName.Should().Be(expectedDirectory);
         }
 
         [Fact]
@@ -53,7 +63,7 @@ namespace Lanceur.Tests.Plugins
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var dir = "directory;";
 
-            var expectedDirectory = new DirectoryInfo(Path.Combine(myDocuments, PluginDirectory.RelativePath, dir));
+            var expectedDirectory = new DirectoryInfo(Path.Combine(myDocuments, PluginLocation.RelativePath, dir));
 
             _output.WriteLine($"My Documents: {myDocuments}");
             _output.WriteLine($"Plugin dir  : {dir}");
@@ -63,7 +73,7 @@ namespace Lanceur.Tests.Plugins
             manifest.Dll.Returns(@$"{dir}/plugin.dll");
 
             // Act
-            var path = new PluginDirectory(manifest);
+            var path = new PluginLocation(manifest);
 
             // Assert
             path.Directory.FullName.Should().Be(expectedDirectory.FullName);

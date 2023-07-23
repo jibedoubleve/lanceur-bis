@@ -1,19 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Assets\appIcon.ico</ApplicationIcon>
+    <AssemblyVersion>2.4.0.1</AssemblyVersion>
+    <FileVersion>2.4.0.0</FileVersion>
+    <InformationalVersion>2.4.0-alpha.1+8.Branch.issue-257.Sha.62499d79527971ab1af93744ab78c818bf0a9f20</InformationalVersion>
+    <Version>2.4.0-alpha0001</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <Resource Include="Assets\appIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.*" />
     <PackageReference Include="MahApps.Metro" Version="2.4.*" />
@@ -29,7 +30,6 @@
     <PackageReference Include="ScottPlot.WPF" Version="4.1.*" />
     <PackageReference Include="Splat.NLog" Version="14.6.*" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
     <ProjectReference Include="..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj" />
@@ -38,7 +38,6 @@
     <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
     <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -48,5 +47,4 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
 </Project>
