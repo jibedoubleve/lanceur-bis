@@ -7,6 +7,7 @@ using Lanceur.Infra.Plugins;
 using Lanceur.Infra.Utils;
 using Newtonsoft.Json;
 using Splat;
+using System.Reflection;
 
 namespace Lanceur.Infra.Stores
 {
@@ -18,6 +19,7 @@ namespace Lanceur.Infra.Stores
         private static IEnumerable<SelfExecutableQueryResult> _plugins = null;
         private readonly IPluginStoreContext _context;
         private readonly IAppLogger _log;
+        private readonly Version _appVersion;
         private readonly IAppLoggerFactory _logFactory;
         private readonly IPluginManager _pluginManager;
 
@@ -41,6 +43,8 @@ namespace Lanceur.Infra.Stores
 
             _logFactory = logFactory ?? l.GetService<IAppLoggerFactory>();
             _log = l.GetLogger<PluginStore>(_logFactory);
+
+            _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
         }
 
         #endregion Constructors
@@ -49,17 +53,14 @@ namespace Lanceur.Infra.Stores
 
         public IPluginManifest[] GetPluginManifests()
         {
-            var configs = new List<PluginManifest>();
             var root = _context.RepositoryPath;
             var files = Directory.EnumerateFiles(root, "plugin.config.json", SearchOption.AllDirectories);
-            foreach (var file in files)
+
+            return files.Select(file =>
             {
                 var json = File.ReadAllText(file);
-                var cfg = JsonConvert.DeserializeObject<PluginManifest>(json);
-                configs.Add(cfg);
-            }
-
-            return configs.ToArray();
+                return JsonConvert.DeserializeObject<PluginManifest>(json);
+            }).ToArray();
         }
 
         private void LoadPlugins()
@@ -69,7 +70,8 @@ namespace Lanceur.Infra.Stores
                 var configs = GetPluginManifests();
 
                 _plugins = configs
-                    .SelectMany(x => _pluginManager.CreatePlugin($"plugins/{x.Dll}"))
+                    .Where(manifest => _appVersion >= manifest.AppMinVersion)
+                    .SelectMany(manifest => _pluginManager.CreatePlugin($"plugins/{manifest.Dll}"))
                     .Select(x => new PluginExecutableQueryResult(x, _logFactory))
                     .ToList();
             }
