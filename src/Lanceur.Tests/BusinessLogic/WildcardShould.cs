@@ -44,7 +44,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var clipboard = Substitute.For<IClipboardService>();
             clipboard.GetText().Returns(param);
-            var mgr = new ReplacementCollection(clipboard);
+            var mgr = new ReplacementComposite(clipboard);
 
             mgr.Replace(actual, param)
                .Should().Be(expected);
@@ -57,7 +57,7 @@ namespace Lanceur.Tests.BusinessLogic
         public void ReturnParametersAsExpected(string aliasParam, string userParam, string expected)
         {
             var clipboard = Substitute.For<IClipboardService>();
-            var mgr = new ReplacementCollection(clipboard);
+            var mgr = new ReplacementComposite(clipboard);
 
             mgr.ReplaceOrReplacementOnNull(aliasParam, userParam).Should().Be(expected);
         }
