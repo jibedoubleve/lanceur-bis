@@ -12,6 +12,7 @@ namespace Lanceur.Infra.Plugins
         #region Fields
 
         private readonly IAppLogger _log;
+
         private readonly IPluginStoreContext _pluginStoreContext;
 
         #endregion Fields
@@ -29,13 +30,13 @@ namespace Lanceur.Infra.Plugins
 
         #region Methods
 
-        private Assembly LoadPluginAsm(string path)
+        private Assembly LoadPluginAsm(string relativePath)
         {
-            var root = _pluginStoreContext.RepositoryPath;
-            var pluginLocation = Path.GetFullPath(Path.Combine(root, path.Replace('\\', Path.DirectorySeparatorChar)));
-            var ctx = new PluginLoadContext(pluginLocation);
+            var loc = PluginLocation.FromFile(relativePath).FullPath;
 
-            var filename = Path.GetFileNameWithoutExtension(pluginLocation);
+            var ctx = new PluginLoadContext(loc);
+
+            var filename = Path.GetFileNameWithoutExtension(loc);
             return ctx.LoadFromAssemblyName(new AssemblyName(filename));
         }
 

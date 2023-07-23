@@ -61,7 +61,7 @@ namespace Lanceur.Infra.Plugins
             var manifest = JsonConvert.DeserializeObject<PluginManifest>(json);
 
             InstallFiles(
-                new PluginDirectory(manifest).Path,
+                new PluginLocation(manifest).DirectoryPath,
                 zip);
 
             return manifest;

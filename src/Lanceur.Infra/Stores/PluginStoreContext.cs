@@ -1,4 +1,6 @@
-﻿namespace Lanceur.Infra.Stores
+﻿using Lanceur.Infra.Plugins;
+
+namespace Lanceur.Infra.Stores
 {
     public interface IPluginStoreContext
     {
@@ -15,10 +17,6 @@
 
         public PluginStoreContext()
         {
-            var doc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = @"Lanceur2\";
-            RepositoryPath = Path.Combine(doc, dir);
-
             CreateIfNotExist();
         }
 
@@ -26,7 +24,7 @@
 
         #region Properties
 
-        public string RepositoryPath { get; }
+        public string RepositoryPath => PluginLocation.Root;
 
         #endregion Properties
 
