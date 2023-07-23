@@ -85,7 +85,7 @@ namespace Lanceur
             l.Register<ICmdlineManager>(() => new CmdlineManager());
             l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(), Get<IDbRepository>(), Get<ICmdlineManager>()));
             l.Register<IDbRepository>(() => new SQLiteRepository(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(), Get<IConvertionService>()));
-            l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
+            l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
             l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
             l.Register<IClipboardService>(() => new WindowsClipboardService());

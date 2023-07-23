@@ -4,7 +4,7 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Wildcards
 {
-    public class ReplacementCollection : IReplacement, IWildcardManager
+    public class ReplacementComposite : IReplacement, IWildcardManager
     {
         #region Fields
 
@@ -14,7 +14,7 @@ namespace Lanceur.Infra.Wildcards
 
         #region Constructors
 
-        public ReplacementCollection(IClipboardService clipboard)
+        public ReplacementComposite(IClipboardService clipboard)
         {
             _replacements = new List<IReplacement>()
             {
