@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Lanceur.Converters;
 using Lanceur.Infra.Formatters;
-using Lanceur.Tests.Utils;
 using NSubstitute;
 using Splat;
 using Xunit;
@@ -11,6 +10,16 @@ namespace Lanceur.Tests.Converters
     public class StringConverterShould
     {
         #region Methods
+
+        [Fact]
+        public void FailWhenFormatterIsNull()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var locator = Substitute.For<IReadonlyDependencyResolver>();
+                new QueryDescriptionConverter(null, locator);
+            });
+        }
 
         [Theory]
         [InlineData("", "")]
@@ -51,26 +60,6 @@ namespace Lanceur.Tests.Converters
             description.Should().Be(output);
         }
 
-        [Fact]
-        public void FailWhenFormatterNotInIOC()
-        {
-            using var scope = new LocatorDesactivator();
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                new QueryDescriptionConverter();
-
-            });
-        }
-
-        [Fact]
-        public void FailWhenFormatterIsNull()
-        {
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                new QueryDescriptionConverter(null);
-
-            });
-        }
         #endregion Methods
     }
 }

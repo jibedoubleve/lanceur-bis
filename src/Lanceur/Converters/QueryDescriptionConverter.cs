@@ -16,17 +16,15 @@ namespace Lanceur.Converters
 
         #region Constructors
 
-        public QueryDescriptionConverter()
+        public QueryDescriptionConverter() : this(null)
         {
-            _formatter = Locator.Current.GetService<IStringFormatter>();
-
-            ArgumentNullException.ThrowIfNull(_formatter);
         }
 
-        public QueryDescriptionConverter(IStringFormatter formatter)
+        public QueryDescriptionConverter(IStringFormatter formatter, IReadonlyDependencyResolver locator = null)
         {
-            ArgumentNullException.ThrowIfNull(formatter);
-            _formatter = formatter;
+            var l = locator ?? Locator.Current;
+            _formatter = formatter ?? l.GetService<IStringFormatter>();
+            ArgumentNullException.ThrowIfNull(_formatter);
         }
 
         #endregion Constructors
