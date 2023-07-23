@@ -7,7 +7,7 @@ namespace Lanceur.Core.Models
     {
         #region Methods
 
-        public static string GetMacro(this AliasQueryResult @this)
+        public static string GetMacroName(this AliasQueryResult @this)
         {
             var regex = new Regex("@(.*)@");
             var result = regex.IsMatch(@this?.FileName ?? string.Empty)
@@ -21,7 +21,7 @@ namespace Lanceur.Core.Models
 
         public static bool IsComposite(this AliasQueryResult @this) => @this.Is(CompositeMacros.Multi);
 
-        public static bool IsMacro(this AliasQueryResult @this) => !GetMacro(@this).IsNullOrEmpty();
+        public static bool IsMacro(this AliasQueryResult @this) => !GetMacroName(@this).IsNullOrEmpty();
 
         public static string ToQuery(this QueryResult @this) => $"{@this.Name} {(@this.Query?.Parameters ?? "")}".Trim();
 

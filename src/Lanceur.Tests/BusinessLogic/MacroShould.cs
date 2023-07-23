@@ -123,7 +123,7 @@ namespace Lanceur.Tests.BusinessLogic
             var results = service.Search("alias1");
 
             //Assert
-            ((AliasQueryResult)results.ElementAt(0)).GetMacro().Should().Be("MULTI");
+            ((AliasQueryResult)results.ElementAt(0)).GetMacroName().Should().Be("MULTI");
         }
 
         [Fact]

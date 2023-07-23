@@ -1,111 +1,52 @@
-﻿using Lanceur.Core;
-using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
-using Splat;
-using System.ComponentModel;
 using System.Reflection;
 
 namespace Lanceur.Infra.Managers
 {
-    public class MacroManager : IMacroManager
+    public class MacroManager : MacroManagerCache, IMacroManager
     {
-        #region Fields
-
-        private static Dictionary<string, SelfExecutableQueryResult> _macroInstances = null;
-        private readonly Assembly _asm;
-        private readonly IDbRepository _dataService;
-        private readonly IAppLogger _log;
-
-        #endregion Fields
-
         #region Constructors
 
-        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null)
+        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null) : base(asm, logFactory)
         {
-            _asm = asm;
-            _log = Locator.Current.GetLogger<MacroManager>(logFactory);
-            _dataService = Locator.Current.GetService<IDbRepository>();
         }
 
         #endregion Constructors
 
         #region Methods
 
-        private void LoadMacros()
-        {
-            var types = _asm.GetTypes();
-            if (_macroInstances is null)
-            {
-                var found = from t in types
-                            where t.GetCustomAttributes<MacroAttribute>().Any()
-                            select t;
-                var macroInstances = new Dictionary<string, SelfExecutableQueryResult>();
-                foreach (var type in found)
-                {
-                    var instance = Activator.CreateInstance(type);
-                    if (instance is SelfExecutableQueryResult alias)
-                    {
-                        var name = alias.Name = (type.GetCustomAttribute(typeof(MacroAttribute)) as MacroAttribute)?.Name;
-                        name = name.ToUpper().Replace("@", string.Empty);
+        /// <inheritdoc/>
+        public IEnumerable<string> GetAll() => MacroInstances.Keys;
 
-                        var description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
-                        alias.Description = description;
-
-                        _dataService.HydrateMacro(alias);
-
-                        macroInstances.Add(name, alias);
-                        _log.Trace($"Found macro '{name}'");
-                    }
-                }
-                _macroInstances = macroInstances;
-            }
-        }
-
-        public IEnumerable<string> GetAll()
-        {
-            LoadMacros();
-            return _macroInstances.Keys;
-        }
-
+        /// <inheritdoc/>
         public IEnumerable<QueryResult> Handle(IEnumerable<QueryResult> collection)
         {
-            LoadMacros();
-
-            var results = new List<QueryResult>();
-            foreach (var item in collection)
-            {
-                var toAdd = Handle(item);
-                if (toAdd != null)
-                {
-                    results.Add(toAdd);
-                }
-            }
-
-            return results;
+            return collection
+                .Select(item => Handle(item))
+                .Where(item => item is not null);
         }
 
+        /// <inheritdoc/>
         public QueryResult Handle(QueryResult item)
         {
-            if (item is AliasQueryResult src && src.IsMacro())
+            if (item is not AliasQueryResult alias || !alias.IsMacro())
             {
-                if (_macroInstances.ContainsKey(src.GetMacro()))
-                {
-                    var macro = _macroInstances[src.GetMacro()];
-                    macro.Name = src.Name;
-                    macro.Parameters = src.Parameters;
-                    return macro;
-                }
-                else
-                {
-                    /* Well, this is a misconfigured macro, log it and forget it */
-                    _log.Warning($"User has misconfigured a Macro with name '{src.FileName}'. Fix the name of the macro or remove the alias from the database.");
-                    return null;
-                }
+                return item;
             }
-            else { return item; }
+
+            if (!MacroInstances.ContainsKey(alias.GetMacroName()))
+            {
+                /* Well, this is a misconfigured macro, log it and forget it */
+                _log.Warning($"User has misconfigured a Macro with name '{alias.FileName}'. Fix the name of the macro or remove the alias from the database.");
+                return null;
+            }
+
+            var macro = MacroInstances[alias.GetMacroName()];
+            macro.Name = alias.Name;
+            macro.Parameters = alias.Parameters;
+            return macro;
         }
 
         #endregion Methods
