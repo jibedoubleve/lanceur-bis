@@ -1,25 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <EnableDynamicLoading>true</EnableDynamicLoading>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <AssemblyVersion>2.4.0.1</AssemblyVersion>
+    <FileVersion>2.4.0.0</FileVersion>
+    <InformationalVersion>2.4.0-alpha.1+8.Branch.issue-257.Sha.62499d79527971ab1af93744ab78c818bf0a9f20</InformationalVersion>
+    <Version>2.4.0-alpha0001</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj">
-		<Private>false</Private>
-		<ExcludeAssets>runtime</ExcludeAssets>
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="plugin.config.json">
-		<Private>false</Private>
-		<ExcludeAssets>runtime</ExcludeAssets>
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>

@@ -3,10 +3,10 @@
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>2.1.0.1</AssemblyVersion>
-    <FileVersion>2.1.0.0</FileVersion>
-    <InformationalVersion>2.1.0-issue-59-105.1+2.Branch.issue-59-105.Sha.6e4865d2f58fcbdd38f17a193610df75ea975a9e</InformationalVersion>
-    <Version>2.1.0-issue-59-105-0001</Version>
+    <AssemblyVersion>2.4.0.1</AssemblyVersion>
+    <FileVersion>2.4.0.0</FileVersion>
+    <InformationalVersion>2.4.0-alpha.1+8.Branch.issue-257.Sha.62499d79527971ab1af93744ab78c818bf0a9f20</InformationalVersion>
+    <Version>2.4.0-alpha0001</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="UI\**" />
