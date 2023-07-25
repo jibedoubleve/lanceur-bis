@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.*" />
+    <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.1" />
     <PackageReference Include="MahApps.Metro" Version="2.4.*" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.*" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.*" />
@@ -32,7 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
-    <ProjectReference Include="..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj" />
     <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj" />
     <ProjectReference Include="..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
     <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
