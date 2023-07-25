@@ -16,7 +16,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="plugin.config.json">
+    <None Update="manifest.json">
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

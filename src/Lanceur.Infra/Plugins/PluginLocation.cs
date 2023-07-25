@@ -49,6 +49,8 @@ namespace Lanceur.Infra.Plugins
 
         public static string UninstallManifest { get; }
 
+        public const string MaifestName = "manifest.json";
+
         public DirectoryInfo Directory => new DirectoryInfo(DirectoryPath);
 
         public string DirectoryPath { get; }
