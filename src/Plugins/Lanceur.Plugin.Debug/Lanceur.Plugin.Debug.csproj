@@ -13,7 +13,7 @@
     <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="plugin.config.json">
+    <None Update="manifest.json">
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -54,7 +54,7 @@ namespace Lanceur.Infra.Stores
         public IPluginManifest[] GetPluginManifests()
         {
             var root = _context.RepositoryPath;
-            var files = Directory.EnumerateFiles(root, "plugin.config.json", SearchOption.AllDirectories);
+            var files = Directory.EnumerateFiles(root, PluginLocation.MaifestName, SearchOption.AllDirectories);
 
             return files.Select(file =>
             {
