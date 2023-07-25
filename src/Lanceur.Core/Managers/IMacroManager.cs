@@ -13,23 +13,34 @@ namespace Lanceur.Core.Managers
         IEnumerable<string> GetAll();
 
         /// <summary>
-        /// Go throught he collection and replace the macro with
-        /// executable behaviour.
+        /// Go throught the collection and update any macro with
+        /// data of the search query.
         /// </summary>
         /// <param name="collection">The collection to parse</param>
         /// <returns>
-        /// The collection with the macro behaviour. It Doesn't
-        /// touch non macro <see cref="QueryResult"/>
+        /// The updated collection. It doesn't touch non macro <see cref="QueryResult"/>
         /// </returns>
+        /// <remarks>        
+        /// This method <b>do not</b> update the database.
+        /// This <b>doesn't</b> touch <see cref="QueryResult"/> that 
+        /// are <b>not</b> macro </remarks>
         IEnumerable<QueryResult> Handle(IEnumerable<QueryResult> collection);
 
         /// <summary>
-        /// Replace the macro with executable behaviour.
+        /// Update the macro with the information of the user query.
+        /// It'll fill the <see cref="ExecutableQueryResult.Parameters"/> with
+        /// the parameters from the query the user entered. It'll remove any '@'     
+        /// from <see cref="QueryResult.Name"/> 
         /// </summary>
         /// <param name="collection"><see cref="QueryResult"/> to handle</param>
         /// <returns>
-        /// The macro with the behaviour. It Doesn't touch non macro <see cref="QueryResult"/>
+        /// The updated macro.
         /// </returns>
+        /// <remarks>
+        /// This method <b>do not</b> update the database.
+        /// This <b>doesn't</b> touch <see cref="QueryResult"/> that 
+        /// are <b>not</b> macro 
+        /// </remarks>
         QueryResult Handle(QueryResult item);
 
         #endregion Methods

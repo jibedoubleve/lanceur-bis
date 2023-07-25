@@ -1,11 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyVersion>2.4.0.1</AssemblyVersion>
+    <FileVersion>2.4.0.0</FileVersion>
+    <InformationalVersion>2.4.0-alpha.1+8.Branch.issue-257.Sha.62499d79527971ab1af93744ab78c818bf0a9f20</InformationalVersion>
+    <Version>2.4.0-alpha0001</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="SQL\script-0.1.1.sql" />
     <None Remove="SQL\script-0.1.sql" />
@@ -24,7 +26,6 @@
     <None Remove="SQL\script-0.8.sql" />
     <None Remove="SQL\script-0.9.sql" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="SQL\script-0.1.1.sql" />
     <EmbeddedResource Include="SQL\script-0.1.sql" />
@@ -43,5 +44,4 @@
     <EmbeddedResource Include="SQL\script-0.8.sql" />
     <EmbeddedResource Include="SQL\script-0.9.sql" />
   </ItemGroup>
-
 </Project>

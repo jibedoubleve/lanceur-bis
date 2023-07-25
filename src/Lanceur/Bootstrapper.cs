@@ -2,6 +2,7 @@
 using Lanceur.Core.Formatters;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -84,7 +85,7 @@ namespace Lanceur
             l.Register<ICmdlineManager>(() => new CmdlineManager());
             l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(), Get<IDbRepository>(), Get<ICmdlineManager>()));
             l.Register<IDbRepository>(() => new SQLiteRepository(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(), Get<IConvertionService>()));
-            l.Register<IWildcardManager>(() => new ReplacementCollection(Get<IClipboardService>()));
+            l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
             l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
             l.Register<IClipboardService>(() => new WindowsClipboardService());
@@ -93,9 +94,16 @@ namespace Lanceur
             l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>()));
             l.Register<IPackagedAppManager>(() => new PackagedAppManager());
             l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppManager>()));
-            //Formatters
+
+            // Formatters
             l.Register<IStringFormatter>(() => new DefaultStringFormatter());
 
+            // Plugins
+            l.Register<IPluginManifestRepository>(() => new PluginStore());
+            l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
+            l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>()));
+
+            // SQLite
             l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
             l.Register(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));

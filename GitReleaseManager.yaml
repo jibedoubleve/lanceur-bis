@@ -13,20 +13,19 @@ export:
 issue-labels-include:
 - breaking change
 - bug
-- feature
 - feature plugin
+- feature
 issue-labels-exclude:
+- analyse
+- build
 - documentation
-- internal refactoring
 - duplicate
 - good first issue
 - help wanted
+- internal refactoring
 - invalid
 - question
-- build
 - wontfix
-- to be investigated
-- to be analysed
 issue-labels-alias:
     - name:    Documentation
       header:  Documentation

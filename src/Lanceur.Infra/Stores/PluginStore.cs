@@ -1,21 +1,25 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Plugins;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Plugins;
 using Lanceur.Infra.Utils;
 using Newtonsoft.Json;
 using Splat;
+using System.Reflection;
 
 namespace Lanceur.Infra.Stores
 {
     [Store]
-    public class PluginStore : ISearchService
+    public class PluginStore : ISearchService, IPluginManifestRepository
     {
         #region Fields
 
         private static IEnumerable<SelfExecutableQueryResult> _plugins = null;
         private readonly IPluginStoreContext _context;
         private readonly IAppLogger _log;
+        private readonly Version _appVersion;
         private readonly IAppLoggerFactory _logFactory;
         private readonly IPluginManager _pluginManager;
 
@@ -39,45 +43,37 @@ namespace Lanceur.Infra.Stores
 
             _logFactory = logFactory ?? l.GetService<IAppLoggerFactory>();
             _log = l.GetLogger<PluginStore>(_logFactory);
+
+            _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
         }
 
         #endregion Constructors
 
         #region Methods
 
-        private PluginConfig[] GetPluginsConfig()
+        public IPluginManifest[] GetPluginManifests()
         {
-            var configs = new List<PluginConfig>();
             var root = _context.RepositoryPath;
             var files = Directory.EnumerateFiles(root, "plugin.config.json", SearchOption.AllDirectories);
-            foreach (var file in files)
+
+            return files.Select(file =>
             {
                 var json = File.ReadAllText(file);
-                var cfg = JsonConvert.DeserializeObject<PluginConfig>(json);
-                configs.Add(cfg);
-            }
-
-            return configs.ToArray();
+                return JsonConvert.DeserializeObject<PluginManifest>(json);
+            }).ToArray();
         }
 
         private void LoadPlugins()
         {
             if (_plugins == null)
             {
-                var configs = GetPluginsConfig();
-                var queryResults = new List<PluginExecutableQueryResult>();
+                var configs = GetPluginManifests();
 
-                foreach (var config in configs)
-                {
-                    var asm = _pluginManager.LoadPluginAsm($"plugins/{config.Dll}");
-                    var plugins = _pluginManager.CreatePlugin(asm);
-                    foreach (var plugin in plugins)
-                    {
-                        var query = new PluginExecutableQueryResult(plugin, _logFactory);
-                        queryResults.Add(query);
-                    }
-                }
-                _plugins = queryResults;
+                _plugins = configs
+                    .Where(manifest => _appVersion >= manifest.AppMinVersion)
+                    .SelectMany(manifest => _pluginManager.CreatePlugin(manifest.Dll))
+                    .Select(x => new PluginExecutableQueryResult(x, _logFactory))
+                    .ToList();
             }
         }
 
