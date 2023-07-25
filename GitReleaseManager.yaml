@@ -15,14 +15,14 @@ issue-labels-include:
 - bug
 - feature plugin
 - feature
+- internal refactoring
+- documentation
+- build
 issue-labels-exclude:
 - analyse
-- build
-- documentation
 - duplicate
 - good first issue
 - help wanted
-- internal refactoring
 - invalid
 - question
 - wontfix
