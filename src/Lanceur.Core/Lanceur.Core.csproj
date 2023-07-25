@@ -9,7 +9,9 @@
     <Version>2.4.0-alpha0001</Version>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj" />
+    <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.1" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
   </ItemGroup>
 </Project>

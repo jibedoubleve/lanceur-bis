@@ -10,10 +10,7 @@
     <Version>2.4.0-alpha0001</Version>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Lanceur.Core.Plugins\Lanceur.Core.Plugins.csproj">
-      <Private>false</Private>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </ProjectReference>
+    <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="plugin.config.json">
