@@ -1,4 +1,4 @@
-﻿namespace Lanceur.Core.Models
+﻿namespace Lanceur.Core.Plugins
 {
     /// <summary>
     /// Represents the configuration of a plugin
@@ -14,8 +14,7 @@
         public string Dll { get; set; }
         public string Help { get; set; }
         public string Name { get; set; }
-
-        public Version PluginVersion { get; set; }
+        public Version Version { get; set; }
 
         #endregion Properties
     }

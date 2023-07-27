@@ -4,6 +4,9 @@ using System.Reactive.Concurrency;
 
 namespace Lanceur.Ui
 {
+    /// <summary>
+    /// Helper for interaction with predifined parameters for interactions
+    /// </summary>
     public static class Interactions
     {
         #region Methods

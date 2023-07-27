@@ -24,7 +24,6 @@ using Lanceur.Utils;
 using Lanceur.Utils.ConnectionStrings;
 using Lanceur.Utils.PackagedApps;
 using Lanceur.Views;
-using ModernWpf;
 using ReactiveUI;
 using Splat;
 using System;
@@ -102,6 +101,7 @@ namespace Lanceur
             l.Register<IPluginManifestRepository>(() => new PluginStore());
             l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
             l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>()));
+            l.Register<IWebRepository>(() => new WebRepository());
 
             // SQLite
             l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
@@ -138,7 +138,9 @@ namespace Lanceur
             // Statistics
             l.RegisterLazySingleton(() => new TrendsViewModel());
             l.RegisterLazySingleton(() => new MostUsedViewModel());
-            l.RegisterLazySingleton(() => new HistoryViewModel()); ;
+            l.RegisterLazySingleton(() => new HistoryViewModel());
+            //Plugins
+            l.RegisterLazySingleton(() => new PluginFromWebViewModel());
         }
 
         private static void RegisterViews()

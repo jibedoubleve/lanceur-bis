@@ -1,5 +1,4 @@
-﻿using Lanceur.Core.Models;
-using Lanceur.Core.Plugins;
+﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;

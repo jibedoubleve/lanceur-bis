@@ -14,7 +14,7 @@ Set-Location $output
 Write-Host "`t=> Clean useless files"
 Remove-Item *.deps.json
 Remove-Item *.pdb
-Remove-Item *Lanceur.Plugin.Debug.dll
+Remove-Item *Lanceur.Core.Plugins.dll
 Remove-Item *.runtimeconfig.json
 Remove-Item *.lpk
 

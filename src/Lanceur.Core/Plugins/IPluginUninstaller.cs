@@ -1,6 +1,4 @@
-﻿using Lanceur.Core.Models;
-
-namespace Lanceur.Core.Plugins
+﻿namespace Lanceur.Core.Plugins
 {
     public interface IPluginUninstaller
     {

@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
     xmlns:m="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core"
+    xmlns:p="clr-namespace:Lanceur.Core.Plugins;assembly=Lanceur.Core"
     xmlns:vm="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core">
 
     <!--  TEMPATES  -->
@@ -246,7 +247,7 @@
             </DockPanel>
         </Border>
     </DataTemplate>
-    <DataTemplate x:Key="PluginManifestTemplate" DataType="{x:Type m:PluginManifest}">
+    <DataTemplate x:Key="PluginManifestTemplate" DataType="{x:Type p:PluginManifest}">
         <StackPanel Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <StackPanel Margin="5" Orientation="Horizontal">
                 <TextBlock
@@ -258,7 +259,7 @@
                     VerticalAlignment="Center"
                     FontSize="20"
                     FontWeight="ExtraLight"
-                    Text="{Binding PluginVersion, StringFormat={} (v{0})}" />
+                    Text="{Binding Version, StringFormat={} (v{0})}" />
             </StackPanel>
             <TextBlock Margin="5" Text="{Binding Description}" />
             <TextBlock
@@ -270,5 +271,29 @@
                 Command="{Binding Uninstall}"
                 Content="Delete" />
         </StackPanel>
+    </DataTemplate>
+
+    <DataTemplate x:Key="PluginWebManifestTemplate" DataType="{x:Type p:PluginWebManifest}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <TextBlock
+                        DockPanel.Dock="Top"
+                        FontSize="20"
+                        FontWeight="Bold"
+                        Text="{Binding Name}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontSize="20"
+                        FontWeight="ExtraLight"
+                        Text="{Binding Version, StringFormat={} (v{0})}" />
+                </StackPanel>
+                <TextBlock Margin="5" Text="{Binding Description}" />
+            </StackPanel>
+        </Grid>
     </DataTemplate>
 </ResourceDictionary>

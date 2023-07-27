@@ -1,5 +1,4 @@
-﻿using Lanceur.Core.Models;
-using Lanceur.Core.Plugins;
+﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
@@ -61,7 +60,7 @@ namespace Lanceur.Views
 
         public string Name { get; set; }
 
-        public Version PluginVersion { get; set; }
+        public Version Version { get; set; }
 
         public ReactiveCommand<Unit, bool> Uninstall { get; set; }
 
