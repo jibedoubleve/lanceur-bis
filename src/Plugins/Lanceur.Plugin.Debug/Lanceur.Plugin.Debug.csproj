@@ -19,4 +19,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".build\pack.ps1" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy RemoteSigned $(ProjectDir).build\pack.ps1 -name $(AssemblyName) -version 1.0.0 -output $(ProjectDir)$(OutDir)" />
+  </Target>
 </Project>
