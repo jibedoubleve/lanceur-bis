@@ -353,3 +353,7 @@ MigrationBackup/
 Output/
 tools/
 .vscode/
+
+# MacOS 
+
+.DS_Store
