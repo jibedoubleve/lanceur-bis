@@ -103,7 +103,7 @@ namespace Lanceur
             l.Register<IPluginManifestRepository>(() => new PluginStore());
             l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
             l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>()));
-            l.Register<IPluginWebRepository>(() => new WebRepository());
+            l.Register<IPluginWebRepository>(() => new PluginWebRepository());
 
             // SQLite
             l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
