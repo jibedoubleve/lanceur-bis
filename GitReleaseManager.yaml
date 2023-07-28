@@ -26,6 +26,7 @@ issue-labels-exclude:
 - invalid
 - question
 - wontfix
+- PR
 issue-labels-alias:
     - name:    Documentation
       header:  Documentation
