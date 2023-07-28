@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Plugins
 {
-    public interface IWebRepository
+    public interface IPluginWebRepository
     {
         Task<IEnumerable<IPluginWebManifest>> GetPluginListAsync();
     }

@@ -107,16 +107,25 @@ namespace Lanceur.Views
             // and remove them from the list
             var candidates = await _uninstaller.GetCandidatesAsync();
 
-            var pluginConfigurations = (from p in allPluginManifests
-                                        where !(from c in candidates
-                                                select c.Directory
-                                        ).Contains(p.Dll.GetDirectoryName())
-                                        select p).ToList();
+            var pluginManifests = (from p in allPluginManifests
+                                   where !(from c in candidates
+                                           select c.Directory
+                                   ).Contains(p.Dll.GetDirectoryName())
+                                   select p).ToList();
 
             var context = new ActivationContext()
             {
-                PluginManifests = pluginConfigurations.ToViewModel()
+                PluginManifests = pluginManifests.ToViewModel()
             };
+
+            this.WhenAnyObservable(
+                vm => vm.InstallPlugin, 
+                vm => vm.InstallPluginFromWeb)
+                .ObserveOn(_schedulers.MainThreadScheduler)
+                .Subscribe(response =>
+                {
+                    PluginManifests.Add(response.ToViewModel());
+                });
 
             return context;
         }

@@ -19,7 +19,7 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly ISchedulerProvider _schedulers;
-        private readonly IWebRepository _webRepositopry;
+        private readonly IPluginWebRepository _webRepositopry;
 
         #endregion Fields
 
@@ -28,13 +28,13 @@ namespace Lanceur.Views
         public PluginFromWebViewModel(
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
-            IWebRepository webRepositopry = null)
+            IPluginWebRepository webRepositopry = null)
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
 
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _webRepositopry = webRepositopry ?? l.GetService<IWebRepository>();
+            _webRepositopry = webRepositopry ?? l.GetService<IPluginWebRepository>();
             Activate = ReactiveCommand.CreateFromTask(OnActivateAsync, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
@@ -51,7 +51,6 @@ namespace Lanceur.Views
         #region Properties
 
         public ReactiveCommand<Unit, ActivationResponse> Activate { get; private set; }
-        public Action Close { get; internal set; }
         [Reactive] public ObservableCollection<PluginWebManifestViewModel> PluginManifests { get; set; }
         [Reactive] public PluginWebManifestViewModel SelectedManifest { get; set; }
 
