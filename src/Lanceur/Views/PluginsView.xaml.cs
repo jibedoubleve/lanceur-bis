@@ -3,6 +3,7 @@ using ReactiveUI;
 using System;
 using System.Reactive.Disposables;
 using Microsoft.Win32;
+using System.Windows;
 
 namespace Lanceur.Views
 {
@@ -30,12 +31,22 @@ namespace Lanceur.Views
                     var file = (result.HasValue && result.Value) ? ofd.FileName : string.Empty;
                     interaction.SetOutput(file);
                 });
+                ViewModel.AskWebFile.RegisterHandler(interaction =>
+                {
+                    var view = new PluginFromWebView
+                    {
+                        Owner = Window.GetWindow(this),
+                        Interaction = interaction
+                    };
+                    view.ShowDialog();
+                });
 
 
-                this.OneWayBind(ViewModel, vm => vm.PluginManifests, v => v.PluginManifests.ItemsSource).DisposeWith(d);                
+                this.OneWayBind(ViewModel, vm => vm.PluginManifests, v => v.PluginManifests.ItemsSource).DisposeWith(d);
 
                 this.BindCommand(ViewModel, vm => vm.Restart, v => v.BtnRestart).DisposeWith(d);
                 this.BindCommand(ViewModel, vm => vm.InstallPlugin, v => v.BtnInstallPlugin).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.InstallPluginFromWeb, v => v.BtnInstallPluginFromWeb).DisposeWith(d);
 
                 ViewModel.Activate.Execute().Subscribe(x =>
                 {

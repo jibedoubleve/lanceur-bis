@@ -1,5 +1,4 @@
-﻿using Lanceur.Core.Models;
-using Lanceur.Core.Plugins;
+﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
@@ -25,6 +24,7 @@ namespace Lanceur.Views
         #region Fields
 
         private readonly Interaction<Unit, string> _askFile;
+        private readonly Interaction<Unit, string> _askWebFile;
         private readonly INotification _notification;
         private readonly IPluginManifestRepository _pluginManifestRepository;
         private readonly IPluginInstaller _pluginInstaller;
@@ -55,13 +55,18 @@ namespace Lanceur.Views
             _notification = notification ?? l.GetService<INotification>();
             _restart = restart ?? l.GetService<IAppRestart>();
             _pluginInstaller = pluginInstaller ?? l.GetService<IPluginInstaller>();
+
             _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
+            _askWebFile = new Interaction<Unit, string>();
 
             Activate = ReactiveCommand.CreateFromTask(OnActivateAsync, outputScheduler: _schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            InstallPlugin = ReactiveCommand.CreateFromTask(OnInstallPlugin, outputScheduler: _schedulers.MainThreadScheduler);
+            InstallPlugin = ReactiveCommand.CreateFromTask(OnInstallPluginAsync, outputScheduler: _schedulers.MainThreadScheduler);
             InstallPlugin.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            InstallPluginFromWeb = ReactiveCommand.CreateFromTask(OnInstallPluginFromWebAsync, outputScheduler: _schedulers.MainThreadScheduler);
+            InstallPluginFromWeb.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             Restart = ReactiveCommand.Create(OnRestart, outputScheduler: _schedulers.MainThreadScheduler);
             Restart.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
@@ -72,13 +77,6 @@ namespace Lanceur.Views
                 {
                     PluginManifests = new(response.PluginManifests);
                 });
-
-            this.WhenAnyObservable(vm => vm.InstallPlugin)
-                .ObserveOn(_schedulers.MainThreadScheduler)
-                .Subscribe(response =>
-                {
-                    PluginManifests.Add(response.ToViewModel());
-                });
         }
 
         #endregion Constructors
@@ -87,7 +85,9 @@ namespace Lanceur.Views
 
         public ReactiveCommand<Unit, ActivationContext> Activate { get; private set; }
         public Interaction<Unit, string> AskFile => _askFile;
+        public Interaction<Unit, string> AskWebFile => _askWebFile;
         public ReactiveCommand<Unit, IPluginManifest> InstallPlugin { get; set; }
+        public ReactiveCommand<Unit, IPluginManifest> InstallPluginFromWeb { get; set; }
         [Reactive] public ObservableCollection<PluginManifestViewModel> PluginManifests { get; set; }
 
         public ReactiveCommand<Unit, Unit> Restart { get; }
@@ -107,24 +107,41 @@ namespace Lanceur.Views
             // and remove them from the list
             var candidates = await _uninstaller.GetCandidatesAsync();
 
-            var pluginConfigurations = (from p in allPluginManifests
-                                        where !(from c in candidates
-                                                select c.Directory
-                                        ).Contains(p.Dll.GetDirectoryName())
-                                        select p).ToList();
+            var pluginManifests = (from p in allPluginManifests
+                                   where !(from c in candidates
+                                           select c.Directory
+                                   ).Contains(p.Dll.GetDirectoryName())
+                                   select p).ToList();
 
             var context = new ActivationContext()
             {
-                PluginManifests = pluginConfigurations.ToViewModel()
+                PluginManifests = pluginManifests.ToViewModel()
             };
+
+            this.WhenAnyObservable(
+                vm => vm.InstallPlugin, 
+                vm => vm.InstallPluginFromWeb)
+                .ObserveOn(_schedulers.MainThreadScheduler)
+                .Subscribe(response =>
+                {
+                    PluginManifests.Add(response.ToViewModel());
+                });
 
             return context;
         }
 
-        private async Task<IPluginManifest> OnInstallPlugin()
+        private async Task<IPluginManifest> OnInstallPluginAsync()
         {
             var packagePath = await _askFile.Handle(Unit.Default);
             var config = _pluginInstaller.Install(packagePath);
+            _notification.Information($"Install plugin at '{packagePath}'");
+            return config;
+        }
+
+        private async Task<IPluginManifest> OnInstallPluginFromWebAsync()
+        {
+            var packagePath = await _askWebFile.Handle(Unit.Default);
+            var config = await _pluginInstaller.InstallFromWebAsync(packagePath);
             _notification.Information($"Install plugin at '{packagePath}'");
             return config;
         }

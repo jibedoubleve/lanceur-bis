@@ -1,4 +1,4 @@
-﻿using Lanceur.Core.Models;
+﻿using Lanceur.Core.Plugins;
 using IoDirectory = System.IO.Directory;
 
 namespace Lanceur.Infra.Plugins
@@ -8,6 +8,7 @@ namespace Lanceur.Infra.Plugins
         #region Fields
 
         private static readonly char[] TRIM_CHARS = new char[] { '\\', '/' };
+        public const string MaifestName = "manifest.json";
         public static readonly string RelativePath = Path.Combine("lanceur2", "Plugins");
 
         #endregion Fields
@@ -48,9 +49,6 @@ namespace Lanceur.Infra.Plugins
         public static string Root { get; }
 
         public static string UninstallManifest { get; }
-
-        public const string MaifestName = "manifest.json";
-
         public DirectoryInfo Directory => new DirectoryInfo(DirectoryPath);
 
         public string DirectoryPath { get; }
@@ -76,7 +74,7 @@ namespace Lanceur.Infra.Plugins
         }
 
         /// <summary>
-        /// Deletes recurcively the plugin directorys
+        /// Deletes recurcively the plugin directories
         /// </summary>
         public void Delete() => IoDirectory.Delete(DirectoryPath, recursive: true);
 

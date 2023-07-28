@@ -24,7 +24,6 @@ using Lanceur.Utils;
 using Lanceur.Utils.ConnectionStrings;
 using Lanceur.Utils.PackagedApps;
 using Lanceur.Views;
-using ModernWpf;
 using ReactiveUI;
 using Splat;
 using System;
@@ -104,6 +103,7 @@ namespace Lanceur
             l.Register<IPluginManifestRepository>(() => new PluginStore());
             l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
             l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>()));
+            l.Register<IPluginWebRepository>(() => new WebRepository());
 
             // SQLite
             l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
