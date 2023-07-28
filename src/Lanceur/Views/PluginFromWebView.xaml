@@ -22,7 +22,10 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ListView x:Name="PluginManifests" ItemTemplate="{DynamicResource PluginWebManifestTemplate}" />
-        <StackPanel Grid.Row="1" HorizontalAlignment="Right">
+        <StackPanel
+            Grid.Row="1"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
             <Button
                 x:Name="BtnInstallSelected"
                 Width="{StaticResource SettingsButtonWidth}"
@@ -30,7 +33,11 @@
                 Click="OnClickBtnInstallSelected"
                 Content="Install selected"
                 Style="{StaticResource AccentButtonStyle}" />
+            <Button
+                Width="{StaticResource SettingsButtonWidth}"
+                Margin="{StaticResource SettingsButtonMargin}"
+                Click="OnClickCancel"
+                Content="Cancel" />
         </StackPanel>
-        <TextBlock Grid.Row="2" Text="{Binding SelectedManifest.Name}" />
     </Grid>
 </rxui:ReactiveWindow>

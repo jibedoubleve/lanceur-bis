@@ -1,7 +1,6 @@
 ﻿using ReactiveUI;
 using Splat;
 using System;
-using System.Drawing;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Windows;
@@ -30,18 +29,39 @@ namespace Lanceur.Views
 
                 ViewModel.Activate.Execute().Subscribe();
             });
+
+            Closed += OnClosed;
         }
+
+        #endregion Constructors
+
+        #region Properties
 
         public InteractionContext<Unit, string> Interaction { get; internal set; }
 
-        #endregion Constructors
+        #endregion Properties
 
         #region Methods
 
         private void OnClickBtnInstallSelected(object sender, RoutedEventArgs e)
         {
-            Interaction.SetOutput(ViewModel.SelectedManifest.Url);
+            ViewModel.SelectionValidated = true;
             Close();
+        }
+
+        private void OnClickCancel(object sender, RoutedEventArgs e)
+        {
+            ViewModel.SelectionValidated = false;
+            Close();
+        }
+
+        private void OnClosed(object sender, EventArgs e)
+        {
+            var output = ViewModel.SelectionValidated
+                ? ViewModel.SelectedManifest.Url
+                : null;
+
+            Interaction.SetOutput(output);
         }
 
         #endregion Methods

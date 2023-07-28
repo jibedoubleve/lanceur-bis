@@ -6,7 +6,6 @@
 
         Version AppMinVersion { get; set; }
         string Author { get; set; }
-        string Dll { get; set; }
 
         #endregion Properties
     }
@@ -16,6 +15,7 @@
         #region Properties
 
         string Description { get; set; }
+        string Dll { get; set; }
         string Name { get; set; }
         Version Version { get; set; }
 

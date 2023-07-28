@@ -269,7 +269,7 @@
             <Button
                 Margin="5"
                 Command="{Binding Uninstall}"
-                Content="Delete" />
+                Content="Uninstall" />
         </StackPanel>
     </DataTemplate>
 
