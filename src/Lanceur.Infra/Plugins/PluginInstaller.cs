@@ -1,5 +1,4 @@
-﻿using Lanceur.Core.Models;
-using Lanceur.Core.Plugins;
+﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
 using Newtonsoft.Json;
 using System.IO.Compression;
@@ -45,7 +44,7 @@ namespace Lanceur.Infra.Plugins
         {
             using var zip = ZipFile.OpenRead(packagePath);
             var config = (from entry in zip.Entries
-                          where entry.Name == "plugin.config.json"
+                          where entry.Name == PluginLocation.MaifestName
                           select entry).SingleOrDefault();
 
             if (config == null)
@@ -67,6 +66,22 @@ namespace Lanceur.Infra.Plugins
             return manifest;
         }
 
+        public async Task<IPluginManifest> InstallFromWebAsync(string url)
+        {
+            url = WebRepository.ExpandUrl(url);
+            var path = Path.GetTempFileName();
+
+            // Download & copy to temp directory
+            using (var client = new HttpClient())
+            using (var response = await client.GetAsync(url))
+            using (var stream = new FileStream(path, FileMode.OpenOrCreate))
+            {
+                await response.Content.CopyToAsync(stream);
+            }
+
+            return Install(path);
+
+        }
         #endregion Methods
     }
 }

@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Lanceur.Core.Models;
+using Lanceur.Core.Plugins;
 using Lanceur.Infra.Plugins;
 using NSubstitute;
 using Xunit;

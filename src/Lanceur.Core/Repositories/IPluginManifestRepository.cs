@@ -1,4 +1,4 @@
-﻿using Lanceur.Core.Models;
+﻿using Lanceur.Core.Plugins;
 
 namespace Lanceur.Core.Repositories
 {
