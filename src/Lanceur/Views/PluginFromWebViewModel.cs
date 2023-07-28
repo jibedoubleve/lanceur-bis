@@ -53,6 +53,7 @@ namespace Lanceur.Views
         public ReactiveCommand<Unit, ActivationResponse> Activate { get; private set; }
         [Reactive] public ObservableCollection<PluginWebManifestViewModel> PluginManifests { get; set; }
         [Reactive] public PluginWebManifestViewModel SelectedManifest { get; set; }
+        [Reactive] public bool SelectionValidated { get; set; } = false;
 
         #endregion Properties
 

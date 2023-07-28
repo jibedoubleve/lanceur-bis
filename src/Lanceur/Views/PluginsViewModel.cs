@@ -77,6 +77,18 @@ namespace Lanceur.Views
                 {
                     PluginManifests = new(response.PluginManifests);
                 });
+
+            this.WhenAnyObservable(
+                    vm => vm.InstallPlugin,
+                    vm => vm.InstallPluginFromWeb)
+                .ObserveOn(_schedulers.MainThreadScheduler)
+                .Where(response => response is not null)
+                .Subscribe(response =>
+                {
+                    var viewmodel = response.ToViewModel();
+                    RegisterInteraction(viewmodel);
+                    PluginManifests.Add(viewmodel);
+                });
         }
 
         #endregion Constructors
@@ -89,8 +101,8 @@ namespace Lanceur.Views
         public ReactiveCommand<Unit, IPluginManifest> InstallPlugin { get; set; }
         public ReactiveCommand<Unit, IPluginManifest> InstallPluginFromWeb { get; set; }
         [Reactive] public ObservableCollection<PluginManifestViewModel> PluginManifests { get; set; }
-
         public ReactiveCommand<Unit, Unit> Restart { get; }
+        public Action<PluginManifestViewModel> RegisterInteraction { get; set; }
 
         #endregion Properties
 
@@ -113,19 +125,16 @@ namespace Lanceur.Views
                                    ).Contains(p.Dll.GetDirectoryName())
                                    select p).ToList();
 
+            var manifests = pluginManifests.ToViewModel();
+            foreach (var manifest in manifests)
+            {
+                RegisterInteraction(manifest);
+            }
+
             var context = new ActivationContext()
             {
-                PluginManifests = pluginManifests.ToViewModel()
+                PluginManifests = manifests
             };
-
-            this.WhenAnyObservable(
-                vm => vm.InstallPlugin, 
-                vm => vm.InstallPluginFromWeb)
-                .ObserveOn(_schedulers.MainThreadScheduler)
-                .Subscribe(response =>
-                {
-                    PluginManifests.Add(response.ToViewModel());
-                });
 
             return context;
         }
@@ -133,6 +142,11 @@ namespace Lanceur.Views
         private async Task<IPluginManifest> OnInstallPluginAsync()
         {
             var packagePath = await _askFile.Handle(Unit.Default);
+            if (packagePath.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
             var config = _pluginInstaller.Install(packagePath);
             _notification.Information($"Install plugin at '{packagePath}'");
             return config;
@@ -141,6 +155,11 @@ namespace Lanceur.Views
         private async Task<IPluginManifest> OnInstallPluginFromWebAsync()
         {
             var packagePath = await _askWebFile.Handle(Unit.Default);
+            if (packagePath.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
             var config = await _pluginInstaller.InstallFromWebAsync(packagePath);
             _notification.Information($"Install plugin at '{packagePath}'");
             return config;

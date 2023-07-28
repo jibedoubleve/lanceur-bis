@@ -19,6 +19,7 @@ namespace Lanceur.Views
 
         public Action Close { get; internal set; }
         [Reactive] public string Description { get; set; }
+        [Reactive] public string Dll { get; set; }
         [Reactive] public string Name { get; set; }
         [Reactive] public string Url { get; set; }
         [Reactive] public Version Version { get; set; }
