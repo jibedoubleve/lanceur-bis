@@ -28,6 +28,8 @@ using ReactiveUI;
 using Splat;
 using System;
 using System.Data.SQLite;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
 
 namespace Lanceur
@@ -124,23 +126,35 @@ namespace Lanceur
         private static void RegisterViewModels()
         {
             var l = Locator.CurrentMutable;
+            var log = Locator.Current.GetService<ILogManager>().GetLogger<Bootstrapper>();
+
             // Misc
             l.RegisterLazySingleton<INotification>(() => new ToastNotification());
-            //Views
-            l.RegisterLazySingleton(() => new MainViewModel());
-            l.RegisterLazySingleton(() => new SettingsViewModel());
-            l.RegisterLazySingleton(() => new KeywordsViewModel());
-            l.RegisterLazySingleton(() => new SessionsViewModel());
-            l.RegisterLazySingleton(() => new AppSettingsViewModel());
-            l.RegisterLazySingleton(() => new DoubloonsViewModel());
-            l.RegisterLazySingleton(() => new InvalidAliasViewModel());
-            l.RegisterLazySingleton(() => new PluginsViewModel());
-            // Statistics
-            l.RegisterLazySingleton(() => new TrendsViewModel());
-            l.RegisterLazySingleton(() => new MostUsedViewModel());
-            l.RegisterLazySingleton(() => new HistoryViewModel());
-            //Plugins
-            l.RegisterLazySingleton(() => new PluginFromWebViewModel());
+
+            // ViewModels
+            var vmTypeCollection = (from type in Assembly.GetAssembly(typeof(MainViewModel)).GetTypes()
+                                    where type.Name.EndsWith("ViewModel")
+                                    select type).ToList();
+
+            foreach (var vmType in vmTypeCollection)
+            {
+                // https://stackoverflow.com/a/31348824/389529
+                var ctorCollection = vmType.GetConstructors();
+
+                if (ctorCollection.Length == 0)
+                {
+                    log.Info($"Add ViewModel '{vmType.FullName}' into IOC. Ctor has no ctor.");
+                    l.RegisterLazySingleton(() => Activator.CreateInstance(vmType));
+                    continue;
+                }
+
+                var ctor = vmType.GetConstructors()[0];
+                var pCount = ctor.GetParameters().Length;
+
+                log.Info($"Add ViewModel '{vmType.FullName}' into IOC. Ctor has {pCount} parameter(s).");
+                l.RegisterLazySingleton(() => ctor.Invoke(new object[pCount]), vmType);
+
+            }
         }
 
         private static void RegisterViews()
@@ -153,8 +167,8 @@ namespace Lanceur
         internal static void Initialise()
         {
             RegisterViews();
-            RegisterViewModels();
             RegisterServices();
+            RegisterViewModels();
 
             var l = Locator.Current;
             var stg = l.GetService<IConnectionString>();
