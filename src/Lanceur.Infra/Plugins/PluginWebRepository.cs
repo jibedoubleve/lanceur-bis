@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Lanceur.Infra.Plugins
 {
-    public class WebRepository : IPluginWebRepository
+    public class PluginWebRepository : IPluginWebRepository
     {
         #region Fields
 
