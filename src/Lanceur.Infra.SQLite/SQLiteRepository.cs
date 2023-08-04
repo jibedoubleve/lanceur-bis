@@ -191,6 +191,32 @@ namespace Lanceur.Infra.SQLite
         }
 
         ///<inheritdoc/>
+        public void Hydrate(QueryResult queryResult)
+        {
+            var sql = @"
+                select
+	                a.id        as id,
+                    count(a.id) as count
+                from
+	                alias a
+                    inner join alias_name  an on a.id = an.id_alias
+                    inner join alias_usage au on a.id = au.id_alias
+                where an.name = @name
+                group by a.id";
+
+            var result = DB.Connection
+                .Query<AliasQueryResult>(sql, new { queryResult.Name })
+                .ToArray();
+
+            if (!result.Any()) { return; }
+            if (queryResult is null) { return; }
+
+            var first = result.First();
+            queryResult.Id = first.Id;
+            queryResult.Count = first.Count;
+        }
+
+        ///<inheritdoc/>
         public void HydrateMacro(QueryResult alias)
         {
             var sql = @$"

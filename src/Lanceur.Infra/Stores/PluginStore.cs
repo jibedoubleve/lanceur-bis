@@ -1,4 +1,4 @@
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
 using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -93,6 +93,12 @@ namespace Lanceur.Infra.Stores
                          where plugin?.Name?.ToLower()?.StartsWith(query.Name.ToLower()) ?? false
                          select plugin).ToArray();
             _log.Trace($"Found {found.Length} plugin(s)");
+
+            //Set count and name
+            foreach (var item in found)
+            {
+                _dbRepository.Hydrate(item);
+            }
             return found;
         }
 

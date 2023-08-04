@@ -23,6 +23,16 @@ namespace Lanceur.Core.Repositories
         public ExistingNameResponse CheckNamesExist(string[] names, long? idSession = null);
 
         /// <summary>
+        /// Update the id and the counter of <paramref name="queryResult"/>
+        /// with the data of the database. It is used mainly to update
+        /// plugins therfore it'll make an exact search on the name
+        /// of the <see cref="QueryResult"/> and take the first item 
+        /// of the list (that should only have one item)
+        /// </summary>
+        /// <param name="queryResult">The query result to hydrate</param>
+        void Hydrate(QueryResult queryResult);
+
+        /// <summary>
         /// Get all the aliases
         /// </summary>
         /// <param name="idSession">The session linked to the aliases. If null, it'll take the default session</param>
