@@ -36,7 +36,7 @@ namespace Lanceur.Infra.Services
                 ? _macroManager.Handle(results)
                 : new List<QueryResult>();
 
-            //Refresh the thumbnails
+            // Refresh the thumbnails
             _thumbnailManager.RefreshThumbnails(toReturn);
 
             // Order the list and return the result

@@ -8,7 +8,7 @@ namespace Lanceur.Infra.Plugins
         #region Fields
 
         private static readonly char[] TRIM_CHARS = new char[] { '\\', '/' };
-        public const string MaifestName = "manifest.json";
+        public const string ManifestName = "manifest.json";
         public static readonly string RelativePath = Path.Combine("lanceur2", "Plugins");
 
         #endregion Fields

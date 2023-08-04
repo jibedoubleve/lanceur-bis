@@ -38,6 +38,7 @@ namespace Lanceur.Infra.SQLite
 
         #region Methods
 
+        ///<inheritdoc/>
         public ExistingNameResponse CheckNamesExist(string[] names, long? idSession = null)
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
@@ -80,6 +81,7 @@ namespace Lanceur.Infra.SQLite
             return result ?? AliasQueryResult.NoResult;
         }
 
+        ///<inheritdoc/>
         public Session GetDefaultSession()
         {
             var id = GetDefaultSessionId();
@@ -96,8 +98,10 @@ namespace Lanceur.Infra.SQLite
             return result;
         }
 
+        ///<inheritdoc/>
         public long GetDefaultSessionId() => _aliasDbAction.GetDefaultSessionId();
 
+        ///<inheritdoc/>
         public IEnumerable<QueryResult> GetDoubloons()
         {
             var sql = @$"
@@ -138,8 +142,10 @@ namespace Lanceur.Infra.SQLite
             return _converter.ToSelectableQueryResult(result);
         }
 
+        ///<inheritdoc/>
         public KeywordUsage GetKeyword(string name) => _aliasDbAction.GetHiddenKeyword(name);
 
+        ///<inheritdoc/>
         public IEnumerable<QueryResult> GetMostUsedAliases(long? idSession = null)
         {
             idSession ??= GetDefaultSessionId();
@@ -156,6 +162,7 @@ namespace Lanceur.Infra.SQLite
             return DB.Connection.Query<DisplayUsageQueryResult>(sql, new { idSession });
         }
 
+        ///<inheritdoc/>
         public IEnumerable<Session> GetSessions()
         {
             var sql = @$"
@@ -168,6 +175,7 @@ namespace Lanceur.Infra.SQLite
             return result;
         }
 
+        ///<inheritdoc/>
         public IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, long? idSession = null)
         {
             idSession ??= GetDefaultSessionId();
@@ -182,6 +190,7 @@ namespace Lanceur.Infra.SQLite
             };
         }
 
+        ///<inheritdoc/>
         public void HydrateMacro(QueryResult alias)
         {
             var sql = @$"
@@ -206,16 +215,20 @@ namespace Lanceur.Infra.SQLite
             }
         }
 
+        ///<inheritdoc/>
         public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => _aliasDbAction.RefreshUsage(result);
 
+        ///<inheritdoc/>
         public void Remove(AliasQueryResult alias) => _aliasDbAction.Remove(alias);
 
+        ///<inheritdoc/>
         public void Remove(IEnumerable<SelectableAliasQueryResult> doubloons)
         {
             _log.Info($"Removing {doubloons.Count()} alias(es)");
             _aliasDbAction.Remove(doubloons);
         }
 
+        ///<inheritdoc/>
         public void Remove(Session session)
         {
             _log.Info($"Removes session with name '{session.Name}'");
@@ -255,6 +268,7 @@ namespace Lanceur.Infra.SQLite
             }
         }
 
+        ///<inheritdoc/>
         public IEnumerable<AliasQueryResult> Search(string name, long? idSession = null)
         {
             if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
@@ -322,8 +336,10 @@ namespace Lanceur.Infra.SQLite
             _setUsageDbAction.SetUsage(ref alias, idSession);
         }
 
+        ///<inheritdoc/>
         public void SetUsage(string aliasName) => SetUsage(new AliasQueryResult() { Name = aliasName });
 
+        ///<inheritdoc/>
         public void Update(ref Session session)
         {
             var action = new SessionDbAction(DB);
