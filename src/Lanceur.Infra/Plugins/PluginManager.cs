@@ -47,15 +47,15 @@ namespace Lanceur.Infra.Plugins
                 .GetTypes()
                 .Where(type => typeof(IPlugin).IsAssignableFrom(type))
                 .Select(type => Activator.CreateInstance(type) as IPlugin)
-                .Where(plugin => plugin is not null);
+                .Where(plugin => plugin is not null)
+                .ToArray();
 
-            if (plugins.Any())
-            {
-                string availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
-                _log.Warning(
-                    $"Can't find any type which implements {nameof(IPlugin)} in {assembly} from {assembly.Location}.\n" +
-                    $"Available types: {availableTypes}");
-            }
+            if (!plugins.Any()) return plugins;
+            
+            var availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
+            _log.Warning(
+                $"Can't find any type which implements {nameof(IPlugin)} in {assembly} from {assembly.Location}.\n" +
+                $"Available types: {availableTypes}");
 
             return plugins;
         }

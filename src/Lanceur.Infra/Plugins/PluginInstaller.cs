@@ -44,7 +44,7 @@ namespace Lanceur.Infra.Plugins
         {
             using var zip = ZipFile.OpenRead(packagePath);
             var config = (from entry in zip.Entries
-                          where entry.Name == PluginLocation.MaifestName
+                          where entry.Name == PluginLocation.ManifestName
                           select entry).SingleOrDefault();
 
             if (config == null)
