@@ -68,7 +68,7 @@ namespace Lanceur.Infra.Plugins
 
         public async Task<IPluginManifest> InstallFromWebAsync(string url)
         {
-            url = PluginWebRepository.ExpandUrl(url);
+            url = PluginWebManifestMetadata.ExpandUrl(url);
             var path = Path.GetTempFileName();
 
             // Download & copy to temp directory
