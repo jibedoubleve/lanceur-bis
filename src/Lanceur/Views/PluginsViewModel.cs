@@ -147,9 +147,17 @@ namespace Lanceur.Views
                 return null;
             }
 
-            var config = _pluginInstaller.Install(packagePath);
-            _notification.Information($"Install plugin at '{packagePath}'");
-            return config;
+            var installationResult = _pluginInstaller.Install(packagePath);
+            if (installationResult.IsInstallationInstallationSuccess)
+            {
+                _notification.Information($"Install plugin at '{packagePath}'");
+            }
+            else
+            {
+                _notification.Warning(installationResult.ErrorMessage);
+            }
+
+            return installationResult.PluginPluginManifest;
         }
 
         private async Task<IPluginManifest> OnInstallPluginFromWebAsync()
@@ -162,7 +170,7 @@ namespace Lanceur.Views
 
             var config = await _pluginInstaller.InstallFromWebAsync(packagePath);
             _notification.Information($"Install plugin at '{packagePath}'");
-            return config;
+            return config.PluginPluginManifest;
         }
 
         private void OnRestart() => _restart.Restart();

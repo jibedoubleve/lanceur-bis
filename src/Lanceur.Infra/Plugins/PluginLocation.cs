@@ -18,9 +18,9 @@ namespace Lanceur.Infra.Plugins
         private PluginLocation(string path)
         {
             var fullPath = Path.GetFullPath(Path.Combine(Root, path));
-            DirectoryPath = Path.GetDirectoryName(fullPath);
 
-            FullPath = File.Exists(fullPath) ? fullPath : null;
+            DirectoryPath = Path.GetDirectoryName(fullPath);
+            FullPath = fullPath ;
         }
 
         static PluginLocation()

@@ -15,6 +15,12 @@ namespace Lanceur.Infra.Plugins
 
         public PluginLoadContext(string pluginPath)
         {
+            ArgumentNullException.ThrowIfNull(pluginPath, nameof(pluginPath));
+
+            if (!File.Exists(pluginPath))
+            {
+                throw new ArgumentException($"Cannot load plugin. Specified path doesn't exist. (Path: '{pluginPath}')", nameof(pluginPath));
+            }
             _resolver = new AssemblyDependencyResolver(pluginPath);
         }
 

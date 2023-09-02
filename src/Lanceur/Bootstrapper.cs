@@ -102,10 +102,11 @@ namespace Lanceur
             // Plugins
             l.Register<IPluginManifestRepository>(() => new PluginStore());
             l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
-            l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>()));
+            l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>(), Get<IPluginValidationRule>()));
             l.Register<IPluginWebManifestLoader>(() => new PluginWebManifestLoader());
             l.Register<IPluginWebRepository>(() => new PluginWebRepository(Get<IPluginManifestRepository>(), Get<IPluginWebManifestLoader>()));
-
+            l.Register<IPluginValidationRule>(() => new PluginValidationRule(Get<IPluginManifestRepository>()));
+            
             // SQLite
             l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));

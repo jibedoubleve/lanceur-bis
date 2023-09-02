@@ -1,4 +1,3 @@
-using System.Windows.Media.Imaging;
 using FluentAssertions;
 using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
@@ -41,7 +40,7 @@ public class PluginUpdateShould
         // ASSERT
         installablePlugins.Should().HaveCount(1);
     }
-    
+
     [Theory]
     [InlineData("1.0.0", "1.0.0")]
     [InlineData("1.0.0", "0.0.9")]
@@ -72,5 +71,65 @@ public class PluginUpdateShould
         installablePlugins.Should().BeEmpty();
     }
 
+    [Theory]
+    [InlineData("1.0.0", "1.0.1", true)]
+    [InlineData("1.0.0", "1.1.0", true)]
+    [InlineData("1.0.0", "2.0.0", true)]
+    [InlineData("1.0.0", "1.0.0", false)]
+    [InlineData("1.0.0", "0.0.1", false)]
+    [InlineData("1.0.0", "0.1.0", false)]
+    public void ValidateOnlyWhenAlreadyInstalledPluginHasLowerVersion(string versionInstalled, string versionToInstall, bool expectedValue)
+    {
+        // ARRANGE
+        var path = Guid.NewGuid().ToString();
+        var manifestInstalled = new IPluginManifest[]
+        {
+            new PluginManifest()
+            {
+                Dll = path,
+                Version = new(versionInstalled)
+            }
+        };
+        var manifestRepository = Substitute.For<IPluginManifestRepository>();
+        manifestRepository.GetPluginManifests().Returns(manifestInstalled);
+
+        var validationRule = new PluginValidationRule(manifestRepository);
+        var manifestToInstall = new PluginManifest()
+        {
+            Dll = path,
+            Version = new(versionToInstall)
+        };
+
+        // ACT
+        var result = validationRule.Check(manifestToInstall);
+
+        // ASSERT
+        result
+            .IsValid
+            .Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void ValidationSucceedsWhenNoPreinstalledPlugin()
+    {        // ARRANGE
+        var path = Guid.NewGuid().ToString();
+        var manifestRepository = Substitute.For<IPluginManifestRepository>();
+        manifestRepository.GetPluginManifests().Returns(Array.Empty<IPluginManifest>());
+
+        var validationRule = new PluginValidationRule(manifestRepository);
+        var manifestToInstall = new PluginManifest()
+        {
+            Dll = path,
+            Version = new("1.0.0")
+        };
+
+        // ACT
+        var result = validationRule.Check(manifestToInstall);
+
+        // ASSERT
+        result
+            .IsValid
+            .Should().BeTrue();
+    }
     #endregion Methods
 }
