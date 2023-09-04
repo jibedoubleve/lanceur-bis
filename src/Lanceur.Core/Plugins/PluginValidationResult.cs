@@ -4,10 +4,11 @@ public class PluginValidationResult
 {
     #region Constructors
 
-    private PluginValidationResult(bool isValid, string message)
+    private PluginValidationResult(bool isValid, bool isUpdate, string message)
     {
         IsValid = isValid;
         Message = message;
+        IsUpdate = isUpdate;
     }
 
     #endregion Constructors
@@ -18,15 +19,17 @@ public class PluginValidationResult
 
     public bool IsValid { get; }
 
+    public bool IsUpdate { get; }
+
     public string Message { get; }
 
     #endregion Properties
 
     #region Methods
 
-    public static PluginValidationResult BuildInvalid(string message) => new(false, message);
+    public static PluginValidationResult BuildInvalid(string message) => new(false, false, message);
 
-    public static PluginValidationResult BuildValid() => new(true, string.Empty);
+    public static PluginValidationResult BuildValid(bool isUpdate = false) => new(true, isUpdate, string.Empty);
 
     #endregion Methods
 }

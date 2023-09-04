@@ -100,9 +100,10 @@ namespace Lanceur
             l.Register<IStringFormatter>(() => new DefaultStringFormatter());
 
             // Plugins
+            l.Register<IMaintenanceLogBook>(()=> new MaintenanceLogBook());
             l.Register<IPluginManifestRepository>(() => new PluginStore());
-            l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
-            l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>(), Get<IPluginValidationRule>()));
+            l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>(), Get<IMaintenanceLogBook>()));
+            l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>(), Get<IPluginValidationRule>(), Get<IMaintenanceLogBook>(), Get<IPluginUninstaller>()));
             l.Register<IPluginWebManifestLoader>(() => new PluginWebManifestLoader());
             l.Register<IPluginWebRepository>(() => new PluginWebRepository(Get<IPluginManifestRepository>(), Get<IPluginWebManifestLoader>()));
             l.Register<IPluginValidationRule>(() => new PluginValidationRule(Get<IPluginManifestRepository>()));

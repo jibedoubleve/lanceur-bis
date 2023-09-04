@@ -1,14 +1,18 @@
+using Lanceur.SharedKernel.Mixins;
+
 namespace Lanceur.Core.Plugins;
 
 public class PluginInstallationResult
 {
     #region Constructors
 
-    private PluginInstallationResult(IPluginManifest pluginManifest, bool isInstallationSuccess, string errorMessage)
+    private PluginInstallationResult(IPluginManifest pluginManifest, bool isInstallationSuccess, string errorMessage,
+        bool isUpdate)
     {
         ErrorMessage = errorMessage;
-        IsInstallationInstallationSuccess = isInstallationSuccess;
-        PluginPluginManifest = pluginManifest;
+        IsUpdate = isUpdate;
+        IsInstallationSuccess = isInstallationSuccess;
+        PluginManifest = pluginManifest;
     }
 
     #endregion Constructors
@@ -17,17 +21,21 @@ public class PluginInstallationResult
 
     public string ErrorMessage { get; }
 
-    public bool IsInstallationInstallationSuccess { get; }
+    public bool IsUpdate { get; }
 
-    public IPluginManifest PluginPluginManifest { get; }
+    public bool IsInstallationSuccess { get; }
+
+    public IPluginManifest PluginManifest { get; }
 
     #endregion Properties
 
     #region Methods
 
-    public static PluginInstallationResult Error(string errorMessage) => new(null, false, errorMessage);
+    public static PluginInstallationResult Error(string errorMessage) =>
+        new(null, isInstallationSuccess: false, errorMessage, isUpdate: false);
 
-    public static PluginInstallationResult Success(IPluginManifest manifest) => new(manifest, true, null);
+    public static PluginInstallationResult Success(IPluginManifest manifest, bool isUpdate = false) =>
+        new(manifest, isInstallationSuccess: true, null, isUpdate);
 
     #endregion Methods
 }

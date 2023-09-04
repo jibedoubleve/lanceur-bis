@@ -33,20 +33,21 @@ public class PluginValidationRule : IPluginValidationRule
             return PluginValidationResult.BuildValid();
         }
 
-        var isValid =
-            (from m in manifests
-             where manifest.Dll == m.Dll
-                && manifest.Version > m.Version
-             select m).Any();
+        var installed =
+            (from current in manifests
+             where manifest.Dll == current.Dll
+             select current).FirstOrDefault();
 
-        if (!isValid)
+        if (installed is not null && installed.Version >= manifest.Version)
         {
             return PluginValidationResult.BuildInvalid(
                 $"Cannot install plugin '{manifest.Name} V{manifest.Version}' because " +
                 $"the installed version is already up to date.");
         }
 
-        return PluginValidationResult.BuildValid();
+        var isUpdate = (installed?.Version ?? new Version()) < manifest.Version;
+
+        return PluginValidationResult.BuildValid(isUpdate);
     }
 
     #endregion Methods
