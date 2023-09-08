@@ -1,10 +1,10 @@
 ﻿namespace Lanceur.Core.Plugins;
 
-public interface IPluginValidationRule
+public interface IPluginValidationRule<out TValidationResult, in TInput>
 {
     #region Methods
 
-    PluginValidationResult Check(PluginManifest manifest);
+    TValidationResult Check(TInput input);
 
     #endregion Methods
 }

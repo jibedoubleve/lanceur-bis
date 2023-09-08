@@ -14,8 +14,6 @@ public class PluginValidationResult
 
     #region Properties
 
-    public bool IsInvalid => !IsValid;
-
     public bool IsValid { get; }
 
     public string Message { get; }
@@ -24,9 +22,9 @@ public class PluginValidationResult
 
     #region Methods
 
-    public static PluginValidationResult BuildInvalid(string message) => new(false, message);
+    public static PluginValidationResult Invalid(string message) => new(false, message);
 
-    public static PluginValidationResult BuildValid() => new(true, string.Empty);
+    public static PluginValidationResult Valid() => new(true, string.Empty);
 
     #endregion Methods
 }

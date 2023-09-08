@@ -13,14 +13,14 @@ public struct PluginWebManifestMetadata
 
     #region Methods
 
-    public static string ExpandUrl(string url)
+    public static string ToAbsoluteUrl(string relativeUrl)
     {
-        if (!url.Trim('/').StartsWith("plugin"))
+        if (!relativeUrl.Trim('/').StartsWith("plugin"))
         {
-            url = $"plugins/{url.Trim('/')}";
+            relativeUrl = $"plugins/{relativeUrl.Trim('/')}";
         }
 
-        return $"{BaseUrl}{url}";
+        return $"{BaseUrl}{relativeUrl}";
     }
 
     #endregion Methods

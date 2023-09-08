@@ -10,15 +10,16 @@ namespace Lanceur.Infra.Plugins
         #region Fields
 
         private readonly IAppLogger _log;
-        private readonly IPluginValidationRule _pluginValidationRule;
+        private readonly IPluginValidationRule<PluginValidationResult, PluginManifest> _pluginValidationRule;
 
         #endregion Fields
 
         #region Constructors
 
-        public PluginInstaller(IAppLoggerFactory appLoggerFactory, IPluginValidationRule pluginValidationRule)
+        public PluginInstaller(IAppLoggerFactory appLoggerFactory, IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule)
         {
             ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
+            ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
 
             _pluginValidationRule = pluginValidationRule;
             _log = appLoggerFactory.GetLogger<PluginInstaller>();
@@ -31,6 +32,7 @@ namespace Lanceur.Infra.Plugins
         private static void InstallFiles(string destination, ZipArchive zip)
         {
             ArgumentNullException.ThrowIfNull(destination);
+            ArgumentNullException.ThrowIfNull(zip);
 
             foreach (var entry in zip.Entries)
             {
@@ -39,10 +41,7 @@ namespace Lanceur.Infra.Plugins
 
                 var directory = Path.GetDirectoryName(destinationPath) ?? throw new DirectoryNotFoundException($"No directory found at '{destination}'.");
 
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
+                if (!Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
 
                 entry.ExtractToFile(destinationPath);
             }
@@ -70,7 +69,7 @@ namespace Lanceur.Infra.Plugins
             // Check here whether the plugin already exists. If yes but version
             // is equal or higher, log a warning and stop installation
             var validation = _pluginValidationRule.Check(manifest);
-            if (validation.IsInvalid)
+            if (!validation.IsValid)
             {
                 _log.Warning(validation.Message);
                 return PluginInstallationResult.Error(validation.Message);
@@ -85,7 +84,7 @@ namespace Lanceur.Infra.Plugins
 
         public async Task<PluginInstallationResult> InstallFromWebAsync(string url)
         {
-            url = PluginWebManifestMetadata.ExpandUrl(url);
+            url = PluginWebManifestMetadata.ToAbsoluteUrl(url);
             var path = Path.GetTempFileName();
 
             // Download & copy to temp directory
