@@ -17,6 +17,5 @@
         Task<PluginInstallationResult> InstallFromWebAsync(string url);
 
         #endregion Methods
-
     }
 }

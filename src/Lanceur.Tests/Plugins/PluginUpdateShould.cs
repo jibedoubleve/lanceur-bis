@@ -18,19 +18,17 @@ public class PluginUpdateShould
     public async Task SelectExistingPluginIfVersionIsHigher(string localVersion, string webVersion)
     {
         // ARRANGE
-        var localManifests = new IPluginManifest[]
+        var localManifestRepository = Substitute.For<IPluginManifestRepository>();
+        localManifestRepository.GetPluginManifests().Returns(new IPluginManifest[]
         {
             new PluginManifest() { Dll = "A", Version = new(localVersion) }
-        };
-        var localManifestRepository = Substitute.For<IPluginManifestRepository>();
-        localManifestRepository.GetPluginManifests().Returns(localManifests);
-
-        var webManifests = new IPluginWebManifest[]
+        });
+        
+        var webManifestRepository = Substitute.For<IPluginWebManifestLoader>();
+        webManifestRepository.LoadFromWebAsync().Returns(new IPluginWebManifest[]
         {
             new PluginWebManifest() { Dll = "A", Version = new Version(webVersion) }
-        };
-        var webManifestRepository = Substitute.For<IPluginWebManifestLoader>();
-        webManifestRepository.LoadFromWebAsync().Returns(webManifests);
+        });
 
         var repository = new PluginWebRepository(localManifestRepository, webManifestRepository);
 
@@ -78,7 +76,10 @@ public class PluginUpdateShould
     [InlineData("1.0.0", "1.0.0", false)]
     [InlineData("1.0.0", "0.0.1", false)]
     [InlineData("1.0.0", "0.1.0", false)]
-    public void ValidateOnlyWhenAlreadyInstalledPluginHasLowerVersion(string versionInstalled, string versionToInstall, bool expectedValue)
+    public void ValidateOnlyWhenAlreadyInstalledPluginHasLowerVersion(
+        string versionInstalled,
+        string versionToInstall,
+        bool expectedValue)
     {
         // ARRANGE
         var path = Guid.NewGuid().ToString();
@@ -111,7 +112,8 @@ public class PluginUpdateShould
 
     [Fact]
     public void ValidationSucceedsWhenNoPreinstalledPlugin()
-    {        // ARRANGE
+    {
+        // ARRANGE
         var path = Guid.NewGuid().ToString();
         var manifestRepository = Substitute.For<IPluginManifestRepository>();
         manifestRepository.GetPluginManifests().Returns(Array.Empty<IPluginManifest>());
@@ -131,5 +133,6 @@ public class PluginUpdateShould
             .IsValid
             .Should().BeTrue();
     }
+
     #endregion Methods
 }

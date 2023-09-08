@@ -20,7 +20,7 @@ namespace Lanceur.Infra.Plugins
             var fullPath = Path.GetFullPath(Path.Combine(Root, path));
 
             DirectoryPath = Path.GetDirectoryName(fullPath);
-            FullPath = fullPath ;
+            FullPath = fullPath;
         }
 
         static PluginLocation()

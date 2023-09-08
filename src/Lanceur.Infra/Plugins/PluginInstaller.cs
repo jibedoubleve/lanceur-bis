@@ -1,10 +1,9 @@
 ﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 using System.IO.Compression;
 using System.Text;
-using Lanceur.Core.Managers;
-using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Plugins
 {
@@ -13,9 +12,9 @@ namespace Lanceur.Infra.Plugins
         #region Fields
 
         private readonly IAppLogger _log;
-        private readonly IPluginValidationRule _pluginValidationRule;
         private readonly IMaintenanceLogBook _maintenanceLogBook;
         private readonly IPluginUninstaller _pluginUninstaller;
+        private readonly IPluginValidationRule<PluginValidationResult, PluginManifest> _pluginValidationRule;
 
         #endregion Fields
 
@@ -23,11 +22,12 @@ namespace Lanceur.Infra.Plugins
 
         public PluginInstaller(
             IAppLoggerFactory appLoggerFactory,
-            IPluginValidationRule pluginValidationRule,
+            IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule,
             IMaintenanceLogBook maintenanceLogBook,
             IPluginUninstaller pluginUninstaller)
         {
             ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
+            ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
 
             _pluginValidationRule = pluginValidationRule;
             _maintenanceLogBook = maintenanceLogBook;
@@ -42,6 +42,7 @@ namespace Lanceur.Infra.Plugins
         private static void InstallFiles(string destination, ZipArchive zip)
         {
             ArgumentNullException.ThrowIfNull(destination);
+            ArgumentNullException.ThrowIfNull(zip);
 
             foreach (var entry in zip.Entries)
             {
@@ -51,10 +52,7 @@ namespace Lanceur.Infra.Plugins
                 var directory = Path.GetDirectoryName(destinationPath) ??
                                 throw new DirectoryNotFoundException($"No directory found at '{destination}'.");
 
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
+                if (!Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
 
                 entry.ExtractToFile(destinationPath);
             }
@@ -65,17 +63,17 @@ namespace Lanceur.Infra.Plugins
         public async Task<PluginInstallationResult> InstallAsync(string packagePath)
         {
             using var zip = ZipFile.OpenRead(packagePath);
-            var configArchive = (from entry in zip.Entries
-                                 where entry.Name == PluginLocation.ManifestName
-                                 select entry).SingleOrDefault();
+            var config = (from entry in zip.Entries
+                          where entry.Name == PluginLocation.ManifestName
+                          select entry).SingleOrDefault();
 
-            if (configArchive == null)
+            if (config == null)
             {
                 _log.Warning($"No plugin manifest in package '{packagePath}'");
                 return null;
             }
 
-            await using var stream = configArchive.Open();
+            using var stream = config.Open();
             using var reader = new StreamReader(stream);
 
             var json = reader.ReadToEnd();
@@ -84,7 +82,7 @@ namespace Lanceur.Infra.Plugins
             // Check here whether the plugin already exists. If yes but version
             // is equal or higher, log a warning and stop installation
             var validation = _pluginValidationRule.Check(manifest);
-            if (validation.IsInvalid)
+            if (!validation.IsValid)
             {
                 _log.Warning(validation.Message);
                 return PluginInstallationResult.Error(validation.Message);
@@ -125,7 +123,7 @@ namespace Lanceur.Infra.Plugins
 
         public async Task<PluginInstallationResult> InstallFromWebAsync(string url)
         {
-            url = PluginWebManifestMetadata.ExpandUrl(url);
+            url = PluginWebManifestMetadata.ToAbsoluteUrl(url);
             var path = Path.GetTempFileName();
 
             // Download & copy to temp directory

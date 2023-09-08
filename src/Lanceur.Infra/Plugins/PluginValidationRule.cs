@@ -3,7 +3,7 @@ using Lanceur.Core.Repositories;
 
 namespace Lanceur.Infra.Plugins;
 
-public class PluginValidationRule : IPluginValidationRule
+public class PluginValidationRule : IPluginValidationRule<PluginValidationResult, PluginManifest>
 {
     #region Fields
 
@@ -30,7 +30,7 @@ public class PluginValidationRule : IPluginValidationRule
         // one can be installed...
         if (manifests.Length == 0)
         {
-            return PluginValidationResult.BuildValid();
+            return PluginValidationResult.Valid();
         }
 
         var installed =
@@ -40,14 +40,13 @@ public class PluginValidationRule : IPluginValidationRule
 
         if (installed is not null && installed.Version >= manifest.Version)
         {
-            return PluginValidationResult.BuildInvalid(
+            return PluginValidationResult.Invalid(
                 $"Cannot install plugin '{manifest.Name} V{manifest.Version}' because " +
                 $"the installed version is already up to date.");
         }
 
         var isUpdate = (installed?.Version ?? new Version()) < manifest.Version;
-
-        return PluginValidationResult.BuildValid(isUpdate);
+        return PluginValidationResult.Valid(isUpdate);
     }
 
     #endregion Methods

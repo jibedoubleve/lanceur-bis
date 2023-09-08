@@ -1,6 +1,5 @@
 ﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
-using Newtonsoft.Json;
 
 namespace Lanceur.Infra.Plugins
 {
@@ -8,24 +7,25 @@ namespace Lanceur.Infra.Plugins
     {
         #region Fields
 
-        private readonly IPluginManifestRepository _localPluginManifest;
-        private readonly IPluginWebManifestLoader _webPluginManifest;
+        private readonly IPluginManifestRepository _localPluginManifestRepository;
+        private readonly IPluginWebManifestLoader _webPluginManifestLoader;
 
         #endregion Fields
 
-        public PluginWebRepository(IPluginManifestRepository localPluginManifest,
-            IPluginWebManifestLoader webPluginManifest)
+        public PluginWebRepository(
+            IPluginManifestRepository localPluginManifestRepository,
+            IPluginWebManifestLoader webPluginManifestLoader)
         {
-            _localPluginManifest = localPluginManifest;
-            _webPluginManifest = webPluginManifest;
+            _localPluginManifestRepository = localPluginManifestRepository;
+            _webPluginManifestLoader = webPluginManifestLoader;
         }
 
         #region Methods
 
         public async Task<IEnumerable<IPluginWebManifest>> GetPluginListAsync()
         {
-            var webPlugins = await _webPluginManifest.LoadFromWebAsync();
-            var plugins = _localPluginManifest.GetPluginManifests();
+            var webPlugins = await _webPluginManifestLoader.LoadFromWebAsync();
+            var plugins = _localPluginManifestRepository.GetPluginManifests();
             
             // If a plugin is already installed but web version is 
             // newer, then show this new plugin
