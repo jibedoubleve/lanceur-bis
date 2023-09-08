@@ -10,15 +10,18 @@ namespace Lanceur.Infra.Plugins
         #region Fields
 
         private readonly IAppLogger _log;
+        private readonly IPluginValidationRule<PluginValidationResult, PluginManifest> _pluginValidationRule;
 
         #endregion Fields
 
         #region Constructors
 
-        public PluginInstaller(IAppLoggerFactory appLoggerFactory)
+        public PluginInstaller(IAppLoggerFactory appLoggerFactory, IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule)
         {
             ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
+            ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
 
+            _pluginValidationRule = pluginValidationRule;
             _log = appLoggerFactory.GetLogger<PluginInstaller>();
         }
 
@@ -28,19 +31,23 @@ namespace Lanceur.Infra.Plugins
 
         private static void InstallFiles(string destination, ZipArchive zip)
         {
+            ArgumentNullException.ThrowIfNull(destination);
+            ArgumentNullException.ThrowIfNull(zip);
+
             foreach (var entry in zip.Entries)
             {
                 // Gets the full path to ensure that relative segments are removed.
-                string destinationPath = Path.GetFullPath(Path.Combine(destination, entry.FullName));
+                var destinationPath = Path.GetFullPath(Path.Combine(destination, entry.FullName));
 
-                var directory = Path.GetDirectoryName(destinationPath);
+                var directory = Path.GetDirectoryName(destinationPath) ?? throw new DirectoryNotFoundException($"No directory found at '{destination}'.");
+
                 if (!Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
 
                 entry.ExtractToFile(destinationPath);
             }
         }
 
-        public IPluginManifest Install(string packagePath)
+        public PluginInstallationResult Install(string packagePath)
         {
             using var zip = ZipFile.OpenRead(packagePath);
             var config = (from entry in zip.Entries
@@ -59,16 +66,25 @@ namespace Lanceur.Infra.Plugins
             var json = reader.ReadToEnd();
             var manifest = JsonConvert.DeserializeObject<PluginManifest>(json);
 
+            // Check here whether the plugin already exists. If yes but version
+            // is equal or higher, log a warning and stop installation
+            var validation = _pluginValidationRule.Check(manifest);
+            if (!validation.IsValid)
+            {
+                _log.Warning(validation.Message);
+                return PluginInstallationResult.Error(validation.Message);
+            }
+
             InstallFiles(
                 new PluginLocation(manifest).DirectoryPath,
                 zip);
 
-            return manifest;
+            return PluginInstallationResult.Success(manifest);
         }
 
-        public async Task<IPluginManifest> InstallFromWebAsync(string url)
+        public async Task<PluginInstallationResult> InstallFromWebAsync(string url)
         {
-            url = PluginWebRepository.ExpandUrl(url);
+            url = PluginWebManifestMetadata.ToAbsoluteUrl(url);
             var path = Path.GetTempFileName();
 
             // Download & copy to temp directory
@@ -80,8 +96,8 @@ namespace Lanceur.Infra.Plugins
             }
 
             return Install(path);
-
         }
+
         #endregion Methods
     }
 }

@@ -4,9 +4,9 @@
     {
         #region Methods
 
-        IPluginManifest Install(string packagePath);
+        PluginInstallationResult Install(string packagePath);
 
-        Task<IPluginManifest> InstallFromWebAsync(string url);
+        Task<PluginInstallationResult> InstallFromWebAsync(string url);
 
         #endregion Methods
     }

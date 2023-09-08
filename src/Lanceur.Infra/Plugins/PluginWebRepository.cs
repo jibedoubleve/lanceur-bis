@@ -8,43 +8,34 @@ namespace Lanceur.Infra.Plugins
     {
         #region Fields
 
-        public const string BaseUrl = "https://raw.githubusercontent.com/jibedoubleve/lanceur-bis-plugin-repository/master/";
-        public const string UrlToc = $"{BaseUrl}toc.json";
-        private readonly IPluginManifestRepository _pluginManifestRepository;
+        private readonly IPluginManifestRepository _localPluginManifestRepository;
+        private readonly IPluginWebManifestLoader _webPluginManifestLoader;
 
         #endregion Fields
 
-        public PluginWebRepository(IPluginManifestRepository pluginManifestRepository)
+        public PluginWebRepository(
+            IPluginManifestRepository localPluginManifestRepository,
+            IPluginWebManifestLoader webPluginManifestLoader)
         {
-            _pluginManifestRepository = pluginManifestRepository;
+            _localPluginManifestRepository = localPluginManifestRepository;
+            _webPluginManifestLoader = webPluginManifestLoader;
         }
 
         #region Methods
 
-        public static string ExpandUrl(string url)
-        {
-            if (!url.Trim('/').StartsWith("plugin"))
-            {
-                url = $"plugins/{url.Trim('/')}";
-            }
-
-            return $"{BaseUrl}{url}";
-        }
-
         public async Task<IEnumerable<IPluginWebManifest>> GetPluginListAsync()
         {
-            using var client = new HttpClient();
-            using var response = await client.GetAsync(UrlToc);
-            using var stream = await response.Content.ReadAsStreamAsync();
-            using var reader = new StreamReader(stream);
-            var json = reader.ReadToEnd();
-
-            var webplugins = JsonConvert.DeserializeObject<List<PluginWebManifest>>(json);
-            var plugins = _pluginManifestRepository.GetPluginManifests();
-
-            return (from p in webplugins
-                    where false == plugins.Where(x => x.Dll == p.Dll).Any()
-                    select p).ToArray();
+            var webPlugins = await _webPluginManifestLoader.LoadFromWebAsync();
+            var plugins = _localPluginManifestRepository.GetPluginManifests();
+            
+            // If a plugin is already installed but web version is 
+            // newer, then show this new plugin
+            return (from p in webPlugins
+                where false == plugins.Any(
+                    x => x.Dll == p.Dll 
+                         && x.Version >= p.Version
+                )
+                select p).ToArray();
         }
 
         #endregion Methods
