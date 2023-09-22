@@ -8,6 +8,6 @@ branches:
     increment: Minor
   feature:
     regex: ^issue?[\/-]
-    tag: alpha
+    tag: alpha-{BranchName}
     increment: Minor
 
