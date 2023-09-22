@@ -30,7 +30,7 @@ namespace Lanceur.Infra.Plugins
                 RelativePath
             );
 
-            UninstallManifest = Environment.ExpandEnvironmentVariables(@"%appdata%/probel/lanceur2/.plugin-uninstall");
+            MaintenanceLogBook = Environment.ExpandEnvironmentVariables(@"%appdata%/probel/lanceur2/.plugin-uninstall");
         }
 
         public PluginLocation(IPluginManifest manifest)
@@ -48,7 +48,7 @@ namespace Lanceur.Infra.Plugins
 
         public static string Root { get; }
 
-        public static string UninstallManifest { get; }
+        public static string MaintenanceLogBook { get; }
         public DirectoryInfo Directory => new DirectoryInfo(DirectoryPath);
 
         public string DirectoryPath { get; }

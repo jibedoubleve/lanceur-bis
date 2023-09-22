@@ -7,6 +7,8 @@ namespace Lanceur.Infra.Plugins
 {
     public class PluginUninstaller : IPluginUninstaller
     {
+        private readonly IMaintenanceLogBook _maintenanceLogBook;
+
         #region Fields
 
         private readonly IAppLogger _log;
@@ -15,8 +17,9 @@ namespace Lanceur.Infra.Plugins
 
         #region Constructors
 
-        public PluginUninstaller(IAppLoggerFactory loggerFactory)
+        public PluginUninstaller(IAppLoggerFactory loggerFactory, IMaintenanceLogBook maintenanceLogBook)
         {
+            _maintenanceLogBook = maintenanceLogBook;
             ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
             _log = loggerFactory.GetLogger<PluginUninstaller>();
         }
@@ -25,64 +28,52 @@ namespace Lanceur.Infra.Plugins
 
         #region Methods
 
-        private static async Task Save(IEnumerable<UninstallCandidate> candidates)
-        {
-            if (!candidates.Any() && File.Exists(PluginLocation.UninstallManifest))
-            {
-                File.Delete(PluginLocation.UninstallManifest);
-                return;
-            }
+        public async Task<IEnumerable<MaintenanceCandidate>> GetUninstallCandidatesAsync() =>
+            await _maintenanceLogBook.GetUninstallCandidatesAsync();
 
-            var json = JsonConvert.SerializeObject(candidates);
-            await File.WriteAllTextAsync(PluginLocation.UninstallManifest, json);
-        }
-
-        public async Task<IEnumerable<UninstallCandidate>> GetCandidatesAsync()
-        {
-            if (!File.Exists(PluginLocation.UninstallManifest)) { return Array.Empty<UninstallCandidate>(); }
-
-            var json = await File.ReadAllTextAsync(PluginLocation.UninstallManifest);
-            return JsonConvert.DeserializeObject<IEnumerable<UninstallCandidate>>(json);
-        }
-
-        public bool HasCandidateForUninstall() => File.Exists(PluginLocation.UninstallManifest);
+        public async Task<bool> HasMaintenanceAsync() =>
+            (await _maintenanceLogBook.GetUninstallCandidatesAsync()).Any();
 
         public async Task SubscribeForUninstallAsync(IPluginManifest manifest)
         {
-            var candidates = (await GetCandidatesAsync()).ToList();
+            var candidates = (await GetUninstallCandidatesAsync()).ToList();
             var alreadyCandidate = (from c in candidates
                                     where c.Directory == manifest.Dll.GetDirectoryName()
                                     select c).Any();
 
-            if (alreadyCandidate) { return; }
+            if (alreadyCandidate)
+            {
+                return;
+            }
 
-            candidates.Add(new UninstallCandidate(manifest.Dll.GetDirectoryName()));
+            candidates.Add(MaintenanceCandidate.UninstallCandidate(manifest.Dll.GetDirectoryName()));
 
-            await Save(candidates);
+            await _maintenanceLogBook.SaveAsync(candidates.ToArray());
         }
 
         public async Task UninstallAsync()
         {
-            var retryCandidates = new List<UninstallCandidate>();
+            var retryCandidates = new List<MaintenanceCandidate>();
 
-            foreach (var candidate in await GetCandidatesAsync())
+            foreach (var candidate in await _maintenanceLogBook.GetUninstallCandidatesAsync())
             {
                 var directory = PluginLocation.FromDirectory(candidate.Directory);
-                if (directory.Exists())
+
+                if (!directory.Exists()) continue;
+
+                try
                 {
-                    try
-                    {
-                        _log.Info($"Removing plugin at '{candidate.Directory}'");
-                        directory.Delete();
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.Error($"Failed to uninstall plugin at '{candidate.Directory}'", ex);
-                        retryCandidates.Add(candidate);
-                    }
+                    _log.Info($"Removing plugin at '{candidate.Directory}'");
+                    directory.Delete();
+                }
+                catch (Exception ex)
+                {
+                    _log.Error($"Failed to uninstall plugin at '{candidate.Directory}'", ex);
+                    retryCandidates.Add(candidate);
                 }
             }
-            await Save(retryCandidates);
+
+            await _maintenanceLogBook.SaveAsync(retryCandidates.ToArray());
         }
 
         #endregion Methods

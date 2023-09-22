@@ -1,6 +1,5 @@
 ﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
-using Newtonsoft.Json;
 
 namespace Lanceur.Infra.Plugins
 {

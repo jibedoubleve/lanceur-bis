@@ -4,13 +4,13 @@
     {
         #region Methods
 
-        Task<IEnumerable<UninstallCandidate>> GetCandidatesAsync();
+        Task<IEnumerable<MaintenanceCandidate>> GetUninstallCandidatesAsync();
+
+        Task<bool> HasMaintenanceAsync();
 
         Task SubscribeForUninstallAsync(IPluginManifest pluginManifest);
 
         Task UninstallAsync();
-
-        bool HasCandidateForUninstall();
 
         #endregion Methods
     }

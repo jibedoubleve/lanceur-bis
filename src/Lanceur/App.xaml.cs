@@ -6,8 +6,11 @@ using Lanceur.Xaml;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using Lanceur.Infra.Plugins;
+using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur
 {
@@ -46,8 +49,9 @@ namespace Lanceur
             SingleInstance.ReleaseMutex();
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
+            var log = Locator.Current.GetService<IAppLoggerFactory>().GetLogger<App>();
             _notifyIcon ??= new NotifyIconAdapter();
 
             ThemeManager.Current.SetTheme();
@@ -60,10 +64,22 @@ namespace Lanceur
             }
 
             var uninstaller = Locator.Current.GetService<IPluginUninstaller>();
-            if (uninstaller.HasCandidateForUninstall())
+            if (await uninstaller.HasMaintenanceAsync())
             {
-                uninstaller.UninstallAsync();
+                await uninstaller.UninstallAsync();
             }
+            
+            var installer = Locator.Current.GetService<IPluginInstaller>();
+            if (await installer.HasMaintenanceAsync())
+            {
+                var errors = await installer.InstallAsync();
+                if (!errors.IsNullOrEmpty())
+                {
+                    log.Error($"Error occured when installing plugins on startup: {errors}");
+                }
+            }
+            
+            File.Delete(PluginLocation.MaintenanceLogBook);
         }
 
         #endregion Methods

@@ -76,7 +76,9 @@ public class PluginUpdateShould
     [InlineData("1.0.0", "1.0.0", false)]
     [InlineData("1.0.0", "0.0.1", false)]
     [InlineData("1.0.0", "0.1.0", false)]
-    public void ValidateOnlyWhenAlreadyInstalledPluginHasLowerVersion(string versionInstalled, string versionToInstall,
+    public void ValidateOnlyWhenAlreadyInstalledPluginHasLowerVersion(
+        string versionInstalled,
+        string versionToInstall,
         bool expectedValue)
     {
         // ARRANGE

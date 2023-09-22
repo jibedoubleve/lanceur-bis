@@ -18,7 +18,6 @@ namespace Lanceur.Views
 
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IPluginUninstaller _pluginUninstaller;
-        private readonly ISchedulerProvider _schedulers;
 
         #endregion Fields
 
@@ -32,11 +31,11 @@ namespace Lanceur.Views
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _pluginUninstaller = pluginUninstaller ?? l.GetService<IPluginUninstaller>();
-            _schedulers = schedulerProvider ?? new RxAppSchedulerProvider();
+            var schedulers = schedulerProvider ?? new RxAppSchedulerProvider();
 
-            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
+            _confirmRemove = Interactions.YesNoQuestion(schedulers.MainThreadScheduler);
 
-            Uninstall = ReactiveCommand.CreateFromTask(OnUninstall, outputScheduler: _schedulers.MainThreadScheduler);
+            Uninstall = ReactiveCommand.CreateFromTask(OnUninstall, outputScheduler: schedulers.MainThreadScheduler);
             Uninstall.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Uninstall)

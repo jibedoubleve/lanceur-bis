@@ -49,11 +49,13 @@ namespace Lanceur
                 cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>();
 
                 cfg.CreateMap<string, DisplayQueryResult>()
-                   .ConstructUsing(x => new DisplayQueryResult($"@{x}@", "This is a macro", "LinkVariant"));
+                    .ConstructUsing(x => new DisplayQueryResult($"@{x}@", "This is a macro", "LinkVariant"));
 
                 cfg.CreateMap<Session, SessionExecutableQueryResult>()
-                   .ConstructUsing(x => new SessionExecutableQueryResult(x.Name, x.Notes, Get<IAppLoggerFactory>(), Get<IDbRepository>()))
-                   .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
+                    .ConstructUsing(x =>
+                        new SessionExecutableQueryResult(x.Name, x.Notes, Get<IAppLoggerFactory>(),
+                            Get<IDbRepository>()))
+                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
             });
         }
 
@@ -77,15 +79,19 @@ namespace Lanceur
             l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
 #endif
             l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<SQLiteConnectionScope>()));
-            l.RegisterLazySingleton<ISettingsFacade>(() => new SettingsFacade(Get<IDatabaseConfigRepository>(), Get<IAppConfigRepository>()));
+            l.RegisterLazySingleton<ISettingsFacade>(() =>
+                new SettingsFacade(Get<IDatabaseConfigRepository>(), Get<IAppConfigRepository>()));
 
             l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
             l.Register<IAppLoggerFactory>(() => new NLoggerFactory());
             l.Register<IStoreLoader>(() => new StoreLoader());
             l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
             l.Register<ICmdlineManager>(() => new CmdlineManager());
-            l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(), Get<IDbRepository>(), Get<ICmdlineManager>()));
-            l.Register<IDbRepository>(() => new SQLiteRepository(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(), Get<IConvertionService>()));
+            l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), Get<IWildcardManager>(),
+                Get<IDbRepository>(), Get<ICmdlineManager>()));
+            l.Register<IDbRepository>(() =>
+                new SQLiteRepository(Get<SQLiteConnectionScope>(), Get<IAppLoggerFactory>(),
+                    Get<IConvertionService>()));
             l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
             l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
             l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
@@ -100,15 +106,28 @@ namespace Lanceur
             l.Register<IStringFormatter>(() => new DefaultStringFormatter());
 
             // Plugins
+            l.Register<IMaintenanceLogBook>(() => new MaintenanceLogBook());
             l.Register<IPluginManifestRepository>(() => new PluginStore());
-            l.Register<IPluginUninstaller>(() => new PluginUninstaller(Get<IAppLoggerFactory>()));
-            l.Register<IPluginInstaller>(() => new PluginInstaller(Get<IAppLoggerFactory>(), Get<IPluginValidationRule<PluginValidationResult, PluginManifest>>()));
-            l.Register<IPluginWebManifestLoader>(() => new PluginWebManifestLoader());
-            l.Register<IPluginWebRepository>(() => new PluginWebRepository(Get<IPluginManifestRepository>(), Get<IPluginWebManifestLoader>()));
-            l.Register<IPluginValidationRule<PluginValidationResult, PluginManifest>>(() => new PluginValidationRule(Get<IPluginManifestRepository>()));
+            l.Register<IPluginInstaller>(() => new PluginInstaller(
+                Get<IAppLoggerFactory>(),
+                Get<IPluginValidationRule<PluginValidationResult, PluginManifest>>(),
+                Get<IMaintenanceLogBook>(),
+                Get<IPluginUninstaller>()));
+
+            l.Register<IPluginUninstaller>(() =>
+                new PluginUninstaller(Get<IAppLoggerFactory>(), Get<IMaintenanceLogBook>()));
             
+            l.Register<IPluginWebManifestLoader>(() => new PluginWebManifestLoader());
+            l.Register<IPluginWebRepository>(() =>
+                new PluginWebRepository(Get<IPluginManifestRepository>(), Get<IPluginWebManifestLoader>()));
+            
+            l.Register<IPluginValidationRule<PluginValidationResult, PluginManifest>>(() =>
+                new PluginValidationRule(Get<IPluginManifestRepository>()));
+
             // SQLite
-            l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(), Get<IDataStoreUpdateManager>()));
+            l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(),
+                Get<IDataStoreUpdateManager>()));
+           
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
             l.Register(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
             l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
@@ -116,11 +135,11 @@ namespace Lanceur
             l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<SQLiteConnectionScope>())));
 
             l.Register((Func<IDataStoreUpdateManager>)(() =>
-                new SQLiteDatabaseUpdateManager(
-                    Get<IDataStoreVersionManager>(),
-                    Get<SQLiteConnectionScope>(),
-                    ScriptRepository.Asm,
-                    ScriptRepository.DbScriptEmbededResourcePattern)
+                    new SQLiteDatabaseUpdateManager(
+                        Get<IDataStoreVersionManager>(),
+                        Get<SQLiteConnectionScope>(),
+                        ScriptRepository.Asm,
+                        ScriptRepository.DbScriptEmbededResourcePattern)
                 )
             );
         }
@@ -155,7 +174,6 @@ namespace Lanceur
 
                 log.Info($"Add ViewModel '{vmType.FullName}' into IOC. Ctor has {pCount} parameter(s).");
                 l.RegisterLazySingleton(() => ctor.Invoke(new object[pCount]), vmType);
-
             }
         }
 
