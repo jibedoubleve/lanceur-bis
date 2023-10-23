@@ -20,6 +20,11 @@ namespace Lanceur.Views
 
             ViewModel = Locator.Current.GetService<PluginFromWebViewModel>();
 
+            if (ViewModel is null)
+            {
+                throw new NullReferenceException($"Cannot locate '{nameof(PluginFromWebViewModel)}' in the IoC container.");
+            }
+
             this.WhenActivated(d =>
             {
                 this.OneWayBind(ViewModel, vm => vm.PluginManifests, v => v.PluginManifests.ItemsSource).DisposeWith(d);
@@ -27,7 +32,7 @@ namespace Lanceur.Views
                 this.Bind(ViewModel, vm => vm.SelectedManifest, v => v.PluginManifests.SelectedItem).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.SelectedManifest, v => v.BtnInstallSelected.IsEnabled, x => x is not null);
 
-                ViewModel.Activate.Execute().Subscribe();
+                ViewModel!.Activate.Execute().Subscribe();
             });
 
             Closed += OnClosed;
@@ -37,7 +42,7 @@ namespace Lanceur.Views
 
         #region Properties
 
-        public InteractionContext<Unit, string> Interaction { get; internal set; }
+        public InteractionContext<Unit, string> Interaction { get; init; }
 
         #endregion Properties
 
@@ -45,19 +50,19 @@ namespace Lanceur.Views
 
         private void OnClickBtnInstallSelected(object sender, RoutedEventArgs e)
         {
-            ViewModel.SelectionValidated = true;
+            ViewModel!.SelectionValidated = true;
             Close();
         }
 
         private void OnClickCancel(object sender, RoutedEventArgs e)
         {
-            ViewModel.SelectionValidated = false;
+            ViewModel!.SelectionValidated = false;
             Close();
         }
 
         private void OnClosed(object sender, EventArgs e)
         {
-            var output = ViewModel.SelectionValidated
+            var output = ViewModel!.SelectionValidated
                 ? ViewModel.SelectedManifest.Url
                 : null;
 

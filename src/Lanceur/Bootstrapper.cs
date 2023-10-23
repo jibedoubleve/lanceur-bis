@@ -28,7 +28,6 @@ using ReactiveUI;
 using Splat;
 using System;
 using System.Data.SQLite;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -106,28 +105,26 @@ namespace Lanceur
             l.Register<IStringFormatter>(() => new DefaultStringFormatter());
 
             // Plugins
-            l.Register<IMaintenanceLogBook>(() => new MaintenanceLogBook());
             l.Register<IPluginManifestRepository>(() => new PluginStore());
             l.Register<IPluginInstaller>(() => new PluginInstaller(
                 Get<IAppLoggerFactory>(),
                 Get<IPluginValidationRule<PluginValidationResult, PluginManifest>>(),
-                Get<IMaintenanceLogBook>(),
                 Get<IPluginUninstaller>()));
 
             l.Register<IPluginUninstaller>(() =>
-                new PluginUninstaller(Get<IAppLoggerFactory>(), Get<IMaintenanceLogBook>()));
-            
+                new PluginUninstaller(Get<IAppLoggerFactory>()));
+
             l.Register<IPluginWebManifestLoader>(() => new PluginWebManifestLoader());
             l.Register<IPluginWebRepository>(() =>
                 new PluginWebRepository(Get<IPluginManifestRepository>(), Get<IPluginWebManifestLoader>()));
-            
+
             l.Register<IPluginValidationRule<PluginValidationResult, PluginManifest>>(() =>
                 new PluginValidationRule(Get<IPluginManifestRepository>()));
 
             // SQLite
             l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), Get<IAppLoggerFactory>(),
                 Get<IDataStoreUpdateManager>()));
-           
+
             l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
             l.Register(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
             l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));

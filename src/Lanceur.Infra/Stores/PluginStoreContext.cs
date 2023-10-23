@@ -24,7 +24,7 @@ namespace Lanceur.Infra.Stores
 
         #region Properties
 
-        public string RepositoryPath => PluginLocation.Root;
+        public string RepositoryPath => Locations.PluginRootPath;
 
         #endregion Properties
 

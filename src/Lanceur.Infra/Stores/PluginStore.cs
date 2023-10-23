@@ -77,12 +77,12 @@ namespace Lanceur.Infra.Stores
         public IPluginManifest[] GetPluginManifests()
         {
             var root = _context.RepositoryPath;
-            var files = Directory.EnumerateFiles(root, PluginLocation.ManifestName, SearchOption.AllDirectories);
+            var files = Directory.EnumerateFiles(root, Locations.ManifestFileName, SearchOption.AllDirectories);
 
             return files.Select(file =>
             {
                 var json = File.ReadAllText(file);
-                return JsonConvert.DeserializeObject<PluginManifest>(json);
+                return (IPluginManifest)JsonConvert.DeserializeObject<PluginManifest>(json);
             }).ToArray();
         }
 
