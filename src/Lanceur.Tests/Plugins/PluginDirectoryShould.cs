@@ -36,7 +36,7 @@ namespace Lanceur.Tests.Plugins
         {
             // Arrange
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var expectedDirectory = new DirectoryInfo(Path.Combine(myDocuments, PluginLocation.RelativePath, dir.Trim('\\', '/'))).FullName;
+            var expectedDirectory = new DirectoryInfo(Path.Combine(myDocuments, Locations.RelativePath, dir.Trim('\\', '/'))).FullName;
 
             if (isFile)
             {
@@ -49,11 +49,11 @@ namespace Lanceur.Tests.Plugins
 
             // Act
             var path = isFile
-                ? PluginLocation.FromFile(dir)
-                : PluginLocation.FromDirectory(dir);
+                ? Locations.FromFile(dir)
+                : Locations.FromDirectory(dir);
 
             // Assert
-            path.Directory.FullName.Should().Be(expectedDirectory);
+            path.PluginDirectory.FullName.Should().Be(expectedDirectory);
         }
 
         [Fact]
@@ -61,9 +61,9 @@ namespace Lanceur.Tests.Plugins
         {
             // Arrange
             var myDocuments = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var dir = "directory;";
+            const string dir = "directory;";
 
-            var expectedDirectory = new DirectoryInfo(Path.Combine(myDocuments, PluginLocation.RelativePath, dir));
+            var expectedDirectory = new DirectoryInfo(Path.Combine(myDocuments, Locations.RelativePath, dir));
 
             _output.WriteLine($"My Documents: {myDocuments}");
             _output.WriteLine($"Plugin dir  : {dir}");
@@ -73,10 +73,10 @@ namespace Lanceur.Tests.Plugins
             manifest.Dll.Returns(@$"{dir}/plugin.dll");
 
             // Act
-            var path = new PluginLocation(manifest);
+            var path = Locations.FromManifest(manifest);
 
             // Assert
-            path.Directory.FullName.Should().Be(expectedDirectory.FullName);
+            path.PluginDirectory.FullName.Should().Be(expectedDirectory.FullName);
         }
 
         #endregion Methods

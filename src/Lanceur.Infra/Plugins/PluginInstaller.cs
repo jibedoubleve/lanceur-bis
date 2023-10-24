@@ -1,18 +1,17 @@
-﻿using Lanceur.Core.Plugins;
+﻿using FileOperationScheduler.Infrastructure.Operations;
+using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 using System.IO.Compression;
-using System.Text;
 
 namespace Lanceur.Infra.Plugins
 {
-    public class PluginInstaller : IPluginInstaller
+    public class PluginInstaller : PluginButler, IPluginInstaller
     {
         #region Fields
 
         private readonly IAppLogger _log;
-        private readonly IMaintenanceLogBook _maintenanceLogBook;
         private readonly IPluginUninstaller _pluginUninstaller;
         private readonly IPluginValidationRule<PluginValidationResult, PluginManifest> _pluginValidationRule;
 
@@ -23,14 +22,12 @@ namespace Lanceur.Infra.Plugins
         public PluginInstaller(
             IAppLoggerFactory appLoggerFactory,
             IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule,
-            IMaintenanceLogBook maintenanceLogBook,
             IPluginUninstaller pluginUninstaller)
         {
             ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
             ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
 
             _pluginValidationRule = pluginValidationRule;
-            _maintenanceLogBook = maintenanceLogBook;
             _pluginUninstaller = pluginUninstaller;
             _log = appLoggerFactory.GetLogger<PluginInstaller>();
         }
@@ -58,13 +55,17 @@ namespace Lanceur.Infra.Plugins
             }
         }
 
-        public async Task<bool> HasMaintenanceAsync() => (await _maintenanceLogBook.GetInstallCandidatesAsync()).Any();
+        public async Task<bool> HasMaintenanceAsync()
+        {
+            var os = await GetOperationSchedulerAsync();
+            return os.GetState().OperationCount > 0;
+        }
 
         public async Task<PluginInstallationResult> InstallAsync(string packagePath)
         {
             using var zip = ZipFile.OpenRead(packagePath);
             var config = (from entry in zip.Entries
-                          where entry.Name == PluginLocation.ManifestName
+                          where entry.Name == Locations.ManifestFileName
                           select entry).SingleOrDefault();
 
             if (config == null)
@@ -73,11 +74,12 @@ namespace Lanceur.Infra.Plugins
                 return null;
             }
 
-            using var stream = config.Open();
+            await using var stream = config.Open();
             using var reader = new StreamReader(stream);
 
-            var json = reader.ReadToEnd();
+            var json = await reader.ReadToEndAsync();
             var manifest = JsonConvert.DeserializeObject<PluginManifest>(json);
+            RemoveCandidate(manifest);
 
             // Check here whether the plugin already exists. If yes but version
             // is equal or higher, log a warning and stop installation
@@ -99,26 +101,24 @@ namespace Lanceur.Infra.Plugins
 
                 var tempPath = FileHelper.GetRandomTempFile(".zip");
                 File.Copy(packagePath, tempPath);
-                await _maintenanceLogBook.SaveAsync(MaintenanceCandidate.InstallCandidate(tempPath));
+
+                var os = await GetOperationSchedulerAsync();
+                await os.AddOperation(OperationFactory.UnzipDirectory(tempPath, Locations.FromManifest(manifest).PluginDirectoryPath))
+                        .SavePlanAsync();
+
                 return PluginInstallationResult.Success(manifest, isUpdate: true);
             }
 
             InstallFiles(
-                new PluginLocation(manifest).DirectoryPath,
-                zip);
+                Locations.FromManifest(manifest).PluginDirectoryPath, zip);
             return PluginInstallationResult.Success(manifest);
         }
 
         public async Task<string> InstallAsync()
         {
-            var results = new StringBuilder();
-            var candidates = await _maintenanceLogBook.GetInstallCandidatesAsync();
-            foreach (var candidate in candidates)
-            {
-                var r = await InstallAsync(candidate.Directory);
-                results.Append($"{r}{Environment.NewLine}");
-            }
-            return results.ToString();
+            var os = await GetOperationSchedulerAsync();
+            await os.ExecutePlanAsync();
+            return string.Empty;
         }
 
         public async Task<PluginInstallationResult> InstallFromWebAsync(string url)

@@ -1,6 +1,8 @@
 ﻿using Lanceur.Controls;
 using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Plugins;
+using Lanceur.SharedKernel.Mixins;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Xaml;
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -9,8 +11,6 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
-using Lanceur.Infra.Plugins;
-using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur
 {
@@ -68,7 +68,7 @@ namespace Lanceur
             {
                 await uninstaller.UninstallAsync();
             }
-            
+
             var installer = Locator.Current.GetService<IPluginInstaller>();
             if (await installer.HasMaintenanceAsync())
             {
@@ -78,8 +78,8 @@ namespace Lanceur
                     log.Error($"Error occured when installing plugins on startup: {errors}");
                 }
             }
-            
-            File.Delete(PluginLocation.MaintenanceLogBook);
+
+            File.Delete(Locations.MaintenanceLogBookPath);
         }
 
         #endregion Methods

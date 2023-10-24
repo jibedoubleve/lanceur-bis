@@ -32,7 +32,7 @@ namespace Lanceur.Infra.Plugins
 
         private Assembly LoadPluginAsm(string relativePath)
         {
-            var loc = PluginLocation.FromFile(relativePath).FullPath;
+            var loc = Locations.FromFile(relativePath).PluginDllPath;
 
             var ctx = new PluginLoadContext(loc);
 
@@ -51,7 +51,7 @@ namespace Lanceur.Infra.Plugins
                 .ToArray();
 
             if (!plugins.Any()) return plugins;
-            
+
             var availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
             _log.Warning(
                 $"Can't find any type which implements {nameof(IPlugin)} in {assembly} from {assembly.Location}.\n" +

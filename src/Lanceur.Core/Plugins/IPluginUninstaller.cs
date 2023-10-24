@@ -1,11 +1,16 @@
-﻿namespace Lanceur.Core.Plugins
+﻿using System.Collections.Immutable;
+
+namespace Lanceur.Core.Plugins
 {
     public interface IPluginUninstaller
     {
         #region Methods
 
-        Task<IEnumerable<MaintenanceCandidate>> GetUninstallCandidatesAsync();
-
+        /// <summary>
+        /// Represents the plugins the user asked to delete
+        /// </summary>
+        public IEnumerable<IPluginManifest> UninstallationCandidates { get; }
+        
         Task<bool> HasMaintenanceAsync();
 
         Task SubscribeForUninstallAsync(IPluginManifest pluginManifest);

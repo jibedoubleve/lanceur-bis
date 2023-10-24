@@ -18,31 +18,30 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly ISchedulerProvider _schedulers;
-        private readonly IPluginWebRepository _webRepositopry;
-
+        private readonly IPluginWebRepository _webRepository;
+        private readonly IPluginUninstaller _pluginUninstaller;
         #endregion Fields
 
         #region Constructors
 
-        public PluginFromWebViewModel(
-            ISchedulerProvider schedulers = null,
-            IUserNotification notify = null,
-            IPluginWebRepository webRepositopry = null)
+        public PluginFromWebViewModel(IPluginUninstaller pluginUninstaller = null, 
+                                      ISchedulerProvider schedulers = null,
+                                      IUserNotification notify = null,
+                                      IPluginWebRepository webRepository = null)
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
-
-            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _webRepositopry = webRepositopry ?? l.GetService<IPluginWebRepository>();
-            Activate = ReactiveCommand.CreateFromTask(OnActivateAsync, outputScheduler: _schedulers.MainThreadScheduler);
+            schedulers ??= l.GetService<ISchedulerProvider>();
+            _pluginUninstaller = pluginUninstaller ?? l.GetService<IPluginUninstaller>();
+            _webRepository = webRepository ?? l.GetService<IPluginWebRepository>();
+            Activate = ReactiveCommand.CreateFromTask(OnActivateAsync, outputScheduler: schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
-                .ObserveOn(_schedulers.MainThreadScheduler)
+                .ObserveOn(schedulers.MainThreadScheduler)
                 .Subscribe(response =>
                 {
-                    PluginManifests = new ObservableCollection<PluginWebManifestViewModel>(response.PluginManifests);
+                    PluginManifests = new(response.PluginManifests);
                 });
         }
 
@@ -50,7 +49,7 @@ namespace Lanceur.Views
 
         #region Properties
 
-        public ReactiveCommand<Unit, ActivationResponse> Activate { get; private set; }
+        public ReactiveCommand<Unit, ActivationResponse> Activate { get;  }
         [Reactive] public ObservableCollection<PluginWebManifestViewModel> PluginManifests { get; set; }
         [Reactive] public PluginWebManifestViewModel SelectedManifest { get; set; }
         [Reactive] public bool SelectionValidated { get; set; } = false;
@@ -61,7 +60,7 @@ namespace Lanceur.Views
 
         private async Task<ActivationResponse> OnActivateAsync()
         {
-            var manifests = await _webRepositopry.GetPluginListAsync();
+            var manifests = await _webRepository.GetPluginListAsync(_pluginUninstaller.UninstallationCandidates);
             return new() { PluginManifests = manifests.ToViewModel() };
         }
 
@@ -73,7 +72,7 @@ namespace Lanceur.Views
         {
             #region Properties
 
-            public IEnumerable<PluginWebManifestViewModel> PluginManifests { get; set; }
+            public IEnumerable<PluginWebManifestViewModel> PluginManifests { get; init; }
 
             #endregion Properties
         }

@@ -12,6 +12,11 @@ namespace Lanceur.Infra.Plugins
 
         #endregion Fields
 
+        /// <summary>
+        /// Get an instance of <see cref="PluginWebRepository"/>
+        /// </summary>
+        /// <param name="localPluginManifestRepository">Repository to have the list of installed plugins</param>
+        /// <param name="webPluginManifestLoader">Loader to retrieve all the plugin in the web repository</param>
         public PluginWebRepository(
             IPluginManifestRepository localPluginManifestRepository,
             IPluginWebManifestLoader webPluginManifestLoader)
@@ -22,10 +27,16 @@ namespace Lanceur.Infra.Plugins
 
         #region Methods
 
-        public async Task<IEnumerable<IPluginWebManifest>> GetPluginListAsync()
+        /// <inheritdoc />
+        public async Task<IEnumerable<IPluginWebManifest>> GetPluginListAsync(IEnumerable<IPluginManifest> uninstallationCandidates = null)
         {
             var webPlugins = await _webPluginManifestLoader.LoadFromWebAsync();
-            var plugins = _localPluginManifestRepository.GetPluginManifests();
+            var installedPlugins = _localPluginManifestRepository.GetPluginManifests();
+            uninstallationCandidates ??= Array.Empty<IPluginManifest>();
+
+            var plugins = from i in installedPlugins
+                          where uninstallationCandidates.All(x => x.Dll != i.Dll)
+                          select i;
             
             // If a plugin is already installed but web version is 
             // newer, then show this new plugin

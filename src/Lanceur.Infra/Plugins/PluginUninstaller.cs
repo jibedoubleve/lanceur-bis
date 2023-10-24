@@ -1,14 +1,11 @@
-﻿using Lanceur.Core.Plugins;
+﻿using FileOperationScheduler.Infrastructure.Operations;
+using Lanceur.Core.Plugins;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.Mixins;
-using Newtonsoft.Json;
 
 namespace Lanceur.Infra.Plugins
 {
-    public class PluginUninstaller : IPluginUninstaller
+    public class PluginUninstaller : PluginButler, IPluginUninstaller
     {
-        private readonly IMaintenanceLogBook _maintenanceLogBook;
-
         #region Fields
 
         private readonly IAppLogger _log;
@@ -17,9 +14,8 @@ namespace Lanceur.Infra.Plugins
 
         #region Constructors
 
-        public PluginUninstaller(IAppLoggerFactory loggerFactory, IMaintenanceLogBook maintenanceLogBook)
+        public PluginUninstaller(IAppLoggerFactory loggerFactory)
         {
-            _maintenanceLogBook = maintenanceLogBook;
             ArgumentNullException.ThrowIfNull(loggerFactory, nameof(loggerFactory));
             _log = loggerFactory.GetLogger<PluginUninstaller>();
         }
@@ -28,52 +24,31 @@ namespace Lanceur.Infra.Plugins
 
         #region Methods
 
-        public async Task<IEnumerable<MaintenanceCandidate>> GetUninstallCandidatesAsync() =>
-            await _maintenanceLogBook.GetUninstallCandidatesAsync();
-
-        public async Task<bool> HasMaintenanceAsync() =>
-            (await _maintenanceLogBook.GetUninstallCandidatesAsync()).Any();
+        public async Task<bool> HasMaintenanceAsync()
+        {
+            var os = await GetOperationSchedulerAsync();
+            return os.GetState().OperationCount > 0;
+        }
 
         public async Task SubscribeForUninstallAsync(IPluginManifest manifest)
         {
-            var candidates = (await GetUninstallCandidatesAsync()).ToList();
-            var alreadyCandidate = (from c in candidates
-                                    where c.Directory == manifest.Dll.GetDirectoryName()
-                                    select c).Any();
+            var os = await GetOperationSchedulerAsync();
+            var dir = Path.GetDirectoryName(manifest.Dll);
 
-            if (alreadyCandidate)
-            {
-                return;
-            }
+            if (dir is null)
+                throw new DirectoryNotFoundException($"Cannot find plugin directory for plugin '{manifest.Name}'.");
 
-            candidates.Add(MaintenanceCandidate.UninstallCandidate(manifest.Dll.GetDirectoryName()));
-
-            await _maintenanceLogBook.SaveAsync(candidates.ToArray());
+            _log.Info($"Add '{dir}' to directory to remove.");
+            AddCandidate(manifest);
+            
+            os.AddOperation(OperationFactory.RemoveDirectory(Locations.GetAbsolutePath(dir)));
+            await os.SavePlanAsync();
         }
 
         public async Task UninstallAsync()
         {
-            var retryCandidates = new List<MaintenanceCandidate>();
-
-            foreach (var candidate in await _maintenanceLogBook.GetUninstallCandidatesAsync())
-            {
-                var directory = PluginLocation.FromDirectory(candidate.Directory);
-
-                if (!directory.Exists()) continue;
-
-                try
-                {
-                    _log.Info($"Removing plugin at '{candidate.Directory}'");
-                    directory.Delete();
-                }
-                catch (Exception ex)
-                {
-                    _log.Error($"Failed to uninstall plugin at '{candidate.Directory}'", ex);
-                    retryCandidates.Add(candidate);
-                }
-            }
-
-            await _maintenanceLogBook.SaveAsync(retryCandidates.ToArray());
+            var os = await GetOperationSchedulerAsync();
+            await os.ExecutePlanAsync();
         }
 
         #endregion Methods
