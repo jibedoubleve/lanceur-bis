@@ -14,9 +14,7 @@ namespace Lanceur.Core.Plugins
         Task<bool> HasMaintenanceAsync();
 
         Task SubscribeForUninstallAsync(IPluginManifest pluginManifest);
-
-        Task UninstallAsync();
-
+        
         #endregion Methods
     }
 }

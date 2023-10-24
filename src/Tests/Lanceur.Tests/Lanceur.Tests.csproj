@@ -37,9 +37,13 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
-    <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
-    <ProjectReference Include="..\Lanceur\Lanceur.csproj" />
-    <ProjectReference Include="..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj" />
+    <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
+    <ProjectReference Include="..\..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
+    <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj" />
+    <ProjectReference Include="..\..\Lanceur\Lanceur.csproj" />
+    <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj" />
+    <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\Lanceur\Lanceur.csproj" />
+    <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj" />
   </ItemGroup>
 </Project>

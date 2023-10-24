@@ -8,6 +8,7 @@ using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.Utils;
+using Lanceur.Tests.Utils.Builders;
 using Lanceur.Tests.Utils.ReservedAliases;
 using Lanceur.Views.Mixins;
 using Microsoft.Reactive.Testing;

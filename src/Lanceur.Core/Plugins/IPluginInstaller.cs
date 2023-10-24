@@ -6,11 +6,11 @@ public interface IPluginInstaller
 
     Task<bool> HasMaintenanceAsync();
 
-    Task<PluginInstallationResult> InstallAsync(string packagePath);
+    Task<PluginInstallationResult> SubscribeForInstallAsync(string packagePath);
 
-    Task<string> InstallAsync();
+    Task<string> SubscribeForInstallAsync();
 
-    Task<PluginInstallationResult> InstallFromWebAsync(string url);
+    Task<PluginInstallationResult> SubscribeForInstallFromWebAsync(string url);
 
     #endregion Methods
 }
