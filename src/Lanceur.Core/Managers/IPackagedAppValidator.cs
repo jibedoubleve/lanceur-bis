@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Infra.Managers
+namespace Lanceur.Core.Managers
 {
     public interface IPackagedAppValidator
     {

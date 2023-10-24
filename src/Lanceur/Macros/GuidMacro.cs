@@ -1,12 +1,12 @@
-﻿using Lanceur.Core;
-using Lanceur.Core.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
+using Lanceur.Core;
+using Lanceur.Core.Models;
 
-namespace Lanceur.ReservedKeywords
+namespace Lanceur.Macros
 {
     [Macro("guid"), Description("Creates a guid and save it into the clipboard")]
     public class GuidMacro : SelfExecutableQueryResult

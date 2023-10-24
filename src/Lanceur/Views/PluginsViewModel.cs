@@ -137,7 +137,7 @@ public class PluginsViewModel : RoutableViewModel
         var packagePath = await _askFile.Handle(Unit.Default);
         if (packagePath.IsNullOrWhiteSpace()) return null;
 
-        var installationResult = await _pluginInstaller.InstallAsync(packagePath);
+        var installationResult = await _pluginInstaller.SubscribeForInstallAsync(packagePath);
         if (!installationResult.IsInstallationSuccess)
         {
             _notification.Warning(installationResult.ErrorMessage);
@@ -163,7 +163,7 @@ public class PluginsViewModel : RoutableViewModel
         var packagePath = await _askWebFile.Handle(Unit.Default);
         if (packagePath.IsNullOrWhiteSpace()) return null;
 
-        var config = await _pluginInstaller.InstallFromWebAsync(packagePath);
+        var config = await _pluginInstaller.SubscribeForInstallFromWebAsync(packagePath);
         _notification.Information($"Install plugin at '{packagePath}'");
         return config.PluginManifest;
     }

@@ -1,15 +1,14 @@
-﻿using Lanceur.Core;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
 using Splat;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading.Tasks;
 
-namespace Lanceur.ReservedKeywords
+namespace Lanceur.Macros
 {
     [Macro("centre"), Description("Center Lanceur in the middle of the screen")]
     public class CentreMacro : SelfExecutableQueryResult

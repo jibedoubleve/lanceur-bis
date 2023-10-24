@@ -11,6 +11,7 @@ using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
 using System.Reactive.Concurrency;
+using Lanceur.Tests.Utils.Builders;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels

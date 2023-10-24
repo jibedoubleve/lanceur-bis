@@ -9,79 +9,73 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
 using System;
 using System.IO;
+using System.IO.FileOps.Infrastructure;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace Lanceur
+namespace Lanceur;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    #region Fields
+
+    private NotifyIconAdapter _notifyIcon;
+
+    #endregion Fields
+
+    #region Constructors
+
+    public App()
     {
-        #region Fields
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        Bootstrapper.Initialise();
+    }
 
-        private NotifyIconAdapter _notifyIcon;
+    #endregion Constructors
 
-        #endregion Fields
+    #region Methods
 
-        #region Constructors
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        var notify = Locator.Current.GetService<IUserNotification>();
+        notify.Error(e.Exception.Message, e.Exception);
+    }
 
-        public App()
-        {
-            DispatcherUnhandledException += OnDispatcherUnhandledException;
-            Bootstrapper.Initialise();
-        }
+    protected override void OnExit(ExitEventArgs e)
+    {
+        ToastNotificationManagerCompat.Uninstall();
+        SingleInstance.ReleaseMutex();
+    }
 
-        #endregion Constructors
+    protected override async void OnStartup(StartupEventArgs e)
+    {
+        var log = Locator.Current.GetService<IAppLoggerFactory>().GetLogger<App>();
+        _notifyIcon ??= new();
 
-        #region Methods
+        ThemeManager.Current.SetTheme();
 
-        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        if (!SingleInstance.WaitOne())
         {
             var notify = Locator.Current.GetService<IUserNotification>();
-            notify.Error(e.Exception.Message, e.Exception);
+            notify.Warning("An instance of Lanceur is already running.");
+            Environment.Exit(0);
         }
 
-        protected override void OnExit(ExitEventArgs e)
+        var installer = Locator.Current.GetService<IPluginInstaller>();
+        if (await installer.HasMaintenanceAsync())
         {
-            ToastNotificationManagerCompat.Uninstall();
-            SingleInstance.ReleaseMutex();
+            var errors = await installer.SubscribeForInstallAsync();
+            if (!errors.IsNullOrEmpty())
+            {
+                log.Error($"Error occured when installing plugins on startup: {errors}");
+            }
         }
 
-        protected override async void OnStartup(StartupEventArgs e)
-        {
-            var log = Locator.Current.GetService<IAppLoggerFactory>().GetLogger<App>();
-            _notifyIcon ??= new NotifyIconAdapter();
-
-            ThemeManager.Current.SetTheme();
-
-            if (!SingleInstance.WaitOne())
-            {
-                var notify = Locator.Current.GetService<IUserNotification>();
-                notify.Warning("An instance of Lanceur is already running.");
-                Environment.Exit(0);
-            }
-
-            var uninstaller = Locator.Current.GetService<IPluginUninstaller>();
-            if (await uninstaller.HasMaintenanceAsync())
-            {
-                await uninstaller.UninstallAsync();
-            }
-
-            var installer = Locator.Current.GetService<IPluginInstaller>();
-            if (await installer.HasMaintenanceAsync())
-            {
-                var errors = await installer.InstallAsync();
-                if (!errors.IsNullOrEmpty())
-                {
-                    log.Error($"Error occured when installing plugins on startup: {errors}");
-                }
-            }
-
-            File.Delete(Locations.MaintenanceLogBookPath);
-        }
-
-        #endregion Methods
+        File.Delete(Locations.MaintenanceLogBookPath);
     }
+
+    #endregion Methods
 }
