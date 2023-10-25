@@ -22,7 +22,6 @@ namespace Lanceur.Views
 
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly INotification _notification;
-        private readonly ISchedulerProvider _schedulers;
         private readonly IDbRepository _service;
         private readonly IThumbnailManager _thumbnailManager;
 
@@ -39,16 +38,16 @@ namespace Lanceur.Views
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
-            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
+            schedulers ??= l.GetService<ISchedulerProvider>();
             _service = service ?? l.GetService<IDbRepository>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _notification = notification ?? l.GetService<INotification>();
-            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
+            _confirmRemove = Interactions.YesNoQuestion(schedulers.MainThreadScheduler);
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: _schedulers.MainThreadScheduler);
+            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: schedulers.MainThreadScheduler);
             RemoveSelected.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
@@ -70,7 +69,7 @@ namespace Lanceur.Views
 
         private ObservableCollection<SelectableAliasQueryResult> OnActivate()
         {
-            var doubloons = _service.GetDoubloons();
+            var doubloons = _service.GetDoubloons().ToArray();
             _thumbnailManager.RefreshThumbnails(doubloons);
             var results = new ObservableCollection<SelectableAliasQueryResult>(doubloons.Cast<SelectableAliasQueryResult>());
             return results;
@@ -82,7 +81,7 @@ namespace Lanceur.Views
                          where d.IsSelected
                          select d).ToList();
 
-            var count = toDel?.Count() ?? 0;
+            var count = toDel.Count;
             var remove = await _confirmRemove.Handle($"{count}");
             if (remove && count > 0)
             {
