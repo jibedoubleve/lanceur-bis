@@ -2,6 +2,7 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.Entities;
+using Lanceur.Infra.SQLite.Helpers;
 using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite.DbActions
@@ -26,15 +27,60 @@ namespace Lanceur.Infra.SQLite.DbActions
         #endregion Constructors
 
         #region Methods
+
+        private void ClearAlias(params long[] ids)
+        {
+            const string sql = @"
+                    delete from alias
+                    where id = @id";
+            
+            var cnt = _db.DeleteMany(sql, ids);
+            var idd = string.Join(", ", ids);
+            _log.Info($"Removed '{cnt}' row(s) from alias. Id: {idd}");
+        }
+
+        private void ClearAliasArgument(params long[] ids)
+        {
+            const string sql = @"
+                delete from alias_argument
+                where id_alias = @id";
+
+            var cnt = _db.DeleteMany(sql, ids);
+            var idd = string.Join(", ", ids);
+            _log.Debug($"Removed '{cnt}' row(s) from 'alias_argument'. Id: {idd}");
+        }
+
+        private void ClearAliasName(params long[] ids)
+        {
+            const string sql = @"
+                delete from alias_name
+                where id_alias = @id";
+            
+            var cnt = _db.DeleteMany(sql, ids);
+            var idd = string.Join(", ", ids);
+            _log.Debug($"Removed '{cnt}' row(s) from 'alias_name'. Id: {idd}");
+        }
+
+        private void ClearAliasUsage(params long[] ids)
+        {
+            const string sql = @"
+                delete from alias_usage
+                where id_alias = @id;";
+
+            var cnt = _db.DeleteMany(sql, ids);
+            var idd = string.Join(", ", ids);
+            _log.Debug($"Removed '{cnt}' row(s) from 'alias_usage'. Id: {idd}");
+        }
+
         private void CreateAdditionalParameters(AliasQueryResult alias) =>
-            CreateAdditionalParameters(alias.Id, alias.AdditionalParameters);
-        
+                                    CreateAdditionalParameters(alias.Id, alias.AdditionalParameters);
+
         private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters)
         {
             // Remove existing additional alias parameters
             var sql1 = "delete from alias_argument where id_alias = @idAlias";
             _db.Connection.Execute(sql1, new { idAlias });
-            
+
             // Create alias additional parameters
             var sql2 = @"
                 insert into alias_argument (id_alias, argument, name)
@@ -167,7 +213,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             }
 
             alias.Id = id;
-            
+
             //Create additional arguments
             CreateAdditionalParameters(id, alias.AdditionalParameters);
 
@@ -247,7 +293,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public KeywordUsage GetHiddenKeyword(string name)
         {
-            var sql = @"
+            const string sql = @"
                 select
 	                a.id,
                     n.name,
@@ -271,63 +317,21 @@ namespace Lanceur.Infra.SQLite.DbActions
         {
             if (alias == null) { throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias."); }
 
-            const string sqlRmUsage = @"delete from alias_usage where id_alias = @id_alias";
-            var cnt        = _db.Connection.Execute(sqlRmUsage, new { id_alias = alias.Id });
-            _log.Info($"Removed '{cnt}' row(s) from alias_usage. Id: {alias.Id}");
-
-            const string sqlRmParam = "delete from alias_argument where id_alias = @id_alias";
-            cnt = _db.Connection.Execute(sqlRmParam, new { id_alias = alias.Id });
-            _log.Info($"Removed '{cnt}' row(s) from alias_parameter. Id: {alias.Id}");
-
-            const string sqlRmName = @"delete from alias_name where id_alias = @id_alias";
-            cnt = _db.Connection.Execute(sqlRmName, new { id_alias = alias.Id });
-            _log.Info($"Removed '{cnt}' row(s) from alias_name. Id: {alias.Id}");
-
-            // If alias refers to no other names, remove it.
-            // This query, cleans all alias in this situation.
-            const string sqlRmAlias = @"
-                    delete from alias
-                    where id in (
-                      select a.id
-                      from
-                          alias a
-                          left join alias_name an on a.id = an.id_alias
-                      where an.id_alias is null
-                    );";
-            _db.Connection.Execute(sqlRmAlias);
-            _log.Info($"Removed '{cnt}' row(s) from alias. Id: {alias.Id}");
+            ClearAliasUsage(alias.Id);
+            ClearAliasArgument(alias.Id);
+            ClearAliasName(alias.Id);
+            ClearAlias(alias.Id);
         }
 
         public void Remove(IEnumerable<SelectableAliasQueryResult> alias)
         {
-            if (alias == null) { throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias."); }
+            ArgumentNullException.ThrowIfNull(nameof(alias));
+            var ids = alias.Select(x => x.Id).ToArray();
 
-            var aliases = (alias as SelectableAliasQueryResult[] ?? alias.ToArray()).Select(x => x.Id).ToArray();
-            
-            const string sqlRmUsage = @"delete from alias_usage where id_alias in @id_alias";
-            var cnt = _db.Connection.Execute(sqlRmUsage, new { id_alias = aliases });
-            _log.Info($"Removed '{cnt}' row(s) from alias_usage.");
-            
-            const string sqlRmParam = "delete from alias_argument where id_alias = @id_alias";
-            cnt = _db.Connection.Execute(sqlRmParam, new { id_alias = alias });
-            _log.Info($"Removed '{cnt}' row(s) from alias_parameter.");
-
-            const string sqlRmName = @"delete from alias_name where id_alias in @id_alias";
-            _db.Connection.Execute(sqlRmName, new { id_alias = aliases});
-            _log.Info($"Removed '{cnt}' row(s) from alias_name.");
-
-            // If alias refers to no other names, remove it.
-            // This query, cleans all alias in this situation.
-            var sqlRmAlias = @"
-                    delete from alias
-                    where id in (
-                      select a.id
-                      from
-                          alias a
-                          left join alias_name an on a.id = an.id_alias
-                      where an.id_alias is null
-                    );";
-            _db.Connection.Execute(sqlRmAlias);
+            ClearAliasUsage(ids);
+            ClearAliasArgument(ids);
+            ClearAliasName(ids);
+            ClearAlias(ids);
         }
 
         public long Update(AliasQueryResult alias)
