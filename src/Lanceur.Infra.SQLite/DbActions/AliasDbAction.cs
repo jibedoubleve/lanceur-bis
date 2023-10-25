@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.SQLite.Entities;
 using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite.DbActions
@@ -25,6 +26,21 @@ namespace Lanceur.Infra.SQLite.DbActions
         #endregion Constructors
 
         #region Methods
+        private void CreateAdditionalParameters(AliasQueryResult alias) =>
+            CreateAdditionalParameters(alias.Id, alias.AdditionalParameters);
+        
+        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters)
+        {
+            // Remove existing additional alias parameters
+            var sql1 = "delete from alias_argument where id_alias = @idAlias";
+            _db.Connection.Execute(sql1, new { idAlias });
+            
+            // Create alias additional parameters
+            var sql2 = @"
+                insert into alias_argument (id_alias, argument, name)
+                values(@idAlias, @parameter, @name);";
+            _db.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+        }
 
         private void UpdateName(AliasQueryResult alias)
         {
@@ -42,9 +58,6 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
         {
-            var ids = (from r in results
-                       where r.Id != 0
-                       select r);
             var sql = @$"
                 select
 	                id_alias as {nameof(KeywordUsage.Id)},
@@ -53,15 +66,18 @@ namespace Lanceur.Infra.SQLite.DbActions
 	                stat_usage_per_app_v
                 where id_alias in @ids;";
 
-            var dbResults = _db.Connection.Query<KeywordUsage>(sql, new { ids = results.Select(x => x.Id).ToArray() });
+            var dbResultAr = results as QueryResult[] ?? results.ToArray();
+            var dbResults = _db.Connection
+                               .Query<KeywordUsage>(sql, new { ids = dbResultAr.Select(x => x.Id).ToArray() })
+                               .ToArray();
 
-            foreach (var result in results)
+            foreach (var result in dbResultAr)
             {
                 result.Count = (from item in dbResults
                                 where item.Id == result.Id
                                 select item.Count).SingleOrDefault();
             }
-            return results;
+            return dbResultAr;
         }
 
         public bool CheckNameExists(AliasQueryResult alias, long idSession)
@@ -151,16 +167,19 @@ namespace Lanceur.Infra.SQLite.DbActions
             }
 
             alias.Id = id;
+            
+            //Create additional arguments
+            CreateAdditionalParameters(id, alias.AdditionalParameters);
 
             // Return either the id of the created Alias or
-            // return the id of the just updated allias (which
-            // should be the same as the one specified as arg
+            // return the id of the just updated alias (which
+            // should be the same as the one specified as arg)
             return id;
         }
 
         public void CreateInvisible(ref QueryResult alias)
         {
-            var aliasQR = new AliasQueryResult
+            var queryResult = new AliasQueryResult
             {
                 Name = alias.Name,
                 FileName = alias.Name,
@@ -169,7 +188,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 Icon = "PageHidden"
             };
             var idSession = GetDefaultSessionId();
-            alias.Id = Create(ref aliasQR, idSession);
+            alias.Id = Create(ref queryResult, idSession);
         }
 
         public void Dispose() => _db.Dispose();
@@ -187,11 +206,11 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// </summary>
         /// <param name="name">The alias' exact name to find.</param>
         /// <param name="idSession">The session where the search occurs.</param>
-        /// <param name="delay">Indicates a delay to set.</param>
+        /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
         /// <returns>The exact match or <c>null</c> if not found.</returns>
         public AliasQueryResult GetExact(string name, long? idSession = null, bool includeHidden = false)
         {
-            if (!idSession.HasValue) { idSession = GetDefaultSessionId(); }
+            idSession ??= GetDefaultSessionId();
 
             var sql = @$"
                 select
@@ -218,9 +237,9 @@ namespace Lanceur.Infra.SQLite.DbActions
                     and hidden in @hidden
                 order by
                     c.exec_count desc,
-                    n.name asc";
+                    n.name";
 
-            var hidden = includeHidden ? new int[] { 0, 1 } : 0.ToEnumerable();
+            var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
             var arguments = new { idSession, name, hidden };
 
             return _db.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault();
@@ -252,17 +271,21 @@ namespace Lanceur.Infra.SQLite.DbActions
         {
             if (alias == null) { throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias."); }
 
-            var sql1 = @"delete from alias_usage where id_alias = @id_alias";
-            var cnt = _db.Connection.Execute(sql1, new { id_alias = alias.Id });
-            _log.Debug($"Removed '{cnt}' row(s) from alias_usage. Id: {alias.Id}");
+            const string sqlRmUsage = @"delete from alias_usage where id_alias = @id_alias";
+            var cnt        = _db.Connection.Execute(sqlRmUsage, new { id_alias = alias.Id });
+            _log.Info($"Removed '{cnt}' row(s) from alias_usage. Id: {alias.Id}");
 
-            var sql2 = @"delete from alias_name where id_alias = @id_alias";
-            cnt = _db.Connection.Execute(sql2, new { id_alias = alias.Id });
-            _log.Debug($"Removed '{cnt}' row(s) from alias_name. Id: {alias.Id}");
+            const string sqlRmParam = "delete from alias_argument where id_alias = @id_alias";
+            cnt = _db.Connection.Execute(sqlRmParam, new { id_alias = alias.Id });
+            _log.Info($"Removed '{cnt}' row(s) from alias_parameter. Id: {alias.Id}");
+
+            const string sqlRmName = @"delete from alias_name where id_alias = @id_alias";
+            cnt = _db.Connection.Execute(sqlRmName, new { id_alias = alias.Id });
+            _log.Info($"Removed '{cnt}' row(s) from alias_name. Id: {alias.Id}");
 
             // If alias refers to no other names, remove it.
             // This query, cleans all alias in this situation.
-            var sql3 = @"
+            const string sqlRmAlias = @"
                     delete from alias
                     where id in (
                       select a.id
@@ -271,24 +294,31 @@ namespace Lanceur.Infra.SQLite.DbActions
                           left join alias_name an on a.id = an.id_alias
                       where an.id_alias is null
                     );";
-            _db.Connection.Execute(sql3);
-            _log.Debug($"Removed '{cnt}' row(s) from alias. Id: {alias.Id}");
+            _db.Connection.Execute(sqlRmAlias);
+            _log.Info($"Removed '{cnt}' row(s) from alias. Id: {alias.Id}");
         }
 
         public void Remove(IEnumerable<SelectableAliasQueryResult> alias)
         {
             if (alias == null) { throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias."); }
-            else
-            {
-                var sql1 = @"delete from alias_usage where id_alias in @id_alias";
-                _db.Connection.Execute(sql1, new { id_alias = alias.Select(x => x.Id).ToArray() });
 
-                var sql2 = @"delete from alias_name where id_alias in @id_alias";
-                _db.Connection.Execute(sql2, new { id_alias = alias.Select(x => x.Id).ToArray() });
+            var aliases = (alias as SelectableAliasQueryResult[] ?? alias.ToArray()).Select(x => x.Id).ToArray();
+            
+            const string sqlRmUsage = @"delete from alias_usage where id_alias in @id_alias";
+            var cnt = _db.Connection.Execute(sqlRmUsage, new { id_alias = aliases });
+            _log.Info($"Removed '{cnt}' row(s) from alias_usage.");
+            
+            const string sqlRmParam = "delete from alias_argument where id_alias = @id_alias";
+            cnt = _db.Connection.Execute(sqlRmParam, new { id_alias = alias });
+            _log.Info($"Removed '{cnt}' row(s) from alias_parameter.");
 
-                // If alias refers to no other names, remove it.
-                // This query, cleans all alias in this situation.
-                var sql3 = @"
+            const string sqlRmName = @"delete from alias_name where id_alias in @id_alias";
+            _db.Connection.Execute(sqlRmName, new { id_alias = aliases});
+            _log.Info($"Removed '{cnt}' row(s) from alias_name.");
+
+            // If alias refers to no other names, remove it.
+            // This query, cleans all alias in this situation.
+            var sqlRmAlias = @"
                     delete from alias
                     where id in (
                       select a.id
@@ -297,8 +327,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                           left join alias_name an on a.id = an.id_alias
                       where an.id_alias is null
                     );";
-                _db.Connection.Execute(sql3);
-            }
+            _db.Connection.Execute(sqlRmAlias);
         }
 
         public long Update(AliasQueryResult alias)
@@ -328,7 +357,8 @@ namespace Lanceur.Infra.SQLite.DbActions
             });
 
             UpdateName(alias);
-            alias.SynomymsPreviousState = alias.Synonyms;
+            CreateAdditionalParameters(alias);
+            alias.SynonymsPreviousState = alias.Synonyms;
             return alias.Id;
         }
 

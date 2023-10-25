@@ -11,8 +11,8 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:vm="clr-namespace:Lanceur.Views"
-    d:DesignHeight="450"
-    d:DesignWidth="500"
+    d:DesignHeight="600"
+    d:DesignWidth="600"
     x:TypeArguments="vm:KeywordsViewModel"
     mc:Ignorable="d">
     <Control.Resources>
@@ -207,6 +207,27 @@
                                 x:Name="BoxNotes"
                                 Margin="5"
                                 Text="{Binding ElementName=Aliases, Path=SelectedItem.Notes, UpdateSourceTrigger=PropertyChanged}" />
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Parameters">
+                            <DataGrid
+                                AreRowDetailsFrozen="True"
+                                AutoGenerateColumns="False"
+                                CanUserDeleteRows="True"
+                                CanUserResizeColumns="False"
+                                CanUserAddRows="True"
+                                ItemsSource="{Binding ElementName=Aliases, Path=SelectedItem.AdditionalParameters, UpdateSourceTrigger=PropertyChanged}"
+                                SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="90"
+                                        Binding="{Binding Name}"
+                                        Header="Name" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Parameter}"
+                                        Header="Parameter" />
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </HeaderedContentControl>
                     </StackPanel>
                 </DockPanel>
