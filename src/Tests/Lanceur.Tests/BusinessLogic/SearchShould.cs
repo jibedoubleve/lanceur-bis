@@ -76,7 +76,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             SearchService service = BuildSearchService(new StoreLoader());
 
-            service.Stores.Should().HaveCount(4);
+            service.Stores.Should().HaveCount(5);
         }
 
         [Fact]

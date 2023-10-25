@@ -1,11 +1,9 @@
-﻿using ControlzEx.Standard;
-using DynamicData;
+﻿using DynamicData;
 using DynamicData.Binding;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Managers;
 using Lanceur.Infra.Utils;
 using Lanceur.Schedulers;
 using Lanceur.SharedKernel;
@@ -26,7 +24,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Windows.Media.SpeechRecognition;
 
 namespace Lanceur.Views
 {
@@ -41,7 +38,6 @@ namespace Lanceur.Views
         private readonly IAppLogger _log;
         private readonly INotification _notification;
         private readonly IPackagedAppValidator _packagedAppValidator;
-        private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
@@ -57,18 +53,17 @@ namespace Lanceur.Views
             IPackagedAppValidator packagedAppValidator = null,
             INotification notification = null)
         {
-            _busyScope = new Scope<bool>(b => IsBusy = b, true, false);
-            _schedulers = schedulers ?? Locator.Current.GetService<ISchedulerProvider>();
+            _busyScope = new(b => IsBusy = b, true, false);
+            schedulers ??= Locator.Current.GetService<ISchedulerProvider>();
 
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
-            _notification = notification ?? l.GetService<INotification>(); ;
+            _notification = notification ?? l.GetService<INotification>();
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDbRepository>();
-            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _confirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
+            _confirmRemove = Interactions.YesNoQuestion(schedulers.MainThreadScheduler);
 
             this.WhenActivated(d =>
             {
@@ -80,8 +75,8 @@ namespace Lanceur.Views
                 }).DisposeWith(d);
 
                 SetupValidations(d);
-                SetupCommands(_schedulers.MainThreadScheduler, notify, d);
-                SetupBindings(_schedulers.MainThreadScheduler, d);
+                SetupCommands(schedulers.MainThreadScheduler, notify, d);
+                SetupBindings(schedulers.MainThreadScheduler, d);
             });
         }
 
@@ -89,7 +84,7 @@ namespace Lanceur.Views
 
         #region Properties
 
-        public ViewModelActivator Activator { get; } = new ViewModelActivator();
+        public ViewModelActivator Activator { get; } = new();
 
         public IObservableCollection<QueryResult> Aliases { get; } = new ObservableCollectionExtended<QueryResult>();
 
@@ -107,7 +102,7 @@ namespace Lanceur.Views
 
         public ReactiveCommand<AliasQueryResult, SaveOrUpdateAliasResponse> SaveOrUpdateAlias { get; private set; }
 
-        public ReactiveCommand<SearchRequest, IEnumerable<QueryResult>> Search { get; private set; }
+        private ReactiveCommand<SearchRequest, IEnumerable<QueryResult>> Search { get;  set; }
 
         [Reactive] public string SearchQuery { get; set; }
 
@@ -132,24 +127,23 @@ namespace Lanceur.Views
 
         private async Task<Unit> OnRemoveAliasAsync(AliasQueryResult alias)
         {
-            if (alias != null)
-            {
-                var remove = await _confirmRemove.Handle(alias.Name);
-                if (remove)
-                {
-                    _log.Info($"User removed alias '{alias.Name}'");
-                    _aliasService.Remove(alias);
+            if (alias == null) return Unit.Default;
 
-                    if (_aliases.Remove(alias)) { _notification.Information($"Removed alias '{alias.Name}'."); }
-                    else
-                    {
-                        var msg = $"Impossible to remove the alias '{alias.Name}'";
-                        _notification.Warning(msg);
-                        _log.Warning(msg);
-                    }
+            var remove = await _confirmRemove.Handle(alias.Name);
+            if (remove)
+            {
+                _log.Info($"User removed alias '{alias.Name}'");
+                _aliasService.Remove(alias);
+
+                if (_aliases.Remove(alias)) { _notification.Information($"Removed alias '{alias.Name}'."); }
+                else
+                {
+                    var msg = $"Impossible to remove the alias '{alias.Name}'";
+                    _notification.Warning(msg);
+                    _log.Warning(msg);
                 }
-                else { _log.Debug($"User cancelled the remove of '{alias.Name}'."); }
             }
+            else { _log.Debug($"User cancelled the remove of '{alias.Name}'."); }
             return Unit.Default;
         }
 
@@ -165,7 +159,7 @@ namespace Lanceur.Views
             _notification.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
 
             // Returns updated results
-            return new SaveOrUpdateAliasResponse
+            return new()
             {
                 Aliases = _aliasService.GetAll()
             };
@@ -174,17 +168,15 @@ namespace Lanceur.Views
         private IEnumerable<QueryResult> OnSearch(SearchRequest request)
         {
             var results = request.Query.IsNullOrEmpty()
-                ? _aliasService.GetAll()
-                : _aliasService.Search(request.Query);
+                ? _aliasService.GetAll().ToList()
+                : _aliasService.Search(request.Query).ToList();
             _thumbnailManager.RefreshThumbnails(results);
 
-            if (request.AliasToCreate != null)
-            {
-                var list = results.ToList();
-                list.Insert(0, request.AliasToCreate);
-                return list;
-            }
-            else { return results; }
+            if (request.AliasToCreate == null) return results;
+
+            results.Insert(0, request.AliasToCreate);
+            return results;
+
         }
 
         private void SetAliases(IEnumerable<QueryResult> x)
@@ -220,7 +212,7 @@ namespace Lanceur.Views
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
                 .Select(x => new SearchRequest(x?.Trim(), AliasToCreate))
-                .Log(this, $"Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{(c?.AliasToCreate?.Name ?? "<EMPTY>")}'")
+                .Log(this, $"Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{(c.AliasToCreate?.Name ?? "<EMPTY>")}'")
                 .InvokeCommand(Search)
                 .DisposeWith(d);
 
@@ -266,13 +258,9 @@ namespace Lanceur.Views
                    vm => vm.SelectedAlias.Synonyms,
                    nameExists,
                    response => !response.Exists,
-                   response =>
-                   {
-                       return (response.Exists == false && !response.ExistingNames.Any())
-                        ? "The names should not be empty"
-                        : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.";
-                   }
-             );
+                   response => (response.Exists == false && !response.ExistingNames.Any())
+                       ? "The names should not be empty"
+                       : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.");
             ValidationAliasExists.DisposeWith(d);
         }
 
@@ -292,12 +280,12 @@ namespace Lanceur.Views
         {
             #region Properties
 
-            public IEnumerable<QueryResult> Aliases { get; set; }
+            public IEnumerable<QueryResult> Aliases { get; init; }
 
             #endregion Properties
         }
 
-        public class SearchRequest
+        private class SearchRequest
         {
             #region Constructors
 
@@ -318,5 +306,7 @@ namespace Lanceur.Views
         }
 
         #endregion Classes
+
+        public void HydrateSelectedAlias() => _aliasService.HydrateAlias(SelectedAlias);
     }
 }

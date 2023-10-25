@@ -39,6 +39,13 @@ namespace Lanceur.Core.Repositories
         /// <returns>All the aliases related to the specified session (or the default one if not specified).</returns>
         IEnumerable<AliasQueryResult> GetAll(long? idSession = null);
 
+        /// <summary>
+        /// Get all the alias that has additional parameters.
+        /// </summary>
+        /// <param name="idSession">The session linked to the aliases. If null, it'll take the default session</param>
+        /// <returns>All the aliases related to the specified session (or the default one if not specified).</returns>
+        IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(long? idSession = null);
+
         Session GetDefaultSession();
 
         long GetDefaultSessionId();
@@ -91,6 +98,12 @@ namespace Lanceur.Core.Repositories
         void HydrateMacro(QueryResult alias);
 
         /// <summary>
+        /// Hydrate the alias with the additional parameters.
+        /// </summary>
+        /// <param name="alias">The alias to hydrate</param>
+        void HydrateAlias(AliasQueryResult alias);
+
+        /// <summary>
         /// Update the usage of the specified <see cref="QueryResult"/>
         /// </summary>
         /// <param name="result">The collection of <see cref="QueryResult"/>to refresh</param>
@@ -122,6 +135,17 @@ namespace Lanceur.Core.Repositories
         /// <param name="idSession">ID of the session</param>
         /// <returns>Resulting aliases</returns>
         IEnumerable<AliasQueryResult> Search(string criteria, long? idSession = null);
+
+        /// <summary>
+        /// Search all the alias with additional parameters that
+        /// correspond to the criterion and that are linked to the
+        /// specified session.  If session is omitted, the default
+        /// session is selected
+        /// </summary>
+        /// <param name="criteria">Criteria to find the aliases</param>
+        /// <param name="idSession">ID of the session</param>
+        /// <returns>Resulting aliases</returns>
+        IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria, long? idSession = null);
 
         void SetDefaultSession(long idSession);
 

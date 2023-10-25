@@ -52,7 +52,11 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private void OnAliasSelectionChanged(object sender, SelectionChangedEventArgs e) => Aliases.ScrollIntoView(Aliases.SelectedItem);
+        private void OnAliasSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Aliases.ScrollIntoView(Aliases.SelectedItem);
+            ViewModel?.HydrateSelectedAlias();
+        }
 
         #endregion Methods
     }
