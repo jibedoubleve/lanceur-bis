@@ -9,14 +9,14 @@ public class GetAllAliasDbAction
     
     #region Fields
 
-    private readonly ISQLiteConnectionScope _db;
+    private readonly IDbConnectionManager _db;
     private readonly IAppLogger _log;
 
     #endregion Fields
     
     #region Constructors
 
-    public GetAllAliasDbAction(ISQLiteConnectionScope db, IAppLoggerFactory logFactory)
+    public GetAllAliasDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory)
     {
         _db  = db;
         _log = logFactory.GetLogger<AliasDbAction>();

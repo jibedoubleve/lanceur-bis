@@ -16,7 +16,7 @@ namespace Lanceur.Tests.Functional
         private static void WithConfiguration(Action<IAppConfigRepository> assert)
         {
             using var connection = BuildFreshDb();
-            using var scope = new SQLiteConnectionScope(connection);
+            using var scope = new SQLiteDbConnectionManager(connection);
             var settingRepository = new SQLiteAppConfigRepository(scope);
 
             assert(settingRepository);
@@ -75,7 +75,7 @@ namespace Lanceur.Tests.Functional
         public void HaveDefaultShowAtStartup()
         {
             var conn = BuildFreshDb();
-            var scope = new SQLiteConnectionScope(conn);
+            var scope = new SQLiteDbConnectionManager(conn);
             var settings = new SQLiteAppConfigRepository(scope);
 
             settings.Current.Window.ShowAtStartup.Should().BeTrue();
@@ -85,7 +85,7 @@ namespace Lanceur.Tests.Functional
         public void HaveDefaultShowResult()
         {
             var conn = BuildFreshDb();
-            var scope = new SQLiteConnectionScope(conn);
+            var scope = new SQLiteDbConnectionManager(conn);
             var settings = new SQLiteAppConfigRepository(scope);
 
             settings.Current.Window.ShowResult.Should().BeFalse();

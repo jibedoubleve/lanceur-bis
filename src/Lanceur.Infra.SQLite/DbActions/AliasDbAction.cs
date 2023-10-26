@@ -14,14 +14,14 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
-        private readonly ISQLiteConnectionScope _db;
+        private readonly IDbConnectionManager _db;
         private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public AliasDbAction(ISQLiteConnectionScope db, IAppLoggerFactory logFactory)
+        public AliasDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory)
         {
             _db = db;
             _log = logFactory.GetLogger<AliasDbAction>();

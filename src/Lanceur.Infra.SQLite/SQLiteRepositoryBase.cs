@@ -4,17 +4,17 @@
     {
         #region Constructors
 
-        protected SQLiteRepositoryBase(ISQLiteConnectionScope scope)
+        protected SQLiteRepositoryBase(IDbConnectionManager manager)
         {
-            ArgumentNullException.ThrowIfNull(scope);
-            DB = scope;
+            ArgumentNullException.ThrowIfNull(manager);
+            DB = manager;
         }
 
         #endregion Constructors
 
         #region Properties
 
-        protected ISQLiteConnectionScope DB
+        protected IDbConnectionManager DB
         {
             get;
         }

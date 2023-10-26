@@ -7,15 +7,15 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
-        private readonly ISQLiteConnectionScope _db;
+        private readonly IDbConnectionManager _db;
 
         #endregion Fields
 
         #region Constructors
 
-        public HistoryDbAction(ISQLiteConnectionScope scope)
+        public HistoryDbAction(IDbConnectionManager manager)
         {
-            _db = scope;
+            _db = manager;
         }
 
         #endregion Constructors

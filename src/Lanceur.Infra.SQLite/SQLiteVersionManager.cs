@@ -8,7 +8,7 @@ namespace Lanceur.Infra.SQLite
     {
         #region Constructors
 
-        public SQLiteVersionManager(ISQLiteConnectionScope scope) : base(scope)
+        public SQLiteVersionManager(IDbConnectionManager manager) : base(manager)
         {
         }
 

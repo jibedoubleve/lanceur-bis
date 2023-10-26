@@ -18,8 +18,8 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
     #region Constructors
 
     public SQLiteDataDoctorRepository(
-        ISQLiteConnectionScope scope,
-        IAppLoggerFactory logFactory) : base(scope) => _dbAction = new(DB, logFactory);
+        IDbConnectionManager manager,
+        IAppLoggerFactory logFactory) : base(manager) => _dbAction = new(DB, logFactory);
 
     #endregion Constructors
 

@@ -16,7 +16,7 @@ namespace Lanceur.Infra.SQLite
 
         #region Constructors
 
-        public SQLiteAppConfigRepository(ISQLiteConnectionScope scope) : base(scope)
+        public SQLiteAppConfigRepository(IDbConnectionManager manager) : base(manager)
         {
         }
 
