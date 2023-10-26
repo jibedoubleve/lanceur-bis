@@ -61,12 +61,11 @@ namespace System.SQLite.Updater
             {
                 var regex = new Regex(@"^.*?(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*");
                 var match = regex.Matches(item.Key);
-                if (match.Count > 0 && match[0].Groups.Count >= 1)
-                {
-                    var ver = match[0].Groups[1].Value.Trim('.');
-                    var version = new Version(ver);
-                    src.Add(version, item.Value);
-                }
+                if (match.Count <= 0 || match[0].Groups.Count < 1) continue;
+
+                var ver     = match[0].Groups[1].Value.Trim('.');
+                var version = new Version(ver);
+                src.Add(version, item.Value);
             }
             var ordered = src.OrderBy(x => x.Key);
             return new ScriptCollection(new Dictionary<Version, string>(ordered));
