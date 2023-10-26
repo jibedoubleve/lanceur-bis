@@ -7,7 +7,7 @@ internal static class SQLiteConnectionScopeMixin
 {
     #region Methods
 
-    public static int DeleteMany(this ISQLiteConnectionScope db, string sql, params long[] ids)
+    public static int DeleteMany(this IDbConnectionManager db, string sql, params long[] ids)
         => db.WithinTransaction(tx => ids.Sum(id => tx.Connection
                                                       .Execute(sql, new { id })));
 

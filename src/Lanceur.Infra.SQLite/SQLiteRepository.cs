@@ -24,17 +24,17 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     #region Constructors
 
     public SQLiteRepository(
-        ISQLiteConnectionScope scope,
+        IDbConnectionManager manager,
         IAppLoggerFactory logFactory,
-        IConvertionService converter) : base(scope)
+        IConvertionService converter) : base(manager)
     {
         ArgumentNullException.ThrowIfNull(logFactory);
         ArgumentNullException.ThrowIfNull(converter);
 
         _log = logFactory.GetLogger<SQLiteRepository>();
         _converter = converter;
-        _aliasDbAction = new(scope, logFactory);
-        _getAllAliasDbAction = new(scope, logFactory);
+        _aliasDbAction = new(manager, logFactory);
+        _getAllAliasDbAction = new(manager, logFactory);
         _setUsageDbAction = new(DB, logFactory);
         _aliasSearchDbAction = new(DB, logFactory, converter);
     }

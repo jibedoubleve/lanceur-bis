@@ -8,7 +8,7 @@ public class AliasSearchDbAction
 {  
     #region Fields
 
-    private readonly ISQLiteConnectionScope _db;
+    private readonly IDbConnectionManager _db;
     private readonly IAppLogger _log;
     private readonly MacroDbAction _macroManager;
 
@@ -16,7 +16,7 @@ public class AliasSearchDbAction
     
     #region Constructors
 
-    public AliasSearchDbAction(ISQLiteConnectionScope db, IAppLoggerFactory logFactory, IConvertionService converter)
+    public AliasSearchDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory, IConvertionService converter)
     {
         _db  = db;
         _log = logFactory.GetLogger<AliasDbAction>();

@@ -2,7 +2,7 @@ using System.Data.SQLite;
 
 namespace Lanceur.Infra.SQLite;
 
-public interface ISQLiteConnectionScope : IDisposable
+public interface IDbConnectionManager : IDisposable
 {
     #region Methods
 

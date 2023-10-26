@@ -27,7 +27,7 @@ namespace Lanceur.Tests.SQLite
         [InlineData("1.7")]
         public void BeUpToDate(string goal)
         {
-            using var db = new SQLiteConnectionScope(BuildConnection());
+            using var db = new SQLiteDbConnectionManager(BuildConnection());
             CreateTable(db);
             CreateVersion(db, "1.0");
 
@@ -43,7 +43,7 @@ namespace Lanceur.Tests.SQLite
         [InlineData(null)]
         public void CrashWhenInvalidVersionAsStringIsSpecified(string version)
         {
-            using var db = new SQLiteConnectionScope(BuildConnection());
+            using var db = new SQLiteDbConnectionManager(BuildConnection());
             CreateTable(db);
             CreateVersion(db, "1.0");
 
@@ -59,7 +59,7 @@ namespace Lanceur.Tests.SQLite
         [InlineData("1.1.1.1", "1.1.1.1")]
         public void HaveUpToDateDatabaseWhenVersionAsStringIsSpecified(string expected, string actual)
         {
-            using var db = new SQLiteConnectionScope(BuildConnection());
+            using var db = new SQLiteDbConnectionManager(BuildConnection());
             CreateTable(db);
             CreateVersion(db, actual);
 
@@ -74,7 +74,7 @@ namespace Lanceur.Tests.SQLite
         [InlineData("1.1.1.1", "1.1.1.1")]
         public void HaveUpToDateDatabaseWhenVersionIsSpecified(string goal, string actual)
         {
-            using var db = new SQLiteConnectionScope(BuildConnection());
+            using var db = new SQLiteDbConnectionManager(BuildConnection());
             CreateTable(db);
             CreateVersion(db, actual);
 
@@ -91,7 +91,7 @@ namespace Lanceur.Tests.SQLite
         [InlineData("2.1.1")]
         public void ReturnVersionOfDatabase(string version)
         {
-            using var db = new SQLiteConnectionScope(BuildConnection());
+            using var db = new SQLiteDbConnectionManager(BuildConnection());
             CreateTable(db);
             CreateVersion(db, version);
 
@@ -109,7 +109,7 @@ namespace Lanceur.Tests.SQLite
         {
             var version = new Version(ver);
 
-            using var db = new SQLiteConnectionScope(BuildConnection());
+            using var db = new SQLiteDbConnectionManager(BuildConnection());
             CreateTable(db);
 
             var service = new SQLiteVersionManager(db);
@@ -124,7 +124,7 @@ namespace Lanceur.Tests.SQLite
         [InlineData("0.7")]
         public void Update(string goal)
         {
-            using var db = new SQLiteConnectionScope(BuildConnection());
+            using var db = new SQLiteDbConnectionManager(BuildConnection());
             CreateTable(db);
             CreateVersion(db, "1.0");
 

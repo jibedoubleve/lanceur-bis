@@ -174,7 +174,7 @@ namespace Lanceur.Tests.BusinessLogic
             {
                 var log = Substitute.For<IAppLoggerFactory>();
                 var conv = GetConvertionService();
-                var service = new SQLiteRepository(new SQLiteConnectionScope(db), log, conv);
+                var service = new SQLiteRepository(new SQLiteDbConnectionManager(db), log, conv);
                 return service;
             }
 

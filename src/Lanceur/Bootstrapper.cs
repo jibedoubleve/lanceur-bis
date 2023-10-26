@@ -78,7 +78,7 @@ public class Bootstrapper
 #else
         l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
 #endif
-        l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<ISQLiteConnectionScope>()));
+        l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<IDbConnectionManager>()));
         l.RegisterLazySingleton<ISettingsFacade>(() =>
                                                      new SettingsFacade(Get<IDatabaseConfigRepository>(),
                                                                         Get<IAppConfigRepository>()));
@@ -93,10 +93,10 @@ public class Bootstrapper
                                                                  Get<IDbRepository>(),
                                                                  Get<ICmdlineManager>()));
         l.Register<IDbRepository>(() =>
-                                      new SQLiteRepository(Get<ISQLiteConnectionScope>(),
+                                      new SQLiteRepository(Get<IDbConnectionManager>(),
                                                            Get<IAppLoggerFactory>(),
                                                            Get<IConvertionService>()));
-        l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(Get<ISQLiteConnectionScope>(),
+        l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(Get<IDbConnectionManager>(),
                                                                                Get<IAppLoggerFactory>()));
         l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
         l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
@@ -136,11 +136,11 @@ public class Bootstrapper
 
         l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
         
-        l.Register<ISQLiteConnectionScope>(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
+        l.Register<IDbConnectionManager>(() => new SQLiteDbConnectionManager(Get<SQLiteConnection>()));
 
         l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
 
-        l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<ISQLiteConnectionScope>())));
+        l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<IDbConnectionManager>())));
 
         l.Register((Func<IDataStoreUpdateManager>)(() =>
                        new SQLiteDatabaseUpdateManager(

@@ -4,7 +4,7 @@ using System.Data.SQLite;
 
 namespace Lanceur.Infra.SQLite
 {
-    public sealed class SQLiteConnectionScope : ISQLiteConnectionScope
+    public sealed class SQLiteDbConnectionManager : IDbConnectionManager
     {
         #region Fields
 
@@ -14,7 +14,7 @@ namespace Lanceur.Infra.SQLite
 
         #region Constructors
 
-        public SQLiteConnectionScope(SQLiteConnection connection)
+        public SQLiteDbConnectionManager(SQLiteConnection connection)
         {
             _connection = 
                 connection 
@@ -25,7 +25,7 @@ namespace Lanceur.Infra.SQLite
 
         #region Methods
 
-        public static implicit operator SQLiteConnection(SQLiteConnectionScope scope) => scope._connection;
+        public static implicit operator SQLiteConnection(SQLiteDbConnectionManager manager) => manager._connection;
 
         public void Dispose()
         {
