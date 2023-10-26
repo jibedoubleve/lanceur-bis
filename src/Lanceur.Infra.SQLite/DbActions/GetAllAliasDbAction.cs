@@ -6,26 +6,25 @@ namespace Lanceur.Infra.SQLite.DbActions;
 
 public class GetAllAliasDbAction
 {
-    
     #region Fields
 
     private readonly IDbConnectionManager _db;
     private readonly IAppLogger _log;
 
     #endregion Fields
-    
+
     #region Constructors
 
     public GetAllAliasDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory)
     {
-        _db  = db;
+        _db = db;
         _log = logFactory.GetLogger<AliasDbAction>();
     }
 
     #endregion Constructors
-    
+
     #region Methods
-    
+
     public IEnumerable<AliasQueryResult> GetAll(long? idSession = null)
     {
         var sql = @$"
@@ -49,7 +48,7 @@ public class GetAllAliasDbAction
                     inner join data_alias_synonyms_v s on s.id_alias   = a.id";
         if (idSession.HasValue)
         {
-         sql += @"
+            sql += @"
                 where
                   a.id_session = @idSession
                   and a.hidden = 0";
@@ -64,7 +63,7 @@ public class GetAllAliasDbAction
             _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, parameters));
         return result ?? AliasQueryResult.NoResult;
     }
-    
+
     public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(long idSession)
     {
         const string sql = @$"
@@ -99,6 +98,6 @@ public class GetAllAliasDbAction
             _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, parameters));
         return result ?? AliasQueryResult.NoResult;
     }
-    
+
     #endregion Methods
 }

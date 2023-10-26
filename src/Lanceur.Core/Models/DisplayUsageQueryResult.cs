@@ -2,15 +2,8 @@
 {
     public class DisplayUsageQueryResult : QueryResult
     {
-        public override string Icon
-        {
-            get
-            {
-                return (Count / 100) > 9 
-                    ? "Numeric9PlusBoxMultipleOutline" 
-                    : $"Numeric{Count / 100}BoxOutline";
-            }
-        }
+        #region Properties
+
         public string Color
         {
             get
@@ -24,5 +17,17 @@
                 };
             }
         }
+
+        public override string Icon
+        {
+            get
+            {
+                return (Count / 100) > 9
+                    ? "Numeric9PlusBoxMultipleOutline"
+                    : $"Numeric{Count / 100}BoxOutline";
+            }
+        }
+
+        #endregion Properties
     }
 }

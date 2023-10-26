@@ -5,6 +5,7 @@ namespace Lanceur.Core.Managers
     public interface IPackagedAppValidator
     {
         #region Methods
+
         /// <summary>
         /// Checks whether the alias is a packaged app. If it's the case,
         /// it'll fix the <see cref="AliasQueryResult.FileName"/> and the <see cref="QueryResult.Icon"/>

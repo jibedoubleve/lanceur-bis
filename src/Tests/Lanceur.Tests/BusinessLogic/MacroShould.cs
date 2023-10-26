@@ -66,7 +66,7 @@ namespace Lanceur.Tests.BusinessLogic
         public void BeMacroComposite()
         {
             // Arrange
-            string sql = Cfg.SqlForAliases();
+            var sql = Cfg.SqlForAliases();
             using var db = BuildFreshDb(sql);
             var service = Cfg.GetDataService(db);
 
@@ -174,7 +174,7 @@ namespace Lanceur.Tests.BusinessLogic
             {
                 var log = Substitute.For<IAppLoggerFactory>();
                 var conv = GetConvertionService();
-                var service = new SQLiteRepository(new SQLiteDbConnectionManager(db), log, conv);
+                var service = new SQLiteRepository(new SQLiteSingleConnectionManager(db), log, conv);
                 return service;
             }
 

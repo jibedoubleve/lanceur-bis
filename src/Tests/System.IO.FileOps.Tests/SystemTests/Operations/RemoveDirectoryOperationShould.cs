@@ -6,7 +6,7 @@ namespace System.IO.FileOps.Test.SystemTests.Operations;
 
 public class RemoveDirectoryOperationShould
 {
-    #region Public methods
+    #region Methods
 
     [Fact]
     public async Task BeProcessed()
@@ -14,7 +14,6 @@ public class RemoveDirectoryOperationShould
         // ARRANGE
         var directory = Path.Combine(Path.GetTempPath(), "RandomDirectory");
         Directory.CreateDirectory(directory);
-
 
         // ACT
         var rmdir = OperationFactory.RemoveDirectory(directory);
@@ -27,5 +26,5 @@ public class RemoveDirectoryOperationShould
         Directory.Exists(directory).Should().BeFalse();
     }
 
-    #endregion
+    #endregion Methods
 }

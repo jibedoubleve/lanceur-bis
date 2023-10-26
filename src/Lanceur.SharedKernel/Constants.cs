@@ -10,7 +10,7 @@
         /// <remarks>
         /// The order of the items in this <see cref="Enum"/> is very important
         /// as it is mapped from the SQLite database:
-        ///  - 0 is for Admin 
+        ///  - 0 is for Admin
         ///  - 1 is for CurrentUser
         /// </remarks>
         public enum RunAs

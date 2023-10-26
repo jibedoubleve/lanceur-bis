@@ -16,7 +16,7 @@ namespace Lanceur.Infra.Stores
     {
         #region Fields
 
-        private static IEnumerable<SelfExecutableQueryResult> _plugins  ;
+        private static IEnumerable<SelfExecutableQueryResult> _plugins;
         private readonly Version _appVersion;
         private readonly IPluginStoreContext _context;
         private readonly IDbRepository _dbRepository;
@@ -27,10 +27,6 @@ namespace Lanceur.Infra.Stores
         #endregion Fields
 
         #region Constructors
-
-        public PluginStore() : this(null)
-        {
-        }
 
         private PluginStore(
             IPluginStoreContext context = null,
@@ -48,6 +44,10 @@ namespace Lanceur.Infra.Stores
             _log = l.GetLogger<PluginStore>(_logFactory);
 
             _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+        }
+
+        public PluginStore() : this(null)
+        {
         }
 
         #endregion Constructors

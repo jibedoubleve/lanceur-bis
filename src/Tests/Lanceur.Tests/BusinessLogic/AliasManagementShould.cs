@@ -8,7 +8,6 @@ using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Tests.SQLite;
 using NSubstitute;
 using System.Data.SQLite;
-using Windows.Devices.Portable;
 using Xunit;
 using static Lanceur.SharedKernel.Constants;
 
@@ -36,7 +35,7 @@ namespace Lanceur.Tests.BusinessLogic
 
         private static AliasDbAction BuildAliasDbAction(SQLiteConnection connection)
         {
-            var scope = new SQLiteDbConnectionManager(connection);
+            var scope = new SQLiteSingleConnectionManager(connection);
             var log = Substitute.For<IAppLoggerFactory>();
             var action = new AliasDbAction(scope, log);
             return action;
@@ -44,58 +43,11 @@ namespace Lanceur.Tests.BusinessLogic
 
         private static SQLiteRepository BuildDataService(SQLiteConnection connection)
         {
-            var scope = new SQLiteDbConnectionManager(connection);
+            var scope = new SQLiteSingleConnectionManager(connection);
             var log = Substitute.For<IAppLoggerFactory>();
             var conv = Substitute.For<IConvertionService>();
             var service = new SQLiteRepository(scope, log, conv);
             return service;
-        }
-
-        [Fact]
-        public void FindExact()
-        {
-            // ARRANGE
-            var sql = @"
-                insert into alias(id, id_session) values (100, 1); 
-                insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
-                insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
-                insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
-
-            var connection = BuildFreshDb(sql);
-            var action = BuildAliasDbAction(connection);
-
-            // ACT
-            var found = action.GetExact("noname");
-
-            // ASSERT
-            using (new AssertionScope())
-            {
-                found.Should().NotBeNull();
-                found.Name.Should().Be("noname");
-            }
-        }
-
-        [Fact]
-        public void FindNoExact()
-        {
-            // ARRANGE
-            var sql = @"
-                insert into alias(id, id_session) values (100, 1); 
-                insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
-                insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
-                insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
-
-            var connection = BuildFreshDb(sql);
-            var action = BuildAliasDbAction(connection);
-
-            // ACT
-            var found = action.GetExact("nothing");
-
-            // ASSERT
-            using (new AssertionScope())
-            {
-                found.Should().BeNull();
-            }
         }
 
         [Fact]
@@ -142,27 +94,6 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
-        public void CreateAliasVisibleByDefaultUsingService()
-        {
-            // ARRANGE
-            var aliasName = Guid.NewGuid().ToString();
-
-            var connection = BuildFreshDb();
-            var service = BuildDataService(connection);
-
-            var alias1 = BuildAlias(aliasName);
-
-            // ACT
-            service.SaveOrUpdate(ref alias1);
-
-            var sut = service.GetExact(aliasName);
-
-            //ASSERT
-            sut.Should().NotBeNull();
-            sut.IsHidden.Should().Be(false);
-        }
-
-        [Fact]
         public void CreateAliasInvisibleUsingService()
         {
             // ARRANGE
@@ -202,7 +133,7 @@ namespace Lanceur.Tests.BusinessLogic
             const string name1 = "albert";
             const string name2 = "norbert";
             const string name3 = "philibert";
-            
+
             var alias1 = BuildAlias(name1);
             var alias2 = BuildAlias(name2);
             var alias3 = BuildAlias(name3);
@@ -228,6 +159,27 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
+        public void CreateAliasVisibleByDefaultUsingService()
+        {
+            // ARRANGE
+            var aliasName = Guid.NewGuid().ToString();
+
+            var connection = BuildFreshDb();
+            var service = BuildDataService(connection);
+
+            var alias1 = BuildAlias(aliasName);
+
+            // ACT
+            service.SaveOrUpdate(ref alias1);
+
+            var sut = service.GetExact(aliasName);
+
+            //ASSERT
+            sut.Should().NotBeNull();
+            sut.IsHidden.Should().Be(false);
+        }
+
+        [Fact]
         public void CreateAliasWithPrivilegeUsingService()
         {
             var connection = BuildFreshDb();
@@ -241,6 +193,53 @@ namespace Lanceur.Tests.BusinessLogic
             results.Should().HaveCount(1);
 
             results.ElementAt(0).RunAs.Should().Be(RunAs.Admin);
+        }
+
+        [Fact]
+        public void FindExact()
+        {
+            // ARRANGE
+            var sql = @"
+                insert into alias(id, id_session) values (100, 1);
+                insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
+                insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
+                insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
+
+            var connection = BuildFreshDb(sql);
+            var action = BuildAliasDbAction(connection);
+
+            // ACT
+            var found = action.GetExact("noname");
+
+            // ASSERT
+            using (new AssertionScope())
+            {
+                found.Should().NotBeNull();
+                found.Name.Should().Be("noname");
+            }
+        }
+
+        [Fact]
+        public void FindNoExact()
+        {
+            // ARRANGE
+            var sql = @"
+                insert into alias(id, id_session) values (100, 1);
+                insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
+                insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
+                insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
+
+            var connection = BuildFreshDb(sql);
+            var action = BuildAliasDbAction(connection);
+
+            // ACT
+            var found = action.GetExact("nothing");
+
+            // ASSERT
+            using (new AssertionScope())
+            {
+                found.Should().BeNull();
+            }
         }
 
         [Fact]

@@ -59,9 +59,8 @@ namespace Lanceur.Views
 
         public string Name { get; set; }
 
-        public Version Version { get; set; }
-
         public ReactiveCommand<Unit, bool> Uninstall { get; set; }
+        public Version Version { get; set; }
 
         #endregion Properties
 

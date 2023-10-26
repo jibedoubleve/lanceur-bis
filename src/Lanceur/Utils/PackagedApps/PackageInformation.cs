@@ -1,5 +1,4 @@
-﻿using Lanceur.Core.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,16 +26,17 @@ namespace Lanceur.Utils.PackagedApps
             DenyWrite = 0x20,
         }
 
+        public enum PackageVersion
+        {
+            Windows10,
+            Windows81,
+            Windows8,
+            Unknown
+        }
+
         #endregion Enums
 
-
         #region Methods
-
-        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
-        private static extern Hresult SHCreateStreamOnFileEx(string fileName, Stgm grfMode, uint attributes, bool create, IStream reserved, out IStream stream);
-
-        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
-        private static extern Hresult SHLoadIndirectString(string pszSource, StringBuilder pszOutBuf, uint cchOutBuf, IntPtr ppvReserved);
 
         private static string Get(Package package, Func<AppxPackageHelper.IAppxManifestApplication, string> visitor)
         {
@@ -59,6 +59,78 @@ namespace Lanceur.Utils.PackagedApps
             }
             else { return string.Empty; }
         }
+
+        private static PackageVersion InitPackageVersion(string[] namespaces)
+        {
+            var versionFromNamespace = new Dictionary<string, PackageVersion>
+            {
+                {"http://schemas.microsoft.com/appx/manifest/foundation/windows10", PackageVersion.Windows10},
+                {"http://schemas.microsoft.com/appx/2013/manifest", PackageVersion.Windows81},
+                {"http://schemas.microsoft.com/appx/2010/manifest", PackageVersion.Windows8},
+            };
+
+            foreach (var n in versionFromNamespace.Keys)
+            {
+                if (namespaces.Contains(n))
+                {
+                    return versionFromNamespace[n];
+                }
+            }
+
+            //_log.Warning($"Trying to get the package version of the UWP program, but a unknown UWP appmanifest version is returned.");
+
+            return PackageVersion.Unknown;
+        }
+
+        private static string LogoUriFromManifest(AppxPackageHelper.IAppxManifestApplication app, PackageVersion version)
+        {
+            var logoKeyFromVersion = new Dictionary<PackageVersion, string>
+                {
+                    { PackageVersion.Windows10, "Square44x44Logo" },
+                    { PackageVersion.Windows81, "Square30x30Logo" },
+                    { PackageVersion.Windows8, "SmallLogo" },
+                };
+            if (logoKeyFromVersion.ContainsKey(version))
+            {
+                var key = logoKeyFromVersion[version];
+                app.GetStringValue(key, out string logoUri);
+                return logoUri;
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+        private static extern Hresult SHCreateStreamOnFileEx(string fileName, Stgm grfMode, uint attributes, bool create, IStream reserved, out IStream stream);
+
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+        private static extern Hresult SHLoadIndirectString(string pszSource, StringBuilder pszOutBuf, uint cchOutBuf, IntPtr ppvReserved);
+
+        /// http://www.hanselman.com/blog/GetNamespacesFromAnXMLDocumentWithXPathDocumentAndLINQToXML.aspx
+        private static string[] XmlNamespaces(string path)
+        {
+            XDocument z = XDocument.Load(path);
+            if (z.Root != null)
+            {
+                var namespaces = z.Root.Attributes().
+                    Where(a => a.IsNamespaceDeclaration).
+                    GroupBy(
+                        a => a.Name.Namespace == XNamespace.None ? string.Empty : a.Name.LocalName,
+                        a => XNamespace.Get(a.Value)
+                    ).Select(
+                        g => g.First().ToString()
+                    ).ToArray();
+                return namespaces;
+            }
+            else
+            {
+                //_log.Error($"Error occurred while trying to get the XML from '{path}'", new ArgumentNullException());
+                return Array.Empty<string>();
+            }
+        }
+
         internal static string GetAppUserModelId(Package package)
         {
             return Get(package, app =>
@@ -67,9 +139,6 @@ namespace Lanceur.Utils.PackagedApps
                 return result;
             });
         }
-
-        [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]
-        public static extern bool ShouldSystemUseDarkMode();
 
         internal static string GetIcon(Package package)
         {
@@ -86,6 +155,7 @@ namespace Lanceur.Utils.PackagedApps
                 return LogoPathFromUri(relativeUri, location, theme, version);
             });
         }
+
         internal static string LogoPathFromUri(string uri, string location, string theme, PackageVersion version)
         {
             // all https://msdn.microsoft.com/windows/uwp/controls-and-patterns/tiles-and-notifications-app-assets
@@ -180,77 +250,10 @@ namespace Lanceur.Utils.PackagedApps
                 return string.Empty;
             }
         }
-        public enum PackageVersion
-        {
-            Windows10,
-            Windows81,
-            Windows8,
-            Unknown
-        }
-        private static PackageVersion InitPackageVersion(string[] namespaces)
-        {
-            var versionFromNamespace = new Dictionary<string, PackageVersion>
-            {
-                {"http://schemas.microsoft.com/appx/manifest/foundation/windows10", PackageVersion.Windows10},
-                {"http://schemas.microsoft.com/appx/2013/manifest", PackageVersion.Windows81},
-                {"http://schemas.microsoft.com/appx/2010/manifest", PackageVersion.Windows8},
-            };
 
-            foreach (var n in versionFromNamespace.Keys)
-            {
-                if (namespaces.Contains(n))
-                {
-                    return versionFromNamespace[n];
-                }
-            }
+        [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]
+        public static extern bool ShouldSystemUseDarkMode();
 
-            //_log.Warning($"Trying to get the package version of the UWP program, but a unknown UWP appmanifest version is returned.");
-
-            return PackageVersion.Unknown;
-        }
-        /// http://www.hanselman.com/blog/GetNamespacesFromAnXMLDocumentWithXPathDocumentAndLINQToXML.aspx
-        private static string[] XmlNamespaces(string path)
-        {
-            XDocument z = XDocument.Load(path);
-            if (z.Root != null)
-            {
-                var namespaces = z.Root.Attributes().
-                    Where(a => a.IsNamespaceDeclaration).
-                    GroupBy(
-                        a => a.Name.Namespace == XNamespace.None ? string.Empty : a.Name.LocalName,
-                        a => XNamespace.Get(a.Value)
-                    ).Select(
-                        g => g.First().ToString()
-                    ).ToArray();
-                return namespaces;
-            }
-            else
-            {
-                //_log.Error($"Error occurred while trying to get the XML from '{path}'", new ArgumentNullException());
-                return Array.Empty<string>();
-            }
-        }
-
-
-        private static string LogoUriFromManifest(AppxPackageHelper.IAppxManifestApplication app, PackageVersion version)
-        {
-            var logoKeyFromVersion = new Dictionary<PackageVersion, string>
-                {
-                    { PackageVersion.Windows10, "Square44x44Logo" },
-                    { PackageVersion.Windows81, "Square30x30Logo" },
-                    { PackageVersion.Windows8, "SmallLogo" },
-                };
-            if (logoKeyFromVersion.ContainsKey(version))
-            {
-                var key = logoKeyFromVersion[version];
-                app.GetStringValue(key, out string logoUri);
-                return logoUri;
-            }
-            else
-            {
-                return string.Empty;
-            }
-        }
         #endregion Methods
     }
 }

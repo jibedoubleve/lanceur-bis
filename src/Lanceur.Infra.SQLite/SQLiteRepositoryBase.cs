@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Infra.SQLite
 {
-    public abstract class SQLiteRepositoryBase 
+    public abstract class SQLiteRepositoryBase
     {
         #region Constructors
 

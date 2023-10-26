@@ -49,13 +49,13 @@ public class PluginsViewModel : RoutableViewModel
         notify ??= l.GetService<IUserNotification>();
 
         var schedulers1 = schedulers ?? l.GetService<ISchedulerProvider>();
-        _uninstaller              = uninstaller            ?? l.GetService<IPluginUninstaller>();
+        _uninstaller = uninstaller ?? l.GetService<IPluginUninstaller>();
         _pluginManifestRepository = pluginConfigRepository ?? l.GetService<IPluginManifestRepository>();
-        _notification             = notification           ?? l.GetService<INotification>();
-        _restart                  = restart                ?? l.GetService<IAppRestart>();
-        _pluginInstaller          = pluginInstaller        ?? l.GetService<IPluginInstaller>();
+        _notification = notification ?? l.GetService<INotification>();
+        _restart = restart ?? l.GetService<IAppRestart>();
+        _pluginInstaller = pluginInstaller ?? l.GetService<IPluginInstaller>();
 
-        _askFile    = Interactions.SelectFile(schedulers1.MainThreadScheduler);
+        _askFile = Interactions.SelectFile(schedulers1.MainThreadScheduler);
         _askWebFile = new();
 
         Activate = ReactiveCommand.Create(OnActivate,

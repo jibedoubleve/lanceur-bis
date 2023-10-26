@@ -1,9 +1,7 @@
-﻿using System.IO;
-using System.Reflection;
-using Lanceur.SharedKernel.Mixins;
+﻿using Lanceur.SharedKernel.Mixins;
 using Microsoft.Toolkit.Uwp.Notifications;
+using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Windows.Shapes;
 using FileLocation = System.IO.Path;
 
 namespace Lanceur.Ui;
@@ -67,8 +65,8 @@ public class ToastNotification : INotification
 
         public static string Error { get; }
         public static string Info { get; }
-        public static string Warn { get; }
         public static string None => string.Empty;
+        public static string Warn { get; }
 
         #endregion Properties
     };

@@ -4,8 +4,8 @@
     {
         #region Properties
 
-        public string Url { get; set; }
         public string Dll { get; set; }
+        public string Url { get; set; }
 
         #endregion Properties
     }

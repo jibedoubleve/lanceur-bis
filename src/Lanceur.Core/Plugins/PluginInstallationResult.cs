@@ -1,5 +1,3 @@
-using Lanceur.SharedKernel.Mixins;
-
 namespace Lanceur.Core.Plugins;
 
 public class PluginInstallationResult
@@ -21,10 +19,8 @@ public class PluginInstallationResult
 
     public string ErrorMessage { get; }
 
-    public bool IsUpdate { get; }
-
     public bool IsInstallationSuccess { get; }
-
+    public bool IsUpdate { get; }
     public IPluginManifest PluginManifest { get; }
 
     #endregion Properties

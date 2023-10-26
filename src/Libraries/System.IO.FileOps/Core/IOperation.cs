@@ -2,15 +2,15 @@ namespace System.IO.FileOps.Core;
 
 public interface IOperation
 {
-    #region Public properties
+    #region Properties
 
     public Dictionary<string, string> Parameters { get; }
 
-    #endregion
+    #endregion Properties
 
-    #region Public methods
+    #region Methods
 
     Task ProcessAsync();
 
-    #endregion
+    #endregion Methods
 }

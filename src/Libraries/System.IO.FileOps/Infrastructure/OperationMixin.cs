@@ -7,10 +7,16 @@ namespace System.IO.FileOps.Infrastructure;
 
 public static class OperationMixin
 {
+    #region Fields
+
     private static readonly IEnumerable<Type> Types =
         Assembly.GetAssembly(typeof(AbstractOperation))?.GetTypes()
         ?? Type.EmptyTypes;
-    
+
+    #endregion Fields
+
+    #region Methods
+
     public static IOperation AsOperation(this OperationConfiguration cfg)
     {
         var type =
@@ -22,4 +28,6 @@ public static class OperationMixin
 
         return (IOperation)Activator.CreateInstance(type, cfg.Parameters)!;
     }
+
+    #endregion Methods
 }

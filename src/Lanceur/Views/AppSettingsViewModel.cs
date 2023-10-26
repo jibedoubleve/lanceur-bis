@@ -28,8 +28,8 @@ namespace Lanceur.Views
         private readonly INotification _notification;
         private readonly IAppRestart _restart;
         private readonly ISchedulerProvider _schedulers;
-        private readonly ISettingsFacade _settingsFacade;
         private readonly IDbRepository _service;
+        private readonly ISettingsFacade _settingsFacade;
 
         #endregion Fields
 

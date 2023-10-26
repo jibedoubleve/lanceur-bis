@@ -2,9 +2,9 @@ namespace System.IO.FileOps.Test.Helpers;
 
 public static class StringHelper
 {
-    #region Public properties
+    #region Properties
 
     public static string Random => Guid.NewGuid().ToString();
 
-    #endregion
+    #endregion Properties
 }

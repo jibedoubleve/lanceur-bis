@@ -248,7 +248,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
             if (enumerable.Length != 1) return;
 
             var item = enumerable.ElementAt(0);
-            alias.Id    = item.Id;
+            alias.Id = item.Id;
             alias.Count = (int)item.Count;
         });
     }

@@ -21,7 +21,7 @@ namespace Lanceur.Tests.BusinessLogic
         [InlineData("Hello $r$", "", "Hello ")]
         [InlineData("Hello $r$", "`", "Hello `")]
         //
-        [InlineData("$R$", "", "")]        
+        [InlineData("$R$", "", "")]
         [InlineData("$R$", null, "")]
         [InlineData("Hello $R$", "world", "Hello world")]
         [InlineData("Number $R$", "1", "Number 1")]

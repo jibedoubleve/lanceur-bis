@@ -1,10 +1,5 @@
-﻿using Lanceur.SharedKernel.Mixins;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using static Lanceur.SharedKernel.Constants;
 
@@ -12,6 +7,8 @@ namespace Lanceur.Converters
 {
     public class StringToStartModeConverter : IValueConverter
     {
+        #region Methods
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is StartMode startMode)
@@ -41,5 +38,7 @@ namespace Lanceur.Converters
             }
             else { return null; }
         }
+
+        #endregion Methods
     }
 }

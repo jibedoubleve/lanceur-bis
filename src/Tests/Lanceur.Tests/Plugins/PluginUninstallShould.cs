@@ -9,9 +9,11 @@ namespace Lanceur.Tests.Plugins;
 
 public class PluginUninstallShould
 {
+    #region Methods
+
     [Fact]
     public async Task NotDisplayCandidateToUninstall()
-    { 
+    {
         // ARRANGE
         var manifest = new PluginManifest() { Dll = "A", Version = new("1.0.0") };
         var localManifests = new IPluginManifest[]
@@ -34,6 +36,8 @@ public class PluginUninstallShould
         var installablePlugins = await repository.GetPluginListAsync(new[] { manifest });
 
         // ASSERT
-        installablePlugins.Should().NotBeEmpty(); 
+        installablePlugins.Should().NotBeEmpty();
     }
+
+    #endregion Methods
 }

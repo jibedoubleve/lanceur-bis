@@ -6,11 +6,13 @@ internal class RemoveDirectoryOperation : AbstractOperation, IOperation
 {
     #region Constructors
 
-    public RemoveDirectoryOperation(Dictionary<string, string> parameters) : base("rmdir", parameters) { }
+    public RemoveDirectoryOperation(Dictionary<string, string> parameters) : base("rmdir", parameters)
+    {
+    }
 
-    #endregion
+    #endregion Constructors
 
-    #region Public methods
+    #region Methods
 
     public Task ProcessAsync()
     {
@@ -21,5 +23,5 @@ internal class RemoveDirectoryOperation : AbstractOperation, IOperation
         return Task.CompletedTask;
     }
 
-    #endregion
+    #endregion Methods
 }

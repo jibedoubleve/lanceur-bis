@@ -4,7 +4,7 @@ namespace System.IO.FileOps.Infrastructure.Operations;
 
 public static class OperationFactory
 {
-    #region Public methods
+    #region Methods
 
     public static OperationConfiguration MoveDirectory(string source, string destination)
     {
@@ -47,5 +47,5 @@ public static class OperationFactory
         };
     }
 
-    #endregion
+    #endregion Methods
 }

@@ -2,9 +2,9 @@ namespace System.IO.FileOps.Core;
 
 public class SchedulerState
 {
-    #region Public properties
+    #region Properties
 
     public int OperationCount { get; internal set; }
 
-    #endregion
+    #endregion Properties
 }

@@ -97,7 +97,6 @@ namespace Lanceur.Tests.ViewModels
                 var searchService = Substitute.For<ISearchService>();
                 var results = MainViewModelTestHelper.BuildResults(5);
 
-
                 searchService
                     .Search(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { results.First() });

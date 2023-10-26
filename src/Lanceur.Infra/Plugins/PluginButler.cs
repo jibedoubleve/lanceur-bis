@@ -1,11 +1,11 @@
-using System.IO.Compression;
 using Lanceur.Core.Plugins;
-using System.IO.FileOps.Core;
-using System.IO.FileOps.Infrastructure;
-using System.IO.FileOps.Infrastructure.Operations;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
+using System.IO.Compression;
+using System.IO.FileOps.Core;
+using System.IO.FileOps.Infrastructure;
+using System.IO.FileOps.Infrastructure.Operations;
 
 namespace Lanceur.Infra.Plugins;
 
@@ -29,6 +29,21 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
 
     #endregion Fields
 
+    #region Constructors
+
+    public PluginButler(
+            IAppLoggerFactory appLoggerFactory,
+            IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule)
+    {
+        ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
+        ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
+
+        _pluginValidationRule = pluginValidationRule;
+        _log = appLoggerFactory.GetLogger<PluginButler>();
+    }
+
+    #endregion Constructors
+
     #region Properties
 
     /// <summary>
@@ -38,25 +53,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
 
     #endregion Properties
 
-    #region Constructors
-
-    public PluginButler(
-        IAppLoggerFactory appLoggerFactory,
-        IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule)
-    {
-        ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
-        ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
-
-        _pluginValidationRule = pluginValidationRule;
-        _log                  = appLoggerFactory.GetLogger<PluginButler>();
-    }
-
-    #endregion Constructor
-
     #region Methods
-
-    private async Task<IOperationScheduler> GetOperationSchedulerAsync() =>
-        await OperationSchedulerFactory.RetrieveFromFileAsync(Locations.MaintenanceLogBookPath);
 
     private static void AddCandidate(IPluginManifest manifest)
     {
@@ -80,7 +77,8 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         MutableUninstallationCandidates.Remove(dir);
     }
 
-    #endregion Methods
+    private async Task<IOperationScheduler> GetOperationSchedulerAsync() =>
+                await OperationSchedulerFactory.RetrieveFromFileAsync(Locations.MaintenanceLogBookPath);
 
     public async Task ExecutePlanAsync()
     {
@@ -93,8 +91,6 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         var os = await GetOperationSchedulerAsync();
         return os.GetState().OperationCount > 0;
     }
-
-    #region Installation methods
 
     public async Task<PluginInstallationResult> SubscribeForInstallAsync(string packagePath)
     {
@@ -110,9 +106,9 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         }
 
         await using var stream = config.Open();
-        using var       reader = new StreamReader(stream);
+        using var reader = new StreamReader(stream);
 
-        var json     = await reader.ReadToEndAsync();
+        var json = await reader.ReadToEndAsync();
         var manifest = JsonConvert.DeserializeObject<PluginManifest>(json);
         RemoveCandidate(manifest);
 
@@ -165,14 +161,9 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         return await SubscribeForInstallAsync(path);
     }
 
-    #endregion
-
-
-    #region Uninstallation Methods
-
     public async Task SubscribeForUninstallAsync(IPluginManifest manifest)
     {
-        var os  = await GetOperationSchedulerAsync();
+        var os = await GetOperationSchedulerAsync();
         var dir = Path.GetDirectoryName(manifest.Dll);
 
         if (dir is null)
@@ -187,5 +178,5 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         await os.SavePlanAsync();
     }
 
-    #endregion Uninstallation Methods
+    #endregion Methods
 }

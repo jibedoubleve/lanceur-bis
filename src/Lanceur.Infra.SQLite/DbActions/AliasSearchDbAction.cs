@@ -5,7 +5,7 @@ using Lanceur.Core.Services;
 namespace Lanceur.Infra.SQLite.DbActions;
 
 public class AliasSearchDbAction
-{  
+{
     #region Fields
 
     private readonly IDbConnectionManager _db;
@@ -13,20 +13,20 @@ public class AliasSearchDbAction
     private readonly MacroDbAction _macroManager;
 
     #endregion Fields
-    
+
     #region Constructors
 
     public AliasSearchDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory, IConvertionService converter)
     {
-        _db  = db;
+        _db = db;
         _log = logFactory.GetLogger<AliasDbAction>();
         _macroManager = new(db, logFactory, converter);
     }
 
     #endregion Constructors
-    
+
     #region Methods
-    
+
     public IEnumerable<AliasQueryResult> Search(string name, long idSession)
     {
         var sql = @$"
@@ -62,6 +62,7 @@ public class AliasSearchDbAction
         results = _macroManager.UpgradeToComposite(results);
         return results ?? AliasQueryResult.NoResult;
     }
+
     public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string name, long idSession)
     {
         var sql = @$"
@@ -98,6 +99,6 @@ public class AliasSearchDbAction
         results = _macroManager.UpgradeToComposite(results);
         return results ?? AliasQueryResult.NoResult;
     }
-    
+
     #endregion Methods
 }

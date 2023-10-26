@@ -1,23 +1,24 @@
-using System.IO.FileOps.Core.Models;
 using Newtonsoft.Json;
+using System.IO.FileOps.Core.Models;
 
 namespace System.IO.FileOps.Infrastructure;
 
 internal class FileOperationScheduler : AbstractOperationScheduler
 {
-    #region Private members
+    #region Fields
 
     private readonly string _fullName;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
-    public FileOperationScheduler(string fullName) { _fullName = fullName; }
+    public FileOperationScheduler(string fullName)
+    { _fullName = fullName; }
 
-    #endregion
+    #endregion Constructors
 
-    #region Public methods
+    #region Methods
 
     public async Task LoadFileAsync()
     {
@@ -44,5 +45,5 @@ internal class FileOperationScheduler : AbstractOperationScheduler
         await File.WriteAllTextAsync(_fullName, json);
     }
 
-    #endregion
+    #endregion Methods
 }

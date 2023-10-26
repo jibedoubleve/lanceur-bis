@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Moq;
 using System.IO.FileOps.Core.Models;
 using System.IO.FileOps.Infrastructure;
 
@@ -7,7 +6,7 @@ namespace System.IO.FileOps.Test.UnitTests;
 
 public class SchedulerShould
 {
-    #region Public methods
+    #region Methods
 
     [Fact]
     public async Task CreateOperation_WhenSaved()
@@ -31,5 +30,5 @@ public class SchedulerShould
                  .Should().Be(3);
     }
 
-    #endregion
+    #endregion Methods
 }

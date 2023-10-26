@@ -5,12 +5,22 @@ using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using Windows.ApplicationModel;
 using Windows.Management.Deployment;
 
 namespace Lanceur.Utils.PackagedApps
 {
+    public static class PackageMixin
+    {
+        #region Methods
+
+        public static bool HasInstallationPath(this Package package) => Directory.Exists(package.InstalledPath);
+
+        public static bool IsInDirectory(this Package package, string directory) => directory?.Contains(package.InstalledPath) ?? false;
+
+        #endregion Methods
+    }
+
     public class PackagedAppManager : IPackagedAppManager
     {
         #region Fields
@@ -90,11 +100,5 @@ namespace Lanceur.Utils.PackagedApps
         public async Task<bool> IsPackageAsync(string fileName) => await GetPackageUniqueIdAsync(fileName) != string.Empty;
 
         #endregion Methods
-    }
-
-    public static class PackageMixin
-    {
-        public static bool HasInstallationPath(this Package package) => Directory.Exists(package.InstalledPath);
-        public static bool IsInDirectory(this Package package, string directory) => directory?.Contains(package.InstalledPath) ?? false;
     }
 }

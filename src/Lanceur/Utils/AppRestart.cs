@@ -1,5 +1,4 @@
 ﻿using Lanceur.SharedKernel.Utils;
-using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -26,7 +25,7 @@ namespace Lanceur.Utils
         #region Methods
 
         public void Restart()
-        {            
+        {
             _mutex.ReleaseMutex();
 
             var process = Assembly.GetEntryAssembly().Location.Replace("dll", "exe");

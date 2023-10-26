@@ -45,38 +45,6 @@ namespace Lanceur.Tests.BusinessLogic
 
         #region Methods
 
-        [Fact]
-        public void ReturnsNotChangedWhenNoChange()
-        {
-            // ARRANGE
-            // First state
-            var dbPath = Guid.NewGuid().ToString();
-            AppConfig initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
-            var initialDbPath = dbPath;
-
-            // Second state
-            AppConfig secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
-            var secondDbPath = dbPath;
-
-            // Setup SettingsFacade
-            var databaseConfig = Substitute.For<IDatabaseConfig>();
-            databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
-            
-            var databaseConfigRepository = Substitute.For<IDatabaseConfigRepository>();
-            databaseConfigRepository.Current.Returns(databaseConfig);
-
-            var appConfigRepository = Substitute.For<IAppConfigRepository>();
-            appConfigRepository.Current.Returns(initialAppConfig, secondAppConfig);
-
-            var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
-
-            // ACT
-            var memento = SettingsMementoManager.InitialState(settingsFacade);
-
-            // ASSERT
-            memento.HasStateChanged(settingsFacade).Should().BeFalse();
-        }
-
         [Theory]
         // Should show state changed
         [InlineData("Key", "100", "", true)]
@@ -107,11 +75,10 @@ namespace Lanceur.Tests.BusinessLogic
             var secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(newJson);
             secondDbPath = secondDbPath.IsNullOrWhiteSpace() ? dbPath : secondDbPath;
 
-
             // Setup SettingsFacade
             var databaseConfig = Substitute.For<IDatabaseConfig>();
             databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
-            
+
             var databaseConfigRepository = Substitute.For<IDatabaseConfigRepository>();
             databaseConfigRepository.Current.Returns(databaseConfig);
 
@@ -122,10 +89,42 @@ namespace Lanceur.Tests.BusinessLogic
 
             // ACT
             var memento = SettingsMementoManager.InitialState(settingsFacade);
-            
+
             // ASSERT
             memento.HasStateChanged(settingsFacade)
                    .Should().Be(isStateChanged);
+        }
+
+        [Fact]
+        public void ReturnsNotChangedWhenNoChange()
+        {
+            // ARRANGE
+            // First state
+            var dbPath = Guid.NewGuid().ToString();
+            AppConfig initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
+            var initialDbPath = dbPath;
+
+            // Second state
+            AppConfig secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
+            var secondDbPath = dbPath;
+
+            // Setup SettingsFacade
+            var databaseConfig = Substitute.For<IDatabaseConfig>();
+            databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
+
+            var databaseConfigRepository = Substitute.For<IDatabaseConfigRepository>();
+            databaseConfigRepository.Current.Returns(databaseConfig);
+
+            var appConfigRepository = Substitute.For<IAppConfigRepository>();
+            appConfigRepository.Current.Returns(initialAppConfig, secondAppConfig);
+
+            var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
+
+            // ACT
+            var memento = SettingsMementoManager.InitialState(settingsFacade);
+
+            // ASSERT
+            memento.HasStateChanged(settingsFacade).Should().BeFalse();
         }
 
         #endregion Methods

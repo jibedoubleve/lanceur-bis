@@ -18,13 +18,14 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IPluginWebRepository _webRepository;
         private readonly IPluginUninstaller _pluginUninstaller;
+        private readonly IPluginWebRepository _webRepository;
+
         #endregion Fields
 
         #region Constructors
 
-        public PluginFromWebViewModel(IPluginUninstaller pluginUninstaller = null, 
+        public PluginFromWebViewModel(IPluginUninstaller pluginUninstaller = null,
                                       ISchedulerProvider schedulers = null,
                                       IUserNotification notify = null,
                                       IPluginWebRepository webRepository = null)
@@ -49,7 +50,7 @@ namespace Lanceur.Views
 
         #region Properties
 
-        public ReactiveCommand<Unit, ActivationResponse> Activate { get;  }
+        public ReactiveCommand<Unit, ActivationResponse> Activate { get; }
         [Reactive] public ObservableCollection<PluginWebManifestViewModel> PluginManifests { get; set; }
         [Reactive] public PluginWebManifestViewModel SelectedManifest { get; set; }
         [Reactive] public bool SelectionValidated { get; set; } = false;

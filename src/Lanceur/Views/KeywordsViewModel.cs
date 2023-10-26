@@ -84,6 +84,7 @@ namespace Lanceur.Views
 
         #region Properties
 
+        private ReactiveCommand<SearchRequest, IEnumerable<QueryResult>> Search { get; set; }
         public ViewModelActivator Activator { get; } = new();
 
         public IObservableCollection<QueryResult> Aliases { get; } = new ObservableCollectionExtended<QueryResult>();
@@ -101,9 +102,6 @@ namespace Lanceur.Views
         public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; private set; }
 
         public ReactiveCommand<AliasQueryResult, SaveOrUpdateAliasResponse> SaveOrUpdateAlias { get; private set; }
-
-        private ReactiveCommand<SearchRequest, IEnumerable<QueryResult>> Search { get;  set; }
-
         [Reactive] public string SearchQuery { get; set; }
 
         [Reactive] public AliasQueryResult SelectedAlias { get; set; }
@@ -176,7 +174,6 @@ namespace Lanceur.Views
 
             results.Insert(0, request.AliasToCreate);
             return results;
-
         }
 
         private void SetAliases(IEnumerable<QueryResult> x)
@@ -272,18 +269,11 @@ namespace Lanceur.Views
             await Task.Delay(50);
         }
 
+        public void HydrateSelectedAlias() => _aliasService.HydrateAlias(SelectedAlias);
+
         #endregion Methods
 
         #region Classes
-
-        public class SaveOrUpdateAliasResponse
-        {
-            #region Properties
-
-            public IEnumerable<QueryResult> Aliases { get; init; }
-
-            #endregion Properties
-        }
 
         private class SearchRequest
         {
@@ -305,8 +295,15 @@ namespace Lanceur.Views
             #endregion Properties
         }
 
-        #endregion Classes
+        public class SaveOrUpdateAliasResponse
+        {
+            #region Properties
 
-        public void HydrateSelectedAlias() => _aliasService.HydrateAlias(SelectedAlias);
+            public IEnumerable<QueryResult> Aliases { get; init; }
+
+            #endregion Properties
+        }
+
+        #endregion Classes
     }
 }

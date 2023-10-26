@@ -17,15 +17,6 @@ namespace Lanceur.Tests.Libraries
 
         #region Methods
 
-        [Fact]
-        public void ReturnLatestVersionOfScripts()
-        {
-            var version = new Version(0, 2, 1);
-            var manager = new ScriptManager(asm, pattern);
-
-            manager.GetScripts().MaxVersion().Should().Be(version);
-        }
-
         [Theory]
         [InlineData("0.1", 2)]
         [InlineData("0.2", 1)]
@@ -45,6 +36,70 @@ namespace Lanceur.Tests.Libraries
             counter.Should().Be(expectedCount);
         }
 
+        [Fact]
+        public void GetListOfResources()
+        {
+            var manager = new ScriptManager(asm, pattern);
+
+            manager.ListResources().Should().HaveCount(COUNT);
+        }
+
+        [Fact]
+        public void HaveResourceWithSpecifiedVersion()
+        {
+            var manager = new ScriptManager(asm, pattern);
+
+            manager.GetResource("Lanceur.Tests.Libraries.Scripts.script-0.1.sql").Should().NotBeNull();
+        }
+
+        [Fact]
+        public void HaveSQL()
+        {
+            var manager = new ScriptManager(asm, pattern);
+
+            foreach (var script in manager.GetScripts())
+            {
+                script.Should().NotBeNullOrEmpty();
+            }
+        }
+
+        [Fact]
+        public void ReturnDictionaryOfResources()
+        {
+            var manager = new ScriptManager(asm, pattern);
+            manager.GetResources().Should().HaveCount(COUNT);
+        }
+
+        [Fact]
+        public void ReturnLatestVersionOfScripts()
+        {
+            var version = new Version(0, 2, 1);
+            var manager = new ScriptManager(asm, pattern);
+
+            manager.GetScripts().MaxVersion().Should().Be(version);
+        }
+
+        [Fact]
+        public void ReturnPackOfScripts()
+        {
+            var manager = new ScriptManager(asm, pattern);
+            manager.GetScripts().Should().HaveCount(COUNT);
+        }
+
+        [Theory]
+        [InlineData("0.1")]
+        [InlineData("0.2")]
+        [InlineData("0.2.1")]
+        public void ReturnScriptFromVersion(string version)
+        {
+            var ver = new Version(version);
+            var manager = new ScriptManager(asm, pattern);
+
+            var scripts = manager.GetScripts();
+
+            scripts[ver].Should().NotBeNull();
+        }
+
         [Theory]
         [InlineData("1.0.0", 2)]
         [InlineData("1.0.1", 1)]
@@ -62,61 +117,6 @@ namespace Lanceur.Tests.Libraries
             scripts.After(new Version(version)).Should().HaveCount(count);
         }
 
-    [Fact]
-    public void GetListOfResources()
-    {
-        var manager = new ScriptManager(asm, pattern);
-
-        manager.ListResources().Should().HaveCount(COUNT);
+        #endregion Methods
     }
-
-    [Fact]
-    public void HaveResourceWithSpecifiedVersion()
-    {
-        var manager = new ScriptManager(asm, pattern);
-
-        manager.GetResource("Lanceur.Tests.Libraries.Scripts.script-0.1.sql").Should().NotBeNull();
-    }
-
-    [Fact]
-    public void HaveSQL()
-    {
-        var manager = new ScriptManager(asm, pattern);
-
-        foreach (var script in manager.GetScripts())
-        {
-            script.Should().NotBeNullOrEmpty();
-        }
-    }
-
-    [Fact]
-    public void ReturnDictionaryOfResources()
-    {
-        var manager = new ScriptManager(asm, pattern);
-        manager.GetResources().Should().HaveCount(COUNT);
-    }
-
-    [Fact]
-    public void ReturnPackOfScripts()
-    {
-        var manager = new ScriptManager(asm, pattern);
-        manager.GetScripts().Should().HaveCount(COUNT);
-    }
-
-    [Theory]
-    [InlineData("0.1")]
-    [InlineData("0.2")]
-    [InlineData("0.2.1")]
-    public void ReturnScriptFromVersion(string version)
-    {
-        var ver = new Version(version);
-        var manager = new ScriptManager(asm, pattern);
-
-        var scripts = manager.GetScripts();
-
-        scripts[ver].Should().NotBeNull();
-    }
-
-    #endregion Methods
-}
 }

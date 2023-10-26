@@ -12,6 +12,8 @@ namespace Lanceur.Infra.Plugins
 
         #endregion Fields
 
+        #region Constructors
+
         /// <summary>
         /// Get an instance of <see cref="PluginWebRepository"/>
         /// </summary>
@@ -25,6 +27,8 @@ namespace Lanceur.Infra.Plugins
             _webPluginManifestLoader = webPluginManifestLoader;
         }
 
+        #endregion Constructors
+
         #region Methods
 
         /// <inheritdoc />
@@ -37,15 +41,15 @@ namespace Lanceur.Infra.Plugins
             var plugins = from i in installedPlugins
                           where uninstallationCandidates.All(x => x.Dll != i.Dll)
                           select i;
-            
-            // If a plugin is already installed but web version is 
+
+            // If a plugin is already installed but web version is
             // newer, then show this new plugin
             return (from p in webPlugins
-                where false == plugins.Any(
-                    x => x.Dll == p.Dll 
-                         && x.Version >= p.Version
-                )
-                select p).ToArray();
+                    where false == plugins.Any(
+                        x => x.Dll == p.Dll
+                             && x.Version >= p.Version
+                    )
+                    select p).ToArray();
         }
 
         #endregion Methods

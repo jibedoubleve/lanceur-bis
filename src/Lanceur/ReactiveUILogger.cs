@@ -6,7 +6,6 @@ using ILogger = Splat.ILogger;
 using LogLevel = Splat.LogLevel;
 using NLogLevel = NLog.LogLevel;
 
-
 namespace Lanceur
 {
     internal class ReactiveUILogger : ILogger

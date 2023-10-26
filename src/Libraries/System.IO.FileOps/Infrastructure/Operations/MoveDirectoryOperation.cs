@@ -9,9 +9,9 @@ internal class MoveDirectoryOperation : AbstractOperation, IOperation
     public MoveDirectoryOperation(Dictionary<string, string> parameters)
         : base(typeof(MoveDirectoryOperation).FullName!, parameters) { }
 
-    #endregion
+    #endregion Constructors
 
-    #region Public methods
+    #region Methods
 
     public Task ProcessAsync()
     {
@@ -24,5 +24,5 @@ internal class MoveDirectoryOperation : AbstractOperation, IOperation
         return Task.CompletedTask;
     }
 
-    #endregion
+    #endregion Methods
 }

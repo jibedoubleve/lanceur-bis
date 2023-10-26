@@ -26,6 +26,7 @@ namespace Lanceur.Ui
         #endregion Constructors
 
         #region Methods
+
         /// <summary>
         /// Launch a thread to refresh the thumbnails and returns just after. Each time an thumbnail is found
         /// the alias is updated and (because the alias is reactive) the UI should be updated.

@@ -17,7 +17,7 @@ namespace Lanceur.Models
         public static IEnumerable<QueryResult> SetIconForCurrentTheme(this IEnumerable<QueryResult> result, bool isLight)
         {
             var oldValue = isLight ? Dark : Light;
-            var newValue = isLight ? Light : Dark; 
+            var newValue = isLight ? Light : Dark;
 
             foreach (var item in result)
             {

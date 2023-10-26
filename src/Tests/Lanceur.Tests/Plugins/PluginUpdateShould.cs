@@ -23,7 +23,7 @@ public class PluginUpdateShould
         {
             new PluginManifest() { Dll = "A", Version = new(localVersion) }
         });
-        
+
         var webManifestRepository = Substitute.For<IPluginWebManifestLoader>();
         webManifestRepository.LoadFromWebAsync().Returns(new IPluginWebManifest[]
         {

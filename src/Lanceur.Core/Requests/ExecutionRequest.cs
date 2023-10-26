@@ -5,10 +5,12 @@ namespace Lanceur.Core.Requests
     public class ExecutionRequest
     {
         #region Properties
-        public string Query { get; set; }
-        public bool ExecuteWithPrivilege { get; set; }
-        public QueryResult QueryResult { get; set; } 
+
+        public bool ExecuteWithPrivilege { get; init; }
+        public string Query { get; init; }
+        public QueryResult QueryResult { get; init; }
 
         #endregion Properties
+
     }
 }
