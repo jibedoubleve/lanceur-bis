@@ -13,6 +13,12 @@ namespace Lanceur.ReservedKeywords
     [ReservedAlias("version"), Description("Indicates the version of the application")]
     public class VersionAlias : SelfExecutableQueryResult
     {
+        #region Properties
+
+        public override string Icon => "InformationOutline";
+
+        #endregion Properties
+
         #region Methods
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)

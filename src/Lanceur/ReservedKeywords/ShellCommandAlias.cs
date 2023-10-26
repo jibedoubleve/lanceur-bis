@@ -11,6 +11,12 @@ namespace Lanceur.ReservedKeywords
     [ReservedAlias(">"), Description("execute the parameters in PowerShell")]
     internal class ShellCommandAlias : SelfExecutableQueryResult
     {
+        #region Properties
+
+        public override string Icon => "ConsoleLine";
+
+        #endregion Properties
+
         #region Methods
 
         private IEnumerable<QueryResult> Execute(Cmdline cmdline)

@@ -4,19 +4,19 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class GetAllAliasDbAction: IDisposable
+public class GetAllAliasDbAction
 {
     
     #region Fields
 
-    private readonly SQLiteConnectionScope _db;
+    private readonly ISQLiteConnectionScope _db;
     private readonly IAppLogger _log;
 
     #endregion Fields
     
     #region Constructors
 
-    public GetAllAliasDbAction(SQLiteConnectionScope db, IAppLoggerFactory logFactory)
+    public GetAllAliasDbAction(ISQLiteConnectionScope db, IAppLoggerFactory logFactory)
     {
         _db  = db;
         _log = logFactory.GetLogger<AliasDbAction>();
@@ -26,9 +26,7 @@ public class GetAllAliasDbAction: IDisposable
     
     #region Methods
     
-    public void Dispose() => _db.Dispose();
-    
-    public IEnumerable<AliasQueryResult> GetAll(long idSession)
+    public IEnumerable<AliasQueryResult> GetAll(long? idSession = null)
     {
         var sql = @$"
                 select
@@ -48,23 +46,28 @@ public class GetAllAliasDbAction: IDisposable
                     alias a
                     left join alias_name an            on a.id         = an.id_alias
                     left join stat_execution_count_v c on c.id_keyword = a.id
-                    inner join data_alias_synonyms_v s on s.id_alias   = a.id
+                    inner join data_alias_synonyms_v s on s.id_alias   = a.id";
+        if (idSession.HasValue)
+        {
+         sql += @"
                 where
-                    a.id_session = @idSession
-                    and a.hidden = 0
+                  a.id_session = @idSession
+                  and a.hidden = 0";
+        }
+        sql += @"
                 order by
-                    c.exec_count desc,
-                    an.name";
+                  c.exec_count desc,
+                  an.name";
         var parameters = new { idSession };
 
         var result =
-            _db.Connection.Query<AliasQueryResult>(sql, parameters);
+            _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, parameters));
         return result ?? AliasQueryResult.NoResult;
     }
     
     public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(long idSession)
     {
-        var sql = @$"
+        const string sql = @$"
                 select
                     an.Name || ':' || aa.name         as {nameof(AliasQueryResult.Name)},
                     a.Id                              as {nameof(AliasQueryResult.Id)},
@@ -93,7 +96,7 @@ public class GetAllAliasDbAction: IDisposable
         var parameters = new { idSession };
 
         var result =
-            _db.Connection.Query<AliasQueryResult>(sql, parameters);
+            _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, parameters));
         return result ?? AliasQueryResult.NoResult;
     }
     

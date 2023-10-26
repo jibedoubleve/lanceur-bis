@@ -4,17 +4,23 @@
     {
         #region Constructors
 
-        public SelfExecutableQueryResult()
-        {
-        }
-
-        public SelfExecutableQueryResult(string name, string description)
+        protected SelfExecutableQueryResult(string name, string description)
         {
             Name = name;
             Description = description;
         }
 
+        protected SelfExecutableQueryResult()
+        {
+        }
+
         #endregion Constructors
+
+        #region Properties
+
+        public override string Icon => "Console";
+
+        #endregion Properties
 
         #region Methods
 

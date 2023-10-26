@@ -234,8 +234,9 @@ namespace Lanceur.Views
             var hash = CurrentAlias?.GetHashCode() ?? 0;
             var currentAlias = (from r in Results
                                 where r.GetHashCode() == hash
-                                select r).SingleOrDefault();
-            return currentAlias;
+                                select r).ToArray();
+            
+            return currentAlias.SingleOrDefault();
         }
 
         private AliasResponse OnActivate()

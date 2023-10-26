@@ -34,6 +34,12 @@ namespace Lanceur.ReservedKeywords
 
         #endregion Constructors
 
+        #region Properties
+
+        public override string Icon => "AccountSwitch";
+
+        #endregion Properties
+
         #region Methods
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)

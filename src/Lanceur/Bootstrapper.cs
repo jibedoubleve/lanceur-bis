@@ -30,6 +30,7 @@ using System;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
+using Lanceur.Infra.SQLite.Helpers;
 
 namespace Lanceur;
 
@@ -77,7 +78,7 @@ public class Bootstrapper
 #else
         l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
 #endif
-        l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<SQLiteConnectionScope>()));
+        l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<ISQLiteConnectionScope>()));
         l.RegisterLazySingleton<ISettingsFacade>(() =>
                                                      new SettingsFacade(Get<IDatabaseConfigRepository>(),
                                                                         Get<IAppConfigRepository>()));
@@ -92,9 +93,11 @@ public class Bootstrapper
                                                                  Get<IDbRepository>(),
                                                                  Get<ICmdlineManager>()));
         l.Register<IDbRepository>(() =>
-                                      new SQLiteRepository(Get<SQLiteConnectionScope>(),
+                                      new SQLiteRepository(Get<ISQLiteConnectionScope>(),
                                                            Get<IAppLoggerFactory>(),
                                                            Get<IConvertionService>()));
+        l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(Get<ISQLiteConnectionScope>(),
+                                                                               Get<IAppLoggerFactory>()));
         l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
         l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
         l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
@@ -132,19 +135,22 @@ public class Bootstrapper
                                            Get<IDataStoreUpdateManager>()));
 
         l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
-        l.Register(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
+        
+#if DEBUG
+        l.Register<ISQLiteConnectionScope>(() => new SQLiteConnectionScopeTest(Get<SQLiteConnection>()));
+#else
+        l.Register<ISQLiteConnectionScope>(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
+#endif
         l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
 
-        l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<SQLiteConnectionScope>())));
+        l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<ISQLiteConnectionScope>())));
 
         l.Register((Func<IDataStoreUpdateManager>)(() =>
                        new SQLiteDatabaseUpdateManager(
                            Get<IDataStoreVersionManager>(),
-                           Get<SQLiteConnectionScope>(),
+                           Get<SQLiteConnection>(),
                            ScriptRepository.Asm,
-                           ScriptRepository.DbScriptEmbededResourcePattern)
-                   )
-        );
+                           ScriptRepository.DbScriptEmbededResourcePattern)));
     }
 
     private static void RegisterViewModels()

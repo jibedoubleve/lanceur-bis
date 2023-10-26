@@ -4,19 +4,19 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
-    public class SetUsageDbAction : IDisposable
+    public class SetUsageDbAction
     {
         #region Fields
 
         private readonly AliasDbAction _aliasDbAction;
-        private readonly SQLiteConnectionScope _db;
+        private readonly ISQLiteConnectionScope _db;
         private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public SetUsageDbAction(SQLiteConnectionScope db, IAppLoggerFactory logFactory)
+        public SetUsageDbAction(ISQLiteConnectionScope db, IAppLoggerFactory logFactory)
         {
             _db = db;
             _log = logFactory.GetLogger<AliasDbAction>();
@@ -27,8 +27,6 @@ namespace Lanceur.Infra.SQLite.DbActions
         #endregion Constructors
 
         #region Methods
-
-        public void Dispose() => _db.Dispose();
 
         public void SetUsage(ref QueryResult alias, long idSession)
         {
@@ -41,7 +39,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 else { _aliasDbAction.CreateInvisible(ref alias); }
             }
 
-            var sql = @"
+            const string sql = @"
                     insert into alias_usage (
                         id_alias,
                         id_session,
@@ -52,7 +50,9 @@ namespace Lanceur.Infra.SQLite.DbActions
                         @idSession,
                         @now
                     )";
-            _db.Connection.Execute(sql, new { idAlias = alias.Id, idSession, now = DateTime.Now });
+
+            var param = new { idAlias = alias.Id, idSession, now = DateTime.Now };
+            _db.WithinTransaction(tx => tx.Connection.Execute(sql, param));
             alias.Count++;
         }
 

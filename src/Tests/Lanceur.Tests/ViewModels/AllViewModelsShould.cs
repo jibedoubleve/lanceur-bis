@@ -33,7 +33,7 @@ namespace Lanceur.Tests.ViewModels
         [InlineData(typeof(SessionsViewModel))]
         [InlineData(typeof(SettingsViewModel))]
         [InlineData(typeof(TrendsViewModel))]
-        public void InstanciatedWithoutError(Type vmType)
+        public void InstantiateWithoutError(Type vmType)
         {
             var viewModel = (vmType.GetConstructor(Type.EmptyTypes) == null)
                              ? Activator.CreateInstance(vmType,

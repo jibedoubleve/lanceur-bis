@@ -1,11 +1,12 @@
 ﻿namespace Lanceur.Infra.SQLite
 {
-    public abstract class SQLiteRepositoryBase : IDisposable
+    public abstract class SQLiteRepositoryBase 
     {
         #region Constructors
 
-        protected SQLiteRepositoryBase(SQLiteConnectionScope scope)
+        protected SQLiteRepositoryBase(ISQLiteConnectionScope scope)
         {
+            ArgumentNullException.ThrowIfNull(scope);
             DB = scope;
         }
 
@@ -13,24 +14,11 @@
 
         #region Properties
 
-        protected SQLiteConnectionScope DB
+        protected ISQLiteConnectionScope DB
         {
             get;
         }
 
         #endregion Properties
-
-        #region Methods
-
-        public void Dispose()
-        {
-            if (DB.Connection is not null)
-            {
-                DB.Connection.Close();
-                DB.Connection.Dispose();
-            }
-        }
-
-        #endregion Methods
     }
 }

@@ -67,7 +67,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // Arrange
             string sql = Cfg.SqlForAliases();
-            using var db = BuildFreshDB(sql);
+            using var db = BuildFreshDb(sql);
             var service = Cfg.GetDataService(db);
 
             // Act
@@ -82,7 +82,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // Arrange
             var sql = Cfg.SqlForAliases();
-            using var db = BuildFreshDB(sql);
+            using var db = BuildFreshDb(sql);
             var service = Cfg.GetDataService(db);
 
             //Act
@@ -100,7 +100,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // Arrange
             string sql = Cfg.SqlForAliases();
-            using var db = BuildFreshDB(sql);
+            using var db = BuildFreshDb(sql);
             var service = Cfg.GetDataService(db);
 
             // Act
@@ -116,7 +116,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // Arrange
             var sql = Cfg.SqlForAliases();
-            using var db = BuildFreshDB(sql);
+            using var db = BuildFreshDb(sql);
             var service = Cfg.GetDataService(db);
 
             //Act
@@ -131,7 +131,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // Arrange
             string sql = Cfg.SqlForAliases();
-            using var db = BuildFreshDB(sql);
+            using var db = BuildFreshDb(sql);
             var service = Cfg.GetDataService(db);
 
             // Act
@@ -174,7 +174,7 @@ namespace Lanceur.Tests.BusinessLogic
             {
                 var log = Substitute.For<IAppLoggerFactory>();
                 var conv = GetConvertionService();
-                var service = new SQLiteRepository(new SQLiteConnectionScope(db), log, conv);
+                var service = new SQLiteRepository(new SQLiteConnectionScopeTest(db), log, conv);
                 return service;
             }
 

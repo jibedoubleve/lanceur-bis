@@ -8,7 +8,7 @@ namespace Lanceur.Infra.SQLite
     {
         #region Constructors
 
-        public SQLiteVersionManager(SQLiteConnectionScope scope) : base(scope)
+        public SQLiteVersionManager(ISQLiteConnectionScope scope) : base(scope)
         {
         }
 
@@ -18,7 +18,7 @@ namespace Lanceur.Infra.SQLite
 
         public Version GetCurrentDbVersion()
         {
-            var version = DB.Connection.Query<string>(SQL.GetDbVersion).FirstOrDefault();
+            var version = DB.WithinTransaction(tx => tx.Connection.Query<string>(SQL.GetDbVersion).FirstOrDefault());
 
             return version.IsNullOrEmpty()
                 ? new Version()
@@ -27,7 +27,7 @@ namespace Lanceur.Infra.SQLite
 
         public bool IsUpToDate(Version goalVersion)
         {
-            var version = DB.Connection.Query<string>(SQL.GetDbVersion).FirstOrDefault();
+            var version = DB.WithinTransaction(tx => tx.Connection.Query<string>(SQL.GetDbVersion).FirstOrDefault());
 
             var currentVersion = version.IsNullOrEmpty()
                 ? new Version()
@@ -40,16 +40,11 @@ namespace Lanceur.Infra.SQLite
 
         public void SetCurrentDbVersion(Version version)
         {
-            var exists = DB.Connection.ExecuteScalar<int>(SQL.DbVersionCount) >= 1;
-
-            if (exists)
+            DB.WithinTransaction(tx =>
             {
-                DB.Connection.Execute(SQL.UpdateDbVersion.Format(version));
-            }
-            else
-            {
-                DB.Connection.Execute(SQL.SetDbVersion.Format(version));
-            }
+                var exists = tx.Connection.ExecuteScalar<int>(SQL.DbVersionCount) >= 1;
+                tx.Connection.Execute(exists ? SQL.UpdateDbVersion.Format(version) : SQL.SetDbVersion.Format(version));
+            });
         }
 
         #endregion Methods

@@ -90,7 +90,7 @@ namespace Lanceur.Infra.Stores
                         }
 
                         qr.Description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
-                        qr.Icon = "keylink";
+                        qr.Icon = "ApplicationCogOutline";
 
                         foundItems.Add(qr);
                     }

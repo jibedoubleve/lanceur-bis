@@ -16,7 +16,7 @@ namespace Lanceur.Infra.SQLite
 
         #region Constructors
 
-        public SQLiteAppConfigRepository(SQLiteConnectionScope scope) : base(scope)
+        public SQLiteAppConfigRepository(ISQLiteConnectionScope scope) : base(scope)
         {
         }
 
@@ -46,14 +46,14 @@ namespace Lanceur.Infra.SQLite
 
         public void Load()
         {
-            var sql = @"
+            const string sql = @"
                 select
                     s_value as Value
                 from settings
                 where s_key = 'json';";
-            var s = DB.Connection
-                      .Query<string>(sql)
-                      .FirstOrDefault();
+            var s = DB.WithinTransaction(tx =>
+                tx.Connection.Query<string>(sql)
+                    .FirstOrDefault());
 
             _current = s.IsNullOrEmpty() 
                 ? new AppConfig() 
@@ -62,18 +62,21 @@ namespace Lanceur.Infra.SQLite
 
         public void Save()
         {
-            var sqlExists = "select count(*) from settings where s_key = 'json'";
-            var exists = DB.Connection.ExecuteScalar<long>(sqlExists) > 0;
-
-            if (!exists)
+            DB.WithinTransaction(tx =>
             {
-                var sqlInsert = "insert into settings(s_key) values ('json')";
-                DB.Connection.Execute(sqlInsert);
-            }
+                var sqlExists = "select count(*) from settings where s_key = 'json'";
+                var exists    = tx.Connection.ExecuteScalar<long>(sqlExists) > 0;
 
-            var sql = "update settings set s_value = @value where s_key = 'json'";
-            var json = JsonConvert.SerializeObject(Current);
-            DB.Connection.Execute(sql, new { value = json });
+                if (!exists)
+                {
+                    var sqlInsert = "insert into settings(s_key) values ('json')";
+                    tx.Connection.Execute(sqlInsert);
+                }
+
+                var sql  = "update settings set s_value = @value where s_key = 'json'";
+                var json = JsonConvert.SerializeObject(Current);
+                tx.Connection.Execute(sql, new { value = json });
+            });
         }
 
         #endregion Methods
