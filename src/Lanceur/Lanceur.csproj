@@ -47,4 +47,18 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\Modern-InformationCircle.png" />
+    <Content Include="Assets\IconInfo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Remove="Assets\Modern-WarningCircle.png" />
+    <Content Include="Assets\IconWarn.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\IconError.png" />
+    <Content Include="Assets\IconError.png" />
+  </ItemGroup>
 </Project>
