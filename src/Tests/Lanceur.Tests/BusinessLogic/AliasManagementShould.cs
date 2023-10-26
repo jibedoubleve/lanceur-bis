@@ -36,7 +36,7 @@ namespace Lanceur.Tests.BusinessLogic
 
         private static AliasDbAction BuildAliasDbAction(SQLiteConnection connection)
         {
-            var scope = new SQLiteConnectionScopeTest(connection);
+            var scope = new SQLiteConnectionScope(connection);
             var log = Substitute.For<IAppLoggerFactory>();
             var action = new AliasDbAction(scope, log);
             return action;
@@ -44,7 +44,7 @@ namespace Lanceur.Tests.BusinessLogic
 
         private static SQLiteRepository BuildDataService(SQLiteConnection connection)
         {
-            var scope = new SQLiteConnectionScopeTest(connection);
+            var scope = new SQLiteConnectionScope(connection);
             var log = Substitute.For<IAppLoggerFactory>();
             var conv = Substitute.For<IConvertionService>();
             var service = new SQLiteRepository(scope, log, conv);

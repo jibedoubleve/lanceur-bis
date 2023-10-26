@@ -136,11 +136,8 @@ public class Bootstrapper
 
         l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
         
-#if DEBUG
-        l.Register<ISQLiteConnectionScope>(() => new SQLiteConnectionScopeTest(Get<SQLiteConnection>()));
-#else
         l.Register<ISQLiteConnectionScope>(() => new SQLiteConnectionScope(Get<SQLiteConnection>()));
-#endif
+
         l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
 
         l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<ISQLiteConnectionScope>())));

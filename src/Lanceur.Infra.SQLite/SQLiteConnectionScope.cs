@@ -1,70 +1,69 @@
-using System.Data.SQLite;
+﻿using System.Data;
 using Lanceur.SharedKernel.Mixins;
+using System.Data.SQLite;
 
-namespace Lanceur.Infra.SQLite;
-
-public sealed class SQLiteConnectionScope : ISQLiteConnectionScope
+namespace Lanceur.Infra.SQLite
 {
-    #region Fields
-
-    private readonly string _connectionString;
-
-    #endregion Fields
-
-    #region Constructors
-
-    public SQLiteConnectionScope(SQLiteConnection connection)
+    public sealed class SQLiteConnectionScope : ISQLiteConnectionScope
     {
-        _connectionString = connection?.ConnectionString
-                            ?? throw new ArgumentNullException(nameof(connection), "Cannot create a connection scope with an empty connection (NULL).");
-    }
+        #region Fields
 
-    public SQLiteConnectionScope(string connectionString)
-    {
-        if (connectionString.IsNullOrWhiteSpace())
+        private readonly SQLiteConnection _connection;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public SQLiteConnectionScope(SQLiteConnection connection)
         {
-            throw new ArgumentNullException(nameof(connectionString), "The connection string is in an invalid state (it's either null or white space).");
+            _connection = 
+                connection 
+                ?? throw new ArgumentNullException(nameof(connection), "Cannot create a connection scope with an empty connection (NULL).");
         }
-        _connectionString = connectionString;
-    }
 
-    #endregion Constructors
+        #endregion Constructors
 
-    #region Properties
+        #region Methods
 
-    public string DbPath => _connectionString?.ToLower()?.Replace("data source=", "")?.Replace(";version=3;", "") ?? "";
+        public static implicit operator SQLiteConnection(SQLiteConnectionScope scope) => scope._connection;
 
-    #endregion Properties
-
-    #region Methods
-
-    public void Dispose()
-    {
-        // TODO release managed resources here
-    }
-
-    public void WithinTransaction(Action<SQLiteTransaction> action) => WithinTransaction<object>(tx =>
-    {
-        action(tx);
-        return default;
-    });
-
-    public TReturn WithinTransaction<TReturn>(Func<SQLiteTransaction, TReturn> action)
-    {
-        using var conn = new SQLiteConnection(_connectionString);
-        using var tx = conn.BeginTransaction();
-        try
+        public void Dispose()
         {
-            var result =action(tx);
-            tx.Commit();
-            return result;
+            // TODO release managed resources here
         }
-        catch
-        {
-            tx.Rollback();
-            return default;
-        }
-    }
 
-    #endregion Methods
+        public void WithinTransaction(Action<SQLiteTransaction> action)
+        {
+            if(_connection.State != ConnectionState.Open)_connection.Open();
+            using var tx = _connection.BeginTransaction();
+            try
+            {
+                action(tx);
+                tx.Commit();
+            }
+            catch
+            {
+                tx.Rollback();
+            }
+        }
+
+        public TReturn WithinTransaction<TReturn>(Func<SQLiteTransaction, TReturn> action)
+        {     
+            if(_connection.State != ConnectionState.Open)_connection.Open();
+            using var tx = _connection.BeginTransaction();
+            try
+            {
+                var result = action(tx);
+                tx.Commit();
+                return result;
+            }
+            catch
+            {
+                tx.Rollback();
+                return default;
+            }
+        }
+
+        #endregion Methods
+    }
 }

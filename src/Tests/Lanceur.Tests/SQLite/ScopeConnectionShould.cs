@@ -12,7 +12,7 @@ namespace Lanceur.Tests.SQLite
         [Fact]
         public void CrashWhenConnectionIsNull()
         {
-            var newScope = () => new SQLiteConnectionScopeTest((SQLiteConnection)null);
+            var newScope = () => new SQLiteConnectionScope((SQLiteConnection)null);
 
             newScope.Should().Throw<ArgumentNullException>();
         }

@@ -35,7 +35,7 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void HaveTenSessions()
         {
-            var scope = new SQLiteConnectionScopeTest(BuildConnection());
+            var scope = new SQLiteConnectionScope(BuildConnection());
             CreateTableAndPopulate(scope);
             var service = new SQLiteRepository(scope, Substitute.For<IAppLoggerFactory>(), Substitute.For<IConvertionService>());
 
