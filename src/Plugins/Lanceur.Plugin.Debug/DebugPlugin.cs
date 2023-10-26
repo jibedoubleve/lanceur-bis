@@ -14,15 +14,15 @@ namespace Lanceur.Plugin.Debug
             var i = 0;
             IEnumerable<ResultItem> result = new List<ResultItem>()
             {
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
-                new ResultItem($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
+                new($"Debug result {++i}", $"Some description and a guid '{Guid.NewGuid()}'", "ChevronRight"),
             };
             return Task.FromResult(result);
         }

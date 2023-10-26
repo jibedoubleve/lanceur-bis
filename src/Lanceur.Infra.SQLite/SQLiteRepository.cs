@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using Dapper;
+﻿using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -14,26 +13,29 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     #region Fields
 
     private readonly AliasDbAction _aliasDbAction;
+    private readonly AliasSearchDbAction _aliasSearchDbAction;
     private readonly IConvertionService _converter;
+    private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly IAppLogger _log;
     private readonly SetUsageDbAction _setUsageDbAction;
-    private readonly GetAllAliasDbAction _getAllAliasDbAction;
-    private readonly AliasSearchDbAction _aliasSearchDbAction;
 
     #endregion Fields
 
     #region Constructors
 
     public SQLiteRepository(
-        SQLiteConnectionScope scope,
+        ISQLiteConnectionScope scope,
         IAppLoggerFactory logFactory,
         IConvertionService converter) : base(scope)
     {
-        _log                 = logFactory.GetLogger<SQLiteRepository>();
-        _converter           = converter;
-        _aliasDbAction       = new(scope, logFactory);
+        ArgumentNullException.ThrowIfNull(logFactory);
+        ArgumentNullException.ThrowIfNull(converter);
+
+        _log = logFactory.GetLogger<SQLiteRepository>();
+        _converter = converter;
+        _aliasDbAction = new(scope, logFactory);
         _getAllAliasDbAction = new(scope, logFactory);
-        _setUsageDbAction    = new(DB, logFactory);
+        _setUsageDbAction = new(DB, logFactory);
         _aliasSearchDbAction = new(DB, logFactory, converter);
     }
 
@@ -48,6 +50,22 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         return _aliasDbAction.CheckNameExists(names, idSession.Value);
     }
 
+    /// <summary>
+    /// Returns all the alias of the specified session from the repository.
+    /// If no session is specified, it returns all the alias.
+    /// </summary>
+    /// <param name="idSession">
+    /// The alias should be link the the specified session.
+    /// If no session specified, all the alias are returned
+    /// </param>
+    /// <returns>The alias of the specified session or all if no session
+    /// specified</returns>
+    public IEnumerable<AliasQueryResult> GetAll(long? idSession = null)
+    {
+        idSession ??= GetDefaultSessionId();
+        return _getAllAliasDbAction.GetAll(idSession.Value);
+    }
+
     ///<inheritdoc/>
     public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(long? idSession = null)
     {
@@ -55,19 +73,11 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         return _getAllAliasDbAction.GetAllAliasWithAdditionalParameters(idSession.Value);
     }
 
-
-    public IEnumerable<AliasQueryResult> GetAll(long? idSession = null)
-    {
-        idSession ??= GetDefaultSessionId();
-        return _getAllAliasDbAction.GetAll(idSession.Value);
-    }
-
-
     ///<inheritdoc/>
     public Session GetDefaultSession()
     {
         var id = GetDefaultSessionId();
-        var sql = @$"
+        const string sql = @$"
                 select
 	                id    as {nameof(Session.Id)},
 	                name  as {nameof(Session.Name)},
@@ -76,7 +86,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 	                alias_session
                 where
 	                id = @id";
-        var result = DB.Connection.Query<Session>(sql, new { id }).SingleOrDefault();
+        var result = DB.WithinTransaction(tx => tx.Connection.Query<Session>(sql, new { id }).SingleOrDefault());
         return result;
     }
 
@@ -86,7 +96,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     ///<inheritdoc/>
     public IEnumerable<QueryResult> GetDoubloons()
     {
-        var sql = @$"
+        const string sql = @$"
             select
                 id        as {nameof(SelectableAliasQueryResult.Id)},
                 file_name as {nameof(SelectableAliasQueryResult.Description)},
@@ -95,7 +105,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
             from
                 data_doubloons_v
             order by file_name";
-        var results = DB.Connection.Query<SelectableAliasQueryResult>(sql);
+        var results = DB.WithinTransaction(tx => tx.Connection.Query<SelectableAliasQueryResult>(sql));
         return results;
     }
 
@@ -111,12 +121,12 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public IEnumerable<SelectableAliasQueryResult> GetInvalidAliases()
     {
         var macro = new Regex("^@.*@$");
-        var abs   = new Regex(@"[a-zA-Z]:\\");
+        var abs = new Regex(@"[a-zA-Z]:\\");
 
         var result = from a in GetAll()
                      where a.Description != null
                            && Uri.TryCreate(a.Description, UriKind.RelativeOrAbsolute, out _)
-                           && File.Exists(a.Description)   == false
+                           && File.Exists(a.Description) == false
                            && macro.IsMatch(a.Description) == false
                            && abs.IsMatch(a.Description)
                      select a;
@@ -131,7 +141,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public IEnumerable<QueryResult> GetMostUsedAliases(long? idSession = null)
     {
         idSession ??= GetDefaultSessionId();
-        var sql = @$"
+        const string sql = @$"
                 select
 	                keywords   as {nameof(DisplayUsageQueryResult.Name)},
                     exec_count as {nameof(DisplayUsageQueryResult.Count)}
@@ -141,19 +151,19 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                     id_session = @idSession
                 order
                     by exec_count desc";
-        return DB.Connection.Query<DisplayUsageQueryResult>(sql, new { idSession });
+        return DB.WithinTransaction(tx => tx.Connection.Query<DisplayUsageQueryResult>(sql, new { idSession }));
     }
 
     ///<inheritdoc/>
     public IEnumerable<Session> GetSessions()
     {
-        var sql = @$"
+        const string sql = @$"
             select
 	            id    as {nameof(Session.Id)},
                 name  as {nameof(Session.Name)},
                 notes as {nameof(Session.Notes)}
             from alias_session";
-        var result = DB.Connection.Query<Session>(sql);
+        var result = DB.WithinTransaction(tx => tx.Connection.Query<Session>(sql));
         return result;
     }
 
@@ -164,18 +174,18 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         var action = new HistoryDbAction(DB);
         return per switch
         {
-            Per.Hour      => action.PerHour(idSession.Value),
-            Per.Day       => action.PerDay(idSession.Value),
+            Per.Hour => action.PerHour(idSession.Value),
+            Per.Day => action.PerDay(idSession.Value),
             Per.DayOfWeek => action.PerDayOfWeek(idSession.Value),
-            Per.Month     => action.PerMonth(idSession.Value),
-            _             => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
+            Per.Month => action.PerMonth(idSession.Value),
+            _ => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
         };
     }
 
     ///<inheritdoc/>
     public void Hydrate(QueryResult queryResult)
     {
-        var sql = @"
+        const string sql = @"
                 select
 	                a.id        as id,
                     count(a.id) as count
@@ -186,21 +196,39 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                 where an.name = @name
                 group by a.id";
 
-        var result = DB.Connection
-                       .Query<AliasQueryResult>(sql, new { queryResult.Name })
-                       .ToArray();
+        var result = DB.WithinTransaction(
+            tx => tx.Connection
+                    .Query<AliasQueryResult>(sql, new { queryResult.Name })
+                    .ToArray()
+        );
 
         if (!result.Any()) return;
 
         var first = result.First();
-        queryResult.Id    = first.Id;
+        queryResult.Id = first.Id;
         queryResult.Count = first.Count;
+    }
+
+    public void HydrateAlias(AliasQueryResult alias)
+    {
+        if (alias is null) return;
+
+        const string sql = @"
+            select
+                id       as id,
+                name     as name,
+                argument as parameter
+            from alias_argument
+            where id_alias = @idAlias";
+        var parameters =
+            DB.WithinTransaction(tx => tx.Connection.Query<QueryResultAdditionalParameters>(sql, new { idAlias = alias.Id }));
+        alias.AdditionalParameters = new(parameters);
     }
 
     ///<inheritdoc/>
     public void HydrateMacro(QueryResult alias)
     {
-        var sql = @$"
+        const string sql = @$"
             select
 	            a.id        as {nameof(QueryResult.Id)},
                 count(a.id) as {nameof(QueryResult.Count)}
@@ -212,29 +240,17 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
             group by
 	            a.id;";
 
-        var results = DB.Connection.Query<dynamic>(sql, new { name = alias.Name });
+        DB.WithinTransaction(tx =>
+        {
+            var results = tx.Connection.Query<dynamic>(sql, new { name = alias.Name });
 
-        var enumerable = results as dynamic[] ?? results.ToArray();
-        if (enumerable.Length != 1) return;
+            var enumerable = results as dynamic[] ?? results.ToArray();
+            if (enumerable.Length != 1) return;
 
-        var item = enumerable.ElementAt(0);
-        alias.Id    = item.Id;
-        alias.Count = (int)item.Count;
-    }
-
-    public void HydrateAlias(AliasQueryResult alias)
-    {
-        if (alias is null) return;
-
-        var sql = @"
-            select 
-                id       as id,
-                name     as name,
-                argument as parameter
-            from alias_argument
-            where id_alias = @idAlias";
-        var parameters = DB.Connection.Query<QueryResultAdditionalParameters>(sql, new { idAlias = alias.Id });
-        alias.AdditionalParameters = new(parameters);
+            var item = enumerable.ElementAt(0);
+            alias.Id    = item.Id;
+            alias.Count = (int)item.Count;
+        });
     }
 
     ///<inheritdoc/>
@@ -286,6 +302,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                 _aliasDbAction.Create(ref alias, idSession.Value);
                 _log.Info($"Created new alias. (Id: {alias.Id})");
                 break;
+
             case > 0:
                 _log.Info($"Updating alias. (Id: {alias.Id})");
                 _aliasDbAction.Update(alias);
@@ -314,7 +331,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                 s_value = @idSession
             where
                 lower(s_key) = 'idsession'";
-        DB.Connection.Execute(sql, new { idSession });
+        DB.WithinTransaction(tx => tx.Connection.Execute(sql, new { idSession }));
     }
 
     public void SetUsage(QueryResult alias)
@@ -342,7 +359,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     {
         var action = new SessionDbAction(DB);
 
-        if (session         == null) throw new ArgumentNullException(nameof(session));
+        if (session == null) throw new ArgumentNullException(nameof(session));
         else if (session.Id == 0) action.Create(ref session);
         else action.Update(session);
     }

@@ -7,13 +7,13 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
-        private readonly SQLiteConnectionScope _db;
+        private readonly ISQLiteConnectionScope _db;
 
         #endregion Fields
 
         #region Constructors
 
-        public HistoryDbAction(SQLiteConnectionScope scope)
+        public HistoryDbAction(ISQLiteConnectionScope scope)
         {
             _db = scope;
         }
@@ -24,13 +24,13 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public IEnumerable<DataPoint<DateTime, double>> PerDay(long idSession)
         {
-            var sql = @"
+            const string sql = @"
                 select
                     day        as X,
 	                exec_count as Y
                 from stat_usage_per_day_v
                 where id_session = @idSession;";
-            return _db.Connection.Query<DataPoint<DateTime, double>>(sql, new { idSession });
+            return _db.WithinTransaction(tx => tx.Connection.Query<DataPoint<DateTime, double>>(sql, new { idSession }));
         }
 
         public IEnumerable<DataPoint<DateTime, double>> PerDayOfWeek(long idSession)
@@ -41,29 +41,29 @@ namespace Lanceur.Infra.SQLite.DbActions
 	                exec_count                                     as Y
                 from stat_usage_per_day_of_week_v
                 where id_session = @idSession;";
-            return _db.Connection.Query<DataPoint<DateTime, double>>(sql, new { idSession });
+            return _db.WithinTransaction(tx => tx.Connection.Query<DataPoint<DateTime, double>>(sql, new { idSession }));
         }
 
         public IEnumerable<DataPoint<DateTime, double>> PerHour(long idSession)
         {
-            var sql = @"
+            const string sql = @"
                 select
                     hour_in_day as X,
 	                exec_count  as Y
                 from stat_usage_per_hour_in_day_v
                 where id_session = @idSession;";
-            return _db.Connection.Query<DataPoint<DateTime, double>>(sql, new { idSession });
+            return _db.WithinTransaction(tx => tx.Connection.Query<DataPoint<DateTime, double>>(sql, new { idSession }));
         }
 
         public IEnumerable<DataPoint<DateTime, double>> PerMonth(long idSession)
         {
-            var sql = @"
+            const string sql = @"
                 select
                     month      as X,
 	                exec_count as Y
                 from stat_usage_per_month_v
                 where id_session = @idSession;";
-            return _db.Connection.Query<DataPoint<DateTime, double>>(sql, new { idSession });
+            return _db.WithinTransaction(tx => tx.Connection.Query<DataPoint<DateTime, double>>(sql, new { idSession }));
         }
 
         #endregion Methods

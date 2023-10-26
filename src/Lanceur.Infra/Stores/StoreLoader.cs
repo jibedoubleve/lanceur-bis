@@ -17,14 +17,9 @@ namespace Lanceur.Infra.Stores
             var found = (from t in types
                          where t.GetCustomAttributes(typeof(StoreAttribute)).Any()
                          select t).ToList();
-            var stores = new List<ISearchService>();
-            foreach (var type in found)
-            {
-                var instance = (ISearchService)Activator.CreateInstance(type);
-                stores.Add(instance);
-            }
 
-            return stores;
+            return found.Select(type => (ISearchService)Activator.CreateInstance(type))
+                        .ToList();
         }
 
         #endregion Methods

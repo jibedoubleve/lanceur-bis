@@ -1,8 +1,6 @@
 ﻿using Dapper;
 using Lanceur.Scripts;
-using Lanceur.Views;
 using System.Data.SQLite;
-using System.Reflection;
 using System.SQLite.Updater;
 
 namespace Lanceur.Tests.SQLite
@@ -11,7 +9,7 @@ namespace Lanceur.Tests.SQLite
     {
         #region Fields
 
-        protected const string ConnectionString = "Data Source =:memory: ";
+        private const string ConnectionString = "Data Source =:memory: ";
 
         #endregion Fields
 
@@ -25,7 +23,7 @@ namespace Lanceur.Tests.SQLite
         }
 
 
-        protected static SQLiteConnection BuildFreshDB(string sql = null)
+        protected static SQLiteConnection BuildFreshDb(string sql = null)
         {
             var db = BuildConnection();
             var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbededResourcePattern);

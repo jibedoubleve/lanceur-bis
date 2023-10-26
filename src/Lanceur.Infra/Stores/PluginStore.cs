@@ -16,7 +16,7 @@ namespace Lanceur.Infra.Stores
     {
         #region Fields
 
-        private static IEnumerable<SelfExecutableQueryResult> _plugins = null;
+        private static IEnumerable<SelfExecutableQueryResult> _plugins  ;
         private readonly Version _appVersion;
         private readonly IPluginStoreContext _context;
         private readonly IDbRepository _dbRepository;
@@ -32,7 +32,7 @@ namespace Lanceur.Infra.Stores
         {
         }
 
-        public PluginStore(
+        private PluginStore(
             IPluginStoreContext context = null,
             IAppLoggerFactory logFactory = null,
             IPluginManager pluginManager = null,
@@ -56,16 +56,14 @@ namespace Lanceur.Infra.Stores
 
         private void LoadPlugins()
         {
-            if (_plugins == null)
-            {
-                var configs = GetPluginManifests();
+            if (_plugins != null) return;
 
-                _plugins = configs
-                    .Where(manifest => _appVersion >= manifest.AppMinVersion)
-                    .SelectMany(manifest => _pluginManager.CreatePlugin(manifest.Dll))
-                    .Select(x => new PluginExecutableQueryResult(x, _logFactory))
-                    .ToList();
-            }
+            var configs = GetPluginManifests();
+            _plugins = configs
+                       .Where(manifest => _appVersion >= manifest.AppMinVersion)
+                       .SelectMany(manifest => _pluginManager.CreatePlugin(manifest.Dll))
+                       .Select(x => new PluginExecutableQueryResult(x, _logFactory))
+                       .ToList();
         }
 
         public IEnumerable<QueryResult> GetAll()
@@ -90,7 +88,7 @@ namespace Lanceur.Infra.Stores
         {
             LoadPlugins();
             var found = (from plugin in _plugins
-                         where plugin?.Name?.ToLower()?.StartsWith(query.Name.ToLower()) ?? false
+                         where plugin?.Name?.ToLower().StartsWith(query.Name.ToLower()) ?? false
                          select plugin).ToArray();
             _log.Trace($"Found {found.Length} plugin(s)");
 

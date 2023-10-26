@@ -4,11 +4,11 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class AliasSearchDbAction : IDisposable
+public class AliasSearchDbAction
 {  
     #region Fields
 
-    private readonly SQLiteConnectionScope _db;
+    private readonly ISQLiteConnectionScope _db;
     private readonly IAppLogger _log;
     private readonly MacroDbAction _macroManager;
 
@@ -16,7 +16,7 @@ public class AliasSearchDbAction : IDisposable
     
     #region Constructors
 
-    public AliasSearchDbAction(SQLiteConnectionScope db, IAppLoggerFactory logFactory, IConvertionService converter)
+    public AliasSearchDbAction(ISQLiteConnectionScope db, IAppLoggerFactory logFactory, IConvertionService converter)
     {
         _db  = db;
         _log = logFactory.GetLogger<AliasDbAction>();
@@ -26,8 +26,6 @@ public class AliasSearchDbAction : IDisposable
     #endregion Constructors
     
     #region Methods
-    
-    public void Dispose() => _db.Dispose();
     
     public IEnumerable<AliasQueryResult> Search(string name, long idSession)
     {
@@ -59,7 +57,7 @@ public class AliasSearchDbAction : IDisposable
                     an.name";
 
         name = $"{name ?? string.Empty}%";
-        var results = _db.Connection.Query<AliasQueryResult>(sql, new { name, idSession });
+        var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name, idSession }));
 
         results = _macroManager.UpgradeToComposite(results);
         return results ?? AliasQueryResult.NoResult;
@@ -95,7 +93,7 @@ public class AliasSearchDbAction : IDisposable
                     an.name";
 
         name = $"{name ?? string.Empty}%";
-        var results = _db.Connection.Query<AliasQueryResult>(sql, new { name, idSession });
+        var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name, idSession }));
 
         results = _macroManager.UpgradeToComposite(results);
         return results ?? AliasQueryResult.NoResult;

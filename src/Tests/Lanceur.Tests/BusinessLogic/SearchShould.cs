@@ -57,8 +57,8 @@ namespace Lanceur.Tests.BusinessLogic
             // arrange
             var converter = Substitute.For<IConvertionService>();
             var sql = SQL_CreateAlias;
-            using var db = BuildFreshDB(sql);
-            using var scope = new SQLiteConnectionScope(db);
+            using var db = BuildFreshDb(sql);
+            using var scope = new SQLiteConnectionScopeTest(db);
 
             var action = new SQLiteRepository(scope, _testLoggerFactory, converter);
 

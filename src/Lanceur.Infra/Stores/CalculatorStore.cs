@@ -9,7 +9,12 @@ namespace Lanceur.Infra.Stores
     [Store]
     public class CalculatorStore : ISearchService
     {
+        #region Fields
+
         private static readonly ICalculatorService _calculator = new CodingSebCalculatorService();
+
+        #endregion Fields
+
         #region Methods
 
         public IEnumerable<QueryResult> GetAll()

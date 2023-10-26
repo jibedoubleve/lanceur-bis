@@ -12,6 +12,12 @@ namespace Lanceur.ReservedKeywords
     [ReservedAlias("setup"), Description("Open the setup page")]
     public class SetupAlias : SelfExecutableQueryResult
     {
+        #region Properties
+
+        public override string Icon => "CogOutline";
+
+        #endregion Properties
+
         #region Methods
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)

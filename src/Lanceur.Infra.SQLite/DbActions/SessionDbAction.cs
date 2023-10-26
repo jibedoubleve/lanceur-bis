@@ -3,17 +3,17 @@ using Lanceur.Core.Models;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
-    internal class SessionDbAction : IDisposable
+    internal class SessionDbAction
     {
         #region Fields
 
-        private readonly SQLiteConnectionScope _db;
+        private readonly ISQLiteConnectionScope _db;
 
         #endregion Fields
 
         #region Constructors
 
-        public SessionDbAction(SQLiteConnectionScope db)
+        public SessionDbAction(ISQLiteConnectionScope db)
         {
             _db = db;
         }
@@ -27,11 +27,10 @@ namespace Lanceur.Infra.SQLite.DbActions
             var sql = @"
             insert into alias_session (name, notes) values (@name, @notes);
             select last_insert_rowid() limit 1;";
-            var id = _db.Connection.ExecuteScalar<long>(sql, new { session.Name, session.Notes });
+            var param = new { session.Name, session.Notes };
+            var id = _db.WithinTransaction(tx => tx.Connection.ExecuteScalar<long>(sql, param));
             session.Id = id;
         }
-
-        public void Dispose() => _db.Dispose();
 
         public void Remove(Session session)
         {
@@ -49,22 +48,26 @@ namespace Lanceur.Infra.SQLite.DbActions
                 "delete from alias_session where id = @id",
             };
 
-            foreach (var sql in queries)
+            _db.WithinTransaction(tx =>
             {
-                _db.Connection.Execute(sql, new { session.Id });
-            }
+                foreach (var sql in queries)
+                {
+                    tx.Connection.Execute(sql, new { session.Id });
+                }
+            });
         }
 
         public void Update(Session session)
         {
-            var sql = @"
+            const string sql = @"
                 update alias_session
                 set
                     name  = @name,
                     notes = @notes
                 where
                     id = @id;";
-            _db.Connection.Execute(sql, new { session.Name, session.Notes, session.Id });
+
+            _db.WithinTransaction(tx => tx.Connection.Execute(sql, new { session.Name, session.Notes, session.Id }));
         }
 
         #endregion Methods

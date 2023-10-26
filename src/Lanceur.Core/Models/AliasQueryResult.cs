@@ -100,7 +100,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 
     public static AliasQueryResult FromName(string aliasName) => new() { Name = aliasName, Synonyms = aliasName };
 
-    public override int GetHashCode() => base.GetHashCode() + Parameters?.GetHashCode() ?? 0;
+    public override int GetHashCode() => (base.GetHashCode(), (Parameters?.GetHashCode() ?? 0)).GetHashCode();
 
     #endregion Methods
 }

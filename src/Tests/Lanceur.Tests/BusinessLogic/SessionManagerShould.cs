@@ -16,7 +16,7 @@ namespace Lanceur.Tests.BusinessLogic
 
         private static void CreateTableAndPopulate(SQLiteConnection conn)
         {
-            var sql = @"
+            const string sql = @"
             create table alias_session (
                 id    integer primary key,
                 name  text,
@@ -25,9 +25,9 @@ namespace Lanceur.Tests.BusinessLogic
 
             conn.Execute(sql);
 
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
-                string insertSql = @"insert into alias_session (name, notes) values ('name_{0}', 'some notes')".Format(i);
+                var insertSql = @"insert into alias_session (name, notes) values ('name_{0}', 'some notes')".Format(i);
                 conn.Execute(insertSql);
             }
         }
@@ -35,7 +35,7 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void HaveTenSessions()
         {
-            var scope = new SQLiteConnectionScope(BuildConnection());
+            var scope = new SQLiteConnectionScopeTest(BuildConnection());
             CreateTableAndPopulate(scope);
             var service = new SQLiteRepository(scope, Substitute.For<IAppLoggerFactory>(), Substitute.For<IConvertionService>());
 

@@ -59,6 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\IconError.png" />
-    <Content Include="Assets\IconError.png" />
+    <Content Include="Assets\IconError.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

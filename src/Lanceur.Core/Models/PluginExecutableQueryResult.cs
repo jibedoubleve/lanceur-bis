@@ -5,7 +5,7 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Core.Models
 {
-    public class PluginExecutableQueryResult : SelfExecutableQueryResult
+    public sealed class PluginExecutableQueryResult : SelfExecutableQueryResult
     {
         #region Fields
 

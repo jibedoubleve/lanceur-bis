@@ -38,6 +38,8 @@ namespace Lanceur.Macros
         private static IMacroManager MacroManager => Locator.Current.GetService<IMacroManager>();
         private static ISearchService SearchService => Locator.Current.GetService<ISearchService>();
 
+        public override string Icon => "BugOutline";
+
         #endregion Properties
 
         #region Methods

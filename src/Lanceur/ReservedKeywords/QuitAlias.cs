@@ -11,6 +11,12 @@ namespace Lanceur.ReservedKeywords
     [ReservedAlias("quit"), Description("Quit lanceur")]
     public class QuitAlias : SelfExecutableQueryResult
     {
+        #region Properties
+
+        public override string Icon => "LocationExit";
+
+        #endregion Properties
+
         #region Methods
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)

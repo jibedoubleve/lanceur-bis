@@ -21,7 +21,7 @@ namespace Lanceur.Tests.BusinessLogic
         private static AliasQueryResult BuildAlias(string name = null, RunAs runAs = RunAs.CurrentUser)
         {
             name ??= Guid.NewGuid().ToString();
-            return new AliasQueryResult()
+            return new()
             {
                 Name = name,
                 Synonyms = name,
@@ -36,7 +36,7 @@ namespace Lanceur.Tests.BusinessLogic
 
         private static AliasDbAction BuildAliasDbAction(SQLiteConnection connection)
         {
-            var scope = new SQLiteConnectionScope(connection);
+            var scope = new SQLiteConnectionScopeTest(connection);
             var log = Substitute.For<IAppLoggerFactory>();
             var action = new AliasDbAction(scope, log);
             return action;
@@ -44,7 +44,7 @@ namespace Lanceur.Tests.BusinessLogic
 
         private static SQLiteRepository BuildDataService(SQLiteConnection connection)
         {
-            var scope = new SQLiteConnectionScope(connection);
+            var scope = new SQLiteConnectionScopeTest(connection);
             var log = Substitute.For<IAppLoggerFactory>();
             var conv = Substitute.For<IConvertionService>();
             var service = new SQLiteRepository(scope, log, conv);
@@ -61,7 +61,7 @@ namespace Lanceur.Tests.BusinessLogic
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
                 insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
 
-            var connection = BuildFreshDB(sql);
+            var connection = BuildFreshDb(sql);
             var action = BuildAliasDbAction(connection);
 
             // ACT
@@ -85,7 +85,7 @@ namespace Lanceur.Tests.BusinessLogic
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
                 insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
 
-            var connection = BuildFreshDB(sql);
+            var connection = BuildFreshDb(sql);
             var action = BuildAliasDbAction(connection);
 
             // ACT
@@ -102,7 +102,7 @@ namespace Lanceur.Tests.BusinessLogic
         public void CreateAlias()
         {
             // ARRANGE
-            var sql = @"
+            const string sql = @"
                 insert into alias(id, id_session) values (1001, 1);
                 insert into alias(id, id_session) values (1002, 1);
                 insert into alias(id, id_session) values (1003, 1);
@@ -111,7 +111,7 @@ namespace Lanceur.Tests.BusinessLogic
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
                 insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);";
 
-            var connection = BuildFreshDB(sql);
+            var connection = BuildFreshDb(sql);
             var action = BuildAliasDbAction(connection);
 
             var alias1 = BuildAlias();
@@ -130,8 +130,11 @@ namespace Lanceur.Tests.BusinessLogic
                 alias2.Id.Should().Be(1005);
                 alias3.Id.Should().Be(1006);
 
-                var sql2 = "select count(*) from alias";
-                var sql3 = "select count(*) from alias_name";
+                const string sql2 = "select count(*) from alias";
+                const string sql3 = "select count(*) from alias_name";
+
+                dynamic result = connection.Query("select * from alias_name");
+                dynamic result2 = connection.Query("select * from alias");
 
                 connection.ExecuteScalar<int>(sql2).Should().Be(6);
                 connection.ExecuteScalar<int>(sql3).Should().Be(6);
@@ -144,7 +147,7 @@ namespace Lanceur.Tests.BusinessLogic
             // ARRANGE
             var aliasName = Guid.NewGuid().ToString();
 
-            var connection = BuildFreshDB();
+            var connection = BuildFreshDb();
             var service = BuildDataService(connection);
 
             var alias1 = BuildAlias(aliasName);
@@ -165,7 +168,7 @@ namespace Lanceur.Tests.BusinessLogic
             // ARRANGE
             var aliasName = Guid.NewGuid().ToString();
 
-            var connection = BuildFreshDB();
+            var connection = BuildFreshDb();
             var action = BuildAliasDbAction(connection);
 
             QueryResult alias1 = new AliasQueryResult { Name = aliasName };
@@ -193,12 +196,16 @@ namespace Lanceur.Tests.BusinessLogic
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
                 insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);";
 
-            var connection = BuildFreshDB(sql);
+            var connection = BuildFreshDb(sql);
             var service = BuildDataService(connection);
 
-            var alias1 = BuildAlias();
-            var alias2 = BuildAlias();
-            var alias3 = BuildAlias();
+            const string name1 = "albert";
+            const string name2 = "norbert";
+            const string name3 = "philibert";
+            
+            var alias1 = BuildAlias(name1);
+            var alias2 = BuildAlias(name2);
+            var alias3 = BuildAlias(name3);
 
             // ACT
             service.SaveOrUpdate(ref alias1);
@@ -211,9 +218,9 @@ namespace Lanceur.Tests.BusinessLogic
                 var sql2 = "select count(*) from alias;";
                 var sql3 = "select count(*) from alias_name;";
 
-                alias1.Id.Should().Be(1004);
-                alias2.Id.Should().Be(1005);
-                alias3.Id.Should().Be(1006);
+                alias1.Name.Should().Be(name1);
+                alias2.Name.Should().Be(name2);
+                alias3.Name.Should().Be(name3);
 
                 connection.ExecuteScalar<int>(sql2).Should().Be(6);
                 connection.ExecuteScalar<int>(sql3).Should().Be(6);
@@ -223,13 +230,13 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void CreateAliasWithPrivilegeUsingService()
         {
-            var connection = BuildFreshDB();
+            var connection = BuildFreshDb();
             var service = BuildDataService(connection);
 
             var alias = BuildAlias("admin", RunAs.Admin);
             service.SaveOrUpdate(ref alias);
 
-            var results = service.Search("admin");
+            var results = service.Search("admin").ToArray();
 
             results.Should().HaveCount(1);
 
@@ -240,7 +247,7 @@ namespace Lanceur.Tests.BusinessLogic
         public void RemoveAlias()
         {
             // ARRANGE
-            var connection = BuildFreshDB();
+            var connection = BuildFreshDb();
             var action = BuildAliasDbAction(connection);
 
             var alias = BuildAlias();
@@ -261,7 +268,7 @@ namespace Lanceur.Tests.BusinessLogic
         public void RemoveAliasUsingService()
         {
             // ARRANGE
-            var connection = BuildFreshDB();
+            var connection = BuildFreshDb();
             var service = BuildDataService(connection);
 
             var alias1 = BuildAlias("one");
@@ -296,7 +303,7 @@ namespace Lanceur.Tests.BusinessLogic
 
                 insert into alias (id, arguments, file_name, id_session) values (258, 'no args', 'no file name', 1);
                 insert into alias_name(name, id_alias) values ('noname', 258);";
-            var connection = BuildFreshDB(sql);
+            var connection = BuildFreshDb(sql);
 
             var action = BuildAliasDbAction(connection);
 
@@ -327,7 +334,7 @@ namespace Lanceur.Tests.BusinessLogic
 
                 insert into alias (id, arguments, file_name, id_session) values (258, 'no args', 'no file name', 1);
                 insert into alias_name(name, id_alias) values ('noname', 258);";
-            var connection = BuildFreshDB(sql);
+            var connection = BuildFreshDb(sql);
 
             var service = BuildDataService(connection);
 

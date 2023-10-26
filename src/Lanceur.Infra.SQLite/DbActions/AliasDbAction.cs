@@ -1,4 +1,7 @@
-﻿using Dapper;
+﻿using System.Data.SQLite;
+using System.Diagnostics.CodeAnalysis;
+using System.Transactions;
+using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.Entities;
@@ -7,18 +10,18 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
-    public class AliasDbAction : IDisposable
+    public class AliasDbAction
     {
         #region Fields
 
-        private readonly SQLiteConnectionScope _db;
+        private readonly ISQLiteConnectionScope _db;
         private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public AliasDbAction(SQLiteConnectionScope db, IAppLoggerFactory logFactory)
+        public AliasDbAction(ISQLiteConnectionScope db, IAppLoggerFactory logFactory)
         {
             _db = db;
             _log = logFactory.GetLogger<AliasDbAction>();
@@ -72,33 +75,35 @@ namespace Lanceur.Infra.SQLite.DbActions
             _log.Debug($"Removed '{cnt}' row(s) from 'alias_usage'. Id: {idd}");
         }
 
-        private void CreateAdditionalParameters(AliasQueryResult alias) =>
-                                    CreateAdditionalParameters(alias.Id, alias.AdditionalParameters);
+        private void CreateAdditionalParameters(AliasQueryResult alias, SQLiteTransaction tx) 
+            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
-        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters)
+        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters,
+                                                SQLiteTransaction tx)
         {
             // Remove existing additional alias parameters
-            var sql1 = "delete from alias_argument where id_alias = @idAlias";
-            _db.Connection.Execute(sql1, new { idAlias });
-
+            const string sql1 = "delete from alias_argument where id_alias = @idAlias";
+            tx.Connection.Execute(sql1, new { idAlias });
+            
             // Create alias additional parameters
-            var sql2 = @"
+            const string sql2 = @"
                 insert into alias_argument (id_alias, argument, name)
                 values(@idAlias, @parameter, @name);";
-            _db.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+            tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
         }
 
-        private void UpdateName(AliasQueryResult alias)
+        private void UpdateName(AliasQueryResult alias, SQLiteTransaction tx)
         {
             //Remove all names
-            var sql = @"delete from alias_name where id_alias = @id";
-            _db.Connection.Execute(sql, new { id = alias.Id });
-
+            const string sql = @"delete from alias_name where id_alias = @id";
+            tx.Connection.Execute(sql, new { id = alias.Id });
+            
             //Recreate new names
-            sql = @"insert into alias_name (id_alias, name) values (@id, @name)";
+            const string sql2 = @"insert into alias_name (id_alias, name) values (@id, @name)";
             foreach (var name in alias.Synonyms.SplitCsv())
             {
-                _db.Connection.Execute(sql, new { id = alias.Id, name });
+                tx.Connection.Execute(sql2, new { id = alias.Id, name });
+                
             }
         }
 
@@ -113,9 +118,10 @@ namespace Lanceur.Infra.SQLite.DbActions
                 where id_alias in @ids;";
 
             var dbResultAr = results as QueryResult[] ?? results.ToArray();
-            var dbResults = _db.Connection
-                               .Query<KeywordUsage>(sql, new { ids = dbResultAr.Select(x => x.Id).ToArray() })
-                               .ToArray();
+            var dbResults = _db.WithinTransaction(
+                tx => tx.Connection.Query<KeywordUsage>(sql, new { ids = dbResultAr.Select(x => x.Id).ToArray() })
+                            .ToArray()
+            );
 
             foreach (var result in dbResultAr)
             {
@@ -128,7 +134,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public bool CheckNameExists(AliasQueryResult alias, long idSession)
         {
-            var sql = @"
+            const string sql = @"
             select count(*)
             from
 	            alias_name an
@@ -137,11 +143,11 @@ namespace Lanceur.Infra.SQLite.DbActions
             	lower(name) = @name
                 and a.id_session = @idSession";
 
-            var count = _db.Connection.ExecuteScalar<int>(sql, new
+            var count = _db.WithinTransaction(tx => tx.Connection.ExecuteScalar<int>(sql, new
             {
                 name = alias.Name,
                 idSession
-            });
+            }));
             return count > 0;
         }
 
@@ -156,15 +162,17 @@ namespace Lanceur.Infra.SQLite.DbActions
                     an.name in @names
                     and a.id_session = @idSession";
 
-            var result = _db.Connection
-                            .Query<string>(sql, new { names, idSession })
-                            .ToArray();
+            var result = _db.WithinTransaction(
+                tx => tx.Connection.Query<string>(sql, new { names, idSession })
+                            .ToArray()
+            );
 
             return new(result);
         }
 
         public long Create(ref AliasQueryResult alias, long idSession)
         {
+            alias.UpdateIcon();
             const string sqlAlias = @"
                 insert into alias (
                     arguments,
@@ -188,7 +196,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @isHidden
                 );
                 select last_insert_rowid() from alias limit 1;";
-            var id = _db.Connection.ExecuteScalar<long>(sqlAlias, new
+            var param = new
             {
                 Arguments = alias.Parameters,
                 alias.FileName,
@@ -199,23 +207,32 @@ namespace Lanceur.Infra.SQLite.DbActions
                 idSession,
                 alias.Icon,
                 alias.IsHidden
-            });
+            };
 
-            // Create synonyms
-            const string sqlSynonyms = @"insert into alias_name (id_alias, name) values (@id, @name)";
-            foreach (var name in alias.Synonyms.SplitCsv())
+            var csv = alias.Synonyms.SplitCsv();
+            var additionalParameters = alias.AdditionalParameters;
+            var id = _db.WithinTransaction(tx =>
             {
-                _db.Connection.ExecuteScalar<long>(sqlSynonyms, new
+                var id = tx.Connection.ExecuteScalar<long>(sqlAlias, param);
+
+                // Create synonyms
+                const string sqlSynonyms = @"insert into alias_name (id_alias, name) values (@id, @name)";
+                foreach (var name in csv)
                 {
-                    id,
-                    name
-                });
-            }
+                    tx.Connection.ExecuteScalar<long>(sqlSynonyms, new
+                    {
+                        id,
+                        name
+                    });
+                }
+
+                //Create additional arguments
+                CreateAdditionalParameters(id, additionalParameters, tx);
+                return id;
+            });
 
             alias.Id = id;
 
-            //Create additional arguments
-            CreateAdditionalParameters(id, alias.AdditionalParameters);
 
             // Return either the id of the created Alias or
             // return the id of the just updated alias (which
@@ -237,12 +254,10 @@ namespace Lanceur.Infra.SQLite.DbActions
             alias.Id = Create(ref queryResult, idSession);
         }
 
-        public void Dispose() => _db.Dispose();
-
         public long GetDefaultSessionId()
         {
             var sql = "select s_value from settings where lower(s_key) = 'idsession'";
-            var result = _db.Connection.Query<long>(sql).FirstOrDefault();
+            var result = _db.WithinTransaction(tx => tx.Connection.Query<long>(sql).FirstOrDefault());
             return result;
         }
 
@@ -288,7 +303,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
             var arguments = new { idSession, name, hidden };
 
-            return _db.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault();
+            return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault());
         }
 
         public KeywordUsage GetHiddenKeyword(string name)
@@ -308,7 +323,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 where
 	                hidden = 1
                     and n.name = @name;";
-            var result = _db.Connection.Query<KeywordUsage>(sql, new { name }).FirstOrDefault();
+            var result = _db.WithinTransaction(tx => tx.Connection.Query<KeywordUsage>(sql, new { name }).FirstOrDefault());
 
             return result;
         }
@@ -336,7 +351,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Update(AliasQueryResult alias)
         {
-            var sql = @"
+            const string sql = @"
                 update alias
                 set
                     arguments   = @parameters,
@@ -348,20 +363,23 @@ namespace Lanceur.Infra.SQLite.DbActions
                     icon        = @Icon
                 where id = @id;";
 
-            _db.Connection.Execute(sql, new
+            _db.WithinTransaction(tx =>
             {
-                alias.Parameters,
-                alias.FileName,
-                alias.Notes,
-                alias.RunAs,
-                alias.StartMode,
-                alias.WorkingDirectory,
-                alias.Icon,
-                id = alias.Id
+                 tx.Connection.Execute(sql, new
+                {
+                    alias.Parameters,
+                    alias.FileName,
+                    alias.Notes,
+                    alias.RunAs,
+                    alias.StartMode,
+                    alias.WorkingDirectory,
+                    alias.Icon,
+                    id = alias.Id
+                });
+                 CreateAdditionalParameters(alias, tx);
+                 UpdateName(alias, tx);
             });
 
-            UpdateName(alias);
-            CreateAdditionalParameters(alias);
             alias.SynonymsPreviousState = alias.Synonyms;
             return alias.Id;
         }

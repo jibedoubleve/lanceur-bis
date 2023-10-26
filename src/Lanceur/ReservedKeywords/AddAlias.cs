@@ -11,6 +11,12 @@ namespace Lanceur.ReservedKeywords
     [ReservedAlias("add"), Description("Add a new alias")]
     public class AddAlias : SelfExecutableQueryResult
     {
+        #region Properties
+
+        public override string Icon => "BookmarkPlusOutline";
+
+        #endregion Properties
+
         #region Methods
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
