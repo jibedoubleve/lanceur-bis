@@ -85,9 +85,6 @@ namespace Lanceur.Tests.BusinessLogic
                 const string sql2 = "select count(*) from alias";
                 const string sql3 = "select count(*) from alias_name";
 
-                dynamic result = connection.Query("select * from alias_name");
-                dynamic result2 = connection.Query("select * from alias");
-
                 connection.ExecuteScalar<int>(sql2).Should().Be(6);
                 connection.ExecuteScalar<int>(sql3).Should().Be(6);
             }

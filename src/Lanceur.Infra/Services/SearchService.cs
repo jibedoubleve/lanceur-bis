@@ -77,7 +77,7 @@ namespace Lanceur.Infra.Services
                          where r.Name == query.Name
                          select r).FirstOrDefault();
             if (match is not null) { orderedResults.Move(match, 0); }
-
+            
             return orderedResults;
         }
 
