@@ -24,7 +24,7 @@ namespace Lanceur.Infra.Managers
         public IEnumerable<QueryResult> Handle(IEnumerable<QueryResult> collection)
         {
             return collection
-                .Select(item => Handle(item))
+                .Select(Handle)
                 .Where(item => item is not null);
         }
 

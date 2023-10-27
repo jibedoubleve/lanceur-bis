@@ -33,8 +33,8 @@ namespace Lanceur.Infra.Services
         {
             // Upgrade alias to executable macro and return the result
             var toReturn = results?.Any() ?? false
-                ? _macroManager.Handle(results)
-                : new List<QueryResult>();
+                ? _macroManager.Handle(results).ToList()
+                : new();
 
             // Refresh the thumbnails
             _thumbnailManager.RefreshThumbnails(toReturn);
@@ -72,12 +72,13 @@ namespace Lanceur.Infra.Services
 
             // If there's an exact match, promote it to the top
             // of the list.
-            var match = (from r in results
+            var orderedResults = SetupAndSort(results).ToList();
+            var match = (from r in orderedResults 
                          where r.Name == query.Name
                          select r).FirstOrDefault();
-            if (match is not null) { results.Move(match, 0); }
+            if (match is not null) { orderedResults.Move(match, 0); }
 
-            return SetupAndSort(results);
+            return orderedResults;
         }
 
         #endregion Methods
