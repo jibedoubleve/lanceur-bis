@@ -209,6 +209,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         queryResult.Count = first.Count;
     }
 
+    /// <inheritdoc/>
     public void HydrateAlias(AliasQueryResult alias)
     {
         if (alias is null) return;

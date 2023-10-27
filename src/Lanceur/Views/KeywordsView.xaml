@@ -208,13 +208,20 @@
                                 Margin="5"
                                 Text="{Binding ElementName=Aliases, Path=SelectedItem.Notes, UpdateSourceTrigger=PropertyChanged}" />
                         </HeaderedContentControl>
+                        <HeaderedContentControl Header="LUA script">
+                            <TextBlock TextAlignment="Center">
+                                <Hyperlink x:Name="BtnLuaEditor" Click="OnClickLuaEditor">
+                                    Open Lua editor...
+                                </Hyperlink>
+                            </TextBlock>
+                        </HeaderedContentControl>
                         <HeaderedContentControl Header="Parameters">
                             <DataGrid
                                 AreRowDetailsFrozen="True"
                                 AutoGenerateColumns="False"
+                                CanUserAddRows="True"
                                 CanUserDeleteRows="True"
                                 CanUserResizeColumns="False"
-                                CanUserAddRows="True"
                                 ItemsSource="{Binding ElementName=Aliases, Path=SelectedItem.AdditionalParameters, UpdateSourceTrigger=PropertyChanged}"
                                 SelectionMode="Single">
                                 <DataGrid.Columns>

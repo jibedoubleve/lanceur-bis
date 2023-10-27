@@ -40,6 +40,7 @@ public class AliasSearchDbAction
                     a.start_mode  as {nameof(AliasQueryResult.StartMode)},
                     a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
                     a.icon        as {nameof(AliasQueryResult.Icon)},
+                    a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count  as {nameof(AliasQueryResult.Count)},
                     s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
                     s.Synonyms    as {nameof(AliasQueryResult.SynonymsPreviousState)}
@@ -76,6 +77,7 @@ public class AliasSearchDbAction
                     a.start_mode                      as {nameof(AliasQueryResult.StartMode)},
                     a.working_dir                     as {nameof(AliasQueryResult.WorkingDirectory)},
                     a.icon                            as {nameof(AliasQueryResult.Icon)},
+                    a.lua_script                      as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count                      as {nameof(AliasQueryResult.Count)},
                     s.synonyms                        as {nameof(AliasQueryResult.Synonyms)},
                     s.Synonyms                        as {nameof(AliasQueryResult.SynonymsPreviousState)}

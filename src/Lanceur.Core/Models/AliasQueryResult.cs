@@ -49,7 +49,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 
     /// <summary>
     /// Indicates whether the alias should override the RunAs value and execute
-    /// in priviledge mode (as admin).
+    /// in privilege mode (as admin).
     /// </summary>
     public override bool IsElevated
     {
@@ -57,11 +57,17 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
         set => RunAs = value ? RunAs.Admin : RunAs.CurrentUser;
     }
 
-    public bool IsHidden { get; set; } = false;
+    public bool IsHidden { get; set; }
 
     public string Notes { get; set; }
 
     public RunAs RunAs { get; set; } = RunAs.CurrentUser;
+    
+    /// <summary>
+    /// Gets or sets a Lua script that will be executed
+    /// when user launch an alias
+    /// </summary>
+    public string LuaScript { get; set; }
 
     public StartMode StartMode { get; set; } = StartMode.Default;
 

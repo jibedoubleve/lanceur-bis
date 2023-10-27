@@ -180,6 +180,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     working_dir,
                     id_session,
                     icon,
+                    lua_script,
                     hidden
                 ) values (
                     @arguments,
@@ -190,6 +191,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @workingDirectory,
                     @idSession,
                     @icon,
+                    @luaScript,
                     @isHidden
                 );
                 select last_insert_rowid() from alias limit 1;";
@@ -203,6 +205,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.WorkingDirectory,
                 idSession,
                 alias.Icon,
+                alias.LuaScript,
                 alias.IsHidden
             };
 
@@ -281,6 +284,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     a.start_mode  as {nameof(AliasQueryResult.StartMode)},
                     a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
                     a.icon        as {nameof(AliasQueryResult.Icon)},
+                    a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count  as {nameof(AliasQueryResult.Count)},
                     a.hidden      as {nameof(AliasQueryResult.IsHidden)}
                 from
@@ -356,7 +360,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                     run_as      = @runAs,
                     start_mode  = @startMode,
                     working_dir = @WorkingDirectory,
-                    icon        = @Icon
+                    icon        = @Icon,
+                    lua_script  = @luaScript                                   
                 where id = @id;";
 
             _db.WithinTransaction(tx =>
@@ -370,6 +375,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     alias.StartMode,
                     alias.WorkingDirectory,
                     alias.Icon,
+                    alias.LuaScript,
                     id = alias.Id
                 });
                 CreateAdditionalParameters(alias, tx);

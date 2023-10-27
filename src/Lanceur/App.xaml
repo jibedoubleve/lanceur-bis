@@ -2,9 +2,9 @@
     x:Class="Lanceur.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:local="clr-namespace:Lanceur"
     xmlns:theming="clr-namespace:Lanceur.Xaml"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     StartupUri="Views/MainView.xaml">
     <Application.Resources>
         <ResourceDictionary>

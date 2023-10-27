@@ -1,5 +1,6 @@
 ﻿using DynamicData;
 using DynamicData.Binding;
+using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -33,6 +34,7 @@ namespace Lanceur.Views
 
         private readonly SourceList<QueryResult> _aliases = new();
         private readonly IDbRepository _aliasService;
+        private readonly Interaction<Script, string> _askLuaEditor;
         private readonly Scope<bool> _busyScope;
         private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
@@ -64,6 +66,7 @@ namespace Lanceur.Views
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDbRepository>();
             _confirmRemove = Interactions.YesNoQuestion(schedulers.MainThreadScheduler);
+            _askLuaEditor = new();
 
             this.WhenActivated(d =>
             {
@@ -91,6 +94,8 @@ namespace Lanceur.Views
 
         [Reactive] public AliasQueryResult AliasToCreate { get; set; }
 
+        public Interaction<Script, string> AskLuaEditor => _askLuaEditor;
+
         [Reactive] public string BusyMessage { get; set; }
 
         public Interaction<string, bool> ConfirmRemove => _confirmRemove;
@@ -98,6 +103,8 @@ namespace Lanceur.Views
         public ReactiveCommand<Unit, Unit> CreateAlias { get; private set; }
 
         [Reactive] public bool IsBusy { get; set; }
+
+        public ReactiveCommand<Unit, string> EditLuaScript { get; private set; }
 
         public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; private set; }
 
@@ -231,6 +238,16 @@ namespace Lanceur.Views
 
             SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, SaveOrUpdateAliasResponse>(OnSaveOrUpdateAliasAsync, this.IsValid(), outputScheduler: uiThread).DisposeWith(d);
             SaveOrUpdateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
+            EditLuaScript = ReactiveCommand.CreateFromTask(OnEditLuaScript, outputScheduler: uiThread).DisposeWith(d);
+            EditLuaScript.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+        }
+
+        private async Task<string> OnEditLuaScript()
+        {
+            var output = await _askLuaEditor.Handle(SelectedAlias.ToScript());
+            SelectedAlias.LuaScript = output;
+            return output;
         }
 
         private void SetupValidations(CompositeDisposable d)

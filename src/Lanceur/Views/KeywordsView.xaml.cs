@@ -4,6 +4,7 @@ using Lanceur.Utils;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using System.Reactive.Disposables;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Lanceur.Views
@@ -23,6 +24,20 @@ namespace Lanceur.Views
             this.WhenActivated(d =>
             {
                 AppLogFactory.Get<KeywordsView>().Trace($"Activating {nameof(KeywordsView)}");
+
+                ViewModel.AskLuaEditor.RegisterHandler(interaction =>
+                {
+                    var backup = interaction.Input;
+                    var window = new LuaEditorView
+                    {
+                        Owner = Window.GetWindow(this),
+                        LuaScript = interaction.Input,
+                    };
+                    var dialogResult = window.ShowDialog();
+
+                    if (dialogResult == true) { interaction.SetOutput(window.LuaScript.Code); }
+                    else { interaction.SetOutput(backup.Code); }
+                });
 
                 ViewModel.ConfirmRemove.RegisterHandler(async interaction =>
                 {
@@ -56,6 +71,11 @@ namespace Lanceur.Views
         {
             Aliases.ScrollIntoView(Aliases.SelectedItem);
             ViewModel?.HydrateSelectedAlias();
+        }
+
+        private void OnClickLuaEditor(object sender, RoutedEventArgs e)
+        {
+            ViewModel.EditLuaScript.Execute();
         }
 
         #endregion Methods

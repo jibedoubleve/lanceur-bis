@@ -5,10 +5,10 @@
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Assets\appIcon.ico</ApplicationIcon>
-    <AssemblyVersion>2.4.0.1</AssemblyVersion>
-    <FileVersion>2.4.0.0</FileVersion>
-    <InformationalVersion>2.4.0-alpha.1+8.Branch.issue-257.Sha.62499d79527971ab1af93744ab78c818bf0a9f20</InformationalVersion>
-    <Version>2.4.0-alpha0001</Version>
+    <AssemblyVersion>2.5.0.1</AssemblyVersion>
+    <FileVersion>2.5.0.0</FileVersion>
+    <InformationalVersion>2.5.0-alpha-333.1+63.Branch.issue-333.Sha.c71a55d32cfcf2f91a3a3cdfa98c8f0ac6f4a136</InformationalVersion>
+    <Version>2.5.0-alpha-333-0001</Version>
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\appIcon.ico">
@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.*" />
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.1" />
     <PackageReference Include="MahApps.Metro" Version="2.4.*" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.*" />
@@ -49,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\Modern-InformationCircle.png" />
+    <None Remove="SyntaxColoration\LUA-Mode.xml" />
     <Content Include="Assets\IconInfo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -59,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\IconError.png" />
+    <EmbeddedResource Include="SyntaxColoration\LUA-Mode.xml" />
     <Content Include="Assets\IconError.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
