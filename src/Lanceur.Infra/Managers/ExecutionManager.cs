@@ -1,10 +1,12 @@
 ﻿using Lanceur.Core;
+using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.LuaScripting;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
 using System.Diagnostics;
@@ -41,6 +43,22 @@ namespace Lanceur.Infra.Managers
 
         #region Methods
 
+        private static void ExecuteLuaScript(ref AliasQueryResult query)
+        {
+            var result = LuaManager.ExecuteScript(new()
+            {
+                Code = query.LuaScript,
+                Context = new()
+                {
+                    FileName = query.FileName,
+                    Parameters = query.Parameters
+                }
+
+            });
+            if(result?.Context?.FileName is not null) query.FileName = result.Context.FileName;
+            if(result?.Context?.Parameters is not null) query.Parameters = result.Context.Parameters;
+        }
+
         private async Task<IEnumerable<QueryResult>> ExecuteAliasAsync(AliasQueryResult query)
         {
             try
@@ -61,19 +79,22 @@ namespace Lanceur.Infra.Managers
                     return ExecuteProcess(query);
                 }
             }
-            catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}'", ex); }
+            catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}: {ex.Message}'", ex); }
         }
 
         private IEnumerable<QueryResult> ExecuteProcess(AliasQueryResult query)
         {
             if (query is null) return QueryResult.NoResult;
-                
+
+            query.Parameters = _wildcardManager.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
+            ExecuteLuaScript(ref query);
+
             _log.Debug($"Executing '{query.FileName}' with args '{query.Query.Parameters}'");
             var psi = new ProcessStartInfo
             {
                 FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
                 Verb = "open",
-                Arguments = _wildcardManager.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters),
+                Arguments = query.Parameters,
                 UseShellExecute = true,
                 WorkingDirectory = query.WorkingDirectory,
                 WindowStyle = query.StartMode.AsWindowsStyle(),

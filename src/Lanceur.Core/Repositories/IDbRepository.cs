@@ -91,7 +91,7 @@ namespace Lanceur.Core.Repositories
         void Hydrate(QueryResult queryResult);
 
         /// <summary>
-        /// Hydrate the alias with the additional parameters.
+        /// Hydrate the <see cref="AliasQueryResult"/> with the additional parameters.
         /// </summary>
         /// <param name="alias">The alias to hydrate</param>
         void HydrateAlias(AliasQueryResult alias);
