@@ -13,6 +13,7 @@ namespace Lanceur.Infra.Utils
                 ?? locator?.GetService<IAppLoggerFactory>()?.GetLogger<TCategory>()
                 ?? new TraceLogger();
         }
+
         public static IAppLogger GetLogger(this IReadonlyDependencyResolver locator, Type category, IAppLoggerFactory factory = null)
         {
             return factory?.GetLogger(category)

@@ -1,15 +1,15 @@
-using System.IO.FileOps.Test.Helpers;
 using FluentAssertions;
 using Newtonsoft.Json;
 using System.IO.FileOps.Infrastructure;
 using System.IO.FileOps.Infrastructure.Operations;
+using System.IO.FileOps.Test.Helpers;
 using Xunit.Abstractions;
 
 namespace System.IO.FileOps.Test.SystemTests;
 
 public class SerialiserShould : IDisposable
 {
-    #region Private members
+    #region Fields
 
     private readonly string _destinationDir = Path.Combine(Path.GetTempPath(), "destination");
     private readonly string _directory = Path.Combine(Path.GetTempPath(), "toRemove");
@@ -18,6 +18,23 @@ public class SerialiserShould : IDisposable
 
     private readonly ITestOutputHelper _output;
     private readonly string _zipFile = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}.zip");
+
+    #endregion Fields
+
+    #region Constructors
+
+    public SerialiserShould(ITestOutputHelper output)
+    {
+        _output = output;
+
+        _output.WriteLine($"Zip file       : {_zipFile}");
+        _output.WriteLine($"Destination dir: {_destinationDir}");
+        _output.WriteLine($"Directory      : {_directory}");
+    }
+
+    #endregion Constructors
+
+    #region Methods
 
     private void OutputJsonFile()
     {
@@ -32,23 +49,6 @@ public class SerialiserShould : IDisposable
         _output.WriteLine("Json configuration file contains:");
         _output.WriteLine(json);
     }
-
-    #endregion
-
-    #region Constructors
-
-    public SerialiserShould(ITestOutputHelper output)
-    {
-        _output = output;
-
-        _output.WriteLine($"Zip file       : {_zipFile}");
-        _output.WriteLine($"Destination dir: {_destinationDir}");
-        _output.WriteLine($"Directory      : {_directory}");
-    }
-
-    #endregion
-
-    #region Public methods
 
     [Fact]
     public async Task Deserialize()
@@ -111,5 +111,5 @@ public class SerialiserShould : IDisposable
                  .Should().BeGreaterThan(0);
     }
 
-    #endregion
+    #endregion Methods
 }

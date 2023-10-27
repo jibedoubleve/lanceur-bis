@@ -1,8 +1,6 @@
 ﻿using Lanceur.Utils;
 using ReactiveUI;
-using ScottPlot;
 using System;
-using System.Drawing;
 using System.Linq;
 
 namespace Lanceur.Views
@@ -45,7 +43,6 @@ namespace Lanceur.Views
 
                 ViewModel.Activate.Execute().Subscribe();
             });
-
         }
 
         #endregion Constructors

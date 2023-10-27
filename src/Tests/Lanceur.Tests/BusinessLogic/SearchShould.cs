@@ -4,7 +4,6 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
-using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.SQLite;
@@ -52,13 +51,21 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
+        public void HaveStores()
+        {
+            SearchService service = BuildSearchService(new StoreLoader());
+
+            service.Stores.Should().HaveCount(5);
+        }
+
+        [Fact]
         public void NOT_HaveNullParameters()
         {
             // arrange
             var converter = Substitute.For<IConvertionService>();
             var sql = SQL_CreateAlias;
             using var db = BuildFreshDb(sql);
-            using var scope = new SQLiteDbConnectionManager(db);
+            using var scope = new SQLiteMultiConnectionManager(db);
 
             var action = new SQLiteRepository(scope, _testLoggerFactory, converter);
 
@@ -68,15 +75,6 @@ namespace Lanceur.Tests.BusinessLogic
 
             //assert
             parameters.Should().NotContain((string)null);
-
-        }
-
-        [Fact]
-        public void HaveStores()
-        {
-            SearchService service = BuildSearchService(new StoreLoader());
-
-            service.Stores.Should().HaveCount(5);
         }
 
         [Fact]

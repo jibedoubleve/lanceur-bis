@@ -13,10 +13,9 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private static Dictionary<string, SelfExecutableQueryResult> _macroInstances = null;
+        private static Dictionary<string, SelfExecutableQueryResult> _macroInstances;
         private readonly Assembly _asm;
         private readonly IDbRepository _dataService;
-        protected readonly IAppLogger _log;
 
         #endregion Fields
 
@@ -25,13 +24,15 @@ namespace Lanceur.Infra.Managers
         internal MacroManagerCache(Assembly asm, IAppLoggerFactory logFactory)
         {
             _asm = asm;
-            _log = Locator.Current.GetLogger<MacroManager>(logFactory);
+            Log = Locator.Current.GetLogger<MacroManager>(logFactory);
             _dataService = Locator.Current.GetService<IDbRepository>();
         }
 
         #endregion Constructors
 
         #region Properties
+
+        protected IAppLogger Log { get;  }
 
         protected Dictionary<string, SelfExecutableQueryResult> MacroInstances
         {
@@ -48,31 +49,29 @@ namespace Lanceur.Infra.Managers
 
         private void LoadMacros()
         {
-            if (_macroInstances is null)
+            if (_macroInstances is not null) return;
+
+            var found = from t in _asm.GetTypes()
+                        where t.GetCustomAttributes<MacroAttribute>().Any()
+                        select t;
+            var macroInstances = new Dictionary<string, SelfExecutableQueryResult>();
+            foreach (var type in found)
             {
-                var found = from t in _asm.GetTypes()
-                            where t.GetCustomAttributes<MacroAttribute>().Any()
-                            select t;
-                var macroInstances = new Dictionary<string, SelfExecutableQueryResult>();
-                foreach (var type in found)
-                {
-                    var instance = Activator.CreateInstance(type);
-                    if (instance is SelfExecutableQueryResult alias)
-                    {
-                        var name = alias.Name = (type.GetCustomAttribute(typeof(MacroAttribute)) as MacroAttribute)?.Name;
-                        name = name.ToUpper().Replace("@", string.Empty);
+                var instance = Activator.CreateInstance(type);
+                if (instance is not SelfExecutableQueryResult alias) continue;
 
-                        var description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
-                        alias.Description = description;
+                var name = alias.Name = (type.GetCustomAttribute(typeof(MacroAttribute)) as MacroAttribute)?.Name;
+                name = name?.ToUpper().Replace("@", string.Empty) ?? string.Empty;
 
-                        _dataService.HydrateMacro(alias);
+                var description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
+                alias.Description = description;
 
-                        macroInstances.Add(name, alias);
-                        _log.Trace($"Found macro '{name}'");
-                    }
-                }
-                _macroInstances = macroInstances;
+                _dataService.HydrateMacro(alias);
+
+                macroInstances.Add(name, alias);
+                Log.Trace($"Found macro '{name}'");
             }
+            _macroInstances = macroInstances;
         }
 
         #endregion Methods

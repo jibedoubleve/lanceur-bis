@@ -10,6 +10,7 @@ using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Macros;
 using Lanceur.Tests.Utils;
+using Lanceur.Tests.Utils.Builders;
 using Lanceur.Tests.Utils.ReservedAliases;
 using Lanceur.Views.Mixins;
 using Microsoft.Reactive.Testing;
@@ -17,7 +18,6 @@ using NSubstitute;
 using ReactiveUI.Testing;
 using Splat;
 using System.Reactive.Concurrency;
-using Lanceur.Tests.Utils.Builders;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -41,49 +41,6 @@ namespace Lanceur.Tests.ViewModels
         #endregion Constructors
 
         #region Methods
-
-        [Theory]
-        [InlineData(true, 5)]
-        [InlineData(false, 0)]
-        public void ShowResultWhenConfigured(bool showResult, int expectedCount)
-        {
-            new TestScheduler().With(scheduler =>
-            {
-                // ARRANGE
-                var settings = Substitute.For<ISettingsFacade>();
-                settings.Application.Returns(new AppConfig
-                {
-                    Window = new WindowSection()
-                    {
-                        ShowResult = showResult
-                    }
-                });
-
-                var searchService = Substitute.For<ISearchService>();
-                searchService.GetAll().Returns(new AliasQueryResult[]
-                {
-                    new AliasQueryResult(),
-                    new AliasQueryResult(),
-                    new AliasQueryResult(),
-                    new AliasQueryResult(),
-                    new AliasQueryResult()
-                });
-
-                var vm = new MainViewModelBuilder()
-                            .With(_output)
-                            .With(scheduler)
-                            .With(settings)
-                            .With(searchService)
-                            .Build();
-
-                // ACT
-                vm.Activate.Execute().Subscribe();
-
-                // ASSERT
-                scheduler.Start();
-                vm.Results.Should().HaveCount(expectedCount);
-            });
-        }
 
         [Theory]
         [InlineData("=8*5", "40")]
@@ -247,6 +204,49 @@ namespace Lanceur.Tests.ViewModels
                     vm.CurrentAlias.Should().NotBeNull();
                     vm.CurrentAlias?.Name.Should().Be("debug all"); // I know the first result in debug is 'debug all'
                 }
+            });
+        }
+
+        [Theory]
+        [InlineData(true, 5)]
+        [InlineData(false, 0)]
+        public void ShowResultWhenConfigured(bool showResult, int expectedCount)
+        {
+            new TestScheduler().With(scheduler =>
+            {
+                // ARRANGE
+                var settings = Substitute.For<ISettingsFacade>();
+                settings.Application.Returns(new AppConfig
+                {
+                    Window = new WindowSection()
+                    {
+                        ShowResult = showResult
+                    }
+                });
+
+                var searchService = Substitute.For<ISearchService>();
+                searchService.GetAll().Returns(new AliasQueryResult[]
+                {
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult(),
+                    new AliasQueryResult()
+                });
+
+                var vm = new MainViewModelBuilder()
+                            .With(_output)
+                            .With(scheduler)
+                            .With(settings)
+                            .With(searchService)
+                            .Build();
+
+                // ACT
+                vm.Activate.Execute().Subscribe();
+
+                // ASSERT
+                scheduler.Start();
+                vm.Results.Should().HaveCount(expectedCount);
             });
         }
 

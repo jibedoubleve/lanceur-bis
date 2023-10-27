@@ -9,7 +9,6 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
 using System;
 using System.IO;
-using System.IO.FileOps.Infrastructure;
 using System.Windows;
 using System.Windows.Threading;
 

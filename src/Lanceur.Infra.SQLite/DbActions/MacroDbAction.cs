@@ -1,5 +1,4 @@
-﻿using Lanceur.Core;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.SQLite.DbActions
@@ -64,7 +63,7 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// </summary>
         /// <param name="collection">The collection to upgrade</param>
         /// <returns>
-        /// The collection with all element that are upgradable 
+        /// The collection with all element that are upgradable
         /// to composite, upgraded
         /// </returns>
         public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)

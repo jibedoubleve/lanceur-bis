@@ -13,8 +13,10 @@ namespace Lanceur.Ui
 
         private const int ThumbnailSize = 64;
 
+        private static readonly Dictionary<string, ImageSource> _cache = new();
+
         private static readonly string[] ImageExtensions =
-        {
+                {
             ".png",
             ".jpg",
             ".jpeg",
@@ -51,8 +53,6 @@ namespace Lanceur.Ui
                 options
                 );
         }
-
-        private static readonly Dictionary<string, ImageSource> _cache = new();
 
         public static ImageSource Get(string path)
         {

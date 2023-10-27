@@ -6,11 +6,14 @@ namespace System.IO.FileOps.Test.SystemTests;
 
 public class SchedulerShould : IDisposable
 {
-    #region Private members
-
-    private readonly string _fileName = string.Format(FilePattern, Guid.NewGuid());
+    #region Fields
 
     private const string FilePattern = "lanceur_operation_log_{0}.json";
+    private readonly string _fileName = string.Format(FilePattern, Guid.NewGuid());
+
+    #endregion Fields
+
+    #region Methods
 
     private static List<OperationConfiguration> GetRandomOperations(int count)
     {
@@ -24,10 +27,6 @@ public class SchedulerShould : IDisposable
                 });
         return results;
     }
-
-    #endregion
-
-    #region Public methods
 
     [Fact]
     public async Task CreateInMemoryBeforeSaving()
@@ -111,5 +110,5 @@ public class SchedulerShould : IDisposable
                  .Be(3);
     }
 
-    #endregion
+    #endregion Methods
 }

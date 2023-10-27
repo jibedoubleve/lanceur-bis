@@ -1,10 +1,8 @@
 ﻿using Lanceur.Utils;
 using ReactiveUI;
 using ScottPlot;
-using ScottPlot.Statistics.Interpolation;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace Lanceur.Views

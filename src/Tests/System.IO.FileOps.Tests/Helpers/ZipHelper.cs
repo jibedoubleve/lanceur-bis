@@ -4,7 +4,7 @@ namespace System.IO.FileOps.Test.Helpers;
 
 public class ZipHelper
 {
-    #region Public methods
+    #region Methods
 
     /// <summary>
     ///     Zip the specified text file into the specified zip file
@@ -28,5 +28,5 @@ public class ZipHelper
         ZipFile.CreateFromDirectory(sourceDir, zipFile);
     }
 
-    #endregion
+    #endregion Methods
 }

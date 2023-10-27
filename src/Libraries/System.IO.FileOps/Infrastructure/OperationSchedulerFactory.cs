@@ -4,7 +4,7 @@ namespace System.IO.FileOps.Infrastructure;
 
 public static class OperationSchedulerFactory
 {
-    #region Public methods
+    #region Methods
 
     public static async Task<IOperationScheduler> RetrieveFromFileAsync(string filePath)
     {
@@ -13,7 +13,8 @@ public static class OperationSchedulerFactory
         return scheduler;
     }
 
-    public static IOperationScheduler RetrieveFromMemory() { return new MemoryOperationScheduler(); }
+    public static IOperationScheduler RetrieveFromMemory()
+    { return new MemoryOperationScheduler(); }
 
-    #endregion
+    #endregion Methods
 }

@@ -7,9 +7,9 @@ public static class AliasQueryResultMixin
     public static void UpdateIcon(this AliasQueryResult alias)
     {
         if (alias is null) return;
-        
+
         var uri = alias.FileName ?? string.Empty;
-        if (Uri.TryCreate(uri, UriKind.Absolute, out _) 
+        if (Uri.TryCreate(uri, UriKind.Absolute, out _)
             && uri.StartsWith("http"))
         {
             alias.Icon = "Web";

@@ -25,11 +25,11 @@ namespace Lanceur.Ui
 
         #region Methods
 
-        public bool IsInCache(string path) => _cache.ContainsKey(path);
-
         public IEnumerator<KeyValuePair<string, ImageSource>> GetEnumerator() => _cache.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public bool IsInCache(string path) => _cache.ContainsKey(path);
 
         #endregion Methods
     }

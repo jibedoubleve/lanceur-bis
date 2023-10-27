@@ -14,8 +14,8 @@ namespace Lanceur.Xaml
 
         private const string DarkTheme = "Dark.Accent1";
         private const string LightTheme = "Light.Accent1";
-        private static Application _app;
         private static readonly IAppLogger _log = AppLogFactory.Get<ThemeManager>();
+        private static Application _app;
         private static ThemeManager _instance;
 
         #endregion Fields
@@ -86,6 +86,8 @@ namespace Lanceur.Xaml
             }
         }
 
+        private void ResetTheme() => SetTheme(GetTheme());
+
         public static Themes GetTheme()
         {
             object value = Registry.GetValue(@"HKEY_CURRENT_USER\Software\\Microsoft\Windows\\CurrentVersion\Themes\\Personalize", "AppsUseLightTheme", null);
@@ -95,8 +97,6 @@ namespace Lanceur.Xaml
                     ? Themes.Light
                     : Themes.Dark;
         }
-
-        private void ResetTheme() => SetTheme(GetTheme());
 
         public void SetTheme(Themes? theme = null)
         {

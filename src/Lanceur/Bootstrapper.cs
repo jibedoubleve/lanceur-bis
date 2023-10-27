@@ -30,7 +30,6 @@ using System;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
-using Lanceur.Infra.SQLite.Helpers;
 
 namespace Lanceur;
 
@@ -88,7 +87,7 @@ public class Bootstrapper
         l.Register<IStoreLoader>(() => new StoreLoader());
         l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
         l.Register<ICmdlineManager>(() => new CmdlineManager());
-        l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(), 
+        l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(),
                                                                  Get<IWildcardManager>(),
                                                                  Get<IDbRepository>(),
                                                                  Get<ICmdlineManager>()));
@@ -130,13 +129,12 @@ public class Bootstrapper
                 new PluginValidationRule(Get<IPluginManifestRepository>()));
 
         // SQLite
-        l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(), 
+        l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(),
                                            Get<IAppLoggerFactory>(),
                                            Get<IDataStoreUpdateManager>()));
 
         l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
-        
-        l.Register<IDbConnectionManager>(() => new SQLiteDbConnectionManager(Get<SQLiteConnection>()));
+        l.Register<IDbConnectionManager>(() => new SQLiteMultiConnectionManager(Get<SQLiteConnection>()));
 
         l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
 
@@ -152,7 +150,7 @@ public class Bootstrapper
 
     private static void RegisterViewModels()
     {
-        var l   = Locator.CurrentMutable;
+        var l = Locator.CurrentMutable;
         var log = Locator.Current.GetService<ILogManager>().GetLogger<Bootstrapper>();
 
         // Misc
@@ -175,7 +173,7 @@ public class Bootstrapper
                 continue;
             }
 
-            var ctor   = vmType.GetConstructors()[0];
+            var ctor = vmType.GetConstructors()[0];
             var pCount = ctor.GetParameters().Length;
 
             log.Info($"Add ViewModel '{vmType.FullName}' into IOC. Ctor has {pCount} parameter(s).");
@@ -196,8 +194,8 @@ public class Bootstrapper
         RegisterServices();
         RegisterViewModels();
 
-        var l      = Locator.Current;
-        var stg    = l.GetService<IConnectionString>();
+        var l = Locator.Current;
+        var stg = l.GetService<IConnectionString>();
         var sqlite = l.GetService<SQLiteUpdater>();
 
         AppLogFactory.Get<Bootstrapper>().Trace($"Settings DB path: '{stg.ToString()}'");

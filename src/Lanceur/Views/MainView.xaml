@@ -49,7 +49,6 @@
             x:Key="QueryResultSelector"
             DefaultTemplate="{StaticResource QueryResultTemplate}"
             DisplayResultTemplate="{StaticResource SimpleQueryResultTemplate}" />
-
     </Window.Resources>
     <Grid Margin="24,24,24,24" Background="Transparent">
         <Rectangle

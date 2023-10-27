@@ -7,15 +7,14 @@ using Splat;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class AdditionalParametersStore: ISearchService
+public class AdditionalParametersStore : ISearchService
 {
-    
     #region Fields
 
     private readonly IDbRepository _aliasService;
 
     #endregion Fields
-    
+
     #region Constructors
 
     public AdditionalParametersStore() : this(null)

@@ -11,6 +11,5 @@ namespace Lanceur.Core.Requests
         public bool RunAsAdmin { get; set; }
 
         #endregion Properties
-
     }
 }

@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Lanceur.Utils.ConnectionStrings;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Xunit;
 
@@ -9,7 +8,7 @@ namespace Lanceur.Tests.Functional
     public class ConnectionStringShould
     {
         #region Methods
-      
+
         [Fact]
         public void HaveExistingDebugDatabase()
         {

@@ -22,7 +22,7 @@ namespace Lanceur.Tests.Logging
 
         #region Methods
 
-        private string Wrap(string message) => $" -- ReactiveUI -- {message, -6}";
+        private string Wrap(string message) => $" -- ReactiveUI -- {message,-6}";
 
         public void Write([Localizable(false)] string message, LogLevel logLevel) => Write(Wrap(message), $"{logLevel}");
 

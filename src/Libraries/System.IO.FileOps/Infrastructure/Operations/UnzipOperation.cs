@@ -5,21 +5,23 @@ namespace System.IO.FileOps.Infrastructure.Operations;
 
 internal class UnzipOperation : AbstractOperation, IOperation
 {
-    #region Private members
+    #region Constructors
+
+    public UnzipOperation(Dictionary<string, string> parameters) : base("unzip", parameters)
+    {
+    }
+
+    #endregion Constructors
+
+    #region Properties
 
     private string ArchiveFile => Parameters["zip"];
 
     private string Destination => Parameters["destination"];
 
-    #endregion
+    #endregion Properties
 
-    #region Constructors
-
-    public UnzipOperation(Dictionary<string, string> parameters) : base("unzip", parameters) { }
-
-    #endregion
-
-    #region Public methods
+    #region Methods
 
     public async Task ProcessAsync()
     {
@@ -28,7 +30,6 @@ internal class UnzipOperation : AbstractOperation, IOperation
         if (!Directory.Exists(Destination))
         {
             Directory.CreateDirectory(Destination);
-            
         }
 
         if (!Directory.Exists(Destination))
@@ -40,5 +41,5 @@ internal class UnzipOperation : AbstractOperation, IOperation
         await Task.Run(() => ZipFile.ExtractToDirectory(ArchiveFile, Destination));
     }
 
-    #endregion
+    #endregion Methods
 }

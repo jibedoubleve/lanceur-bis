@@ -28,8 +28,6 @@ public abstract class QueryResult : ObservableModel
     public int Count { get; set; } = 0;
     public virtual string Description { get; set; }
 
-    public virtual string Name { get; set; } = string.Empty;
-
     /// <summary>
     /// Fall back for <see cref="Thumbnail"/>. This property is expected to
     /// contain information to display an icon (or whatever) in the UI
@@ -48,6 +46,7 @@ public abstract class QueryResult : ObservableModel
     /// </summary>
     public virtual bool IsResult => true;
 
+    public virtual string Name { get; set; } = string.Empty;
     public Cmdline Query { get; set; } = Cmdline.Empty;
 
     /// <summary>

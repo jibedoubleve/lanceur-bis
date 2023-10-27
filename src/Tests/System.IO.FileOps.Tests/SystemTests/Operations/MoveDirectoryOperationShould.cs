@@ -6,22 +6,13 @@ namespace System.IO.FileOps.Test.SystemTests.Operations;
 
 public class MoveDirectoryOperationShould : IDisposable
 {
-    #region Private members
+    #region Fields
 
-    private void Cleanup()
-    {
-        if (Directory.Exists(Source)) Directory.Delete(Source, true);
-        if (Directory.Exists(Destination)) Directory.Delete(Destination, true);
-    }
-
-    private string Destination { get; }
     private const string DestinationName = "RandomDirectory_dst_MVDIR";
-
-    private string Source { get; }
 
     private const string SourceName = "RandomDirectory_src_MVDIR";
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -41,9 +32,23 @@ public class MoveDirectoryOperationShould : IDisposable
         Destination = Path.Combine(Path.GetTempPath(), DestinationName);
     }
 
-    #endregion
+    #endregion Constructors
 
-    #region Public methods
+    #region Properties
+
+    private string Destination { get; }
+
+    private string Source { get; }
+
+    #endregion Properties
+
+    #region Methods
+
+    private void Cleanup()
+    {
+        if (Directory.Exists(Source)) Directory.Delete(Source, true);
+        if (Directory.Exists(Destination)) Directory.Delete(Destination, true);
+    }
 
     [Fact]
     public async Task BeProcessed()
@@ -62,7 +67,8 @@ public class MoveDirectoryOperationShould : IDisposable
                  .Should().BeGreaterThan(0);
     }
 
-    public void Dispose() { Cleanup(); }
+    public void Dispose()
+    { Cleanup(); }
 
-    #endregion
+    #endregion Methods
 }

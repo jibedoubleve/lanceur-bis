@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Lanceur.Core.Plugins;
-using System;
 using System.Collections.Generic;
 
 namespace Lanceur.Views.Mixins

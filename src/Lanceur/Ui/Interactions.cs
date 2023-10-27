@@ -11,9 +11,9 @@ namespace Lanceur.Ui
     {
         #region Methods
 
-        public static Interaction<string, bool> YesNoQuestion(IScheduler scheduler = null) => new(scheduler);
-
         public static Interaction<Unit, string> SelectFile(IScheduler scheduler = null) => new(scheduler);
+
+        public static Interaction<string, bool> YesNoQuestion(IScheduler scheduler = null) => new(scheduler);
 
         #endregion Methods
     }

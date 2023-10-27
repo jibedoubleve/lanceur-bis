@@ -63,7 +63,7 @@ namespace System.SQLite.Updater
                 var match = regex.Matches(item.Key);
                 if (match.Count <= 0 || match[0].Groups.Count < 1) continue;
 
-                var ver     = match[0].Groups[1].Value.Trim('.');
+                var ver = match[0].Groups[1].Value.Trim('.');
                 var version = new Version(ver);
                 src.Add(version, item.Value);
             }

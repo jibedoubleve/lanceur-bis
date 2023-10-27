@@ -1,5 +1,4 @@
 using Dapper;
-using System.Data;
 
 namespace Lanceur.Infra.SQLite.Helpers;
 

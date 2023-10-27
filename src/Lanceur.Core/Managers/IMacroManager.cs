@@ -20,17 +20,17 @@ namespace Lanceur.Core.Managers
         /// <returns>
         /// The updated collection. It doesn't touch non macro <see cref="QueryResult"/>
         /// </returns>
-        /// <remarks>        
+        /// <remarks>
         /// This method <b>do not</b> update the database.
-        /// This <b>doesn't</b> touch <see cref="QueryResult"/> that 
+        /// This <b>doesn't</b> touch <see cref="QueryResult"/> that
         /// are <b>not</b> macro </remarks>
         IEnumerable<QueryResult> Handle(IEnumerable<QueryResult> collection);
 
         /// <summary>
         /// Update the macro with the information of the user query.
         /// It'll fill the <see cref="ExecutableQueryResult.Parameters"/> with
-        /// the parameters from the query the user entered. It'll remove any '@'     
-        /// from <see cref="QueryResult.Name"/> 
+        /// the parameters from the query the user entered. It'll remove any '@'
+        /// from <see cref="QueryResult.Name"/>
         /// </summary>
         /// <param name="collection"><see cref="QueryResult"/> to handle</param>
         /// <returns>
@@ -38,8 +38,8 @@ namespace Lanceur.Core.Managers
         /// </returns>
         /// <remarks>
         /// This method <b>do not</b> update the database.
-        /// This <b>doesn't</b> touch <see cref="QueryResult"/> that 
-        /// are <b>not</b> macro 
+        /// This <b>doesn't</b> touch <see cref="QueryResult"/> that
+        /// are <b>not</b> macro
         /// </remarks>
         QueryResult Handle(QueryResult item);
 

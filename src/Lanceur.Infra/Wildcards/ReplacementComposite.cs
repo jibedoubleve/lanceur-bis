@@ -36,14 +36,6 @@ namespace Lanceur.Infra.Wildcards
         #region Methods
 
         /// <inheritdoc />
-        public string ReplaceOrReplacementOnNull(string text, string withThis)
-        {
-            return text.IsNullOrWhiteSpace()
-                ? withThis
-                : Replace(text, withThis);
-        }
-
-        /// <inheritdoc />
         public string Replace(string text, string withThis)
         {
             foreach (var replacement in _replacements)
@@ -52,6 +44,14 @@ namespace Lanceur.Infra.Wildcards
             }
 
             return text;
+        }
+
+        /// <inheritdoc />
+        public string ReplaceOrReplacementOnNull(string text, string withThis)
+        {
+            return text.IsNullOrWhiteSpace()
+                ? withThis
+                : Replace(text, withThis);
         }
 
         #endregion Methods

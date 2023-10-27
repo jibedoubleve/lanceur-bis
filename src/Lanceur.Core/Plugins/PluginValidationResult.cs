@@ -15,10 +15,8 @@ public class PluginValidationResult
 
     #region Properties
 
-    public bool IsValid { get; }
-
     public bool IsUpdate { get; }
-
+    public bool IsValid { get; }
     public string Message { get; }
 
     #endregion Properties

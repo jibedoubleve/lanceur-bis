@@ -5,8 +5,17 @@
         #region Methods
 
         /// <summary>
-        /// Will go through all the replacement actions and execute them. 
-        /// A replacement action is implementing <see cref="IReplacement"/>. 
+        /// Will go through all the replacement actions and execute them.
+        /// A replacement action is implementing <see cref="IReplacement"/>
+        /// </summary>
+        /// <param name="text">The text where the replacement will take place</param>
+        /// <param name="replacement">The replacement text</param>
+        /// <returns></returns>
+        string Replace(string text, string replacement);
+
+        /// <summary>
+        /// Will go through all the replacement actions and execute them.
+        /// A replacement action is implementing <see cref="IReplacement"/>.
         /// If the specified <paramref name="text"/> is null, then return the
         /// <paramref name="replacement"/>
         /// </summary>
@@ -16,15 +25,6 @@
         /// The parameters to apply to the execution of the alias
         /// </returns>
         string ReplaceOrReplacementOnNull(string text, string replacement);
-
-        /// <summary>
-        /// Will go through all the replacement actions and execute them. 
-        /// A replacement action is implementing <see cref="IReplacement"/>
-        /// </summary>
-        /// <param name="text">The text where the replacement will take place</param>
-        /// <param name="replacement">The replacement text</param>
-        /// <returns></returns>
-        string Replace(string text, string replacement);
 
         #endregion Methods
     }

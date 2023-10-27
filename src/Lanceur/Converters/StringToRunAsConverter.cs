@@ -1,5 +1,4 @@
-﻿using Lanceur.SharedKernel.Mixins;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows.Data;
 using static Lanceur.SharedKernel.Constants;

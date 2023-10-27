@@ -37,7 +37,7 @@ namespace Lanceur.Infra.SQLite.DbActions
         {
             var sql = @"
                 select
-                	date('0001-01-'|| printf('%02d', day_of_week)) as X,                    
+                	date('0001-01-'|| printf('%02d', day_of_week)) as X,
 	                exec_count                                     as Y
                 from stat_usage_per_day_of_week_v
                 where id_session = @idSession;";

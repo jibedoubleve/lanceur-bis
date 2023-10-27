@@ -13,7 +13,7 @@ namespace Lanceur.Tests.Logging
 
         #region Methods
 
-        private static void Write(this ITestOutputHelper output, string message, [CallerMemberName] string method = null) => output.WriteLine($"[{method, -6}] {message}");
+        private static void Write(this ITestOutputHelper output, string message, [CallerMemberName] string method = null) => output.WriteLine($"[{method,-6}] {message}");
 
         public static void Act(this ITestOutputHelper output) => output.Write("---- ACT", nameof(Info));
 

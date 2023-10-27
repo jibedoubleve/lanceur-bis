@@ -7,6 +7,8 @@ namespace Lanceur.Converters
 {
     public class StringToVisibilityConverter : IValueConverter
     {
+        #region Methods
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is string str)
@@ -22,5 +24,7 @@ namespace Lanceur.Converters
         {
             throw new NotImplementedException();
         }
+
+        #endregion Methods
     }
 }

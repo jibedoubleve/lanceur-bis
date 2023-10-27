@@ -66,7 +66,9 @@ namespace Lanceur.Infra.Managers
 
         private IEnumerable<QueryResult> ExecuteProcess(AliasQueryResult query)
         {
-            _log.Debug($"Executing '{query.FileName}' with args '{query?.Query?.Parameters ?? string.Empty}'");
+            if (query is null) return QueryResult.NoResult;
+                
+            _log.Debug($"Executing '{query.FileName}' with args '{query.Query.Parameters}'");
             var psi = new ProcessStartInfo
             {
                 FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
@@ -119,16 +121,16 @@ namespace Lanceur.Infra.Managers
         {
             if (request is null)
             {
-                _log.Trace($"The execution request is null.");
-                return new ExecutionResponse
+                _log.Trace("The execution request is null.");
+                return new()
                 {
-                    Results = DisplayQueryResult.SingleFromResult($"This alias does not exist"),
+                    Results = DisplayQueryResult.SingleFromResult("This alias does not exist"),
                     HasResult = true,
                 };
             }
             if (request.QueryResult is not IExecutable)
             {
-                _log.Trace($"Alias '{(request?.QueryResult?.Name ?? "<EMPTY>")}', is not executable. Return '{nameof(ExecutionResponse.NoResult)}'.");
+                _log.Trace($"Alias '{request.QueryResult?.Name ?? "<EMPTY>"}', is not executable. Return '{nameof(ExecutionResponse.NoResult)}'.");
                 return ExecutionResponse.NoResult;
             }
 

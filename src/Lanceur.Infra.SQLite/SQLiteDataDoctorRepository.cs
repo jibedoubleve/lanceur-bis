@@ -3,7 +3,6 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
-using System.Data;
 
 namespace Lanceur.Infra.SQLite;
 

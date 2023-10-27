@@ -1,9 +1,9 @@
-﻿using System;
-using System.Reactive.Disposables;
-using System.Windows;
-using Lanceur.Ui;
+﻿using Lanceur.Ui;
 using Microsoft.Win32;
 using ReactiveUI;
+using System;
+using System.Reactive.Disposables;
+using System.Windows;
 
 namespace Lanceur.Views;
 

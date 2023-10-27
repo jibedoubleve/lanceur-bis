@@ -1,6 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using Lanceur.SharedKernel.Mixins;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using Lanceur.SharedKernel.Mixins;
 using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Core.Models;
@@ -10,15 +10,18 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 {
     #region Fields
 
+    private ObservableCollection<QueryResultAdditionalParameters> _additionalParameters = new();
     private string _fileName;
 
     private string _synonyms;
 
-    private ObservableCollection<QueryResultAdditionalParameters> _additionalParameters = new();
-
     #endregion Fields
 
     #region Properties
+
+    public static AliasQueryResult EmptyForCreation => new() { Name = "new alias" };
+
+    public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();
 
     /// <summary>
     /// Additional parameters are a way to not duplicate alias to create other with the same
@@ -29,10 +32,6 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
         get => _additionalParameters;
         set => Set(ref _additionalParameters, value);
     }
-
-    public static AliasQueryResult EmptyForCreation => new() { Name = "new alias" };
-
-    public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();
 
     public int Delay { get; set; }
 
@@ -67,11 +66,6 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     public StartMode StartMode { get; set; } = StartMode.Default;
 
     /// <summary>
-    /// Synonyms present when the entity was loaded
-    /// </summary>
-    public string SynonymsPreviousState { get; set; }
-
-    /// <summary>
     /// Get or set a string representing all the name this alias has.
     /// It should be a coma separated list of names.
     /// </summary>
@@ -91,6 +85,11 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     public string SynonymsNextState => (from n in Synonyms.SplitCsv()
                                         where !SynonymsPreviousState.SplitCsv().Contains(n)
                                         select n).ToArray().JoinCsv();
+
+    /// <summary>
+    /// Synonyms present when the entity was loaded
+    /// </summary>
+    public string SynonymsPreviousState { get; set; }
 
     public string WorkingDirectory { get; set; }
 

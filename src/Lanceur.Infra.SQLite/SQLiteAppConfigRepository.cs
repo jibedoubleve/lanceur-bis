@@ -55,8 +55,8 @@ namespace Lanceur.Infra.SQLite
                 tx.Connection.Query<string>(sql)
                     .FirstOrDefault());
 
-            _current = s.IsNullOrEmpty() 
-                ? new AppConfig() 
+            _current = s.IsNullOrEmpty()
+                ? new AppConfig()
                 : JsonConvert.DeserializeObject<AppConfig>(s);
         }
 
@@ -65,7 +65,7 @@ namespace Lanceur.Infra.SQLite
             DB.WithinTransaction(tx =>
             {
                 var sqlExists = "select count(*) from settings where s_key = 'json'";
-                var exists    = tx.Connection.ExecuteScalar<long>(sqlExists) > 0;
+                var exists = tx.Connection.ExecuteScalar<long>(sqlExists) > 0;
 
                 if (!exists)
                 {
@@ -73,7 +73,7 @@ namespace Lanceur.Infra.SQLite
                     tx.Connection.Execute(sqlInsert);
                 }
 
-                var sql  = "update settings set s_value = @value where s_key = 'json'";
+                var sql = "update settings set s_value = @value where s_key = 'json'";
                 var json = JsonConvert.SerializeObject(Current);
                 tx.Connection.Execute(sql, new { value = json });
             });

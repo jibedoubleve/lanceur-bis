@@ -5,17 +5,19 @@ namespace System.IO.FileOps.Core;
 
 public interface IOperationScheduler
 {
-    #region Public methods
+    #region Methods
 
     IOperationScheduler AddOperation(OperationConfiguration operation);
-    IOperationScheduler RemoveOperation(OperationInfo operation);
+
     Task ExecutePlanAsync();
 
     SchedulerState GetState();
+
+    IOperationScheduler RemoveOperation(OperationInfo operation);
 
     IOperationScheduler ResetPlan();
 
     Task SavePlanAsync();
 
-    #endregion
+    #endregion Methods
 }

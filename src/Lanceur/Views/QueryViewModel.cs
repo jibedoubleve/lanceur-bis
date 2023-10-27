@@ -5,7 +5,6 @@ namespace Lanceur.Views
 {
     public class QueryViewModel : ReactiveObject
     {
-
         #region Constructors
 
         private QueryViewModel(string value, bool isActive) => (Value, IsActive) = (value, isActive);
@@ -29,6 +28,5 @@ namespace Lanceur.Views
         public string Trim() => Value.Trim();
 
         #endregion Methods
-
     }
 }

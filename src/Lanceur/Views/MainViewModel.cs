@@ -26,13 +26,12 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly ISettingsFacade _settingsFacade;
         private readonly ICmdlineManager _cmdlineManager;
         private readonly IDbRepository _dbRepository;
         private readonly IExecutionManager _executor;
         private readonly IAppLogger _log;
-        private readonly ISchedulerProvider _schedulers;
         private readonly ISearchService _searchService;
+        private readonly ISettingsFacade _settingsFacade;
 
         #endregion Fields
 
@@ -48,7 +47,7 @@ namespace Lanceur.Views
             IExecutionManager executor = null,
             ISettingsFacade appConfigService = null)
         {
-            _schedulers = schedulerProvider ?? new RxAppSchedulerProvider();
+            schedulerProvider ??= new RxAppSchedulerProvider();
 
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
@@ -64,35 +63,35 @@ namespace Lanceur.Views
             AutoComplete = ReactiveCommand.Create(OnAutoComplete);
             AutoComplete.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: schedulerProvider.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             var canSearch = Query.WhenAnyValue(x => x.IsActive);
-            SearchAlias = ReactiveCommand.CreateFromTask<string, AliasResponse>(OnSearchAliasAsync, canSearch, outputScheduler: _schedulers.MainThreadScheduler);
+            SearchAlias = ReactiveCommand.CreateFromTask<string, AliasResponse>(OnSearchAliasAsync, canSearch, outputScheduler: schedulerProvider.MainThreadScheduler);
             SearchAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SelectNextResult = ReactiveCommand.Create(OnSelectNextResult, outputScheduler: _schedulers.MainThreadScheduler);
+            SelectNextResult = ReactiveCommand.Create(OnSelectNextResult, outputScheduler: schedulerProvider.MainThreadScheduler);
             SelectNextResult.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SelectPreviousResult = ReactiveCommand.Create(OnSelectPreviousResult, outputScheduler: _schedulers.MainThreadScheduler);
+            SelectPreviousResult = ReactiveCommand.Create(OnSelectPreviousResult, outputScheduler: schedulerProvider.MainThreadScheduler);
             SelectPreviousResult.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             //CanExecute for ExecuteAlias
             var isExecutable = this
                     .WhenAnyValue(x => x.CurrentAlias)
-                    .Select(x => x != null && x is IExecutable);
+                    .Select(x => x is IExecutable);
 
-            var isSearchinished = SearchAlias
+            var isSearchFinished = SearchAlias
                     .IsExecuting
                     .Select(x => !x);
 
             var canExecuteAlias = Observable.CombineLatest(
                 isExecutable,
-                isSearchinished
-            ).Where(x => x.Where(y => !y).Any() == false)
-             .Select(x => true);
+                isSearchFinished
+            ).Where(x => x.Any(y => !y) == false)
+             .Select(_ => true);
 
-            ExecuteAlias = ReactiveCommand.CreateFromTask<AliasExecutionRequest, AliasResponse>(OnExecuteAliasAsync, canExecuteAlias, _schedulers.MainThreadScheduler);
+            ExecuteAlias = ReactiveCommand.CreateFromTask<AliasExecutionRequest, AliasResponse>(OnExecuteAliasAsync, canExecuteAlias, schedulerProvider.MainThreadScheduler);
             ExecuteAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             #endregion Commands
@@ -100,11 +99,12 @@ namespace Lanceur.Views
             Observable.CombineLatest(
                 this.WhenAnyObservable(vm => vm.ExecuteAlias.IsExecuting),
                 this.WhenAnyObservable(vm => vm.SearchAlias.IsExecuting)
-            ).DistinctUntilChanged()
-             .Select(x => x.Where(x => x).Any())
-             .Log(this, "ViewModel is busy.", x => $"{x}")
-             .ObserveOn(_schedulers.MainThreadScheduler)
-             .BindTo(this, vm => vm.IsBusy);
+            )
+                      .DistinctUntilChanged()
+                      .Select(x => x.Any(x => x))
+                      .Log(this, "ViewModel is busy.", x => $"{x}")
+                      .ObserveOn(schedulerProvider.MainThreadScheduler)
+                      .BindTo(this, vm => vm.IsBusy);
 
             #region Navigation
 
@@ -112,13 +112,14 @@ namespace Lanceur.Views
                 vm => vm.SelectNextResult,
                 vm => vm.SelectPreviousResult
             )
-             .ObserveOn(_schedulers.MainThreadScheduler)
+             .ObserveOn(schedulerProvider.MainThreadScheduler)
              .Where(x => x is not null);
 
             nav.Select(x => x.Result).BindTo(this, vm => vm.CurrentAlias);
 
             nav.Where(x => x.Result?.Query?.Name is not null)
-               .Log(this, "Navigation occured", x => $"Current alias: '{(x?.Result?.Name ?? "<NULL>")}' is {(x.IsActive ? "ACTIVE" : "INACTIVE")}")
+               .Log(this, "Navigation occured",
+                    x => $"Current alias: '{(x?.Result?.Name ?? "<NULL>")}' is {(x?.IsActive ?? false ? "ACTIVE" : "INACTIVE")}")
                .Subscribe(x =>
                {
                    Query.IsActive = x.IsActive;
@@ -138,15 +139,15 @@ namespace Lanceur.Views
             #region Query
 
             this.WhenAnyValue(vm => vm.Query.Value)
-                .Throttle(TimeSpan.FromMilliseconds(100), _schedulers.TaskpoolScheduler)
+                .Throttle(TimeSpan.FromMilliseconds(100), schedulerProvider.TaskpoolScheduler)
                 .Select(x => x.Trim())
                 .Where(x => !x.IsNullOrWhiteSpace())
                 .Log(this, "Query changed.", x => $"'{x}'")
-                .ObserveOn(_schedulers.MainThreadScheduler)
+                .ObserveOn(schedulerProvider.MainThreadScheduler)
                 .InvokeCommand(this, vm => vm.SearchAlias);
 
             this.WhenAnyValue(vm => vm.Query.Value)
-                .Where(x => string.IsNullOrEmpty(x))
+                .Where(string.IsNullOrEmpty)
                 .Log(this, "Query is empty, clearing the view.", x => $"'{x}'")
                 .Subscribe(_ =>
                 {
@@ -162,14 +163,14 @@ namespace Lanceur.Views
                 .Where(x => x is not null)
                 .Select(x => x.FirstOrDefault())
                 .Log(this, "Results changed.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
-                .ObserveOn(_schedulers.MainThreadScheduler)
+                .ObserveOn(schedulerProvider.MainThreadScheduler)
                 .BindTo(this, vm => vm.CurrentAlias);
 
             #region on Search & on Execute
 
             var obs = this
                 .WhenAnyObservable(vm => vm.SearchAlias, vm => vm.ExecuteAlias)
-                .ObserveOn(_schedulers.MainThreadScheduler);
+                .ObserveOn(schedulerProvider.MainThreadScheduler);
 
             obs.Where(r => (r?.Results?.Count() ?? 0) > 0)
                .Select(r => r?.Results?.ElementAt(0))
@@ -181,7 +182,7 @@ namespace Lanceur.Views
                .BindTo(this, vm => vm.Results);
 
             obs.Select(r => r.KeepAlive)
-               .ObserveOn(_schedulers.MainThreadScheduler)
+               .ObserveOn(schedulerProvider.MainThreadScheduler)
                .BindTo(this, vm => vm.KeepAlive);
 
             #endregion on Search & on Execute
@@ -189,7 +190,7 @@ namespace Lanceur.Views
             var activated = this
                 .WhenAnyObservable(vm => vm.Activate)
                 .DistinctUntilChanged()
-                .ObserveOn(_schedulers.MainThreadScheduler);
+                .ObserveOn(schedulerProvider.MainThreadScheduler);
 
             activated.Select(x => x.CurrentSessionName)
                      .Log(this, "Activated: get current session name.", x => $"Session name: '{x}'.")
@@ -200,7 +201,7 @@ namespace Lanceur.Views
                      .BindTo(this, vm => vm.Results);
 
             activated.Select(x => x.Results)
-                     .Where(x => x.Count() > 0)
+                     .Where(x => x.Any())
                      .Select(x => x.First())
                      .Log(this, "Activated: Select current alias.", x => $"Current alias is '{x.Name}'.")
                      .BindTo(this, vm => vm.CurrentAlias);
@@ -235,7 +236,7 @@ namespace Lanceur.Views
             var currentAlias = (from r in Results
                                 where r.GetHashCode() == hash
                                 select r).ToArray();
-            
+
             return currentAlias.SingleOrDefault();
         }
 
@@ -244,12 +245,12 @@ namespace Lanceur.Views
             var sessionName = _dbRepository.GetDefaultSession()?.Name ?? "N.A.";
 
             var aliases = _settingsFacade.Application.Window.ShowResult
-                ? _searchService.GetAll()
+                ? _searchService.GetAll().ToArray()
                 : Array.Empty<AliasQueryResult>();
 
             aliases.SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
 
-            _log.Trace($"{(_settingsFacade.Application.Window.ShowResult ? $"View activation: show all {aliases?.Count() ?? 0} result(s)" : "View activation: display nothing")}");
+            _log.Trace($"{(_settingsFacade.Application.Window.ShowResult ? $"View activation: show all {aliases.Length} result(s)" : "View activation: display nothing")}");
             return new()
             {
                 CurrentSessionName = sessionName,
@@ -261,11 +262,11 @@ namespace Lanceur.Views
 
         private async Task<AliasResponse> OnExecuteAliasAsync(AliasExecutionRequest request)
         {
-            request ??= new AliasExecutionRequest();
+            request ??= new();
 
             if (request.AliasToExecute is null) { return new(); }
 
-            var response = await _executor.ExecuteAsync(new ExecutionRequest
+            var response = await _executor.ExecuteAsync(new()
             {
                 Query = Query,
                 QueryResult = request.AliasToExecute,
@@ -286,7 +287,9 @@ namespace Lanceur.Views
             if (criterion.IsNullOrWhiteSpace() && showResult) { return new AliasResponse(); }
             if (criterion.IsNullOrWhiteSpace() && !showResult)
             {
-                var all = _searchService.GetAll().SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
+                var all = _searchService.GetAll()
+                                        .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light)
+                                        .ToArray();
                 return new AliasResponse
                 {
                     Results = all,
@@ -300,9 +303,10 @@ namespace Lanceur.Views
 
             var results = _searchService
                     .Search(query)
-                    .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
+                    .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light)
+                    .ToArray();
 
-            _log.Trace($"Search: Found {results?.Count() ?? 0} element(s)");
+            _log.Trace($"Search: Found {results.Length} element(s)");
             return new AliasResponse()
             {
                 Results = results,

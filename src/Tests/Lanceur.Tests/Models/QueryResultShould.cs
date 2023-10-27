@@ -11,12 +11,6 @@ namespace Lanceur.Tests.Models
         #region Methods
 
         [Fact]
-        public void HaveNullDescriptionByDefault()
-        {
-            new TestQueryResult().Description.Should().BeNull();
-        }
-
-        [Fact]
         public void HaveEmptyNameByDefault() => new TestQueryResult().Name.Should().BeEmpty();
 
         [Fact]
@@ -27,9 +21,9 @@ namespace Lanceur.Tests.Models
         }
 
         [Fact]
-        public void HaveZeroCountByDefault()
+        public void HaveNullDescriptionByDefault()
         {
-            new TestQueryResult().Count.Should().Be(0);
+            new TestQueryResult().Description.Should().BeNull();
         }
 
         [Fact]
@@ -49,6 +43,12 @@ namespace Lanceur.Tests.Models
                 names.Select(x => x.Should().NotStartWith(" "));
                 names.Select(x => x.Should().NotEndWith(" "));
             }
+        }
+
+        [Fact]
+        public void HaveZeroCountByDefault()
+        {
+            new TestQueryResult().Count.Should().Be(0);
         }
 
         #endregion Methods

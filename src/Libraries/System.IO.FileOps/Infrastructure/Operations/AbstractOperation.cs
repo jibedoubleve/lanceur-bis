@@ -10,13 +10,13 @@ public abstract class AbstractOperation
         Parameters = parameters;
     }
 
-    #endregion
+    #endregion Constructors
 
-    #region Public properties
+    #region Properties
 
     public string Name { get; init; }
 
     public Dictionary<string, string> Parameters { get; init; }
 
-    #endregion
+    #endregion Properties
 }

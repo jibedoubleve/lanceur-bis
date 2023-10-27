@@ -39,7 +39,7 @@ namespace Lanceur.Infra.Managers
             if (!MacroInstances.ContainsKey(alias.GetMacroName()))
             {
                 /* Well, this is a misconfigured macro, log it and forget it */
-                _log.Warning($"User has misconfigured a Macro with name '{alias.FileName}'. Fix the name of the macro or remove the alias from the database.");
+                Log.Warning($"User has misconfigured a Macro with name '{alias.FileName}'. Fix the name of the macro or remove the alias from the database.");
                 return null;
             }
 

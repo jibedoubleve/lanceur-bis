@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Lanceur.Core.Models.Settings
+﻿namespace Lanceur.Core.Models.Settings
 {
     public class AppConfig
     {
