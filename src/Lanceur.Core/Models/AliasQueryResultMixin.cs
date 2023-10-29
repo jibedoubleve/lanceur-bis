@@ -1,3 +1,5 @@
+using Lanceur.SharedKernel.Mixins;
+
 namespace Lanceur.Core.Models;
 
 public static class AliasQueryResultMixin
@@ -14,6 +16,17 @@ public static class AliasQueryResultMixin
         {
             alias.Icon = "Web";
         }
+    }
+
+    /// <summary>
+    /// Set first names defined in the synonyms as the name of the alias
+    /// </summary>
+    /// <param name="alias">The alias</param>
+    public static void SetName(this AliasQueryResult alias)
+    {
+        alias.Name = alias.Synonyms
+                          .SplitCsv()
+                          .FirstOrDefault();
     }
 
     #endregion Methods

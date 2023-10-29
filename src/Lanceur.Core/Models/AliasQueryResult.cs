@@ -81,21 +81,21 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
         set
         {
             Set(ref _synonyms, value);
-            OnPropertyChanged(nameof(SynonymsNextState));
+            OnPropertyChanged(nameof(SynonymsToAdd));
         }
     }
 
     /// <summary>
     /// New synonyms added when updated
     /// </summary>
-    public string SynonymsNextState => (from n in Synonyms.SplitCsv()
-                                        where !SynonymsPreviousState.SplitCsv().Contains(n)
+    public string SynonymsToAdd => (from n in Synonyms.SplitCsv()
+                                        where !SynonymsWhenLoaded.SplitCsv().Contains(n)
                                         select n).ToArray().JoinCsv();
 
     /// <summary>
     /// Synonyms present when the entity was loaded
     /// </summary>
-    public string SynonymsPreviousState { get; set; }
+    public string SynonymsWhenLoaded { get; set; }
 
     public string WorkingDirectory { get; set; }
 
@@ -104,8 +104,6 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     #region Methods
 
     public static AliasQueryResult FromName(string aliasName) => new() { Name = aliasName, Synonyms = aliasName };
-
-    public override int GetHashCode() => (base.GetHashCode(), (Parameters?.GetHashCode() ?? 0)).GetHashCode();
 
     #endregion Methods
 }

@@ -7,9 +7,7 @@
     {
         public ExistingNameResponse(string[] existingNames)
         {
-            ExistingNames = existingNames is null
-                ? Array.Empty<string>()
-                : existingNames;
+            ExistingNames = existingNames ?? Array.Empty<string>();
         }
 
         /// <summary>

@@ -43,7 +43,7 @@ public class AliasSearchDbAction
                     a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count  as {nameof(AliasQueryResult.Count)},
                     s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
-                    s.Synonyms    as {nameof(AliasQueryResult.SynonymsPreviousState)}
+                    s.Synonyms    as {nameof(AliasQueryResult.SynonymsWhenLoaded)}
                 from
                     alias a
                     left join alias_name            an on a.id         = an.id_alias
@@ -80,7 +80,7 @@ public class AliasSearchDbAction
                     a.lua_script                      as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count                      as {nameof(AliasQueryResult.Count)},
                     s.synonyms                        as {nameof(AliasQueryResult.Synonyms)},
-                    s.Synonyms                        as {nameof(AliasQueryResult.SynonymsPreviousState)}
+                    s.Synonyms                        as {nameof(AliasQueryResult.SynonymsWhenLoaded)}
                 from
                     alias a
                     left join alias_name            an on a.id         = an.id_alias
