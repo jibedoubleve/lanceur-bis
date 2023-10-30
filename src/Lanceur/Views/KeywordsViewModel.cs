@@ -39,6 +39,8 @@ namespace Lanceur.Views
         private readonly INotification _notification;
         private readonly IPackagedAppValidator _packagedAppValidator;
         private readonly IThumbnailManager _thumbnailManager;
+        private readonly IUserNotification _notify;
+        private readonly ISchedulerProvider _schedulers;
 
         #endregion Fields
 
@@ -54,33 +56,42 @@ namespace Lanceur.Views
             INotification notification = null)
         {
             _busyScope = new(b => IsBusy = b, true, false);
-            schedulers ??= Locator.Current.GetService<ISchedulerProvider>();
+            _schedulers = schedulers ?? Locator.Current.GetService<ISchedulerProvider>();
 
             var l = Locator.Current;
-            notify ??= l.GetService<IUserNotification>();
+            _notify = notify?? l.GetService<IUserNotification>();
             _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
             _notification = notification ?? l.GetService<INotification>();
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDbRepository>();
-            ConfirmRemove = Interactions.YesNoQuestion(schedulers.MainThreadScheduler);
+
+            ConfirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
             AskLuaEditor = new();
 
-            this.WhenActivated(d =>
-            {
-                Disposable
+            this.WhenActivated(Activate);
+        }
+
+        /// <summary>
+        /// The purpose of this method is for unit test only. You can manually mimic
+        /// <code>WhenActivated</code>
+        /// </summary>
+        /// <param name="d">
+        /// Ensures the provided disposable is disposed with the specified <see cref="CompositeDisposable"/>.
+        /// </param>
+        internal void Activate(CompositeDisposable d)
+        {
+            Disposable
                 .Create(() =>
                 {
                     Aliases.Clear();
                     AliasToCreate = null;
                 }).DisposeWith(d);
 
-                SetupValidations(d);
-                SetupCommands(schedulers.MainThreadScheduler, notify, d);
-                SetupBindings(schedulers.MainThreadScheduler, d);
-            });
+            SetupValidations(d);
+            SetupCommands(_schedulers.MainThreadScheduler, _notify, d);
+            SetupBindings(_schedulers.MainThreadScheduler, d);
         }
-
         #endregion Constructors
 
         #region Properties
