@@ -215,7 +215,7 @@
                                 </Hyperlink>
                             </TextBlock>
                         </HeaderedContentControl>
-                        <HeaderedContentControl Header="Parameters">
+                        <HeaderedContentControl Header="Additional arguments">
                             <DataGrid
                                 AreRowDetailsFrozen="True"
                                 AutoGenerateColumns="False"
