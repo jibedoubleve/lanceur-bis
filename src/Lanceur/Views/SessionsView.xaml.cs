@@ -21,7 +21,7 @@ namespace Lanceur.Views
                 ViewModel.ConfirmRemove.RegisterHandler(async interaction =>
                 {
                     var result = await Dialogs.YesNoQuestion($"Do you want to remove alias '{interaction.Input}'?");
-                    interaction.SetOutput(result.AsBool());
+                    interaction.SetOutput(result.ToBool());
                 });
 
                 this.OneWayBind(ViewModel, vm => vm.Sessions, v => v.CbSessions.ItemsSource).DisposeWith(d);

@@ -7,7 +7,7 @@ namespace Lanceur.Ui
     {
         #region Methods
 
-        public static bool AsBool(this ContentDialogResult result)
+        public static bool ToBool(this ContentDialogResult result)
         {
             return result switch
             {
