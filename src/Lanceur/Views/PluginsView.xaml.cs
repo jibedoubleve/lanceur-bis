@@ -53,7 +53,7 @@ public partial class PluginsView : IViewFor<PluginsViewModel>
                 {
                     var result =
                         await Dialogs.YesNoQuestion($"Do you want to uninstall the plugin '{interaction.Input}'?");
-                    interaction.SetOutput(result.AsBool());
+                    interaction.SetOutput(result.ToBool());
                 });
             };
             ViewModel.Activate.Execute().Subscribe();

@@ -42,7 +42,7 @@ namespace Lanceur.Views
                 ViewModel.ConfirmRemove.RegisterHandler(async interaction =>
                 {
                     var result = await Dialogs.YesNoQuestion($"Do you want to delete alias '{interaction.Input}' and all its synonyms?");
-                    interaction.SetOutput(result.AsBool());
+                    interaction.SetOutput(result.ToBool());
                 });
 
                 this.OneWayBind(ViewModel, vm => vm.Aliases, v => v.Aliases.ItemsSource).DisposeWith(d);
