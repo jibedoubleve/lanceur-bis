@@ -96,31 +96,13 @@
                     </Button>
                 </Grid>
             </Grid>
-            <Border
-                Grid.Column="1"
-                Margin="0"
-                Padding="0"
-                BorderBrush="{StaticResource DialogBorderBrush}"
-                Visibility="{Binding SelectedItem, ElementName=Aliases, Converter={StaticResource NullToVisibilityConverter}}">
-                <DockPanel>
-                    <StackPanel
-                        HorizontalAlignment="Right"
-                        DockPanel.Dock="Bottom"
-                        Orientation="Horizontal">
-                        <Button
-                            x:Name="BtnSaveOrUpdateAlias"
-                            Width="{StaticResource SettingsButtonWidth}"
-                            Margin="{StaticResource SettingsButtonMargin}"
-                            Style="{StaticResource AccentButtonStyle}">
-                            Save or update
-                        </Button>
-                        <Button
-                            x:Name="BtnDeleteAlias"
-                            Width="{StaticResource SettingsButtonWidth}"
-                            Margin="{StaticResource SettingsButtonMargin}">
-                            Delete
-                        </Button>
-                    </StackPanel>
+
+            <Grid Grid.Column="1" Visibility="{Binding SelectedItem, ElementName=Aliases, Converter={StaticResource NullToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ScrollViewer>
                     <StackPanel Margin="15">
                         <HeaderedContentControl Header="Names (separate with coma)">
                             <StackPanel>
@@ -215,7 +197,7 @@
                                 </Hyperlink>
                             </TextBlock>
                         </HeaderedContentControl>
-                        <HeaderedContentControl Header="Parameters">
+                        <HeaderedContentControl Header="Additional arguments">
                             <DataGrid
                                 AreRowDetailsFrozen="True"
                                 AutoGenerateColumns="False"
@@ -237,8 +219,27 @@
                             </DataGrid>
                         </HeaderedContentControl>
                     </StackPanel>
-                </DockPanel>
-            </Border>
+                </ScrollViewer>
+                <StackPanel
+                    Grid.Row="1"
+                    HorizontalAlignment="Right"
+                    DockPanel.Dock="Bottom"
+                    Orientation="Horizontal">
+                    <Button
+                        x:Name="BtnSaveOrUpdateAlias"
+                        Width="{StaticResource SettingsButtonWidth}"
+                        Margin="{StaticResource SettingsButtonMargin}"
+                        Style="{StaticResource AccentButtonStyle}">
+                        Save or update
+                    </Button>
+                    <Button
+                        x:Name="BtnDeleteAlias"
+                        Width="{StaticResource SettingsButtonWidth}"
+                        Margin="{StaticResource SettingsButtonMargin}">
+                        Delete
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </rxui:ReactiveUserControl>
