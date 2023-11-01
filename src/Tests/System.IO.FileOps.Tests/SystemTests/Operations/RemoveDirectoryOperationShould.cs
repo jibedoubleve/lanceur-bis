@@ -19,7 +19,7 @@ public class RemoveDirectoryOperationShould
         var rmdir = OperationFactory.RemoveDirectory(directory);
         Directory.Exists(directory).Should().BeTrue();
 
-        await rmdir.AsOperation()
+        await rmdir.ToOperation()
                    .ProcessAsync();
 
         // ASSERT

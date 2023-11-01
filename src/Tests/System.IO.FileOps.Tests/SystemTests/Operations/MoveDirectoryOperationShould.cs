@@ -55,7 +55,7 @@ public class MoveDirectoryOperationShould : IDisposable
     {
         // ACT
         var moveDirectory = OperationFactory.MoveDirectory(Source, Destination);
-        await moveDirectory.AsOperation()
+        await moveDirectory.ToOperation()
                            .ProcessAsync();
 
         // ASSERT

@@ -64,7 +64,7 @@ public class UnzipDirectoryOperationShould : IDisposable
     {
         // ACT
         var unzipDir = OperationFactory.UnzipDirectory(ArchiveFile, Destination);
-        await unzipDir.AsOperation()
+        await unzipDir.ToOperation()
                       .ProcessAsync();
 
         // ASSERT

@@ -17,16 +17,16 @@ public static class OperationMixin
 
     #region Methods
 
-    public static IOperation AsOperation(this OperationConfiguration cfg)
+    public static IOperation ToOperation(this OperationConfiguration cfg)
     {
         var type =
             (from t in Types
              where t.FullName == cfg.Name
              select t).FirstOrDefault();
 
-        if (type is null) throw new NotSupportedException($"Cannot find operation '{cfg.Name}'");
-
-        return (IOperation)Activator.CreateInstance(type, cfg.Parameters)!;
+        return type is null
+            ? throw new NotSupportedException($"Cannot find operation '{cfg.Name}'")
+            : (IOperation)Activator.CreateInstance(type, cfg.Parameters)!;
     }
 
     #endregion Methods

@@ -21,7 +21,7 @@ internal abstract class AbstractOperationScheduler : IOperationScheduler
 
     private static IEnumerable<IOperation> GetOperations(IEnumerable<OperationConfiguration> configurations)
     {
-        return configurations.Select(cfg => cfg.AsOperation()).ToList();
+        return configurations.Select(cfg => cfg.ToOperation()).ToList();
     }
 
     protected IOperationScheduler AddOperations(IEnumerable<OperationConfiguration> operations, bool resetList = true)
