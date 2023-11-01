@@ -309,6 +309,9 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                 _aliasDbAction.Update(alias);
                 break;
         }
+
+        // Reset state after save
+        alias.SynonymsWhenLoaded = alias.Synonyms;
     }
 
     ///<inheritdoc/>

@@ -34,13 +34,13 @@ namespace Lanceur.Views
 
         private readonly SourceList<QueryResult> _aliases = new();
         private readonly IDbRepository _aliasService;
-        private readonly Interaction<Script, string> _askLuaEditor;
         private readonly Scope<bool> _busyScope;
-        private readonly Interaction<string, bool> _confirmRemove;
         private readonly IAppLogger _log;
         private readonly INotification _notification;
         private readonly IPackagedAppValidator _packagedAppValidator;
         private readonly IThumbnailManager _thumbnailManager;
+        private readonly IUserNotification _notify;
+        private readonly ISchedulerProvider _schedulers;
 
         #endregion Fields
 
@@ -56,59 +56,67 @@ namespace Lanceur.Views
             INotification notification = null)
         {
             _busyScope = new(b => IsBusy = b, true, false);
-            schedulers ??= Locator.Current.GetService<ISchedulerProvider>();
+            _schedulers = schedulers ?? Locator.Current.GetService<ISchedulerProvider>();
 
             var l = Locator.Current;
-            notify ??= l.GetService<IUserNotification>();
+            _notify = notify?? l.GetService<IUserNotification>();
             _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
             _notification = notification ?? l.GetService<INotification>();
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDbRepository>();
-            _confirmRemove = Interactions.YesNoQuestion(schedulers.MainThreadScheduler);
-            _askLuaEditor = new();
 
-            this.WhenActivated(d =>
-            {
-                Disposable
+            ConfirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
+            AskLuaEditor = new();
+
+            this.WhenActivated(Activate);
+        }
+
+        /// <summary>
+        /// The purpose of this method is for unit test only. You can manually mimic
+        /// <code>WhenActivated</code>
+        /// </summary>
+        /// <param name="d">
+        /// Ensures the provided disposable is disposed with the specified <see cref="CompositeDisposable"/>.
+        /// </param>
+        internal void Activate(CompositeDisposable d)
+        {
+            Disposable
                 .Create(() =>
                 {
                     Aliases.Clear();
                     AliasToCreate = null;
                 }).DisposeWith(d);
 
-                SetupValidations(d);
-                SetupCommands(schedulers.MainThreadScheduler, notify, d);
-                SetupBindings(schedulers.MainThreadScheduler, d);
-            });
+            SetupValidations(d);
+            SetupCommands(_schedulers.MainThreadScheduler, _notify, d);
+            SetupBindings(_schedulers.MainThreadScheduler, d);
         }
-
         #endregion Constructors
 
         #region Properties
 
         private ReactiveCommand<SearchRequest, IEnumerable<QueryResult>> Search { get; set; }
+
         public ViewModelActivator Activator { get; } = new();
 
         public IObservableCollection<QueryResult> Aliases { get; } = new ObservableCollectionExtended<QueryResult>();
 
         [Reactive] public AliasQueryResult AliasToCreate { get; set; }
 
-        public Interaction<Script, string> AskLuaEditor => _askLuaEditor;
+        public Interaction<Script, string> AskLuaEditor { get; }
 
         [Reactive] public string BusyMessage { get; set; }
 
-        public Interaction<string, bool> ConfirmRemove => _confirmRemove;
+        public Interaction<string, bool> ConfirmRemove { get; }
 
-        public ReactiveCommand<Unit, Unit> CreateAlias { get; private set; }
-
-        [Reactive] public bool IsBusy { get; set; }
+        public ReactiveCommand<Unit, Unit> CreatingAlias { get; private set; }
 
         public ReactiveCommand<Unit, string> EditLuaScript { get; private set; }
-
+        [Reactive] public bool IsBusy { get; set; }
         public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; private set; }
 
-        public ReactiveCommand<AliasQueryResult, SaveOrUpdateAliasResponse> SaveOrUpdateAlias { get; private set; }
+        public ReactiveCommand<AliasQueryResult, AliasQueryResult> SaveOrUpdateAlias { get; private set; }
         [Reactive] public string SearchQuery { get; set; }
 
         [Reactive] public AliasQueryResult SelectedAlias { get; set; }
@@ -123,18 +131,27 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private void OnCreateAlias()
+        private void OnCreatingAlias()
         {
+            if (Aliases.Any(x => x.Id == 0)) return;
+
             var newAlias = AliasQueryResult.EmptyForCreation;
             _aliases.Insert(0, newAlias);
             SelectedAlias = newAlias;
+        }
+
+        private async Task<string> OnEditLuaScript()
+        {
+            var output = await AskLuaEditor.Handle(SelectedAlias.ToScript());
+            SelectedAlias.LuaScript = output;
+            return output;
         }
 
         private async Task<Unit> OnRemoveAliasAsync(AliasQueryResult alias)
         {
             if (alias == null) return Unit.Default;
 
-            var remove = await _confirmRemove.Handle(alias.Name);
+            var remove = await ConfirmRemove.Handle(alias.Name);
             if (remove)
             {
                 _log.Info($"User removed alias '{alias.Name}'");
@@ -152,22 +169,19 @@ namespace Lanceur.Views
             return Unit.Default;
         }
 
-        private async Task<SaveOrUpdateAliasResponse> OnSaveOrUpdateAliasAsync(AliasQueryResult alias)
+        private async Task<AliasQueryResult> OnSaveOrUpdateAliasAsync(AliasQueryResult alias)
         {
             var created = alias.Id == 0;
             BusyMessage = "Saving alias...";
             using (_busyScope.Open())
             {
+                alias.SetName();
                 alias = await _packagedAppValidator.FixAsync(alias);
                 _aliasService.SaveOrUpdate(ref alias);
             }
             _notification.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
 
-            // Returns updated results
-            return new()
-            {
-                Aliases = _aliasService.GetAll()
-            };
+            return alias;
         }
 
         private IEnumerable<QueryResult> OnSearch(SearchRequest request)
@@ -185,8 +199,14 @@ namespace Lanceur.Views
 
         private void SetAliases(IEnumerable<QueryResult> x)
         {
+            var selected = Aliases.FirstOrDefault(a => a.Id == SelectedAlias?.Id);
             _aliases.Clear();
             _aliases.AddRange(x);
+
+            if (selected is AliasQueryResult alias)
+            {
+                SelectedAlias = alias;
+            }
         }
 
         private void SetupBindings(IScheduler uiThread, CompositeDisposable d)
@@ -212,6 +232,16 @@ namespace Lanceur.Views
                 .BindTo(this, vm => vm.SelectedAlias)
                 .DisposeWith(d);
 
+            this.WhenAnyObservable(vm => vm.SaveOrUpdateAlias)
+                .Where(alias => alias is not null)
+                .Subscribe(alias =>
+                {
+                    var toDel = _aliases.Items.Single(a => a.Id == alias.Id);
+                    _aliases.Remove(toDel);
+                    _aliases.Add(alias);
+                })
+                .DisposeWith(d);
+
             this.WhenAnyValue(vm => vm.SearchQuery)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
@@ -219,10 +249,6 @@ namespace Lanceur.Views
                 .Log(this, $"Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{(c.AliasToCreate?.Name ?? "<EMPTY>")}'")
                 .InvokeCommand(Search)
                 .DisposeWith(d);
-
-            this.WhenAnyObservable(vm => vm.SaveOrUpdateAlias)
-                .Select(x => x.Aliases.ToObservableCollection())
-                .Subscribe(SetAliases);
         }
 
         private void SetupCommands(IScheduler uiThread, IUserNotification notify, CompositeDisposable d)
@@ -230,60 +256,49 @@ namespace Lanceur.Views
             Search = ReactiveCommand.Create<SearchRequest, IEnumerable<QueryResult>>(OnSearch, outputScheduler: uiThread).DisposeWith(d);
             Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            CreateAlias = ReactiveCommand.Create(OnCreateAlias, outputScheduler: uiThread).DisposeWith(d);
-            CreateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+            CreatingAlias = ReactiveCommand.Create(OnCreatingAlias, outputScheduler: uiThread).DisposeWith(d);
+            CreatingAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread).DisposeWith(d);
             RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, SaveOrUpdateAliasResponse>(OnSaveOrUpdateAliasAsync, this.IsValid(), outputScheduler: uiThread).DisposeWith(d);
+            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, AliasQueryResult>(
+                OnSaveOrUpdateAliasAsync,
+                this.IsValid(),
+                outputScheduler: uiThread
+            ).DisposeWith(d);
             SaveOrUpdateAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             EditLuaScript = ReactiveCommand.CreateFromTask(OnEditLuaScript, outputScheduler: uiThread).DisposeWith(d);
             EditLuaScript.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
         }
 
-        private async Task<string> OnEditLuaScript()
-        {
-            var output = await _askLuaEditor.Handle(SelectedAlias.ToScript());
-            SelectedAlias.LuaScript = output;
-            return output;
-        }
-
         private void SetupValidations(CompositeDisposable d)
         {
-            var fileNameExists = this.WhenAnyValue(
+            var validateFileNameExists = this.WhenAnyValue(
                 x => x.SelectedAlias.FileName,
                 x => !x.IsNullOrEmpty()
             );
-            var nameExists = this.WhenAnyValue(
-                x => x.SelectedAlias.SynonymsNextState,
+            var validateNameExists = this.WhenAnyValue(
+                x => x.SelectedAlias.SynonymsToAdd,
                 x => _aliasService.CheckNamesExist(x.SplitCsv())
             );
 
             ValidationFileName = this.ValidationRule(
                    vm => vm.SelectedAlias.FileName,
-                   fileNameExists,
+                   validateFileNameExists,
                    "The path to the file shouldn't be empty."
              );
             ValidationFileName.DisposeWith(d);
 
             ValidationAliasExists = this.ValidationRule(
                    vm => vm.SelectedAlias.Synonyms,
-                   nameExists,
+                   validateNameExists,
                    response => !response.Exists,
-                   response => (response.Exists == false && !response.ExistingNames.Any())
+                   response => !response.Exists && !response.ExistingNames.Any()
                        ? "The names should not be empty"
                        : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.");
             ValidationAliasExists.DisposeWith(d);
-        }
-
-        public async Task Clear()
-        {
-            SearchQuery = null;
-            SelectedAlias = null;
-            Aliases.Clear();
-            await Task.Delay(50);
         }
 
         public void HydrateSelectedAlias() => _aliasService.HydrateAlias(SelectedAlias);
@@ -308,15 +323,6 @@ namespace Lanceur.Views
 
             public AliasQueryResult AliasToCreate { get; }
             public string Query { get; }
-
-            #endregion Properties
-        }
-
-        public class SaveOrUpdateAliasResponse
-        {
-            #region Properties
-
-            public IEnumerable<QueryResult> Aliases { get; init; }
 
             #endregion Properties
         }

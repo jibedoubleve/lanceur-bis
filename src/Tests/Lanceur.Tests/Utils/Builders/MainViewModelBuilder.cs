@@ -41,8 +41,8 @@ namespace Lanceur.Tests.Utils.Builders
             var settingsFacade = Substitute.For<ISettingsFacade>();
             settingsFacade.Application.Returns(new AppConfig());
 
-            return new MainViewModel(
-                schedulerProvider: _schedulerProvider,
+            return new(
+                schedulerProvider: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
                 logFactory: new XUnitLoggerFactory(_output),
                 searchService: _searchService ?? Substitute.For<ISearchService>(),
                 cmdlineService: new CmdlineManager(),

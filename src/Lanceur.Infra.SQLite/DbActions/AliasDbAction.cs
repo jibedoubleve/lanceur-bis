@@ -382,7 +382,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 UpdateName(alias, tx);
             });
 
-            alias.SynonymsPreviousState = alias.Synonyms;
+            alias.SynonymsWhenLoaded = alias.Synonyms;
             return alias.Id;
         }
 

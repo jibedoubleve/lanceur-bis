@@ -25,7 +25,7 @@ public abstract class QueryResult : ObservableModel
     protected static Task<IEnumerable<QueryResult>> NoResultAsync => Task.FromResult(NoResult);
 
     public static IEnumerable<QueryResult> NoResult => new List<QueryResult>();
-    public int Count { get; set; } = 0;
+    public int Count { get; set; }
     public virtual string Description { get; set; }
 
     /// <summary>
@@ -46,7 +46,7 @@ public abstract class QueryResult : ObservableModel
     /// </summary>
     public virtual bool IsResult => true;
 
-    public virtual string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public Cmdline Query { get; set; } = Cmdline.Empty;
 
     /// <summary>
@@ -65,11 +65,6 @@ public abstract class QueryResult : ObservableModel
     #endregion Properties
 
     #region Methods
-
-    /// <remarks>
-    /// This hashcode is calculated on not readonly properties and can be outdated if properties are updated!
-    /// </remarks>
-    public override int GetHashCode() => (Count, Description, Icon, Id, IsResult, Name, Query, Thumbnail).GetHashCode();
 
     public virtual string ToQuery() => $"{Name}";
 
