@@ -17,5 +17,7 @@ jobs:
     steps:
       - name: Get the sources
         uses: actions/checkout@v1
+      - name: Restore dotnet tools
+        run: dotnet tool restore
       - name: Run the Cake script
         uses: cake-build/cake-action@v1

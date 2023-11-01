@@ -22,16 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 var solution = "./Lanceur.sln";
 
-// https://gitversion.net/docs/usage/cli/arguments
-// https://cakebuild.net/api/Cake.Core.Tooling/ToolSettings/50AAB3A8
-GitVersion gitVersion = GitVersion(new GitVersionSettings 
-{ 
-    OutputType = GitVersionOutput.Json,
-    Verbosity = GitVersionVerbosity.Verbose,        
-    ArgumentCustomization = args => args.Append("/updateprojectfiles")
-});
-var branchName = gitVersion.BranchName;
-
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -44,14 +34,32 @@ var verbosity       = Argument("verbosity", Verbosity.Minimal);
 var binDirectory    = $"./src/Lanceur/bin/{configuration}/net6.0-windows10.0.19041.0/";
 var setupIconFile   = $"./src/Lanceur/Assets/appIcon.ico";
 var publishDir      = "./Publish";
-var zipName         = new FilePath(publishDir + "/Lanceur." + gitVersion.SemVer + ".bin.zip").FullPath;
-var innoSetupName   = new FilePath(publishDir + "/Lanceur." + gitVersion.SemVer + ".setup.exe").FullPath;
 var inno_setup      = "./setup.iss";
+
+GitVersion gitVersion;
+string zipName;
+string innoSetupName;
+
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
 ///////////////////////////////////////////////////////////////////////////////
+
 Setup(ctx =>
 {
+
+    // https://gitversion.net/docs/usage/cli/arguments
+    // https://cakebuild.net/api/Cake.Core.Tooling/ToolSettings/50AAB3A8
+    gitVersion = GitVersion(new GitVersionSettings 
+    { 
+        OutputType            = GitVersionOutput.Json,
+        Verbosity             = GitVersionVerbosity.Verbose,        
+        ArgumentCustomization = args => args.Append("/updateprojectfiles")
+    });
+    var branchName = gitVersion.BranchName;
+
+    zipName         = new FilePath(publishDir + "/Lanceur." + gitVersion.SemVer + ".bin.zip").FullPath;
+    innoSetupName   = new FilePath(publishDir + "/Lanceur." + gitVersion.SemVer + ".setup.exe").FullPath;
+
     if(!IsRunningOnWindows())
     {
         throw new NotImplementedException($"{repoName} should only run on Windows");
@@ -79,11 +87,45 @@ Task("info")
 
 Task("clean")
     .Does(()=> {
+        Information("Cleaning files...");
         var dirToDelete = GetDirectories("./**/obj")
                             .Concat(GetDirectories("./**/bin"))
                             .Concat(GetDirectories("./**/Output"))
                             .Concat(GetDirectories("./**/Publish"));
         DeleteDirectories(dirToDelete, new DeleteDirectorySettings{ Recursive = true, Force = true});
+
+        DotNetTool(
+            solution,
+            "clean"
+        );
+});
+
+Task("restore")
+    .Does(()=>{
+
+        DotNetTool(
+            solution,
+            "restore"
+        );
+});
+
+Task("build")
+    .Does(() => {        
+        DotNetTool(
+            solution,
+            "build",
+            "--no-restore -c release"
+        );
+});
+
+Task("test")
+    .Does(()=>{
+
+        DotNetTool(
+            solution,
+            "test",
+            "--no-restore --no-build -c release"
+        );
 });
 
 Task("zip")
@@ -101,8 +143,11 @@ Task("inno-setup")
     .Does(() => {
         var path = MakeAbsolute(Directory(binDirectory));
 
-        Information("Bin path   : {0}", path);
-        Information("Output dir : {0}", publishDir);
+        Information("Bin path      : {0}", path);
+        Information("Output dir    : {0}", publishDir);
+        Information("MyAppVersion  : {0}", gitVersion?.SemVer ?? "<NULL>");
+        Information("BinDirectory  : {0}", path?.FullPath ?? "<NULL>");
+        Information("SetupIconFile : {0}", setupIconFile ?? "<NULL>");
 
         InnoSetup(inno_setup, new InnoSetupSettings { 
             OutputDirectory = publishDir,
@@ -114,33 +159,10 @@ Task("inno-setup")
         });
 });
 
-Task("build")
-    .Does(() => {  
-        var settings = new DotNetBuildSettings {
-            Configuration = "release"
-        };
-        DotNetBuild(solution, settings);        
-});
-
-Task("tests")
-    .Does(()=>{
-        var projects = GetFiles("./src/**/*.csproj");
-        foreach(var project in projects)
-        {
-            DotNetTest(
-                project.FullPath,
-                new DotNetTestSettings()
-                {
-                    Configuration = configuration,
-                    NoBuild = true
-                });
-        }
-});
-
 ///////////////////////////////////////////////////////////////////////////////
 // BATCHES
 ///////////////////////////////////////////////////////////////////////////////
-Task("release-github")
+Task("relnote")
     .Does(()=>{
         //https://stackoverflow.com/questions/42761777/hide-services-passwords-in-cake-build
         var token = EnvironmentVariable("CAKE_PUBLIC_GITHUB_TOKEN");
@@ -149,36 +171,36 @@ Task("release-github")
         var fZip = MakeAbsolute(File(zipName));
         var fInn = MakeAbsolute(File(innoSetupName));
         var assets = $"{fZip},{fInn}";
-        
-        Information("Has token     : {0}", !string.IsNullOrEmpty(token));
-        Information("Has owner     : {0}", !string.IsNullOrEmpty(owner));
-        Information("Zip           : {0}", fZip);
-        Information("Inno setup    : {0}", fInn);
-        Information($"Assets to add: '{assets}'");
 
-        /*
-         * Because a bug on GitReleaseManager, 
-         * we have to create an empty release
-         * and then we'll upload the assets
-         */
-        var stg = new GitReleaseManagerCreateSettings {
-            Milestone  = gitVersion.MajorMinorPatch,            
-            Name       = gitVersion.SemVer,
-            Prerelease = gitVersion.SemVer.Contains("alpha"),
-            Debug      = true,
-            Verbose    = true,
-        };
-        GitReleaseManagerCreate(token, owner, repoName, stg);  
+        var alphaVersions = new[] { "alpha", "beta" };
+        var isPrerelease = alphaVersions.Any(x => gitVersion.SemVer.ToLower().Contains(x));
 
-        stg.Assets= assets;
-        GitReleaseManagerCreate(token, owner, repoName, stg);  
+        if(isPrerelease) { Information("This is a prerelease"); }        
+        Information("Has token      : {0}", !string.IsNullOrEmpty(token));
+        Information("Has owner      : {0}", !string.IsNullOrEmpty(owner));
+        Information("Zip            : {0}", fZip);
+        Information("Inno setup     : {0}", fInn);
+
+        var parameters = $"create --token {token} -o {owner} -r {repoName} " +
+                         $"--milestone {gitVersion.MajorMinorPatch} --name {gitVersion.SemVer} " +
+                         $"{(isPrerelease ? "--pre" : "")} " +
+                         $"--targetDirectory {Environment.CurrentDirectory} " + 
+                         $"--assets {assets}"
+                         // + "--debug --verbose"
+                         ;
+        DotNetTool(
+            solution, 
+            "gitreleasemanager",
+            parameters 
+        );
     });
 
 
 Task("default")
     .IsDependentOn("clean")
+    .IsDependentOn("restore")
     .IsDependentOn("build")
-    .IsDependentOn("tests");
+    .IsDependentOn("test");
 
 Task("bin")
     .IsDependentOn("default")
@@ -188,6 +210,6 @@ Task("bin")
     
 Task("github")    
     .IsDependentOn("bin")
-    .IsDependentOn("Release-GitHub");
+    .IsDependentOn("relnote");
 
 RunTarget(target);
