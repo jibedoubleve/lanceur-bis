@@ -355,5 +355,7 @@ tools/
 .vscode/
 
 # MacOS 
-
 .DS_Store
+
+# Rider
+/.idea
