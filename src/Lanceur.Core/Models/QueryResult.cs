@@ -11,7 +11,7 @@ namespace Lanceur.Core.Models;
 /// Only <see cref="Thumbnail"/> notifies the event as this is the only property
 /// that is designed to react on modifications.
 /// </remarks>
-[DebuggerDisplay("{Name} - Desc: {Description}")]
+[DebuggerDisplay("({Id}) {Name} - Desc: {Description}")]
 public abstract class QueryResult : ObservableModel
 {
     #region Fields

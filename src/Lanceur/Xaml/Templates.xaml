@@ -272,7 +272,6 @@
                 Content="Uninstall" />
         </StackPanel>
     </DataTemplate>
-
     <DataTemplate x:Key="PluginWebManifestTemplate" DataType="{x:Type p:PluginWebManifest}">
         <Grid>
             <Grid.ColumnDefinitions>

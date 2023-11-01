@@ -100,7 +100,7 @@ namespace Lanceur.Infra.Managers
                 WindowStyle = query.StartMode.AsWindowsStyle(),
             };
 
-            if (query.IsElevated || query.RunAs == Constants.RunAs.Admin)
+            if (query.IsElevated || query.RunAs == SharedKernel.Constants.RunAs.Admin)
             {
                 psi.Verb = "runas";
                 _log.Info($"Runs '{query.FileName}' as ADMIN");

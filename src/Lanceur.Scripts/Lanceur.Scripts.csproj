@@ -5,29 +5,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="SQL\script-0.1.1.sql" />
-    <None Remove="SQL\script-0.1.sql" />
-    <None Remove="SQL\script-0.10.sql" />
-    <None Remove="SQL\script-0.11.sql" />
-    <None Remove="SQL\script-0.12.sql" />
-    <None Remove="SQL\script-0.2.sql" />
-    <None Remove="SQL\script-0.3.sql" />
-    <None Remove="SQL\script-0.4.1.sql" />
-    <None Remove="SQL\script-0.4.2.sql" />
-    <None Remove="SQL\script-0.4.3.sql" />
-    <None Remove="SQL\script-0.4.sql" />
-    <None Remove="SQL\script-0.5.sql" />
-    <None Remove="SQL\script-0.6.sql" />
-    <None Remove="SQL\script-0.7.sql" />
-    <None Remove="SQL\script-0.8.sql" />
-    <None Remove="SQL\script-0.9.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="SQL\script-0.1.1.sql" />
     <EmbeddedResource Include="SQL\script-0.1.sql" />
     <EmbeddedResource Include="SQL\script-0.10.sql" />
     <EmbeddedResource Include="SQL\script-0.11.sql" />
     <EmbeddedResource Include="SQL\script-0.12.sql" />
+    <EmbeddedResource Include="SQL\script-0.13.sql" />
+    <EmbeddedResource Include="SQL\script-0.14.sql" />
+    <EmbeddedResource Include="SQL\script-0.14.1.sql" />
     <EmbeddedResource Include="SQL\script-0.2.sql" />
     <EmbeddedResource Include="SQL\script-0.3.sql" />
     <EmbeddedResource Include="SQL\script-0.4.1.sql" />
@@ -39,11 +24,5 @@
     <EmbeddedResource Include="SQL\script-0.7.sql" />
     <EmbeddedResource Include="SQL\script-0.8.sql" />
     <EmbeddedResource Include="SQL\script-0.9.sql" />
-    <None Remove="SQL\script-0.14.sql" />
-    <EmbeddedResource Include="SQL\script-0.14.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="SQL\script-0.13.sql" />
-    <EmbeddedResource Include="SQL\script-0.13.sql" />
   </ItemGroup>
 </Project>

@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Tests", "src\Tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IO.FileOps.Tests", "src\Tests\System.IO.FileOps.Tests\System.IO.FileOps.Tests.csproj", "{084BD3F9-987B-4E68-9CD8-F6FF94146072}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Infra.Win32", "src\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj", "{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{084BD3F9-987B-4E68-9CD8-F6FF94146072}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{084BD3F9-987B-4E68-9CD8-F6FF94146072}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{084BD3F9-987B-4E68-9CD8-F6FF94146072}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

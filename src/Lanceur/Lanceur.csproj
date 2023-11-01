@@ -33,6 +33,7 @@
     <PackageReference Include="Splat.NLog" Version="14.6.*" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj" />
     <ProjectReference Include="..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
     <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj" />
     <ProjectReference Include="..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />

@@ -4,7 +4,7 @@ public interface IDataDoctorRepository
 {
     #region Methods
 
-    Task FixIconsAsync();
+    Task FixIconsForHyperlinksAsync();
 
     #endregion Methods
 }

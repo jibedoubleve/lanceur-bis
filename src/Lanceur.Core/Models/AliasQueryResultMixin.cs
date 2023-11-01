@@ -6,7 +6,7 @@ public static class AliasQueryResultMixin
 {
     #region Methods
 
-    public static void UpdateIcon(this AliasQueryResult alias)
+    public static void UpdateIconForHyperlinks(this AliasQueryResult alias)
     {
         if (alias is null) return;
 
@@ -28,6 +28,14 @@ public static class AliasQueryResultMixin
                           .SplitCsv()
                           .FirstOrDefault();
     }
+
+    /// <summary>
+    /// Indicates whether this alias is a packaged application (i.e: UWP)
+    /// </summary>
+    /// <param name="alias">The alias ti check</param>
+    /// <returns><c>True</c> if this is a packaged application; otherwise <c>False</c></returns>
+    public static bool IsPackagedApplication(this AliasQueryResult alias) 
+        => alias.FileName.ToLower().StartsWith("package:");
 
     #endregion Methods
 }

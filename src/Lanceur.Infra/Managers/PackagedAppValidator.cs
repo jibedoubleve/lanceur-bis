@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Managers
 {
@@ -7,16 +8,13 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private readonly IPackagedAppManager _packagedAppManager;
+        private readonly IPackagedAppSearchService _searchService;
 
         #endregion Fields
 
         #region Constructors
 
-        public PackagedAppValidator(IPackagedAppManager packagedAppManager)
-        {
-            _packagedAppManager = packagedAppManager;
-        }
+        public PackagedAppValidator(IPackagedAppSearchService searchService) => _searchService = searchService;
 
         #endregion Constructors
 
@@ -31,12 +29,16 @@ namespace Lanceur.Infra.Managers
         /// <returns>Standardised alias</returns>
         public async Task<AliasQueryResult> FixAsync(AliasQueryResult alias)
         {
-            var response = await _packagedAppManager.GetPackageInfoAsync(alias.FileName);
-            if (response.IsPackage)
-            {
-                alias.FileName = response.Uri;
-                alias.Icon = await _packagedAppManager.GetIconAsync(response.FileName);
-            }
+            if (alias is null) return default;
+
+            var response = await Task.Run(() => _searchService.GetByInstalledDirectory(alias.FileName)
+                                                              .FirstOrDefault());
+
+            if (response is null) return alias;
+
+            alias.FileName = $"package:{response.AppUserModelId}";
+            alias.Thumbnail = response.Logo.LocalPath;
+            alias.Icon = null;
             return alias;
         }
 

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UseWpf>True</UseWpf>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj" />
+      <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="PresentationCore">
+        <HintPath>C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\6.0.24\PresentationCore.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

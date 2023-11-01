@@ -38,12 +38,12 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
         });
     }
 
-    public Task FixIconsAsync()
+    public Task FixIconsForHyperlinksAsync()
     {
         var aliases = _dbAction.GetAll()
                                .ToArray();
 
-        foreach (var alias in aliases) alias.UpdateIcon();
+        foreach (var alias in aliases) alias.UpdateIconForHyperlinks();
 
         Update(aliases);
         return Task.CompletedTask;

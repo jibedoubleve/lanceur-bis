@@ -1,4 +1,8 @@
-﻿using Lanceur.Core;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -6,13 +10,8 @@ using Lanceur.Ui;
 using Lanceur.Utils;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Lanceur.Macros
+namespace Lanceur.Macros.Development
 {
     [Macro("debug"), Description("Provides some debugging tools. But it is more an easter egg than something else")]
     public class DebugMacro : SelfExecutableQueryResult

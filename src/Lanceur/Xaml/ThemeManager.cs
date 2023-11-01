@@ -14,8 +14,8 @@ namespace Lanceur.Xaml
 
         private const string DarkTheme = "Dark.Accent1";
         private const string LightTheme = "Light.Accent1";
-        private static readonly IAppLogger _log = AppLogFactory.Get<ThemeManager>();
-        private static Application _app;
+        private static readonly IAppLogger Log = AppLogFactory.Get<ThemeManager>();
+        private Application _app;
         private static ThemeManager _instance;
 
         #endregion Fields
@@ -30,15 +30,11 @@ namespace Lanceur.Xaml
             var darkThemeUri = new Uri("pack://application:,,,/Xaml/Themes/DarkTheme.xaml");
 
             ControlzEx.Theming.ThemeManager.Current.AddLibraryTheme(
-                new LibraryTheme(
-                    lightThemeUri,
-                    CustomLibraryThemeProvider.DefaultInstance)
+                new(lightThemeUri, CustomLibraryThemeProvider.DefaultInstance)
             );
 
             ControlzEx.Theming.ThemeManager.Current.AddLibraryTheme(
-                new LibraryTheme(
-                    darkThemeUri,
-                    CustomLibraryThemeProvider.DefaultInstance)
+                new(darkThemeUri, CustomLibraryThemeProvider.DefaultInstance)
             );
 
             ResetTheme();
@@ -69,6 +65,8 @@ namespace Lanceur.Xaml
             }
         }
 
+        public static bool IsLightTheme => GetTheme() == Themes.Light;
+
         #endregion Properties
 
         #region Methods
@@ -90,7 +88,7 @@ namespace Lanceur.Xaml
 
         public static Themes GetTheme()
         {
-            object value = Registry.GetValue(@"HKEY_CURRENT_USER\Software\\Microsoft\Windows\\CurrentVersion\Themes\\Personalize", "AppsUseLightTheme", null);
+            var value = Registry.GetValue(@"HKEY_CURRENT_USER\Software\\Microsoft\Windows\\CurrentVersion\Themes\\Personalize", "AppsUseLightTheme", null);
             return value is null
                 ? Themes.Light
                 : Convert.ToBoolean(value)
@@ -101,14 +99,14 @@ namespace Lanceur.Xaml
         public void SetTheme(Themes? theme = null)
         {
             theme ??= GetTheme();
-            string themeToApply = theme switch
+            var themeToApply = theme switch
             {
                 Themes.Light => LightTheme,
                 Themes.Dark => DarkTheme,
                 _ => throw new NotSupportedException($"The theme '{theme}' is not supported!")
             };
 
-            _log.Trace($"Applying theme '{themeToApply}'. Asked theme is '{theme}'");
+            Log.Trace($"Applying theme '{themeToApply}'. Asked theme is '{theme}'");
             ControlzEx.Theming.ThemeManager.Current.ChangeTheme(_app, themeToApply);
         }
 
@@ -116,7 +114,7 @@ namespace Lanceur.Xaml
     }
 
     /// <summary>
-    /// Used to allow a default instanciable <see cref="LibraryThemeProvider"/>
+    /// Used to allow a default instantiable <see cref="LibraryThemeProvider"/>
     /// </summary>
     public class CustomLibraryThemeProvider : LibraryThemeProvider
     {

@@ -248,8 +248,6 @@ namespace Lanceur.Views
                 ? _searchService.GetAll().ToArray()
                 : Array.Empty<AliasQueryResult>();
 
-            aliases.SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light);
-
             _log.Trace($"{(_settingsFacade.Application.Window.ShowResult ? $"View activation: show all {aliases.Length} result(s)" : "View activation: display nothing")}");
             return new()
             {
@@ -288,7 +286,6 @@ namespace Lanceur.Views
             if (criterion.IsNullOrWhiteSpace() && !showResult)
             {
                 var all = _searchService.GetAll()
-                                        .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light)
                                         .ToArray();
                 return new AliasResponse
                 {
@@ -301,10 +298,8 @@ namespace Lanceur.Views
 
             _log.Debug($"Search: criterion '{criterion}'");
 
-            var results = _searchService
-                    .Search(query)
-                    .SetIconForCurrentTheme(isLight: ThemeManager.GetTheme() == ThemeManager.Themes.Light)
-                    .ToArray();
+            var results = _searchService.Search(query)
+                                        .ToArray();
 
             _log.Trace($"Search: Found {results.Length} element(s)");
             return new AliasResponse()

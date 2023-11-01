@@ -30,6 +30,9 @@ using System;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
+using Lanceur.Infra.Win32;
+using Lanceur.Infra.Win32.PackagedApp;
+using Lanceur.Ui.Thumbnails;
 
 namespace Lanceur;
 
@@ -68,7 +71,7 @@ public class Bootstrapper
         l.RegisterLazySingleton<IUserNotification>(() => new UserNotification());
         l.RegisterLazySingleton(() => new RoutingState());
         l.RegisterLazySingleton<IPluginStoreContext>(() => new PluginStoreContext());
-        l.RegisterLazySingleton<IImageCache>(() => new ImageCache());
+        l.RegisterLazySingleton<IImageCache>(() => new ImageCache(Get<IAppLoggerFactory>()));
         l.RegisterLazySingleton<IDelay>(() => new Delay());
         l.RegisterLazySingleton<IAppRestart>(() => new AppRestart());
 
@@ -103,9 +106,10 @@ public class Bootstrapper
         l.Register<IClipboardService>(() => new WindowsClipboardService());
         l.Register<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
         l.Register<IPluginManager>(() => new PluginManager(Get<IPluginStoreContext>()));
-        l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>()));
+        l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>(), Get<IAppLoggerFactory>()));
         l.Register<IPackagedAppManager>(() => new PackagedAppManager());
-        l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppManager>()));
+        l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService());
+        l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppSearchService>()));
 
         // Formatters
         l.Register<IStringFormatter>(() => new DefaultStringFormatter());
