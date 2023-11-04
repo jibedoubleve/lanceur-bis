@@ -37,6 +37,9 @@
             };
         }
 
+        public static IEnumerable<QueryResult> NoResultFound 
+            => SingleFromResult("No result found", iconKind: "AlertCircleOutline");
+
         #endregion Methods
     }
 }

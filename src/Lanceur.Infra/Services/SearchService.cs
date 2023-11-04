@@ -40,9 +40,13 @@ namespace Lanceur.Infra.Services
             _thumbnailManager.RefreshThumbnails(toReturn);
 
             // Order the list and return the result
-            return toReturn
-                    .OrderByDescending(e => e.Count)
-                    .ThenBy(e => e.Name);
+            var result = toReturn.OrderByDescending(e => e.Count)
+                                 .ThenBy(e => e.Name)
+                                 .ToArray();
+            
+            return results?.Any() ?? false 
+                ? result 
+                : DisplayQueryResult.NoResultFound;
         }
 
         public IEnumerable<QueryResult> GetAll()
@@ -62,10 +66,6 @@ namespace Lanceur.Infra.Services
                 .SelectMany(store => store.Search(query))
                 .ToList();
 
-            if (!results.Any())
-            {
-                return DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline");
-            }
 
             // Remember the query
             foreach (var result in results) { result.Query = query; }
@@ -78,7 +78,9 @@ namespace Lanceur.Infra.Services
                          select r).FirstOrDefault();
             if (match is not null) { orderedResults.Move(match, 0); }
             
-            return orderedResults;
+            return !orderedResults.Any() 
+                ? DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline") 
+                : orderedResults;
         }
 
         #endregion Methods

@@ -50,8 +50,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var calculator = new CodingSebCalculatorService();
-                var log = Substitute.For<IAppLoggerFactory>();
+                Substitute.For<IAppLoggerFactory>();
 
                 var executor = Substitute.For<IExecutionManager>();
                 executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
@@ -79,7 +78,7 @@ namespace Lanceur.Tests.ViewModels
                 vm.CurrentAlias?.Name?.Should().Be(result);
             });
         }
-
+        
         [Fact]
         public void NotifyWhenCriterionChanges()
         {
@@ -169,7 +168,7 @@ namespace Lanceur.Tests.ViewModels
         }
 
         [Fact]
-        public void ShowAutoCompleteWhenCalingDebugMacro()
+        public void ShowAutoCompleteWhenCallingDebugMacro()
         {
             Locator.CurrentMutable.Register<ICmdlineManager>(() => new CmdlineManager());
             new TestScheduler().With(scheduler =>
