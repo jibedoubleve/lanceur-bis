@@ -2,6 +2,7 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using System.Reflection;
+using Lanceur.Core.Repositories;
 
 namespace Lanceur.Infra.Managers
 {
@@ -9,7 +10,7 @@ namespace Lanceur.Infra.Managers
     {
         #region Constructors
 
-        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null) : base(asm, logFactory)
+        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null, IDbRepository repository = null) : base(asm, logFactory, repository)
         {
         }
 
@@ -23,9 +24,9 @@ namespace Lanceur.Infra.Managers
         /// <inheritdoc/>
         public IEnumerable<QueryResult> Handle(IEnumerable<QueryResult> collection)
         {
-            return collection
-                .Select(Handle)
-                .Where(item => item is not null);
+            return  collection
+                    .Select(Handle)
+                    .Where(item => item is not null);
         }
 
         /// <inheritdoc/>

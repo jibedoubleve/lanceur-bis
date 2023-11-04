@@ -21,11 +21,11 @@ namespace Lanceur.Infra.Managers
 
         #region Constructors
 
-        internal MacroManagerCache(Assembly asm, IAppLoggerFactory logFactory)
+        internal MacroManagerCache(Assembly asm, IAppLoggerFactory logFactory, IDbRepository repository)
         {
             _asm = asm;
             Log = Locator.Current.GetLogger<MacroManager>(logFactory);
-            _dataService = Locator.Current.GetService<IDbRepository>();
+            _dataService = repository ?? Locator.Current.GetService<IDbRepository>();
         }
 
         #endregion Constructors
