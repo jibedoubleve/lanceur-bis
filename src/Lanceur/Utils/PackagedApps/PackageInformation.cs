@@ -47,17 +47,12 @@ namespace Lanceur.Utils.PackagedApps
             const Stgm exclusiveRead = Stgm.Read | Stgm.DenyWrite;
             var hResult = SHCreateStreamOnFileEx(path, exclusiveRead, noAttribute, false, null, out IStream stream);
 
-            if (hResult == Hresult.Ok)
-            {
-                List<AppxPackageHelper.IAppxManifestApplication> apps = helper.GetAppsFromManifest(stream);
+            if (hResult != Hresult.Ok) return string.Empty;
 
-                if (apps.Count > 0)
-                {
-                    return visitor(apps[0]);
-                }
-                else { return string.Empty; }
-            }
-            else { return string.Empty; }
+            var apps = helper.GetAppsFromManifest(stream);
+
+            return apps.Count > 0 ? visitor(apps[0]) : string.Empty;
+
         }
 
         private static PackageVersion InitPackageVersion(string[] namespaces)

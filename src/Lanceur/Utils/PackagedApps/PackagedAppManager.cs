@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Managers;
+﻿using System;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Responses;
 using System.Collections.Generic;
 using System.IO;
@@ -47,22 +48,24 @@ namespace Lanceur.Utils.PackagedApps
         {
             return await Task.Run(() =>
             {
-                if (_cache.ContainsKey(fileName)) { return _cache[fileName]; }
-                else
-                {
-                    var userId = WindowsIdentity.GetCurrent().User.Value;
-                    var srcDir = Path.GetDirectoryName(fileName);
+                if (_cache.TryGetValue(fileName, out var expression)) { return expression; }
 
-                    var packages = new PackageManager().FindPackagesForUser(userId);
-                    var results = (from p in packages
-                                   where p.HasInstallationPath()
-                                      && p.IsInDirectory(srcDir)
-                                   select p).ToList();
+                var userId = WindowsIdentity.GetCurrent()?.User?.Value
+                             ?? throw new NullReferenceException("Didn't find current Windows user!");
 
-                    var currentpackage = results.FirstOrDefault();
-                    _cache.Add(fileName, currentpackage);
-                    return currentpackage;
-                }
+                var srcDir = Path.GetDirectoryName(fileName);
+
+                var packages = new PackageManager().FindPackagesForUser(userId);
+                var results = (from p in packages
+                               where p.HasInstallationPath()
+                                     && p.IsInDirectory(srcDir)
+                               select p).ToList();
+
+                var currentPkg = results.FirstOrDefault() 
+                    ?? throw new NullReferenceException($"No package for '{fileName}' found for the current user");
+                
+                _cache.Add(fileName, currentPkg);
+                return currentPkg;
             });
         }
 

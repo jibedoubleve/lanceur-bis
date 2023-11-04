@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using Lanceur.Ui;
 
 namespace Lanceur;
 
@@ -53,6 +54,8 @@ public partial class App : Application
     {
         var log = Locator.Current.GetService<IAppLoggerFactory>().GetLogger<App>();
         _notifyIcon ??= new();
+
+        Locator.Current.GetService<IImageCache>().LoadCache();
 
         ThemeManager.Current.SetTheme();
 

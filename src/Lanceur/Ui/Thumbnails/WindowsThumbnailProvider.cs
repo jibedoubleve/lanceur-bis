@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-namespace Lanceur.Ui
+namespace Lanceur.Ui.Thumbnails
 {
     [Flags]
     public enum ThumbnailOptions
@@ -25,6 +26,8 @@ namespace Lanceur.Ui
         #region Fields
 
         private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
+
+        private static readonly Dictionary<string, BitmapSource> _thumbnailCache = new();
 
         #endregion Fields
 
@@ -99,6 +102,10 @@ namespace Lanceur.Ui
 
         #region Methods
 
+        [DllImport("gdi32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool DeleteObject(IntPtr hObject);
+
         private static IntPtr GetHBitmap(string fileName, int width, int height, ThumbnailOptions options)
         {
             IShellItem nativeShellItem;
@@ -129,12 +136,8 @@ namespace Lanceur.Ui
             else { throw new COMException($"Error while extracting thumbnail for {fileName}", Marshal.GetExceptionForHR((int)hr)); }
         }
 
-        [DllImport("gdi32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool DeleteObject(IntPtr hObject);
-
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern int SHCreateItemFromParsingName(
+        private static extern int SHCreateItemFromParsingName(
             [MarshalAs(UnmanagedType.LPWStr)] string path,
             IntPtr pbc,
             ref Guid riid,

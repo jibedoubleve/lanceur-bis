@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Models.Settings;
+using Lanceur.Infra.Constants;
 
 namespace Lanceur.Infra.Services
 {
@@ -6,7 +7,7 @@ namespace Lanceur.Infra.Services
     {
         #region Properties
 
-        public string DbPath { get; set; } = @"%appdata%\probel\lanceur2\data.sqlite";
+        public string DbPath { get; set; } = AppPaths.DefaultDbPath;
 
         #endregion Properties
     }

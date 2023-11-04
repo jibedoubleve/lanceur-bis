@@ -15,6 +15,12 @@ namespace Lanceur.Ui
 
         bool IsInCache(string path);
 
+        /// <summary>
+        /// Load the cache into memory. If implemented, it activate the mechanism to
+        /// load from disk to memory.
+        /// </summary>
+        void LoadCache();
+
         #endregion Methods
     }
 }

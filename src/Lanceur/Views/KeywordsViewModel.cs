@@ -236,7 +236,7 @@ namespace Lanceur.Views
                 .Where(alias => alias is not null)
                 .Subscribe(alias =>
                 {
-                    var toDel = _aliases.Items.Single(a => a.Id == alias.Id);
+                    var toDel = _aliases.Items.FirstOrDefault(a => a.Id == alias.Id);
                     _aliases.Remove(toDel);
                     _aliases.Add(alias);
                 })

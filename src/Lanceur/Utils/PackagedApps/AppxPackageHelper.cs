@@ -90,9 +90,11 @@ namespace Lanceur.Utils.PackagedApps
         // This function returns a list of attributes of applications
         public List<IAppxManifestApplication> GetAppsFromManifest(IStream stream)
         {
-            List<IAppxManifestApplication> apps = new List<IAppxManifestApplication>();
+            var apps = new List<IAppxManifestApplication>();
             var appxFactory = new AppxFactory();
-            var reader = ((IAppxFactory)appxFactory).CreateManifestReader(stream);
+            var reader = (appxFactory as IAppxFactory)?.CreateManifestReader(stream);
+            if (reader == null) return apps;
+
             var manifestApps = reader.GetApplications();
             while (manifestApps.GetHasCurrent())
             {
@@ -104,6 +106,7 @@ namespace Lanceur.Utils.PackagedApps
                 }
                 manifestApps.MoveNext();
             }
+
             return apps;
         }
 

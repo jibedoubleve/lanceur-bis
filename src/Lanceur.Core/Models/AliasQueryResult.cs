@@ -5,7 +5,7 @@ using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Core.Models;
 
-[DebuggerDisplay("Name: {Name} - Synonyms: {Synonyms}")]
+[DebuggerDisplay("{Id} - Name: {Name} - Synonyms: {Synonyms}")]
 public class AliasQueryResult : ExecutableQueryResult, IElevated
 {
     #region Fields

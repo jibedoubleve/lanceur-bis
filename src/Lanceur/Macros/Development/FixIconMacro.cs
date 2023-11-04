@@ -1,12 +1,12 @@
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Splat;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading.Tasks;
 
-namespace Lanceur.Macros;
+namespace Lanceur.Macros.Development;
 
 [Macro("fixicon"), Description("Fix icons when alias is a directory or an hyperlink")]
 public class FixIconMacro : SelfExecutableQueryResult
@@ -22,7 +22,7 @@ public class FixIconMacro : SelfExecutableQueryResult
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
         var action = Locator.Current.GetService<IDataDoctorRepository>();
-        await action.FixIconsAsync();
+        await action.FixIconsForHyperlinksAsync();
 
         return NoResult;
     }

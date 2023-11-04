@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Mixins;
 using System;
+using Lanceur.Infra.Constants;
 
 namespace Lanceur.Utils.ConnectionStrings
 {
@@ -8,10 +9,9 @@ namespace Lanceur.Utils.ConnectionStrings
     {
         #region Fields
 
-        //private string _dbPath = @"%appdata%\probel\Lanceur\debug_data.db";
         private static string _connectionString;
 
-        private readonly string _dbPath = @"%appdata%\probel\lanceur2\data.sqlite";
+        private readonly string _dbPath = AppPaths.DefaultDbPath;
 
         #endregion Fields
 

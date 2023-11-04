@@ -34,7 +34,7 @@ namespace Lanceur.Views
 
         private readonly IAppConfigRepository _settings;
         private bool _isStoryBoardsFree = true;
-        public readonly IAppLogger _log;
+        private readonly IAppLogger _log;
 
         #endregion Fields
 

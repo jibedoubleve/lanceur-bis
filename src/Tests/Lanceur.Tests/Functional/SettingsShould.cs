@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Infra.Constants;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite;
 using Lanceur.Tests.SQLite;
@@ -30,7 +31,7 @@ namespace Lanceur.Tests.Functional
 
             var value = stg.Current.DbPath;
 
-            value.Should().Be(@"%appdata%\probel\lanceur2\data.sqlite");
+            value.Should().Be(AppPaths.DefaultDbPath);
         }
 
         [Fact]

@@ -18,6 +18,7 @@ using NSubstitute;
 using ReactiveUI.Testing;
 using Splat;
 using System.Reactive.Concurrency;
+using Lanceur.Macros.Development;
 using Xunit;
 using Xunit.Abstractions;
 

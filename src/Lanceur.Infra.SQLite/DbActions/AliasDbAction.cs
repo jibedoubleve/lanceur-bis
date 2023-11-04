@@ -76,8 +76,7 @@ namespace Lanceur.Infra.SQLite.DbActions
         private void CreateAdditionalParameters(AliasQueryResult alias, SQLiteTransaction tx)
             => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
-        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters,
-                                                SQLiteTransaction tx)
+        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, SQLiteTransactionBase tx)
         {
             // Remove existing additional alias parameters
             const string sql1 = "delete from alias_argument where id_alias = @idAlias";
@@ -90,7 +89,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
         }
 
-        private void UpdateName(AliasQueryResult alias, SQLiteTransaction tx)
+        private void UpdateName(AliasQueryResult alias, SQLiteTransactionBase tx)
         {
             //Remove all names
             const string sql = @"delete from alias_name where id_alias = @id";
@@ -150,7 +149,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public ExistingNameResponse CheckNameExists(string[] names, long idSession)
         {
-            var sql = @"
+            const string sql = @"
                 select an.name
                 from
                 	alias_name an
@@ -169,7 +168,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Create(ref AliasQueryResult alias, long idSession)
         {
-            alias.UpdateIcon();
+            alias.UpdateIconForHyperlinks();
             const string sqlAlias = @"
                 insert into alias (
                     arguments,
@@ -180,6 +179,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     working_dir,
                     id_session,
                     icon,
+                    thumbnail,
                     lua_script,
                     hidden
                 ) values (
@@ -191,6 +191,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @workingDirectory,
                     @idSession,
                     @icon,
+                    @thumbnail,
                     @luaScript,
                     @isHidden
                 );
@@ -205,6 +206,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.WorkingDirectory,
                 idSession,
                 alias.Icon,
+                alias.Thumbnail,
                 alias.LuaScript,
                 alias.IsHidden
             };
@@ -284,6 +286,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     a.start_mode  as {nameof(AliasQueryResult.StartMode)},
                     a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
                     a.icon        as {nameof(AliasQueryResult.Icon)},
+                    a.thumbnail   as {nameof(AliasQueryResult.Thumbnail)},
                     a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count  as {nameof(AliasQueryResult.Count)},
                     a.hidden      as {nameof(AliasQueryResult.IsHidden)}
@@ -361,6 +364,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     start_mode  = @startMode,
                     working_dir = @WorkingDirectory,
                     icon        = @Icon,
+                    thumbnail   = @thumbnail,
                     lua_script  = @luaScript                                   
                 where id = @id;";
 
@@ -375,6 +379,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     alias.StartMode,
                     alias.WorkingDirectory,
                     alias.Icon,
+                    alias.Thumbnail,
                     alias.LuaScript,
                     id = alias.Id
                 });

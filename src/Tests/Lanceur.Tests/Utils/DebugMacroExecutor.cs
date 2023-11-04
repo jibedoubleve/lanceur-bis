@@ -2,6 +2,7 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
 using Lanceur.Macros;
+using Lanceur.Macros.Development;
 using Xunit;
 
 namespace Lanceur.Tests.Utils

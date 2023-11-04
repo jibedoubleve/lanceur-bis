@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Plugins;
+using Lanceur.Infra.Constants;
 using IoDirectory = System.IO.Directory;
 
 namespace Lanceur.Infra.Plugins
@@ -39,8 +40,7 @@ namespace Lanceur.Infra.Plugins
                 RelativePath
             );
 
-            MaintenanceLogBookPath =
-                Environment.ExpandEnvironmentVariables(@"%appdata%\probel\lanceur2\.plugin-uninstall");
+            MaintenanceLogBookPath = Environment.ExpandEnvironmentVariables(AppPaths.PluginUninstallLogs);
         }
 
         #endregion Constructors
