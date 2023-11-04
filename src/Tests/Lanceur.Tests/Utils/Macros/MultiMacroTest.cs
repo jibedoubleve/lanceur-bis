@@ -9,6 +9,8 @@ namespace Lanceur.Tests.Utils.Macros
     {
         #region Constructors
 
+        public MultiMacroTest() : this(null) { }
+        
         public MultiMacroTest(string parameters = null)
         {
             Name = Guid.NewGuid().ToString();

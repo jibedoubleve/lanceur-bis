@@ -1,9 +1,11 @@
-﻿using FluentAssertions;
+﻿using System.Reflection;
+using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Stores;
@@ -30,7 +32,7 @@ namespace Lanceur.Tests.BusinessLogic
                 insert into alias_name (id, id_alias, name) values (2000, 2000, 'alias2');
 
                 insert into alias (id, file_name, arguments,id_session) values (3000, 'arg', 'c:\dummy\dummy.exe', 1);
-                insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3')";
+                insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');";
 
         #endregion Fields
 
@@ -45,17 +47,10 @@ namespace Lanceur.Tests.BusinessLogic
 
         #region Methods
 
-        private static SearchService BuildSearchService(IStoreLoader loader = null)
-        {
-            loader ??= new DebugStoreLoader();
-            var service = new SearchService(loader);
-            return service;
-        }
-
         [Fact]
         public void HaveStores()
         {
-            SearchService service = BuildSearchService(new StoreLoader());
+            var service = new SearchService(new StoreLoader());
 
             service.Stores.Should().HaveCount(5);
         }
@@ -81,14 +76,19 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void ReturnValues()
         {
-            var service = BuildSearchService();
+            var macroManager = Substitute.For<IMacroManager>();
+            var thumbnailManager = Substitute.For<IThumbnailManager>();
+            var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager);
             var query = new Cmdline("code");
 
             var result = service.Search(query)
                                 .ToArray();
 
-            result.Should().HaveCount(1);
-            result.ElementAt(0).IsResult.Should().BeFalse();
+            using (new AssertionScope())
+            {
+                result.Should().HaveCount(1);
+                result.ElementAt(0).IsResult.Should().BeFalse();
+            }
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace Lanceur.Tests.BusinessLogic
             const string criterion = "u";
             var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
             var stores = Substitute.For<IStoreLoader>();
-            stores.Load().Returns(new[] { new  AliasStore(repository) });
+            stores.Load().Returns(new[] { new AliasStore(repository) });
 
             var results = repository.Search(criterion, 1).ToList();
             var macroManager = Substitute.For<IMacroManager>();
@@ -156,6 +156,38 @@ namespace Lanceur.Tests.BusinessLogic
             }
         }
 
+        [Fact]
+        public void ReturnNoResultMessageWhenMisconfiguredMacro()
+        {
+            // ARRANGE
+            const string sql = SqlCreateAlias
+                               + @"
+                insert into alias (id, file_name, id_session) values (4000, '@zzzz@', 1);
+                insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');";
+
+            using var db = BuildFreshDb(sql);
+            using var conn = new SQLiteSingleConnectionManager(db);
+
+            var thumbnailManager = Substitute.For<IThumbnailManager>();
+            var converter   = Substitute.For<IConvertionService>();
+            var repository  = new SQLiteRepository(conn, _testLoggerFactory, converter);
+            var storeLoader = Substitute.For<IStoreLoader>();
+            storeLoader.Load().Returns(new[] { new AliasStore(repository) });
+            
+            var asm = Assembly.GetExecutingAssembly();
+            var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager);
+            
+            // ACT
+            var result = service.Search(new("z")).ToArray();
+
+            // ASSERT
+            using (new AssertionScope())
+            {
+                result.Should().HaveCountGreaterThan(0);
+                result[0].Name.Should().Be("No result found");
+            }
+
+        }
         #endregion Methods
     }
 }
