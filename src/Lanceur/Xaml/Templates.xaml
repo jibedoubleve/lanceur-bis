@@ -14,21 +14,27 @@
             HorizontalAlignment="Stretch"
             Background="Transparent">
             <DockPanel Background="Transparent">
-                <Grid Margin="5,5,15,5">
-                    <iconPacks:PackIconMaterial
-                        Width="{StaticResource DefaultIconSize}"
-                        Height="{StaticResource DefaultIconSize}"
-                        VerticalAlignment="Center"
-                        Kind="{Binding Icon}"
-                        Visibility="{Binding ElementName=ImageIcon, Path=Visibility, Converter={StaticResource InvertVisibilityConverter}}" />
-                    <Image
-                        x:Name="ImageIcon"
-                        Width="{StaticResource DefaultIconSize}"
-                        Height="{StaticResource DefaultIconSize}"
-                        VerticalAlignment="Center"
-                        Source="{Binding Thumbnail, UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
-                </Grid>
+                <Border
+                    Margin="5,5,15,5"
+                    Background="#FFC8C8C8"
+                    CornerRadius="8">
+                    <Grid Margin="5">
+                        <iconPacks:PackIconMaterial
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            VerticalAlignment="Center"
+                            Foreground="#FF171717"
+                            Kind="{Binding Icon}"
+                            Visibility="{Binding ElementName=ImageIcon, Path=Visibility, Converter={StaticResource InvertVisibilityConverter}}" />
+                        <Image
+                            x:Name="ImageIcon"
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            VerticalAlignment="Center"
+                            Source="{Binding Thumbnail, UpdateSourceTrigger=PropertyChanged}"
+                            Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
+                    </Grid>
+                </Border>
                 <Grid Background="Transparent">
                     <Grid.RowDefinitions>
                         <RowDefinition />
