@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Lanceur.Macros
 {
     [Macro("centre"), Description("Center Lanceur in the middle of the screen")]
-    public class CentreMacro : SelfExecutableQueryResult
+    public class CentreMacro : MacroQueryResult
     {
         #region Properties
 
@@ -30,6 +30,8 @@ namespace Lanceur.Macros
                 s.Window.Position.Top = coordinate.Y;
             });
         }
+
+        public override SelfExecutableQueryResult Clone() => this.CloneObject();
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {

@@ -1,20 +1,21 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using Lanceur.Core;
+﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
 using Lanceur.Utils;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Lanceur.Macros.Development
 {
     [Macro("debug"), Description("Provides some debugging tools. But it is more an easter egg than something else")]
-    public class DebugMacro : SelfExecutableQueryResult
+    public class DebugMacro : MacroQueryResult
     {
         #region Constructors
 
@@ -66,6 +67,8 @@ namespace Lanceur.Macros.Development
                 .Show();
             return NoResult;
         }
+
+        public override SelfExecutableQueryResult Clone() => this.CloneObject();
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {

@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.SharedKernel.Mixins;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +10,7 @@ using System.Windows;
 namespace Lanceur.Macros
 {
     [Macro("guid"), Description("Creates a guid and save it into the clipboard")]
-    public class GuidMacro : SelfExecutableQueryResult
+    public class GuidMacro : MacroQueryResult
     {
         #region Properties
 
@@ -18,6 +19,8 @@ namespace Lanceur.Macros
         #endregion Properties
 
         #region Methods
+
+        public override SelfExecutableQueryResult Clone() => this.CloneObject();
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
