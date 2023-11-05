@@ -73,7 +73,7 @@ namespace Lanceur.Infra.Services
 
             // If there's an exact match, promote it to the top
             // of the list.
-            var orderedResults = SetupAndSort(results).ToArray();
+            var orderedResults = SetupAndSort(results).ToList();
             var match = (from r in orderedResults 
                          where r.Name == query.Name
                          select r).FirstOrDefault();

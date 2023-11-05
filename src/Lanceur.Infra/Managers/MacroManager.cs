@@ -4,6 +4,7 @@ using Lanceur.Core.Services;
 using System.Reflection;
 using Lanceur.Core.Repositories;
 using Lanceur.Infra.Utils;
+using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Managers
 {
@@ -46,7 +47,7 @@ namespace Lanceur.Infra.Managers
                 return null;
             }
 
-            var macro = MacroInstances[alias.GetMacroName()];
+            var macro = MacroInstances[alias.GetMacroName()].Clone();
             macro.Name = alias.Name;
             macro.Parameters = alias.Parameters;
             return macro;
