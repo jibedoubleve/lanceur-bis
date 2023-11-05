@@ -157,7 +157,30 @@ public class MacroShould : SQLiteTest
         }
     }
 
+    [Fact]
+    public void NotHaveDoubloonsWhenMacroUsedMultipleTimes()
+    {
+        var queryResults = new AliasQueryResult[]
+        {
+            new() { Name = "macro_1", FileName = "@multi@" },
+            new() { Name = "macro_2", FileName = "@multi@" },
+            new() { Name = "macro_3", FileName = "@multi@" }
+        };
 
+        var logger = Substitute.For<IAppLoggerFactory>();
+        var repository = Substitute.For<IDbRepository>();
+        var asm = Assembly.GetExecutingAssembly();
+        var manager = new MacroManager(asm, logger, repository);
+
+        var output = manager.Handle(queryResults)
+                            .ToArray();
+
+        using(new AssertionScope())
+        {
+            output.GetDoubloons().Should().HaveCount(0);
+            output.Should().HaveCount(3);
+        }
+    }
 
     [Theory]
     [InlineData("un")]
