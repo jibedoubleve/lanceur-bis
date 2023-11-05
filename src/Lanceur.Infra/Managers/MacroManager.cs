@@ -1,10 +1,8 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using System.Reflection;
-using Lanceur.Core.Repositories;
-using Lanceur.Infra.Utils;
-using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Managers
 {
@@ -18,6 +16,12 @@ namespace Lanceur.Infra.Managers
 
         #endregion Constructors
 
+        #region Properties
+
+        public int MacroCount => MacroInstances?.Count ?? 0;
+
+        #endregion Properties
+
         #region Methods
 
         /// <inheritdoc/>
@@ -26,7 +30,7 @@ namespace Lanceur.Infra.Managers
         /// <inheritdoc/>
         public IEnumerable<QueryResult> Handle(QueryResult[] collection)
         {
-            var result =  collection.Select(Handle)
+            var result = collection.Select(Handle)
                                     .Where(item => item is not null)
                                     .ToArray();
             return result;

@@ -13,6 +13,7 @@ using Lanceur.Utils;
 using NSubstitute;
 using System.Data.SQLite;
 using System.Reflection;
+using Lanceur.Macros;
 using Xunit;
 
 namespace Lanceur.Tests.BusinessLogic;
@@ -191,6 +192,17 @@ public class MacroShould : SQLiteTest
         var query = new AliasQueryResult() { FileName = $"@{macro}@" };
 
         query.IsMacro().Should().BeTrue();
+    }
+
+    [Fact]
+    public void HaveDefaultMacro()
+    {
+        var asm = Assembly.GetAssembly(typeof(MultiMacro));
+        var logFactory = Substitute.For<IAppLoggerFactory>();
+        var repository = Substitute.For<IDbRepository>();
+        var manager = new MacroManager(asm, logFactory, repository);
+
+        manager.MacroCount.Should().BeGreaterThan(0);
     }
 
     #endregion Methods
