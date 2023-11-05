@@ -13,7 +13,7 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private static Dictionary<string, MacroQueryResult> _macroInstances;
+        private Dictionary<string, ISelfExecutable> _macroInstances;
         private readonly Assembly _asm;
         private readonly IDbRepository _dataService;
 
@@ -34,7 +34,7 @@ namespace Lanceur.Infra.Managers
 
         protected IAppLogger Log { get;  }
 
-        protected Dictionary<string, MacroQueryResult> MacroInstances
+        protected Dictionary<string, ISelfExecutable> MacroInstances
         {
             get
             {
@@ -54,11 +54,11 @@ namespace Lanceur.Infra.Managers
             var found = from t in _asm.GetTypes()
                         where t.GetCustomAttributes<MacroAttribute>().Any()
                         select t;
-            var macroInstances = new Dictionary<string, MacroQueryResult>();
+            var macroInstances = new Dictionary<string, ISelfExecutable>();
             foreach (var type in found)
             {
                 var instance = Activator.CreateInstance(type);
-                if (instance is not MacroQueryResult alias) continue;
+                if (instance is not SelfExecutableQueryResult alias) continue;
 
                 var name = alias.Name = (type.GetCustomAttribute(typeof(MacroAttribute)) as MacroAttribute)?.Name;
                 name = name?.ToUpper().Replace("@", string.Empty) ?? string.Empty;

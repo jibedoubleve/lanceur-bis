@@ -51,10 +51,14 @@ namespace Lanceur.Infra.Managers
                 return null;
             }
 
-            var macro = MacroInstances[alias.GetMacroName()].Clone();
-            macro.Name = alias.Name;
+            var instance = MacroInstances[alias.GetMacroName()];
+            if (instance is not MacroQueryResult i) throw new NotSupportedException($"Cannot cast '{instance.GetType()}' into '{typeof(MacroQueryResult)}'");
+
+            var macro = i.Clone();
+            macro.Name       = alias.Name;
             macro.Parameters = alias.Parameters;
             return macro;
+
         }
 
         #endregion Methods

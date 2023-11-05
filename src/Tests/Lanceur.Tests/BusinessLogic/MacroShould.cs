@@ -201,7 +201,7 @@ public class MacroShould : SQLiteTest
         var logFactory = Substitute.For<IAppLoggerFactory>();
         var repository = Substitute.For<IDbRepository>();
         var manager = new MacroManager(asm, logFactory, repository);
-
+        
         manager.MacroCount.Should().BeGreaterThan(0);
     }
 
