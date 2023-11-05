@@ -3,6 +3,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using System.Reflection;
 using Lanceur.Core.Repositories;
+using Lanceur.Infra.Utils;
 
 namespace Lanceur.Infra.Managers
 {
@@ -22,11 +23,12 @@ namespace Lanceur.Infra.Managers
         public IEnumerable<string> GetAll() => MacroInstances.Keys;
 
         /// <inheritdoc/>
-        public IEnumerable<QueryResult> Handle(IEnumerable<QueryResult> collection)
+        public IEnumerable<QueryResult> Handle(QueryResult[] collection)
         {
-            return  collection
-                    .Select(Handle)
-                    .Where(item => item is not null);
+            var result =  collection.Select(Handle)
+                                    .Where(item => item is not null)
+                                    .ToArray();
+            return result;
         }
 
         /// <inheritdoc/>

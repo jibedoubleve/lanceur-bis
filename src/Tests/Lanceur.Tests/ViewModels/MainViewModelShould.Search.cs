@@ -64,7 +64,7 @@ namespace Lanceur.Tests.ViewModels
                 storeLoader.Load().Returns(new List<ISearchService> { store });
 
                 var macroMgr = Substitute.For<IMacroManager>();
-                macroMgr.Handle(Arg.Any<IEnumerable<QueryResult>>()).Returns(results);
+                macroMgr.Handle(Arg.Any<QueryResult[]>()).Returns(results);
 
                 var thumbnailManager = Substitute.For<IThumbnailManager>();
                 var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);

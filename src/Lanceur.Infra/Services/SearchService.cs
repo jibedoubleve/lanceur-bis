@@ -1,7 +1,9 @@
-﻿using Lanceur.Core.Managers;
+﻿using System.Diagnostics;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Splat;
 
@@ -29,31 +31,30 @@ namespace Lanceur.Infra.Services
 
         #region Methods
 
-        private IEnumerable<QueryResult> SetupAndSort(List<QueryResult> results)
+        private IEnumerable<QueryResult> SetupAndSort(QueryResult[] input)
         {
             // Upgrade alias to executable macro and return the result
-            var toReturn = results?.Any() ?? false
-                ? _macroManager.Handle(results).ToList()
+            var results = input?.Any() ?? false
+                ? _macroManager.Handle(input).ToList()
                 : new();
 
             // Refresh the thumbnails
-            _thumbnailManager.RefreshThumbnails(toReturn);
+            _thumbnailManager.RefreshThumbnails(results);
 
             // Order the list and return the result
-            var result = toReturn.OrderByDescending(e => e.Count)
-                                 .ThenBy(e => e.Name)
-                                 .ToArray();
-            
-            return results?.Any() ?? false 
-                ? result 
+            var orderedResults = results.OrderByDescending(e => e.Count)
+                                        .ThenBy(e => e.Name)
+                                        .ToArray();
+
+            return input?.Any() ?? false 
+                ? orderedResults 
                 : DisplayQueryResult.NoResultFound;
         }
 
         public IEnumerable<QueryResult> GetAll()
         {
-            var results = Stores
-                .SelectMany(store => store.GetAll())
-                .ToList();
+            var results = Stores.SelectMany(store => store.GetAll())
+                                .ToArray();
 
             return SetupAndSort(results);
         }
@@ -64,7 +65,7 @@ namespace Lanceur.Infra.Services
 
             var results = Stores
                 .SelectMany(store => store.Search(query))
-                .ToList();
+                .ToArray();
 
 
             // Remember the query
@@ -72,7 +73,7 @@ namespace Lanceur.Infra.Services
 
             // If there's an exact match, promote it to the top
             // of the list.
-            var orderedResults = SetupAndSort(results).ToList();
+            var orderedResults = SetupAndSort(results).ToArray();
             var match = (from r in orderedResults 
                          where r.Name == query.Name
                          select r).FirstOrDefault();

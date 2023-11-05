@@ -66,16 +66,8 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// The collection with all element that are upgradable
         /// to composite, upgraded
         /// </returns>
-        public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)
-        {
-            var items = new List<AliasQueryResult>();
-
-            foreach (var item in collection)
-            {
-                items.Add(Hydrate(item));
-            }
-            return items;
-        }
+        public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection) 
+            => collection.Select(Hydrate).ToList();
 
         #endregion Methods
     }

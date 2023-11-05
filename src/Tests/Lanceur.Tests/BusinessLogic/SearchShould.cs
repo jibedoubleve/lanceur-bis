@@ -134,7 +134,7 @@ namespace Lanceur.Tests.BusinessLogic
 
             var results = repository.Search(criterion, 1).ToList();
             var macroManager = Substitute.For<IMacroManager>();
-            macroManager.Handle(Arg.Any<IEnumerable<QueryResult>>())
+            macroManager.Handle(Arg.Any<QueryResult[]>())
                         .Returns(results);
             
             var searchService = new SearchService(
