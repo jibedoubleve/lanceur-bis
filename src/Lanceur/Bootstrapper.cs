@@ -32,6 +32,7 @@ using System.Linq;
 using System.Reflection;
 using Lanceur.Infra.Win32;
 using Lanceur.Infra.Win32.PackagedApp;
+using Lanceur.SharedKernel.Web;
 using Lanceur.Ui.Thumbnails;
 
 namespace Lanceur;
@@ -109,7 +110,8 @@ public class Bootstrapper
         l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>(), Get<IAppLoggerFactory>()));
         l.Register<IPackagedAppManager>(() => new PackagedAppManager());
         l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService());
-        l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppSearchService>()));
+        l.Register<IFavIconDownloader>(()=> new FavIconDownloader());
+        l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>()));
 
         // Formatters
         l.Register<IStringFormatter>(() => new DefaultStringFormatter());

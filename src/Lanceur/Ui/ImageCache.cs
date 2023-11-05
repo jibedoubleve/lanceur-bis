@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Lanceur.Utils;
 
 namespace Lanceur.Ui
 {
@@ -84,6 +85,13 @@ namespace Lanceur.Ui
                 bitmap.BeginInit();
                 bitmap.UriSource = new(image, UriKind.Absolute);
                 bitmap.EndInit();
+
+                //If it is a URI then key key in cache is the host of the URL
+                if (fileName.IsUrl())
+                {
+                    _cache[fileName.GetKeyForFavIcon()] = bitmap;
+                    continue;
+                }
 
                 _cache[fileName] = bitmap;
             }

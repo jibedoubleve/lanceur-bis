@@ -6,6 +6,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Images;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.Utils;
 
 namespace Lanceur.Ui.Thumbnails
 {
@@ -49,6 +50,12 @@ namespace Lanceur.Ui.Thumbnails
                     var fileName = alias.FileName;
 
                     if (fileName.IsNullOrEmpty()) { continue; }
+
+                    if (fileName.IsUrl() && _cache.IsInCache(fileName.GetKeyForFavIcon()))
+                    {
+                        alias.Thumbnail = _cache[fileName.GetKeyForFavIcon()];
+                        continue;
+                    }
                     if (_cache.IsInCache(fileName))
                     {
                         alias.Thumbnail = _cache[fileName];

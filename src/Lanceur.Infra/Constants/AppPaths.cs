@@ -6,4 +6,5 @@ public static class AppPaths
     public const string PluginUninstallLogs = @"%appdata%\probel\lanceur2\.plugin-uninstall";
     public const string DefaultDbPath       = @"%appdata%\probel\lanceur2\data.sqlite";
     public const string ImageCache          = @"%appdata%\probel\lanceur2\thumbnails";
+    public const string FaviconPrefix       = "favicon_";
 }
