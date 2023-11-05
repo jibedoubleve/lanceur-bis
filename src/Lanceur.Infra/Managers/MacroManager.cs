@@ -1,8 +1,8 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using System.Reflection;
-using Lanceur.Core.Repositories;
 
 namespace Lanceur.Infra.Managers
 {
@@ -16,17 +16,24 @@ namespace Lanceur.Infra.Managers
 
         #endregion Constructors
 
+        #region Properties
+
+        public int MacroCount => MacroInstances?.Count ?? 0;
+
+        #endregion Properties
+
         #region Methods
 
         /// <inheritdoc/>
         public IEnumerable<string> GetAll() => MacroInstances.Keys;
 
         /// <inheritdoc/>
-        public IEnumerable<QueryResult> Handle(IEnumerable<QueryResult> collection)
+        public IEnumerable<QueryResult> Handle(QueryResult[] collection)
         {
-            return  collection
-                    .Select(Handle)
-                    .Where(item => item is not null);
+            var result = collection.Select(Handle)
+                                    .Where(item => item is not null)
+                                    .ToArray();
+            return result;
         }
 
         /// <inheritdoc/>
@@ -44,10 +51,14 @@ namespace Lanceur.Infra.Managers
                 return null;
             }
 
-            var macro = MacroInstances[alias.GetMacroName()];
-            macro.Name = alias.Name;
+            var instance = MacroInstances[alias.GetMacroName()];
+            if (instance is not MacroQueryResult i) throw new NotSupportedException($"Cannot cast '{instance.GetType()}' into '{typeof(MacroQueryResult)}'");
+
+            var macro = i.Clone();
+            macro.Name       = alias.Name;
             macro.Parameters = alias.Parameters;
             return macro;
+
         }
 
         #endregion Methods

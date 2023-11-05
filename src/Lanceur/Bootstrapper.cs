@@ -104,7 +104,7 @@ public class Bootstrapper
         l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
         l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
         l.Register<IClipboardService>(() => new WindowsClipboardService());
-        l.Register<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
+        l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
         l.Register<IPluginManager>(() => new PluginManager(Get<IPluginStoreContext>()));
         l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>(), Get<IAppLoggerFactory>()));
         l.Register<IPackagedAppManager>(() => new PackagedAppManager());

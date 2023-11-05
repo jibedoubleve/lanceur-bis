@@ -24,7 +24,7 @@ namespace Lanceur.Core.Managers
         /// This method <b>do not</b> update the database.
         /// This <b>doesn't</b> touch <see cref="QueryResult"/> that
         /// are <b>not</b> macro </remarks>
-        IEnumerable<QueryResult> Handle(IEnumerable<QueryResult> collection);
+        IEnumerable<QueryResult> Handle(QueryResult[] collection);
 
         /// <summary>
         /// Update the macro with the information of the user query.

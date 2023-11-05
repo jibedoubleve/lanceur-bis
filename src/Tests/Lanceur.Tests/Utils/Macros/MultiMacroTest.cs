@@ -1,11 +1,12 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
 using System.ComponentModel;
+using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Tests.Utils.Macros
 {
     [Macro("multi"), Description("Allow to start multiple alias at once")]
-    public class MultiMacroTest : SelfExecutableQueryResult
+    public class MultiMacroTest : MacroQueryResult
     {
         #region Constructors
 
@@ -20,6 +21,8 @@ namespace Lanceur.Tests.Utils.Macros
         #endregion Constructors
 
         #region Methods
+
+        public override SelfExecutableQueryResult Clone() => this.CloneObject();
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
