@@ -7,20 +7,62 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Utils;
+using Lanceur.Macros;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Utils.Macros;
 using Lanceur.Utils;
 using NSubstitute;
 using System.Data.SQLite;
 using System.Reflection;
-using Lanceur.Macros;
+using System.Runtime.CompilerServices;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.BusinessLogic;
 
 public class MacroShould : SQLiteTest
 {
+    private readonly ITestOutputHelper _output;
+
+    public MacroShould(ITestOutputHelper output)
+    {
+        _output = output;
+    }
     #region Methods
+
+    [Fact]
+    public void BeCastedToSelfExecutableQueryResult()
+    {
+        // ARRANGE
+        var srcNamespace = typeof(MultiMacro).Namespace;
+        var asm = Assembly.GetAssembly(typeof(MultiMacro));
+        
+        var types = asm.GetTypes()
+                       .Where(type =>
+                       {
+                           return type.Namespace != null
+                                  && type.Namespace.StartsWith(srcNamespace);
+                       })
+                       // I'll exclude all the anonymous class from the query
+                       .Where(type => !type.IsDefined(typeof(CompilerGeneratedAttribute), false))
+                       .ToArray();
+        // ACT
+        // ASSERT
+        types.Length.Should().BeGreaterThan(0, "there are preconfigured macros");
+        using (new AssertionScope())
+        {
+            foreach (var type in types)
+            {
+                _output.WriteLine($"Checking '{type.FullName}'");
+                var sut = Activator.CreateInstance(type);
+                sut.Should()
+                   .BeAssignableTo(typeof(SelfExecutableQueryResult));
+
+                sut.Should()
+                   .BeAssignableTo(typeof(MacroQueryResult));
+            }
+        }
+    }
 
     [Theory]
     [InlineData("multi", true)]
@@ -101,6 +143,17 @@ public class MacroShould : SQLiteTest
         }
     }
 
+    [Fact]
+    public void HaveDefaultMacro()
+    {
+        var asm = Assembly.GetAssembly(typeof(MultiMacro));
+        var logFactory = Substitute.For<IAppLoggerFactory>();
+        var repository = Substitute.For<IDbRepository>();
+        var manager = new MacroManager(asm, logFactory, repository);
+
+        manager.MacroCount.Should().BeGreaterThan(0);
+    }
+
     [Theory]
     [InlineData(0, 1)]
     [InlineData(1, 2)]
@@ -176,7 +229,7 @@ public class MacroShould : SQLiteTest
         var output = manager.Handle(queryResults)
                             .ToArray();
 
-        using(new AssertionScope())
+        using (new AssertionScope())
         {
             output.GetDoubloons().Should().HaveCount(0);
             output.Should().HaveCount(3);
@@ -192,17 +245,6 @@ public class MacroShould : SQLiteTest
         var query = new AliasQueryResult() { FileName = $"@{macro}@" };
 
         query.IsMacro().Should().BeTrue();
-    }
-
-    [Fact]
-    public void HaveDefaultMacro()
-    {
-        var asm = Assembly.GetAssembly(typeof(MultiMacro));
-        var logFactory = Substitute.For<IAppLoggerFactory>();
-        var repository = Substitute.For<IDbRepository>();
-        var manager = new MacroManager(asm, logFactory, repository);
-        
-        manager.MacroCount.Should().BeGreaterThan(0);
     }
 
     #endregion Methods

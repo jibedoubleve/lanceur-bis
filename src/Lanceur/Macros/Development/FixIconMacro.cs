@@ -1,15 +1,16 @@
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.SharedKernel.Mixins;
 using Splat;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Lanceur.Macros.Development;
 
 [Macro("fixicon"), Description("Fix icons when alias is a directory or an hyperlink")]
-public class FixIconMacro : SelfExecutableQueryResult
+public class FixIconMacro : MacroQueryResult
 {
     #region Properties
 
@@ -18,6 +19,8 @@ public class FixIconMacro : SelfExecutableQueryResult
     #endregion Properties
 
     #region Methods
+
+    public override SelfExecutableQueryResult Clone() => this.CloneObject();
 
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {

@@ -3,6 +3,7 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Mixins;
 using Splat;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,15 @@ using System.Threading.Tasks;
 namespace Lanceur.Macros
 {
     [Macro("multi"), Description("Allow to start multiple alias at once")]
-    public class MultiMacro : SelfExecutableQueryResult
+    public class MultiMacro : MacroQueryResult
     {
         #region Fields
 
+#if DEBUG
+        private const int DefaultDelay = 0;
+#else
+        private const int DefaultDelay = 1_000;
+#endif
         private readonly int _delay;
 
         private readonly IExecutionManager _executionManager;
@@ -25,24 +31,14 @@ namespace Lanceur.Macros
         #endregion Fields
 
         #region Constructors
-
-#if DEBUG
-
-        public MultiMacro() : this(0, null, null)
-        {
-        }
-
-#else
+        
 
         public MultiMacro() : this(null, null, null)
         {
         }
-
-#endif
-
         public MultiMacro(int? delay = null, IExecutionManager executionManager = null, ISearchService searchService = null)
         {
-            _delay = delay ?? 1_000;
+            _delay = delay ?? DefaultDelay;
             _executionManager = executionManager ?? Locator.Current.GetService<IExecutionManager>();
             _searchService = searchService ?? Locator.Current.GetService<ISearchService>();
         }
@@ -59,6 +55,8 @@ namespace Lanceur.Macros
                 .FirstOrDefault();
             return macro as AliasQueryResult;
         }
+
+        public override SelfExecutableQueryResult Clone() => this.CloneObject();
 
         public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
