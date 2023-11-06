@@ -1,10 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Constants;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.SharedKernel.Web;
+using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.Managers
 {
@@ -12,8 +12,15 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private readonly IPackagedAppSearchService _searchService;
+        /// <summary>
+        /// A regex to check whether the specified text (meant to be the content
+        /// of <see cref="QueryResult"/>'s property <paramref name="FileName"/>)
+        /// is the template of a Macro
+        /// </summary>
+        private static readonly Regex MacroRegex = new("@.*@");
+
         private readonly IFavIconDownloader _favIconDownloader;
+        private readonly IPackagedAppSearchService _searchService;
 
         #endregion Fields
 
@@ -23,7 +30,7 @@ namespace Lanceur.Infra.Managers
         {
             ArgumentNullException.ThrowIfNull(searchService);
             ArgumentNullException.ThrowIfNull(favIconDownloader);
-            
+
             _searchService = searchService;
             _favIconDownloader = favIconDownloader;
         }
@@ -42,6 +49,7 @@ namespace Lanceur.Infra.Managers
         public async Task<AliasQueryResult> FixAsync(AliasQueryResult alias)
         {
             if (alias is null) return default;
+            if (MacroRegex.Match(alias.FileName).Success) return alias;
 
             var response = await Task.Run(() => _searchService.GetByInstalledDirectory(alias.FileName)
                                                               .FirstOrDefault());
@@ -51,7 +59,7 @@ namespace Lanceur.Infra.Managers
                 var uri = new Uri(alias.FileName);
 
                 if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return alias;
-                
+
                 var output = Path.Combine(AppPaths.ImageCache, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
                 await _favIconDownloader.SaveToFileAsync(uri, output);
                 alias.Thumbnail = output;
