@@ -52,7 +52,7 @@ namespace Lanceur.Infra.Managers
 
                 if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return alias;
                 
-                var output = Path.Combine(AppPaths.ImageCache.ExpandPath(), $"{AppPaths.FaviconPrefix}{uri.Host}.png");
+                var output = Path.Combine(AppPaths.ImageCache, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
                 await _favIconDownloader.SaveToFileAsync(uri, output);
                 alias.Thumbnail = output;
                 alias.Icon = null;
