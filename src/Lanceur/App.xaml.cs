@@ -55,7 +55,9 @@ public partial class App : Application
         var log = Locator.Current.GetService<IAppLoggerFactory>().GetLogger<App>();
         _notifyIcon ??= new();
 
-        Locator.Current.GetService<IImageCache>().LoadCache();
+        Locator.Current
+               .GetService<IImageCache>()
+               .LoadCache();
 
         ThemeManager.Current.SetTheme();
 

@@ -10,6 +10,9 @@ namespace Lanceur.SharedKernel.Web
         ///<inheritdoc />
         public async Task SaveToFileAsync(Uri url, string path)
         {
+            ArgumentNullException.ThrowIfNull(url);
+            ArgumentNullException.ThrowIfNull(path);
+
             if (File.Exists(path)) return; 
             var uri = new Uri($"{url.Scheme}://{url.Host}/favicon.ico");
             var httpClient = new HttpClient();

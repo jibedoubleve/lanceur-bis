@@ -20,7 +20,7 @@ public static class ThumbnailMixin
     {
         lock (_locker)
         {
-            var cachePath = AppPaths.ImageCache.ExpandPath();
+            var cachePath = AppPaths.ImageCache;
             if (!Directory.Exists(cachePath)) Directory.CreateDirectory(cachePath);
 
             if (imageSource is not BitmapSource bitmapSource) return;
@@ -39,7 +39,7 @@ public static class ThumbnailMixin
         lock (_locker)
         {
             output = $"{output.Replace("package:", "")}.png";
-            var cachePath = AppPaths.ImageCache.ExpandPath();
+            var cachePath = AppPaths.ImageCache;
             if (!Directory.Exists(cachePath)) Directory.CreateDirectory(cachePath);
 
             var destination = Path.Combine(cachePath, output);

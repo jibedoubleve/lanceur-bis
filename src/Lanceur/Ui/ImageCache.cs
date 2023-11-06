@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Lanceur.Utils;
@@ -69,11 +70,14 @@ namespace Lanceur.Ui
         public void LoadCache()
         {
             if (_cache is not null) return;
-
+            if (!Directory.Exists(AppPaths.ImageCache))
+            {
+                Directory.CreateDirectory(AppPaths.ImageCache);
+            }
             _cache = new();
             var timer = new Stopwatch();
             timer.Start();
-            var images = (from file in Directory.GetFiles(AppPaths.ImageCache.ExpandPath())
+            var images = (from file in Directory.GetFiles(AppPaths.ImageCache)
                           where file.Contains(".png")
                           select file).ToArray();
             
