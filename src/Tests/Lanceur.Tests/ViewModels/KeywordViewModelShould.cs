@@ -1,6 +1,3 @@
-using System.Reactive.Disposables;
-using System.Windows.Forms.Design;
-using Windows.Media.Capture;
 using AutoMapper;
 using Dapper;
 using FluentAssertions;
@@ -8,7 +5,6 @@ using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.SQL;
@@ -110,17 +106,15 @@ public class KeywordViewModelShould : SQLiteTest
             var packageValidator = Substitute.For<IPackagedAppValidator>();
             var vm = new KeywordsViewModelBuilder()
                      .With(scheduler)
-                     .With(_output)
+                     .With(logger)
                      .With(dbRepository)
                      .With(packageValidator)
                      .Build();
 
             // ACT
-            
             vm.Activate(new());
-
             vm.SearchQuery = "multi";
-            scheduler.Start();
+            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(20).Ticks);
             
             // It's only now I know what is returned by 'FixAsync'
             packageValidator.FixAsync(Arg.Any<AliasQueryResult>())
@@ -128,13 +122,13 @@ public class KeywordViewModelShould : SQLiteTest
             
             vm.SelectedAlias.Synonyms = "multi1, multi2";
             vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
+            scheduler.Start();
 
             // ASSERT
-
             using (new AssertionScope())
             {
-                var countSql = $"select count(*) from alias_name where id_alias = {idAlias}";
                 // The database should have one less synonym
+                var countSql = $"select count(*) from alias_name where id_alias = {idAlias}";
                 connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar(countSql))
                              .Should().Be(2);
                 // And the UI also...

@@ -236,7 +236,7 @@ namespace Lanceur.Views
                 .Where(alias => alias is not null)
                 .Subscribe(alias =>
                 {
-                    var toDel = _aliases.Items.FirstOrDefault(a => a.Id == alias.Id);
+                    var toDel = _aliases.Items.FirstOrDefault(a => a.Id == alias.Id && a.Name == alias.Name);
                     _aliases.Remove(toDel);
                     _aliases.Add(alias);
                 })
@@ -246,7 +246,7 @@ namespace Lanceur.Views
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
                 .Select(x => new SearchRequest(x?.Trim(), AliasToCreate))
-                .Log(this, $"Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{(c.AliasToCreate?.Name ?? "<EMPTY>")}'")
+                .Log(this, "Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{c.AliasToCreate?.Name ?? "<EMPTY>"}'")
                 .InvokeCommand(Search)
                 .DisposeWith(d);
         }

@@ -75,7 +75,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var names = new string[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4", };
+                var names = new[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4", };
                 var searchService = Substitute.For<ISearchService>();
                 searchService.Search(Arg.Any<Cmdline>())
                         .Returns(
@@ -117,7 +117,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var names = new string[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4", };
+                var names = new[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4", };
                 var searchService = Substitute.For<ISearchService>();
                 searchService.Search(Arg.Any<Cmdline>())
                         .Returns(
@@ -159,10 +159,6 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var logFactory = Substitute.For<IAppLoggerFactory>();
-                var wildcardManager = Substitute.For<IWildcardManager>();
-                var dataService = Substitute.For<IDbRepository>();
-                var cmdlineManager = Substitute.For<ICmdlineManager>();
                 var executionManager = Substitute.For<IExecutionManager>();
 
                 var vm = new MainViewModelBuilder()
