@@ -40,7 +40,7 @@ namespace Lanceur.Tests.ViewModels
                                     BindingFlags.CreateInstance |
                                     BindingFlags.Public |
                                     BindingFlags.Instance |
-                                    BindingFlags.OptionalParamBinding, null, new object[] { Type.Missing }, CultureInfo.CurrentCulture)
+                                    BindingFlags.OptionalParamBinding, null, new[] { Type.Missing }, CultureInfo.CurrentCulture)
                             : Activator.CreateInstance(vmType);
 
             var fields = from t in vmType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField)

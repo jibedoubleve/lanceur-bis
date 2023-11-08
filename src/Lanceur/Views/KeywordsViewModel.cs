@@ -37,10 +37,10 @@ namespace Lanceur.Views
         private readonly Scope<bool> _busyScope;
         private readonly IAppLogger _log;
         private readonly INotification _notification;
-        private readonly IPackagedAppValidator _packagedAppValidator;
-        private readonly IThumbnailManager _thumbnailManager;
         private readonly IUserNotification _notify;
+        private readonly IPackagedAppValidator _packagedAppValidator;
         private readonly ISchedulerProvider _schedulers;
+        private readonly IThumbnailManager _thumbnailManager;
 
         #endregion Fields
 
@@ -59,7 +59,7 @@ namespace Lanceur.Views
             _schedulers = schedulers ?? Locator.Current.GetService<ISchedulerProvider>();
 
             var l = Locator.Current;
-            _notify = notify?? l.GetService<IUserNotification>();
+            _notify = notify ?? l.GetService<IUserNotification>();
             _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
             _notification = notification ?? l.GetService<INotification>();
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
@@ -72,26 +72,6 @@ namespace Lanceur.Views
             this.WhenActivated(Activate);
         }
 
-        /// <summary>
-        /// The purpose of this method is for unit test only. You can manually mimic
-        /// <code>WhenActivated</code>
-        /// </summary>
-        /// <param name="d">
-        /// Ensures the provided disposable is disposed with the specified <see cref="CompositeDisposable"/>.
-        /// </param>
-        internal void Activate(CompositeDisposable d)
-        {
-            Disposable
-                .Create(() =>
-                {
-                    Aliases.Clear();
-                    AliasToCreate = null;
-                }).DisposeWith(d);
-
-            SetupValidations(d);
-            SetupCommands(_schedulers.MainThreadScheduler, _notify, d);
-            SetupBindings(_schedulers.MainThreadScheduler, d);
-        }
         #endregion Constructors
 
         #region Properties
@@ -113,10 +93,13 @@ namespace Lanceur.Views
         public ReactiveCommand<Unit, Unit> CreatingAlias { get; private set; }
 
         public ReactiveCommand<Unit, string> EditLuaScript { get; private set; }
+
         [Reactive] public bool IsBusy { get; set; }
+
         public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; private set; }
 
         public ReactiveCommand<AliasQueryResult, AliasQueryResult> SaveOrUpdateAlias { get; private set; }
+
         [Reactive] public string SearchQuery { get; set; }
 
         [Reactive] public AliasQueryResult SelectedAlias { get; set; }
@@ -234,19 +217,15 @@ namespace Lanceur.Views
 
             this.WhenAnyObservable(vm => vm.SaveOrUpdateAlias)
                 .Where(alias => alias is not null)
-                .Subscribe(alias =>
-                {
-                    var toDel = _aliases.Items.FirstOrDefault(a => a.Id == alias.Id);
-                    _aliases.Remove(toDel);
-                    _aliases.Add(alias);
-                })
+                .Log(this, "Saved or updated alias.", c => $"Id: {c.Id} - Name: {c.Name}")
+                .Subscribe(UpdateAliasWithSynonyms)
                 .DisposeWith(d);
 
             this.WhenAnyValue(vm => vm.SearchQuery)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
                 .Select(x => new SearchRequest(x?.Trim(), AliasToCreate))
-                .Log(this, $"Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{(c.AliasToCreate?.Name ?? "<EMPTY>")}'")
+                .Log(this, "Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{c.AliasToCreate?.Name ?? "<EMPTY>"}'")
                 .InvokeCommand(Search)
                 .DisposeWith(d);
         }
@@ -299,6 +278,46 @@ namespace Lanceur.Views
                        ? "The names should not be empty"
                        : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.");
             ValidationAliasExists.DisposeWith(d);
+        }
+
+        private void UpdateAliasWithSynonyms(AliasQueryResult alias)
+        {
+            var toDel = _aliases.Items
+                                .Where(a => a.Id == alias.Id)
+                                .ToArray();
+            foreach (var item in toDel)
+            {
+                _aliases.Remove(item);
+            }
+
+            var names = alias.Synonyms.SplitCsv();
+            foreach (var name in names)
+            {
+                var toAdd = alias.CloneObject();
+                toAdd.Name = name;
+                _aliases.Add(toAdd);
+            }
+        }
+
+        /// <summary>
+        /// The purpose of this method is for unit test only. You can manually mimic
+        /// <code>WhenActivated</code>
+        /// </summary>
+        /// <param name="d">
+        /// Ensures the provided disposable is disposed with the specified <see cref="CompositeDisposable"/>.
+        /// </param>
+        internal void Activate(CompositeDisposable d)
+        {
+            Disposable
+                .Create(() =>
+                {
+                    Aliases.Clear();
+                    AliasToCreate = null;
+                }).DisposeWith(d);
+
+            SetupValidations(d);
+            SetupCommands(_schedulers.MainThreadScheduler, _notify, d);
+            SetupBindings(_schedulers.MainThreadScheduler, d);
         }
 
         public void HydrateSelectedAlias() => _aliasService.HydrateAlias(SelectedAlias);

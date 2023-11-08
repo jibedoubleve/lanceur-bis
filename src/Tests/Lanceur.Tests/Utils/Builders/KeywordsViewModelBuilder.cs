@@ -16,7 +16,7 @@ internal class KeywordsViewModelBuilder
     #region Fields
 
     private IDbRepository _dbRepository;
-    private ITestOutputHelper _output;
+    private IAppLoggerFactory _loggerFactory;
     private IPackagedAppValidator _packagedAppValidator;
     private TestSchedulerProvider _schedulerProvider;
 
@@ -27,11 +27,11 @@ internal class KeywordsViewModelBuilder
     public KeywordsViewModel Build()
     {
         return new(
-            logFactory: new XUnitLoggerFactory(_output),
+            logFactory: _loggerFactory,
             searchService: _dbRepository ?? Substitute.For<IDbRepository>(),
             schedulers: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
-            notify:  Substitute.For<IUserNotification>(),
-            thumbnailManager:  Substitute.For<IThumbnailManager>(),
+            notify: Substitute.For<IUserNotification>(),
+            thumbnailManager: Substitute.For<IThumbnailManager>(),
             packagedAppValidator: _packagedAppValidator ?? Substitute.For<IPackagedAppValidator>(),
             notification: Substitute.For<INotification>()
         );
@@ -57,7 +57,13 @@ internal class KeywordsViewModelBuilder
 
     public KeywordsViewModelBuilder With(ITestOutputHelper output)
     {
-        _output = output;
+        _loggerFactory = new XUnitLoggerFactory(output);
+        return this;
+    }
+
+    public KeywordsViewModelBuilder With(IAppLoggerFactory loggerFactory)
+    {
+        _loggerFactory = loggerFactory;
         return this;
     }
 

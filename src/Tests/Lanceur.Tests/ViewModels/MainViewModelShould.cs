@@ -7,8 +7,6 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
-using Lanceur.Infra.Services;
-using Lanceur.Macros;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.Builders;
 using Lanceur.Tests.Utils.ReservedAliases;
@@ -218,7 +216,7 @@ namespace Lanceur.Tests.ViewModels
                 var settings = Substitute.For<ISettingsFacade>();
                 settings.Application.Returns(new AppConfig
                 {
-                    Window = new WindowSection()
+                    Window = new()
                     {
                         ShowResult = showResult
                     }
@@ -227,11 +225,11 @@ namespace Lanceur.Tests.ViewModels
                 var searchService = Substitute.For<ISearchService>();
                 searchService.GetAll().Returns(new AliasQueryResult[]
                 {
-                    new AliasQueryResult(),
-                    new AliasQueryResult(),
-                    new AliasQueryResult(),
-                    new AliasQueryResult(),
-                    new AliasQueryResult()
+                    new(),
+                    new(),
+                    new(),
+                    new(),
+                    new()
                 });
 
                 var vm = new MainViewModelBuilder()
