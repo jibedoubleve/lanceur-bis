@@ -14,7 +14,8 @@ namespace Lanceur.SharedKernel.Web
         /// </summary>
         /// <param name="url">The url of the website</param>
         /// <param name="path">The path of the file to create.</param>
-        Task SaveToFileAsync(Uri url, string path);
+        /// <returns><c>True</c> if favicon was found at the specified address; otherwise <c>False</c></returns>
+        Task<bool> SaveToFileAsync(Uri url, string path);
 
         /// <summary>
         /// Check whether the website exists

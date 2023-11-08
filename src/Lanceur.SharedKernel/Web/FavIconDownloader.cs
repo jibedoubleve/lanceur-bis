@@ -8,18 +8,27 @@ namespace Lanceur.SharedKernel.Web
         #region Methods
 
         ///<inheritdoc />
-        public async Task SaveToFileAsync(Uri url, string path)
+        public async Task<bool> SaveToFileAsync(Uri url, string path)
         {
-            ArgumentNullException.ThrowIfNull(url);
-            ArgumentNullException.ThrowIfNull(path);
+            try
+            {
+                ArgumentNullException.ThrowIfNull(url);
+                ArgumentNullException.ThrowIfNull(path);
 
-            if (File.Exists(path)) return; 
-            var uri = new Uri($"{url.Scheme}://{url.Host}/favicon.ico");
-            var httpClient = new HttpClient();
-            var bytes = await httpClient.GetByteArrayAsync(uri);
-            if (bytes.Length == 0) return;
+                if (File.Exists(path)) return true;
 
-            await File.WriteAllBytesAsync(path, bytes);
+                var uri        = new Uri($"{url.Scheme}://{url.Host}/favicon.ico");
+                var httpClient = new HttpClient();
+                var bytes      = await httpClient.GetByteArrayAsync(uri);
+                if (bytes.Length == 0) return true;
+
+                await File.WriteAllBytesAsync(path, bytes);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<bool> CheckExistsAsync(Uri url)
