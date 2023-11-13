@@ -158,9 +158,18 @@ namespace Lanceur.Views
             BusyMessage = "Saving alias...";
             using (_busyScope.Open())
             {
-                alias.SetName();
-                alias = await _packagedAppValidator.FixAsync(alias);
-                _aliasService.SaveOrUpdate(ref alias);
+                try
+                {
+                    alias.SetName();
+                    alias = await _packagedAppValidator.FixAsync(alias);
+                    _aliasService.SaveOrUpdate(ref alias);
+                }
+                catch (ApplicationException ex)
+                {
+                    _log.Warning(ex.Message);
+                    _notify.Warning($"Error when {(created ? "creating" : "updating")} the alias: {ex.Message}");
+                    return alias;
+                }
             }
             _notification.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
 
