@@ -89,10 +89,10 @@ namespace Lanceur.Infra.Managers
             query.Parameters = _wildcardManager.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
             ExecuteLuaScript(ref query);
 
-            _log.Debug($"Executing '{query.FileName}' with args '{query.Query.Parameters}'");
+            _log.Debug($"Executing '{query.FileName}' with args '{query.Parameters}'");
             var psi = new ProcessStartInfo
             {
-                FileName = _wildcardManager.Replace(query.FileName, query.Query.Parameters),
+                FileName = _wildcardManager.Replace(query.FileName, query.Parameters),
                 Verb = "open",
                 Arguments = query.Parameters,
                 UseShellExecute = true,
