@@ -46,6 +46,7 @@ namespace Lanceur.Infra.Managers
         /// </summary>
         /// <param name="alias">The alias to standardise</param>
         /// <returns>Standardised alias</returns>
+        /// <exception cref="ApplicationException">When the <c>alias.FileName</c> is not a valid URI</exception>
         public async Task<AliasQueryResult> FixAsync(AliasQueryResult alias)
         {
             if (alias is null) return default;
@@ -56,15 +57,22 @@ namespace Lanceur.Infra.Managers
 
             if (response is null)
             {
-                var uri = new Uri(alias.FileName);
+                try
+                {
+                    var uri = new Uri(alias.FileName);
 
-                if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return alias;
+                    if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return alias;
 
-                var output = Path.Combine(AppPaths.ImageCache, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
-                await _favIconDownloader.SaveToFileAsync(uri, output);
-                alias.Thumbnail = output;
-                alias.Icon = null;
-                return alias;
+                    var output = Path.Combine(AppPaths.ImageCache, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
+                    await _favIconDownloader.SaveToFileAsync(uri, output);
+                    alias.Thumbnail = output;
+                    alias.Icon      = null;
+                    return alias;
+                }
+                catch (UriFormatException ex)
+                {
+                    throw new ApplicationException($"Create an URI from '{alias.FileName}' is impossible.", ex);
+                }
             }
 
             // This is a packaged app
