@@ -26,6 +26,12 @@ namespace Lanceur.Infra.Stores
         {
             var (isError, result) = _calculator.Evaluate(query.ToString());
 
+            /* Hack: if user search for 'gc' the result is
+             *       "CodingSeb.ExpressionEvaluator.ClassOrEnumType"
+             *       To fix this problem, I check whether the result
+             *       is numeric and if it is not the case I consider
+             *       that there's no result to display. */
+            if (!float.TryParse(result, out _)) { return QueryResult.NoResult; }
             if (isError) { return QueryResult.NoResult; }
 
             return new DisplayQueryResult(result, query.ToString())
