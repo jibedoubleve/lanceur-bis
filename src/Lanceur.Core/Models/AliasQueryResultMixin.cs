@@ -6,18 +6,6 @@ public static class AliasQueryResultMixin
 {
     #region Methods
 
-    public static void UpdateIconForHyperlinks(this AliasQueryResult alias)
-    {
-        if (alias is null) return;
-
-        var uri = alias.FileName ?? string.Empty;
-        if (Uri.TryCreate(uri, UriKind.Absolute, out _)
-            && uri.StartsWith("http"))
-        {
-            alias.Icon = "Web";
-        }
-    }
-
     /// <summary>
     /// Set first names defined in the synonyms as the name of the alias
     /// </summary>

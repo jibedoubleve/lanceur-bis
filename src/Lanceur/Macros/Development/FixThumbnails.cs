@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Lanceur.Core.Services;
 
 namespace Lanceur.Macros.Development
 {
@@ -19,8 +20,8 @@ namespace Lanceur.Macros.Development
 
         private readonly IDbRepository _aliasService = Locator.Current.GetService<IDbRepository>();
         private readonly INotification _notify = Locator.Current.GetService<INotification>();
-        private readonly IPackagedAppValidator _validator = Locator.Current.GetService<IPackagedAppValidator>();
-
+        private readonly IThumbnailFixer _validator = Locator.Current.GetService<IThumbnailFixer>();
+        private readonly IAppLoggerFactory _loggerFactory = Locator.Current.GetService<IAppLoggerFactory>();
         #endregion Fields
 
         #region Methods
@@ -29,15 +30,15 @@ namespace Lanceur.Macros.Development
 
         public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
+            var log = _loggerFactory.GetLogger<FixThumbnails>();
             var aliases = _aliasService.GetAll().ToArray();
             var counter = 0;
 
             for (var i = 0; i < aliases.Length; i++)
             {
-                if (!aliases[i].IsPackagedApplication()) continue;
-
                 await _validator.FixAsync(aliases[i]);
                 _aliasService.SaveOrUpdate(ref aliases[i]);
+                log.Trace($"Fixed alias '{aliases[i].Name}'.");
                 counter++;
             }
 

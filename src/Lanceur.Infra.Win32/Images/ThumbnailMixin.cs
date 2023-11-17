@@ -1,5 +1,4 @@
 using Lanceur.Infra.Constants;
-using Lanceur.SharedKernel.Mixins;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -10,46 +9,61 @@ public static class ThumbnailMixin
 {
     #region Fields
 
-    private static readonly object _locker = new();
+    private static readonly object Locker = new();
 
     #endregion Fields
 
     #region Methods
 
-    public static void CopyToCache(this ImageSource imageSource, string fileName)
+    /// <summary>
+    /// Copy the image source into the thumbnail repository. If the
+    /// thumbnail already exits, nothing happen.
+    /// </summary>
+    /// <param name="imageSource">The image to copy into the repository</param>
+    /// <param name="fileName">The file name of the thumbnail</param>
+    public static void CopyToImageRepository(this ImageSource imageSource, string fileName)
     {
-        lock (_locker)
+        var destination = fileName.ToAbsolutePath();
+        if (File.Exists(destination)) return;
+        
+        lock (Locker)
         {
-            var cachePath = AppPaths.ImageCache;
-            if (!Directory.Exists(cachePath)) Directory.CreateDirectory(cachePath);
-
+            if (!Directory.Exists(AppPaths.ImageRepository)) Directory.CreateDirectory(AppPaths.ImageRepository);
             if (imageSource is not BitmapSource bitmapSource) return;
 
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
 
-            fileName = Path.Combine(cachePath, fileName);
-            using var fileStream = new FileStream(fileName, FileMode.Create);
+            using var fileStream = new FileStream(destination, FileMode.Create);
             encoder.Save(fileStream);
         }
     }
 
-    public static void CopyToCache(this string source, string output)
+    /// <summary>
+    /// Copy the image specified by the path into the thumbnail repository. If the
+    /// thumbnail already exits, nothing happen.
+    /// </summary>
+    /// <param name="imageSource">The image to copy into the repository</param>
+    /// <param name="fileName">The file name of the thumbnail</param>
+    public static void CopyToImageRepository(this string imageSource, string fileName)
     {
-        lock (_locker)
+        var destination = fileName.ToAbsolutePath();
+        if (File.Exists(destination)) return;
+        
+        lock (Locker)
         {
-            output = $"{output.Replace("package:", "")}.png";
-            var cachePath = AppPaths.ImageCache;
-            if (!Directory.Exists(cachePath)) Directory.CreateDirectory(cachePath);
-
-            var destination = Path.Combine(cachePath, output);
-            if (File.Exists(destination)) return;
-            if (File.Exists(source))
-            {
-                File.Copy(source, destination, true);
-            }
+            if (!Directory.Exists(AppPaths.ImageRepository)) Directory.CreateDirectory(AppPaths.ImageRepository);
+            File.Copy(imageSource, destination, true);
         }
     }
+
+    /// <summary>
+    /// With the <c>alias.Name</c>, it'll get the path where the thumbnail
+    /// should be or should be saved.
+    /// </summary>
+    /// <param name="fileName">The <c>alias.Name</c></param>
+    /// <returns>The absolute path to the thumbnail of the specified <c>alias.Name</c></returns>
+    public static string ToAbsolutePath(this string fileName) => Path.Combine(AppPaths.ImageRepository, $"{fileName.Replace("package:", "")}.png");
 
     #endregion Methods
 }

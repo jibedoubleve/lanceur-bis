@@ -67,4 +67,42 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\SessionsViewModel.cs">
+      <DependentUpon>SessionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SettingsViewModel.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\TrendsViewModel.cs">
+      <DependentUpon>TrendsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PluginsViewModel.cs">
+      <DependentUpon>PluginsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PluginFromWebViewModel.cs">
+      <DependentUpon>PluginFromWebView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MostUsedViewModel.cs">
+      <DependentUpon>MostUsedView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MainViewModel.cs">
+      <DependentUpon>MainView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\KeywordsViewModel.cs">
+      <DependentUpon>KeywordsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\InvalidAliasViewModel.cs">
+      <DependentUpon>InvalidAliasView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\HistoryViewModel.cs">
+      <DependentUpon>HistoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\DoubloonsViewModel.cs">
+      <DependentUpon>DoubloonsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AppSettingsViewModel.cs">
+      <DependentUpon>AppSettingsView.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

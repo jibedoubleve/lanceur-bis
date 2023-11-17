@@ -168,7 +168,6 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Create(ref AliasQueryResult alias, long idSession)
         {
-            alias.UpdateIconForHyperlinks();
             const string sqlAlias = @"
                 insert into alias (
                     arguments,

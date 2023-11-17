@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.Managers
 {
-    public class PackagedAppValidator : IPackagedAppValidator
+    public class ThumbnailFixer : IThumbnailFixer
     {
         #region Fields
 
@@ -26,7 +26,7 @@ namespace Lanceur.Infra.Managers
 
         #region Constructors
 
-        public PackagedAppValidator(IPackagedAppSearchService searchService, IFavIconDownloader favIconDownloader)
+        public ThumbnailFixer(IPackagedAppSearchService searchService, IFavIconDownloader favIconDownloader)
         {
             ArgumentNullException.ThrowIfNull(searchService);
             ArgumentNullException.ThrowIfNull(favIconDownloader);
@@ -57,22 +57,15 @@ namespace Lanceur.Infra.Managers
 
             if (response is null)
             {
-                try
-                {
-                    var uri = new Uri(alias.FileName);
+                if (!Uri.TryCreate(alias.FileName, UriKind.Absolute, out var uri)) return alias;
+                if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return alias;
 
-                    if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return alias;
+                var output = Path.Combine(AppPaths.ImageRepository, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
+                await _favIconDownloader.SaveToFileAsync(uri, output);
+                alias.Thumbnail = output;
+                alias.Icon      = null;
+                return alias;
 
-                    var output = Path.Combine(AppPaths.ImageCache, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
-                    await _favIconDownloader.SaveToFileAsync(uri, output);
-                    alias.Thumbnail = output;
-                    alias.Icon      = null;
-                    return alias;
-                }
-                catch (UriFormatException ex)
-                {
-                    throw new ApplicationException($"Create an URI from '{alias.FileName}' is impossible.", ex);
-                }
             }
 
             // This is a packaged app
