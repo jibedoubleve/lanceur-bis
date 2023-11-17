@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Managers
 {
-    public interface IPackagedAppValidator
+    public interface IThumbnailFixer
     {
         #region Methods
 

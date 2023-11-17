@@ -46,19 +46,6 @@ namespace Lanceur.Macros.Development
 
         private static Cmdline Cmdline(string cmd) => CmdlineProcessor.BuildFromText(cmd);
 
-        private static IEnumerable<QueryResult> DumpCache()
-        {
-            var cache = Locator.Current.GetService<IImageCache>();
-            var results = new List<DisplayQueryResult>();
-            foreach (var item in cache)
-            {
-                var key = item.Key;
-                var value = item.Value?.GetType()?.ToString() ?? "NULL";
-                results.Add(new DisplayQueryResult(value, key, "image"));
-            }
-            return results;
-        }
-
         private static IEnumerable<QueryResult> Echo(Cmdline cl)
         {
             new ToastContentBuilder()
@@ -76,7 +63,6 @@ namespace Lanceur.Macros.Development
 
             var result = cl.Name.ToLower() switch
             {
-                "cache" => DumpCache(),
                 "echo" => Echo(cl),
                 "all" => SearchService.GetAll(),
                 "macro" => Converter.ToQueryResult(MacroManager.GetAll()),

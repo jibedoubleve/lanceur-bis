@@ -38,7 +38,7 @@ namespace Lanceur.Views
         private readonly IAppLogger _log;
         private readonly INotification _notification;
         private readonly IUserNotification _notify;
-        private readonly IPackagedAppValidator _packagedAppValidator;
+        private readonly IThumbnailFixer _thumbnailFixer;
         private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
 
@@ -52,7 +52,7 @@ namespace Lanceur.Views
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
-            IPackagedAppValidator packagedAppValidator = null,
+            IThumbnailFixer thumbnailFixer = null,
             INotification notification = null)
         {
             _busyScope = new(b => IsBusy = b, true, false);
@@ -60,7 +60,7 @@ namespace Lanceur.Views
 
             var l = Locator.Current;
             _notify = notify ?? l.GetService<IUserNotification>();
-            _packagedAppValidator = packagedAppValidator ?? l.GetService<IPackagedAppValidator>();
+            _thumbnailFixer = thumbnailFixer ?? l.GetService<IThumbnailFixer>();
             _notification = notification ?? l.GetService<INotification>();
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
@@ -161,7 +161,7 @@ namespace Lanceur.Views
                 try
                 {
                     alias.SetName();
-                    alias = await _packagedAppValidator.FixAsync(alias);
+                    alias = await _thumbnailFixer.FixAsync(alias);
                     _aliasService.SaveOrUpdate(ref alias);
                 }
                 catch (ApplicationException ex)

@@ -72,7 +72,6 @@ public class Bootstrapper
         l.RegisterLazySingleton<IUserNotification>(() => new UserNotification());
         l.RegisterLazySingleton(() => new RoutingState());
         l.RegisterLazySingleton<IPluginStoreContext>(() => new PluginStoreContext());
-        l.RegisterLazySingleton<IImageCache>(() => new ImageCache(Get<IAppLoggerFactory>()));
         l.RegisterLazySingleton<IDelay>(() => new Delay());
         l.RegisterLazySingleton<IAppRestart>(() => new AppRestart());
 
@@ -107,11 +106,11 @@ public class Bootstrapper
         l.Register<IClipboardService>(() => new WindowsClipboardService());
         l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
         l.Register<IPluginManager>(() => new PluginManager(Get<IPluginStoreContext>()));
-        l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IImageCache>(), Get<IAppLoggerFactory>()));
+        l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IAppLoggerFactory>()));
         l.Register<IPackagedAppManager>(() => new PackagedAppManager());
         l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService());
         l.Register<IFavIconDownloader>(()=> new FavIconDownloader());
-        l.Register<IPackagedAppValidator>(() => new PackagedAppValidator(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>()));
+        l.Register<IThumbnailFixer>(() => new ThumbnailFixer(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>()));
 
         // Formatters
         l.Register<IStringFormatter>(() => new DefaultStringFormatter());

@@ -48,7 +48,7 @@ public class KeywordViewModelShould : SQLiteTest
             dbRepository.CheckNamesExist(Arg.Any<string[]>())
                         .Returns(new ExistingNameResponse(Array.Empty<string>()));
 
-            var packageValidator = Substitute.For<IPackagedAppValidator>();
+            var packageValidator = Substitute.For<IThumbnailFixer>();
             
             var vm = new KeywordsViewModelBuilder()
                      .With(scheduler)
@@ -103,7 +103,7 @@ public class KeywordViewModelShould : SQLiteTest
             var conversionService = new AutoMapperConverter(new Mapper(cfg));
             var dbRepository = new SQLiteRepository(connectionMgr, logger, conversionService);
             
-            var packageValidator = Substitute.For<IPackagedAppValidator>();
+            var packageValidator = Substitute.For<IThumbnailFixer>();
             var vm = new KeywordsViewModelBuilder()
                      .With(scheduler)
                      .With(logger)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Lanceur.Core.Managers;
@@ -14,16 +15,14 @@ namespace Lanceur.Ui.Thumbnails
     {
         #region Fields
 
-        private readonly IImageCache _cache;
         private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public WPFThumbnailManager(IImageCache cache, IAppLoggerFactory loggerFactory)
+        public WPFThumbnailManager(IAppLoggerFactory loggerFactory)
         {
-            _cache = cache;
             _log = loggerFactory.GetLogger<WPFThumbnailManager>();
         }
 
@@ -36,49 +35,54 @@ namespace Lanceur.Ui.Thumbnails
         /// the alias is updated and (because the alias is reactive) the UI should be updated.
         /// </summary>
         /// <remarks>
-        /// All the alias are updated at once to avoid concurrency issues.
+        /// All the alias are updated at once to avoid concurrency issues.Thumbnail
         /// </remarks>
         /// <param name="queries">The list a queries that need to have an updated thumbnail.</param>
         public void RefreshThumbnails(IEnumerable<QueryResult> queries)
         {
-            var t = Task.Run(() =>
+            try
             {
-                foreach (var query in queries)
+                Parallel.ForEach(queries, query =>
                 {
-                    if (query is not AliasQueryResult alias) continue;
+                    if (query is not AliasQueryResult alias) return;
+                    if (alias.FileName.IsNullOrEmpty()) return;
 
-                    var fileName = alias.FileName;
+                    if (alias.IsPackagedApplication())
+                    {
+                        alias.Thumbnail.CopyToImageRepository(alias.FileName);
+                        return;
+                    }
 
-                    if (fileName.IsNullOrEmpty()) { continue; }
+                    var imageSource = ThumbnailLoader.GetThumbnail(alias.FileName);
+                    if (imageSource is null)
+                    {
+                        alias.Thumbnail = null;
+                        if (!alias.FileName.IsUrl()) return;
 
-                    if (fileName.IsUrl() && _cache.IsInCache(fileName.GetKeyForFavIcon()))
-                    {
-                        alias.Thumbnail = _cache[fileName.GetKeyForFavIcon()];
-                        continue;
+                        var favicon = alias.FileName
+                                           .GetKeyForFavIcon()
+                                           .ToAbsolutePath();
+                        if (File.Exists(favicon))
+                        {
+                            alias.Thumbnail = favicon;
+                        }
+                        else
+                        {
+                            alias.Icon = "Web";
+                        }
+
+                        return;
                     }
-                    if (_cache.IsInCache(fileName))
-                    {
-                        alias.Thumbnail = _cache[fileName];
-                        continue;
-                    }
-                    
-                    if (alias.IsPackagedApplication() && alias.Thumbnail is string)
-                    {
-                         ((string)alias.Thumbnail).CopyToCache(alias.FileName);
-                        continue;
-                    }
-                    
-                    var imageSource = ThumbnailLoader.GetThumbnail(fileName);
-                    var file = new FileInfo(fileName);
-                    imageSource.CopyToCache($"{file.Name}.png");
-                    _cache[fileName] = imageSource;
-                    alias.Thumbnail = imageSource;
-                }
-            });
-            t.ContinueWith(t =>
+
+                    var file = new FileInfo(alias.FileName);
+                    imageSource.CopyToImageRepository(file.Name);
+                    alias.Thumbnail = file.Name.ToAbsolutePath();
+                });
+            }
+            catch(Exception ex)
             {
-                _log.Warning($"An error occured during the refresh of the icons. ('{t.Exception.Message}')", t.Exception);
-            }, TaskContinuationOptions.OnlyOnFaulted);
+                _log.Warning($"An error occured during the refresh of the icons. ('{ex.Message}')", ex);
+            }
         }
 
         #endregion Methods

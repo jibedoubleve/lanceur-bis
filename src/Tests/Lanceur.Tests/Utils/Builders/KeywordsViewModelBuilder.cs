@@ -17,7 +17,7 @@ internal class KeywordsViewModelBuilder
 
     private IDbRepository _dbRepository;
     private IAppLoggerFactory _loggerFactory;
-    private IPackagedAppValidator _packagedAppValidator;
+    private IThumbnailFixer _thumbnailFixer;
     private TestSchedulerProvider _schedulerProvider;
 
     #endregion Fields
@@ -32,14 +32,14 @@ internal class KeywordsViewModelBuilder
             schedulers: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
             notify: Substitute.For<IUserNotification>(),
             thumbnailManager: Substitute.For<IThumbnailManager>(),
-            packagedAppValidator: _packagedAppValidator ?? Substitute.For<IPackagedAppValidator>(),
+            thumbnailFixer: _thumbnailFixer ?? Substitute.For<IThumbnailFixer>(),
             notification: Substitute.For<INotification>()
         );
     }
 
-    public KeywordsViewModelBuilder With(IPackagedAppValidator packagedAppValidator)
+    public KeywordsViewModelBuilder With(IThumbnailFixer thumbnailFixer)
     {
-        _packagedAppValidator = packagedAppValidator;
+        _thumbnailFixer = thumbnailFixer;
         return this;
     }
 

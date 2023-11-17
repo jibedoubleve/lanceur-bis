@@ -16,7 +16,7 @@ public abstract class QueryResult : ObservableModel
 {
     #region Fields
 
-    private object _thumbnail;
+    private string _thumbnail;
 
     #endregion Fields
 
@@ -53,10 +53,7 @@ public abstract class QueryResult : ObservableModel
     /// Contains a thumbnail that can be displayed on the UI. Put <c>null</c> if you want
     /// to let <see cref="Icon"/> handle this.
     /// </summary>
-    /// <remarks>
-    /// The type is <see cref="object"/> to avoid UI technology leaking into Infrastructure
-    /// </remarks>
-    public object Thumbnail
+    public string Thumbnail
     {
         get => _thumbnail;
         set => Set(ref _thumbnail, value);
