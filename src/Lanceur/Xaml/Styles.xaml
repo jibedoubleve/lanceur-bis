@@ -6,6 +6,11 @@
 
     <Duration x:Key="FadeInDuration">0:0:0:0.03</Duration>
     <Duration x:Key="FadeOutDuration">0:0:0:0.25</Duration>
+
+    <!--  BRUSH  -->
+    <Brush x:Key="MidGrayColour">#FFC8C8C8</Brush>
+    <Brush x:Key="MidBlackColour">#FF171717</Brush>
+
     <!--  FONTS  -->
     <FontFamily x:Key="TextFontFamily">Segoe UI</FontFamily>
 

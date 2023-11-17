@@ -16,14 +16,14 @@
             <DockPanel Background="Transparent">
                 <Border
                     Margin="5,5,15,5"
-                    Background="#FFC8C8C8"
+                    Background="{StaticResource MidGrayColour}"
                     CornerRadius="8">
                     <Grid Margin="5">
                         <iconPacks:PackIconMaterial
                             Width="{StaticResource DefaultIconSize}"
                             Height="{StaticResource DefaultIconSize}"
                             VerticalAlignment="Center"
-                            Foreground="#FF171717"
+                            Foreground="{StaticResource MidBlackColour}"
                             Kind="{Binding Icon}"
                             Visibility="{Binding ElementName=ImageIcon, Path=Visibility, Converter={StaticResource InvertVisibilityConverter}}" />
                         <Image
@@ -76,25 +76,28 @@
             HorizontalAlignment="Stretch"
             Background="Transparent">
             <DockPanel Background="Transparent">
-                <Grid Margin="5,5,15,5">
-                    <iconPacks:PackIconMaterial
-                        Width="{StaticResource DefaultIconSize}"
-                        Height="{StaticResource DefaultIconSize}"
-                        VerticalAlignment="Center"
-                        Kind="{Binding Icon}"
-                        Visibility="{Binding ElementName=ImageIcon, Path=Visibility, Converter={StaticResource InvertVisibilityConverter}}" />
-                    <Image
-                        x:Name="ImageIcon"
-                        Width="{StaticResource DefaultIconSize}"
-                        Height="{StaticResource DefaultIconSize}"
-                        VerticalAlignment="Center"
-                        Source="{Binding Thumbnail, UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
-                </Grid>
+                <Border
+                    Margin="5,5,15,5"
+                    Background="{StaticResource MidGrayColour}"
+                    CornerRadius="8">
+                    <Grid Margin="5" Background="{StaticResource MidGrayColour}">
+                        <iconPacks:PackIconMaterial
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource MidBlackColour}"
+                            Kind="{Binding Icon}"
+                            Visibility="{Binding ElementName=ImageIcon, Path=Visibility, Converter={StaticResource InvertVisibilityConverter}}" />
+                        <Image
+                            x:Name="ImageIcon"
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            VerticalAlignment="Center"
+                            Source="{Binding Thumbnail, UpdateSourceTrigger=PropertyChanged}"
+                            Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
+                    </Grid>
+                </Border>
                 <Grid Background="Transparent">
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
@@ -115,21 +118,27 @@
             HorizontalAlignment="Stretch"
             Background="Transparent">
             <DockPanel Background="Transparent">
-                <Grid Margin="5,5,15,5">
-                    <iconPacks:PackIconMaterial
-                        Width="{StaticResource DefaultIconSize}"
-                        Height="{StaticResource DefaultIconSize}"
-                        VerticalAlignment="Center"
-                        Kind="{Binding Icon}"
-                        Visibility="{Binding ElementName=ImageIcon, Path=Visibility, Converter={StaticResource InvertVisibilityConverter}}" />
-                    <Image
-                        x:Name="ImageIcon"
-                        Width="{StaticResource DefaultIconSize}"
-                        Height="{StaticResource DefaultIconSize}"
-                        VerticalAlignment="Center"
-                        Source="{Binding Thumbnail, UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
-                </Grid>
+                <Border
+                    Margin="5,5,15,5"
+                    Background="{StaticResource MidGrayColour}"
+                    CornerRadius="8">
+                    <Grid Margin="5" Background="{StaticResource MidGrayColour}">
+                        <iconPacks:PackIconMaterial
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource MidBlackColour}"
+                            Kind="{Binding Icon}"
+                            Visibility="{Binding ElementName=ImageIcon, Path=Visibility, Converter={StaticResource InvertVisibilityConverter}}" />
+                        <Image
+                            x:Name="ImageIcon"
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            VerticalAlignment="Center"
+                            Source="{Binding Thumbnail, UpdateSourceTrigger=PropertyChanged}"
+                            Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
+                    </Grid>
+                </Border>
                 <DockPanel Margin="0" Background="Transparent">
                     <TextBlock
                         x:Name="Name"
@@ -198,6 +207,7 @@
                             Text="{Binding Name}" />
                         <TextBlock
                             Grid.Row="1"
+                            Grid.Column="0"
                             VerticalAlignment="Center"
                             FontSize="11"
                             Foreground="{DynamicResource TextColourBrush}"
@@ -236,13 +246,11 @@
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <TextBlock
-                        Grid.ColumnSpan="2"
                         VerticalAlignment="Center"
                         FontSize="20"
                         Text="{Binding Name}" />
                     <TextBlock
                         Grid.Row="1"
-                        Grid.Column="1"
                         VerticalAlignment="Bottom"
                         FontSize="9"
                         Foreground="{DynamicResource TextColourBrush}">
