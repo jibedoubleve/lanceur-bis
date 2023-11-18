@@ -46,7 +46,6 @@ namespace Lanceur.Ui.Thumbnails
                 {
                     if (query is not AliasQueryResult alias) return;
                     if (alias.FileName.IsNullOrEmpty()) return;
-
                     if (alias.IsPackagedApplication())
                     {
                         alias.Thumbnail.CopyToImageRepository(alias.FileName);

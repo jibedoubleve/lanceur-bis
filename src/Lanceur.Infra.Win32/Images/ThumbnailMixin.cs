@@ -17,17 +17,17 @@ public static class ThumbnailMixin
 
     /// <summary>
     /// Copy the image source into the thumbnail repository. If the
-    /// thumbnail already exits, nothing happen.
+    /// thumbnail already exits, nothing happens.
     /// </summary>
     /// <param name="imageSource">The image to copy into the repository</param>
     /// <param name="fileName">The file name of the thumbnail</param>
     public static void CopyToImageRepository(this ImageSource imageSource, string fileName)
     {
         var destination = fileName.ToAbsolutePath();
-        if (File.Exists(destination)) return;
         
         lock (Locker)
         {
+            if (File.Exists(destination)) return;
             if (!Directory.Exists(AppPaths.ImageRepository)) Directory.CreateDirectory(AppPaths.ImageRepository);
             if (imageSource is not BitmapSource bitmapSource) return;
 
@@ -41,17 +41,17 @@ public static class ThumbnailMixin
 
     /// <summary>
     /// Copy the image specified by the path into the thumbnail repository. If the
-    /// thumbnail already exits, nothing happen.
+    /// thumbnail already exits, nothing happens.
     /// </summary>
     /// <param name="imageSource">The image to copy into the repository</param>
     /// <param name="fileName">The file name of the thumbnail</param>
     public static void CopyToImageRepository(this string imageSource, string fileName)
     {
         var destination = fileName.ToAbsolutePath();
-        if (File.Exists(destination)) return;
         
         lock (Locker)
         {
+            if (File.Exists(destination)) return;
             if (!Directory.Exists(AppPaths.ImageRepository)) Directory.CreateDirectory(AppPaths.ImageRepository);
             File.Copy(imageSource, destination, true);
         }
