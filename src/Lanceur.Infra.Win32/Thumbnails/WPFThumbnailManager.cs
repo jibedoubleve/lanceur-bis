@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.IO;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Images;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.Utils;
 
-namespace Lanceur.Ui.Thumbnails
+namespace Lanceur.Infra.Win32.Thumbnails
 {
     public class WPFThumbnailManager : IThumbnailManager
     {

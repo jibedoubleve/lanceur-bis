@@ -1,10 +1,8 @@
 using Lanceur.Infra.Constants;
-using System;
-using System.Linq;
 
-namespace Lanceur.Utils
+namespace Lanceur.Infra.Win32.Thumbnails
 {
-    public static class ImageCacheMixin
+    internal static class ImageRepositoryMixin
     {
         #region Fields
 
