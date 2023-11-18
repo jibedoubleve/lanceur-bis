@@ -12,10 +12,4 @@
       <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="PresentationCore">
-        <HintPath>C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\6.0.24\PresentationCore.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>

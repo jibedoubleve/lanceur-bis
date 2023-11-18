@@ -113,7 +113,7 @@ namespace Lanceur.Ui.Thumbnails
             int retCode = SHCreateItemFromParsingName(fileName, IntPtr.Zero, ref shellItem2Guid, out nativeShellItem);
 
             if (retCode != 0)
-                throw Marshal.GetExceptionForHR(retCode);
+                throw Marshal.GetExceptionForHR(retCode)!;
 
             NativeSize nativeSize = new NativeSize
             {

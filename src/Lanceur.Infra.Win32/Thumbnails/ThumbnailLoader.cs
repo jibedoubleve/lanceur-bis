@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Windows.Media;
-using Lanceur.Utils;
+using Lanceur.Core.Services;
+using Lanceur.Ui.Thumbnails;
+using Splat;
 
-namespace Lanceur.Ui.Thumbnails
+namespace Lanceur.Infra.Win32.Thumbnails
 {
     internal static class ThumbnailLoader
     {
         #region Fields
 
         private const int ThumbnailSize = 64;
-
-        private static readonly Dictionary<string, ImageSource> _cache = new();
+        private static readonly IAppLoggerFactory AppLogFactory = Locator.Current.GetService<IAppLoggerFactory>()!;
+        private static readonly Dictionary<string, ImageSource> Cache = new();
 
         private static readonly string[] ImageExtensions =
         {
@@ -53,14 +52,13 @@ namespace Lanceur.Ui.Thumbnails
                 options
                 );
         }
-        public static ImageSource GetThumbnail(string path)
+        public static ImageSource? GetThumbnail(string path)
         {
-            ImageSource image = null;
+            ImageSource? image = null;
             try
             {
                 if (string.IsNullOrEmpty(path)) { return null; }
-                if (_cache.TryGetValue(path, out var value)) { return value; }
-
+                if (Cache.TryGetValue(path, out var value)) { return value; }
                 if (Directory.Exists(path))
                 {
                     /* Directories can also have thumbnails instead of shell icons.
@@ -79,17 +77,20 @@ namespace Lanceur.Ui.Thumbnails
                                               * be the case in many situations while testing.
                                               * - Solution: explicitly pass the ThumbnailOnly flag
                                               */
-                                             ? ThumbnailOptions.ThumbnailOnly 
+                                             ? ThumbnailOptions.ThumbnailOnly
                                              : ThumbnailOptions.None);
                 }
 
                 if (image != null)
                 {
                     image.Freeze();
-                    _cache[path] = image;
+                    Cache[path] = image;
                 }
             }
-            catch (Exception ex) { AppLogFactory.Get(typeof(ThumbnailLoader)).Warning($"Failed to extract thumbnail for {path}", ex); }
+            catch (Exception ex)
+            {
+                AppLogFactory!.GetLogger(typeof(ThumbnailLoader)).Warning($"Failed to extract thumbnail for {path}", ex);
+            }
 
             //Return the value event if null;
             return image;
