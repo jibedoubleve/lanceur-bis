@@ -12,6 +12,20 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
+        private const string UpdateAliasSQL = @"
+                update alias
+                set
+                    arguments   = @parameters,
+                    file_name   = @fileName,
+                    notes       = @notes,
+                    run_as      = @runAs,
+                    start_mode  = @startMode,
+                    working_dir = @WorkingDirectory,
+                    icon        = @Icon,
+                    thumbnail   = @thumbnail,
+                    lua_script  = @luaScript
+                where id = @id;";
+
         private readonly IDbConnectionManager _db;
         private readonly IAppLogger _log;
 
@@ -353,41 +367,37 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Update(AliasQueryResult alias)
         {
-            const string sql = @"
-                update alias
-                set
-                    arguments   = @parameters,
-                    file_name   = @fileName,
-                    notes       = @notes,
-                    run_as      = @runAs,
-                    start_mode  = @startMode,
-                    working_dir = @WorkingDirectory,
-                    icon        = @Icon,
-                    thumbnail   = @thumbnail,
-                    lua_script  = @luaScript                                   
-                where id = @id;";
+            var ids = UpdateMany(new[] { alias });
+            return ids.FirstOrDefault();
+        }
 
+        public long[] UpdateMany(IEnumerable<AliasQueryResult> aliases)
+        {
+            var ids = new List<long>();
             _db.WithinTransaction(tx =>
             {
-                tx.Connection.Execute(sql, new
+                foreach (var alias in aliases)
                 {
-                    alias.Parameters,
-                    alias.FileName,
-                    alias.Notes,
-                    alias.RunAs,
-                    alias.StartMode,
-                    alias.WorkingDirectory,
-                    alias.Icon,
-                    alias.Thumbnail,
-                    alias.LuaScript,
-                    id = alias.Id
-                });
-                CreateAdditionalParameters(alias, tx);
-                UpdateName(alias, tx);
+                    tx.Connection.Execute(UpdateAliasSQL, new
+                    {
+                        alias.Parameters,
+                        alias.FileName,
+                        alias.Notes,
+                        alias.RunAs,
+                        alias.StartMode,
+                        alias.WorkingDirectory,
+                        alias.Icon,
+                        alias.Thumbnail,
+                        alias.LuaScript,
+                        id = alias.Id
+                    });
+                    CreateAdditionalParameters(alias, tx);
+                    UpdateName(alias, tx);
+                    alias.SynonymsWhenLoaded = alias.Synonyms;
+                    ids.Add(alias.Id);
+                }
             });
-
-            alias.SynonymsWhenLoaded = alias.Synonyms;
-            return alias.Id;
+            return ids.ToArray();
         }
 
         #endregion Methods

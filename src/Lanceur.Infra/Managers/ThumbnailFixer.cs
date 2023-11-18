@@ -1,10 +1,9 @@
 ﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Constants;
-using Lanceur.SharedKernel.Mixins;
 using Lanceur.SharedKernel.Web;
 using System.Text.RegularExpressions;
+using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Infra.Managers
 {
@@ -13,66 +12,42 @@ namespace Lanceur.Infra.Managers
         #region Fields
 
         /// <summary>
-        /// A regex to check whether the specified text (meant to be the content
-        /// of <see cref="QueryResult"/>'s property <paramref name="FileName"/>)
+        /// A regex to check whether the specified text
         /// is the template of a Macro
         /// </summary>
-        private static readonly Regex MacroRegex = new("@.*@");
+        private static readonly Regex IsMacro = new("@.*@");
 
         private readonly IFavIconDownloader _favIconDownloader;
-        private readonly IPackagedAppSearchService _searchService;
+        private readonly IAppLogger _log;
 
         #endregion Fields
 
         #region Constructors
 
-        public ThumbnailFixer(IPackagedAppSearchService searchService, IFavIconDownloader favIconDownloader)
+        public ThumbnailFixer(IPackagedAppSearchService searchService, IFavIconDownloader favIconDownloader, IAppLoggerFactory appLoggerFactory)
         {
             ArgumentNullException.ThrowIfNull(searchService);
             ArgumentNullException.ThrowIfNull(favIconDownloader);
+            ArgumentNullException.ThrowIfNull(appLoggerFactory);
 
-            _searchService = searchService;
             _favIconDownloader = favIconDownloader;
+            _log = appLoggerFactory.GetLogger<ThumbnailFixer>();
         }
 
         #endregion Constructors
 
         #region Methods
 
-        /// <summary>
-        /// Checks whether the alias is a packaged app. If it's the case,
-        /// it'll fix the <see cref="AliasQueryResult.FileName"/> and the <see cref="QueryResult.Icon"/>
-        /// of the specified alias
-        /// </summary>
-        /// <param name="alias">The alias to standardise</param>
-        /// <returns>Standardised alias</returns>
-        /// <exception cref="ApplicationException">When the <c>alias.FileName</c> is not a valid URI</exception>
-        public async Task<AliasQueryResult> FixAsync(AliasQueryResult alias)
+        public async Task RetrieveFaviconAsync(string fileName)
         {
-            if (alias is null) return default;
-            if (MacroRegex.Match(alias.FileName).Success) return alias;
+            if (fileName is null) return;
+            if (IsMacro.Match(fileName).Success) return;
+            if (!Uri.TryCreate(fileName, UriKind.Absolute, out var uri)) return;
+            if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return;
 
-            var response = await Task.Run(() => _searchService.GetByInstalledDirectory(alias.FileName)
-                                                              .FirstOrDefault());
-
-            if (response is null)
-            {
-                if (!Uri.TryCreate(alias.FileName, UriKind.Absolute, out var uri)) return alias;
-                if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return alias;
-
-                var output = Path.Combine(AppPaths.ImageRepository, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
-                await _favIconDownloader.SaveToFileAsync(uri, output);
-                alias.Thumbnail = output;
-                alias.Icon      = null;
-                return alias;
-
-            }
-
-            // This is a packaged app
-            alias.FileName = $"package:{response.AppUserModelId}";
-            alias.Thumbnail = response.Logo.LocalPath;
-            alias.Icon = null;
-            return alias;
+            using var m = TimePiece.Measure(this, m => _log.Trace(m));
+            var output = Path.Combine(AppPaths.ImageRepository, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
+            await _favIconDownloader.SaveToFileAsync(uri, output);
         }
 
         #endregion Methods

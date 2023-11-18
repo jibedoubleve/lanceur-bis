@@ -11,8 +11,8 @@ namespace Lanceur.Core.Managers
         /// and returns. Callbacks will set the property <see cref="QueryResult.Thumbnail"/>
         /// when thread has done its work
         /// </summary>
-        /// <param name="queries">The <see cref="QueryResult"/> to refresh</param>
-        void RefreshThumbnails(IEnumerable<QueryResult> queries);
+        /// <param name="results">The <see cref="QueryResult"/> to refresh</param>
+        void RefreshThumbnails(IEnumerable<QueryResult> results);
 
         #endregion Methods
     }

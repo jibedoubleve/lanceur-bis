@@ -158,6 +158,17 @@ namespace Lanceur.Core.Repositories
 
         void Update(ref Session session);
 
+        /// <summary>
+        /// Updates many aliases at once.
+        /// </summary>
+        /// <param name="aliases">Aliases to update</param>
+        /// <returns>The ids of the updated aliases</returns>
+        /// <remarks>
+        /// This method does not create new aliases. If the id of an alias is 0
+        /// No update will occur as this alias is considered as non existing.
+        /// </remarks>
+        long[] UpdateMany(IEnumerable<AliasQueryResult> aliases);
+
         #endregion Methods
     }
 }

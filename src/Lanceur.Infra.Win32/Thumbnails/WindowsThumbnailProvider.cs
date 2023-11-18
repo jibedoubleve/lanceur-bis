@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-namespace Lanceur.Ui.Thumbnails
+namespace Lanceur.Infra.Win32.Thumbnails
 {
     [Flags]
     public enum ThumbnailOptions
@@ -26,8 +24,8 @@ namespace Lanceur.Ui.Thumbnails
         #region Fields
 
         private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
-
         private static readonly Dictionary<string, BitmapSource> _thumbnailCache = new();
+        private static readonly object Locker = new();
 
         #endregion Fields
 
@@ -145,16 +143,24 @@ namespace Lanceur.Ui.Thumbnails
 
         public static BitmapSource GetThumbnail(string fileName, int width, int height, ThumbnailOptions options)
         {
-            IntPtr hBitmap = GetHBitmap(Path.GetFullPath(fileName), width, height, options);
+            lock (Locker)
+            {
+                var hBitmap = GetHBitmap(Path.GetFullPath(fileName), width, height, options);
 
-            try
-            {
-                return Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            }
-            finally
-            {
-                // delete HBitmap to avoid memory leaks
-                DeleteObject(hBitmap);
+                try
+                {
+                    return Imaging.CreateBitmapSourceFromHBitmap(
+                        hBitmap, 
+                        IntPtr.Zero, 
+                        Int32Rect.Empty,
+                        BitmapSizeOptions.FromEmptyOptions()
+                    );
+                }
+                finally
+                {
+                    // delete HBitmap to avoid memory leaks
+                    DeleteObject(hBitmap);
+                }
             }
         }
 

@@ -69,9 +69,6 @@ public class KeywordViewModelShould : SQLiteTest
             
             vm.SelectedAlias.Synonyms = synonyms;
             vm.SelectedAlias.FileName = fileName;
-            
-            packageValidator.FixAsync(Arg.Any<AliasQueryResult>())
-                            .Returns(vm.SelectedAlias);
 
             vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
             
@@ -115,10 +112,6 @@ public class KeywordViewModelShould : SQLiteTest
             vm.Activate(new());
             vm.SearchQuery = "multi";
             scheduler.AdvanceBy(TimeSpan.FromMilliseconds(20).Ticks);
-            
-            // It's only now I know what is returned by 'FixAsync'
-            packageValidator.FixAsync(Arg.Any<AliasQueryResult>())
-                            .Returns(vm.SelectedAlias);
             
             vm.SelectedAlias.Synonyms = "multi1, multi2";
             vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();

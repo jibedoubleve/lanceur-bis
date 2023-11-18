@@ -38,7 +38,6 @@ namespace Lanceur.Views
         private readonly IAppLogger _log;
         private readonly INotification _notification;
         private readonly IUserNotification _notify;
-        private readonly IThumbnailFixer _thumbnailFixer;
         private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
 
@@ -52,7 +51,6 @@ namespace Lanceur.Views
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
-            IThumbnailFixer thumbnailFixer = null,
             INotification notification = null)
         {
             _busyScope = new(b => IsBusy = b, true, false);
@@ -60,7 +58,6 @@ namespace Lanceur.Views
 
             var l = Locator.Current;
             _notify = notify ?? l.GetService<IUserNotification>();
-            _thumbnailFixer = thumbnailFixer ?? l.GetService<IThumbnailFixer>();
             _notification = notification ?? l.GetService<INotification>();
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
@@ -152,7 +149,7 @@ namespace Lanceur.Views
             return Unit.Default;
         }
 
-        private async Task<AliasQueryResult> OnSaveOrUpdateAliasAsync(AliasQueryResult alias)
+        private AliasQueryResult OnSaveOrUpdateAlias(AliasQueryResult alias)
         {
             var created = alias.Id == 0;
             BusyMessage = "Saving alias...";
@@ -161,7 +158,6 @@ namespace Lanceur.Views
                 try
                 {
                     alias.SetName();
-                    alias = await _thumbnailFixer.FixAsync(alias);
                     _aliasService.SaveOrUpdate(ref alias);
                 }
                 catch (ApplicationException ex)
@@ -250,8 +246,8 @@ namespace Lanceur.Views
             RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread).DisposeWith(d);
             RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, AliasQueryResult>(
-                OnSaveOrUpdateAliasAsync,
+            SaveOrUpdateAlias = ReactiveCommand.Create<AliasQueryResult, AliasQueryResult>(
+                OnSaveOrUpdateAlias,
                 this.IsValid(),
                 outputScheduler: uiThread
             ).DisposeWith(d);

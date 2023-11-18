@@ -34,7 +34,6 @@ using Lanceur.Infra.Win32;
 using Lanceur.Infra.Win32.PackagedApp;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.SharedKernel.Web;
-using Lanceur.Ui.Thumbnails;
 
 namespace Lanceur;
 
@@ -107,11 +106,11 @@ public class Bootstrapper
         l.Register<IClipboardService>(() => new WindowsClipboardService());
         l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
         l.Register<IPluginManager>(() => new PluginManager(Get<IPluginStoreContext>()));
-        l.Register<IThumbnailManager>(() => new WPFThumbnailManager(Get<IAppLoggerFactory>()));
+        l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<IAppLoggerFactory>(), Get<IThumbnailFixer>(), Get<IDbRepository>(), Get<IPackagedAppSearchService>()));
         l.Register<IPackagedAppManager>(() => new PackagedAppManager());
         l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService());
         l.Register<IFavIconDownloader>(()=> new FavIconDownloader());
-        l.Register<IThumbnailFixer>(() => new ThumbnailFixer(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>()));
+        l.Register<IThumbnailFixer>(() => new ThumbnailFixer(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>(), Get<IAppLoggerFactory>()));
 
         // Formatters
         l.Register<IStringFormatter>(() => new DefaultStringFormatter());

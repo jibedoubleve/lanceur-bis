@@ -32,7 +32,6 @@ internal class KeywordsViewModelBuilder
             schedulers: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
             notify: Substitute.For<IUserNotification>(),
             thumbnailManager: Substitute.For<IThumbnailManager>(),
-            thumbnailFixer: _thumbnailFixer ?? Substitute.For<IThumbnailFixer>(),
             notification: Substitute.For<INotification>()
         );
     }
