@@ -31,7 +31,7 @@ namespace Lanceur.Core.Decorators
         public static IEnumerable<EntityDecorator<TEntity>> FromEnumerable(IEnumerable<TEntity> results) => results.Select(x => new EntityDecorator<TEntity>(x));
 
         /// <summary>
-        /// Mark the contained <see cref="Entity"/> as updated in the database
+        /// Mark the contained <see cref="Entity"/> as to be updated in the database
         /// </summary>
         public void Soil() => IsDirty = true;
 

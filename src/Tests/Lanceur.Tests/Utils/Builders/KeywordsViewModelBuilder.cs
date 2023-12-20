@@ -17,7 +17,7 @@ internal class KeywordsViewModelBuilder
 
     private IDbRepository _dbRepository;
     private IAppLoggerFactory _loggerFactory;
-    private IThumbnailFixer _thumbnailFixer;
+    private IFavIconManager _favIconManager;
     private TestSchedulerProvider _schedulerProvider;
 
     #endregion Fields
@@ -36,9 +36,9 @@ internal class KeywordsViewModelBuilder
         );
     }
 
-    public KeywordsViewModelBuilder With(IThumbnailFixer thumbnailFixer)
+    public KeywordsViewModelBuilder With(IFavIconManager favIconManager)
     {
-        _thumbnailFixer = thumbnailFixer;
+        _favIconManager = favIconManager;
         return this;
     }
 
