@@ -7,7 +7,7 @@ namespace Lanceur.Infra.Formatters
     {
         #region Fields
 
-        private const int LENGTH = 115;
+        private const int LENGTH = 90;
 
         #endregion Fields
 
