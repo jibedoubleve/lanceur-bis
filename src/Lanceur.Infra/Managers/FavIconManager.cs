@@ -7,7 +7,7 @@ using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Infra.Managers
 {
-    public class ThumbnailFixer : IThumbnailFixer
+    public class FavIconManager : IFavIconManager
     {
         #region Fields
 
@@ -24,14 +24,14 @@ namespace Lanceur.Infra.Managers
 
         #region Constructors
 
-        public ThumbnailFixer(IPackagedAppSearchService searchService, IFavIconDownloader favIconDownloader, IAppLoggerFactory appLoggerFactory)
+        public FavIconManager(IPackagedAppSearchService searchService, IFavIconDownloader favIconDownloader, IAppLoggerFactory appLoggerFactory)
         {
             ArgumentNullException.ThrowIfNull(searchService);
             ArgumentNullException.ThrowIfNull(favIconDownloader);
             ArgumentNullException.ThrowIfNull(appLoggerFactory);
 
             _favIconDownloader = favIconDownloader;
-            _log = appLoggerFactory.GetLogger<ThumbnailFixer>();
+            _log = appLoggerFactory.GetLogger<FavIconManager>();
         }
 
         #endregion Constructors

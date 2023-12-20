@@ -17,7 +17,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
         private readonly IDbRepository _dbRepository;
         private readonly IPackagedAppSearchService _searchService;
         private readonly IAppLogger _log;
-        private readonly IThumbnailFixer _thumbnailFixer;
+        private readonly IFavIconManager _favIconManager;
 
         #endregion Fields
 
@@ -25,11 +25,11 @@ namespace Lanceur.Infra.Win32.Thumbnails
 
         public ThumbnailManager(
             IAppLoggerFactory loggerFactory, 
-            IThumbnailFixer thumbnailFixer, 
+            IFavIconManager favIconManager, 
             IDbRepository dbRepository,
             IPackagedAppSearchService searchService)
         {
-            _thumbnailFixer = thumbnailFixer;
+            _favIconManager = favIconManager;
             _dbRepository = dbRepository;
             _searchService = searchService;
             _log = loggerFactory.GetLogger<ThumbnailManager>();
@@ -125,7 +125,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
                 alias.Icon = webIcon;
                 alias.Thumbnail = favicon;
 
-                _ = _thumbnailFixer.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
+                _ = _favIconManager.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
                 _log.Trace($"Retrieved favicon for alias '{alias.Name}'. Favicon '{alias.FileName}'");
             }
         }

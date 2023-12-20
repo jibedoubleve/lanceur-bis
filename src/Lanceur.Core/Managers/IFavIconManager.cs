@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Managers
 {
-    public interface IThumbnailFixer
+    public interface IFavIconManager
     {
         #region Methods
 
