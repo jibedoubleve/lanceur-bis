@@ -3,6 +3,7 @@ using Splat;
 using System;
 using System.Globalization;
 using System.Windows.Data;
+using Lanceur.Infra.Formatters;
 
 namespace Lanceur.Converters
 {
@@ -39,7 +40,8 @@ namespace Lanceur.Converters
             }
             else
             {
-                return _formatter.Format(value);
+                var msg = _formatter.Format(value);
+                return new LimitedStringLengthFormatter().Format(msg);
             }
         }
 
