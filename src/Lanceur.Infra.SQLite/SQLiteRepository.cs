@@ -44,10 +44,10 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     #region Methods
 
     ///<inheritdoc/>
-    public ExistingNameResponse CheckNamesExist(string[] names, long? idSession = null)
+    public ExistingNameResponse SelectNames(string[] names, long? idSession = null)
     {
         idSession ??= GetDefaultSessionId();
-        return _aliasDbAction.CheckNameExists(names, idSession.Value);
+        return _aliasDbAction.SelectNames(names, idSession.Value);
     }
 
     /// <summary>
@@ -299,7 +299,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 
         switch (alias.Id)
         {
-            case 0 when !_aliasDbAction.CheckNameExists(alias, idSession.Value):
+            case 0 when !_aliasDbAction.SelectNames(alias, idSession.Value):
                 _aliasDbAction.Create(ref alias, idSession.Value);
                 _log.Info($"Created new alias. (Id: {alias.Id})");
                 break;
@@ -368,7 +368,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         else action.Update(session);
     }
 
-    public long[] UpdateMany(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateMany(aliases);
+    public long[] UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateThumbnails(aliases);
 
     #endregion Methods
 }

@@ -138,12 +138,7 @@ namespace Lanceur.Views
                 _aliasService.Remove(alias);
 
                 if (_aliases.Remove(alias)) { _notification.Information($"Removed alias '{alias.Name}'."); }
-                else
-                {
-                    var msg = $"Impossible to remove the alias '{alias.Name}'";
-                    _notification.Warning(msg);
-                    _log.Warning(msg);
-                }
+                else { _log.Warning($"Impossible to remove the alias '{alias.Name}'"); }
             }
             else { _log.Debug($"User cancelled the remove of '{alias.Name}'."); }
             return Unit.Default;
@@ -265,7 +260,7 @@ namespace Lanceur.Views
             );
             var validateNameExists = this.WhenAnyValue(
                 x => x.SelectedAlias.SynonymsToAdd,
-                x => _aliasService.CheckNamesExist(x.SplitCsv())
+                x => _aliasService.SelectNames(x.SplitCsv())
             );
 
             ValidationFileName = this.ValidationRule(

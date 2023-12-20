@@ -17,7 +17,6 @@ internal class KeywordsViewModelBuilder
 
     private IDbRepository _dbRepository;
     private IAppLoggerFactory _loggerFactory;
-    private IFavIconManager _favIconManager;
     private TestSchedulerProvider _schedulerProvider;
 
     #endregion Fields
@@ -34,12 +33,6 @@ internal class KeywordsViewModelBuilder
             thumbnailManager: Substitute.For<IThumbnailManager>(),
             notification: Substitute.For<INotification>()
         );
-    }
-
-    public KeywordsViewModelBuilder With(IFavIconManager favIconManager)
-    {
-        _favIconManager = favIconManager;
-        return this;
     }
 
     public KeywordsViewModelBuilder With(IDbRepository dbRepository)

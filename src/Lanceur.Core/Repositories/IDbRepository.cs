@@ -15,12 +15,12 @@ namespace Lanceur.Core.Repositories
         #region Methods
 
         /// <summary>
-        /// Checks whether the specified names exists in the database for the specified session
+        /// Returns all the names that exists in the database AND in the specified list of <see cref="names"/>
         /// </summary>
-        /// <param name="names"></param>
-        /// <param name="idSession"></param>
+        /// <param name="names">The names to find in the database</param>
+        /// <param name="idSession">The id of the session. If not specified, will take default session</param>
         /// <returns></returns>
-        public ExistingNameResponse CheckNamesExist(string[] names, long? idSession = null);
+        public ExistingNameResponse SelectNames(string[] names, long? idSession = null);
 
         /// <summary>
         /// Get all the aliases
@@ -159,15 +159,18 @@ namespace Lanceur.Core.Repositories
         void Update(ref Session session);
 
         /// <summary>
-        /// Updates many aliases at once.
+        /// Updates thumbnail of many aliases at once.
         /// </summary>
         /// <param name="aliases">Aliases to update</param>
         /// <returns>The ids of the updated aliases</returns>
         /// <remarks>
         /// This method does not create new aliases. If the id of an alias is 0
         /// No update will occur as this alias is considered as non existing.
+        ///
+        /// This methods will only update thumbnails, all other properties
+        /// will be ignored.
         /// </remarks>
-        long[] UpdateMany(IEnumerable<AliasQueryResult> aliases);
+        long[] UpdateThumbnails(IEnumerable<AliasQueryResult> aliases);
 
         #endregion Methods
     }
