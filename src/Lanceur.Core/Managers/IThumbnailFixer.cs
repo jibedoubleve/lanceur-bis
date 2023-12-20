@@ -7,13 +7,10 @@ namespace Lanceur.Core.Managers
         #region Methods
 
         /// <summary>
-        /// Checks whether the alias is a packaged app. If it's the case,
-        /// it'll fix the <see cref="AliasQueryResult.FileName"/> and the <see cref="QueryResult.Icon"/>
-        /// of the specified alias
+        /// Retrieve favicon (if exists) and copy it into the thumbnails repository
         /// </summary>
-        /// <param name="alias">The alias to standardise</param>
-        /// <returns>Standardised alias</returns>
-        Task<AliasQueryResult> FixAsync(AliasQueryResult alias);
+        /// <param name="url">The url configured in the alias</param>
+        Task RetrieveFaviconAsync(string url);
 
         #endregion Methods
     }

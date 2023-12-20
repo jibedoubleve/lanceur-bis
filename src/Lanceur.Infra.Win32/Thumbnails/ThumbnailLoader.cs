@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Windows.Media;
 using Lanceur.Core.Services;
-using Lanceur.Ui.Thumbnails;
 using Splat;
 
 namespace Lanceur.Infra.Win32.Thumbnails

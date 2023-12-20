@@ -7,6 +7,17 @@ namespace Lanceur.SharedKernel.Web
     {
         #region Methods
 
+        public async Task<bool> CheckExistsAsync(Uri url)
+        {
+            try
+            {
+                var client = new HttpClient();
+                var result = await client.SendAsync(new(HttpMethod.Head, url));
+                return result.StatusCode == HttpStatusCode.OK;
+            }
+            catch { return false; }
+        }
+
         ///<inheritdoc />
         public async Task<bool> SaveToFileAsync(Uri url, string path)
         {
@@ -17,9 +28,9 @@ namespace Lanceur.SharedKernel.Web
 
                 if (File.Exists(path)) return true;
 
-                var uri        = new Uri($"{url.Scheme}://{url.Host}/favicon.ico");
+                var uri = new Uri($"{url.Scheme}://{url.Host}/favicon.ico");
                 var httpClient = new HttpClient();
-                var bytes      = await httpClient.GetByteArrayAsync(uri);
+                var bytes = await httpClient.GetByteArrayAsync(uri);
                 if (bytes.Length == 0) return true;
 
                 await File.WriteAllBytesAsync(path, bytes);
@@ -29,17 +40,6 @@ namespace Lanceur.SharedKernel.Web
             {
                 return false;
             }
-        }
-
-        public async Task<bool> CheckExistsAsync(Uri url)
-        {    
-            try
-            {
-                var client = new HttpClient();
-                var result = await client.SendAsync(new(HttpMethod.Head, url));
-                return result.StatusCode == HttpStatusCode.OK;
-            }
-            catch { return false; }  
         }
 
         #endregion Methods

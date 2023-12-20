@@ -368,5 +368,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         else action.Update(session);
     }
 
+    public long[] UpdateMany(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateMany(aliases);
+
     #endregion Methods
 }

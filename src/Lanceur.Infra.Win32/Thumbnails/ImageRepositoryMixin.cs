@@ -22,10 +22,9 @@ namespace Lanceur.Infra.Win32.Thumbnails
         public static string GetKeyForFavIcon(this string address)
         {
             ArgumentNullException.ThrowIfNull(address);
-            if (!Uri.TryCreate(address, new UriCreationOptions(), out _))
-                throw new NotSupportedException("The specified address is not a valid URL");
-
-            return $"{AppPaths.FaviconPrefix}{new Uri(address).Host}";
+            return Uri.TryCreate(address, new UriCreationOptions(), out _) 
+                ? $"{AppPaths.FaviconPrefix}{new Uri(address).Host}" 
+                : string.Empty;
         }
         #endregion Methods
     }
