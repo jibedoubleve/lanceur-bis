@@ -107,7 +107,7 @@ public class Bootstrapper
         l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
         l.Register<IPluginManager>(() => new PluginManager(Get<IPluginStoreContext>()));
         l.Register<IThumbnailRefresher>(()=> new ThumbnailRefresher(Get<IAppLoggerFactory>(), Get<IPackagedAppSearchService>(), Get<IFavIconManager>()));
-        l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<IAppLoggerFactory>(), Get<IDbRepository>(), Get<ThumbnailRefresher>()));
+        l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<IAppLoggerFactory>(), Get<IDbRepository>(), Get<IThumbnailRefresher>()));
         l.Register<IPackagedAppManager>(() => new PackagedAppManager());
         l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService());
         l.Register<IFavIconDownloader>(()=> new FavIconDownloader());
