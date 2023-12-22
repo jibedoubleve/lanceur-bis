@@ -386,7 +386,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long[] UpdateThumbnails(IEnumerable<AliasQueryResult> aliases)
         {
-            const string sql = "update alias set thumbnail = @thumbnail where id = @is";
+            const string sql = "update alias set thumbnail = @thumbnail where id = @id";
             var ids = new List<long>();
             _db.WithinTransaction(tx =>
             {
