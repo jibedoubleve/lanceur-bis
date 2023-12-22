@@ -12,7 +12,7 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
-        private const string UpdateAliasSQL = @"
+        private const string UpdateAliasSql = @"
                 update alias
                 set
                     arguments   = @parameters,
@@ -43,67 +43,18 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Methods
 
-        private void ClearAlias(params long[] ids)
-        {
-            const string sql = @"
-                    delete from alias
-                    where id = @id";
-
-            var cnt = _db.DeleteMany(sql, ids);
-            var idd = string.Join(", ", ids);
-            _log.Info($"Removed '{cnt}' row(s) from alias. Id: {idd}");
-        }
-
-        private void ClearAliasArgument(params long[] ids)
-        {
-            const string sql = @"
-                delete from alias_argument
-                where id_alias = @id";
-
-            var cnt = _db.DeleteMany(sql, ids);
-            var idd = string.Join(", ", ids);
-            _log.Debug($"Removed '{cnt}' row(s) from 'alias_argument'. Id: {idd}");
-        }
-
-        private void ClearAliasName(params long[] ids)
-        {
-            const string sql = @"
-                delete from alias_name
-                where id_alias = @id";
-
-            var cnt = _db.DeleteMany(sql, ids);
-            var idd = string.Join(", ", ids);
-            _log.Debug($"Removed '{cnt}' row(s) from 'alias_name'. Id: {idd}");
-        }
-
-        private void ClearAliasUsage(params long[] ids)
-        {
-            const string sql = @"
-                delete from alias_usage
-                where id_alias = @id;";
-
-            var cnt = _db.DeleteMany(sql, ids);
-            var idd = string.Join(", ", ids);
-            _log.Debug($"Removed '{cnt}' row(s) from 'alias_usage'. Id: {idd}");
-        }
-
-        private void CreateAdditionalParameters(AliasQueryResult alias, SQLiteTransaction tx)
-            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
-
-        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, SQLiteTransactionBase tx)
+        private static void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, SQLiteTransactionBase tx)
         {
             // Remove existing additional alias parameters
             const string sql1 = "delete from alias_argument where id_alias = @idAlias";
             tx.Connection.Execute(sql1, new { idAlias });
 
             // Create alias additional parameters
-            const string sql2 = @"
-                insert into alias_argument (id_alias, argument, name)
-                values(@idAlias, @parameter, @name);";
+            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
             tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
         }
 
-        private void UpdateName(AliasQueryResult alias, SQLiteTransactionBase tx)
+        private static void UpdateName(AliasQueryResult alias, SQLiteTransactionBase tx)
         {
             //Remove all names
             const string sql = @"delete from alias_name where id_alias = @id";
@@ -116,6 +67,53 @@ namespace Lanceur.Infra.SQLite.DbActions
                 tx.Connection.Execute(sql2, new { id = alias.Id, name });
             }
         }
+
+        private void ClearAlias(params long[] ids)
+        {
+            const string sql = @"
+                    delete from alias
+                    where id = @id";
+
+            var cnt = _db.ExecuteMany(sql, ids);
+            var idd = string.Join(", ", ids);
+            _log.Info($"Removed {cnt} row(s) from alias. Id: {idd}");
+        }
+
+        private void ClearAliasArgument(params long[] ids)
+        {
+            const string sql = @"
+                delete from alias_argument
+                where id_alias = @id";
+
+            var cnt = _db.ExecuteMany(sql, ids);
+            var idd = string.Join(", ", ids);
+            _log.Info($"Removed {cnt} row(s) from 'alias_argument'. Id: {idd}");
+        }
+
+        private void ClearAliasName(params long[] ids)
+        {
+            const string sql = @"
+                delete from alias_name
+                where id_alias = @id";
+
+            var cnt = _db.ExecuteMany(sql, ids);
+            var idd = string.Join(", ", ids);
+            _log.Info($"Removed {cnt} row(s) from 'alias_name'. Id: {idd}");
+        }
+
+        private void ClearAliasUsage(params long[] ids)
+        {
+            const string sql = @"
+                delete from alias_usage
+                where id_alias = @id;";
+
+            var cnt = _db.ExecuteMany(sql, ids);
+            var idd = string.Join(", ", ids);
+            _log.Info($"Removed {cnt} row(s) from 'alias_usage'. Id: {idd}");
+        }
+
+        private void CreateAdditionalParameters(AliasQueryResult alias, SQLiteTransaction tx)
+            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
         internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
         {
@@ -140,44 +138,6 @@ namespace Lanceur.Infra.SQLite.DbActions
                                 select item.Count).SingleOrDefault();
             }
             return dbResultAr;
-        }
-
-        public bool CheckNameExists(AliasQueryResult alias, long idSession)
-        {
-            const string sql = @"
-            select count(*)
-            from
-	            alias_name an
-                inner join alias a on an.id_alias = a.id
-            where
-            	lower(name) = @name
-                and a.id_session = @idSession";
-
-            var count = _db.WithinTransaction(tx => tx.Connection.ExecuteScalar<int>(sql, new
-            {
-                name = alias.Name,
-                idSession
-            }));
-            return count > 0;
-        }
-
-        public ExistingNameResponse CheckNameExists(string[] names, long idSession)
-        {
-            const string sql = @"
-                select an.name
-                from
-                	alias_name an
-                	inner join alias a on a.id = an.id_alias
-                where
-                    an.name in @names
-                    and a.id_session = @idSession";
-
-            var result = _db.WithinTransaction(
-                tx => tx.Connection.Query<string>(sql, new { names, idSession })
-                            .ToArray()
-            );
-
-            return new(result);
         }
 
         public long Create(ref AliasQueryResult alias, long idSession)
@@ -365,35 +325,74 @@ namespace Lanceur.Infra.SQLite.DbActions
             ClearAlias(ids);
         }
 
-        public long Update(AliasQueryResult alias)
+        public bool SelectNames(AliasQueryResult alias, long idSession)
         {
-            var ids = UpdateMany(new[] { alias });
-            return ids.FirstOrDefault();
+            const string sql = @"
+            select count(*)
+            from
+	            alias_name an
+                inner join alias a on an.id_alias = a.id
+            where
+            	lower(name) = @name
+                and a.id_session = @idSession";
+
+            var count = _db.WithinTransaction(tx => tx.Connection.ExecuteScalar<int>(sql, new
+            {
+                name = alias.Name,
+                idSession
+            }));
+            return count > 0;
         }
 
-        public long[] UpdateMany(IEnumerable<AliasQueryResult> aliases)
+        public ExistingNameResponse SelectNames(string[] names, long idSession)
         {
+            const string sql = @"
+                select an.name
+                from
+                	alias_name an
+                	inner join alias a on a.id = an.id_alias
+                where
+                    an.name in @names
+                    and a.id_session = @idSession";
+
+            var result = _db.WithinTransaction(
+                tx => tx.Connection.Query<string>(sql, new { names, idSession })
+                            .ToArray()
+            );
+
+            return new(result);
+        }
+
+        public long Update(AliasQueryResult alias) => _db.WithinTransaction(tx =>
+        {
+            tx.Connection.Execute(UpdateAliasSql, new
+            {
+                alias.Parameters,
+                alias.FileName,
+                alias.Notes,
+                alias.RunAs,
+                alias.StartMode,
+                alias.WorkingDirectory,
+                alias.Icon,
+                alias.Thumbnail,
+                alias.LuaScript,
+                id = alias.Id
+            });
+            CreateAdditionalParameters(alias, tx);
+            UpdateName(alias, tx);
+            alias.SynonymsWhenLoaded = alias.Synonyms;
+            return alias.Id;
+        });
+
+        public long[] UpdateThumbnails(IEnumerable<AliasQueryResult> aliases)
+        {
+            const string sql = "update alias set thumbnail = @thumbnail where id = @is";
             var ids = new List<long>();
             _db.WithinTransaction(tx =>
             {
                 foreach (var alias in aliases)
                 {
-                    tx.Connection.Execute(UpdateAliasSQL, new
-                    {
-                        alias.Parameters,
-                        alias.FileName,
-                        alias.Notes,
-                        alias.RunAs,
-                        alias.StartMode,
-                        alias.WorkingDirectory,
-                        alias.Icon,
-                        alias.Thumbnail,
-                        alias.LuaScript,
-                        id = alias.Id
-                    });
-                    CreateAdditionalParameters(alias, tx);
-                    UpdateName(alias, tx);
-                    alias.SynonymsWhenLoaded = alias.Synonyms;
+                    tx.Connection.Execute(sql, new { alias.Thumbnail, alias.Id });
                     ids.Add(alias.Id);
                 }
             });

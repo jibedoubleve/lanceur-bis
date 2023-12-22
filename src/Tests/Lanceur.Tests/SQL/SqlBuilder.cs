@@ -8,7 +8,6 @@ internal class SqlBuilder
     #region Fields
 
     private readonly StringBuilder _sql = new();
-    private long _sequence;
 
     #endregion Fields
 
@@ -23,21 +22,29 @@ internal class SqlBuilder
 
     #region Methods
 
-    public SqlBuilder AppendAlias(string fileName, string arguments, params string[] synonyms)
-        => AppendAlias(++_sequence, fileName, arguments, synonyms);
-
-    public SqlBuilder AppendAlias(long id, string fileName, string arguments, params string[] synonyms)
+    public SqlBuilder AppendSynonyms(long idAlias, params string[] synonyms)
     {
-        if (id < _sequence) throw new InvalidDataException($"The id '{id}' is below the minimum sequence value ({_sequence})");
-
-        _sequence = id;
-        _sql.Append($"insert into alias (id, file_name, arguments, id_session) values ({id}, '{fileName}', '{arguments}', 1);");
-        _sql.AppendNewLine();
+        if(synonyms is null || synonyms.Length == 0) { throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias"); }
+        
         foreach (var synonym in synonyms)
         {
-            _sql.Append($"insert into alias_name(id, id_alias, name) values ({++_sequence}, {id}, '{synonym}');");
+            _sql.Append($"insert into alias_name(id_alias, name) values ({idAlias}, '{synonym}');");
             _sql.AppendNewLine();
         }
+        return this;
+    }
+
+    public SqlBuilder AppendAlias(long idAlias, string fileName, string arguments)
+    {
+        _sql.Append($"insert into alias (id, file_name, arguments, id_session) values ({idAlias}, '{fileName}', '{arguments}', 1);");
+        _sql.AppendNewLine();
+        return this;
+    }
+
+    public SqlBuilder AppendArgument(long idAlias, string name, string argument)
+    {
+        _sql.Append($"insert into alias_argument(id_alias, name, argument) values ({idAlias}, '{name}', '{argument}');");
+        _sql.AppendNewLine();
         return this;
     }
 
