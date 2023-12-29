@@ -134,7 +134,8 @@
                     MaxHeight="{StaticResource ResultBoxHeight}"
                     HorizontalContentAlignment="Stretch"
                     Background="Transparent"
-                    ItemTemplateSelector="{StaticResource QueryResultSelector}" />
+                    ItemTemplateSelector="{StaticResource QueryResultSelector}" 
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
             </Border>
             <!--  ======================================================  -->
             <!--  STATUS BOX  -->
