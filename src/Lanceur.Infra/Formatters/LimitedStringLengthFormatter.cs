@@ -7,13 +7,13 @@ namespace Lanceur.Infra.Formatters
     {
         #region Fields
 
-        private const int LENGTH = 90;
+        public const int MaxLength = 90;
 
         #endregion Fields
 
         #region Methods
 
-        public string Format(object value) => value?.ToString()?.Truncate(LENGTH, "(...)");
+        public string Format(object value) => value?.ToString()?.Truncate(MaxLength, "(...)");
 
         #endregion Methods
     }
