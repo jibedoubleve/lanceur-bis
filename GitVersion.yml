@@ -1,13 +1,13 @@
 assembly-versioning-scheme: MajorMinorPatchTag
-next-version: 2.5.1
+next-version: 2.5.0
 branches:
   master:
     is-release-branch: true  
   develop:
     tag: beta
-    increment: Minor
+    increment: Patch
   feature:
     regex: ^issue?[\/-]
     tag: alpha-issue.{BranchName}
-    increment: Minor
+    increment: Patch
 
