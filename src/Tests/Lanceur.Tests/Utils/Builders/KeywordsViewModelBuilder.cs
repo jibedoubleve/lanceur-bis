@@ -18,6 +18,7 @@ internal class KeywordsViewModelBuilder
     private IDbRepository _dbRepository;
     private IAppLoggerFactory _loggerFactory;
     private TestSchedulerProvider _schedulerProvider;
+    private IPackagedAppSearchService _packagedAppSearchService;
 
     #endregion Fields
 
@@ -26,8 +27,9 @@ internal class KeywordsViewModelBuilder
     public KeywordsViewModel Build()
     {
         return new(
-            logFactory: _loggerFactory,
+            logFactory: _loggerFactory ?? throw new ArgumentNullException(nameof(_loggerFactory), "Log factory is mandatory"),
             searchService: _dbRepository ?? Substitute.For<IDbRepository>(),
+            packagedAppSearchService: _packagedAppSearchService ?? Substitute.For<IPackagedAppSearchService>(),
             schedulers: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
             notify: Substitute.For<IUserNotification>(),
             thumbnailManager: Substitute.For<IThumbnailManager>(),
@@ -43,7 +45,13 @@ internal class KeywordsViewModelBuilder
 
     public KeywordsViewModelBuilder With(IScheduler scheduler)
     {
-        _schedulerProvider = new TestSchedulerProvider(scheduler);
+        _schedulerProvider = new(scheduler);
+        return this;
+    }
+
+    public KeywordsViewModelBuilder With(IPackagedAppSearchService packagedAppSearchService)
+    {
+        _packagedAppSearchService = packagedAppSearchService;
         return this;
     }
 

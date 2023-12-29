@@ -4,9 +4,11 @@ namespace Lanceur.Core.Models
     {
         #region Properties
 
-        public string AppUserModelId { get; set; }
-        public string InstalledLocation { get; set; }
-        public Uri Logo { get; set; }
+        public string AppUserModelId { get; init; }
+        public string Description { get; init; }
+        public string DisplayName { get; init; }
+        public string InstalledLocation { get; init; }
+        public Uri Logo { get; init; }
 
         #endregion Properties
     }

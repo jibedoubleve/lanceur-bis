@@ -21,7 +21,9 @@ namespace Lanceur.Infra.Win32.PackagedApp
                                      {
                                          AppUserModelId    = p.GetAppUserModelId(),
                                          InstalledLocation = p.InstalledLocation.Path,
-                                         Logo              = p.Logo
+                                         Logo              = p.Logo,
+                                         Description       = p.Description,
+                                         DisplayName       = p.DisplayName
                                      })
                                      .Where(e => !string.IsNullOrEmpty(e.AppUserModelId))
                                      .ToArray();
