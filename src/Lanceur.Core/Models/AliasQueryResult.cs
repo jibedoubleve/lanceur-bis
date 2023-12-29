@@ -80,7 +80,8 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
         get => _synonyms;
         set
         {
-            Set(ref _synonyms, value);
+            var trimmed = value.Trim(',', ' ');
+            Set(ref _synonyms, trimmed);
             OnPropertyChanged(nameof(SynonymsToAdd));
         }
     }
