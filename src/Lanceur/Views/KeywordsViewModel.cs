@@ -284,10 +284,15 @@ namespace Lanceur.Views
             ValidationAliasExists = this.ValidationRule(
                    vm => vm.SelectedAlias.Synonyms,
                    validateNameExists,
-                   response => !response.Exists,
-                   response => !response.Exists && !response.ExistingNames.Any()
-                       ? "The names should not be empty"
-                       : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.");
+                   response => !response?.Exists ?? false,
+                   response =>
+                   {
+                       if (response == null) return "The names should not be empty.";
+                       
+                       return !response.Exists && !response.ExistingNames.Any()
+                           ? "The names should not be empty."
+                           : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.";
+                   });
             ValidationAliasExists.DisposeWith(d);
         }
 

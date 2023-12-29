@@ -1,3 +1,4 @@
+using Windows.Services.Maps;
 using AutoMapper;
 using Castle.Core.Logging;
 using Dapper;
@@ -45,6 +46,82 @@ public class KeywordViewModelShould : SQLiteTest
     #region Methods
 
     [Fact]
+    public void AbleToRemoveSynonym()
+    {
+        new TestScheduler().With(scheduler =>
+        {
+            // ARRANGE
+            const long idAlias = 10;
+            var sql = new SqlBuilder().AppendAlias(10, "@multi@", "@alias2@@alias3")
+                                      .AppendSynonyms(10, "multi1", "multi2", "multi3")
+                                      .AppendAlias(20, "alias2", "action1")
+                                      .AppendSynonyms(20, "alias2")
+                                      .AppendAlias(30, "alias3", "action2")
+                                      .AppendSynonyms(30, "alias3")
+                                      .ToString();
+
+            var connectionMgr = new SQLiteSingleConnectionManager(BuildFreshDb(sql));
+
+            var logger = new XUnitLoggerFactory(_output);
+            var cfg = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>();
+            });
+            var conversionService = new AutoMapperConverter(new Mapper(cfg));
+            var dbRepository = new SQLiteRepository(connectionMgr, logger, conversionService);
+
+            var vm = new KeywordsViewModelBuilder()
+                     .With(scheduler)
+                     .With(logger)
+                     .With(dbRepository)
+                     .Build();
+
+            // ACT
+            vm.Activate(new());
+            vm.SearchQuery = "multi";
+            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(20).Ticks);
+
+            vm.SelectedAlias.Synonyms = "multi1, multi2";
+            vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
+            scheduler.Start();
+
+            // ASSERT
+            using (new AssertionScope())
+            {
+                // The database should have one less synonym
+                var countSql = $"select count(*) from alias_name where id_alias = {idAlias}";
+                connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar(countSql))
+                             .Should().Be(2);
+                // And the UI also...
+                vm.Aliases.Should().HaveCount(2);
+            }
+        });
+    }
+
+    [Fact]
+    public void BeAbleToCreateAliasForPackagedApp() => new TestScheduler().With(scheduler =>
+        {
+            // ARRANGE
+            var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();
+            
+            packagedAppSearchService.GetByInstalledDirectory(Arg.Any<string>())
+                                    .Returns(new List<PackagedApp> { new() { AppUserModelId = Guid.NewGuid().ToString() } });
+            
+            var vm = new KeywordsViewModelBuilder().With(scheduler)
+                                                   .With(_output)
+                                                   .With(packagedAppSearchService)
+                                                   .Build();
+
+            // ACT
+            vm.Activate(new());
+            vm.CreatingAlias.Execute().Subscribe();
+            vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
+
+            // ASSERT
+            vm.SelectedAlias.FileName.Should().StartWith("package:");
+        });
+
+    [Fact]
     public void CreateAliasAndSelectIt()
     {
         new TestScheduler().With(scheduler =>
@@ -60,77 +137,23 @@ public class KeywordViewModelShould : SQLiteTest
                      .With(dbRepository)
                      .Build();
 
-            var synonyms = Guid.NewGuid().ToString(); 
+            var synonyms = Guid.NewGuid().ToString();
             var fileName = Guid.NewGuid().ToString();
-            
+
             // ACT
-            
+
             vm.Activate(new());
             scheduler.Start();
             vm.CreatingAlias.Execute().Subscribe();
             var hash = vm.SelectedAlias.GetHashCode();
-            
+
             vm.SelectedAlias.Synonyms = synonyms;
             vm.SelectedAlias.FileName = fileName;
 
             vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
-            
+
             // ASSERT
             vm.SelectedAlias.GetHashCode().Should().Be(hash);
-
-        });
-    }
-
-    [Fact]
-    public void AbleToRemoveSynonym()
-    {
-        new TestScheduler().With(scheduler =>
-        {
-            // ARRANGE
-            const long idAlias = 10;
-            var sql = new SqlBuilder().AppendAlias(10,  "@multi@", "@alias2@@alias3")
-                                      .AppendSynonyms(10, "multi1", "multi2", "multi3")
-                                      .AppendAlias(20,  "alias2", "action1")
-                                      .AppendSynonyms(20, "alias2")
-                                      .AppendAlias(30,  "alias3",  "action2")
-                                      .AppendSynonyms(30, "alias3")
-                                      .ToString();
-            
-            var connectionMgr = new SQLiteSingleConnectionManager(BuildFreshDb(sql));
-            
-            var logger = new XUnitLoggerFactory(_output);
-            var cfg = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>();
-            });
-            var conversionService = new AutoMapperConverter(new Mapper(cfg));
-            var dbRepository = new SQLiteRepository(connectionMgr, logger, conversionService);
-            
-            var vm = new KeywordsViewModelBuilder()
-                     .With(scheduler)
-                     .With(logger)
-                     .With(dbRepository)
-                     .Build();
-
-            // ACT
-            vm.Activate(new());
-            vm.SearchQuery = "multi";
-            scheduler.AdvanceBy(TimeSpan.FromMilliseconds(20).Ticks);
-            
-            vm.SelectedAlias.Synonyms = "multi1, multi2";
-            vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
-            scheduler.Start();
-
-            // ASSERT
-            using (new AssertionScope())
-            {
-                // The database should have one less synonym
-                var countSql = $"select count(*) from alias_name where id_alias = {idAlias}";
-                connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar(countSql))
-                             .Should().Be(2);
-                // And the UI also...
-                vm.Aliases.Should().HaveCount(2);
-            }
         });
     }
 
@@ -155,10 +178,10 @@ public class KeywordViewModelShould : SQLiteTest
                                       .AppendArgument(120, "name_0", "argument_0")
                                       .AppendArgument(120, "name_0", "argument_0")
                                       .ToString();
-            
+
             var connectionMgr = new SQLiteSingleConnectionManager(BuildFreshDb(sql));
             var loggerFactory = new XUnitLoggerFactory(_output);
-            
+
             var cfg = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>();
@@ -169,15 +192,16 @@ public class KeywordViewModelShould : SQLiteTest
 
             var thumbnailManager = new ThumbnailManager(loggerFactory, dbRepository, thumbnailRefresher);
             var aliases = dbRepository.Search("a");
-            
+
             // ACT
             thumbnailManager.RefreshThumbnails(aliases);
-            
+
             // ASSERT
             connectionMgr
                 .WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))
                 .Should().Be(6);
         });
     }
+
     #endregion Methods
 }
