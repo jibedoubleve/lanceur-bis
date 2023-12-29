@@ -38,6 +38,7 @@ namespace Lanceur.Views
         private readonly IAppLogger _log;
         private readonly INotification _notification;
         private readonly IUserNotification _notify;
+        private readonly IPackagedAppSearchService _packagedAppSearchService;
         private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
 
@@ -51,13 +52,15 @@ namespace Lanceur.Views
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
-            INotification notification = null)
+            INotification notification = null,
+            IPackagedAppSearchService packagedAppSearchService = null)
         {
             _busyScope = new(b => IsBusy = b, true, false);
             _schedulers = schedulers ?? Locator.Current.GetService<ISchedulerProvider>();
 
             var l = Locator.Current;
             _notify = notify ?? l.GetService<IUserNotification>();
+            _packagedAppSearchService = packagedAppSearchService ?? l.GetService<IPackagedAppSearchService>();
             _notification = notification ?? l.GetService<INotification>();
             _log = l.GetLogger<KeywordsViewModel>(logFactory);
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
@@ -153,6 +156,14 @@ namespace Lanceur.Views
                 try
                 {
                     alias.SetName();
+                    var response = _packagedAppSearchService.GetByInstalledDirectory(alias.FileName)
+                                                            .FirstOrDefault();
+                    if (response is not null) // This is a packaged application
+                    {
+                        alias.FileName = $"package:{response.AppUserModelId}";
+                        alias.Description = response.DisplayName.IsNullOrWhiteSpace() ? "Packaged app" : response.DisplayName;
+                    }
+
                     _aliasService.SaveOrUpdate(ref alias);
                 }
                 catch (ApplicationException ex)
