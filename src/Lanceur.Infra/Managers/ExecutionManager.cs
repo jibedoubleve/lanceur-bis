@@ -79,7 +79,7 @@ namespace Lanceur.Infra.Managers
                     return ExecuteProcess(query);
                 }
             }
-            catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}: {ex.Message}'", ex); }
+            catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}'. Check the path of the executable or the URL.", ex); }
         }
 
         private IEnumerable<QueryResult> ExecuteProcess(AliasQueryResult query)
