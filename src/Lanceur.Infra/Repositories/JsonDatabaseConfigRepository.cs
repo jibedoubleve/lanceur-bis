@@ -2,6 +2,7 @@
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Constants;
 using Lanceur.Infra.Services;
+using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 
 namespace Lanceur.Infra.Repositories
@@ -10,7 +11,7 @@ namespace Lanceur.Infra.Repositories
     {
         #region Fields
 
-        private static readonly object _locker = new();
+        private static readonly object Locker = new();
         private readonly string _filePath;
         private IDatabaseConfig _current;
 
@@ -44,9 +45,10 @@ namespace Lanceur.Infra.Repositories
         private FileStream OpenFile()
         {
             var dir = Path.GetDirectoryName(_filePath);
+            if (dir.IsNullOrEmpty()) throw new DirectoryNotFoundException($"Directory '{dir}' does not exist.");
             if (!Directory.Exists(dir))
             {
-                Directory.CreateDirectory(dir);
+                Directory.CreateDirectory(dir!);
             }
 
             if (File.Exists(_filePath)) { File.Delete(_filePath); }
@@ -56,7 +58,7 @@ namespace Lanceur.Infra.Repositories
 
         public void Load()
         {
-            lock (_locker)
+            lock (Locker)
             {
                 DatabaseConfig jsonSettings = null;
                 if (File.Exists(_filePath))
@@ -71,7 +73,7 @@ namespace Lanceur.Infra.Repositories
 
         public void Save()
         {
-            lock (_locker)
+            lock (Locker)
             {
                 // If _current is null, it was never loaded, then
                 // not modified...

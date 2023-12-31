@@ -16,7 +16,7 @@ namespace Lanceur.Infra.Stores
 
         private readonly Assembly _assembly;
         private readonly IDbRepository _dataService;
-        private IEnumerable<QueryResult> _reservedAliases = null;
+        private IEnumerable<QueryResult> _reservedAliases;
 
         #endregion Fields
 
@@ -26,7 +26,7 @@ namespace Lanceur.Infra.Stores
         /// Generate a new instance. Look into the Executing Assembly to find reserved aliases.
         /// </summary>
         /// <remarks>
-        /// Each reserved alias should be decarated with <see cref="ReservedAliasAttribute"/>
+        /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
         /// </remarks>
         public ReservedAliasStore()
         {
@@ -37,23 +37,12 @@ namespace Lanceur.Infra.Stores
         /// <summary>
         /// Generate a new instance
         /// </summary>
-        /// <param name="assembly">The assembly where to search the reseved aliases. </param>
+        /// <param name="assembly">The assembly where to search the reserved aliases. </param>
+        /// <param name="dataService">The service used to update usage of the alias</param>
         /// <remarks>
         /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
         /// </remarks>
-        public ReservedAliasStore(Assembly assembly) : this(assembly, null)
-        {
-        }
-
-        /// <summary>
-        /// Generate a new instance
-        /// </summary>
-        /// <param name="assembly">The assembly where to search the reseved aliases. </param>
-        /// <param name="dataService">The dataservice used to update usage of the alias</param>
-        /// <remarks>
-        /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
-        /// </remarks>
-        public ReservedAliasStore(Assembly assembly, IDbRepository dataService)
+        public ReservedAliasStore(Assembly assembly, IDbRepository dataService = null)
         {
             _assembly = assembly;
             _dataService = dataService ?? Locator.Current.GetService<IDbRepository>();
@@ -79,7 +68,7 @@ namespace Lanceur.Infra.Stores
 
                     if (instance is SelfExecutableQueryResult qr)
                     {
-                        var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name; ;
+                        var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
                         var keyword = _dataService.GetKeyword(name);
 
                         qr.Name = name;

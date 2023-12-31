@@ -11,7 +11,7 @@ namespace Lanceur.Infra.Stores
     {
         #region Fields
 
-        private static readonly ICalculatorService _calculator = new CodingSebCalculatorService();
+        private static readonly ICalculatorService Calculator = new CodingSebCalculatorService();
 
         #endregion Fields
 
@@ -24,7 +24,7 @@ namespace Lanceur.Infra.Stores
 
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
-            var (isError, result) = _calculator.Evaluate(query.ToString());
+            var (isError, result) = Calculator.Evaluate(query.ToString());
 
             /* Hack: if user search for 'gc' the result is
              *       "CodingSeb.ExpressionEvaluator.ClassOrEnumType"
