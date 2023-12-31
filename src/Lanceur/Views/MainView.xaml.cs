@@ -22,6 +22,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Lanceur.Infra.Win32.Utils;
 
 namespace Lanceur.Views
 {

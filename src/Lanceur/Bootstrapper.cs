@@ -32,6 +32,7 @@ using System.Linq;
 using System.Reflection;
 using Lanceur.Infra.Win32;
 using Lanceur.Infra.Win32.PackagedApp;
+using Lanceur.Infra.Win32.Restart;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.SharedKernel.Web;
 

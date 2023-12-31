@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using Lanceur.Infra.Win32.Restart;
 
 namespace Lanceur.Views
 {
