@@ -35,18 +35,10 @@ namespace Lanceur.ReservedKeywords
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            var parameters = cmdline?.Parameters.IsNullOrEmpty() ?? true
-                ? ScreenRuler.DefaultTopOffset.ToString(CultureInfo.InvariantCulture)
-                : cmdline.Parameters;
-
-            _ = int.TryParse(parameters, out int offset);
-
-            var coordinate = ScreenRuler.GetCenterCoordinate(offset);
+           var coordinate = ScreenRuler.SetDefaultPosition();
             AppLogFactory.Get<CentreAlias>()
-                         .Trace(
-                             $"Put the screen at the centre of the screen. (x: {coordinate.X} - y: {coordinate.Y} - offset: {offset})");
-
-            ScreenRuler.SetWindowPosition(coordinate);
+                         .Info(
+                             $"Put window at default position. (x: {coordinate.X} - y: {coordinate.Y}");
 
             Save(coordinate);
             return NoResultAsync;

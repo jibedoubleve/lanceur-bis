@@ -7,7 +7,7 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        public int _stateHash;
+        private readonly int _stateHash;
 
         #endregion Fields
 
