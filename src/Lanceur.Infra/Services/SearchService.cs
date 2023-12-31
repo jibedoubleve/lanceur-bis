@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
-using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Splat;
 

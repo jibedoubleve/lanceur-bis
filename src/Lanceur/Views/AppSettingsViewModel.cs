@@ -6,7 +6,6 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
-using Lanceur.Utils;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -28,7 +27,6 @@ namespace Lanceur.Views
         private readonly IDelay _delay;
         private readonly INotification _notification;
         private readonly IAppRestart _restart;
-        private readonly ISchedulerProvider _schedulers;
         private readonly IDbRepository _service;
         private readonly ISettingsFacade _settingsFacade;
 
@@ -43,30 +41,30 @@ namespace Lanceur.Views
             IDbRepository dataService = null,
             IDelay delay = null,
             IAppRestart restart = null,
-            INotification nofification = null
+            INotification notification = null
             )
         {
             var l = Locator.Current;
-            _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
-            _askFile = Interactions.SelectFile(_schedulers.MainThreadScheduler);
+            schedulers ??= l.GetService<ISchedulerProvider>();
+            _askFile = Interactions.SelectFile(schedulers.MainThreadScheduler);
             _service = dataService ?? l.GetService<IDbRepository>();
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
             _restart = restart ?? l.GetService<IAppRestart>();
-            _notification = nofification ?? l.GetService<INotification>();
+            _notification = notification ?? l.GetService<INotification>();
             _settingsFacade = settingsFacade ?? l.GetService<ISettingsFacade>();
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
+            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveSettings = ReactiveCommand.Create(OnSaveSettings, outputScheduler: _schedulers.MainThreadScheduler);
+            SaveSettings = ReactiveCommand.Create(OnSaveSettings, outputScheduler: schedulers.MainThreadScheduler);
             SaveSettings.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SelectDatabase = ReactiveCommand.CreateFromTask(async () => await AskFile.Handle(Unit.Default), outputScheduler: _schedulers.MainThreadScheduler);
+            SelectDatabase = ReactiveCommand.CreateFromTask(async () => await AskFile.Handle(Unit.Default), outputScheduler: schedulers.MainThreadScheduler);
             SelectDatabase.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
-                .ObserveOn(_schedulers.MainThreadScheduler)
+                .ObserveOn(schedulers.MainThreadScheduler)
                 .Subscribe(response =>
                 {
                     DbPath = response.DbPath;
@@ -80,7 +78,7 @@ namespace Lanceur.Views
                 });
 
             this.WhenAnyObservable(vm => vm.SelectDatabase)
-                .ObserveOn(_schedulers.MainThreadScheduler)
+                .ObserveOn(schedulers.MainThreadScheduler)
                 .BindTo(this, vm => vm.DbPath);
         }
 

@@ -26,7 +26,7 @@ namespace Lanceur.Infra.Managers
             {
                 return cmdline[..1];
             }
-            else { throw new ArgumentException($"Cmdline is too short (length {cmdline?.Length ?? 0})"); }
+            else { throw new ArgumentException($"Cmdline is too short (length {cmdline.Length})"); }
         }
 
         private static bool HasSpecialName(string cmdName)
@@ -35,13 +35,13 @@ namespace Lanceur.Infra.Managers
             var res1 = false;
             var res2 = false;
 
-            if (cmdName?.Length > 0)
+            if (cmdName.Length > 0)
             {
-                res1 = Specials.Contains(cmdName[..1].ToString());
+                res1 = Specials.Contains(cmdName[..1]);
             }
-            if (cmdName?.Length > 1)
+            if (cmdName.Length > 1)
             {
-                res2 = Specials.Contains(cmdName[..2].ToString());
+                res2 = Specials.Contains(cmdName[..2]);
             }
 
             return res1 || res2;

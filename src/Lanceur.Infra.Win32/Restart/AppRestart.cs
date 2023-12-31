@@ -8,7 +8,7 @@ namespace Lanceur.Infra.Win32.Restart
     {
         #region Fields
 
-        public readonly Mutex _mutex = SingleInstance.Mutex;
+        private readonly Mutex _mutex = SingleInstance.Mutex;
 
         #endregion Fields
 
@@ -18,7 +18,7 @@ namespace Lanceur.Infra.Win32.Restart
         {
             _mutex.ReleaseMutex();
 
-            var process = Assembly.GetEntryAssembly().Location.Replace("dll", "exe");
+            var process = Assembly.GetEntryAssembly()!.Location.Replace("dll", "exe");
             System.Diagnostics.Process.Start(process);
             Application.Current.Shutdown();
         }
