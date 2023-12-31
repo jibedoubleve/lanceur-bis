@@ -1,19 +1,9 @@
-﻿using Lanceur.SharedKernel.Utils;
-using System.Reflection;
-using System.Threading;
+﻿using System.Reflection;
 using System.Windows;
+using Lanceur.SharedKernel.Utils;
 
-namespace Lanceur.Utils
+namespace Lanceur.Infra.Win32.Restart
 {
-    public interface IAppRestart
-    {
-        #region Methods
-
-        void Restart();
-
-        #endregion Methods
-    }
-
     public class AppRestart : IAppRestart
     {
         #region Fields
@@ -32,16 +22,6 @@ namespace Lanceur.Utils
             System.Diagnostics.Process.Start(process);
             Application.Current.Shutdown();
         }
-
-        #endregion Methods
-    }
-
-    public class DummyAppRestart : IAppRestart
-    {
-        #region Methods
-
-        public void Restart()
-        { }
 
         #endregion Methods
     }
