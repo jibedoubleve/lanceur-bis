@@ -1,4 +1,4 @@
-﻿namespace Lanceur.Utils
+﻿namespace Lanceur.Infra.Win32.Utils
 {
     public class Coordinate
     {
