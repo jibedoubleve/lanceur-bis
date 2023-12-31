@@ -239,7 +239,9 @@ namespace Lanceur.Views
 
             //var coordinate = ScreenRuler.GetCenterCoordinate(ScreenRuler.DefaultTopOffset);
             var coordinate = new Coordinate(stg.Window.Position.Left, stg.Window.Position.Top);
-            ScreenRuler.SetWindowPosition(coordinate);
+
+            if (coordinate.IsEmpty) ScreenRuler.SetDefaultPosition();
+            else ScreenRuler.SetWindowPosition(coordinate);
 
             ShowWindow();
         }

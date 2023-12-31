@@ -30,7 +30,14 @@ namespace Lanceur.Infra.Win32.Utils
                 ? (screenHeight - WindowHeight) / 2
                 : topOffset;
 
-            return new Coordinate(x, y);
+            return new(x, y);
+        }
+
+        public static Coordinate SetDefaultPosition()
+        {
+            var coordinate = GetCenterCoordinate(DefaultTopOffset);
+            SetWindowPosition(coordinate);
+            return coordinate;
         }
 
         public static void SetWindowPosition(Coordinate coordinate)

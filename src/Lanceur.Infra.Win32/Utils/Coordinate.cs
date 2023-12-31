@@ -1,4 +1,6 @@
-﻿namespace Lanceur.Infra.Win32.Utils
+﻿using System.Windows.Navigation;
+
+namespace Lanceur.Infra.Win32.Utils
 {
     public class Coordinate
     {
@@ -14,8 +16,9 @@
 
         #region Properties
 
-        public double X { get; set; }
-        public double Y { get; set; }
+        public bool IsEmpty => X == double.MaxValue && Y == double.MaxValue;
+        public double X { get; }
+        public double Y { get; }
 
         #endregion Properties
     }
