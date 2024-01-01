@@ -227,7 +227,7 @@ public class KeywordViewModelShould : SQLiteTest
         var aliases = dbRepository.Search("a");
 
         // ACT
-        await thumbnailManager.RefreshThumbnails(aliases);
+        await thumbnailManager.RefreshThumbnailsAsync(aliases);
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))
