@@ -62,7 +62,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
             }
             catch (Exception ex)
             {
-                _log.Warning($"An error occured during the refresh of the icons. ('{ex.Message}')", ex);
+                _log.Warning(ex, $"An error occured during the refresh of the icons. ('{ex}')", ex.Message);
             }
         }
 

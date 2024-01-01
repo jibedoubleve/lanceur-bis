@@ -246,7 +246,9 @@ namespace Lanceur.Views
                 ? _searchService.GetAll().ToArray()
                 : Array.Empty<AliasQueryResult>();
 
-            _log.Trace($"{(_settingsFacade.Application.Window.ShowResult ? $"View activation: show all {aliases.Length} result(s)" : "View activation: display nothing")}");
+            _log.Trace(
+                "MainViewModel activated. There's {Length} alias(es) to show. Show all result whe showing: {ShowResult}",
+                aliases.Length, _settingsFacade.Application.Window.ShowResult);
             return new()
             {
                 CurrentSessionName = sessionName,
@@ -269,7 +271,7 @@ namespace Lanceur.Views
                 ExecuteWithPrivilege = request.RunAsAdmin,
             });
 
-            _log.Trace($"Execution of '{request.Query}' returned {(response?.Results?.Count() ?? 0)} result(s).");
+            _log.Trace("Execution of '{Query}' returned {Count} result(s).", request.Query, response.Results.Count());
             return new()
             {
                 Results = response?.Results ?? Array.Empty<QueryResult>(),
@@ -294,12 +296,12 @@ namespace Lanceur.Views
 
             var query = _cmdlineManager.BuildFromText(criterion);
 
-            _log.Debug($"Search: criterion '{criterion}'");
+            _log.Debug("Search: criterion '{criterion}'", criterion);
 
             var results = _searchService.Search(query)
                                         .ToArray();
 
-            _log.Trace($"Search: Found {results.Length} element(s)");
+            _log.Trace("Search: Found {Length} element(s)", results.Length);
             return new AliasResponse()
             {
                 Results = results,
@@ -313,7 +315,7 @@ namespace Lanceur.Views
 
             var currentIndex = Results.IndexOf(GetCurrentAlias());
             var nextAlias = Results.GetNextItem(currentIndex);
-            _log.Trace($"Selecting next result. [Index: {nextAlias?.Name}]");
+            _log.Trace("Selecting next result. [Index: {Name]", nextAlias.Name);
 
             return NavigationResponse.InactiveFromResult(nextAlias);
         }
@@ -324,7 +326,7 @@ namespace Lanceur.Views
 
             var currentIndex = Results.IndexOf(GetCurrentAlias());
             var previousAlias = Results.GetPreviousItem(currentIndex);
-            _log.Trace($"Selecting previous result. [Index: {previousAlias?.Name}]");
+            _log.Trace("Selecting previous result. [Index: {Name}]", previousAlias.Name);
 
             return NavigationResponse.InactiveFromResult(previousAlias);
         }

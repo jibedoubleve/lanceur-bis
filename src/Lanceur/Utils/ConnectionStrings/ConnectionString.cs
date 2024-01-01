@@ -36,7 +36,7 @@ namespace Lanceur.Utils.ConnectionStrings
         {
             if (!File.Exists(_dbPath))
             {
-                AppLogFactory.Get<ConnectionString>().Warning($"The path '{_dbPath}' doesn't exist. A new database should be created!");
+                AppLogFactory.Get<ConnectionString>().Warning("The path '{_dbPath}' doesn't exist. A new database should be created!", _dbPath);
             }
             var path = Environment.ExpandEnvironmentVariables(_dbPath);
             return CSTRING_PATTERN.Format(path);

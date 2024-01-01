@@ -155,7 +155,7 @@ namespace Lanceur.Views
             if (delete)
             {
                 _aliasService.Remove(session.ToEntity());
-                _log.Trace($"Removed session with id '{session?.Id ?? -1}'");
+                _log.Trace("Removed session with id '{Id}'", session.Id);
                 _notification.Information($"Session '{session.Name}' removed.");
                 return session;
             }
@@ -166,7 +166,7 @@ namespace Lanceur.Views
         {
             if (session is not null)
             {
-                _log.Trace($"Save session {session.Id}");
+                _log.Trace("Save session {Id}", session.Id);
                 var entity = session.ToEntity();
 
                 _aliasService.Update(ref entity);
@@ -177,7 +177,7 @@ namespace Lanceur.Views
             }
             else
             {
-                _log.Warning($"Trying to change the default session to a null.");
+                _log.Warning("Trying to change the default session to a null.");
                 return null;
             }
         }

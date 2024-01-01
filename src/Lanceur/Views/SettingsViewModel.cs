@@ -85,13 +85,14 @@ namespace Lanceur.Views
         private IObservable<IRoutableViewModel> OnAddAlias(string aliasName)
         {
             _keywordVm.AliasToCreate = AliasQueryResult.FromName(aliasName);
-            _log.Debug($"Request creation of alias '{aliasName}'");
+            _log.Debug("Request creation of alias '{aliasName}'", aliasName);
             return Router.Navigate.Execute(_keywordVm);
         }
 
         private IObservable<IRoutableViewModel> OnPushNavigation(string arg)
         {
-            _log.Trace($"Navigate to '{arg ?? ""}'");
+            arg ??= "<null>";
+            _log.Trace("Navigate to '{arg}'", arg);
             switch (arg.ToLower())
             {
                 case "keywordsview":

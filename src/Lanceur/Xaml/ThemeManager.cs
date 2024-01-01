@@ -106,7 +106,7 @@ namespace Lanceur.Xaml
                 _ => throw new NotSupportedException($"The theme '{theme}' is not supported!")
             };
 
-            Log.Trace($"Applying theme '{themeToApply}'. Asked theme is '{theme}'");
+            Log.Trace("Applying theme '{themeToApply}'. Asked theme is '{theme}'", themeToApply, theme);
             ControlzEx.Theming.ThemeManager.Current.ChangeTheme(_app, themeToApply);
         }
 

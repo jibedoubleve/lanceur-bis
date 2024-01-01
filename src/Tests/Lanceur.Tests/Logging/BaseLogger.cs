@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Lanceur.SharedKernel.Mixins;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Logging
@@ -13,7 +14,7 @@ namespace Lanceur.Tests.Logging
 
         #region Constructors
 
-        public BaseLogger(ITestOutputHelper output)
+        protected BaseLogger(ITestOutputHelper output)
         {
             ArgumentNullException.ThrowIfNull(nameof(output));
             _output = output;
@@ -23,11 +24,15 @@ namespace Lanceur.Tests.Logging
 
         #region Methods
 
-        protected void Write(string message, [CallerMemberName] string method = null) => _output.WriteLine($"[{method,-6}] {message}");
-
-        protected void Write(string message, Exception ex, [CallerMemberName] string method = null) => _output.WriteLine($"[{method,-6}] {message} - {ex}");
-
-        protected void Write(Exception ex, [CallerMemberName] string method = null) => _output.WriteLine($"[{method,-6}] {ex}");
+        protected void Write(Exception ex, string message,  object[] propertyValues, [CallerMemberName] string method = null)
+        {
+            var msg = $"[{method,-6}] {message.Format(propertyValues)}";
+            if (ex is not null)
+            {
+                msg += $" - {ex}";
+            }
+            _output.WriteLine(msg);
+        }
 
         #endregion Methods
     }

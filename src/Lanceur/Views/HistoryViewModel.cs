@@ -54,8 +54,8 @@ namespace Lanceur.Views
 
         private void OnActivate()
         {
-            var history = _service.GetUsage(Per.Day);
-            _log.Trace($"Loaded {history.Count()} item(s) from history");
+            var history = _service.GetUsage(Per.Day).ToList();
+            _log.Trace("Loaded {Count} item(s) from history", history.Count);
 
             var x = history.Select(x => x.X.ToOADate());
             var y = history.Select(x => x.Y);

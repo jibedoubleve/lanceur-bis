@@ -76,7 +76,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from alias. Id: {idd}");
+            _log.Info("Removed {cnt} row(s) from alias. Id: {idd}", cnt, idd);
         }
 
         private void ClearAliasArgument(params long[] ids)
@@ -87,7 +87,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_argument'. Id: {idd}");
+            _log.Info("Removed {cnt} row(s) from 'alias_argument'. Id: {idd}", cnt, idd);
         }
 
         private void ClearAliasName(params long[] ids)
@@ -98,7 +98,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_name'. Id: {idd}");
+            _log.Info("Removed {cnt} row(s) from 'alias_name'. Id: {idd}", cnt, idd);
         }
 
         private void ClearAliasUsage(params long[] ids)
@@ -109,7 +109,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_usage'. Id: {idd}");
+            _log.Info("Removed {cnt} row(s) from 'alias_usage'. Id: {idd}", cnt, idd);
         }
 
         private void CreateAdditionalParameters(AliasQueryResult alias, SQLiteTransaction tx)

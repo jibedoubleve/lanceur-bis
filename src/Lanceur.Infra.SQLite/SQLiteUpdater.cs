@@ -43,7 +43,7 @@ namespace Lanceur.Infra.SQLite
             if (!File.Exists(dbPath))
             {
                 CreateDirectory(dbPath);
-                _log.Warning($"Creating a new database in '{dbPath}'");
+                _log.Warning("Creating a new database in '{dbPath}'", dbPath);
                 _updater.UpdateFromScratch();
                 _updater.SetLatestVersion();
             }
@@ -54,11 +54,11 @@ namespace Lanceur.Infra.SQLite
 
                 if (_versionManager.IsUpToDate(latestVer) == false)
                 {
-                    _log.Warning($"Database V.{currentVer} is out of date. Updating to V.{latestVer}");
+                    _log.Warning("Database V.{currentVer} is out of date. Updating to V.{latestVer}", currentVer, latestVer);
                     _updater.UpdateFrom(currentVer);
                     _updater.SetLatestVersion();
                 }
-                else { _log.Info($"Database V.{currentVer} is up to date. Latest script version is V.{latestVer}"); }
+                else { _log.Info("Database V.{currentVer} is up to date. Latest script version is V.{latestVer}", currentVer, latestVer); }
             }
         }
 

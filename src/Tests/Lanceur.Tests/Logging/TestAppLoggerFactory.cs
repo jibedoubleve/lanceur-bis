@@ -14,7 +14,7 @@ namespace Lanceur.Tests.Logging
 
         public IAppLogger GetLogger<TSource>() => _appLogger;
 
-        public IAppLogger GetLogger(Type sourceType) => _appLogger;
+        public IAppLogger GetLogger(Type sourceContext) => _appLogger;
 
         #endregion Methods
     }

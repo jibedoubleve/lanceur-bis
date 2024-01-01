@@ -90,7 +90,7 @@ namespace Lanceur.Infra.Stores
             var found = (from plugin in _plugins
                          where plugin?.Name?.ToLower().StartsWith(query.Name.ToLower()) ?? false
                          select plugin).ToArray();
-            _log.Trace($"Found {found.Length} plugin(s)");
+            _log.Trace("Found {Length} plugin(s)", found.Length);
 
             //Set count and name
             foreach (var item in found)

@@ -23,7 +23,7 @@ namespace Lanceur.Views
 
             this.WhenActivated(d =>
             {
-                AppLogFactory.Get<KeywordsView>().Trace($"Activating {nameof(KeywordsView)}");
+                AppLogFactory.Get<KeywordsView>().Trace("Activating {KeywordsView}", nameof(KeywordsView));
 
                 ViewModel.AskLuaEditor.RegisterHandler(interaction =>
                 {

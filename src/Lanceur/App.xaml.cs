@@ -11,7 +11,8 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
-using Lanceur.Ui;
+using Serilog;
+using Serilog.Events;
 
 namespace Lanceur;
 
@@ -70,7 +71,7 @@ public partial class App : Application
             var errors = await installer.SubscribeForInstallAsync();
             if (!errors.IsNullOrEmpty())
             {
-                log.Error($"Error occured when installing plugins on startup: {errors}");
+                log.Error(null, $"Error occured when installing plugins on startup: {errors}");
             }
         }
 

@@ -88,7 +88,8 @@ namespace Lanceur.Infra.Win32.Thumbnails
             }
             catch (Exception ex)
             {
-                AppLogFactory!.GetLogger(typeof(ThumbnailLoader)).Warning($"Failed to extract thumbnail for {path}", ex);
+                AppLogFactory!.GetLogger(typeof(ThumbnailLoader))
+                              .Warning(ex, "Failed to extract thumbnail for {path}", path);
             }
 
             //Return the value event if null;

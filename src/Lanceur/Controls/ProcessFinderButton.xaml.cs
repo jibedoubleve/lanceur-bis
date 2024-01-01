@@ -131,7 +131,7 @@ namespace Lanceur.Controls
                 ReleaseMouseCapture();
                 Cursor = null;
             }
-            catch (Exception ex) { AppLogFactory.Get<ProcessFinderButton>().Error(ex.Message, ex); }
+            catch (Exception ex) { AppLogFactory.Get<ProcessFinderButton>().Error(ex, ex.Message); }
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)

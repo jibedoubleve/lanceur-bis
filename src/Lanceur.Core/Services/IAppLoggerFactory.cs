@@ -6,7 +6,7 @@
 
         IAppLogger GetLogger<TSource>();
 
-        IAppLogger GetLogger(Type sourceType);
+        IAppLogger GetLogger(Type sourceContext);
 
         #endregion Methods
     }

@@ -24,13 +24,16 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.*" />
     <PackageReference Include="ModernWpfUI" Version="0.9.*" />
     <PackageReference Include="NHotkey.Wpf" Version="2.1.*" />
-    <PackageReference Include="NLog" Version="5.2.*" />
     <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.*" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.*" />
     <PackageReference Include="ReactiveUI.Validation" Version="3.0.*" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.4.*" />
     <PackageReference Include="ScottPlot.WPF" Version="4.1.*" />
-    <PackageReference Include="Splat.NLog" Version="14.6.*" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="2.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Splat.Serilog" Version="14.8.12" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj" />
@@ -41,9 +44,6 @@
     <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="NLog.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

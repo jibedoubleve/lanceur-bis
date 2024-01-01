@@ -28,7 +28,7 @@ namespace Lanceur.Ui
 
         public void Error(string message, Exception ex)
         {
-            _log.Error(message, ex);
+            _log.Error(ex, message);
             _notification.Error(message);
         }
 

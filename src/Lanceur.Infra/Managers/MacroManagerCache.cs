@@ -69,7 +69,7 @@ namespace Lanceur.Infra.Managers
                 _dataService.HydrateMacro(alias);
 
                 macroInstances.Add(name, alias);
-                Log.Trace($"Found macro '{name}'");
+                Log.Trace("Found macro '{name}'", name);
             }
             _macroInstances = macroInstances;
         }

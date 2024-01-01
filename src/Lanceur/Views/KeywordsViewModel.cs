@@ -137,13 +137,13 @@ namespace Lanceur.Views
             var remove = await ConfirmRemove.Handle(alias.Name);
             if (remove)
             {
-                _log.Info($"User removed alias '{alias.Name}'");
+                _log.Info("User removed alias '{Name}'", alias.Name);
                 _aliasService.Remove(alias);
 
                 if (_aliases.Remove(alias)) { _notification.Information($"Removed alias '{alias.Name}'."); }
-                else { _log.Warning($"Impossible to remove the alias '{alias.Name}'"); }
+                else { _log.Warning("Impossible to remove the alias '{Name}'", alias.Name); }
             }
-            else { _log.Debug($"User cancelled the remove of '{alias.Name}'."); }
+            else { _log.Debug("User cancelled the remove of '{Name}'.", alias.Name); }
             return Unit.Default;
         }
 
@@ -168,7 +168,7 @@ namespace Lanceur.Views
                 }
                 catch (ApplicationException ex)
                 {
-                    _log.Warning(ex.Message);
+                    _log.Warning(ex, "Warning: ", ex.Message);
                     _notify.Warning($"Error when {(created ? "creating" : "updating")} the alias: {ex.Message}");
                     return alias;
                 }
@@ -313,15 +313,15 @@ namespace Lanceur.Views
             {
                 try
                 {
-                    _log.Trace($"Cloning alias (type: '{alias.GetType()}'. Thumbnail: '{alias.Thumbnail}'");
+                    _log.Trace("Cloning alias (type: '{alias}'. Thumbnail: '{Thumbnail}'", alias.GetType(), alias.Thumbnail);
                     var toAdd = alias.CloneObject();
                     toAdd.Name = name;
-                    _log.Trace($"Add cloned object (which is a synonym) to the list of alias (name: '{name}')");
+                    _log.Trace("Add cloned object (which is a synonym) to the list of alias (name: '{name}')", name);
                     _aliases.Add(toAdd);
                 }
                 catch (Exception ex)
                 {
-                    _log.Warning($"Error occured while cloning object of type '{alias.GetType()}' with name '{name}'", ex);
+                    _log.Warning(ex, "Error occured while cloning object of type '{alias}' with name '{name}'", alias.GetType(), name);
                     errors.Add(ex);
                 }
             }

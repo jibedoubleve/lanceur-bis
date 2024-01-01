@@ -63,7 +63,7 @@ namespace Lanceur.Infra.Managers
             {
                 if (query.Delay > 0)
                 {
-                    _log.Trace($"Delay of {query.Delay} second(s) before executing the alias");
+                    _log.Trace("Delay of {Delay} second(s) before executing the alias", query.Delay);
                     await Task.Delay(query.Delay * 1000);
                 }
                 if (query.IsUwp())
@@ -85,7 +85,7 @@ namespace Lanceur.Infra.Managers
             query.Parameters = _wildcardManager.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
             ExecuteLuaScript(ref query);
 
-            _log.Debug($"Executing '{query.FileName}' with args '{query.Parameters}'");
+            _log.Debug("Executing '{FileName}' with args '{Parameters}'", query.FileName, query.Parameters);
             var psi = new ProcessStartInfo
             {
                 FileName = _wildcardManager.Replace(query.FileName, query.Parameters),
@@ -99,7 +99,7 @@ namespace Lanceur.Infra.Managers
             if (query.IsElevated || query.RunAs == SharedKernel.Constants.RunAs.Admin)
             {
                 psi.Verb = "runas";
-                _log.Info($"Runs '{query.FileName}' as ADMIN");
+                _log.Info("Runs '{FileName}' as ADMIN", query.FileName);
             }
 
             using var _ = Process.Start(psi);
@@ -118,17 +118,17 @@ namespace Lanceur.Infra.Managers
                 //https://stackoverflow.com/a/23199505/389529
                 psi.UseShellExecute = true;
                 psi.Verb = "runas";
-                _log.Info($"Runs '{query.FileName}' as ADMIN");
+                _log.Info("Runs '{FileName}' as ADMIN", query.FileName);
             }
             else
             {
                 psi.FileName = $"explorer.exe";
                 psi.Arguments = file;
                 psi.UseShellExecute = false;
-                _log.Info($"Runs '{query.FileName}'");
+                _log.Info("Runs '{FileName}'", query.FileName);
             }
 
-            _log.Debug($"Executing packaged application'{file}'");
+            _log.Debug("Executing packaged application'{file}'", file);
             Process.Start(psi);
 
             return QueryResult.NoResult;
@@ -147,11 +147,13 @@ namespace Lanceur.Infra.Managers
             }
             if (request.QueryResult is not IExecutable)
             {
-                _log.Trace($"Alias '{request.QueryResult?.Name ?? "<EMPTY>"}', is not executable. Return '{nameof(ExecutionResponse.NoResult)}'.");
+                var name = request.QueryResult?.Name ?? "<EMPTY>";
+                const string noResult = nameof(ExecutionResponse.NoResult);
+                _log.Trace("Alias '{name}', is not executable. Return '{noResult}'.", name, noResult);
                 return ExecutionResponse.NoResult;
             }
 
-            _log.Info($"Executing alias '{request.QueryResult.Name}'");
+            _log.Info("Executing alias '{Name}'", request.QueryResult.Name);
             _dataService.SetUsage(request.QueryResult);
             switch (request.QueryResult)
             {

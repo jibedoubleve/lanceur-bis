@@ -73,7 +73,8 @@ namespace Lanceur.Macros.Development
                     new DebugMacro("debug cache", "Displays thumbnails in the cache",  Cmdline("debug cache") ),
                 },
             };
-            AppLogFactory.Get<DebugMacro>().Debug($"Executed 'debug {cl.Name.ToLower()}' and found {result.Count()} item(s)");
+            result = result.ToList();
+            AppLogFactory.Get<DebugMacro>().Debug("Executed 'debug {Name}' and found {result} item(s)", cl.Name.ToLower(), result.Count());
             return Task.FromResult(result);
         }
 

@@ -49,7 +49,7 @@ namespace Lanceur.Core.Models
         {
             if (cmdline == null || cmdline.Name.IsNullOrWhiteSpace())
             {
-                _log.Info($"Cannot execute plugin '{Name}': the cmdline is empty.");
+                _log.Info("Cannot execute plugin '{Name}': the cmdline is empty.", Name);
                 return NoResult;
             }
 

@@ -30,7 +30,7 @@ namespace Lanceur.Core.Models
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            _log.Trace($"Change to session '{Name}' with id {Id}");
+            _log.Trace("Change to session '{Name}' with id {Id}", Name, Id);
             _service.SetDefaultSession(Id);
             return NoResultAsync;
         }

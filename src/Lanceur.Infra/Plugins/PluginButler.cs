@@ -101,7 +101,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
 
         if (config == null)
         {
-            _log.Warning($"No plugin manifest in package '{packagePath}'");
+            _log.Warning("No plugin manifest in package '{packagePath}'", packagePath);
             return null;
         }
 
@@ -169,7 +169,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         if (dir is null)
             throw new DirectoryNotFoundException($"Cannot find plugin directory for plugin '{manifest.Name}'.");
 
-        _log.Info($"Add '{dir}' to directory to remove.");
+        _log.Info("Add '{dir}' to directory to remove.", dir);
         AddCandidate(manifest);
 
         os.AddOperation(OperationFactory.RemoveDirectory(Locations.GetAbsolutePath(dir)))

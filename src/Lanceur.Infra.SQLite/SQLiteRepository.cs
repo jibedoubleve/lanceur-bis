@@ -265,14 +265,14 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public void Remove(IEnumerable<SelectableAliasQueryResult> doubloons)
     {
         var selectableAliasQueryResults = doubloons as SelectableAliasQueryResult[] ?? doubloons.ToArray();
-        _log.Info($"Removing {selectableAliasQueryResults.Length} alias(es)");
+        _log.Info("Removing {Length} alias(es)", selectableAliasQueryResults.Length);
         _aliasDbAction.Remove(selectableAliasQueryResults);
     }
 
     ///<inheritdoc/>
     public void Remove(Session session)
     {
-        _log.Info($"Removes session with name '{session.Name}'");
+        _log.Info("Removes session with name '{Name}'", session.Name);
         var action = new SessionDbAction(DB);
         action.Remove(session);
     }
@@ -301,11 +301,11 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         {
             case 0 when !_aliasDbAction.SelectNames(alias, idSession.Value):
                 _aliasDbAction.Create(ref alias, idSession.Value);
-                _log.Info($"Created new alias. (Id: {alias.Id})");
+                _log.Info("Created new alias. (Id: {Id})", alias.Id);
                 break;
 
             case > 0:
-                _log.Info($"Updating alias. (Id: {alias.Id})");
+                _log.Info("Updating alias. (Id: {Id})", alias.Id);
                 _aliasDbAction.Update(alias);
                 break;
         }

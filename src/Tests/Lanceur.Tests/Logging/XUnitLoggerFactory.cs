@@ -24,7 +24,7 @@ namespace Lanceur.Tests.Logging
 
         public IAppLogger GetLogger<TSource>() => new XUnitLogger(_output);
 
-        public IAppLogger GetLogger(Type sourceType) => new XUnitLogger(_output);
+        public IAppLogger GetLogger(Type sourceContext) => new XUnitLogger(_output);
 
         #endregion Methods
     }

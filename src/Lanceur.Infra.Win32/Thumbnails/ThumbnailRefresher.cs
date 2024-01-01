@@ -38,7 +38,8 @@ public class ThumbnailRefresher : IThumbnailRefresher
         if (alias.FileName.IsNullOrEmpty()) return;
         if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon)
         {
-            _log.Trace($"A thumbnail already exists for '{alias.Name}'. Thumbnail: '{alias.Thumbnail ?? WebIcon}'");
+            var thumb = alias.Thumbnail ?? WebIcon;
+            _log.Trace("A thumbnail already exists for '{Name}'. Thumbnail: '{thumb}'", alias.Name, thumb);
             return;
         }
         if (alias.IsPackagedApplication())
@@ -52,7 +53,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
             }
 
             alias.Thumbnail.CopyToImageRepository(alias.FileName);
-            _log.Trace($"Retrieved thumbnail for packaged app '{alias.Name}'. Thumbnail: '{alias.Thumbnail}'");
+            _log.Trace("Retrieved thumbnail for packaged app '{Name}'. Thumbnail: '{Thumbnail}'", alias.Name, alias.Thumbnail);
             return;
         }
 
@@ -63,7 +64,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
             imageSource.CopyToImageRepository(file.Name);
             alias.Thumbnail = file.Name.ToAbsolutePath();
             query.Soil();
-            _log.Trace($"Retrieved thumbnail for win32 application'{alias.Name}'. Thumbnail: '{alias.Thumbnail}'");
+            _log.Trace("Retrieved thumbnail for win32 application'{Name}'. Thumbnail: '{Thumbnail}'", alias.Name, alias.Thumbnail);
             return;
         }
 
@@ -84,7 +85,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
         alias.Thumbnail = favicon;
 
         _ = _favIconManager.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
-        _log.Trace($"Retrieved favicon for alias '{alias.Name}'. Favicon '{alias.FileName}'");
+        _log.Trace("Retrieved favicon for alias '{Name}'. Favicon '{FileName}'", alias.Name, alias.FileName);
     }
 
     #endregion Methods
