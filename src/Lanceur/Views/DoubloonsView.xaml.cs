@@ -29,8 +29,6 @@ namespace Lanceur.Views
                     var result = await Dialogs.YesNoQuestion($"Do you want to delete {interaction.Input} {(value > 1 ? "aliases" : "alias")}?");
                     interaction.SetOutput(result.ToBool());
                 });
-
-                ViewModel.Activate.Execute().Subscribe();
             });
         }
 

@@ -41,7 +41,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
         /// All the alias are updated at once to avoid concurrency issues.Thumbnail
         /// </remarks>
         /// <param name="results">The list a queries that need to have an updated thumbnail.</param>
-        public void RefreshThumbnails(IEnumerable<QueryResult> results)
+        public async Task RefreshThumbnails(IEnumerable<QueryResult> results)
         {
             var queries = EntityDecorator<QueryResult>.FromEnumerable(results)
                                                       .ToArray();
@@ -49,7 +49,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
             using var m = TimePiece.Measure(this, m => _log.Info(m));
             try
             {
-                Parallel.ForEach(queries, _thumbnailRefresher.RefreshCurrentThumbnail);
+                await Task.Run(() => Parallel.ForEach(queries, _thumbnailRefresher.RefreshCurrentThumbnail));
 
                 var aliases = queries.Where(x => x.IsDirty)
                                      .Select(x => x.Entity)
