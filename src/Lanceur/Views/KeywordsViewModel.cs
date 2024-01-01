@@ -183,7 +183,7 @@ namespace Lanceur.Views
             var results = request.Query.IsNullOrEmpty()
                 ? _aliasService.GetAll().ToList()
                 : _aliasService.Search(request.Query).ToList();
-            _thumbnailManager.RefreshThumbnails(results);
+            _thumbnailManager.RefreshThumbnailsAsync(results);
 
             if (request.AliasToCreate == null) return results;
 

@@ -41,7 +41,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
         /// All the alias are updated at once to avoid concurrency issues.Thumbnail
         /// </remarks>
         /// <param name="results">The list a queries that need to have an updated thumbnail.</param>
-        public async Task RefreshThumbnails(IEnumerable<QueryResult> results)
+        public async Task RefreshThumbnailsAsync(IEnumerable<QueryResult> results)
         {
             var queries = EntityDecorator<QueryResult>.FromEnumerable(results)
                                                       .ToArray();

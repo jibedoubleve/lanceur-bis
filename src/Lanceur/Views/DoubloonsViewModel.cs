@@ -93,7 +93,7 @@ namespace Lanceur.Views
         private ObservableCollection<SelectableAliasQueryResult> OnActivate()
         {
             var doubloons = _service.GetDoubloons().ToArray();
-            _thumbnailManager.RefreshThumbnails(doubloons);
+            _thumbnailManager.RefreshThumbnailsAsync(doubloons);
             var results = new ObservableCollection<SelectableAliasQueryResult>(doubloons.Cast<SelectableAliasQueryResult>());
             return results;
         }

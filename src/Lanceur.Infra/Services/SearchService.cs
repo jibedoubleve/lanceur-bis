@@ -37,7 +37,7 @@ namespace Lanceur.Infra.Services
                 : new();
 
             // Refresh the thumbnails
-            _thumbnailManager.RefreshThumbnails(results);
+            _thumbnailManager.RefreshThumbnailsAsync(results);
 
             // Order the list and return the result
             var orderedResults = results.OrderByDescending(e => e.Count)

@@ -145,7 +145,7 @@ namespace Lanceur.Views
         private IEnumerable<QueryResult> OnLoadAliases(long idSession)
         {
             var aliases = _aliasService.GetAll(idSession);
-            _thumbnailManager.RefreshThumbnails(aliases);
+            _thumbnailManager.RefreshThumbnailsAsync(aliases);
             return aliases;
         }
 
