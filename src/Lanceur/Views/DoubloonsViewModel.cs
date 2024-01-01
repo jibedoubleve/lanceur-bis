@@ -11,12 +11,13 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 namespace Lanceur.Views
 {
-    public class DoubloonsViewModel : RoutableViewModel
+    public class DoubloonsViewModel : RoutableViewModel, IActivatableViewModel
     {
         #region Fields
 
@@ -44,29 +45,51 @@ namespace Lanceur.Views
             _notification = notification ?? l.GetService<INotification>();
             _confirmRemove = Interactions.YesNoQuestion(schedulers.MainThreadScheduler);
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: schedulers.MainThreadScheduler);
-            Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+            this.WhenActivated(d =>
+            {
+                Activate = ReactiveCommand.Create(OnActivate, outputScheduler: schedulers.TaskpoolScheduler);
+                Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+                Activate.DisposeWith(d);
 
-            RemoveSelected = ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: schedulers.MainThreadScheduler);
-            RemoveSelected.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+                RemoveSelected =
+                    ReactiveCommand.CreateFromTask(OnRemoveSelected, outputScheduler: schedulers.MainThreadScheduler);
+                RemoveSelected.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+                RemoveSelected.DisposeWith(d);
 
-            this.WhenAnyObservable(vm => vm.Activate)
-                .BindTo(this, vm => vm.Doubloons);
+                this.WhenAnyObservable(vm => vm.Activate)
+                    .BindTo(this, vm => vm.Doubloons)
+                    .DisposeWith(d);
+
+                this.WhenAnyValue(vm => vm.IsActivating)
+                    .Where(x => x)
+                    .Select(_ => Unit.Default)
+                    .InvokeCommand(Activate)
+                    .DisposeWith(d);
+
+                Activate.WhenAnyObservable(x => x.IsExecuting)
+                        .Where(x => !x)
+                        .BindTo(this, vm => vm.IsActivating)
+                        .DisposeWith(d);
+
+                IsActivating = true;
+                // Activate.Execute().Subscribe().DisposeWith(d);
+            });
         }
 
         #endregion Constructors
 
         #region Properties
-
-        public ReactiveCommand<Unit, ObservableCollection<SelectableAliasQueryResult>> Activate { get; }
+        [Reactive] private bool IsActivating { get; set; }
+        public ReactiveCommand<Unit, ObservableCollection<SelectableAliasQueryResult>> Activate { get; private set; }
+        
+        public ViewModelActivator Activator { get; } = new();
         public Interaction<string, bool> ConfirmRemove => _confirmRemove;
         [Reactive] public ObservableCollection<SelectableAliasQueryResult> Doubloons { get; set; }
-        public ReactiveCommand<Unit, Unit> RemoveSelected { get; }
+        public ReactiveCommand<Unit, Unit> RemoveSelected { get; private set;}
 
         #endregion Properties
 
         #region Methods
-
         private ObservableCollection<SelectableAliasQueryResult> OnActivate()
         {
             var doubloons = _service.GetDoubloons().ToArray();

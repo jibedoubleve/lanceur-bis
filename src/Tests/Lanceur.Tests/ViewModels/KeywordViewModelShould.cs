@@ -193,7 +193,7 @@ public class KeywordViewModelShould : SQLiteTest
     });
 
     [Fact]
-    public void RefreshThumbnailsWithoutRemovingAdditionalParameters()
+    public async Task RefreshThumbnailsWithoutRemovingAdditionalParameters()
     {
         // ARRANGE
         var sql = new SqlBuilder().AppendAlias(1, "fileName1", "arguments1")
@@ -227,7 +227,7 @@ public class KeywordViewModelShould : SQLiteTest
         var aliases = dbRepository.Search("a");
 
         // ACT
-        thumbnailManager.RefreshThumbnails(aliases);
+        await thumbnailManager.RefreshThumbnails(aliases);
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))
