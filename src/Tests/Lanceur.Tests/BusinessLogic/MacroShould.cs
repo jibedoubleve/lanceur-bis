@@ -11,6 +11,7 @@ using Lanceur.Macros;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Utils.Macros;
 using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Data.SQLite;
 using System.Reflection;
@@ -22,12 +23,21 @@ namespace Lanceur.Tests.BusinessLogic;
 
 public class MacroShould : SQLiteTest
 {
+    #region Fields
+
     private readonly ITestOutputHelper _output;
+
+    #endregion Fields
+
+    #region Constructors
 
     public MacroShould(ITestOutputHelper output)
     {
         _output = output;
     }
+
+    #endregion Constructors
+
     #region Methods
 
     [Fact]
@@ -36,7 +46,7 @@ public class MacroShould : SQLiteTest
         // ARRANGE
         var srcNamespace = typeof(MultiMacro).Namespace;
         var asm = Assembly.GetAssembly(typeof(MultiMacro));
-        
+
         var types = asm.GetTypes()
                        .Where(type =>
                        {
@@ -147,7 +157,7 @@ public class MacroShould : SQLiteTest
     public void HaveDefaultMacro()
     {
         var asm = Assembly.GetAssembly(typeof(MultiMacro));
-        var logFactory = Substitute.For<IAppLoggerFactory>();
+        var logFactory = Substitute.For<ILoggerFactory>();
         var repository = Substitute.For<IDbRepository>();
         var manager = new MacroManager(asm, logFactory, repository);
 
@@ -221,7 +231,7 @@ public class MacroShould : SQLiteTest
             new() { Name = "macro_3", FileName = "@multi@" }
         };
 
-        var logger = Substitute.For<IAppLoggerFactory>();
+        var logger = Substitute.For<ILoggerFactory>();
         var repository = Substitute.For<IDbRepository>();
         var asm = Assembly.GetExecutingAssembly();
         var manager = new MacroManager(asm, logger, repository);
@@ -277,7 +287,7 @@ public class MacroShould : SQLiteTest
 
         public static IDbRepository GetDataService(SQLiteConnection db)
         {
-            var log = Substitute.For<IAppLoggerFactory>();
+            var log = Substitute.For<ILoggerFactory>();
             var conv = GetConversionService();
             var service = new SQLiteRepository(new SQLiteSingleConnectionManager(db), log, conv);
             return service;

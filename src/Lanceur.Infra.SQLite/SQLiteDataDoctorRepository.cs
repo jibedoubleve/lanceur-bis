@@ -1,8 +1,8 @@
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite;
 
@@ -18,7 +18,7 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
 
     public SQLiteDataDoctorRepository(
         IDbConnectionManager manager,
-        IAppLoggerFactory logFactory) : base(manager) => _dbAction = new(DB, logFactory);
+        ILoggerFactory logFactory) : base(manager) => _dbAction = new(DB, logFactory);
 
     #endregion Constructors
 

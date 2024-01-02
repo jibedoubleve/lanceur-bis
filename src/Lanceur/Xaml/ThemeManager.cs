@@ -1,7 +1,8 @@
 ﻿using ControlzEx.Theming;
-using Lanceur.Core.Services;
-using Lanceur.Utils;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -14,9 +15,9 @@ namespace Lanceur.Xaml
 
         private const string DarkTheme = "Dark.Accent1";
         private const string LightTheme = "Light.Accent1";
-        private static readonly IAppLogger Log = AppLogFactory.Get<ThemeManager>();
-        private Application _app;
         private static ThemeManager _instance;
+        private readonly ILogger<ThemeManager> _logger;
+        private Application _app;
 
         #endregion Fields
 
@@ -24,6 +25,7 @@ namespace Lanceur.Xaml
 
         private ThemeManager(Application app)
         {
+            _logger = Locator.Current.GetService<ILoggerFactory>().GetLogger<ThemeManager>();
             _app = app;
 
             var lightThemeUri = new Uri("pack://application:,,,/Xaml/Themes/LightTheme.xaml");
@@ -106,7 +108,7 @@ namespace Lanceur.Xaml
                 _ => throw new NotSupportedException($"The theme '{theme}' is not supported!")
             };
 
-            Log.Trace("Applying theme '{themeToApply}'. Asked theme is '{theme}'", themeToApply, theme);
+            _logger.LogDebug("Applying theme {ThemeToApply}. Requested theme is {Theme}", themeToApply, theme);
             ControlzEx.Theming.ThemeManager.Current.ChangeTheme(_app, themeToApply);
         }
 

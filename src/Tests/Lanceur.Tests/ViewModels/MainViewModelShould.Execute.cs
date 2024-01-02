@@ -7,6 +7,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Tests.Utils.Builders;
 using Lanceur.Tests.Utils.ReservedAliases;
+using Microsoft.Extensions.Logging;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
@@ -188,7 +189,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var logFactory = Substitute.For<IAppLoggerFactory>();
+                var logFactory = Substitute.For<ILoggerFactory>();
                 var wildcardManager = Substitute.For<IWildcardManager>();
                 var dataService = Substitute.For<IDbRepository>();
                 var cmdlineManager = Substitute.For<ICmdlineManager>();

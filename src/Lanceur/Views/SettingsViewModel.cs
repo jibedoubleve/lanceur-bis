@@ -1,7 +1,8 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -17,7 +18,7 @@ namespace Lanceur.Views
         private readonly HistoryViewModel _historyVm;
         private readonly InvalidAliasViewModel _invalidAliasVm;
         private readonly KeywordsViewModel _keywordVm;
-        private readonly IAppLogger _log;
+        private readonly ILogger<SettingsViewModel> _logger;
         private readonly MostUsedViewModel _mostUsedVm;
         private readonly PluginsViewModel _pluginsViewModel;
         private readonly IDbRepository _service;
@@ -30,7 +31,7 @@ namespace Lanceur.Views
         #region Constructors
 
         public SettingsViewModel(
-            IAppLoggerFactory logFactory = null,
+            ILoggerFactory logFactory = null,
             KeywordsViewModel keywordVm = null,
             SessionsViewModel sessionsVm = null,
             AppSettingsViewModel settingsVm = null,
@@ -47,7 +48,7 @@ namespace Lanceur.Views
             Router = l.GetService<RoutingState>();
 
             notify ??= l.GetService<IUserNotification>();
-            _log = l.GetLogger<SettingsViewModel>(logFactory);
+            _logger = logFactory.GetLogger<SettingsViewModel>();
             _keywordVm = keywordVm ?? l.GetService<KeywordsViewModel>();
             _sessionsVm = sessionsVm ?? l.GetService<SessionsViewModel>();
             _settingsVm = settingsVm ?? l.GetService<AppSettingsViewModel>();
@@ -85,15 +86,15 @@ namespace Lanceur.Views
         private IObservable<IRoutableViewModel> OnAddAlias(string aliasName)
         {
             _keywordVm.AliasToCreate = AliasQueryResult.FromName(aliasName);
-            _log.Debug("Request creation of alias '{aliasName}'", aliasName);
+            _logger.LogDebug("Request creation of alias {AliasName}", aliasName);
             return Router.Navigate.Execute(_keywordVm);
         }
 
-        private IObservable<IRoutableViewModel> OnPushNavigation(string arg)
+        private IObservable<IRoutableViewModel> OnPushNavigation(string route)
         {
-            arg ??= "<null>";
-            _log.Trace("Navigate to '{arg}'", arg);
-            switch (arg.ToLower())
+            route ??= "<null>";
+            _logger.LogInformation("Navigate to {Route}", route);
+            switch (route.ToLower())
             {
                 case "keywordsview":
                     var sessionName = _service.GetDefaultSession()?.FullName ?? "N.A.";
@@ -133,7 +134,7 @@ namespace Lanceur.Views
                     return Router.Navigate.Execute(_pluginsViewModel);
 
                 default:
-                    Title = $"The view '{arg}' do not exist.";
+                    Title = $"The view '{route}' do not exist.";
                     return Router.Navigate.Execute(_settingsVm);
             }
         }

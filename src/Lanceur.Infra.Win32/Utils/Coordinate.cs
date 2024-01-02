@@ -1,6 +1,4 @@
-﻿using System.Windows.Navigation;
-
-namespace Lanceur.Infra.Win32.Utils
+﻿namespace Lanceur.Infra.Win32.Utils
 {
     public class Coordinate
     {

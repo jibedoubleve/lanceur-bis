@@ -1,8 +1,8 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 using Splat;
 using System.ComponentModel;
 using System.Reflection;
@@ -13,18 +13,18 @@ namespace Lanceur.Infra.Managers
     {
         #region Fields
 
-        private Dictionary<string, ISelfExecutable> _macroInstances;
         private readonly Assembly _asm;
         private readonly IDbRepository _dataService;
+        private Dictionary<string, ISelfExecutable> _macroInstances;
 
         #endregion Fields
 
         #region Constructors
 
-        internal MacroManagerCache(Assembly asm, IAppLoggerFactory logFactory, IDbRepository repository)
+        internal MacroManagerCache(Assembly asm, ILoggerFactory logFactory, IDbRepository repository)
         {
             _asm = asm;
-            Log = Locator.Current.GetLogger<MacroManager>(logFactory);
+            Logger = logFactory.GetLogger<MacroManager>();
             _dataService = repository ?? Locator.Current.GetService<IDbRepository>();
         }
 
@@ -32,7 +32,7 @@ namespace Lanceur.Infra.Managers
 
         #region Properties
 
-        protected IAppLogger Log { get;  }
+        protected ILogger<MacroManager> Logger { get; }
 
         protected Dictionary<string, ISelfExecutable> MacroInstances
         {
@@ -69,7 +69,7 @@ namespace Lanceur.Infra.Managers
                 _dataService.HydrateMacro(alias);
 
                 macroInstances.Add(name, alias);
-                Log.Trace("Found macro '{name}'", name);
+                Logger.LogDebug("Found macro {Name}", name);
             }
             _macroInstances = macroInstances;
         }

@@ -12,20 +12,21 @@ namespace Lanceur.Infra.Win32.Thumbnails
 
         #region Methods
 
+        public static string GetKeyForFavIcon(this string address)
+        {
+            ArgumentNullException.ThrowIfNull(address);
+            return Uri.TryCreate(address, new UriCreationOptions(), out _)
+                ? $"{AppPaths.FaviconPrefix}{new Uri(address).Host}"
+                : string.Empty;
+        }
+
         public static bool IsUrl(this string address)
         {
             var result = Uri.TryCreate(address, new UriCreationOptions(), out var uri)
                          && SupportedSchemes.Contains(uri.Scheme);
             return result;
+        }
 
-        }
-        public static string GetKeyForFavIcon(this string address)
-        {
-            ArgumentNullException.ThrowIfNull(address);
-            return Uri.TryCreate(address, new UriCreationOptions(), out _) 
-                ? $"{AppPaths.FaviconPrefix}{new Uri(address).Host}" 
-                : string.Empty;
-        }
         #endregion Methods
     }
 }

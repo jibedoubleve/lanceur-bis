@@ -7,16 +7,17 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
+using Lanceur.Macros.Development;
 using Lanceur.Tests.Utils;
 using Lanceur.Tests.Utils.Builders;
 using Lanceur.Tests.Utils.ReservedAliases;
 using Lanceur.Views.Mixins;
+using Microsoft.Extensions.Logging;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
 using Splat;
 using System.Reactive.Concurrency;
-using Lanceur.Macros.Development;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -48,7 +49,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                Substitute.For<IAppLoggerFactory>();
+                Substitute.For<ILoggerFactory>();
 
                 var executor = Substitute.For<IExecutionManager>();
                 executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
@@ -76,7 +77,7 @@ namespace Lanceur.Tests.ViewModels
                 vm.CurrentAlias?.Name?.Should().Be(result);
             });
         }
-        
+
         [Fact]
         public void NotifyWhenCriterionChanges()
         {

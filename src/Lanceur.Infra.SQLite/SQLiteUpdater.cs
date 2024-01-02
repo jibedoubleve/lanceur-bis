@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite
 {
@@ -8,7 +9,7 @@ namespace Lanceur.Infra.SQLite
     {
         #region Fields
 
-        private readonly IAppLogger _log;
+        private readonly ILogger<SQLiteUpdater> _logger;
         private readonly IDataStoreUpdateManager _updater;
         private readonly IDataStoreVersionManager _versionManager;
 
@@ -18,12 +19,12 @@ namespace Lanceur.Infra.SQLite
 
         public SQLiteUpdater(
             IDataStoreVersionManager versionManager,
-            IAppLoggerFactory logService,
+            ILoggerFactory logService,
             IDataStoreUpdateManager updater
             )
         {
             _versionManager = versionManager;
-            _log = logService.GetLogger<SQLiteUpdater>();
+            _logger = logService.GetLogger<SQLiteUpdater>();
             _updater = updater;
         }
 
@@ -43,7 +44,7 @@ namespace Lanceur.Infra.SQLite
             if (!File.Exists(dbPath))
             {
                 CreateDirectory(dbPath);
-                _log.Warning("Creating a new database in '{dbPath}'", dbPath);
+                _logger.LogWarning("Creating a new database in {DbPath}", dbPath);
                 _updater.UpdateFromScratch();
                 _updater.SetLatestVersion();
             }
@@ -54,11 +55,11 @@ namespace Lanceur.Infra.SQLite
 
                 if (_versionManager.IsUpToDate(latestVer) == false)
                 {
-                    _log.Warning("Database V.{currentVer} is out of date. Updating to V.{latestVer}", currentVer, latestVer);
+                    _logger.LogWarning("Database V.{CurrentVer} is out of date. Updating to V.{LatestVer}", currentVer, latestVer);
                     _updater.UpdateFrom(currentVer);
                     _updater.SetLatestVersion();
                 }
-                else { _log.Info("Database V.{currentVer} is up to date. Latest script version is V.{latestVer}", currentVer, latestVer); }
+                else { _logger.LogInformation("Database V.{CurrentVer} is up to date. Latest script version is V.{LatestVer}", currentVer, latestVer); }
             }
         }
 

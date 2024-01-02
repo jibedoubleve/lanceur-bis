@@ -1,4 +1,5 @@
 ﻿using Lanceur.Converters.Reactive;
+using Lanceur.Infra.Logging;
 using Lanceur.Ui;
 using Lanceur.Utils;
 using ReactiveUI;
@@ -23,7 +24,7 @@ namespace Lanceur.Views
 
             this.WhenActivated(d =>
             {
-                AppLogFactory.Get<KeywordsView>().Trace("Activating {KeywordsView}", nameof(KeywordsView));
+                StaticLoggerFactory.GetLogger<KeywordsView>().LogActivate<KeywordsView>();
 
                 ViewModel.AskLuaEditor.RegisterHandler(interaction =>
                 {
@@ -50,8 +51,8 @@ namespace Lanceur.Views
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.BusyControl.Visibility).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.AliasList.Visibility, val => val.ToVisibilityInverted()).DisposeWith(d);
                 this.OneWayBind(
-                    ViewModel, 
-                    vm => vm.SelectedAlias, 
+                    ViewModel,
+                    vm => vm.SelectedAlias,
                     v => v.BtnDeleteAlias.Content,
                     val => val is null ? "Delete" : val.Id == 0 ? "Discard" : "Delete").DisposeWith(d);
 

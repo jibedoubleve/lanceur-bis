@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Plugins.Models;
-using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Core.Models
 {
@@ -9,16 +9,16 @@ namespace Lanceur.Core.Models
     {
         #region Fields
 
-        private readonly IAppLogger _log;
+        private readonly ILogger<PluginExecutableQueryResult> _logger;
         private readonly IPlugin _plugin;
 
         #endregion Fields
 
         #region Constructors
 
-        public PluginExecutableQueryResult(IPlugin plugin, IAppLoggerFactory logFactory)
+        public PluginExecutableQueryResult(IPlugin plugin, ILoggerFactory loggerFactory)
         {
-            _log = logFactory.GetLogger<PluginExecutableQueryResult>();
+            _logger = loggerFactory.CreateLogger<PluginExecutableQueryResult>();
             _plugin = plugin;
             Name = plugin.Name;
             Icon = plugin.Icon;
@@ -49,7 +49,7 @@ namespace Lanceur.Core.Models
         {
             if (cmdline == null || cmdline.Name.IsNullOrWhiteSpace())
             {
-                _log.Info("Cannot execute plugin '{Name}': the cmdline is empty.", Name);
+                _logger.LogInformation("Cannot execute plugin {Name}: the cmdline is empty", Name);
                 return NoResult;
             }
 

@@ -1,7 +1,6 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
-using Lanceur.Macros;
 using Lanceur.Macros.Development;
 using Xunit;
 
@@ -17,7 +16,7 @@ namespace Lanceur.Tests.Utils
             {
                 return new()
                 {
-                    Results = await macro.ExecuteAsync(new Cmdline("debug")),
+                    Results = await macro.ExecuteAsync(new("debug")),
                 };
             }
             else

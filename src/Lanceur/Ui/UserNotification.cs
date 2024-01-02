@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 using Splat;
 using System;
 
@@ -9,16 +10,16 @@ namespace Lanceur.Ui
     {
         #region Fields
 
-        private readonly IAppLogger _log;
+        private readonly ILogger<UserNotification> _logger;
         private readonly INotification _notification;
 
         #endregion Fields
 
         #region Constructors
 
-        public UserNotification(IAppLoggerFactory logFactory = null, INotification notification = null)
+        public UserNotification(ILoggerFactory logFactory = null, INotification notification = null)
         {
-            _log = Locator.Current.GetLogger<UserNotification>(logFactory);
+            _logger = logFactory.GetLogger<UserNotification>();
             _notification = notification ?? Locator.Current.GetService<INotification>(); ;
         }
 
@@ -26,15 +27,17 @@ namespace Lanceur.Ui
 
         #region Methods
 
+        //TODO: refactor logging... It's not optimised
         public void Error(string message, Exception ex)
         {
-            _log.Error(ex, message);
+            _logger.LogError(ex, message);
             _notification.Error(message);
         }
 
+        //TODO: refactor logging... It's not optimised
         public void Warning(string message, Exception ex = null)
         {
-            _log.Warning(message, ex);
+            _logger.LogWarning(message, ex);
             _notification.Warning(message);
         }
 

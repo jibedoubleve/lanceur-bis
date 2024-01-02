@@ -12,7 +12,7 @@ namespace Lanceur.Core.Models
         public static string GetMacroName(this AliasQueryResult @this)
         {
             if (@this is null) return string.Empty;
-            
+
             var regex = new Regex("@(.*)@");
             var result = regex.IsMatch(@this.FileName ?? string.Empty)
                 ? regex.Match(@this.FileName ?? string.Empty).Groups[1].Value

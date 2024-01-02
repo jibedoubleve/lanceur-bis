@@ -21,7 +21,7 @@ namespace Lanceur.ReservedKeywords
 
         #region Constructors
 
-        public SessionListAlias() : this(null, null)
+        public SessionListAlias() : this(null)
         {
         }
 

@@ -7,7 +7,7 @@ namespace Lanceur.Tests.Logging
     {
         #region Fields
 
-        private static string TAB = "  ";
+        private const string Tab = "  ";
 
         #endregion Fields
 
@@ -21,13 +21,13 @@ namespace Lanceur.Tests.Logging
 
         public static void Assert(this ITestOutputHelper output) => output.Write("---- ASSERT", nameof(Info));
 
-        public static void Debug(this ITestOutputHelper output, string message) => output.Write($"{TAB}{message}");
+        public static void Debug(this ITestOutputHelper output, string message) => output.Write($"{Tab}{message}");
 
-        public static void Error(this ITestOutputHelper output, string message) => output.Write($"{TAB}{message}");
+        public static void Error(this ITestOutputHelper output, string message) => output.Write($"{Tab}{message}");
 
-        public static void Info(this ITestOutputHelper output, string message) => output.Write($"{TAB}{message}");
+        public static void Info(this ITestOutputHelper output, string message) => output.Write($"{Tab}{message}");
 
-        public static void Warn(this ITestOutputHelper output, string message) => output.Write($"{TAB}{message}");
+        public static void Warn(this ITestOutputHelper output, string message) => output.Write($"{Tab}{message}");
 
         #endregion Methods
     }

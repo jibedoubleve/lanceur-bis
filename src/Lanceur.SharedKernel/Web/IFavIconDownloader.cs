@@ -9,6 +9,13 @@ namespace Lanceur.SharedKernel.Web
         #region Methods
 
         /// <summary>
+        /// Check whether the website exists
+        /// </summary>
+        /// <param name="url">The URL to check</param>
+        /// <returns><c>True</c> if the website exists; otherwise <c>False</c></returns>
+        Task<bool> CheckExistsAsync(Uri url);
+
+        /// <summary>
         /// Download the favicon and save it to a file. If there's no
         /// favicon, nothing is saved
         /// </summary>
@@ -16,13 +23,6 @@ namespace Lanceur.SharedKernel.Web
         /// <param name="path">The path of the file to create.</param>
         /// <returns><c>True</c> if favicon was found at the specified address; otherwise <c>False</c></returns>
         Task<bool> SaveToFileAsync(Uri url, string path);
-
-        /// <summary>
-        /// Check whether the website exists
-        /// </summary>
-        /// <param name="url">The URL to check</param>
-        /// <returns><c>True</c> if the website exists; otherwise <c>False</c></returns>
-        Task<bool> CheckExistsAsync(Uri url);
 
         #endregion Methods
     }

@@ -5,8 +5,8 @@
         #region Properties
 
         public static ScriptContext Empty => new();
-        public string FileName { get; set; }
-        public string Parameters { get; set; }
+        public string FileName { get; init; }
+        public string Parameters { get; init; }
 
         #endregion Properties
     }

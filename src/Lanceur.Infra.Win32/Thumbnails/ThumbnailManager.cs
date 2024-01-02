@@ -1,9 +1,10 @@
-﻿using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Decorators;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Utils;
-using Lanceur.Core.Decorators;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails
 {
@@ -12,7 +13,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
         #region Fields
 
         private readonly IDbRepository _dbRepository;
-        private readonly IAppLogger _log;
+        private readonly ILogger<ThumbnailManager> _logger;
         private readonly IThumbnailRefresher _thumbnailRefresher;
 
         #endregion Fields
@@ -20,13 +21,13 @@ namespace Lanceur.Infra.Win32.Thumbnails
         #region Constructors
 
         public ThumbnailManager(
-            IAppLoggerFactory loggerFactory,
+            ILoggerFactory loggerFactory,
             IDbRepository dbRepository,
             IThumbnailRefresher thumbnailRefresher)
         {
             _dbRepository = dbRepository;
             _thumbnailRefresher = thumbnailRefresher;
-            _log = loggerFactory.GetLogger<ThumbnailManager>();
+            _logger = loggerFactory.GetLogger<ThumbnailManager>();
         }
 
         #endregion Constructors
@@ -46,7 +47,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
             var queries = EntityDecorator<QueryResult>.FromEnumerable(results)
                                                       .ToArray();
 
-            using var m = TimePiece.Measure(this, m => _log.Info(m));
+            using var m = TimePiece.Measure(this, (msg, @params) => _logger.LogTrace(msg, @params));
             try
             {
                 await Task.Run(() => Parallel.ForEach(queries, _thumbnailRefresher.RefreshCurrentThumbnail));
@@ -62,7 +63,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
             }
             catch (Exception ex)
             {
-                _log.Warning(ex, $"An error occured during the refresh of the icons. ('{ex}')", ex.Message);
+                _logger.LogWarning(ex, "An error occured during the refresh of the icons");
             }
         }
 

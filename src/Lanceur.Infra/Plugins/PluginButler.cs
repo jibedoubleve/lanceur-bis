@@ -1,6 +1,7 @@
 using Lanceur.Core.Plugins;
-using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.IO.Compression;
 using System.IO.FileOps.Core;
@@ -24,7 +25,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
     /// </remarks>
     private static readonly Dictionary<string, IPluginManifest> MutableUninstallationCandidates = new();
 
-    private readonly IAppLogger _log;
+    private readonly ILogger<PluginButler> _logger;
     private readonly IPluginValidationRule<PluginValidationResult, PluginManifest> _pluginValidationRule;
 
     #endregion Fields
@@ -32,14 +33,14 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
     #region Constructors
 
     public PluginButler(
-            IAppLoggerFactory appLoggerFactory,
+            ILoggerFactory appLoggerFactory,
             IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule)
     {
         ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
         ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
 
         _pluginValidationRule = pluginValidationRule;
-        _log = appLoggerFactory.GetLogger<PluginButler>();
+        _logger = appLoggerFactory.GetLogger<PluginButler>();
     }
 
     #endregion Constructors
@@ -101,7 +102,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
 
         if (config == null)
         {
-            _log.Warning("No plugin manifest in package '{packagePath}'", packagePath);
+            _logger.LogWarning("No plugin manifest in package {PackagePath}", packagePath);
             return null;
         }
 
@@ -117,7 +118,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         var validation = _pluginValidationRule.Check(manifest);
         if (!validation.IsValid)
         {
-            _log.Warning(validation.Message);
+            _logger.LogWarning("Validation failed: {ValidationMsg}", validation.Message);
             return PluginInstallationResult.Error(validation.Message);
         }
 
@@ -169,7 +170,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         if (dir is null)
             throw new DirectoryNotFoundException($"Cannot find plugin directory for plugin '{manifest.Name}'.");
 
-        _log.Info("Add '{dir}' to directory to remove.", dir);
+        _logger.LogInformation("Add {Directory} to directory to remove", dir);
         AddCandidate(manifest);
 
         os.AddOperation(OperationFactory.RemoveDirectory(Locations.GetAbsolutePath(dir)))

@@ -1,7 +1,8 @@
-﻿using System.IO;
-using System.Windows.Media;
-using Lanceur.Core.Services;
+﻿using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 using Splat;
+using System.IO;
+using System.Windows.Media;
 
 namespace Lanceur.Infra.Win32.Thumbnails
 {
@@ -10,7 +11,8 @@ namespace Lanceur.Infra.Win32.Thumbnails
         #region Fields
 
         private const int ThumbnailSize = 64;
-        private static readonly IAppLoggerFactory AppLogFactory = Locator.Current.GetService<IAppLoggerFactory>()!;
+        private static readonly Microsoft.Extensions.Logging.ILogger _logger;
+        private static readonly ILoggerFactory AppLogFactory = Locator.Current.GetService<ILoggerFactory>()!;
         private static readonly Dictionary<string, ImageSource> Cache = new();
 
         private static readonly string[] ImageExtensions =
@@ -25,6 +27,16 @@ namespace Lanceur.Infra.Win32.Thumbnails
         };
 
         #endregion Fields
+
+        #region Constructors
+
+        static ThumbnailLoader()
+        {
+            var factory = Locator.Current.GetService<ILoggerFactory>();
+            _logger = factory.GetLogger(typeof(ThumbnailLoader));
+        }
+
+        #endregion Constructors
 
         #region Enums
 
@@ -51,6 +63,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
                 options
                 );
         }
+
         public static ImageSource? GetThumbnail(string path)
         {
             ImageSource? image = null;
@@ -88,8 +101,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
             }
             catch (Exception ex)
             {
-                AppLogFactory!.GetLogger(typeof(ThumbnailLoader))
-                              .Warning(ex, "Failed to extract thumbnail for {path}", path);
+                _logger.LogWarning(ex, "Failed to extract thumbnail for {Path}", path);
             }
 
             //Return the value event if null;

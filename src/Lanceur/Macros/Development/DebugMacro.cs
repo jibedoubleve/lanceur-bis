@@ -2,9 +2,10 @@
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.Ui;
 using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
 using System.Collections.Generic;
@@ -17,6 +18,12 @@ namespace Lanceur.Macros.Development
     [Macro("debug"), Description("Provides some debugging tools. But it is more an easter egg than something else")]
     public class DebugMacro : MacroQueryResult
     {
+        #region Fields
+
+        private readonly ILogger<DebugMacro> _logger;
+
+        #endregion Fields
+
         #region Constructors
 
         internal DebugMacro(string name, string description, Cmdline query)
@@ -24,6 +31,7 @@ namespace Lanceur.Macros.Development
             Name = name;
             Query = query;
             Description = description;
+            _logger = Locator.Current.GetService<LoggerFactory>().GetLogger<DebugMacro>();
         }
 
         public DebugMacro()
@@ -74,7 +82,7 @@ namespace Lanceur.Macros.Development
                 },
             };
             result = result.ToList();
-            AppLogFactory.Get<DebugMacro>().Debug("Executed 'debug {Name}' and found {result} item(s)", cl.Name.ToLower(), result.Count());
+            StaticLoggerFactory.GetLogger<DebugMacro>().LogDebug("Executed 'debug {Name}' and found {Result} item(s)", cl.Name.ToLower(), result.Count());
             return Task.FromResult(result);
         }
 

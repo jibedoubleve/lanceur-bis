@@ -2,10 +2,11 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
 using Lanceur.Models;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -25,7 +26,7 @@ namespace Lanceur.Views
 
         private readonly IDbRepository _aliasService;
         private readonly Interaction<string, bool> _confirmRemove;
-        private readonly IAppLogger _log;
+        private readonly ILogger<SessionsViewModel> _logger;
         private readonly INotification _notification;
         private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
@@ -36,7 +37,7 @@ namespace Lanceur.Views
 
         public SessionsViewModel(
             ISchedulerProvider schedulers = null,
-            IAppLoggerFactory logFactory = null,
+            ILoggerFactory logFactory = null,
             IDbRepository aliasService = null,
             IUserNotification notify = null,
             IThumbnailManager thumbnailManager = null,
@@ -44,7 +45,7 @@ namespace Lanceur.Views
         {
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
-            _log = l.GetLogger<SessionsViewModel>(logFactory);
+            _logger = logFactory.GetLogger<SessionsViewModel>();
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _aliasService = aliasService ?? l.GetService<IDbRepository>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
@@ -155,7 +156,7 @@ namespace Lanceur.Views
             if (delete)
             {
                 _aliasService.Remove(session.ToEntity());
-                _log.Trace("Removed session with id '{Id}'", session.Id);
+                _logger.LogInformation("Removed session with id {Id}", session.Id);
                 _notification.Information($"Session '{session.Name}' removed.");
                 return session;
             }
@@ -164,22 +165,19 @@ namespace Lanceur.Views
 
         private SessionModel OnSaveSession(SessionModel session)
         {
-            if (session is not null)
+            if (session is null)
             {
-                _log.Trace("Save session {Id}", session.Id);
-                var entity = session.ToEntity();
-
-                _aliasService.Update(ref entity);
-
-                session.Id = entity.Id;
-                _notification.Information($"Session '{session.Name}' updated.");
-                return session;
-            }
-            else
-            {
-                _log.Warning("Trying to change the default session to a null.");
+                _logger.LogWarning("Trying to change the default session to a null");
                 return null;
             }
+
+            var entity = session.ToEntity();
+
+            _notification.Information($"Updating session {session.Name}");
+            _aliasService.Update(ref entity);
+
+            session.Id = entity.Id;
+            return session;
         }
 
         #endregion Methods

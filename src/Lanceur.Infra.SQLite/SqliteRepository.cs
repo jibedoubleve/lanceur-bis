@@ -2,8 +2,10 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.SQLite;
@@ -16,7 +18,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     private readonly AliasSearchDbAction _aliasSearchDbAction;
     private readonly IConvertionService _converter;
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
-    private readonly IAppLogger _log;
+    private readonly ILogger<SQLiteRepository> _logger;
     private readonly SetUsageDbAction _setUsageDbAction;
 
     #endregion Fields
@@ -25,13 +27,13 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 
     public SQLiteRepository(
         IDbConnectionManager manager,
-        IAppLoggerFactory logFactory,
+        ILoggerFactory logFactory,
         IConvertionService converter) : base(manager)
     {
         ArgumentNullException.ThrowIfNull(logFactory);
         ArgumentNullException.ThrowIfNull(converter);
 
-        _log = logFactory.GetLogger<SQLiteRepository>();
+        _logger = logFactory.GetLogger<SQLiteRepository>();
         _converter = converter;
         _aliasDbAction = new(manager, logFactory);
         _getAllAliasDbAction = new(manager, logFactory);
@@ -42,13 +44,6 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     #endregion Constructors
 
     #region Methods
-
-    ///<inheritdoc/>
-    public ExistingNameResponse SelectNames(string[] names, long? idSession = null)
-    {
-        idSession ??= GetDefaultSessionId();
-        return _aliasDbAction.SelectNames(names, idSession.Value);
-    }
 
     /// <summary>
     /// Returns all the alias of the specified session from the repository.
@@ -265,14 +260,14 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public void Remove(IEnumerable<SelectableAliasQueryResult> doubloons)
     {
         var selectableAliasQueryResults = doubloons as SelectableAliasQueryResult[] ?? doubloons.ToArray();
-        _log.Info("Removing {Length} alias(es)", selectableAliasQueryResults.Length);
+        _logger.LogInformation("Removing {Length} alias(es)", selectableAliasQueryResults.Length);
         _aliasDbAction.Remove(selectableAliasQueryResults);
     }
 
     ///<inheritdoc/>
     public void Remove(Session session)
     {
-        _log.Info("Removes session with name '{Name}'", session.Name);
+        _logger.LogInformation("Removes session with name {Name}. Session: {@Session}", session.Name, session);
         var action = new SessionDbAction(DB);
         action.Remove(session);
     }
@@ -295,17 +290,18 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         ArgumentNullException.ThrowIfNull(alias.Synonyms, nameof(alias.Synonyms));
         ArgumentNullException.ThrowIfNull(alias.Id, nameof(alias.Id));
 
+        using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
         idSession ??= GetDefaultSessionId();
 
         switch (alias.Id)
         {
             case 0 when !_aliasDbAction.SelectNames(alias, idSession.Value):
                 _aliasDbAction.Create(ref alias, idSession.Value);
-                _log.Info("Created new alias. (Id: {Id})", alias.Id);
+                _logger.LogInformation("Created new alias {AliasName}", alias.Name);
                 break;
 
             case > 0:
-                _log.Info("Updating alias. (Id: {Id})", alias.Id);
+                _logger.LogInformation("Updating alias {AliasName}", alias.Name);
                 _aliasDbAction.Update(alias);
                 break;
         }
@@ -327,6 +323,13 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         return _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria, idSession.Value);
     }
 
+    ///<inheritdoc/>
+    public ExistingNameResponse SelectNames(string[] names, long? idSession = null)
+    {
+        idSession ??= GetDefaultSessionId();
+        return _aliasDbAction.SelectNames(names, idSession.Value);
+    }
+
     public void SetDefaultSession(long idSession)
     {
         var sql = @"
@@ -342,13 +345,13 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     {
         if (alias is null)
         {
-            _log.Info("Impossible to set usage: alias is null.;");
+            _logger.LogInformation("Impossible to set usage: alias is null");
             return;
         }
 
         if (alias.Name.IsNullOrEmpty())
         {
-            _log.Info("Impossible to set usage: alias name is empty.");
+            _logger.LogInformation("Impossible to set usage: alias name is empty. Alias: {@Alias}", alias);
             return;
         }
 

@@ -39,12 +39,16 @@ namespace Lanceur.Core.LuaScripting
 
         public ScriptContext Context { get; init; }
 
-        public ScriptResult EmptyResult => new ScriptResult
+        #endregion Properties
+
+        #region Methods
+
+        public ScriptResult CloneWithoutContext() => new()
         {
             Code = Code,
             Context = ScriptContext.Empty
         };
 
-        #endregion Properties
+        #endregion Methods
     }
 }

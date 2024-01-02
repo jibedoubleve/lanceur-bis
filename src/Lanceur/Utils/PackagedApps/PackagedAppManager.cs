@@ -1,6 +1,6 @@
-﻿using System;
-using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Responses;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -61,9 +61,9 @@ namespace Lanceur.Utils.PackagedApps
                                      && p.IsInDirectory(srcDir)
                                select p).ToList();
 
-                var currentPkg = results.FirstOrDefault() 
+                var currentPkg = results.FirstOrDefault()
                     ?? throw new NullReferenceException($"No package for '{fileName}' found for the current user");
-                
+
                 _cache.Add(fileName, currentPkg);
                 return currentPkg;
             });

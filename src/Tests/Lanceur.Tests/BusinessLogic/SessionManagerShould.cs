@@ -4,6 +4,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Tests.SQLite;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Data.SQLite;
 using Xunit;
@@ -37,7 +38,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var scope = new SQLiteSingleConnectionManager(BuildConnection());
             CreateTableAndPopulate(scope);
-            var service = new SQLiteRepository(scope, Substitute.For<IAppLoggerFactory>(), Substitute.For<IConvertionService>());
+            var service = new SQLiteRepository(scope, Substitute.For<ILoggerFactory>(), Substitute.For<IConvertionService>());
 
             service.GetSessions().Should().HaveCount(10);
         }

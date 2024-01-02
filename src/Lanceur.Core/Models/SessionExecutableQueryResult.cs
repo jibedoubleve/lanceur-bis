@@ -1,5 +1,5 @@
 ﻿using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Core.Models
 {
@@ -7,7 +7,7 @@ namespace Lanceur.Core.Models
     {
         #region Fields
 
-        private readonly IAppLogger _log;
+        private readonly ILogger<SessionExecutableQueryResult> _logger;
         private readonly IDbRepository _service;
 
         #endregion Fields
@@ -17,10 +17,10 @@ namespace Lanceur.Core.Models
         public SessionExecutableQueryResult(
             string name,
             string description,
-            IAppLoggerFactory logFactory,
+            ILogger<SessionExecutableQueryResult> logger,
             IDbRepository service) : base(name, description)
         {
-            _log = logFactory.GetLogger<SessionExecutableQueryResult>();
+            _logger = logger;
             _service = service;
         }
 
@@ -30,7 +30,7 @@ namespace Lanceur.Core.Models
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-            _log.Trace("Change to session '{Name}' with id {Id}", Name, Id);
+            _logger.LogInformation("Change to session {Name} with id {Id}", Name, Id);
             _service.SetDefaultSession(Id);
             return NoResultAsync;
         }

@@ -8,7 +8,9 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.Constants;
 using Lanceur.Infra.Formatters;
+using Lanceur.Infra.Logging;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Plugins;
 using Lanceur.Infra.Repositories;
@@ -28,23 +30,25 @@ using Lanceur.Utils;
 using Lanceur.Utils.ConnectionStrings;
 using Lanceur.Utils.PackagedApps;
 using Lanceur.Views;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 using Splat;
+using Splat.Serilog;
 using System;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
-using Lanceur.Infra.Constants;
-using Serilog.Formatting.Compact;
-using Splat.Serilog;
-using ILogger = Splat.ILogger;
 
 namespace Lanceur;
 
 public class Bootstrapper
 {
+    private static ServiceProvider _serviceCollection;
+
     #region Methods
 
     private static T Get<T>() => Locator.Current.GetService<T>();
@@ -62,7 +66,7 @@ public class Bootstrapper
 
             cfg.CreateMap<Session, SessionExecutableQueryResult>()
                .ConstructUsing(x =>
-                                   new(x.Name, x.Notes, Get<IAppLoggerFactory>(),
+                                   new(x.Name, x.Notes, Get<ILoggerFactory>().GetLogger<SessionExecutableQueryResult>(),
                                        Get<IDbRepository>()))
                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
         });
@@ -70,14 +74,15 @@ public class Bootstrapper
 
     private static void RegisterLoggers()
     {
-        Log.Logger = new LoggerConfiguration()
-                     .MinimumLevel.Verbose()
-                     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                     .Enrich.FromLogContext()
-                     .WriteTo.File(new CompactJsonFormatter(), AppPaths.LogFilePath,
-                                   rollingInterval: RollingInterval.Day)
-                     .WriteTo.Console()
-                     .CreateLogger();
+        var config = new LoggerConfiguration().MinimumLevel.Verbose()
+                                              .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                                              .Enrich.FromLogContext()
+                                              .WriteTo.File(new CompactJsonFormatter(),
+                                                            AppPaths.LogFilePath,
+                                                            rollingInterval: RollingInterval.Day)
+                                              .WriteTo.Console();
+        _serviceCollection = new ServiceCollection().AddLogging(b => b.AddSerilog(config.CreateLogger()))
+                                                    .BuildServiceProvider();
     }
 
     private static void RegisterServices()
@@ -102,37 +107,36 @@ public class Bootstrapper
                                                                         Get<IAppConfigRepository>()));
 
         l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
-        
+
         // Logging
-        l.Register<IAppLoggerFactory>(() => new SerilogFactory());
         Locator.CurrentMutable.UseSerilogFullLogger();
-        
-        
+        l.Register(() => _serviceCollection?.GetService<ILoggerFactory>() ?? new DefaultLoggerFactory());
+
         l.Register<IStoreLoader>(() => new StoreLoader());
         l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
         l.Register<ICmdlineManager>(() => new CmdlineManager());
-        l.Register<IExecutionManager>(() => new ExecutionManager(Get<IAppLoggerFactory>(),
+        l.Register<IExecutionManager>(() => new ExecutionManager(Get<ILoggerFactory>(),
                                                                  Get<IWildcardManager>(),
                                                                  Get<IDbRepository>(),
                                                                  Get<ICmdlineManager>()));
         l.Register<IDbRepository>(() =>
                                       new SQLiteRepository(Get<IDbConnectionManager>(),
-                                                           Get<IAppLoggerFactory>(),
+                                                           Get<ILoggerFactory>(),
                                                            Get<IConvertionService>()));
         l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(Get<IDbConnectionManager>(),
-                                                                               Get<IAppLoggerFactory>()));
+                                                                               Get<ILoggerFactory>()));
         l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
         l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
         l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
         l.Register<IClipboardService>(() => new WindowsClipboardService());
         l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
-        l.Register<IPluginManager>(() => new PluginManager(Get<IAppLoggerFactory>()));
-        l.Register<IThumbnailRefresher>(() => new ThumbnailRefresher(Get<IAppLoggerFactory>(), Get<IPackagedAppSearchService>(), Get<IFavIconManager>()));
-        l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<IAppLoggerFactory>(), Get<IDbRepository>(), Get<IThumbnailRefresher>()));
+        l.Register<IPluginManager>(() => new PluginManager(Get<ILoggerFactory>()));
+        l.Register<IThumbnailRefresher>(() => new ThumbnailRefresher(Get<ILoggerFactory>(), Get<IPackagedAppSearchService>(), Get<IFavIconManager>()));
+        l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<ILoggerFactory>(), Get<IDbRepository>(), Get<IThumbnailRefresher>()));
         l.Register<IPackagedAppManager>(() => new PackagedAppManager());
         l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService());
         l.Register<IFavIconDownloader>(() => new FavIconDownloader());
-        l.Register<IFavIconManager>(() => new FavIconManager(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>(), Get<IAppLoggerFactory>()));
+        l.Register<IFavIconManager>(() => new FavIconManager(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>(), Get<ILoggerFactory>()));
 
         // Formatters
         l.Register<IStringFormatter>(() => new DefaultStringFormatter());
@@ -140,11 +144,11 @@ public class Bootstrapper
         // Plugins
         l.Register<IPluginManifestRepository>(() => new PluginStore());
         l.Register<IPluginInstaller>(() => new PluginButler(
-                                         Get<IAppLoggerFactory>(),
+                                         Get<ILoggerFactory>(),
                                          Get<IPluginValidationRule<PluginValidationResult, PluginManifest>>()));
 
         l.Register<IPluginUninstaller>(() => new PluginButler(
-                                           Get<IAppLoggerFactory>(),
+                                           Get<ILoggerFactory>(),
                                            Get<IPluginValidationRule<PluginValidationResult, PluginManifest>>()));
 
         l.Register<IPluginWebManifestLoader>(() => new PluginWebManifestLoader());
@@ -157,7 +161,7 @@ public class Bootstrapper
 
         // SQLite
         l.Register(() => new SQLiteUpdater(Get<IDataStoreVersionManager>(),
-                                           Get<IAppLoggerFactory>(),
+                                           Get<ILoggerFactory>(),
                                            Get<IDataStoreUpdateManager>()));
 
         l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
@@ -195,7 +199,7 @@ public class Bootstrapper
 
             if (ctorCollection.Length == 0)
             {
-                log.Info("Add ViewModel '{FullName}' into IOC. Ctor has no ctor.", vmType.FullName);
+                log.Info("Add ViewModel {FullName} into IOC. Ctor has no ctor.", vmType.FullName);
                 l.RegisterLazySingleton(() => Activator.CreateInstance(vmType));
                 continue;
             }
@@ -203,7 +207,7 @@ public class Bootstrapper
             var ctor = vmType.GetConstructors()[0];
             var pCount = ctor.GetParameters().Length;
 
-            log.Info("Add ViewModel '{FullName}' into IOC. Ctor has {pCount} parameter(s).", vmType.FullName, pCount);
+            log.Info("Add ViewModel {FullName} into IOC. Ctor has {pCount} parameter(s).", vmType.FullName, pCount);
             l.RegisterLazySingleton(() => ctor.Invoke(new object[pCount]), vmType);
         }
     }
@@ -226,7 +230,7 @@ public class Bootstrapper
         var stg = l.GetService<IConnectionString>();
         var sqlite = l.GetService<SQLiteUpdater>();
 
-        AppLogFactory.Get<Bootstrapper>().Trace("Settings DB path: '{stg}'", stg);
+        StaticLoggerFactory.GetLogger<Bootstrapper>().LogInformation("Settings DB path: {Settings}", stg);
 
         sqlite.Update(stg.ToString());
     }

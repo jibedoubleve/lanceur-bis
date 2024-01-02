@@ -24,7 +24,7 @@ public static class ThumbnailMixin
     public static void CopyToImageRepository(this ImageSource imageSource, string fileName)
     {
         var destination = fileName.ToAbsolutePath();
-        
+
         lock (Locker)
         {
             if (File.Exists(destination)) return;
@@ -48,7 +48,7 @@ public static class ThumbnailMixin
     public static void CopyToImageRepository(this string imageSource, string fileName)
     {
         var destination = fileName.ToAbsolutePath();
-        
+
         lock (Locker)
         {
             if (File.Exists(destination)) return;

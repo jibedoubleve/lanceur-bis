@@ -52,7 +52,6 @@ namespace Lanceur.Utils.PackagedApps
             var apps = helper.GetAppsFromManifest(stream);
 
             return apps.Count > 0 ? visitor(apps[0]) : string.Empty;
-
         }
 
         private static PackageVersion InitPackageVersion(string[] namespaces)
@@ -197,7 +196,7 @@ namespace Lanceur.Utils.PackagedApps
 
                 foreach (var factor in targetSizes)
                 {
-                    var simplePath      = $"{prefix}.targetsize-{factor}{extension}";
+                    var simplePath = $"{prefix}.targetsize-{factor}{extension}";
                     var suffixThemePath = $"{prefix}.targetsize-{factor}_{theme}{extension}";
                     var prefixThemePath = $"{prefix}.{theme}_targetsize-{factor}{extension}";
 

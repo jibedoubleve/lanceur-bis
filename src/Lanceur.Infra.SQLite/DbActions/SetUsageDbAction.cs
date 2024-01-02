@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
@@ -10,18 +11,18 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         private readonly AliasDbAction _aliasDbAction;
         private readonly IDbConnectionManager _db;
-        private readonly IAppLogger _log;
+        private readonly ILogger<SetUsageDbAction> _logger;
 
         #endregion Fields
 
         #region Constructors
 
-        public SetUsageDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory)
+        public SetUsageDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
         {
             _db = db;
-            _log = logFactory.GetLogger<AliasDbAction>();
+            _logger = logFactory.GetLogger<SetUsageDbAction>();
 
-            _aliasDbAction = new AliasDbAction(db, logFactory);
+            _aliasDbAction = new(db, logFactory);
         }
 
         #endregion Constructors

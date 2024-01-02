@@ -4,22 +4,22 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Plugins;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.SharedKernel.Utils;
+using Lanceur.Utils;
 using Lanceur.Xaml;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
 using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
-using Serilog;
-using Serilog.Events;
 
 namespace Lanceur;
 
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public partial class App
 {
     #region Fields
 
@@ -39,7 +39,7 @@ public partial class App : Application
 
     #region Methods
 
-    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         var notify = Locator.Current.GetService<IUserNotification>();
         notify.Error(e.Exception.Message, e.Exception);
@@ -53,7 +53,7 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
-        var log = Locator.Current.GetService<IAppLoggerFactory>().GetLogger<App>();
+        var log = StaticLoggerFactory.GetLogger<App>();
         _notifyIcon ??= new();
 
         ThemeManager.Current.SetTheme();
@@ -71,7 +71,7 @@ public partial class App : Application
             var errors = await installer.SubscribeForInstallAsync();
             if (!errors.IsNullOrEmpty())
             {
-                log.Error(null, $"Error occured when installing plugins on startup: {errors}");
+                log.LogError("Error occured when installing plugins on startup: {Errors}", errors);
             }
         }
 

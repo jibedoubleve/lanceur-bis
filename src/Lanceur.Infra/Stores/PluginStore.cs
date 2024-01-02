@@ -3,8 +3,9 @@ using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Logging;
 using Lanceur.Infra.Plugins;
-using Lanceur.Infra.Utils;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Splat;
 using System.Reflection;
@@ -20,8 +21,8 @@ namespace Lanceur.Infra.Stores
         private readonly Version _appVersion;
         private readonly IPluginStoreContext _context;
         private readonly IDbRepository _dbRepository;
-        private readonly IAppLogger _log;
-        private readonly IAppLoggerFactory _logFactory;
+        private readonly ILogger<PluginStore> _logger;
+        private readonly ILoggerFactory _loggerFactory;
         private readonly IPluginManager _pluginManager;
 
         #endregion Fields
@@ -30,19 +31,19 @@ namespace Lanceur.Infra.Stores
 
         private PluginStore(
             IPluginStoreContext context = null,
-            IAppLoggerFactory logFactory = null,
             IPluginManager pluginManager = null,
-            IDbRepository dbRepository = null
+            IDbRepository dbRepository = null,
+            ILoggerFactory loggerFactory = null
         )
         {
             var l = Locator.Current;
+
+            _loggerFactory = loggerFactory ?? l.GetService<ILoggerFactory>();
+            _logger = LoggerFactoryMixin.GetLogger<PluginStore>(_loggerFactory);
+
             _dbRepository = dbRepository ?? l.GetService<IDbRepository>();
             _pluginManager = pluginManager ?? l.GetService<IPluginManager>();
             _context = context ?? l.GetService<IPluginStoreContext>();
-
-            _logFactory = logFactory ?? l.GetService<IAppLoggerFactory>();
-            _log = l.GetLogger<PluginStore>(_logFactory);
-
             _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
         }
 
@@ -62,7 +63,7 @@ namespace Lanceur.Infra.Stores
             _plugins = configs
                        .Where(manifest => _appVersion >= manifest.AppMinVersion)
                        .SelectMany(manifest => _pluginManager.CreatePlugin(manifest.Dll))
-                       .Select(x => new PluginExecutableQueryResult(x, _logFactory))
+                       .Select(x => new PluginExecutableQueryResult(x, _loggerFactory))
                        .ToList();
         }
 
@@ -90,7 +91,7 @@ namespace Lanceur.Infra.Stores
             var found = (from plugin in _plugins
                          where plugin?.Name?.ToLower().StartsWith(query.Name.ToLower()) ?? false
                          select plugin).ToArray();
-            _log.Trace("Found {Length} plugin(s)", found.Length);
+            _logger.LogDebug("Found {Length} plugin(s)", found.Length);
 
             //Set count and name
             foreach (var item in found)

@@ -44,8 +44,8 @@ namespace Lanceur.Infra.Services
                                         .ThenBy(e => e.Name)
                                         .ToArray();
 
-            return input?.Any() ?? false 
-                ? orderedResults 
+            return input?.Any() ?? false
+                ? orderedResults
                 : DisplayQueryResult.NoResultFound;
         }
 
@@ -65,20 +65,19 @@ namespace Lanceur.Infra.Services
                 .SelectMany(store => store.Search(query))
                 .ToArray();
 
-
             // Remember the query
             foreach (var result in results) { result.Query = query; }
 
             // If there's an exact match, promote it to the top
             // of the list.
             var orderedResults = SetupAndSort(results).ToList();
-            var match = (from r in orderedResults 
+            var match = (from r in orderedResults
                          where r.Name == query.Name
                          select r).FirstOrDefault();
             if (match is not null) { orderedResults.Move(match, 0); }
-            
-            return !orderedResults.Any() 
-                ? DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline") 
+
+            return !orderedResults.Any()
+                ? DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline")
                 : orderedResults;
         }
 

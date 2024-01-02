@@ -12,6 +12,7 @@ using Lanceur.Infra.Stores;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Utils;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
@@ -21,8 +22,6 @@ namespace Lanceur.Tests.BusinessLogic
     public class SearchShould : SQLiteTest
     {
         #region Fields
-
-        private readonly IAppLoggerFactory _testLoggerFactory;
 
         private const string SqlCreateAlias = @"
                 insert into alias (id, file_name, arguments, id_session) values (1000, '@multi@', '@alias2@@alias3', 1);
@@ -34,13 +33,15 @@ namespace Lanceur.Tests.BusinessLogic
                 insert into alias (id, file_name, arguments,id_session) values (3000, 'arg', 'c:\dummy\dummy.exe', 1);
                 insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');";
 
+        private readonly ILoggerFactory _testLoggerFactory;
+
         #endregion Fields
 
         #region Constructors
 
         public SearchShould(ITestOutputHelper output)
         {
-            _testLoggerFactory = new XUnitLoggerFactory(output);
+            _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
         }
 
         #endregion Constructors
@@ -74,36 +75,49 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
-        public void ReturnValues()
+        public void ReturnNoResultMessageWhenMisconfiguredMacro()
         {
-            var macroManager = Substitute.For<IMacroManager>();
+            // ARRANGE
+            const string sql = SqlCreateAlias
+                               + @"
+                insert into alias (id, file_name, id_session) values (4000, '@zzzz@', 1);
+                insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');";
+
+            using var db = BuildFreshDb(sql);
+            using var conn = new SQLiteSingleConnectionManager(db);
+
             var thumbnailManager = Substitute.For<IThumbnailManager>();
-            var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager);
-            var query = new Cmdline("code");
+            var converter = Substitute.For<IConvertionService>();
+            var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
+            var storeLoader = Substitute.For<IStoreLoader>();
+            storeLoader.Load().Returns(new[] { new AliasStore(repository) });
 
-            var result = service.Search(query)
-                                .ToArray();
+            var asm = Assembly.GetExecutingAssembly();
+            var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager);
 
+            // ACT
+            var result = service.Search(new("z")).ToArray();
+
+            // ASSERT
             using (new AssertionScope())
             {
-                result.Should().HaveCount(1);
-                result.ElementAt(0).IsResult.Should().BeFalse();
+                result.Should().HaveCountGreaterThan(0);
+                result[0].Name.Should().Be("No result found");
             }
         }
 
         [Fact]
         public void ReturnResultWithExactMatchOnTop()
         {
-
-            var dt        = DateTime.Now;
+            var dt = DateTime.Now;
             var converter = Substitute.For<IConvertionService>();
             var sql = @$"
             insert into alias (id, file_name, arguments, id_session) values (1000, 'un', '@alias2@@alias3', 1);
             insert into alias_name (id, id_alias, name) values (1001, 1000, 'un');
-            
+
             insert into alias (id, file_name, arguments, id_session) values (2000, 'deux', '@alias2@@alias3', 1);
             insert into alias_name (id, id_alias, name) values (1002, 2000, 'deux');
-            
+
             insert into alias (id, file_name, arguments, id_session) values (3000, 'trois', '@alias2@@alias3', 1);
             insert into alias_name (id, id_alias, name) values (1003, 3000, 'trois');
             --
@@ -124,7 +138,7 @@ namespace Lanceur.Tests.BusinessLogic
          ";
 
             // ARRANGE
-            using var db   = BuildFreshDb(sql);
+            using var db = BuildFreshDb(sql);
             using var conn = new SQLiteSingleConnectionManager(db);
 
             const string criterion = "u";
@@ -136,7 +150,7 @@ namespace Lanceur.Tests.BusinessLogic
             var macroManager = Substitute.For<IMacroManager>();
             macroManager.Handle(Arg.Any<QueryResult[]>())
                         .Returns(results);
-            
+
             var searchService = new SearchService(
                 stores,
                 macroManager,
@@ -146,7 +160,7 @@ namespace Lanceur.Tests.BusinessLogic
             // ACT
             var result = searchService.Search(new(criterion))
                                       .ToArray();
-            
+
             // ASSERT
             using (new AssertionScope())
             {
@@ -157,37 +171,23 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
-        public void ReturnNoResultMessageWhenMisconfiguredMacro()
+        public void ReturnValues()
         {
-            // ARRANGE
-            const string sql = SqlCreateAlias
-                               + @"
-                insert into alias (id, file_name, id_session) values (4000, '@zzzz@', 1);
-                insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');";
-
-            using var db = BuildFreshDb(sql);
-            using var conn = new SQLiteSingleConnectionManager(db);
-
+            var macroManager = Substitute.For<IMacroManager>();
             var thumbnailManager = Substitute.For<IThumbnailManager>();
-            var converter   = Substitute.For<IConvertionService>();
-            var repository  = new SQLiteRepository(conn, _testLoggerFactory, converter);
-            var storeLoader = Substitute.For<IStoreLoader>();
-            storeLoader.Load().Returns(new[] { new AliasStore(repository) });
-            
-            var asm = Assembly.GetExecutingAssembly();
-            var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager);
-            
-            // ACT
-            var result = service.Search(new("z")).ToArray();
+            var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager);
+            var query = new Cmdline("code");
 
-            // ASSERT
+            var result = service.Search(query)
+                                .ToArray();
+
             using (new AssertionScope())
             {
-                result.Should().HaveCountGreaterThan(0);
-                result[0].Name.Should().Be("No result found");
+                result.Should().HaveCount(1);
+                result.ElementAt(0).IsResult.Should().BeFalse();
             }
-
         }
+
         #endregion Methods
     }
 }

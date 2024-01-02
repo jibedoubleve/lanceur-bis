@@ -14,18 +14,18 @@ namespace Lanceur.Infra.LuaScripting
             try
             {
                 lua.State.Encoding = Encoding.UTF8;
-                lua["context"]     = script.Context;
+                lua["context"] = script.Context;
                 var result = lua.DoString(script.Code);
 
-                if (!result.Any()) { return script.EmptyResult; }
-                if (result[0] is not ScriptContext output) return script.EmptyResult;
+                if (!result.Any()) { return script.CloneWithoutContext(); }
+                if (result[0] is not ScriptContext output) return script.CloneWithoutContext();
 
                 return new()
                 {
                     Code = script.Code,
                     Context = new()
                     {
-                        FileName   = output.FileName,
+                        FileName = output.FileName,
                         Parameters = output.Parameters
                     },
                 };
@@ -34,7 +34,7 @@ namespace Lanceur.Infra.LuaScripting
             {
                 return new()
                 {
-                    Code  = script.Code,
+                    Code = script.Code,
                     Error = e.Message,
                 };
             }

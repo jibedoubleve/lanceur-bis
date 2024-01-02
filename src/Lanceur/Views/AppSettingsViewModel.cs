@@ -4,6 +4,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
+using Lanceur.Infra.Win32.Restart;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
 using ReactiveUI;
@@ -15,7 +16,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using Lanceur.Infra.Win32.Restart;
 
 namespace Lanceur.Views
 {
