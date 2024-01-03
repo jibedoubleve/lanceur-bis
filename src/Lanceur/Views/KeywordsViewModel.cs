@@ -307,12 +307,26 @@ namespace Lanceur.Views
             }
 
             var names = alias.Synonyms.SplitCsv();
+            var errors = new List<Exception>();
+            
             foreach (var name in names)
             {
-                var toAdd = alias.CloneObject();
-                toAdd.Name = name;
-                _aliases.Add(toAdd);
+                try
+                {
+                    _log.Trace($"Cloning alias (type: '{alias.GetType()}'. Thumbnail: '{alias.Thumbnail}'");
+                    var toAdd = alias.CloneObject();
+                    toAdd.Name = name;
+                    _log.Trace($"Add cloned object (which is a synonym) to the list of alias (name: '{name}')");
+                    _aliases.Add(toAdd);
+                }
+                catch (Exception ex)
+                {
+                    _log.Warning($"Error occured while cloning object of type '{alias.GetType()}' with name '{name}'", ex);
+                    errors.Add(ex);
+                }
             }
+
+            if (errors.Any()) throw new AggregateException($"Errors occured while updating synonyms of alias with these synonyms: {alias.Synonyms}", errors);
         }
 
         /// <summary>

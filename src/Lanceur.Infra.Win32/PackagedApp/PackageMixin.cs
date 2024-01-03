@@ -7,9 +7,9 @@ public static class PackageMixin
 {
     #region Fields
 
-    private static readonly ConcurrentDictionary<string, string> Cache = new();
+    private static readonly ConcurrentDictionary<string, string> CacheAppUser = new();
     
-    private static readonly ConcurrentDictionary<string, bool> Cache_ = new();
+    private static readonly ConcurrentDictionary<string, bool> CacheIsAppUser = new();
 
     #endregion Fields
 
@@ -18,29 +18,29 @@ public static class PackageMixin
     public static bool IsAppUserModelId(this Package entry, string fileName)
     {
         var key = $"{fileName}-{entry.Id.FullName}";
-        if (Cache_.TryGetValue(key, out var value)) return value;
+        if (CacheIsAppUser.TryGetValue(key, out var value)) return value;
 
         var result = entry.GetAppListEntries()
                           .Where(e => !string.IsNullOrEmpty(e.AppUserModelId))
                           .Select(e => e.AppUserModelId)
                           .FirstOrDefault(e => !string.IsNullOrEmpty(e) && e == fileName);
-        Cache_[key] = result is not null;
+        CacheIsAppUser[key] = result is not null;
 
-        return Cache_[key];
+        return CacheIsAppUser[key];
     }
-    public static string? GetAppUserModelId(this Package entry)
+    public static string GetAppUserModelId(this Package entry)
     {
         var key = entry.Id.FullName;
 
-        if (Cache.TryGetValue(key, out var value)) return value;
+        if (CacheAppUser.TryGetValue(key, out var value)) return value;
 
         var result = entry.GetAppListEntries()
                           .Where(e => !string.IsNullOrEmpty(e.AppUserModelId))
                           .Select(e => e.AppUserModelId)
                           .FirstOrDefault(e => !string.IsNullOrEmpty(e));
-        Cache[key] = result ?? string.Empty;
+        CacheAppUser[key] = result ?? string.Empty;
 
-        return Cache[key];
+        return CacheAppUser[key];
     }
 
     #endregion Methods

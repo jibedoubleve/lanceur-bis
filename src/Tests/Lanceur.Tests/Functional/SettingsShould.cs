@@ -66,8 +66,8 @@ namespace Lanceur.Tests.Functional
             WithConfiguration(repository =>
             {
                 var settings = repository.Current;
-                settings.Window.Position.Left.Should().Be(600);
-                settings.Window.Position.Top.Should().Be(150);
+                settings.Window.Position.Left.Should().Be(double.MaxValue);
+                settings.Window.Position.Top.Should().Be(double.MaxValue);
             });
         }
 

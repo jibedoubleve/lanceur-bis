@@ -5,9 +5,9 @@ branches:
     is-release-branch: true  
   develop:
     tag: beta
-    increment: Minor
+    increment: Patch
   feature:
     regex: ^issue?[\/-]
     tag: alpha-issue.{BranchName}
-    increment: Minor
+    increment: Patch
 

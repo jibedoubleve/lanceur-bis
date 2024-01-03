@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 
-namespace Lanceur.Utils
+namespace Lanceur.Infra.Win32.Utils
 {
-    internal static class ScreenRuler
+    public static class ScreenRuler
     {
         #region Fields
 
@@ -12,9 +12,9 @@ namespace Lanceur.Utils
 
         #region Properties
 
-        private static double WindowHeight => Application.Current.MainWindow.Height;
+        private static double WindowHeight => Application.Current.MainWindow!.Height;
 
-        private static double WindowWidth => Application.Current.MainWindow.Width;
+        private static double WindowWidth => Application.Current.MainWindow!.Width;
 
         #endregion Properties
 
@@ -30,12 +30,22 @@ namespace Lanceur.Utils
                 ? (screenHeight - WindowHeight) / 2
                 : topOffset;
 
-            return new Coordinate(x, y);
+            return new(x, y);
+        }
+
+        public static Coordinate SetDefaultPosition()
+        {
+            var coordinate = GetCenterCoordinate(DefaultTopOffset);
+            SetWindowPosition(coordinate);
+            return coordinate;
         }
 
         public static void SetWindowPosition(Coordinate coordinate)
         {
             var win = Application.Current.MainWindow;
+
+            if (win is null) return;
+
             win.Left = coordinate.X;
             win.Top = coordinate.Y;
         }

@@ -1,5 +1,4 @@
 ﻿using Lanceur.Core;
-using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -7,7 +6,6 @@ using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.LuaScripting;
-using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
 using System.Diagnostics;
 
@@ -73,13 +71,11 @@ namespace Lanceur.Infra.Managers
                     _log.Trace("Executing UWP application...");
                     return ExecuteUwp(query);
                 }
-                else
-                {
-                    _log.Trace("Executing process...");
-                    return ExecuteProcess(query);
-                }
+
+                _log.Trace("Executing process...");
+                return ExecuteProcess(query);
             }
-            catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}: {ex.Message}'", ex); }
+            catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{(query?.Name ?? "NULL")}'. Check the path of the executable or the URL.", ex); }
         }
 
         private IEnumerable<QueryResult> ExecuteProcess(AliasQueryResult query)

@@ -8,7 +8,7 @@ namespace Lanceur.Infra.Repositories
     {
         #region Fields
 
-        private static readonly DatabaseConfig _settings;
+        private static readonly DatabaseConfig Settings;
 
         #endregion Fields
 
@@ -19,14 +19,14 @@ namespace Lanceur.Infra.Repositories
             var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             var path = Path.Combine(desktop, "debug.sqlite");
 
-            _settings = new DatabaseConfig { DbPath = path };
+            Settings = new DatabaseConfig { DbPath = path };
         }
 
         #endregion Constructors
 
         #region Properties
 
-        public IDatabaseConfig Current => _settings;
+        public IDatabaseConfig Current => Settings;
 
         #endregion Properties
 

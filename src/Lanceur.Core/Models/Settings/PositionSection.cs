@@ -4,7 +4,7 @@
     {
         #region Properties
 
-        public static PositionSection Default => new() { Left = 600, Top = 150 };
+        public static PositionSection Default => new() { Left = double.MaxValue, Top = double.MaxValue };
 
         public double Left { get; set; }
         public double Top { get; set; }
