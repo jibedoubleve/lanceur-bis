@@ -7,6 +7,7 @@ using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
+using Lanceur.Core.BusinessLogic;
 
 namespace Lanceur.Infra.SQLite;
 
@@ -289,6 +290,8 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         ArgumentNullException.ThrowIfNull(alias, nameof(alias));
         ArgumentNullException.ThrowIfNull(alias.Synonyms, nameof(alias.Synonyms));
         ArgumentNullException.ThrowIfNull(alias.Id, nameof(alias.Id));
+        
+        alias.SanitizeSynonyms();
 
         using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
         idSession ??= GetDefaultSessionId();
