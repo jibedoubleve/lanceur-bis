@@ -12,6 +12,7 @@ using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
 using System.Reactive.Concurrency;
+using FluentAssertions.Extensions;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels
@@ -30,7 +31,7 @@ namespace Lanceur.Tests.ViewModels
                     .With(scheduler)
                     .Build();
 
-                scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new NotExecutableTestAlias());
+                scheduler.Schedule(0.Ticks(), () => vm.CurrentAlias = new NotExecutableTestAlias());
 
                 var results = scheduler.Start(
                     () => vm.ExecuteAlias.CanExecute,
@@ -55,7 +56,7 @@ namespace Lanceur.Tests.ViewModels
                     .With(scheduler)
                     .Build();
 
-                scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new ExecutableTestAlias());
+                scheduler.Schedule(0.Ticks(), () => vm.CurrentAlias = new ExecutableTestAlias());
 
                 var results = scheduler.Start(
                     () => vm.ExecuteAlias.CanExecute,

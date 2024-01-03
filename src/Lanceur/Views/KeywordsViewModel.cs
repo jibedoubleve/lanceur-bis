@@ -26,6 +26,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Humanizer;
 
 namespace Lanceur.Views
 {
@@ -236,7 +237,7 @@ namespace Lanceur.Views
 
             this.WhenAnyValue(vm => vm.SearchQuery)
                 .DistinctUntilChanged()
-                .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
+                .Throttle(10.Milliseconds(), scheduler: uiThread)
                 .Select(x => new SearchRequest(x?.Trim(), AliasToCreate))
                 .Log(this, "Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{c.AliasToCreate?.Name ?? "<EMPTY>"}'")
                 .InvokeCommand(Search)

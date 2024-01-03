@@ -18,6 +18,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Humanizer;
 
 namespace Lanceur.Views
 {
@@ -138,7 +139,7 @@ namespace Lanceur.Views
             #region Query
 
             this.WhenAnyValue(vm => vm.Query.Value)
-                .Throttle(TimeSpan.FromMilliseconds(100), schedulerProvider.TaskpoolScheduler)
+                .Throttle(100.Milliseconds(), schedulerProvider.TaskpoolScheduler)
                 .Select(x => x.Trim())
                 .Where(x => !x.IsNullOrWhiteSpace())
                 .Log(this, "Query changed.", x => $"'{x}'")

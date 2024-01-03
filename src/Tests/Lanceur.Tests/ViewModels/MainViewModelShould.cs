@@ -18,6 +18,7 @@ using NSubstitute;
 using ReactiveUI.Testing;
 using Splat;
 using System.Reactive.Concurrency;
+using FluentAssertions.Extensions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -90,20 +91,20 @@ namespace Lanceur.Tests.ViewModels
                     .Build();
 
                 scheduler.Schedule(() => vm.Query.Value = "a");
-                scheduler.Schedule(TimeSpan.FromTicks(200), () => vm.Query.Value += "b");
-                scheduler.Schedule(TimeSpan.FromTicks(300), () => vm.Query.Value += "c");
-                scheduler.Schedule(TimeSpan.FromTicks(400), () => vm.Query.Value += "d");
+                scheduler.Schedule(200.Ticks(), () => vm.Query.Value += "b");
+                scheduler.Schedule(300.Ticks(), () => vm.Query.Value += "c");
+                scheduler.Schedule(400.Ticks(), () => vm.Query.Value += "d");
 
                 var results = scheduler.Start(
                     () => vm.SearchAlias.IsExecuting,
                     created: 0,
                     subscribed: 100,
-                    disposed: TimeSpan.FromMilliseconds(1_000).Ticks);
+                    disposed: 1_000.Milliseconds().Ticks);
 
                 results.Messages.AssertEqual(
                     OnNext(100, false),
-                    OnNext(TimeSpan.FromMilliseconds(100).Ticks + 402, true),
-                    OnNext(TimeSpan.FromMilliseconds(100).Ticks + 404, false)
+                    OnNext(100.Milliseconds().Ticks + 402, true),
+                    OnNext(100.Milliseconds().Ticks + 404, false)
                 );
             });
         }
