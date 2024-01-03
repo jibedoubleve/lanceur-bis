@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using Humanizer;
 
 namespace Lanceur.Views
 {
@@ -105,7 +106,7 @@ namespace Lanceur.Views
         private TimeSpan GetDelay()
         {
             var delay = _settingsFacade.Application.RestartDelay;
-            var time = TimeSpan.FromMilliseconds(delay);
+            var time = delay.Milliseconds();
             return time;
         }
 
