@@ -13,7 +13,7 @@ namespace Lanceur.Views
     /// <summary>
     /// Interaction logic for KeywordsView.xaml
     /// </summary>
-    public partial class KeywordsView : IViewFor<KeywordsViewModel>
+    public partial class KeywordsView
     {
         #region Constructors
 
@@ -36,8 +36,10 @@ namespace Lanceur.Views
                     };
                     var dialogResult = window.ShowDialog();
 
-                    if (dialogResult == true) { interaction.SetOutput(window.LuaScript.Code); }
-                    else { interaction.SetOutput(backup.Code); }
+                    interaction.SetOutput(dialogResult == true 
+                                              ? window.LuaScript.Code 
+                                              : backup.Code
+                    );
                 });
 
                 ViewModel.ConfirmRemove.RegisterHandler(async interaction =>
@@ -81,7 +83,7 @@ namespace Lanceur.Views
 
         private void OnClickLuaEditor(object sender, RoutedEventArgs e)
         {
-            ViewModel.EditLuaScript.Execute();
+            ViewModel!.EditLuaScript.Execute();
         }
 
         #endregion Methods
