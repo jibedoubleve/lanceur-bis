@@ -1,10 +1,10 @@
 ﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Win32.Restart;
 using Lanceur.Schedulers;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
-using Lanceur.Utils;
 using Lanceur.Views.Mixins;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -16,7 +16,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Lanceur.Infra.Win32.Restart;
 
 namespace Lanceur.Views;
 

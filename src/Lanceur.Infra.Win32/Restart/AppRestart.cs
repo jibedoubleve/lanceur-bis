@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using Lanceur.SharedKernel.Utils;
+using System.Reflection;
 using System.Windows;
-using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Infra.Win32.Restart
 {

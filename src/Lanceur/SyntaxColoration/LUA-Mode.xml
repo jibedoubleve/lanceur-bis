@@ -3,7 +3,7 @@
 <SyntaxDefinition name="LUA" extensions=".lua" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
 	<Color name="Comment"       foreground="Gray"       fontStyle="oblique"     exampleText="-- comment" />
 	<Color name="String"        foreground="#FF5E5EAE"                          exampleText="text = &quot;Hello, World!&quot;" />
-	<Color name="Operators"     foreground="#FFFF0F27"                          exampleText="= + * /"/>
+	<Color name="Operators"     foreground="#FFFF0F27"                          exampleText="= + * /" />
 	<Color name="Keywords"      foreground="#FF569CD6"   fontWeight="bold"      exampleText="if then else end function" />
 	<Color name="Extra"         foreground="#FFE07534"   fontWeight="bold"      exampleText="self" />
 	<Color name="Functions"     foreground="#FF0080C0"   fontWeight="bold"      exampleText="print" />
@@ -28,7 +28,7 @@
 			<Begin><![CDATA[\[\[]]></Begin>
 			<End><![CDATA[]]]]></End>
 			<RuleSet>
-				<Span begin="\\" end="."/>
+				<Span begin="\\" end="." />
 			</RuleSet>
 		</Span>
 
@@ -36,7 +36,7 @@
 			<Begin>'</Begin>
 			<End>'</End>
 			<RuleSet>
-				<Span begin="\\" end="."/>
+				<Span begin="\\" end="." />
 			</RuleSet>
 		</Span>
 
@@ -44,7 +44,7 @@
 			<Begin>"</Begin>
 			<End>"</End>
 			<RuleSet>
-				<Span begin="\\" end="."/>
+				<Span begin="\\" end="." />
 			</RuleSet>
 		</Span>
 

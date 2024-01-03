@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
-using System.ComponentModel;
 using Lanceur.SharedKernel.Mixins;
+using System.ComponentModel;
 
 namespace Lanceur.Tests.Utils.Macros
 {
@@ -10,8 +10,10 @@ namespace Lanceur.Tests.Utils.Macros
     {
         #region Constructors
 
-        public MultiMacroTest() : this(null) { }
-        
+        public MultiMacroTest() : this(null)
+        {
+        }
+
         public MultiMacroTest(string parameters = null)
         {
             Name = Guid.NewGuid().ToString();

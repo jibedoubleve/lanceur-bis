@@ -1,5 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
@@ -9,16 +11,18 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         private readonly IConvertionService _converter;
         private readonly IDbConnectionManager _db;
-        private readonly IAppLoggerFactory _log;
+        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
 
         #endregion Fields
 
         #region Constructors
 
-        public MacroDbAction(IDbConnectionManager db, IAppLoggerFactory log, IConvertionService converter)
+        public MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IConvertionService converter)
         {
             _db = db;
-            _log = log;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<MacroDbAction>();
             _converter = converter;
         }
 
@@ -35,18 +39,24 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// <returns>The hydrated <see cref="QueryResult"/> or <paramref name="item"/></returns>
         private AliasQueryResult Hydrate(AliasQueryResult item)
         {
+            _logger.BeginSingleScope("AliasToHydrate", item);
             if (!item.IsComposite()) { return item; }
 
-            var action = new AliasDbAction(_db, _log);
+            var action = new AliasDbAction(_db, _loggerFactory);
             var subAliases = new List<AliasQueryResult>();
 
-            int delay = 0;
+            var delay = 0;
             foreach (var name in item?.Parameters?.Split("@") ?? Array.Empty<string>())
             {
                 if (name == string.Empty) { delay++; }
                 else
                 {
                     var alias = action.GetExact(name);
+                    if (alias is null)
+                    {
+                        _logger.LogWarning("Impossible to create composite alias {AliasName}. Check all the items of the composite exists in the database", name);
+                        continue;
+                    }
                     alias.Delay = delay;
 
                     subAliases.Add(alias);
@@ -66,7 +76,7 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// The collection with all element that are upgradable
         /// to composite, upgraded
         /// </returns>
-        public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection) 
+        public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)
             => collection.Select(Hydrate).ToList();
 
         #endregion Methods

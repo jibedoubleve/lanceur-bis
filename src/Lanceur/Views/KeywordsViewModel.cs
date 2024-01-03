@@ -5,11 +5,12 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
 using Lanceur.Schedulers;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Abstractions;
@@ -35,7 +36,7 @@ namespace Lanceur.Views
         private readonly SourceList<QueryResult> _aliases = new();
         private readonly IDbRepository _aliasService;
         private readonly Scope<bool> _busyScope;
-        private readonly IAppLogger _log;
+        private readonly ILogger<KeywordsViewModel> _logger;
         private readonly INotification _notification;
         private readonly IUserNotification _notify;
         private readonly IPackagedAppSearchService _packagedAppSearchService;
@@ -47,7 +48,7 @@ namespace Lanceur.Views
         #region Constructors
 
         public KeywordsViewModel(
-            IAppLoggerFactory logFactory = null,
+            ILoggerFactory logFactory = null,
             IDbRepository searchService = null,
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
@@ -62,7 +63,7 @@ namespace Lanceur.Views
             _notify = notify ?? l.GetService<IUserNotification>();
             _packagedAppSearchService = packagedAppSearchService ?? l.GetService<IPackagedAppSearchService>();
             _notification = notification ?? l.GetService<INotification>();
-            _log = l.GetLogger<KeywordsViewModel>(logFactory);
+            _logger = logFactory.GetLogger<KeywordsViewModel>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDbRepository>();
 
@@ -132,18 +133,19 @@ namespace Lanceur.Views
 
         private async Task<Unit> OnRemoveAliasAsync(AliasQueryResult alias)
         {
+            using var _ = _logger.BeginSingleScope("RemovedAlias", alias);
             if (alias == null) return Unit.Default;
 
             var remove = await ConfirmRemove.Handle(alias.Name);
             if (remove)
             {
-                _log.Info($"User removed alias '{alias.Name}'");
+                _logger.LogInformation("User removed alias {Name}", alias.Name);
                 _aliasService.Remove(alias);
 
                 if (_aliases.Remove(alias)) { _notification.Information($"Removed alias '{alias.Name}'."); }
-                else { _log.Warning($"Impossible to remove the alias '{alias.Name}'"); }
+                else { _logger.LogWarning("Impossible to remove the alias {Name}", alias.Name); }
             }
-            else { _log.Debug($"User cancelled the remove of '{alias.Name}'."); }
+            else { _logger.LogDebug("User cancelled the remove of {Name}", alias.Name); }
             return Unit.Default;
         }
 
@@ -168,7 +170,7 @@ namespace Lanceur.Views
                 }
                 catch (ApplicationException ex)
                 {
-                    _log.Warning(ex.Message);
+                    _logger.LogWarning(ex, "An error occured while saving or updating alias");
                     _notify.Warning($"Error when {(created ? "creating" : "updating")} the alias: {ex.Message}");
                     return alias;
                 }
@@ -288,7 +290,7 @@ namespace Lanceur.Views
                    response =>
                    {
                        if (response == null) return "The names should not be empty.";
-                       
+
                        return !response.Exists && !response.ExistingNames.Any()
                            ? "The names should not be empty."
                            : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.";
@@ -298,6 +300,7 @@ namespace Lanceur.Views
 
         private void UpdateAliasWithSynonyms(AliasQueryResult alias)
         {
+            using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
             var toDel = _aliases.Items
                                 .Where(a => a.Id == alias.Id)
                                 .ToArray();
@@ -308,20 +311,19 @@ namespace Lanceur.Views
 
             var names = alias.Synonyms.SplitCsv();
             var errors = new List<Exception>();
-            
+
             foreach (var name in names)
             {
                 try
                 {
-                    _log.Trace($"Cloning alias (type: '{alias.GetType()}'. Thumbnail: '{alias.Thumbnail}'");
                     var toAdd = alias.CloneObject();
                     toAdd.Name = name;
-                    _log.Trace($"Add cloned object (which is a synonym) to the list of alias (name: '{name}')");
+                    _logger.LogDebug("Add cloned object (which is a synonym) to the list of alias (name: {Name})", name);
                     _aliases.Add(toAdd);
                 }
                 catch (Exception ex)
                 {
-                    _log.Warning($"Error occured while cloning object of type '{alias.GetType()}' with name '{name}'", ex);
+                    _logger.LogWarning(ex, "Error occured while cloning {Name}", name);
                     errors.Add(ex);
                 }
             }

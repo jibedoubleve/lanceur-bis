@@ -79,17 +79,19 @@ namespace Lanceur.Views
         #endregion Constructors
 
         #region Properties
+
         [Reactive] private bool IsActivating { get; set; }
         public ReactiveCommand<Unit, ObservableCollection<SelectableAliasQueryResult>> Activate { get; private set; }
-        
+
         public ViewModelActivator Activator { get; } = new();
         public Interaction<string, bool> ConfirmRemove => _confirmRemove;
         [Reactive] public ObservableCollection<SelectableAliasQueryResult> Doubloons { get; set; }
-        public ReactiveCommand<Unit, Unit> RemoveSelected { get; private set;}
+        public ReactiveCommand<Unit, Unit> RemoveSelected { get; private set; }
 
         #endregion Properties
 
         #region Methods
+
         private ObservableCollection<SelectableAliasQueryResult> OnActivate()
         {
             var doubloons = _service.GetDoubloons().ToArray();

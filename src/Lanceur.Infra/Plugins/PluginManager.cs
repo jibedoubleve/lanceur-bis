@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Plugins;
-using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 using Splat;
 using System.Reflection;
 
@@ -10,16 +10,15 @@ namespace Lanceur.Infra.Plugins
     {
         #region Fields
 
-        private readonly IAppLogger _log;
+        private readonly ILogger<PluginManager> _logger;
 
         #endregion Fields
 
         #region Constructors
 
-        public PluginManager(IAppLoggerFactory logFactory = null)
+        public PluginManager(ILoggerFactory logFactory = null)
         {
-            var l = Locator.Current;
-            _log = l.GetLogger<PluginManager>(logFactory);
+            _logger = logFactory.GetLogger<PluginManager>();
         }
 
         #endregion Constructors
@@ -49,9 +48,12 @@ namespace Lanceur.Infra.Plugins
             if (!plugins.Any()) return plugins;
 
             var availableTypes = string.Join(",", assembly.GetTypes().Select(t => t.FullName));
-            _log.Warning(
-                $"Can't find any type which implements {nameof(IPlugin)} in {assembly} from {assembly.Location}.\n" +
-                $"Available types: {availableTypes}");
+            _logger.LogWarning(
+                "Can't find any type which implements {IPlugin} in {Assembly} from {Location}. Available types: {AvailableTypes}",
+                nameof(IPlugin),
+                assembly,
+                assembly.Location,
+                availableTypes);
 
             return plugins;
         }

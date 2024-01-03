@@ -21,15 +21,15 @@ namespace Lanceur.Ui
                 var viewType = Type.GetType(viewTypeName);
                 if (viewType == null)
                 {
-                    this.Log().Error($"Could not find the view {viewTypeName} for view model {viewModelName}.");
+                    this.Log().Error("Could not find the view {viewTypeName} for view model {viewModelName}.", viewTypeName, viewModelName);
                     return null;
                 }
-                this.Log().Info($"Find view {viewTypeName} for view model {viewModelName}.");
+                this.Log().Info("Find view {viewTypeName} for view model {viewModelName}.", viewTypeName, viewModelName);
                 return Activator.CreateInstance(viewType) as IViewFor;
             }
             catch (Exception)
             {
-                this.Log().Error($"Could not instantiate view {viewTypeName}.");
+                this.Log().Error("Could not instantiate view {viewTypeName}.", viewTypeName);
                 throw;
             }
         }

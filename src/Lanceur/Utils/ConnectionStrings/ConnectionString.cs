@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 
@@ -36,7 +37,7 @@ namespace Lanceur.Utils.ConnectionStrings
         {
             if (!File.Exists(_dbPath))
             {
-                AppLogFactory.Get<ConnectionString>().Warning($"The path '{_dbPath}' doesn't exist. A new database should be created!");
+                StaticLoggerFactory.GetLogger<ConnectionString>().LogWarning("The path {DbPath} doesn't exist. A new database should be created!", _dbPath);
             }
             var path = Environment.ExpandEnvironmentVariables(_dbPath);
             return CSTRING_PATTERN.Format(path);

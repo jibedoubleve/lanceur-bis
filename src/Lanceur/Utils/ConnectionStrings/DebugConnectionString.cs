@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Utils;
+using Lanceur.Infra.Constants;
 using Lanceur.SharedKernel.Mixins;
 using System;
-using Lanceur.Infra.Constants;
 
 namespace Lanceur.Utils.ConnectionStrings
 {

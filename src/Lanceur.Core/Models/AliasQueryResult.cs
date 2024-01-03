@@ -59,16 +59,15 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 
     public bool IsHidden { get; set; }
 
-    public string Notes { get; set; }
-
-    public RunAs RunAs { get; set; } = RunAs.CurrentUser;
-    
     /// <summary>
     /// Gets or sets a Lua script that will be executed
     /// when user launch an alias
     /// </summary>
     public string LuaScript { get; set; }
 
+    public string Notes { get; set; }
+
+    public RunAs RunAs { get; set; } = RunAs.CurrentUser;
     public StartMode StartMode { get; set; } = StartMode.Default;
 
     /// <summary>
@@ -90,8 +89,8 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     /// New synonyms added when updated
     /// </summary>
     public string SynonymsToAdd => (from n in Synonyms.SplitCsv()
-                                        where !SynonymsWhenLoaded.SplitCsv().Contains(n)
-                                        select n).ToArray().JoinCsv();
+                                    where !SynonymsWhenLoaded.SplitCsv().Contains(n)
+                                    select n).ToArray().JoinCsv();
 
     /// <summary>
     /// Synonyms present when the entity was loaded

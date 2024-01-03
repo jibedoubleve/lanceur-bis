@@ -14,7 +14,12 @@ namespace Lanceur.Views
     /// </summary>
     public partial class LuaEditorView : Window
     {
+        #region Fields
+
         private Script _luaCode;
+
+        #endregion Fields
+
         #region Constructors
 
         public LuaEditorView()

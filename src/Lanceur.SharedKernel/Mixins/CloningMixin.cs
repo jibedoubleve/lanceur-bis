@@ -13,7 +13,7 @@ public static class CloningMixin
     /// <typeparam name="T">The type of the object to clone</typeparam>
     /// <returns>A new instance of the object with the same state</returns>
     public static T CloneObject<T>(this T obj)
-        where T: new()
+        where T : new()
     {
         var bytes = JsonSerializer.SerializeToUtf8Bytes(obj);
         return JsonSerializer.Deserialize<T>(bytes);

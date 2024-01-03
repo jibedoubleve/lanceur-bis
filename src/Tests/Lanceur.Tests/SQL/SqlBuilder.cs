@@ -22,18 +22,6 @@ internal class SqlBuilder
 
     #region Methods
 
-    public SqlBuilder AppendSynonyms(long idAlias, params string[] synonyms)
-    {
-        if(synonyms is null || synonyms.Length == 0) { throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias"); }
-        
-        foreach (var synonym in synonyms)
-        {
-            _sql.Append($"insert into alias_name(id_alias, name) values ({idAlias}, '{synonym}');");
-            _sql.AppendNewLine();
-        }
-        return this;
-    }
-
     public SqlBuilder AppendAlias(long idAlias, string fileName, string arguments)
     {
         _sql.Append($"insert into alias (id, file_name, arguments, id_session) values ({idAlias}, '{fileName}', '{arguments}', 1);");
@@ -45,6 +33,18 @@ internal class SqlBuilder
     {
         _sql.Append($"insert into alias_argument(id_alias, name, argument) values ({idAlias}, '{name}', '{argument}');");
         _sql.AppendNewLine();
+        return this;
+    }
+
+    public SqlBuilder AppendSynonyms(long idAlias, params string[] synonyms)
+    {
+        if (synonyms is null || synonyms.Length == 0) { throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias"); }
+
+        foreach (var synonym in synonyms)
+        {
+            _sql.Append($"insert into alias_name(id_alias, name) values ({idAlias}, '{synonym}');");
+            _sql.AppendNewLine();
+        }
         return this;
     }
 

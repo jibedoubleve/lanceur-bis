@@ -1,4 +1,5 @@
 ﻿using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ScottPlot;
 using System;
@@ -47,7 +48,7 @@ namespace Lanceur.Views
                 ctrl.Plot.Legend();
                 ctrl.Refresh();
             }
-            else { AppLogFactory.Get<TrendsView>().Warning("No history to display."); }
+            else { StaticLoggerFactory.GetLogger<TrendsView>().LogWarning("No history to display"); }
         }
 
         #endregion Methods

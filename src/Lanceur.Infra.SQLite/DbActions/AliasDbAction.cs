@@ -1,9 +1,10 @@
 ﻿using Dapper;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
-using Lanceur.Infra.SQLite.Entities;
+using Lanceur.Infra.Logging;
+using Lanceur.Infra.Sqlite.Entities;
 using Lanceur.Infra.SQLite.Helpers;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 using System.Data.SQLite;
 
 namespace Lanceur.Infra.SQLite.DbActions
@@ -27,32 +28,21 @@ namespace Lanceur.Infra.SQLite.DbActions
                 where id = @id;";
 
         private readonly IDbConnectionManager _db;
-        private readonly IAppLogger _log;
+        private readonly ILogger<AliasDbAction> _logger;
 
         #endregion Fields
 
         #region Constructors
 
-        public AliasDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory)
+        public AliasDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
         {
             _db = db;
-            _log = logFactory.GetLogger<AliasDbAction>();
+            _logger = logFactory.GetLogger<AliasDbAction>();
         }
 
         #endregion Constructors
 
         #region Methods
-
-        private static void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, SQLiteTransactionBase tx)
-        {
-            // Remove existing additional alias parameters
-            const string sql1 = "delete from alias_argument where id_alias = @idAlias";
-            tx.Connection.Execute(sql1, new { idAlias });
-
-            // Create alias additional parameters
-            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
-            tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
-        }
 
         private static void UpdateName(AliasQueryResult alias, SQLiteTransactionBase tx)
         {
@@ -76,7 +66,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from alias. Id: {idd}");
+            _logger.LogInformation("Removed {Count} row(s) from alias. Id: {Idd}", cnt, idd);
         }
 
         private void ClearAliasArgument(params long[] ids)
@@ -87,7 +77,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_argument'. Id: {idd}");
+            _logger.LogInformation("Removed {Count} row(s) from alias_argument. Id: {IdAliases}", cnt, idd);
         }
 
         private void ClearAliasName(params long[] ids)
@@ -98,7 +88,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_name'. Id: {idd}");
+            _logger.LogInformation("Removed {RemovedCount} row(s) from alias_name. Id: {IdAliases}", cnt, idd);
         }
 
         private void ClearAliasUsage(params long[] ids)
@@ -109,9 +99,20 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_usage'. Id: {idd}");
+            _logger.LogInformation("Removed {Count} row(s) from alias_usage. Id: {IdAliases}", cnt, idd);
         }
 
+        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, SQLiteTransactionBase tx)
+        {
+            const string sql1 = "delete from alias_argument where id_alias = @idAlias";
+            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
+
+            // Remove existing additional alias parameters
+            tx.Connection.Execute(sql1, new { idAlias });
+
+            // Create alias additional parameters
+            tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+        }
         private void CreateAdditionalParameters(AliasQueryResult alias, SQLiteTransaction tx)
             => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
@@ -169,6 +170,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @isHidden
                 );
                 select last_insert_rowid() from alias limit 1;";
+
             var param = new
             {
                 Arguments = alias.Parameters,
@@ -186,6 +188,8 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var csv = alias.Synonyms.SplitCsv();
             var additionalParameters = alias.AdditionalParameters;
+
+            using var _ = _logger.BeginSingleScope("SqlCreateAlias", sqlAlias);
             var id = _db.WithinTransaction(tx =>
             {
                 var id = tx.Connection.ExecuteScalar<long>(sqlAlias, param);
@@ -365,6 +369,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Update(AliasQueryResult alias) => _db.WithinTransaction(tx =>
         {
+            using var _ = _logger.BeginSingleScope("Sql", UpdateAliasSql);
             tx.Connection.Execute(UpdateAliasSql, new
             {
                 alias.Parameters,

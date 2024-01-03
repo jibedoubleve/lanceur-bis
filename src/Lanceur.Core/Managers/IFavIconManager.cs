@@ -1,6 +1,4 @@
-﻿using Lanceur.Core.Models;
-
-namespace Lanceur.Core.Managers
+﻿namespace Lanceur.Core.Managers
 {
     public interface IFavIconManager
     {

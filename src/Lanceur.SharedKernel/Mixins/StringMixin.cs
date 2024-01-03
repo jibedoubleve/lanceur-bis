@@ -7,19 +7,19 @@ namespace Lanceur.SharedKernel.Mixins
     {
         #region Methods
 
-        public static bool CastToBool(this string @this, bool @default = default) => bool.TryParse(@this, out bool result) ? result : @default;
+        private static bool CastToBool(this string @this, bool @default = default) => bool.TryParse(@this, out bool result) ? result : @default;
 
-        public static bool CastToBool(this object @this, bool @default = default) => $"{@this}".CastToBool(@default);
-
-        public static double CastToDouble(this object @this, double @default = default, IFormatProvider provider = null) => $"{@this}".CastToDouble(@default, provider);
-
-        public static double CastToDouble(this string @this, double @default = default, IFormatProvider provider = null)
+        private static double CastToDouble(this string @this, double @default = default, IFormatProvider provider = null)
         {
             provider ??= new CultureInfo("en-US");
             return double.TryParse(@this, NumberStyles.AllowDecimalPoint, provider, out double result) ? result : @default;
         }
 
-        public static int CastToInt(this string @this, int @default = default) => int.TryParse(@this, out int result) ? result : @default;
+        private static int CastToInt(this string @this, int @default = default) => int.TryParse(@this, out int result) ? result : @default;
+
+        public static bool CastToBool(this object @this, bool @default = default) => $"{@this}".CastToBool(@default);
+
+        public static double CastToDouble(this object @this, double @default = default, IFormatProvider provider = null) => $"{@this}".CastToDouble(@default, provider);
 
         public static int CastToInt(this object @this, int @default = default) => $"{@this}".CastToInt(@default);
 
@@ -52,6 +52,13 @@ namespace Lanceur.SharedKernel.Mixins
             if (strings is null) { return string.Empty; }
 
             return string.Join(", ", strings);
+        }
+
+        public static string Left(this string @string, int length)
+        {
+            return @string.Length <= length
+                ? @string
+                : @string[..length];
         }
 
         public static string[] SplitCsv(this string str)

@@ -7,11 +7,26 @@ namespace Lanceur.Infra.SQLite
     {
         #region Fields
 
+        private static readonly object Locker = new();
         private readonly string _connectionString;
         private SQLiteConnection _currentConnection;
-        private static readonly object Locker = new ();
 
-        private  SQLiteConnection GetConnection(bool renewConnection = true)
+        #endregion Fields
+
+        #region Constructors
+
+        public SQLiteMultiConnectionManager(SQLiteConnection connection)
+        {
+            _connectionString =
+                connection?.ConnectionString
+                ?? throw new ArgumentNullException(nameof(connection), "Cannot create a connection scope with an empty connection (NULL).");
+        }
+
+        #endregion Constructors
+
+        #region Methods
+
+        private SQLiteConnection GetConnection(bool renewConnection = true)
         {
             lock (Locker)
             {
@@ -28,20 +43,6 @@ namespace Lanceur.Infra.SQLite
                 return _currentConnection;
             }
         }
-        #endregion Fields
-
-        #region Constructors
-
-        public SQLiteMultiConnectionManager(SQLiteConnection connection)
-        {
-            _connectionString =
-                connection?.ConnectionString
-                ?? throw new ArgumentNullException(nameof(connection), "Cannot create a connection scope with an empty connection (NULL).");
-        }
-
-        #endregion Constructors
-
-        #region Methods
 
         public static implicit operator SQLiteConnection(SQLiteMultiConnectionManager manager) => manager.GetConnection(renewConnection: false);
 
@@ -63,7 +64,7 @@ namespace Lanceur.Infra.SQLite
         {
             using var conn = GetConnection();
             if (conn.State != ConnectionState.Open) conn.Open();
-            
+
             using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
             try
             {

@@ -21,6 +21,9 @@
 
         #region Properties
 
+        public static IEnumerable<QueryResult> NoResultFound
+            => SingleFromResult("No result found", iconKind: "AlertCircleOutline");
+
         public override string Description => _description;
 
         public override bool IsResult => false;
@@ -36,9 +39,6 @@
                 new DisplayQueryResult(text, subtext, iconKind)
             };
         }
-
-        public static IEnumerable<QueryResult> NoResultFound 
-            => SingleFromResult("No result found", iconKind: "AlertCircleOutline");
 
         #endregion Methods
     }

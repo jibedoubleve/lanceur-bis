@@ -11,6 +11,5 @@ namespace Lanceur.Core.Requests
         public QueryResult QueryResult { get; init; }
 
         #endregion Properties
-
     }
 }

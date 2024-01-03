@@ -1,10 +1,10 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:m="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core"
-    xmlns:p="clr-namespace:Lanceur.Core.Plugins;assembly=Lanceur.Core"
-    xmlns:vm="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core">
+    xmlns:vm="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core"
+    xmlns:p="clr-namespace:Lanceur.Core.Plugins;assembly=Lanceur.Core">
 
     <!--  TEMPATES  -->
     <DataTemplate x:Key="QueryResultTemplate" DataType="{x:Type vm:QueryResult}">

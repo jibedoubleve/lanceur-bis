@@ -31,11 +31,11 @@ namespace Lanceur.Macros
         #endregion Fields
 
         #region Constructors
-        
 
         public MultiMacro() : this(null, null, null)
         {
         }
+
         public MultiMacro(int? delay = null, IExecutionManager executionManager = null, ISearchService searchService = null)
         {
             _delay = delay ?? DefaultDelay;

@@ -5,9 +5,10 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
 using Lanceur.Schedulers;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -27,7 +28,7 @@ namespace Lanceur.Views
         private readonly ICmdlineManager _cmdlineManager;
         private readonly IDbRepository _dbRepository;
         private readonly IExecutionManager _executor;
-        private readonly IAppLogger _log;
+        private readonly ILogger<MainViewModel> _logger;
         private readonly ISearchService _searchService;
         private readonly ISettingsFacade _settingsFacade;
 
@@ -37,7 +38,7 @@ namespace Lanceur.Views
 
         public MainViewModel(
             ISchedulerProvider schedulerProvider = null,
-            IAppLoggerFactory logFactory = null,
+            ILoggerFactory loggerFactory = null,
             ISearchService searchService = null,
             ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
@@ -49,7 +50,7 @@ namespace Lanceur.Views
 
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
-            _log = Locator.Current.GetLogger<MainViewModel>(logFactory);
+            _logger = loggerFactory.GetLogger<MainViewModel>();
             _searchService = searchService ?? l.GetService<ISearchService>();
             _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
             _dbRepository = dataService ?? l.GetService<IDbRepository>();
@@ -246,7 +247,9 @@ namespace Lanceur.Views
                 ? _searchService.GetAll().ToArray()
                 : Array.Empty<AliasQueryResult>();
 
-            _log.Trace($"{(_settingsFacade.Application.Window.ShowResult ? $"View activation: show all {aliases.Length} result(s)" : "View activation: display nothing")}");
+            _logger.LogInformation(
+                "MainViewModel activated. There is {Length} alias(es) to show. (Show all results on search box show: {ShowResult})",
+                aliases.Length, _settingsFacade.Application.Window.ShowResult);
             return new()
             {
                 CurrentSessionName = sessionName,
@@ -259,6 +262,7 @@ namespace Lanceur.Views
         private async Task<AliasResponse> OnExecuteAliasAsync(AliasExecutionRequest request)
         {
             request ??= new();
+            using var _ = _logger.BeginSingleScope("ExecuteAliasRequest", request);
 
             if (request.AliasToExecute is null) { return new(); }
 
@@ -269,11 +273,10 @@ namespace Lanceur.Views
                 ExecuteWithPrivilege = request.RunAsAdmin,
             });
 
-            _log.Trace($"Execution of '{request.Query}' returned {(response?.Results?.Count() ?? 0)} result(s).");
             return new()
             {
-                Results = response?.Results ?? Array.Empty<QueryResult>(),
-                KeepAlive = response?.HasResult ?? false
+                Results = response.Results ?? Array.Empty<QueryResult>(),
+                KeepAlive = response.HasResult
             };
         }
 
@@ -294,12 +297,12 @@ namespace Lanceur.Views
 
             var query = _cmdlineManager.BuildFromText(criterion);
 
-            _log.Debug($"Search: criterion '{criterion}'");
+            _logger.LogInformation("Search criterion: {Criterion}", criterion);
 
             var results = _searchService.Search(query)
                                         .ToArray();
 
-            _log.Trace($"Search: Found {results.Length} element(s)");
+            _logger.LogDebug("Search: Found {Length} element(s)", results.Length);
             return new AliasResponse()
             {
                 Results = results,
@@ -313,7 +316,7 @@ namespace Lanceur.Views
 
             var currentIndex = Results.IndexOf(GetCurrentAlias());
             var nextAlias = Results.GetNextItem(currentIndex);
-            _log.Trace($"Selecting next result. [Index: {nextAlias?.Name}]");
+            _logger.LogTrace("Selecting next result. [Index: {Name}]", nextAlias.Name);
 
             return NavigationResponse.InactiveFromResult(nextAlias);
         }
@@ -324,7 +327,7 @@ namespace Lanceur.Views
 
             var currentIndex = Results.IndexOf(GetCurrentAlias());
             var previousAlias = Results.GetPreviousItem(currentIndex);
-            _log.Trace($"Selecting previous result. [Index: {previousAlias?.Name}]");
+            _logger.LogTrace("Selecting previous result. [Index: {Name}]", previousAlias.Name);
 
             return NavigationResponse.InactiveFromResult(previousAlias);
         }

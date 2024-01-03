@@ -1,6 +1,7 @@
 using Lanceur.Core.Models;
+using Lanceur.Infra.SQLite.Entities;
 
-namespace Lanceur.Infra.SQLite.Entities;
+namespace Lanceur.Infra.Sqlite.Entities;
 
 public static class AdditionalParameterMixin
 {

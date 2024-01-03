@@ -1,9 +1,9 @@
 ﻿using Lanceur.Core.Formatters;
+using Lanceur.Infra.Formatters;
 using Splat;
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using Lanceur.Infra.Formatters;
 
 namespace Lanceur.Converters
 {

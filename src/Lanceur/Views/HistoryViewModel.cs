@@ -1,8 +1,9 @@
 ﻿using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Splat;
 using System;
@@ -16,7 +17,7 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly IAppLogger _log;
+        private readonly ILogger<HistoryViewModel> _logger;
         private readonly ISchedulerProvider _schedulers;
         private readonly IDbRepository _service;
 
@@ -27,13 +28,13 @@ namespace Lanceur.Views
         public HistoryViewModel(
             ISchedulerProvider schedulers = null,
             IDbRepository service = null,
-            IAppLoggerFactory logFactory = null,
+            ILoggerFactory logFactory = null,
             IUserNotification notify = null)
         {
             var l = Locator.Current;
             _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
             _service = service ?? l.GetService<IDbRepository>();
-            _log = l.GetLogger<HistoryViewModel>(logFactory);
+            _logger = logFactory.GetLogger<HistoryViewModel>();
             notify ??= l.GetService<IUserNotification>();
 
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
@@ -54,11 +55,11 @@ namespace Lanceur.Views
 
         private void OnActivate()
         {
-            var history = _service.GetUsage(Per.Day);
-            _log.Trace($"Loaded {history.Count()} item(s) from history");
+            var history = _service.GetUsage(Per.Day).ToList();
+            _logger.LogDebug("Loaded {Count} item(s) from history", history.Count);
 
-            var x = history.Select(x => x.X.ToOADate());
-            var y = history.Select(x => x.Y);
+            var x = history.Select(p => p.X.ToOADate());
+            var y = history.Select(p => p.Y);
 
             OnRefreshChart(x, y);
         }

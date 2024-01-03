@@ -1,6 +1,8 @@
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
@@ -9,17 +11,17 @@ public class AliasSearchDbAction
     #region Fields
 
     private readonly IDbConnectionManager _db;
-    private readonly IAppLogger _log;
+    private readonly ILogger<AliasSearchDbAction> _logger;
     private readonly MacroDbAction _macroManager;
 
     #endregion Fields
 
     #region Constructors
 
-    public AliasSearchDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory, IConvertionService converter)
+    public AliasSearchDbAction(IDbConnectionManager db, ILoggerFactory logFactory, IConvertionService converter)
     {
         _db = db;
-        _log = logFactory.GetLogger<AliasDbAction>();
+        _logger = logFactory.GetLogger<AliasSearchDbAction>();
         _macroManager = new(db, logFactory, converter);
     }
 

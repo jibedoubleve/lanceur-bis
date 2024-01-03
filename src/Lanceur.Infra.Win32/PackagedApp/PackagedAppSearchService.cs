@@ -12,18 +12,18 @@ namespace Lanceur.Infra.Win32.PackagedApp
             fileName = fileName.Replace("package:", "");
             var installedDir = Path.GetDirectoryName(fileName);
 
-            return  GetUserPackages().AsParallel()
+            return GetUserPackages().AsParallel()
                                      .Where(p => p is { IsFramework: false, IsDevelopmentMode: false }
                                                  && (
-                                                     p.InstalledLocation.Path == installedDir 
+                                                     p.InstalledLocation.Path == installedDir
                                                      || p.IsAppUserModelId(fileName)))
                                      .Select(p => new Core.Models.PackagedApp
                                      {
-                                         AppUserModelId    = p.GetAppUserModelId(),
+                                         AppUserModelId = p.GetAppUserModelId(),
                                          InstalledLocation = p.InstalledLocation.Path,
-                                         Logo              = p.Logo,
-                                         Description       = p.Description,
-                                         DisplayName       = p.DisplayName
+                                         Logo = p.Logo,
+                                         Description = p.Description,
+                                         DisplayName = p.DisplayName
                                      })
                                      .Where(e => !string.IsNullOrEmpty(e.AppUserModelId))
                                      .ToArray();

@@ -5,6 +5,7 @@ using Lanceur.Schedulers;
 using Lanceur.Tests.Logging;
 using Lanceur.Ui;
 using Lanceur.Views;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Reactive.Concurrency;
 using Xunit.Abstractions;
@@ -16,9 +17,9 @@ internal class KeywordsViewModelBuilder
     #region Fields
 
     private IDbRepository _dbRepository;
-    private IAppLoggerFactory _loggerFactory;
-    private TestSchedulerProvider _schedulerProvider;
+    private ILoggerFactory _loggerFactory;
     private IPackagedAppSearchService _packagedAppSearchService;
+    private TestSchedulerProvider _schedulerProvider;
 
     #endregion Fields
 
@@ -57,11 +58,11 @@ internal class KeywordsViewModelBuilder
 
     public KeywordsViewModelBuilder With(ITestOutputHelper output)
     {
-        _loggerFactory = new XUnitLoggerFactory(output);
+        _loggerFactory = new MicrosoftLoggingLoggerFactory(output);
         return this;
     }
 
-    public KeywordsViewModelBuilder With(IAppLoggerFactory loggerFactory)
+    public KeywordsViewModelBuilder With(ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
         return this;

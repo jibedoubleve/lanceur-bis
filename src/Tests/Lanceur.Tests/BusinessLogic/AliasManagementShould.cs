@@ -6,6 +6,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Tests.SQLite;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Data.SQLite;
 using Xunit;
@@ -36,7 +37,7 @@ namespace Lanceur.Tests.BusinessLogic
         private static AliasDbAction BuildAliasDbAction(SQLiteConnection connection)
         {
             var scope = new SQLiteSingleConnectionManager(connection);
-            var log = Substitute.For<IAppLoggerFactory>();
+            var log = Substitute.For<ILoggerFactory>();
             var action = new AliasDbAction(scope, log);
             return action;
         }
@@ -44,7 +45,7 @@ namespace Lanceur.Tests.BusinessLogic
         private static SQLiteRepository BuildDataService(SQLiteConnection connection)
         {
             var scope = new SQLiteSingleConnectionManager(connection);
-            var log = Substitute.For<IAppLoggerFactory>();
+            var log = Substitute.For<ILoggerFactory>();
             var conv = Substitute.For<IConvertionService>();
             var service = new SQLiteRepository(scope, log, conv);
             return service;
