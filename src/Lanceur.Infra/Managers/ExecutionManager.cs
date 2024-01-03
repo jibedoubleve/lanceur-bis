@@ -5,10 +5,10 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Logging;
-using Lanceur.Infra.LuaScripting;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using Lanceur.Infra.LuaScripting;
 
 namespace Lanceur.Infra.Managers
 {
