@@ -45,7 +45,7 @@ namespace Lanceur.Core.BusinessLogic
 
             if (errors.Any()) throw new AggregateException($"Errors occured while updating synonyms of alias with these synonyms: {alias.Synonyms}", errors);
 
-            return results;
+            return results.ToList();
         }
 
         #endregion Methods
