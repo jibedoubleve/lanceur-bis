@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace Lanceur.SharedKernel.Utils;
 
-public static class TimePiece
+public static class TimeMeter
 {
     #region Methods
 

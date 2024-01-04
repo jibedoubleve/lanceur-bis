@@ -34,7 +34,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
 
     #region Methods
 
-    public void RefreshCurrentThumbnail(EntityDecorator<QueryResult> query)
+    public async Task RefreshCurrentThumbnailAsync(EntityDecorator<QueryResult> query)
     {
         if (query.Entity is not AliasQueryResult alias) return;
         if (alias.FileName.IsNullOrEmpty()) return;
@@ -46,8 +46,8 @@ public class ThumbnailRefresher : IThumbnailRefresher
         }
         if (alias.IsPackagedApplication())
         {
-            var response = _searchService.GetByInstalledDirectory(alias.FileName)
-                                         .FirstOrDefault();
+            var response = (await _searchService.GetByInstalledDirectory(alias.FileName))
+                                                .FirstOrDefault();
             if (response is not null)
             {
                 alias.Thumbnail = response.Logo.LocalPath;

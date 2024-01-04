@@ -8,10 +8,11 @@ public class MockThumbnailRefresher : IThumbnailRefresher
 {
     #region Methods
 
-    public void RefreshCurrentThumbnail(EntityDecorator<QueryResult> query)
+    public Task RefreshCurrentThumbnailAsync(EntityDecorator<QueryResult> query)
     {
         query.Entity.Thumbnail = Guid.NewGuid().ToString();
         query.Soil();
+        return Task.CompletedTask;
     }
 
     #endregion Methods

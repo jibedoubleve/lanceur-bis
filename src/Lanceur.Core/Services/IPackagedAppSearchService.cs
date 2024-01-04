@@ -6,7 +6,7 @@ public interface IPackagedAppSearchService
 {
     #region Methods
 
-    IEnumerable<PackagedApp> GetByInstalledDirectory(string fileName);
+    Task<IEnumerable<PackagedApp>> GetByInstalledDirectory(string fileName);
 
     #endregion Methods
 }

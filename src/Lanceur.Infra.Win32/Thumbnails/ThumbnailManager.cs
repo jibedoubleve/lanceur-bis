@@ -47,10 +47,12 @@ namespace Lanceur.Infra.Win32.Thumbnails
             var queries = EntityDecorator<QueryResult>.FromEnumerable(results)
                                                       .ToArray();
 
-            using var m = TimePiece.Measure(this, (msg, @params) => _logger.LogTrace(msg, @params));
+            using var m = TimeMeter.Measure(this, (msg, @params) => _logger.LogTrace(msg, @params));
             try
             {
-                await Task.Run(() => Parallel.ForEach(queries, _thumbnailRefresher.RefreshCurrentThumbnail));
+                await Task.CompletedTask;
+                var tasks = queries.Select(q => _thumbnailRefresher.RefreshCurrentThumbnailAsync(q));
+                await Task.WhenAll(tasks);
 
                 var aliases = queries.Where(x => x.IsDirty)
                                      .Select(x => x.Entity)
