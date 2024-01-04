@@ -122,9 +122,12 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBox
+                                    <ComboBox
                                         x:Name="BoxFileName"
                                         Margin="5"
+                                        DisplayMemberPath="."
+                                        HorizontalAlignment="Stretch"
+                                        IsEditable="True"
                                         Text="{Binding ElementName=Aliases, Path=SelectedItem.FileName, UpdateSourceTrigger=PropertyChanged}"
                                         Validation.ErrorTemplate="{StaticResource TextControlValidationErrorTemplate}" />
                                     <TextBlock

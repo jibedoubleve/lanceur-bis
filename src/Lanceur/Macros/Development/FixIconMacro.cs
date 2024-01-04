@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Lanceur.Macros.Development;
 
-[Macro("fixicon"), Description("Fix icons when alias is a directory or an hyperlink")]
+[Macro("fixicon", isVisible: false), Description("Fix icons when alias is a directory or an hyperlink")]
 public class FixIconMacro : MacroQueryResult
 {
     #region Properties

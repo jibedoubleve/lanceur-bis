@@ -17,6 +17,7 @@ using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Splat;
 using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
@@ -24,12 +25,14 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows.Media.TextFormatting;
 using DynamicData;
 using Humanizer;
 using Lanceur.Core.BusinessLogic;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Utils;
+using System.Reflection;
+using Lanceur.Core;
+using Lanceur.Infra.Utils;
 
 namespace Lanceur.Views
 {
@@ -45,6 +48,7 @@ namespace Lanceur.Views
         private readonly IPackagedAppSearchService _packagedAppSearchService;
         private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
+        private readonly MacroLister _macroLister;
 
         #endregion Fields
 
@@ -72,6 +76,7 @@ namespace Lanceur.Views
 
             ConfirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
             AskLuaEditor = new();
+            _macroLister = new MacroLister(this);
 
             this.WhenActivated(Activate);
         }
@@ -87,6 +92,8 @@ namespace Lanceur.Views
         [Reactive] public ObservableCollection<QueryResult> Aliases { get; set; } = new(); 
 
         [Reactive] public AliasQueryResult AliasToCreate { get; set; }
+
+        [Reactive] public ObservableCollection<string> MacroCollection { get; set; }
 
         public Interaction<Script, string> AskLuaEditor { get; }
 
@@ -309,8 +316,14 @@ namespace Lanceur.Views
         {
             var validateFileNameExists = this.WhenAnyValue(
                 x => x.SelectedAlias.FileName,
-                x => !x.IsNullOrEmpty()
-            );
+                x =>
+                {
+                    if (x.IsNullOrEmpty()) return false;
+                    if (!x.StartsWith('@')) return true;
+                    
+                    return x.StartsWith('@') && _macroLister.GetAttributes().Any(a => a.Name == x.ToUpper());
+                });
+            
             var validateNameExists = this.WhenAnyValue(
                 x => x.SelectedAlias.SynonymsToAdd,
                 x => _aliasService.SelectNames(x.SplitCsv())
@@ -319,7 +332,7 @@ namespace Lanceur.Views
             ValidationFileName = this.ValidationRule(
                    vm => vm.SelectedAlias.FileName,
                    validateFileNameExists,
-                   "The path to the file shouldn't be empty."
+                   "Either the path to the file is empty or the macro does not exist."
              );
             ValidationFileName.DisposeWith(d);
 
@@ -357,6 +370,12 @@ namespace Lanceur.Views
             SetupValidations(d);
             SetupCommands(_schedulers.MainThreadScheduler, _notify, d);
             SetupBindings(_schedulers.MainThreadScheduler, d);
+            
+            //load macros
+            var macros = _macroLister.GetVisibleAttributes()
+                                     .Select(x => x.Name)
+                                     .ToArray();
+            MacroCollection = new(macros);
         }
 
         public void HydrateSelectedAlias() => _aliasService.HydrateAlias(SelectedAlias);
