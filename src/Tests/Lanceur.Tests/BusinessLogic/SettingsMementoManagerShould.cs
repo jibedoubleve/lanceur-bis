@@ -7,7 +7,9 @@ using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 using NSubstitute;
 using System.Text.RegularExpressions;
+using Lanceur.Tests.Utils;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.BusinessLogic
 {
@@ -41,7 +43,18 @@ namespace Lanceur.Tests.BusinessLogic
     }
 }";
 
+        private readonly ITestOutputHelper _output;
+
         #endregion Fields
+
+        #region Constructors
+
+        public SettingsMementoManagerShould(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
+        #endregion Constructors
 
         #region Methods
 
@@ -63,21 +76,24 @@ namespace Lanceur.Tests.BusinessLogic
             // ARRANGE
             var pattern = @$"(""{property}"": [a-zA-Z0-9.]*)";
             var regex = new Regex(pattern, RegexOptions.Singleline);
-
             var dbPath = Guid.NewGuid().ToString();
 
             // Initial state
             var initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
-            var initialDbPath = dbPath;
+            _output.WriteJson("Initial AppConfig", initialAppConfig);
 
             // Second state
-            var newJson = regex.Replace(_jsonAppConfig, @$"""{property}"":{newValue}");
+            var replacement = @$"""{property}"": {newValue}";
+            var newJson = regex.Replace(_jsonAppConfig, replacement);
             var secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(newJson);
+            _output.WriteJson("Second AppConfig", secondAppConfig);
+            _output.WriteLine($"Replacement: '{replacement}', Pattern: '{pattern}'");
+            
             secondDbPath = secondDbPath.IsNullOrWhiteSpace() ? dbPath : secondDbPath;
 
             // Setup SettingsFacade
             var databaseConfig = Substitute.For<IDatabaseConfig>();
-            databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
+            databaseConfig.DbPath.Returns(dbPath, secondDbPath);
 
             var databaseConfigRepository = Substitute.For<IDatabaseConfigRepository>();
             databaseConfigRepository.Current.Returns(databaseConfig);
