@@ -28,6 +28,7 @@ using System.Windows.Media.TextFormatting;
 using DynamicData;
 using Humanizer;
 using Lanceur.Core.BusinessLogic;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Utils;
 
 namespace Lanceur.Views
@@ -148,17 +149,20 @@ namespace Lanceur.Views
             return alias;
         }
 
-        private QueryResult OnSaveOrUpdateAlias(AliasQueryResult alias)
+        private async Task<QueryResult> OnSaveOrUpdateAlias(AliasQueryResult alias)
         {
+            using var _ = _logger.BeginSingleScope("AliasToSaveOrUpdate", alias);
+            
             var created = alias.Id == 0;
             BusyMessage = "Saving alias...";
             using (_busyScope.Open())
+            using (TimeMeter.Measure(this, (template, @params) => _logger.LogTrace(template, @params)))
             {
                 try
                 {
                     alias.SetName();
-                    var response = _packagedAppSearchService.GetByInstalledDirectory(alias.FileName)
-                                                            .FirstOrDefault();
+                    var response = (await _packagedAppSearchService.GetByInstalledDirectory(alias.FileName))
+                                                                   .FirstOrDefault();
                     if (response is not null) // This is a packaged application
                     {
                         alias.FileName = $"package:{response.AppUserModelId}";
@@ -290,7 +294,7 @@ namespace Lanceur.Views
                           .DisposeWith(d);
             RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveOrUpdateAlias = ReactiveCommand.Create<AliasQueryResult, QueryResult>(
+            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, QueryResult>(
                 OnSaveOrUpdateAlias,
                 this.IsValid(),
                 outputScheduler: uiThread

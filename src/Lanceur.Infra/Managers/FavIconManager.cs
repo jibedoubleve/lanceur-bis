@@ -46,7 +46,7 @@ namespace Lanceur.Infra.Managers
             if (!Uri.TryCreate(fileName, UriKind.Absolute, out var uri)) return;
             if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return;
 
-            using var m = TimePiece.Measure(this, (msg, @params) => _logger.LogTrace(msg, @params));
+            using var m = TimeMeter.Measure(this, (msg, @params) => _logger.LogTrace(msg, @params));
             var output = Path.Combine(AppPaths.ImageRepository, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
             await _favIconDownloader.SaveToFileAsync(uri, output);
         }
