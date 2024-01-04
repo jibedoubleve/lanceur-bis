@@ -48,6 +48,8 @@ namespace Lanceur.Views
                     interaction.SetOutput(result.ToBool());
                 });
 
+                
+                this.OneWayBind(ViewModel, vm => vm.MacroCollection, v => v.BoxFileName.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Aliases, v => v.Aliases.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.BusyMessage, v => v.BusyMessage.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.BusyControl.Visibility).DisposeWith(d);

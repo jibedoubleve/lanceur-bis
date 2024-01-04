@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Lanceur.Macros.Development
 {
-    [Macro("debug"), Description("Provides some debugging tools. But it is more an easter egg than something else")]
+    [Macro("debug", isVisible: false), Description("Provides some debugging tools. But it is more an easter egg than something else")]
     public class DebugMacro : MacroQueryResult
     {
         #region Fields
