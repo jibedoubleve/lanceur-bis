@@ -108,10 +108,6 @@ public class Bootstrapper
 
         l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
 
-        // Logging
-        Locator.CurrentMutable.UseSerilogFullLogger();
-        l.Register(() => _serviceCollection?.GetService<ILoggerFactory>() ?? new DefaultLoggerFactory());
-
         l.Register<IStoreLoader>(() => new StoreLoader());
         l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
         l.Register<ICmdlineManager>(() => new CmdlineManager());
@@ -177,6 +173,10 @@ public class Bootstrapper
                            Get<SQLiteConnection>(),
                            ScriptRepository.Asm,
                            ScriptRepository.DbScriptEmbededResourcePattern)));
+        
+        // Logging
+        l.UseSerilogFullLogger();
+        l.Register(() => _serviceCollection?.GetService<ILoggerFactory>() ?? new DefaultLoggerFactory());
     }
 
     private static void RegisterViewModels()

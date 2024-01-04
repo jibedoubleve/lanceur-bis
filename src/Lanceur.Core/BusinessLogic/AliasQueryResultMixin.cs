@@ -18,10 +18,36 @@ namespace Lanceur.Core.BusinessLogic
             var items = string.Join(',',
                                     alias.Synonyms
                                          .Replace(' ', ',')
-                                         .Split(',',StringSplitOptions.RemoveEmptyEntries)
-                                );
+                                         .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            );
             alias.Synonyms = items;
         }
+
+        public static IEnumerable<AliasQueryResult> CloneFromSynonyms(this AliasQueryResult alias)
+        {
+            var names = alias.Synonyms.SplitCsv();
+            var errors = new List<Exception>();
+            var results = new List<AliasQueryResult>();
+
+            foreach (var name in names)
+            {
+                try
+                {
+                    var toAdd = alias.CloneObject();
+                    toAdd.Name = name;
+                    results.Add(toAdd);
+                }
+                catch (Exception ex)
+                {
+                    errors.Add(ex);
+                }
+            }
+
+            if (errors.Any()) throw new AggregateException($"Errors occured while updating synonyms of alias with these synonyms: {alias.Synonyms}", errors);
+
+            return results;
+        }
+
         #endregion Methods
     }
 }

@@ -93,37 +93,38 @@ public class KeywordViewModelShould : SQLiteTest
 
     [Fact]
     public void CreateAliasAndSelectIt() => new TestScheduler().With(scheduler =>
-        {
-            // ARRANGE
-            var dbRepository = Substitute.For<IDbRepository>();
-            dbRepository.SelectNames(Arg.Any<string[]>())
-                        .Returns(new ExistingNameResponse(Array.Empty<string>()));
+    {
+        // ARRANGE
+        var dbRepository = Substitute.For<IDbRepository>();
+        dbRepository.SelectNames(Arg.Any<string[]>())
+                    .Returns(new ExistingNameResponse(Array.Empty<string>()));
 
-            var vm = new KeywordsViewModelBuilder()
-                     .With(scheduler)
-                     .With(_output)
-                     .With(dbRepository)
-                     .Build();
+        var vm = new KeywordsViewModelBuilder()
+                 .With(scheduler)
+                 .With(_output)
+                 .With(dbRepository)
+                 .Build();
 
-            var synonyms = Guid.NewGuid().ToString();
-            var fileName = Guid.NewGuid().ToString();
+        // ACT
+        vm.Activate(new());
+        vm.CreatingAlias.Execute().Subscribe();
+        scheduler.Start();
+        
+        // Check conditions before going further
+        // as it is an error point here.
+        vm.SelectedAlias.Should().NotBeNull("because it will be used for the update");
+        
+        var hash = vm.SelectedAlias.GetHashCode();
 
-            // ACT
+        vm.SelectedAlias.Synonyms = Guid.NewGuid().ToString();
+        vm.SelectedAlias.FileName = Guid.NewGuid().ToString();
 
-            vm.Activate(new());
-            scheduler.Start();
-            vm.CreatingAlias.Execute().Subscribe();
-            var hash = vm.SelectedAlias.GetHashCode();
+        vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
 
-            vm.SelectedAlias.Synonyms = synonyms;
-            vm.SelectedAlias.FileName = fileName;
-
-            vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
-
-            // ASSERT
-            vm.SelectedAlias.GetHashCode().Should().Be(hash);
-        });
-
+        // ASSERT
+        vm.SelectedAlias.GetHashCode().Should().Be(hash);
+    });
+    
     [Fact]
     public void CreateAliasForPackagedApp() => new TestScheduler().With(scheduler =>
         {
@@ -141,6 +142,12 @@ public class KeywordViewModelShould : SQLiteTest
             // ACT
             vm.Activate(new());
             vm.CreatingAlias.Execute().Subscribe();
+            scheduler.Start();
+            
+            // Check conditions before going further
+            // as it is an error point here.
+            vm.SelectedAlias.Should().NotBeNull("because it will be used for the update");
+            
             vm.SaveOrUpdateAlias.Execute(vm.SelectedAlias).Subscribe();
 
             // ASSERT
@@ -169,7 +176,7 @@ public class KeywordViewModelShould : SQLiteTest
             cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>();
         });
         var conversionService = new AutoMapperConverter(new Mapper(cfg));
-        var dbRepository      = new SQLiteRepository(connectionMgr, logger, conversionService);
+        var dbRepository = new SQLiteRepository(connectionMgr, logger, conversionService);
 
         var vm = new KeywordsViewModelBuilder()
                  .With(scheduler)
@@ -239,8 +246,6 @@ public class KeywordViewModelShould : SQLiteTest
         string Random() => Guid.NewGuid().ToString();
          
     });
-
-
 
     #endregion Methods
 }
