@@ -2,6 +2,8 @@ using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
@@ -31,6 +33,7 @@ public class AliasSearchDbAction
 
     public IEnumerable<AliasQueryResult> Search(string name, long idSession)
     {
+        using var _ = _logger.MeasureExecutionTime(this);
         var sql = @$"
                 select
                     an.Name       as {nameof(AliasQueryResult.Name)},

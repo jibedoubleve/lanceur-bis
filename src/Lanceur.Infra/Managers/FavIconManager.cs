@@ -5,6 +5,7 @@ using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
+using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Managers
 {
@@ -46,7 +47,7 @@ namespace Lanceur.Infra.Managers
             if (!Uri.TryCreate(fileName, UriKind.Absolute, out var uri)) return;
             if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return;
 
-            using var m = TimeMeter.Measure(this, (msg, @params) => _logger.LogTrace(msg, @params));
+            using var m = _logger.MeasureExecutionTime(this);
             var output = Path.Combine(AppPaths.ImageRepository, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
             await _favIconDownloader.SaveToFileAsync(uri, output);
         }

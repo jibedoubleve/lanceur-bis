@@ -6,6 +6,10 @@ using Lanceur.Core.Stores;
 using Splat;
 using System.ComponentModel;
 using System.Reflection;
+using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores
 {
@@ -17,6 +21,7 @@ namespace Lanceur.Infra.Stores
         private readonly Assembly _assembly;
         private readonly IDbRepository _dataService;
         private IEnumerable<QueryResult> _reservedAliases;
+        private readonly ILogger<ReservedAliasStore> _logger;
 
         #endregion Fields
 
@@ -32,6 +37,9 @@ namespace Lanceur.Infra.Stores
         {
             _assembly = Assembly.GetEntryAssembly();
             _dataService = Locator.Current.GetService<IDbRepository>();
+
+            var loggerFactory = Locator.Current.GetService<ILoggerFactory>();
+            _logger = loggerFactory.GetLogger<ReservedAliasStore>();
         }
 
         /// <summary>
@@ -39,13 +47,17 @@ namespace Lanceur.Infra.Stores
         /// </summary>
         /// <param name="assembly">The assembly where to search the reserved aliases. </param>
         /// <param name="dataService">The service used to update usage of the alias</param>
+        /// <param name="loggerFactory">Logger factory used to create logger</param>
         /// <remarks>
         /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
         /// </remarks>
-        public ReservedAliasStore(Assembly assembly, IDbRepository dataService = null)
+        public ReservedAliasStore(Assembly assembly, IDbRepository dataService = null, ILoggerFactory loggerFactory = null)
         {
             _assembly = assembly;
             _dataService = dataService ?? Locator.Current.GetService<IDbRepository>();
+            
+            loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
+            _logger = loggerFactory.GetLogger<ReservedAliasStore>();
         }
 
         #endregion Constructors
@@ -97,6 +109,7 @@ namespace Lanceur.Infra.Stores
 
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
+            using var _ = _logger.MeasureExecutionTime(this);
             var result = (from k in GetAll()
                           where k.Name.ToLower().StartsWith(query.Name)
                           select k).ToList();

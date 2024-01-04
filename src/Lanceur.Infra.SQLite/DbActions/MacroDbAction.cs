@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions
@@ -77,7 +78,10 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// to composite, upgraded
         /// </returns>
         public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)
-            => collection.Select(Hydrate).ToList();
+        {
+            using var _ = _logger.MeasureExecutionTime(this);
+            return collection.Select(Hydrate).ToList();
+        }
 
         #endregion Methods
     }

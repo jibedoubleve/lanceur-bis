@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Splat;
 using System.Reflection;
+using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Infra.Stores
 {
@@ -87,6 +89,7 @@ namespace Lanceur.Infra.Stores
 
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
+            using var _ = _logger.MeasureExecutionTime(this);
             LoadPlugins();
             var found = (from plugin in _plugins
                          where plugin?.Name?.ToLower().StartsWith(query.Name.ToLower()) ?? false
