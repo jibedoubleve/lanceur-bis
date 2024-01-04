@@ -253,7 +253,7 @@ namespace Lanceur.Views
                                                    .Add("TypeOfQueryResult", updated.GetType())
                                                    .BeginScope();
                 // Remove all synonyms ... 
-                var toDel = Aliases.Where(a => a.Id == updated.Id);
+                var toDel = Aliases.Where(a => a.Id == updated.Id).ToList();
                 Aliases.Remove(toDel);
 
                 // ... and recreate them
@@ -262,7 +262,9 @@ namespace Lanceur.Views
 
                 // Sort and display selected alias
                 Aliases.SortCollection(criterion => criterion.Name);
-                SelectedAlias = updatedAlias;
+                SelectedAlias = Aliases.Where(a=>a.Id == updated.Id)
+                                       .Cast<AliasQueryResult>()
+                                       .FirstOrDefault() ;
             }
             catch(Exception ex)
             {
