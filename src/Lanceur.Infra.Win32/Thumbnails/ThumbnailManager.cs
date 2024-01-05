@@ -51,9 +51,8 @@ namespace Lanceur.Infra.Win32.Thumbnails
             using var m = _logger.MeasureExecutionTime(this);
             try
             {
-                await Task.CompletedTask;
                 var tasks = queries.Select(q => _thumbnailRefresher.RefreshCurrentThumbnailAsync(q));
-                Task.WhenAll(tasks);
+                _ =  Task.WhenAll(tasks); // Fire & forget thumbnail refresh
 
                 var aliases = queries.Where(x => x.IsDirty)
                                      .Select(x => x.Entity)
