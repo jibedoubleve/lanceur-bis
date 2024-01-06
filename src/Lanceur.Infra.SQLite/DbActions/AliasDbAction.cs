@@ -12,21 +12,7 @@ namespace Lanceur.Infra.SQLite.DbActions
     public class AliasDbAction
     {
         #region Fields
-
-        private const string UpdateAliasSql = @"
-                update alias
-                set
-                    arguments   = @parameters,
-                    file_name   = @fileName,
-                    notes       = @notes,
-                    run_as      = @runAs,
-                    start_mode  = @startMode,
-                    working_dir = @WorkingDirectory,
-                    icon        = @Icon,
-                    thumbnail   = @thumbnail,
-                    lua_script  = @luaScript
-                where id = @id;";
-
+        
         private readonly IDbConnectionManager _db;
         private readonly ILogger<AliasDbAction> _logger;
 
@@ -413,8 +399,23 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Update(AliasQueryResult alias) => _db.WithinTransaction(tx =>
         {
-            using var _ = _logger.BeginSingleScope("Sql", UpdateAliasSql);
-            tx.Connection.Execute(UpdateAliasSql, new
+            const string updateAliasSql = @"
+                update alias
+                set
+                    arguments   = @parameters,
+                    file_name   = @fileName,
+                    notes       = @notes,
+                    run_as      = @runAs,
+                    start_mode  = @startMode,
+                    working_dir = @WorkingDirectory,
+                    icon        = @Icon,
+                    thumbnail   = @thumbnail,
+                    lua_script  = @luaScript,
+                    exec_count  = @count
+                where id = @id;";
+        
+            using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
+            tx.Connection.Execute(updateAliasSql, new
             {
                 alias.Parameters,
                 alias.FileName,
@@ -425,7 +426,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.Icon,
                 alias.Thumbnail,
                 alias.LuaScript,
-                id = alias.Id
+                alias.Count,
+                id = alias.Id,
             });
             CreateAdditionalParameters(alias, tx);
             UpdateName(alias, tx);
