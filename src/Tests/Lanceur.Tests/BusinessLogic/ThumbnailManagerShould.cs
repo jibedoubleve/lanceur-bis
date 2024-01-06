@@ -34,7 +34,7 @@ public class ThumbnailManagerShould : SQLiteTest
     #region Methods
 
     [Fact]
-    public async Task RefreshThumbnailsWithoutRemovingAdditionalParameters()
+    public void RefreshThumbnailsWithoutRemovingAdditionalParameters()
     {
         // ARRANGE
         var sql = new SqlBuilder().AppendAlias(1, "fileName1", "arguments1")
@@ -68,7 +68,7 @@ public class ThumbnailManagerShould : SQLiteTest
         var aliases = dbRepository.Search("a");
 
         // ACT
-        await thumbnailManager.RefreshThumbnailsAsync(aliases);
+        thumbnailManager.RefreshThumbnailsAsync(aliases);
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))

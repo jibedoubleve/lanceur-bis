@@ -49,7 +49,7 @@ public class AliasSearchDbAction
                     a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count  as {nameof(AliasQueryResult.Count)},
                     s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
-                    s.Synonyms    as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
+                    s.Synonyms    as {nameof(AliasQueryResult.SynonymsWhenLoaded)};
                     a.exec_count  as {nameof(AliasQueryResult.Count)}
                 from
                     alias a
