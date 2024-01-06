@@ -3,6 +3,7 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -47,12 +48,11 @@ namespace Lanceur.Infra.Win32.Thumbnails
             var queries = EntityDecorator<QueryResult>.FromEnumerable(results)
                                                       .ToArray();
 
-            using var m = TimeMeter.Measure(this, (msg, @params) => _logger.LogTrace(msg, @params));
+            using var m = _logger.MeasureExecutionTime(this);
             try
             {
-                await Task.CompletedTask;
                 var tasks = queries.Select(q => _thumbnailRefresher.RefreshCurrentThumbnailAsync(q));
-                await Task.WhenAll(tasks);
+                _ =  Task.WhenAll(tasks); // Fire & forget thumbnail refresh
 
                 var aliases = queries.Where(x => x.IsDirty)
                                      .Select(x => x.Entity)

@@ -2,6 +2,8 @@ using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
@@ -31,6 +33,7 @@ public class AliasSearchDbAction
 
     public IEnumerable<AliasQueryResult> Search(string name, long idSession)
     {
+        using var _ = _logger.MeasureExecutionTime(this);
         var sql = @$"
                 select
                     an.Name       as {nameof(AliasQueryResult.Name)},
@@ -46,7 +49,8 @@ public class AliasSearchDbAction
                     a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count  as {nameof(AliasQueryResult.Count)},
                     s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
-                    s.Synonyms    as {nameof(AliasQueryResult.SynonymsWhenLoaded)}
+                    s.Synonyms    as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
+                    a.exec_count  as {nameof(AliasQueryResult.Count)}
                 from
                     alias a
                     left join alias_name            an on a.id         = an.id_alias
@@ -69,7 +73,7 @@ public class AliasSearchDbAction
 
     public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string name, long idSession)
     {
-        var sql = @$"
+        const string sql = @$"
                 select
                     an.Name || ':' || aa.name         as {nameof(AliasQueryResult.Name)},
                     a.Id                              as {nameof(AliasQueryResult.Id)},
@@ -84,7 +88,8 @@ public class AliasSearchDbAction
                     a.lua_script                      as {nameof(AliasQueryResult.LuaScript)},
                     c.exec_count                      as {nameof(AliasQueryResult.Count)},
                     s.synonyms                        as {nameof(AliasQueryResult.Synonyms)},
-                    s.Synonyms                        as {nameof(AliasQueryResult.SynonymsWhenLoaded)}
+                    s.Synonyms                        as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
+                    a.exec_count                      as {nameof(AliasQueryResult.Count)}
                 from
                     alias a
                     left join alias_name            an on a.id         = an.id_alias

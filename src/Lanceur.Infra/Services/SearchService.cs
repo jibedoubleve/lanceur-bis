@@ -2,7 +2,10 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Utils;
+using Microsoft.Extensions.Logging;
 using Splat;
 
 namespace Lanceur.Infra.Services
@@ -13,16 +16,24 @@ namespace Lanceur.Infra.Services
 
         private readonly IMacroManager _macroManager;
         private readonly IThumbnailManager _thumbnailManager;
+        private readonly ILogger<SearchService> _logger;
 
         #endregion Fields
 
         #region Constructors
 
-        public SearchService(IStoreLoader storeLoader = null, IMacroManager macroManager = null, IThumbnailManager thumbnailManager = null) : base(storeLoader)
+        public SearchService(
+            IStoreLoader storeLoader = null, 
+            IMacroManager macroManager = null, 
+            IThumbnailManager thumbnailManager = null,
+            ILoggerFactory loggerFactory = null) : base(storeLoader)
         {
             var l = Locator.Current;
             _macroManager = macroManager ?? l.GetService<IMacroManager>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
+
+            loggerFactory ??= l.GetService<ILoggerFactory>();
+            _logger = loggerFactory.GetLogger<SearchService>();
         }
 
         #endregion Constructors
@@ -59,6 +70,7 @@ namespace Lanceur.Infra.Services
 
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
+            using var _ = _logger.MeasureExecutionTime(this);
             if (query == null) { return new List<QueryResult>(); }
 
             var results = Stores

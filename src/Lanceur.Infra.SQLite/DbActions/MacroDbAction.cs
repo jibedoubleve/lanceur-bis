@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions
@@ -45,13 +46,16 @@ namespace Lanceur.Infra.SQLite.DbActions
             var action = new AliasDbAction(_db, _loggerFactory);
             var subAliases = new List<AliasQueryResult>();
 
+            var names = item?.Parameters?.Split("@") ?? Array.Empty<string>();
+            var aliases = action.GetExact(names).ToArray();
+
             var delay = 0;
-            foreach (var name in item?.Parameters?.Split("@") ?? Array.Empty<string>())
+            foreach (var name in names)
             {
                 if (name == string.Empty) { delay++; }
                 else
                 {
-                    var alias = action.GetExact(name);
+                    var alias = aliases.FirstOrDefault(a => a.Name == name);
                     if (alias is null)
                     {
                         _logger.LogWarning("Impossible to create composite alias {AliasName}. Check all the items of the composite exists in the database", name);
@@ -77,7 +81,18 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// to composite, upgraded
         /// </returns>
         public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)
-            => collection.Select(Hydrate).ToList();
+        {
+            using var _ = _logger.MeasureExecutionTime(this);
+            var list = new List<AliasQueryResult>(collection);
+            var composites = list.Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
+                                       .Select(Hydrate)
+                                       .ToArray();
+
+            list.RemoveAll(x => composites.Select(c => c.Id).Contains(x.Id));
+            list.AddRange(composites);
+            
+            return list.ToArray();
+        }
 
         #endregion Methods
     }

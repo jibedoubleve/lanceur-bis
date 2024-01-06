@@ -163,7 +163,7 @@ namespace Lanceur.Views
             var created = alias.Id == 0;
             BusyMessage = "Saving alias...";
             using (_busyScope.Open())
-            using (TimeMeter.Measure(this, (template, @params) => _logger.LogTrace(template, @params)))
+            using (_logger.MeasureExecutionTime(this))
             {
                 try
                 {

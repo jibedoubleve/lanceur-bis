@@ -38,12 +38,8 @@ public class ThumbnailRefresher : IThumbnailRefresher
     {
         if (query.Entity is not AliasQueryResult alias) return;
         if (alias.FileName.IsNullOrEmpty()) return;
-        if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon)
-        {
-            var thumbnail = alias.Thumbnail ?? WebIcon;
-            _logger.LogTrace("A thumbnail already exists for {Name}. Thumbnail: {Thumbnail}", alias.Name, thumbnail);
-            return;
-        }
+
+        if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon) return; 
         if (alias.IsPackagedApplication())
         {
             var response = (await _searchService.GetByInstalledDirectory(alias.FileName))

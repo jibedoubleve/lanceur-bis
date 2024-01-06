@@ -12,21 +12,7 @@ namespace Lanceur.Infra.SQLite.DbActions
     public class AliasDbAction
     {
         #region Fields
-
-        private const string UpdateAliasSql = @"
-                update alias
-                set
-                    arguments   = @parameters,
-                    file_name   = @fileName,
-                    notes       = @notes,
-                    run_as      = @runAs,
-                    start_mode  = @startMode,
-                    working_dir = @WorkingDirectory,
-                    icon        = @Icon,
-                    thumbnail   = @thumbnail,
-                    lua_script  = @luaScript
-                where id = @id;";
-
+        
         private readonly IDbConnectionManager _db;
         private readonly ILogger<AliasDbAction> _logger;
 
@@ -240,18 +226,21 @@ namespace Lanceur.Infra.SQLite.DbActions
         }
 
         /// <summary>
-        /// Get the a first alias with the exact name. In case of multiple aliases
-        /// with same name, the one with greater counter is selected.
+        /// Get the a first alias with the exact name. 
         /// </summary>
         /// <param name="name">The alias' exact name to find.</param>
         /// <param name="idSession">The session where the search occurs.</param>
         /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
         /// <returns>The exact match or <c>null</c> if not found.</returns>
+        /// <remarks>
+        /// For optimisation reason, there's no check of doubloons. Bear UI validates and
+        /// forbid to insert two aliases with same name.
+        /// </remarks>
         public AliasQueryResult GetExact(string name, long? idSession = null, bool includeHidden = false)
         {
             idSession ??= GetDefaultSessionId();
 
-            var sql = @$"
+            const string sql = @$"
                 select
                     n.Name        as {nameof(AliasQueryResult.Name)},
                     s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
@@ -286,6 +275,47 @@ namespace Lanceur.Infra.SQLite.DbActions
             return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault());
         }
 
+        /// <summary>
+        /// Get all the alias that has an exact name in the specified list of names.
+        /// . In case of multiple aliases with same name, the one with greater counter
+        /// is selected.
+        /// </summary>
+        /// <param name="names">The list of names to find.</param>
+        /// <param name="idSession">The session where the search occurs.</param>
+        /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
+        /// <returns>The exact match or <c>null</c> if not found.</returns>
+        public IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, long? idSession = null, bool includeHidden = false)
+        {
+            idSession ??= GetDefaultSessionId();
+
+            const string sql = @$"
+            select
+                n.Name        as {nameof(AliasQueryResult.Name)},
+                a.Id          as {nameof(AliasQueryResult.Id)},
+                a.arguments   as {nameof(AliasQueryResult.Parameters)},
+                a.file_name   as {nameof(AliasQueryResult.FileName)},
+                a.notes       as {nameof(AliasQueryResult.Notes)},
+                a.run_as      as {nameof(AliasQueryResult.RunAs)},
+                a.start_mode  as {nameof(AliasQueryResult.StartMode)},
+                a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
+                a.icon        as {nameof(AliasQueryResult.Icon)},
+                a.thumbnail   as {nameof(AliasQueryResult.Thumbnail)},
+                a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
+                a.hidden      as {nameof(AliasQueryResult.IsHidden)}
+            from
+                alias a
+                left join alias_name n on a.id = n.id_alias
+            where
+                a.id_session = @idSession
+                and n.Name in @names
+                and hidden in @hidden
+            order by n.name";
+
+            var hidden    = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
+            var arguments = new { idSession, names, hidden };
+
+            return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).ToArray());
+        }
         public KeywordUsage GetHiddenKeyword(string name)
         {
             const string sql = @"
@@ -369,8 +399,23 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Update(AliasQueryResult alias) => _db.WithinTransaction(tx =>
         {
-            using var _ = _logger.BeginSingleScope("Sql", UpdateAliasSql);
-            tx.Connection.Execute(UpdateAliasSql, new
+            const string updateAliasSql = @"
+                update alias
+                set
+                    arguments   = @parameters,
+                    file_name   = @fileName,
+                    notes       = @notes,
+                    run_as      = @runAs,
+                    start_mode  = @startMode,
+                    working_dir = @WorkingDirectory,
+                    icon        = @Icon,
+                    thumbnail   = @thumbnail,
+                    lua_script  = @luaScript,
+                    exec_count  = @count
+                where id = @id;";
+        
+            using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
+            tx.Connection.Execute(updateAliasSql, new
             {
                 alias.Parameters,
                 alias.FileName,
@@ -381,7 +426,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.Icon,
                 alias.Thumbnail,
                 alias.LuaScript,
-                id = alias.Id
+                alias.Count,
+                id = alias.Id,
             });
             CreateAdditionalParameters(alias, tx);
             UpdateName(alias, tx);

@@ -19,6 +19,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Humanizer;
+using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Views
 {
@@ -97,10 +98,9 @@ namespace Lanceur.Views
             #endregion Commands
 
             Observable.CombineLatest(
-                this.WhenAnyObservable(vm => vm.ExecuteAlias.IsExecuting),
-                this.WhenAnyObservable(vm => vm.SearchAlias.IsExecuting)
-            )
-                      .DistinctUntilChanged()
+                          this.WhenAnyObservable(vm => vm.ExecuteAlias.IsExecuting),
+                          this.WhenAnyObservable(vm => vm.SearchAlias.IsExecuting)
+                      ).DistinctUntilChanged()
                       .Select(x => x.Any(x => x))
                       .Log(this, "ViewModel is busy.", x => $"{x}")
                       .ObserveOn(schedulerProvider.MainThreadScheduler)
@@ -283,6 +283,7 @@ namespace Lanceur.Views
 
         private Task<AliasResponse> OnSearchAliasAsync(string criterion)
         {
+            using var _ = _logger.MeasureExecutionTime(this);
             var showResult = _settingsFacade.Application.Window.ShowResult;
             if (criterion.IsNullOrWhiteSpace() && showResult) { return new AliasResponse(); }
             if (criterion.IsNullOrWhiteSpace() && !showResult)
@@ -297,13 +298,10 @@ namespace Lanceur.Views
             }
 
             var query = _cmdlineManager.BuildFromText(criterion);
-
-            _logger.LogInformation("Search criterion: {Criterion}", criterion);
-
             var results = _searchService.Search(query)
                                         .ToArray();
 
-            _logger.LogDebug("Search: Found {Length} element(s)", results.Length);
+            _logger.LogInformation("Search: {Criterion} (Found {Length} element(s))",criterion, results.Length);
             return new AliasResponse()
             {
                 Results = results,

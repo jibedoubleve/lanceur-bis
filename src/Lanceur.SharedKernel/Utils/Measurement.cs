@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Lanceur.SharedKernel.Utils;
 
@@ -24,6 +25,8 @@ public sealed class Measurement : IDisposable
         _stopwatch.Start();
     }
 
+    public static Measurement Empty => new(typeof(object), "", null);
+
     #endregion Constructors
 
     #region Methods
@@ -32,7 +35,7 @@ public sealed class Measurement : IDisposable
     {
         var elapsed = _stopwatch.ElapsedMilliseconds;
         _stopwatch.Stop();
-        var message = "{SourceFullName}.{CallerMemberName} executed in {ElapsedMilliseconds} milliseconds";
+        const string message = "Execution of {SourceFullName}.{CallerMemberName} in {ElapsedMilliseconds} milliseconds";
         var parameters = new object[] { _source.FullName, _callerMemberName, elapsed };
         _log(message, parameters);
     }
