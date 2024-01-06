@@ -73,7 +73,7 @@ public class AliasSearchDbAction
 
     public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string name, long idSession)
     {
-        var sql = @$"
+        const string sql = @$"
                 select
                     an.Name || ':' || aa.name         as {nameof(AliasQueryResult.Name)},
                     a.Id                              as {nameof(AliasQueryResult.Id)},

@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Logging;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.SharedKernel.Utils;
@@ -23,9 +24,11 @@ namespace Lanceur.Infra.Stores
 
         public CalculatorStore()
         {
-            _logger = Locator.GetLocator()
-                             .GetService<ILoggerFactory>()
-                             .CreateLogger<CalculatorStore>();
+            var factory = Locator.GetLocator()
+                                 .GetService<ILoggerFactory>();
+            _logger = factory is not null
+                ? factory.CreateLogger<CalculatorStore>()
+                : new TraceLogger<CalculatorStore>();
         }
 
         #endregion Constructors
