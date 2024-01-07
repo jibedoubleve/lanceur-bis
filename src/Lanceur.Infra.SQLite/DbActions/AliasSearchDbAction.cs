@@ -20,7 +20,7 @@ public class AliasSearchDbAction
 
     #region Constructors
 
-    public AliasSearchDbAction(IDbConnectionManager db, ILoggerFactory logFactory, IConvertionService converter)
+    public AliasSearchDbAction(IDbConnectionManager db, ILoggerFactory logFactory, IConversionService converter)
     {
         _db = db;
         _logger = logFactory.GetLogger<AliasSearchDbAction>();
@@ -31,10 +31,10 @@ public class AliasSearchDbAction
 
     #region Methods
 
-    public IEnumerable<AliasQueryResult> Search(string name, long idSession)
+    public IEnumerable<AliasQueryResult> Search(string name = null, long? idSession = null)
     {
         using var _ = _logger.MeasureExecutionTime(this);
-        const string sql = @$"
+        var sql = @$"
                 select
                     an.Name       as {nameof(AliasQueryResult.Name)},
                     a.Id          as {nameof(AliasQueryResult.Id)},
@@ -55,14 +55,19 @@ public class AliasSearchDbAction
                     alias a
                     left join alias_name            an on a.id         = an.id_alias
                     left join stat_execution_count_v c on c.id_keyword = a.id
-                    inner join data_alias_synonyms_v s on s.id_alias   = a.id
+                    inner join data_alias_synonyms_v s on s.id_alias   = a.id";
+        if (!name.IsNullOrEmpty() && idSession.HasValue)
+        {
+            sql += @"
                 where
                     a.id_session = @idSession
                     and an.Name like @name
-                    and a.hidden = 0
+                    and a.hidden = 0";
+        }
+        sql += @"
                 order by
-                    c.exec_count desc,
-                    an.name";
+                  c.exec_count desc,
+                  an.name";
 
         name = $"{name ?? string.Empty}%";
         var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name, idSession }));
