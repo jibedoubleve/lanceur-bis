@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 

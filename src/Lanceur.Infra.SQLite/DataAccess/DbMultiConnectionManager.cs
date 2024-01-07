@@ -4,18 +4,6 @@ using Splat;
 
 namespace Lanceur.Infra.SQLite.DataAccess
 {
-    public static class DbMultiConnectionManagerMixin
-    {
-        #region Methods
-
-        public static DbConnection GetConnection(DbMultiConnectionManager manager)
-        {
-            return manager.GetConnection(renewConnection: false);
-        }
-
-        #endregion Methods
-    }
-
     public sealed class DbMultiConnectionManager : IDbConnectionManager
     {
         #region Fields

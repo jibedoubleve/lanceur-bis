@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Lanceur.Core.Models;
+using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {

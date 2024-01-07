@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Managers;
+﻿using System.Data;
+using Lanceur.Core.Managers;
 using System.Data.SQLite;
 using System.Reflection;
 using System.SQLite.Updater;
@@ -16,7 +17,7 @@ namespace Lanceur.Infra.SQLite
 
         #region Constructors
 
-        public SQLiteDatabaseUpdateManager(IDataStoreVersionManager versionManager, SQLiteConnection db, Assembly asm, string pattern)
+        public SQLiteDatabaseUpdateManager(IDataStoreVersionManager versionManager, IDbConnection db, Assembly asm, string pattern)
         {
             _dbUpdater = new DatabaseUpdater(db, asm, pattern);
             _versionManager = versionManager;

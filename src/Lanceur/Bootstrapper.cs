@@ -39,9 +39,11 @@ using Serilog.Formatting.Compact;
 using Splat;
 using Splat.Serilog;
 using System;
+using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
+using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur;
 
@@ -160,8 +162,12 @@ public class Bootstrapper
                                            Get<ILoggerFactory>(),
                                            Get<IDataStoreUpdateManager>()));
 
-        l.Register(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
-        l.Register<IDbConnectionManager>(() => new SQLiteMultiConnectionManager(Get<SQLiteConnection>()));
+        l.Register<IDbConnection>(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
+        l.Register<IDbConnectionFactory>(() => new SQLiteProfiledConnectionFactory(
+                                             Get<IConnectionString>().ToString(), 
+                                             Get<ILoggerFactory>())
+        );
+        l.Register<IDbConnectionManager>(() => new DbMultiConnectionManager(Get<SQLiteConnectionFactory>()));
 
         l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
 
@@ -170,7 +176,7 @@ public class Bootstrapper
         l.Register((Func<IDataStoreUpdateManager>)(() =>
                        new SQLiteDatabaseUpdateManager(
                            Get<IDataStoreVersionManager>(),
-                           Get<SQLiteConnection>(),
+                           Get<IDbConnection>(),
                            ScriptRepository.Asm,
                            ScriptRepository.DbScriptEmbededResourcePattern)));
         

@@ -1,7 +1,9 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using FluentAssertions;
 using Lanceur.Infra.SQLite;
 using System.Data.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
 
 namespace Lanceur.Tests.SQLite
@@ -10,7 +12,7 @@ namespace Lanceur.Tests.SQLite
     {
         #region Methods
 
-        private static void CreateTable(SQLiteConnection db)
+        private static void CreateTable(IDbConnection db)
         {
             var ddl = @"
             create table settings (
@@ -27,9 +29,9 @@ namespace Lanceur.Tests.SQLite
         [InlineData("1.7")]
         public void BeUpToDate(string goal)
         {
-            using var db = new SQLiteSingleConnectionManager(BuildConnection());
-            CreateTable(db);
-            CreateVersion(db, "1.0");
+            using var db = new DbSingleConnectionManager(BuildConnection());
+            CreateTable(db.GetConnection());
+            CreateVersion(db.GetConnection(), "1.0");
 
             var service = new SQLiteVersionManager(db);
             service.IsUpToDate(goal)
@@ -43,9 +45,9 @@ namespace Lanceur.Tests.SQLite
         [InlineData(null)]
         public void CrashWhenInvalidVersionAsStringIsSpecified(string version)
         {
-            using var db = new SQLiteSingleConnectionManager(BuildConnection());
-            CreateTable(db);
-            CreateVersion(db, "1.0");
+            using var db = new DbSingleConnectionManager(BuildConnection());
+            CreateTable(db.GetConnection());
+            CreateVersion(db.GetConnection(), "1.0");
 
             var service = new SQLiteVersionManager(db);
             var action = () => service.IsUpToDate(version);
@@ -59,9 +61,9 @@ namespace Lanceur.Tests.SQLite
         [InlineData("1.1.1.1", "1.1.1.1")]
         public void HaveUpToDateDatabaseWhenVersionAsStringIsSpecified(string expected, string actual)
         {
-            using var db = new SQLiteSingleConnectionManager(BuildConnection());
-            CreateTable(db);
-            CreateVersion(db, actual);
+            using var db = new DbSingleConnectionManager(BuildConnection());
+            CreateTable(db.GetConnection());
+            CreateVersion(db.GetConnection(), actual);
 
             var service = new SQLiteVersionManager(db);
             service.IsUpToDate(expected).Should().BeTrue();
@@ -74,9 +76,9 @@ namespace Lanceur.Tests.SQLite
         [InlineData("1.1.1.1", "1.1.1.1")]
         public void HaveUpToDateDatabaseWhenVersionIsSpecified(string goal, string actual)
         {
-            using var db = new SQLiteSingleConnectionManager(BuildConnection());
-            CreateTable(db);
-            CreateVersion(db, actual);
+            using var db = new DbSingleConnectionManager(BuildConnection());
+            CreateTable(db.GetConnection());
+            CreateVersion(db.GetConnection(), actual);
 
             var goalVersion = new Version(goal);
             var service = new SQLiteVersionManager(db);
@@ -91,9 +93,9 @@ namespace Lanceur.Tests.SQLite
         [InlineData("2.1.1")]
         public void ReturnVersionOfDatabase(string version)
         {
-            using var db = new SQLiteSingleConnectionManager(BuildConnection());
-            CreateTable(db);
-            CreateVersion(db, version);
+            using var db = new DbSingleConnectionManager(BuildConnection());
+            CreateTable(db.GetConnection());
+            CreateVersion(db.GetConnection(), version);
 
             var service = new SQLiteVersionManager(db);
             var expected = new Version(version);
@@ -109,8 +111,8 @@ namespace Lanceur.Tests.SQLite
         {
             var version = new Version(ver);
 
-            using var db = new SQLiteSingleConnectionManager(BuildConnection());
-            CreateTable(db);
+            using var db = new DbSingleConnectionManager(BuildConnection());
+            CreateTable(db.GetConnection());
 
             var service = new SQLiteVersionManager(db);
             service.SetCurrentDbVersion(version);
@@ -124,9 +126,9 @@ namespace Lanceur.Tests.SQLite
         [InlineData("0.7")]
         public void Update(string goal)
         {
-            using var db = new SQLiteSingleConnectionManager(BuildConnection());
-            CreateTable(db);
-            CreateVersion(db, "1.0");
+            using var db = new DbSingleConnectionManager(BuildConnection());
+            CreateTable(db.GetConnection());
+            CreateVersion(db.GetConnection(), "1.0");
 
             var service = new SQLiteVersionManager(db);
             service.IsUpToDate(goal)

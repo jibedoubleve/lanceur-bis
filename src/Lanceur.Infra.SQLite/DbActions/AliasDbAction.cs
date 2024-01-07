@@ -1,11 +1,12 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Infra.Logging;
 using Lanceur.Infra.Sqlite.Entities;
-using Lanceur.Infra.SQLite.Helpers;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 using System.Data.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
@@ -30,7 +31,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Methods
 
-        private static void UpdateName(AliasQueryResult alias, SQLiteTransactionBase tx)
+        private static void UpdateName(AliasQueryResult alias, IDbTransaction tx)
         {
             //Remove all names
             const string sql = @"delete from alias_name where id_alias = @id";
@@ -88,7 +89,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             _logger.LogInformation("Removed {Count} row(s) from alias_usage. Id: {IdAliases}", cnt, idd);
         }
 
-        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, SQLiteTransactionBase tx)
+        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
         {
             const string sql1 = "delete from alias_argument where id_alias = @idAlias";
             const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
@@ -99,7 +100,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             // Create alias additional parameters
             tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
         }
-        private void CreateAdditionalParameters(AliasQueryResult alias, SQLiteTransaction tx)
+        private void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx)
             => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
         internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)

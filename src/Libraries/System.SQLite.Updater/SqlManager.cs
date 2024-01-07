@@ -1,5 +1,5 @@
-﻿using Dapper;
-using System.Data.SQLite;
+﻿using System.Data;
+using Dapper;
 
 namespace System.SQLite.Updater
 {
@@ -7,13 +7,13 @@ namespace System.SQLite.Updater
     {
         #region Fields
 
-        private readonly SQLiteConnection _db;
+        private readonly IDbConnection _db;
 
         #endregion Fields
 
         #region Constructors
 
-        public SqlManager(SQLiteConnection db)
+        public SqlManager(IDbConnection db)
         {
             _db = db;
         }
