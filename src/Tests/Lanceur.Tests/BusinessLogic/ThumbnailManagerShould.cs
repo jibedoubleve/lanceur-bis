@@ -17,17 +17,10 @@ namespace Lanceur.Tests.BusinessLogic;
 
 public class ThumbnailManagerShould : SQLiteTest
 {
-    #region Fields
-
-    private readonly ITestOutputHelper _output;
-
-    #endregion Fields
-
     #region Constructors
 
-    public ThumbnailManagerShould(ITestOutputHelper output)
+    public ThumbnailManagerShould(ITestOutputHelper output): base(output)
     {
-        _output = output;
     }
 
     #endregion Constructors
@@ -55,7 +48,7 @@ public class ThumbnailManagerShould : SQLiteTest
                                   .ToString();
 
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
-        var loggerFactory = new MicrosoftLoggingLoggerFactory(_output);
+        var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
         var cfg = new MapperConfiguration(cfg =>
         {

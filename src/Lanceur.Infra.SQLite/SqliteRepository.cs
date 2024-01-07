@@ -18,7 +18,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 
     private readonly AliasDbAction _aliasDbAction;
     private readonly AliasSearchDbAction _aliasSearchDbAction;
-    private readonly IConvertionService _converter;
+    private readonly IConversionService _converter;
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly ILogger<SQLiteRepository> _logger;
     private readonly SetUsageDbAction _setUsageDbAction;
@@ -30,7 +30,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public SQLiteRepository(
         IDbConnectionManager manager,
         ILoggerFactory logFactory,
-        IConvertionService converter) : base(manager)
+        IConversionService converter) : base(manager)
     {
         ArgumentNullException.ThrowIfNull(logFactory);
         ArgumentNullException.ThrowIfNull(converter);
@@ -38,7 +38,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         _logger = logFactory.GetLogger<SQLiteRepository>();
         _converter = converter;
         _aliasDbAction = new(manager, logFactory);
-        _getAllAliasDbAction = new(manager, logFactory);
+        _getAllAliasDbAction = new(manager);
         _setUsageDbAction = new(DB, logFactory);
         _aliasSearchDbAction = new(DB, logFactory, converter);
     }
@@ -60,7 +60,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public IEnumerable<AliasQueryResult> GetAll(long? idSession = null)
     {
         idSession ??= GetDefaultSessionId();
-        return _getAllAliasDbAction.GetAll(idSession.Value);
+        return _aliasSearchDbAction.Search(idSession: idSession.Value);
     }
 
     ///<inheritdoc/>

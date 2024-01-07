@@ -120,12 +120,14 @@ public class Bootstrapper
         l.Register<IDbRepository>(() =>
                                       new SQLiteRepository(Get<IDbConnectionManager>(),
                                                            Get<ILoggerFactory>(),
-                                                           Get<IConvertionService>()));
-        l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(Get<IDbConnectionManager>(),
-                                                                               Get<ILoggerFactory>()));
+                                                           Get<IConversionService>()));
+        l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(
+                                              Get<IDbConnectionManager>(), 
+                                              Get<ILoggerFactory>(),
+                                              Get<IConversionService>()));
         l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
         l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
-        l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
+        l.Register<IConversionService>(() => new AutoMapperConverter(Get<IMapper>()));
         l.Register<IClipboardService>(() => new WindowsClipboardService());
         l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
         l.Register<IPluginManager>(() => new PluginManager(Get<ILoggerFactory>()));

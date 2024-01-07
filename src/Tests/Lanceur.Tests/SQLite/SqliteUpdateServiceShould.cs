@@ -2,14 +2,22 @@
 using Dapper;
 using FluentAssertions;
 using Lanceur.Infra.SQLite;
-using System.Data.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.SQLite
 {
     public class SQLiteUpdateServiceShould : SQLiteTest
     {
+        #region Constructors
+
+        public SQLiteUpdateServiceShould(ITestOutputHelper outputHelper) : base(outputHelper)
+        {
+        }
+
+        #endregion Constructors
+
         #region Methods
 
         private static void CreateTable(IDbConnection db)

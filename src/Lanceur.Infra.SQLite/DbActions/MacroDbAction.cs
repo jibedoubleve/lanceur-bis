@@ -11,7 +11,7 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
-        private readonly IConvertionService _converter;
+        private readonly IConversionService _converter;
         private readonly IDbConnectionManager _db;
         private readonly ILogger _logger;
         private readonly ILoggerFactory _loggerFactory;
@@ -20,7 +20,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Constructors
 
-        public MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IConvertionService converter)
+        public MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IConversionService converter)
         {
             _db = db;
             _loggerFactory = loggerFactory;
@@ -69,7 +69,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                 }
             }
 
-            return _converter.ToAliasQueryResultComposite(item, subAliases);
+            var result = _converter.ToAliasQueryResultComposite(item, subAliases);
+            return result;
         }
 
         /// <summary>
@@ -86,8 +87,8 @@ namespace Lanceur.Infra.SQLite.DbActions
             using var _ = _logger.MeasureExecutionTime(this);
             var list = new List<AliasQueryResult>(collection);
             var composites = list.Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
-                                       .Select(Hydrate)
-                                       .ToArray();
+                                 .Select(Hydrate)
+                                 .ToArray();
 
             list.RemoveAll(x => composites.Select(c => c.Id).Contains(x.Id));
             list.AddRange(composites);
