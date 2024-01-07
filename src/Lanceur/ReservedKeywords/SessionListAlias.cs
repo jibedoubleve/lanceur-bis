@@ -14,7 +14,7 @@ namespace Lanceur.ReservedKeywords
     {
         #region Fields
 
-        private readonly IConvertionService _converter;
+        private readonly IConversionService _converter;
         private readonly IDbRepository _service;
 
         #endregion Fields
@@ -25,11 +25,11 @@ namespace Lanceur.ReservedKeywords
         {
         }
 
-        public SessionListAlias(IDbRepository service = null, IConvertionService converter = null)
+        public SessionListAlias(IDbRepository service = null, IConversionService converter = null)
         {
             var l = Locator.Current;
             _service = service ?? l.GetService<IDbRepository>();
-            _converter = converter ?? l.GetService<IConvertionService>();
+            _converter = converter ?? l.GetService<IConversionService>();
         }
 
         #endregion Constructors

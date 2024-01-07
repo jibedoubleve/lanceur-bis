@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Services
 {
-    public interface IConvertionService
+    public interface IConversionService
     {
         #region Methods
 

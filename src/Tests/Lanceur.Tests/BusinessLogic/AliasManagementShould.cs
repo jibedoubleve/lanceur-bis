@@ -9,15 +9,23 @@ using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Tests.SQLite;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System.Data.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
+using Xunit.Abstractions;
 using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Tests.BusinessLogic
 {
     public class AliasManagementShould : SQLiteTest
     {
+        #region Constructors
+
+        public AliasManagementShould(ITestOutputHelper outputHelper) : base(outputHelper)
+        {
+        }
+
+        #endregion Constructors
+
         #region Methods
 
         private static AliasQueryResult BuildAlias(string name = null, RunAs runAs = RunAs.CurrentUser)
@@ -48,7 +56,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var scope = new DbSingleConnectionManager(connection);
             var log = Substitute.For<ILoggerFactory>();
-            var conv = Substitute.For<IConvertionService>();
+            var conv = Substitute.For<IConversionService>();
             var service = new SQLiteRepository(scope, log, conv);
             return service;
         }

@@ -25,17 +25,10 @@ namespace Lanceur.Tests.BusinessLogic;
 
 public class MacroShould : SQLiteTest
 {
-    #region Fields
-
-    private readonly ITestOutputHelper _output;
-
-    #endregion Fields
-
     #region Constructors
 
-    public MacroShould(ITestOutputHelper output)
+    public MacroShould(ITestOutputHelper output) : base(output)
     {
-        _output = output;
     }
 
     #endregion Constructors
@@ -65,7 +58,7 @@ public class MacroShould : SQLiteTest
         {
             foreach (var type in types)
             {
-                _output.WriteLine($"Checking '{type.FullName}'");
+                OutputHelper.WriteLine($"Checking '{type.FullName}'");
                 var sut = Activator.CreateInstance(type);
                 sut.Should()
                    .BeAssignableTo(typeof(SelfExecutableQueryResult));
@@ -281,7 +274,7 @@ public class MacroShould : SQLiteTest
 
         #region Methods
 
-        private static IConvertionService GetConversionService()
+        private static IConversionService GetConversionService()
         {
             var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
             return new AutoMapperConverter(new Mapper(cfg));

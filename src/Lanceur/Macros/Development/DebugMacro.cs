@@ -42,7 +42,7 @@ namespace Lanceur.Macros.Development
         #region Properties
 
         private static ICmdlineManager CmdlineProcessor => Locator.Current.GetService<ICmdlineManager>();
-        private static IConvertionService Converter => Locator.Current.GetService<IConvertionService>();
+        private static IConversionService Converter => Locator.Current.GetService<IConversionService>();
         private static IMacroManager MacroManager => Locator.Current.GetService<IMacroManager>();
         private static ISearchService SearchService => Locator.Current.GetService<ISearchService>();
 

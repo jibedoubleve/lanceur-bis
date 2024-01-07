@@ -1,5 +1,4 @@
-﻿using System.Data.SQLite;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Constants;
@@ -7,16 +6,24 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.SQLite;
-using Microsoft.Extensions.Logging;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Functional
 {
     public class SettingsShould : SQLiteTest
     {
+        #region Constructors
+
+        public SettingsShould(ITestOutputHelper output) : base(output)
+        {
+        }
+
+        #endregion Constructors
+
         #region Methods
 
-        private static void WithConfiguration(Action<IAppConfigRepository> assert)
+        private void WithConfiguration(Action<IAppConfigRepository> assert)
         {
             using var c = BuildFreshDb();
             using var scope = new DbSingleConnectionManager(c);

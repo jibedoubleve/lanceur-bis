@@ -10,16 +10,15 @@ namespace Lanceur.Infra.SQLite.DataAccess
         #region Fields
 
         private readonly string _connectionString;
-        private readonly ILoggerFactory _loggerFactory;
+        private readonly SQLiteLoggerDbProfiler _dbProfiler;
 
         #endregion Fields
 
         #region Constructors
-
-        public SQLiteProfiledConnectionFactory(string connectionString, ILoggerFactory loggerFactory)
+        public SQLiteProfiledConnectionFactory(string connectionString, ILoggerFactory loggerFactory, bool isFullProvider = false)
         {
             _connectionString = connectionString;
-            _loggerFactory = loggerFactory;
+            _dbProfiler = new(loggerFactory, isFullProvider);
         }
 
         #endregion Constructors
@@ -27,7 +26,7 @@ namespace Lanceur.Infra.SQLite.DataAccess
         #region Methods
 
         public DbConnection CreateConnection() =>
-            new ProfiledDbConnection(new SQLiteConnection(_connectionString), new SQLiteLoggerDbProfiler(_loggerFactory));
+            new ProfiledDbConnection(new SQLiteConnection(_connectionString), _dbProfiler);
 
         #endregion Methods
     }

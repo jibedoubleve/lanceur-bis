@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using AutoMapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
@@ -13,6 +14,7 @@ using Lanceur.Infra.Stores;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Utils;
+using Lanceur.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -40,7 +42,7 @@ namespace Lanceur.Tests.BusinessLogic
 
         #region Constructors
 
-        public SearchShould(ITestOutputHelper output)
+        public SearchShould(ITestOutputHelper output) : base(output)
         {
             _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
         }
@@ -48,6 +50,12 @@ namespace Lanceur.Tests.BusinessLogic
         #endregion Constructors
 
         #region Methods
+
+        private static IConversionService GetConversionService()
+        {
+            var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
+            return new AutoMapperConverter(new Mapper(cfg));
+        }
 
         [Fact]
         public void HaveStores()
@@ -61,7 +69,7 @@ namespace Lanceur.Tests.BusinessLogic
         public void NOT_HaveNullParameters()
         {
             // arrange
-            var converter = Substitute.For<IConvertionService>();
+            var converter = GetConversionService();
             using var db = BuildFreshDb(SqlCreateAlias);
             using var conn = new DbSingleConnectionManager(db);
 
@@ -88,7 +96,7 @@ namespace Lanceur.Tests.BusinessLogic
             using var conn = new DbSingleConnectionManager(db);
 
             var thumbnailManager = Substitute.For<IThumbnailManager>();
-            var converter = Substitute.For<IConvertionService>();
+            var converter = Substitute.For<IConversionService>();
             var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
             var storeLoader = Substitute.For<IStoreLoader>();
             storeLoader.Load().Returns(new[] { new AliasStore(repository) });
@@ -111,7 +119,7 @@ namespace Lanceur.Tests.BusinessLogic
         public void ReturnResultWithExactMatchOnTop()
         {
             var dt = DateTime.Now;
-            var converter = Substitute.For<IConvertionService>();
+            var converter = Substitute.For<IConversionService>();
             var sql = @$"
             insert into alias (id, file_name, arguments, id_session) values (1000, 'un', '@alias2@@alias3', 1);
             insert into alias_name (id, id_alias, name) values (1001, 1000, 'un');

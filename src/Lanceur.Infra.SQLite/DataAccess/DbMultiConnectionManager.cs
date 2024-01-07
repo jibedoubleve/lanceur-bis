@@ -25,7 +25,7 @@ namespace Lanceur.Infra.SQLite.DataAccess
 
         #region Methods
 
-        internal DbConnection GetConnection(bool renewConnection = true)
+        private DbConnection GetConnection(bool renewConnection = true)
         {
             lock (Locker)
             {

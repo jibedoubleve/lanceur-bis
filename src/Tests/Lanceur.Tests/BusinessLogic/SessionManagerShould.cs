@@ -7,14 +7,22 @@ using Lanceur.SharedKernel.Mixins;
 using Lanceur.Tests.SQLite;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System.Data.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.BusinessLogic
 {
     public class SessionManagerShould : SQLiteTest
     {
+        #region Constructors
+
+        public SessionManagerShould(ITestOutputHelper output) : base(output)
+        {
+        }
+
+        #endregion Constructors
+
         #region Methods
 
         private static void CreateTableAndPopulate(IDbConnection conn)
@@ -40,7 +48,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var scope = new DbSingleConnectionManager(BuildConnection());
             CreateTableAndPopulate(scope.GetConnection());
-            var service = new SQLiteRepository(scope, Substitute.For<ILoggerFactory>(), Substitute.For<IConvertionService>());
+            var service = new SQLiteRepository(scope, Substitute.For<ILoggerFactory>(), Substitute.For<IConversionService>());
 
             service.GetSessions().Should().HaveCount(10);
         }
