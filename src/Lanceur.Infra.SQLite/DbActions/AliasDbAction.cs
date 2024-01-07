@@ -255,19 +255,18 @@ namespace Lanceur.Infra.SQLite.DbActions
                     a.icon        as {nameof(AliasQueryResult.Icon)},
                     a.thumbnail   as {nameof(AliasQueryResult.Thumbnail)},
                     a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
-                    c.exec_count  as {nameof(AliasQueryResult.Count)},
+                    a.exec_count  as {nameof(AliasQueryResult.Count)},
                     a.hidden      as {nameof(AliasQueryResult.IsHidden)}
                 from
                     alias a
-                    left join alias_name n on a.id = n.id_alias
-                    left join stat_execution_count_v c on c.id_keyword = a.id
+                    left join alias_name n on a.id = n.id_alias                    
                     inner join data_alias_synonyms_v s on s.id_alias = a.id
                 where
                     a.id_session = @idSession
                     and n.Name = @name
                     and hidden in @hidden
                 order by
-                    c.exec_count desc,
+                    a.exec_count desc,
                     n.name";
 
             var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
