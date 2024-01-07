@@ -17,9 +17,7 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
 
     #region Constructors
 
-    public SQLiteDataDoctorRepository(
-        IDbConnectionManager manager,
-        ILoggerFactory logFactory) : base(manager) => _dbAction = new(DB, logFactory);
+    public SQLiteDataDoctorRepository(IDbConnectionManager manager) : base(manager) => _dbAction = new(DB);
 
     #endregion Constructors
 

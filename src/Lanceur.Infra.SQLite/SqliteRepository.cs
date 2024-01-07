@@ -38,7 +38,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         _logger = logFactory.GetLogger<SQLiteRepository>();
         _converter = converter;
         _aliasDbAction = new(manager, logFactory);
-        _getAllAliasDbAction = new(manager, logFactory);
+        _getAllAliasDbAction = new(manager);
         _setUsageDbAction = new(DB, logFactory);
         _aliasSearchDbAction = new(DB, logFactory, converter);
     }

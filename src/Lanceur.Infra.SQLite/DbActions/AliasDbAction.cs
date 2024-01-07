@@ -5,7 +5,6 @@ using Lanceur.Infra.Logging;
 using Lanceur.Infra.Sqlite.Entities;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
-using System.Data.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions
@@ -13,7 +12,7 @@ namespace Lanceur.Infra.SQLite.DbActions
     public class AliasDbAction
     {
         #region Fields
-        
+
         private readonly IDbConnectionManager _db;
         private readonly ILogger<AliasDbAction> _logger;
 
@@ -30,6 +29,21 @@ namespace Lanceur.Infra.SQLite.DbActions
         #endregion Constructors
 
         #region Methods
+
+        private static void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
+        {
+            const string sql1 = "delete from alias_argument where id_alias = @idAlias";
+            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
+
+            // Remove existing additional alias parameters
+            tx.Connection.Execute(sql1, new { idAlias });
+
+            // Create alias additional parameters
+            tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+        }
+
+        private static void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx)
+            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
         private static void UpdateName(AliasQueryResult alias, IDbTransaction tx)
         {
@@ -88,20 +102,6 @@ namespace Lanceur.Infra.SQLite.DbActions
             var idd = string.Join(", ", ids);
             _logger.LogInformation("Removed {Count} row(s) from alias_usage. Id: {IdAliases}", cnt, idd);
         }
-
-        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
-        {
-            const string sql1 = "delete from alias_argument where id_alias = @idAlias";
-            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
-
-            // Remove existing additional alias parameters
-            tx.Connection.Execute(sql1, new { idAlias });
-
-            // Create alias additional parameters
-            tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
-        }
-        private void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx)
-            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
         internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
         {
@@ -227,7 +227,7 @@ namespace Lanceur.Infra.SQLite.DbActions
         }
 
         /// <summary>
-        /// Get the a first alias with the exact name. 
+        /// Get the a first alias with the exact name.
         /// </summary>
         /// <param name="name">The alias' exact name to find.</param>
         /// <param name="idSession">The session where the search occurs.</param>
@@ -312,11 +312,12 @@ namespace Lanceur.Infra.SQLite.DbActions
                 and hidden in @hidden
             order by n.name";
 
-            var hidden    = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
+            var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
             var arguments = new { idSession, names, hidden };
 
             return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).ToArray());
         }
+
         public KeywordUsage GetHiddenKeyword(string name)
         {
             const string sql = @"
@@ -414,7 +415,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     lua_script  = @luaScript,
                     exec_count  = @count
                 where id = @id;";
-        
+
             using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
             tx.Connection.Execute(updateAliasSql, new
             {

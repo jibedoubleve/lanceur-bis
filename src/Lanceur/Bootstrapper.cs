@@ -121,8 +121,7 @@ public class Bootstrapper
                                       new SQLiteRepository(Get<IDbConnectionManager>(),
                                                            Get<ILoggerFactory>(),
                                                            Get<IConvertionService>()));
-        l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(Get<IDbConnectionManager>(),
-                                                                               Get<ILoggerFactory>()));
+        l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(Get<IDbConnectionManager>()));
         l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
         l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
         l.Register<IConvertionService>(() => new AutoMapperConverter(Get<IMapper>()));
