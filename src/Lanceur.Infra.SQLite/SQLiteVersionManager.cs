@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Lanceur.Core.Managers;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite

@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Models;
@@ -9,6 +10,7 @@ using Lanceur.Tests.SQLite;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Data.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
 using static Lanceur.SharedKernel.Constants;
 
@@ -34,17 +36,17 @@ namespace Lanceur.Tests.BusinessLogic
             };
         }
 
-        private static AliasDbAction BuildAliasDbAction(SQLiteConnection connection)
+        private static AliasDbAction BuildAliasDbAction(IDbConnection connection)
         {
-            var scope = new SQLiteSingleConnectionManager(connection);
+            var scope = new DbSingleConnectionManager(connection);
             var log = Substitute.For<ILoggerFactory>();
             var action = new AliasDbAction(scope, log);
             return action;
         }
 
-        private static SQLiteRepository BuildDataService(SQLiteConnection connection)
+        private static SQLiteRepository BuildDataService(IDbConnection connection)
         {
-            var scope = new SQLiteSingleConnectionManager(connection);
+            var scope = new DbSingleConnectionManager(connection);
             var log = Substitute.For<ILoggerFactory>();
             var conv = Substitute.For<IConvertionService>();
             var service = new SQLiteRepository(scope, log, conv);
@@ -185,6 +187,8 @@ namespace Lanceur.Tests.BusinessLogic
 
             var alias = BuildAlias("admin", RunAs.Admin);
             service.SaveOrUpdate(ref alias);
+
+            var r = connection.Query<AliasQueryResult>("select * from alias");
 
             var results = service.Search("admin").ToArray();
 

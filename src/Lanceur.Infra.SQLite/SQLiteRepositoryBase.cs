@@ -1,4 +1,6 @@
-﻿namespace Lanceur.Infra.SQLite
+﻿using Lanceur.Infra.SQLite.DataAccess;
+
+namespace Lanceur.Infra.SQLite
 {
     public abstract class SQLiteRepositoryBase
     {

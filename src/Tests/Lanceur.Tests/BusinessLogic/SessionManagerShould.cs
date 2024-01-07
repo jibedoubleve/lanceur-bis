@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using FluentAssertions;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite;
@@ -7,6 +8,7 @@ using Lanceur.Tests.SQLite;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Data.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
 
 namespace Lanceur.Tests.BusinessLogic
@@ -15,7 +17,7 @@ namespace Lanceur.Tests.BusinessLogic
     {
         #region Methods
 
-        private static void CreateTableAndPopulate(SQLiteConnection conn)
+        private static void CreateTableAndPopulate(IDbConnection conn)
         {
             const string sql = @"
             create table alias_session (
@@ -36,8 +38,8 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void HaveTenSessions()
         {
-            var scope = new SQLiteSingleConnectionManager(BuildConnection());
-            CreateTableAndPopulate(scope);
+            var scope = new DbSingleConnectionManager(BuildConnection());
+            CreateTableAndPopulate(scope.GetConnection());
             var service = new SQLiteRepository(scope, Substitute.For<ILoggerFactory>(), Substitute.For<IConvertionService>());
 
             service.GetSessions().Should().HaveCount(10);

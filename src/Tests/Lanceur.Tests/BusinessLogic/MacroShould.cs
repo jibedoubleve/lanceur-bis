@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Data;
+using AutoMapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Models;
@@ -16,6 +17,7 @@ using NSubstitute;
 using System.Data.SQLite;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -285,11 +287,11 @@ public class MacroShould : SQLiteTest
             return new AutoMapperConverter(new Mapper(cfg));
         }
 
-        public static IDbRepository GetDataService(SQLiteConnection db)
+        public static IDbRepository GetDataService(IDbConnection db)
         {
             var log = Substitute.For<ILoggerFactory>();
             var conv = GetConversionService();
-            var service = new SQLiteRepository(new SQLiteSingleConnectionManager(db), log, conv);
+            var service = new SQLiteRepository(new DbSingleConnectionManager(db), log, conv);
             return service;
         }
 

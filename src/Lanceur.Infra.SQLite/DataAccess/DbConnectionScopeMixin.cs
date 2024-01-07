@@ -1,8 +1,8 @@
 using Dapper;
 
-namespace Lanceur.Infra.SQLite.Helpers;
+namespace Lanceur.Infra.SQLite.DataAccess;
 
-internal static class SQLiteConnectionScopeMixin
+internal static class DbConnectionScopeMixin
 {
     #region Methods
 

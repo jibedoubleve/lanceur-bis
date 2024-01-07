@@ -7,6 +7,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.Mocks;
@@ -54,7 +55,7 @@ public class KeywordViewModelShould : SQLiteTest
                                       .AppendSynonyms(30, "alias3")
                                       .ToString();
 
-            var connectionMgr = new SQLiteSingleConnectionManager(BuildFreshDb(sql));
+            var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
 
             var logger = new MicrosoftLoggingLoggerFactory(_output);
             var cfg = new MapperConfiguration(cfg =>
@@ -168,7 +169,7 @@ public class KeywordViewModelShould : SQLiteTest
                                   .AppendSynonyms(30, "alias3")
                                   .ToString();
 
-        var connectionMgr = new SQLiteSingleConnectionManager(BuildFreshDb(sql));
+        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
 
         var logger = new MicrosoftLoggingLoggerFactory(_output);
         var cfg = new MapperConfiguration(cfg =>
@@ -211,7 +212,7 @@ public class KeywordViewModelShould : SQLiteTest
                                      .AppendAlias(30, Random(), Random()).AppendSynonyms(30, "alias3")
                                      .ToString();
 
-        var connectionMgr = new SQLiteSingleConnectionManager(BuildFreshDb(sqlDDL));
+        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sqlDDL));
 
         var logger = new MicrosoftLoggingLoggerFactory(_output);
         var cfg = new MapperConfiguration(cfg =>

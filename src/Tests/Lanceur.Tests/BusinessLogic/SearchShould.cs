@@ -8,6 +8,7 @@ using Lanceur.Core.Stores;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.SQLite;
@@ -62,7 +63,7 @@ namespace Lanceur.Tests.BusinessLogic
             // arrange
             var converter = Substitute.For<IConvertionService>();
             using var db = BuildFreshDb(SqlCreateAlias);
-            using var conn = new SQLiteSingleConnectionManager(db);
+            using var conn = new DbSingleConnectionManager(db);
 
             var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
 
@@ -84,7 +85,7 @@ namespace Lanceur.Tests.BusinessLogic
                 insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');";
 
             using var db = BuildFreshDb(sql);
-            using var conn = new SQLiteSingleConnectionManager(db);
+            using var conn = new DbSingleConnectionManager(db);
 
             var thumbnailManager = Substitute.For<IThumbnailManager>();
             var converter = Substitute.For<IConvertionService>();
@@ -139,7 +140,7 @@ namespace Lanceur.Tests.BusinessLogic
 
             // ARRANGE
             using var db = BuildFreshDb(sql);
-            using var conn = new SQLiteSingleConnectionManager(db);
+            using var conn = new DbSingleConnectionManager(db);
 
             const string criterion = "u";
             var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);

@@ -8,6 +8,7 @@ using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using Lanceur.Core.BusinessLogic;
+using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite;
 

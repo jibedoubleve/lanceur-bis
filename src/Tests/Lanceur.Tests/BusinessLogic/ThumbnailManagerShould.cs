@@ -3,6 +3,7 @@ using Dapper;
 using FluentAssertions;
 using Lanceur.Core.Models;
 using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Tests.Logging;
 using Lanceur.Tests.Mocks;
@@ -34,7 +35,7 @@ public class ThumbnailManagerShould : SQLiteTest
     #region Methods
 
     [Fact]
-    public async Task RefreshThumbnailsWithoutRemovingAdditionalParameters()
+    public void RefreshThumbnailsWithoutRemovingAdditionalParameters()
     {
         // ARRANGE
         var sql = new SqlBuilder().AppendAlias(1, "fileName1", "arguments1")
@@ -53,7 +54,7 @@ public class ThumbnailManagerShould : SQLiteTest
                                   .AppendArgument(120, "name_0", "argument_0")
                                   .ToString();
 
-        var connectionMgr = new SQLiteSingleConnectionManager(BuildFreshDb(sql));
+        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var loggerFactory = new MicrosoftLoggingLoggerFactory(_output);
 
         var cfg = new MapperConfiguration(cfg =>
@@ -68,7 +69,7 @@ public class ThumbnailManagerShould : SQLiteTest
         var aliases = dbRepository.Search("a");
 
         // ACT
-        await thumbnailManager.RefreshThumbnailsAsync(aliases);
+        thumbnailManager.RefreshThumbnailsAsync(aliases);
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))

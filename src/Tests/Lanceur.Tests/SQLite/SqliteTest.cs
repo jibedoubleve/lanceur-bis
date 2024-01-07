@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Lanceur.Scripts;
 using System.Data.SQLite;
 using System.SQLite.Updater;
@@ -15,14 +16,14 @@ namespace Lanceur.Tests.SQLite
 
         #region Methods
 
-        protected static SQLiteConnection BuildConnection()
+        protected static IDbConnection BuildConnection()
         {
             var conn = new SQLiteConnection(ConnectionString);
             conn.Open();
             return conn;
         }
 
-        protected static SQLiteConnection BuildFreshDb(string sql = null)
+        protected static IDbConnection BuildFreshDb(string sql = null)
         {
             var db = BuildConnection();
             var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbededResourcePattern);
@@ -33,7 +34,7 @@ namespace Lanceur.Tests.SQLite
             return db;
         }
 
-        protected static void CreateVersion(SQLiteConnection db, string version)
+        protected static void CreateVersion(IDbConnection db, string version)
         {
             var sql = $"insert into settings (s_key, s_value) values ('db_version', '{version}')";
             db.Execute(sql);

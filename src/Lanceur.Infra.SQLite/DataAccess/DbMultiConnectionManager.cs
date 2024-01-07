@@ -1,32 +1,31 @@
 ﻿using System.Data;
-using System.Data.SQLite;
+using System.Data.Common;
+using Splat;
 
-namespace Lanceur.Infra.SQLite
+namespace Lanceur.Infra.SQLite.DataAccess
 {
-    public sealed class SQLiteMultiConnectionManager : IDbConnectionManager
+    public sealed class DbMultiConnectionManager : IDbConnectionManager
     {
         #region Fields
 
         private static readonly object Locker = new();
-        private readonly string _connectionString;
-        private SQLiteConnection _currentConnection;
+        private readonly IDbConnectionFactory _connectionFactory;
+        private DbConnection _currentConnection;
 
         #endregion Fields
 
         #region Constructors
 
-        public SQLiteMultiConnectionManager(SQLiteConnection connection)
+        public DbMultiConnectionManager(IDbConnectionFactory connectionFactory)
         {
-            _connectionString =
-                connection?.ConnectionString
-                ?? throw new ArgumentNullException(nameof(connection), "Cannot create a connection scope with an empty connection (NULL).");
+            _connectionFactory = connectionFactory ?? Locator.Current.GetService<IDbConnectionFactory>();
         }
 
         #endregion Constructors
 
         #region Methods
 
-        private SQLiteConnection GetConnection(bool renewConnection = true)
+        internal DbConnection GetConnection(bool renewConnection = true)
         {
             lock (Locker)
             {
@@ -37,21 +36,19 @@ namespace Lanceur.Infra.SQLite
 
                 if (renewConnection)
                 {
-                    _currentConnection = new(_connectionString);
+                    _currentConnection = _connectionFactory.CreateConnection();
                 }
 
                 return _currentConnection;
             }
         }
 
-        public static implicit operator SQLiteConnection(SQLiteMultiConnectionManager manager) => manager.GetConnection(renewConnection: false);
-
         public void Dispose()
         {
             // TODO release managed resources here
         }
 
-        public void WithinTransaction(Action<SQLiteTransaction> action)
+        public void WithinTransaction(Action<IDbTransaction> action)
         {
             WithinTransaction(tx =>
             {
@@ -60,7 +57,7 @@ namespace Lanceur.Infra.SQLite
             });
         }
 
-        public TReturn WithinTransaction<TReturn>(Func<SQLiteTransaction, TReturn> action)
+        public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)
         {
             using var conn = GetConnection();
             if (conn.State != ConnectionState.Open) conn.Open();
@@ -75,7 +72,7 @@ namespace Lanceur.Infra.SQLite
             catch
             {
                 tx.Rollback();
-                return default;
+                throw;
             }
         }
 
