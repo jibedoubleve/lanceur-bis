@@ -4,7 +4,7 @@
     {
         #region Properties
 
-        public string Error { get; init; }
+        public Exception Exception { get; init; }
 
         #endregion Properties
 

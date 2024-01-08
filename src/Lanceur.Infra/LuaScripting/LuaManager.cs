@@ -35,7 +35,7 @@ namespace Lanceur.Infra.LuaScripting
                 return new()
                 {
                     Code = script.Code,
-                    Error = e.Message,
+                    Exception = e,
                 };
             }
         }

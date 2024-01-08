@@ -77,11 +77,11 @@ namespace Lanceur.Views
             };
             var result = LuaManager.ExecuteScript(script);
 
-            if (!string.IsNullOrEmpty(result.Error))
+            if (result.Exception is not null)
             {
                 ErrorOutputHeader.Visibility = Visibility.Visible;
                 ScriptOutputHeader.Visibility = Visibility.Collapsed;
-                ErrorOutput.Text = result.Error;
+                ErrorOutput.Text = result.Exception.Message;
                 return;
             }
 
