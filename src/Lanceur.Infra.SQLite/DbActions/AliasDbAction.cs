@@ -30,19 +30,25 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Methods
 
-        private static void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
+        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
         {
+            using var _ = _logger.BeginSingleScope("Parameters", parameters);
             const string sql1 = "delete from alias_argument where id_alias = @idAlias";
             const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
 
             // Remove existing additional alias parameters
-            tx.Connection.Execute(sql1, new { idAlias });
+            var deletedRowsCount = tx.Connection.Execute(sql1, new { idAlias });
 
             // Create alias additional parameters
-            tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+            var addedRowsCount = tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+
+            if (deletedRowsCount > 0 && addedRowsCount == 0)
+            {
+                _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);
+            }
         }
 
-        private static void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx)
+        private void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx)
             => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
         private static void UpdateName(AliasQueryResult alias, IDbTransaction tx)
