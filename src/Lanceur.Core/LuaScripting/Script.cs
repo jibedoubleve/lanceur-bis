@@ -35,9 +35,9 @@ namespace Lanceur.Core.LuaScripting
     {
         #region Properties
 
-        public string Code { get; init; }
+        public string Code { get; init; } = string.Empty;
 
-        public ScriptContext Context { get; init; }
+        public ScriptContext Context { get; init; } = ScriptContext.Empty;
 
         #endregion Properties
 
