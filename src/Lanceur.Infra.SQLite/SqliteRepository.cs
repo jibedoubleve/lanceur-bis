@@ -363,7 +363,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         _setUsageDbAction.SetUsage(ref alias, idSession);
 
         if (alias is AliasQueryResult aqr) { _aliasDbAction.Update(aqr); }
-        else _logger.LogWarning("Alias {AliasName} is not an AliasQueryResult", alias.Name);
+        else _logger.LogInformation("Alias {AliasName} is not an AliasQueryResult", alias.Name);
     }
 
     public void SetUsage(string aliasName) => SetUsage(new AliasQueryResult() { Name = aliasName });
