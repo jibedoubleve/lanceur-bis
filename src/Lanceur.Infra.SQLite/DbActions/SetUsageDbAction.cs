@@ -32,15 +32,36 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public void SetUsage(ref QueryResult alias, long idSession)
         {
+            ArgumentNullException.ThrowIfNull(alias);
+            
             if ((alias?.Id ?? 0) == 0)
             {
-                if (_aliasDbAction.GetExact(alias.Name) is { } a)
+                if (_aliasDbAction.GetExact(alias?.Name) is { } a)
                 {
-                    alias.Id = a.Id;
+                    alias!.Id = a.Id;
                 }
                 else { _aliasDbAction.CreateInvisible(ref alias); }
             }
+            
+            AddHistory(ref alias, idSession);
+            IncrementCounter(alias);
+        }
 
+        private void IncrementCounter(QueryResult alias)
+        {
+            alias.Count++;
+            const string sql = @"
+                update alias 
+                set 
+                    exec_count = @counter 
+                where 
+                    id = @id";
+            var param = new { id = alias.Id, counter = alias.Count };
+            _db.WithinTransaction(tx => tx.Connection.Execute(sql, param));
+        }
+
+        private void AddHistory(ref QueryResult alias, long idSession)
+        {
             const string sql = @"
                     insert into alias_usage (
                         id_alias,
@@ -55,7 +76,6 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var param = new { idAlias = alias.Id, idSession, now = DateTime.Now };
             _db.WithinTransaction(tx => tx.Connection.Execute(sql, param));
-            alias.Count++;
         }
 
         #endregion Methods
