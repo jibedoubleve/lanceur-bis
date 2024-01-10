@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.LuaScripting;
 using NLua;
 using System.Text;
+using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.LuaScripting
 {
@@ -10,6 +11,15 @@ namespace Lanceur.Infra.LuaScripting
 
         public static ScriptResult ExecuteScript(Script script)
         {
+            if (script.Code.IsNullOrWhiteSpace())
+            {
+                return new()
+                {
+                    Code    = script.Code,
+                    Context = script.Context
+                };
+            }
+            
             using var lua = new Lua();
             try
             {

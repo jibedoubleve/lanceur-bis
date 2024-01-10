@@ -68,7 +68,7 @@ namespace Lanceur.Infra.Managers
 
             var result = LuaManager.ExecuteScript(new()
             {
-                Code = query.LuaScript,
+                Code = query.LuaScript ?? string.Empty,
                 Context = new()
                 {
                     FileName = query.FileName,
