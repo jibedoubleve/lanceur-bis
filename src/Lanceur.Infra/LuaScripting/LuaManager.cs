@@ -15,8 +15,12 @@ namespace Lanceur.Infra.LuaScripting
             {
                 return new()
                 {
-                    Code    = script.Code,
-                    Context = script.Context
+                    Code    = script.Code ?? string.Empty,
+                    Context =new()
+                    {
+                        FileName = script?.Context?.FileName ?? string.Empty,   
+                        Parameters = script?.Context?.Parameters ?? string.Empty
+                    }
                 };
             }
             
