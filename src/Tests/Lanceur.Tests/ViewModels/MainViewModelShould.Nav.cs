@@ -17,7 +17,7 @@ namespace Lanceur.Tests.ViewModels
             {
                 // ARRANGE
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 

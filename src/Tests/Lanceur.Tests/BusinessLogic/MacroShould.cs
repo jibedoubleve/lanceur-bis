@@ -23,7 +23,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.BusinessLogic;
 
-public class MacroShould : SQLiteTest
+public class MacroShould : TestBase
 {
     #region Constructors
 
@@ -42,7 +42,7 @@ public class MacroShould : SQLiteTest
         var srcNamespace = typeof(MultiMacro).Namespace;
         var asm = Assembly.GetAssembly(typeof(MultiMacro));
 
-        var types = asm.GetTypes()
+        var types = asm!.GetTypes()
                        .Where(type =>
                        {
                            return type.Namespace != null

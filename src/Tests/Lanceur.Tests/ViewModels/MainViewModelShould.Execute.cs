@@ -27,7 +27,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 
@@ -52,7 +52,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 
@@ -95,7 +95,7 @@ namespace Lanceur.Tests.ViewModels
                         );
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(searchService)
                     .Build();
@@ -137,7 +137,7 @@ namespace Lanceur.Tests.ViewModels
                         );
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(searchService)
                     .Build();
@@ -164,7 +164,7 @@ namespace Lanceur.Tests.ViewModels
                 var executionManager = Substitute.For<IExecutionManager>();
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(executionManager)
                     .Build();
@@ -203,7 +203,7 @@ namespace Lanceur.Tests.ViewModels
                 );
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(executionManager)
                     .Build();

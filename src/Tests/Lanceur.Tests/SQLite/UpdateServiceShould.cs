@@ -8,11 +8,11 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.SQLite
 {
-    public class SQLiteUpdateServiceShould : SQLiteTest
+    public class UpdateServiceShould : TestBase
     {
         #region Constructors
 
-        public SQLiteUpdateServiceShould(ITestOutputHelper outputHelper) : base(outputHelper)
+        public UpdateServiceShould(ITestOutputHelper outputHelper) : base(outputHelper)
         {
         }
 

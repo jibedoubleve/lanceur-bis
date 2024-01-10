@@ -19,24 +19,24 @@ using ReactiveUI.Testing;
 using Splat;
 using System.Reactive.Concurrency;
 using FluentAssertions.Extensions;
+using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Tests.Logging;
+using Lanceur.Tests.SQL;
+using Lanceur.Tests.SQLite;
 using Xunit;
 using Xunit.Abstractions;
+using Dapper;
+using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.DbActions;
 
 namespace Lanceur.Tests.ViewModels
 {
-    public partial class MainViewModelShould : ReactiveTest
+    public partial class MainViewModelShould : TestBase
     {
-        #region Fields
-
-        private readonly ITestOutputHelper _output;
-
-        #endregion Fields
-
         #region Constructors
 
-        public MainViewModelShould(ITestOutputHelper output)
+        public MainViewModelShould(ITestOutputHelper output) : base(output)
         {
-            _output = output;
         }
 
         #endregion Constructors
@@ -63,7 +63,7 @@ namespace Lanceur.Tests.ViewModels
                         });
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(executor)
                     .Build();
@@ -85,27 +85,22 @@ namespace Lanceur.Tests.ViewModels
             //https://stackoverflow.com/questions/49338867/unit-testing-viewmodel-property-bound-to-reactivecommand-isexecuting
             new TestScheduler().With(scheduler =>
             {
+                var searchService = Substitute.For<ISearchService>();
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
+                    .With(searchService)
                     .Build();
 
                 scheduler.Schedule(() => vm.Query.Value = "a");
-                scheduler.Schedule(200.Ticks(), () => vm.Query.Value += "b");
-                scheduler.Schedule(300.Ticks(), () => vm.Query.Value += "c");
-                scheduler.Schedule(400.Ticks(), () => vm.Query.Value += "d");
+                scheduler.Schedule(101.Milliseconds(), () => vm.Query.Value += "b");
+                scheduler.Schedule(301.Milliseconds(), () => vm.Query.Value += "c");
+                scheduler.Schedule(501.Milliseconds(), () => vm.Query.Value += "d");
 
-                var results = scheduler.Start(
-                    () => vm.SearchAlias.IsExecuting,
-                    created: 0,
-                    subscribed: 100,
-                    disposed: 1_000.Milliseconds().Ticks);
+                scheduler.AdvanceTo(1_000.Milliseconds().Ticks);
 
-                results.Messages.AssertEqual(
-                    OnNext(100, false),
-                    OnNext(100.Milliseconds().Ticks + 402, true),
-                    OnNext(100.Milliseconds().Ticks + 404, false)
-                );
+                searchService.ReceivedWithAnyArgs(4)
+                             .Search(default);
             });
         }
 
@@ -118,7 +113,7 @@ namespace Lanceur.Tests.ViewModels
                 var searchService = Substitute.For<ISearchService>();
                 searchService.Search(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(searchService)
                     .Build();
@@ -150,7 +145,7 @@ namespace Lanceur.Tests.ViewModels
                         });
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(executor)
                     .Build();
@@ -167,6 +162,8 @@ namespace Lanceur.Tests.ViewModels
             });
         }
 
+
+
         [Fact]
         public void ShowAutoCompleteWhenCallingDebugMacro()
         {
@@ -177,14 +174,14 @@ namespace Lanceur.Tests.ViewModels
                 var searchService = Substitute.For<ISearchService>();
                 searchService.Search(Arg.Any<Cmdline>())
                         .Returns(
-                            new List<QueryResult>()
+                            new List<QueryResult>
                             {
-                               new DebugMacro(){ Name = "debug" }
+                               new DebugMacro { Name = "debug" }
                             }
                         );
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(searchService)
                     .With(new DebugMacroExecutor())
@@ -235,7 +232,7 @@ namespace Lanceur.Tests.ViewModels
                 });
 
                 var vm = new MainViewModelBuilder()
-                            .With(_output)
+                            .With(OutputHelper)
                             .With(scheduler)
                             .With(settings)
                             .With(searchService)

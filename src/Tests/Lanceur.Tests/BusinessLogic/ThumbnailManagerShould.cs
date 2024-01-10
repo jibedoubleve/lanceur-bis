@@ -15,7 +15,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.BusinessLogic;
 
-public class ThumbnailManagerShould : SQLiteTest
+public class ThumbnailManagerShould : TestBase
 {
     #region Constructors
 

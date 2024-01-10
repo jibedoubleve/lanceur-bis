@@ -11,7 +11,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Functional
 {
-    public class SettingsShould : SQLiteTest
+    public class SettingsShould : TestBase
     {
         #region Constructors
 

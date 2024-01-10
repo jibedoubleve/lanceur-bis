@@ -16,7 +16,7 @@ using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Tests.BusinessLogic
 {
-    public class AliasManagementShould : SQLiteTest
+    public class AliasManagementShould : TestBase
     {
         #region Constructors
 

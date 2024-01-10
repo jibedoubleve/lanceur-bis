@@ -5,11 +5,12 @@ using StackExchange.Profiling.Data;
 using System.Data;
 using System.Data.SQLite;
 using System.SQLite.Updater;
+using Microsoft.Reactive.Testing;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.SQLite
 {
-    public class SQLiteTest
+    public class TestBase : ReactiveTest
     {
         #region Fields
 
@@ -19,7 +20,7 @@ namespace Lanceur.Tests.SQLite
 
         #region Constructors
 
-        public SQLiteTest(ITestOutputHelper outputHelper)
+        public TestBase(ITestOutputHelper outputHelper)
         {
             OutputHelper = outputHelper;
         }
