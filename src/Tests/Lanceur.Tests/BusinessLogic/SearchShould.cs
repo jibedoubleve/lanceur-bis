@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using AutoMapper;
+using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
@@ -12,6 +13,7 @@ using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Logging;
+using Lanceur.Tests.SQL;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Utils;
 using Lanceur.Utils;
@@ -22,7 +24,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.BusinessLogic
 {
-    public class SearchShould : SQLiteTest
+    public class SearchShould : TestBase
     {
         #region Fields
 
@@ -195,6 +197,38 @@ namespace Lanceur.Tests.BusinessLogic
                 result.Should().HaveCount(1);
                 result.ElementAt(0).IsResult.Should().BeFalse();
             }
+        }
+
+        [Fact]
+        public void SetUsageDoesNotResetAdditionalParameters()
+        {
+            OutputHelper.Arrange();
+            var sql = new SqlBuilder().AppendAlias(1)
+                                      .AppendSynonyms(1, "a")
+                                      .AppendArgument(1)
+                                      .AppendArgument(1)
+                                      .AppendArgument(1)
+                                      .ToString();
+
+            var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
+            var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
+            var converter = Substitute.For<IConversionService>();
+            QueryResult alias = new AliasQueryResult
+            {
+                Id = 1,
+                Name = "a"
+            };
+
+            var repository = new SQLiteRepository(connectionMgr, logger, converter);
+
+            OutputHelper.Act();
+            repository.SetUsage(alias);
+
+            OutputHelper.Assert();
+            const string sqlCount = "select count(*) from alias_argument";
+
+            connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
+                         .Should().Be(3);
         }
 
         #endregion Methods

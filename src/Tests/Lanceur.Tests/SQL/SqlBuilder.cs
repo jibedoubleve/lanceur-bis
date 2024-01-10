@@ -22,15 +22,21 @@ internal class SqlBuilder
 
     #region Methods
 
-    public SqlBuilder AppendAlias(long idAlias, string fileName, string arguments)
+    public SqlBuilder AppendAlias(long idAlias, string fileName = null, string arguments = null)
     {
+        fileName ??= Guid.NewGuid().ToString();
+        arguments ??= Guid.NewGuid().ToString();
+        
         _sql.Append($"insert into alias (id, file_name, arguments, id_session) values ({idAlias}, '{fileName}', '{arguments}', 1);");
         _sql.AppendNewLine();
         return this;
     }
 
-    public SqlBuilder AppendArgument(long idAlias, string name, string argument)
+    public SqlBuilder AppendArgument(long idAlias, string name = null, string argument = null)
     {
+        name ??= Guid.NewGuid().ToString();
+        argument ??= Guid.NewGuid().ToString();
+        
         _sql.Append($"insert into alias_argument(id_alias, name, argument) values ({idAlias}, '{name}', '{argument}');");
         _sql.AppendNewLine();
         return this;

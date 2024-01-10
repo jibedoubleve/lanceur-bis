@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.SQLite
 {
-    public class DatabaseUpdaterShould : SQLiteTest
+    public class DatabaseUpdaterShould : TestBase
     {
         #region Fields
 

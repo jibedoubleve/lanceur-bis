@@ -13,7 +13,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.BusinessLogic
 {
-    public class SessionManagerShould : SQLiteTest
+    public class SessionManagerShould : TestBase
     {
         #region Constructors
 

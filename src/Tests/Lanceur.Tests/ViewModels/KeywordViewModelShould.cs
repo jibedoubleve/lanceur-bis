@@ -21,7 +21,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class KeywordViewModelShould : SQLiteTest
+public class KeywordViewModelShould : TestBase
 {
     #region Constructors
 
