@@ -1,10 +1,18 @@
 ﻿using Lanceur.Core.Services;
 using System.IO;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.PackagedApp
 {
     public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPackagedAppSearchService
     {
+        private readonly ILogger<PackagedAppSearchService> _logger;
+
+        public PackagedAppSearchService(ILoggerFactory factory)
+        {
+            _logger = factory.GetLogger<PackagedAppSearchService>();
+        }
         #region Methods
 
         public async Task<IEnumerable<Core.Models.PackagedApp>> GetByInstalledDirectory(string fileName)
@@ -16,9 +24,19 @@ namespace Lanceur.Infra.Win32.PackagedApp
             {
                 var userPackages = GetUserPackages();
                 return userPackages.AsParallel()
-                                   .Where(p => p is { IsFramework: false, IsDevelopmentMode: false }
-                                               && (p.InstalledLocation.Path == installedDir
-                                                   || p.IsAppUserModelId(fileName)))
+                                   .Where(p =>
+                                   {
+                                       try
+                                       {
+                                           return p is { IsFramework: false, IsDevelopmentMode: false }
+                                                  && (p.InstalledLocation.Path == installedDir || p.IsAppUserModelId(fileName));
+                                       }
+                                       catch (Exception ex)
+                                       {
+                                           _logger.LogWarning(ex, "An error occured when selecting package {FileName}", fileName);
+                                           return false;
+                                       }
+                                   })
                                    .Select(p => new Core.Models.PackagedApp
                                    {
                                        AppUserModelId    = p.GetAppUserModelId(),

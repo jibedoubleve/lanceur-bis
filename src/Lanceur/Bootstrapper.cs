@@ -134,7 +134,7 @@ public class Bootstrapper
         l.Register<IThumbnailRefresher>(() => new ThumbnailRefresher(Get<ILoggerFactory>(), Get<IPackagedAppSearchService>(), Get<IFavIconManager>()));
         l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<ILoggerFactory>(), Get<IDbRepository>(), Get<IThumbnailRefresher>()));
         l.RegisterLazySingleton<IPackagedAppManager>(() => new PackagedAppManager());
-        l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService());
+        l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService(Get<ILoggerFactory>()));
         l.Register<IFavIconDownloader>(() => new FavIconDownloader());
         l.Register<IFavIconManager>(() => new FavIconManager(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>(), Get<ILoggerFactory>()));
 
