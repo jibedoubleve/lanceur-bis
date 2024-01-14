@@ -21,6 +21,8 @@ namespace Lanceur.ReservedKeywords
 
         public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
+            if (cmdline is null) return NoResult;
+            
             var psi = new ProcessStartInfo
             {
                 FileName               = "Powershell.exe",
@@ -32,10 +34,11 @@ namespace Lanceur.ReservedKeywords
             };
 
             using var process      = Process.Start(psi);
-            using var outputStream = process.StandardOutput;
-            using var errorStream  = process.StandardError;
-            var       output       = await outputStream.ReadToEndAsync();
-            var       error        = await errorStream.ReadToEndAsync();
+            using var outputStream = process!.StandardOutput;
+            using var errorStream  = process!.StandardError;
+            
+            var output = await outputStream.ReadToEndAsync();
+            var error = await errorStream.ReadToEndAsync();
 
             var resultOutput = error.IsNullOrWhiteSpace()
                 ? output
