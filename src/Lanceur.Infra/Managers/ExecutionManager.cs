@@ -3,7 +3,6 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
-using Lanceur.Core.Utils;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
@@ -52,12 +51,10 @@ namespace Lanceur.Infra.Managers
                     _logger.LogDebug("Delay of {Delay} second(s) before executing the alias", query.Delay);
                     await Task.Delay(query.Delay * 1000);
                 }
-                if (query.IsUwp())
-                {
-                    return ExecuteUwp(query);
-                }
-
-                return ExecuteProcess(query);
+                
+                return query.IsUwp() 
+                    ? ExecuteUwp(query) 
+                    : ExecuteProcess(query);
             }
             catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{query?.Name ?? "NULL"}'. Check the path of the executable or the URL.", ex); }
         }
@@ -78,8 +75,8 @@ namespace Lanceur.Infra.Managers
             using var __ = _logger.BeginSingleScope("ScriptResult", result);
             if (result.Exception is not null) _logger.LogWarning(result.Exception, "The Lua script is on error");
 
-            if (result?.Context?.FileName is not null) query.FileName = result.Context.FileName;
-            if (result?.Context?.Parameters is not null) query.Parameters = result.Context.Parameters;
+            if (result.Context?.FileName is not null) query.FileName = result.Context.FileName;
+            if (result.Context?.Parameters is not null) query.Parameters = result.Context.Parameters;
 
             _logger.LogInformation("Lua script executed on {AlisName}", query.Name);
         }
@@ -97,7 +94,7 @@ namespace Lanceur.Infra.Managers
                 FileName = _wildcardManager.Replace(query.FileName, query.Parameters),
                 Verb = "open",
                 Arguments = query.Parameters,
-                UseShellExecute = true,
+                UseShellExecute = true, // https://stackoverflow.com/a/5255335/389529
                 WorkingDirectory = query.WorkingDirectory,
                 WindowStyle = query.StartMode.AsWindowsStyle(),
             };
