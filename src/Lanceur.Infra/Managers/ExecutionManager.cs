@@ -85,6 +85,8 @@ namespace Lanceur.Infra.Managers
         {
             if (query is null) return QueryResult.NoResult;
 
+            using var _ = _logger.MeasureExecutionTime(this);
+
             query.Parameters = _wildcardManager.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
             ExecuteLuaScript(ref query);
 
@@ -105,7 +107,7 @@ namespace Lanceur.Infra.Managers
                 _logger.LogInformation("Run {FileName} as ADMIN", query.FileName);
             }
 
-            using var _ = Process.Start(psi);
+            using var __ = Process.Start(psi);
             return QueryResult.NoResult;
         }
 
