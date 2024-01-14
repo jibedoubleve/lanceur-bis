@@ -5,6 +5,7 @@
         #region Fields
 
         private readonly string _description;
+        private string _icon;
 
         #endregion Fields
 
@@ -14,7 +15,7 @@
         {
             Name = name;
             _description = description;
-            Icon = iconKind;
+            _icon = iconKind;
         }
 
         #endregion Constructors
@@ -27,6 +28,8 @@
         public override string Description => _description;
 
         public override bool IsResult => false;
+
+        public override string Icon { get=> _icon; set => _icon = value; }
 
         #endregion Properties
 

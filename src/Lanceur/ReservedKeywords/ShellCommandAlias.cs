@@ -19,39 +19,34 @@ namespace Lanceur.ReservedKeywords
 
         #region Methods
 
-        private IEnumerable<QueryResult> Execute(Cmdline cmdline)
+        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             var psi = new ProcessStartInfo
             {
-                FileName = "Powershell.exe",
-                Arguments = cmdline.Parameters,
-                CreateNoWindow = true,
-                UseShellExecute = false,
+                FileName               = "Powershell.exe",
+                Arguments              = cmdline.Parameters,
+                CreateNoWindow         = true,
+                UseShellExecute        = false,
                 RedirectStandardOutput = true,
-                RedirectStandardError = true,
+                RedirectStandardError  = true,
             };
 
-            using var process = Process.Start(psi);
+            using var process      = Process.Start(psi);
             using var outputStream = process.StandardOutput;
-            using var errorStream = process.StandardError;
-            var output = outputStream.ReadToEnd();
-            var error = errorStream.ReadToEnd();
+            using var errorStream  = process.StandardError;
+            var       output       = await outputStream.ReadToEndAsync();
+            var       error        = await errorStream.ReadToEndAsync();
 
             var resultOutput = error.IsNullOrWhiteSpace()
                 ? output
                 : error;
             return new List<DisplayQueryResult>
-                {
-                    new DisplayQueryResult(
-                        name: null,
-                        description: resultOutput
-                    )
-                };
-        }
-
-        public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
-        {
-            return await Task.Run(() => Execute(cmdline));
+            {
+                new(
+                    null,
+                    description: resultOutput
+                )
+            };
         }
 
         #endregion Methods

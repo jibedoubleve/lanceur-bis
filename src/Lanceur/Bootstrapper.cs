@@ -140,6 +140,7 @@ public class Bootstrapper
 
         // Formatters
         l.Register<IStringFormatter>(() => new DefaultStringFormatter());
+        l.Register<IStringFormatter>(() => new LimitedStringLengthFormatter(), "limitedSize");
 
         // Plugins
         l.Register<IPluginManifestRepository>(() => new PluginStore());
