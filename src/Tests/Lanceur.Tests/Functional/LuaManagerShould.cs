@@ -27,5 +27,87 @@ public class LuaManagerShould
         result.Context.Parameters.Should().NotBeNull();
     }
 
+    [Fact]
+    public void GetDefaultValueWhenReturnNullContext()
+    {
+        // arrange
+        const string url = "https://random.url.com";
+        const string luaScript = @"
+            if context.Parameters == ""dev"" or context.Parameters == ""int"" then
+                context.FileName = ""output_dev""
+                return context
+            end
+            if context.Parameters == ""test"" then
+                context.FileName = ""output_test""
+                return context
+            end
+            if context.Parameters == ""prod"" then
+                context.FileName = ""output_prod""
+                return context
+            end";
+        
+        var result = LuaManager.ExecuteScript(new()
+        {
+            Code = luaScript,
+            Context = new()
+            {
+                FileName   = url,
+                Parameters = "unhandled_case" 
+            }
+        });
+        using var _ = new AssertionScope();
+        result.Should().NotBeNull();
+        
+        result.Context.FileName.Should().Be(url);
+        result.Context.Parameters.Should().NotBeNullOrEmpty();
+    }
+    
+    [Fact]
+    public void ReturnAnErrorWhenScriptDoesNotCompile()
+    {
+        // arrange
+        const string url = "https://random.url.com";
+        const string luaScript = "this is a failing script";
+        
+        var result = LuaManager.ExecuteScript(new()
+        {
+            Code = luaScript,
+            Context = new()
+            {
+                FileName   = url,
+                Parameters = "unhandled_case" 
+            }
+        });
+        using var _ = new AssertionScope();
+        result.Should().NotBeNull();
+        result.Exception.Should().NotBeNull();
+
+        result.Context.FileName.Should().BeEmpty();
+        result.Context.Parameters.Should().BeEmpty();
+    }
+    
+    [Fact]
+    public void ReturnEmptyContextWhenScriptDoNotReturnContext()
+    {
+        // arrange
+        const string url = "https://random.url.com";
+        const string parameters = "unhandled_case";
+        const string luaScript = "return 145";
+        
+        var result = LuaManager.ExecuteScript(new()
+        {
+            Code = luaScript,
+            Context = new()
+            {
+                FileName   = url,
+                Parameters = parameters 
+            }
+        });
+        using var _ = new AssertionScope();
+        result.Should().NotBeNull();
+        result.Context.Should().NotBeNull();
+        result.Context.FileName.Should().Be(url);
+        result.Context.Parameters.Should().Be(parameters);
+    }
     #endregion Methods
 }

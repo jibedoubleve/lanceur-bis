@@ -16,10 +16,10 @@ namespace Lanceur.Infra.LuaScripting
                 return new()
                 {
                     Code    = script.Code ?? string.Empty,
-                    Context =new()
+                    Context = new()
                     {
-                        FileName = script?.Context?.FileName ?? string.Empty,   
-                        Parameters = script?.Context?.Parameters ?? string.Empty
+                        FileName = script.Context?.FileName ?? string.Empty,   
+                        Parameters = script.Context?.Parameters ?? string.Empty
                     }
                 };
             }
@@ -31,8 +31,8 @@ namespace Lanceur.Infra.LuaScripting
                 lua["context"] = script.Context;
                 var result = lua.DoString(script.Code);
 
-                if (!result.Any()) { return script.CloneWithoutContext(); }
-                if (result[0] is not ScriptContext output) return script.CloneWithoutContext();
+                if (!result.Any()) return script.ToScriptResult();
+                if (result[0] is not ScriptContext output) return script.ToScriptResult();
 
                 return new()
                 {
