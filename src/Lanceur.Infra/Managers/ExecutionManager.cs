@@ -107,6 +107,8 @@ namespace Lanceur.Infra.Managers
                 _logger.LogInformation("Run {FileName} as ADMIN", query.FileName);
             }
 
+            _logger.BeginSingleScope("ProcessStartInfo", psi);
+            _logger.LogDebug("Executing process for alias {AliasName}", query.Name);
             using var __ = Process.Start(psi);
             return QueryResult.NoResult;
         }
