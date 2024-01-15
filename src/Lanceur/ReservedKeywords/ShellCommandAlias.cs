@@ -26,7 +26,7 @@ namespace Lanceur.ReservedKeywords
             var psi = new ProcessStartInfo
             {
                 FileName               = "Powershell.exe",
-                Arguments              = cmdline.Parameters,
+                Arguments              = $"-noprofile {cmdline.Parameters}",
                 CreateNoWindow         = true,
                 UseShellExecute        = false,
                 RedirectStandardOutput = true,
