@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using Lanceur.Core.BusinessLogic;
 using Lanceur.Infra.LuaScripting;
+using Lanceur.Infra.Utils;
 
 namespace Lanceur.Infra.Managers
 {
@@ -97,17 +98,18 @@ namespace Lanceur.Infra.Managers
                 WorkingDirectory = query.WorkingDirectory,
                 WindowStyle = query.StartMode.AsWindowsStyle(),
             };
-
+            using var __ = _logger.ScopeProcessStartInfo(psi);
             if (query.IsElevated || query.RunAs == SharedKernel.Constants.RunAs.Admin)
             {
                 psi.Verb = "runas";
                 _logger.LogInformation("Run {FileName} as ADMIN", query.FileName);
             }
-
-            _logger.BeginSingleScope("ProcessStartInfo", psi);
-            _logger.LogDebug("Executing process for alias {AliasName}", query.Name);
-            using var __ = Process.Start(psi);
-            return QueryResult.NoResult;
+            
+            using (Process.Start(psi))
+            {
+                _logger.LogDebug("Executing process for alias {AliasName}", query.Name);
+                return QueryResult.NoResult;
+            }
         }
 
         private IEnumerable<QueryResult> ExecuteUwp(AliasQueryResult query)
