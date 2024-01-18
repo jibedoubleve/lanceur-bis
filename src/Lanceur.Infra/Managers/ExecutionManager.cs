@@ -76,6 +76,9 @@ namespace Lanceur.Infra.Managers
             using var __ = _logger.BeginSingleScope("ScriptResult", result);
             if (result.Exception is not null) _logger.LogWarning(result.Exception, "The Lua script is on error");
 
+            query.Parameters = result.Context.Parameters;
+            query.FileName = result.Context.FileName;
+            
             _logger.LogInformation("Lua script executed on {AlisName}", query.Name);
         }
 
