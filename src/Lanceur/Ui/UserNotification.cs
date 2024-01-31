@@ -3,6 +3,9 @@ using Lanceur.Infra.Logging;
 using Microsoft.Extensions.Logging;
 using Splat;
 using System;
+using System.Net.Mime;
+using System.Windows;
+using Lanceur.Utils;
 
 namespace Lanceur.Ui
 {
@@ -27,18 +30,39 @@ namespace Lanceur.Ui
 
         #region Methods
 
+        private static void HandleCrashingNotification(string message, Exception ex, Exception e)
+        {
+            StaticLoggerFactory.GetLogger<UserNotification>()
+                               .LogWarning(ex, "User notification failed ({Message}). Show message in a MessageBox", e.Message);
+            MessageBox.Show(Application.Current.MainWindow!, $"{message}. {(ex is null ? "" : $"{Environment.NewLine}{ex}")}", "Warning");
+        }
+
         //TODO: refactor logging... It's not optimised
         public void Error(string message, Exception ex)
         {
-            _logger.LogError(ex, message);
-            _notification.Error(message);
+            try
+            {
+                _logger.LogError(ex, "An error occured. {Message}", ex.Message);
+                _notification.Error(message);
+            }
+            catch (Exception e)
+            {
+                HandleCrashingNotification(message, ex, e);
+            }
         }
 
         //TODO: refactor logging... It's not optimised
         public void Warning(string message, Exception ex = null)
         {
-            _logger.LogWarning(message, ex);
-            _notification.Warning(message);
+            try
+            {
+                _logger.LogWarning(ex, "{Message}", message);
+                _notification.Warning(message);
+            }
+            catch (Exception e)
+            {
+                HandleCrashingNotification(message, ex, e);
+            }
         }
 
         #endregion Methods

@@ -13,6 +13,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using ScottPlot.Renderable;
 
 namespace Lanceur;
 
@@ -41,8 +42,17 @@ public partial class App
 
     private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        var notify = Locator.Current.GetService<IUserNotification>();
-        notify.Error(e.Exception.Message, e.Exception);
+        var logger = StaticLoggerFactory.GetLogger<App>();
+        try
+        {
+            var notify = Locator.Current.GetService<IUserNotification>();
+            notify.Error(e.Exception.Message, e.Exception);
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, "Application crashed. See error for further information");
+            MessageBox.Show(Current.MainWindow, $"A fatal error occured: {ex.Message}");
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
