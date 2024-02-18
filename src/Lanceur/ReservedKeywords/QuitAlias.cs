@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Lanceur.ReservedKeywords
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             Application.Current.Shutdown();
-            this.Log().Info("Quit the application from alias 'Quit'");
+            this.GetLogger().LogInformation("Quit the application from alias 'Quit'");
 
             return NoResultAsync;
         }

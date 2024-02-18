@@ -15,14 +15,6 @@ namespace Lanceur.Core.Repositories
         #region Methods
 
         /// <summary>
-        /// Returns all the names that exists in the database AND in the specified list of <see cref="names"/>
-        /// </summary>
-        /// <param name="names">The names to find in the database</param>
-        /// <param name="idSession">The id of the session. If not specified, will take default session</param>
-        /// <returns></returns>
-        public ExistingNameResponse SelectNames(string[] names, long? idSession = null);
-
-        /// <summary>
         /// Get all the aliases
         /// </summary>
         /// <param name="idSession">The session linked to the aliases. If null, it'll take the default session</param>
@@ -146,6 +138,14 @@ namespace Lanceur.Core.Repositories
         /// <param name="idSession">ID of the session</param>
         /// <returns>Resulting aliases</returns>
         IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria, long? idSession = null);
+
+        /// <summary>
+        /// Returns all the names that exists in the database AND in the specified list of <see cref="names"/>
+        /// </summary>
+        /// <param name="names">The names to find in the database</param>
+        /// <param name="idSession">The id of the session. If not specified, will take default session</param>
+        /// <returns></returns>
+        public ExistingNameResponse SelectNames(string[] names, long? idSession = null);
 
         void SetDefaultSession(long idSession);
 

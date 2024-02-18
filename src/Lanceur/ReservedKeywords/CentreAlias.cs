@@ -1,14 +1,13 @@
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Threading.Tasks;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Win32.Utils;
-using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using Splat;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Lanceur.ReservedKeywords
 {
@@ -35,10 +34,11 @@ namespace Lanceur.ReservedKeywords
 
         public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
-           var coordinate = ScreenRuler.SetDefaultPosition();
-            AppLogFactory.Get<CentreAlias>()
-                         .Info(
-                             $"Put window at default position. (x: {coordinate.X} - y: {coordinate.Y}");
+            var coordinate = ScreenRuler.SetDefaultPosition();
+            StaticLoggerFactory.GetLogger<CentreAlias>()
+                               .LogInformation("Put window at default position. (x: {X} - y: {Y}",
+                                               coordinate.X,
+                                               coordinate.Y);
 
             Save(coordinate);
             return NoResultAsync;

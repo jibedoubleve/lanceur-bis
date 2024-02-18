@@ -27,23 +27,23 @@ namespace Lanceur.Tests.ViewModels
         {
             new TestScheduler().With(scheduler =>
             {
-                _output.Arrange();
+                OutputHelper.Arrange();
                 var searchService = Substitute.For<ISearchService>();
                 searchService
                     .Search(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
 
                 var vm = new MainViewModelBuilder()
-                        .With(_output)
+                        .With(OutputHelper)
                         .With(scheduler)
                         .With(searchService)
                         .Build();
 
-                _output.Act();
+                OutputHelper.Act();
                 vm.SearchAlias.Execute("...").Subscribe();
                 scheduler.Start();
 
-                _output.Assert();
+                OutputHelper.Assert();
                 vm.Results.Count.Should().Be(2);
             });
         }
@@ -54,7 +54,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 //Arrange
-                _output.Arrange();
+                OutputHelper.Arrange();
                 var results = new List<SelfExecutableQueryResult> { new ExecutableTestAlias() };
                 var store = Substitute.For<ISearchService>();
                 store.Search(Arg.Any<Cmdline>())
@@ -70,19 +70,19 @@ namespace Lanceur.Tests.ViewModels
                 var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(searchService)
                     .Build();
 
                 //Act
-                _output.Act();
+                OutputHelper.Act();
                 var @params = "parameters";
                 vm.SearchAlias.Execute("Search " + @params).Subscribe();
                 scheduler.Start();
 
                 //Assert
-                _output.Assert();
+                OutputHelper.Assert();
                 vm.Results.Count.Should().BeGreaterThan(0);
                 vm.Results.ElementAt(0)?.Query.Parameters.Should().Be(@params);
             });
@@ -102,16 +102,16 @@ namespace Lanceur.Tests.ViewModels
                     .Search(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { results.First() });
 
-                _output.Arrange();
+                OutputHelper.Arrange();
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(searchService)
                     .Build();
 
                 vm.SetResults(results);
 
-                _output.Act();
+                OutputHelper.Act();
 
                 vm.Query.Value = query;
                 scheduler.Start();
@@ -120,7 +120,7 @@ namespace Lanceur.Tests.ViewModels
 
                 scheduler.Start();
 
-                _output.Assert();
+                OutputHelper.Assert();
                 using (new AssertionScope())
                 {
                     vm.Results.Should().HaveCount(1);
@@ -149,7 +149,7 @@ namespace Lanceur.Tests.ViewModels
                     });
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(executionManager)
                     .Build();
@@ -172,7 +172,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 
@@ -190,7 +190,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 
@@ -208,7 +208,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 
@@ -227,7 +227,7 @@ namespace Lanceur.Tests.ViewModels
             {
                 // ARRANGE
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 
@@ -260,7 +260,7 @@ namespace Lanceur.Tests.ViewModels
                     });
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(executor)
                     .Build();

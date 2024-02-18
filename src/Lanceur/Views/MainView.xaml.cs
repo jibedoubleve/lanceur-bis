@@ -2,11 +2,12 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
-using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
+using Lanceur.Infra.Win32.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
 using Lanceur.Views.Mixins;
+using Microsoft.Extensions.Logging;
 using NHotkey;
 using NHotkey.Wpf;
 using ReactiveUI;
@@ -20,9 +21,7 @@ using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Lanceur.Infra.Win32.Utils;
 
 namespace Lanceur.Views
 {
@@ -33,9 +32,9 @@ namespace Lanceur.Views
     {
         #region Fields
 
+        private readonly ILogger<MainView> _logger;
         private readonly IAppConfigRepository _settings;
         private bool _isStoryBoardsFree = true;
-        private readonly IAppLogger _log;
 
         #endregion Fields
 
@@ -45,11 +44,11 @@ namespace Lanceur.Views
         {
         }
 
-        public MainView(IAppLoggerFactory factory, IAppConfigRepository settings)
+        public MainView(ILoggerFactory factory, IAppConfigRepository settings)
         {
             InitializeComponent();
 
-            _log = Locator.Current.GetLogger<MainView>(factory);
+            _logger = factory.GetLogger<MainView>();
 
             ViewModel = Locator.Current.GetService<MainViewModel>();
             _settings = settings ?? Locator.Current.GetService<IAppConfigRepository>();
@@ -178,14 +177,14 @@ namespace Lanceur.Views
         private void OnFadeInStoryBoardCompleted(object sender, EventArgs e)
         {
             _isStoryBoardsFree = true;
-            _log.Trace("Fade in Storyboard completed...");
+            _logger.LogTrace("Fade in Storyboard completed...");
             Visibility = Visibility.Visible;
         }
 
         private void OnFadeOutStoryBoardCompleted(object sender, EventArgs e)
         {
             _isStoryBoardsFree = true;
-            _log.Trace("Fade out Storyboard completed...");
+            _logger.LogTrace("Fade out Storyboard completed...");
             Visibility = Visibility.Collapsed;
         }
 
@@ -193,7 +192,8 @@ namespace Lanceur.Views
         {
             if (e.Key == Key.Up || e.Key == Key.Down)
             {
-                var collection = QueryResults.ItemsSource.Cast<object>();
+                var collection = QueryResults.ItemsSource
+                                             .Cast<object>().ToList();
 
                 if (collection.CanNavigate() == false) { e.Handled = false; }
                 else
@@ -251,23 +251,23 @@ namespace Lanceur.Views
             if (e.ChangedButton == MouseButton.Left) { DragMove(); }
         }
 
-        private void SetShortcut(Key key, ModifierKeys modifyer)
+        private void SetShortcut(Key key, ModifierKeys modifier)
         {
             try
             {
-                HotkeyManager.Current.AddOrReplace("OnShowWindow", key, modifyer, OnShowWindow);
+                HotkeyManager.Current.AddOrReplace("OnShowWindow", key, modifier, OnShowWindow);
             }
             catch (HotkeyAlreadyRegisteredException ex)
             {
                 //Default values
-                _log?.Warning(ex.Message);
+                _logger.LogWarning(ex, "Impossible to set shortcut. (Key: {Key}, Modifier: {Modifier})", key, modifier);
                 SetShortcut(Key.R, ModifierKeys.Shift | ModifierKeys.Windows);
             }
         }
 
         protected override void OnDeactivated(EventArgs e)
         {
-            _log?.Info("Window deactivated");
+            _logger.LogInformation("Window deactivated");
             HideControl();
         }
 
@@ -275,23 +275,22 @@ namespace Lanceur.Views
         {
             QueryTextBox.Text = string.Empty;
 
-            if (_isStoryBoardsFree)
-            {
-                _isStoryBoardsFree = false;
-                var storyBoard = FindResource("fadeOutStoryBoard") as Storyboard;
-                storyBoard.Begin(this);
-            }
+            if (!_isStoryBoardsFree) return;
+
+            _isStoryBoardsFree = false;
+            var storyBoard = FindResource("fadeOutStoryBoard") as Storyboard;
+            storyBoard!.Begin(this);
         }
 
         public void ShowWindow()
         {
-            _log?.Info("Window showing");
-            ViewModel.Activate.Execute().Subscribe();
+            _logger.LogInformation("Window showing");
+            ViewModel!.Activate.Execute().Subscribe();
             if (_isStoryBoardsFree)
             {
                 _isStoryBoardsFree = false;
                 var storyBoard = FindResource("fadeInStoryBoard") as Storyboard;
-                storyBoard.Begin(this);
+                storyBoard!.Begin(this);
 
                 Visibility = Visibility.Visible;
                 QueryTextBox.Focus();

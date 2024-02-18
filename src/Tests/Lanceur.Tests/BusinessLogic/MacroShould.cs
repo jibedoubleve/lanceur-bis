@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Data;
+using AutoMapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Models;
@@ -11,23 +12,27 @@ using Lanceur.Macros;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Utils.Macros;
 using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Data.SQLite;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.BusinessLogic;
 
-public class MacroShould : SQLiteTest
+public class MacroShould : TestBase
 {
-    private readonly ITestOutputHelper _output;
+    #region Constructors
 
-    public MacroShould(ITestOutputHelper output)
+    public MacroShould(ITestOutputHelper output) : base(output)
     {
-        _output = output;
     }
+
+    #endregion Constructors
+
     #region Methods
 
     [Fact]
@@ -36,8 +41,8 @@ public class MacroShould : SQLiteTest
         // ARRANGE
         var srcNamespace = typeof(MultiMacro).Namespace;
         var asm = Assembly.GetAssembly(typeof(MultiMacro));
-        
-        var types = asm.GetTypes()
+
+        var types = asm!.GetTypes()
                        .Where(type =>
                        {
                            return type.Namespace != null
@@ -53,7 +58,7 @@ public class MacroShould : SQLiteTest
         {
             foreach (var type in types)
             {
-                _output.WriteLine($"Checking '{type.FullName}'");
+                OutputHelper.WriteLine($"Checking '{type.FullName}'");
                 var sut = Activator.CreateInstance(type);
                 sut.Should()
                    .BeAssignableTo(typeof(SelfExecutableQueryResult));
@@ -147,7 +152,7 @@ public class MacroShould : SQLiteTest
     public void HaveDefaultMacro()
     {
         var asm = Assembly.GetAssembly(typeof(MultiMacro));
-        var logFactory = Substitute.For<IAppLoggerFactory>();
+        var logFactory = Substitute.For<ILoggerFactory>();
         var repository = Substitute.For<IDbRepository>();
         var manager = new MacroManager(asm, logFactory, repository);
 
@@ -221,7 +226,7 @@ public class MacroShould : SQLiteTest
             new() { Name = "macro_3", FileName = "@multi@" }
         };
 
-        var logger = Substitute.For<IAppLoggerFactory>();
+        var logger = Substitute.For<ILoggerFactory>();
         var repository = Substitute.For<IDbRepository>();
         var asm = Assembly.GetExecutingAssembly();
         var manager = new MacroManager(asm, logger, repository);
@@ -269,17 +274,17 @@ public class MacroShould : SQLiteTest
 
         #region Methods
 
-        private static IConvertionService GetConversionService()
+        private static IConversionService GetConversionService()
         {
             var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
             return new AutoMapperConverter(new Mapper(cfg));
         }
 
-        public static IDbRepository GetDataService(SQLiteConnection db)
+        public static IDbRepository GetDataService(IDbConnection db)
         {
-            var log = Substitute.For<IAppLoggerFactory>();
+            var log = Substitute.For<ILoggerFactory>();
             var conv = GetConversionService();
-            var service = new SQLiteRepository(new SQLiteSingleConnectionManager(db), log, conv);
+            var service = new SQLiteRepository(new DbSingleConnectionManager(db), log, conv);
             return service;
         }
 

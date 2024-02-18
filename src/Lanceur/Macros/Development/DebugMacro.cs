@@ -2,9 +2,10 @@
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.Ui;
 using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
 using System.Collections.Generic;
@@ -14,9 +15,15 @@ using System.Threading.Tasks;
 
 namespace Lanceur.Macros.Development
 {
-    [Macro("debug"), Description("Provides some debugging tools. But it is more an easter egg than something else")]
+    [Macro("debug", isVisible: false), Description("Provides some debugging tools. But it is more an easter egg than something else")]
     public class DebugMacro : MacroQueryResult
     {
+        #region Fields
+
+        private readonly ILogger<DebugMacro> _logger;
+
+        #endregion Fields
+
         #region Constructors
 
         internal DebugMacro(string name, string description, Cmdline query)
@@ -24,6 +31,7 @@ namespace Lanceur.Macros.Development
             Name = name;
             Query = query;
             Description = description;
+            _logger = Locator.Current.GetService<LoggerFactory>().GetLogger<DebugMacro>();
         }
 
         public DebugMacro()
@@ -34,7 +42,7 @@ namespace Lanceur.Macros.Development
         #region Properties
 
         private static ICmdlineManager CmdlineProcessor => Locator.Current.GetService<ICmdlineManager>();
-        private static IConvertionService Converter => Locator.Current.GetService<IConvertionService>();
+        private static IConversionService Converter => Locator.Current.GetService<IConversionService>();
         private static IMacroManager MacroManager => Locator.Current.GetService<IMacroManager>();
         private static ISearchService SearchService => Locator.Current.GetService<ISearchService>();
 
@@ -73,7 +81,8 @@ namespace Lanceur.Macros.Development
                     new DebugMacro("debug cache", "Displays thumbnails in the cache",  Cmdline("debug cache") ),
                 },
             };
-            AppLogFactory.Get<DebugMacro>().Debug($"Executed 'debug {cl.Name.ToLower()}' and found {result.Count()} item(s)");
+            result = result.ToList();
+            StaticLoggerFactory.GetLogger<DebugMacro>().LogDebug("Executed 'debug {Name}' and found {Result} item(s)", cl.Name.ToLower(), result.Count());
             return Task.FromResult(result);
         }
 

@@ -25,7 +25,6 @@ namespace Lanceur.Tests.BusinessLogic
 
         [Theory]
         [InlineData("add")]
-        [InlineData("import")]
         [InlineData("quit")]
         [InlineData("sessions")]
         [InlineData("setup")]

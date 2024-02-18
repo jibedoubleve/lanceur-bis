@@ -1,4 +1,5 @@
 ﻿using Lanceur.Converters.Reactive;
+using Lanceur.Infra.Logging;
 using Lanceur.Ui;
 using Lanceur.Utils;
 using ReactiveUI;
@@ -12,7 +13,7 @@ namespace Lanceur.Views
     /// <summary>
     /// Interaction logic for KeywordsView.xaml
     /// </summary>
-    public partial class KeywordsView : IViewFor<KeywordsViewModel>
+    public partial class KeywordsView
     {
         #region Constructors
 
@@ -23,7 +24,7 @@ namespace Lanceur.Views
 
             this.WhenActivated(d =>
             {
-                AppLogFactory.Get<KeywordsView>().Trace($"Activating {nameof(KeywordsView)}");
+                StaticLoggerFactory.GetLogger<KeywordsView>().LogActivate<KeywordsView>();
 
                 ViewModel.AskLuaEditor.RegisterHandler(interaction =>
                 {
@@ -35,8 +36,10 @@ namespace Lanceur.Views
                     };
                     var dialogResult = window.ShowDialog();
 
-                    if (dialogResult == true) { interaction.SetOutput(window.LuaScript.Code); }
-                    else { interaction.SetOutput(backup.Code); }
+                    interaction.SetOutput(dialogResult == true 
+                                              ? window.LuaScript.Code 
+                                              : backup.Code
+                    );
                 });
 
                 ViewModel.ConfirmRemove.RegisterHandler(async interaction =>
@@ -45,13 +48,15 @@ namespace Lanceur.Views
                     interaction.SetOutput(result.ToBool());
                 });
 
+                
+                this.OneWayBind(ViewModel, vm => vm.MacroCollection, v => v.BoxFileName.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Aliases, v => v.Aliases.ItemsSource).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.BusyMessage, v => v.BusyMessage.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.BusyControl.Visibility).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.AliasList.Visibility, val => val.ToVisibilityInverted()).DisposeWith(d);
                 this.OneWayBind(
-                    ViewModel, 
-                    vm => vm.SelectedAlias, 
+                    ViewModel,
+                    vm => vm.SelectedAlias,
                     v => v.BtnDeleteAlias.Content,
                     val => val is null ? "Delete" : val.Id == 0 ? "Discard" : "Delete").DisposeWith(d);
 
@@ -80,7 +85,7 @@ namespace Lanceur.Views
 
         private void OnClickLuaEditor(object sender, RoutedEventArgs e)
         {
-            ViewModel.EditLuaScript.Execute();
+            ViewModel!.EditLuaScript.Execute();
         }
 
         #endregion Methods

@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 namespace Lanceur.Infra.Managers
@@ -10,7 +10,7 @@ namespace Lanceur.Infra.Managers
     {
         #region Constructors
 
-        public MacroManager(Assembly asm, IAppLoggerFactory logFactory = null, IDbRepository repository = null) : base(asm, logFactory, repository)
+        public MacroManager(Assembly asm, ILoggerFactory logFactory = null, IDbRepository repository = null) : base(asm, logFactory, repository)
         {
         }
 
@@ -47,7 +47,9 @@ namespace Lanceur.Infra.Managers
             if (!MacroInstances.ContainsKey(alias.GetMacroName()))
             {
                 /* Well, this is a misconfigured macro, log it and forget it */
-                Log.Warning($"User has misconfigured a Macro with name '{alias.FileName}'. Fix the name of the macro or remove the alias from the database.");
+                Logger.LogWarning(
+                    "User has misconfigured a Macro with name {FileName}. Fix the name of the macro or remove the alias from the database",
+                    alias.FileName);
                 return null;
             }
 
@@ -55,10 +57,9 @@ namespace Lanceur.Infra.Managers
             if (instance is not MacroQueryResult i) throw new NotSupportedException($"Cannot cast '{instance.GetType()}' into '{typeof(MacroQueryResult)}'");
 
             var macro = i.Clone();
-            macro.Name       = alias.Name;
+            macro.Name = alias.Name;
             macro.Parameters = alias.Parameters;
             return macro;
-
         }
 
         #endregion Methods

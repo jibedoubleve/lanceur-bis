@@ -27,8 +27,7 @@ public class AbstractPackagedAppSearchService
         var user = GetCurrentUser();
         if (user is null) return Array.Empty<Windows.ApplicationModel.Package>();
 
-        _packages = new PackageManager().FindPackagesForUser(user.Value);
-        return _packages;
+        return _packages ??= new PackageManager().FindPackagesForUser(user.Value);
     }
 
     #endregion Methods

@@ -1,4 +1,5 @@
-﻿using System.Data.SQLite;
+﻿using System.Data;
+using System.Data.SQLite;
 using System.Reflection;
 
 namespace System.SQLite.Updater
@@ -8,7 +9,7 @@ namespace System.SQLite.Updater
         #region Fields
 
         private readonly Assembly _asm;
-        private readonly SQLiteConnection _db;
+        private readonly IDbConnection _db;
         private readonly string _pattern;
         private readonly ScriptManager _scriptManager;
         private readonly SqlManager _sqlManager;
@@ -17,7 +18,7 @@ namespace System.SQLite.Updater
 
         #region Constructors
 
-        public DatabaseUpdater(SQLiteConnection db, Assembly asm, string pattern)
+        public DatabaseUpdater(IDbConnection db, Assembly asm, string pattern)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
             _asm = asm ?? throw new ArgumentNullException(nameof(asm));

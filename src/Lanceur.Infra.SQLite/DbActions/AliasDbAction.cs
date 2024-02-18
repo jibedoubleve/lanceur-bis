@@ -1,10 +1,11 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
-using Lanceur.Infra.SQLite.Entities;
-using Lanceur.Infra.SQLite.Helpers;
+using Lanceur.Infra.Logging;
+using Lanceur.Infra.Sqlite.Entities;
 using Lanceur.SharedKernel.Mixins;
-using System.Data.SQLite;
+using Microsoft.Extensions.Logging;
+using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
@@ -12,49 +13,45 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
-        private const string UpdateAliasSql = @"
-                update alias
-                set
-                    arguments   = @parameters,
-                    file_name   = @fileName,
-                    notes       = @notes,
-                    run_as      = @runAs,
-                    start_mode  = @startMode,
-                    working_dir = @WorkingDirectory,
-                    icon        = @Icon,
-                    thumbnail   = @thumbnail,
-                    lua_script  = @luaScript
-                where id = @id;";
-
         private readonly IDbConnectionManager _db;
-        private readonly IAppLogger _log;
+        private readonly ILogger<AliasDbAction> _logger;
 
         #endregion Fields
 
         #region Constructors
 
-        public AliasDbAction(IDbConnectionManager db, IAppLoggerFactory logFactory)
+        public AliasDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
         {
             _db = db;
-            _log = logFactory.GetLogger<AliasDbAction>();
+            _logger = logFactory.GetLogger<AliasDbAction>();
         }
 
         #endregion Constructors
 
         #region Methods
 
-        private static void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, SQLiteTransactionBase tx)
+        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
         {
-            // Remove existing additional alias parameters
+            using var _ = _logger.BeginSingleScope("Parameters", parameters);
             const string sql1 = "delete from alias_argument where id_alias = @idAlias";
-            tx.Connection.Execute(sql1, new { idAlias });
+            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
+
+            // Remove existing additional alias parameters
+            var deletedRowsCount = tx.Connection.Execute(sql1, new { idAlias });
 
             // Create alias additional parameters
-            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
-            tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+            var addedRowsCount = tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+
+            if (deletedRowsCount > 0 && addedRowsCount == 0)
+            {
+                _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);
+            }
         }
 
-        private static void UpdateName(AliasQueryResult alias, SQLiteTransactionBase tx)
+        private void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx)
+            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
+
+        private static void UpdateName(AliasQueryResult alias, IDbTransaction tx)
         {
             //Remove all names
             const string sql = @"delete from alias_name where id_alias = @id";
@@ -76,7 +73,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from alias. Id: {idd}");
+            _logger.LogInformation("Removed {Count} row(s) from alias. Id: {Idd}", cnt, idd);
         }
 
         private void ClearAliasArgument(params long[] ids)
@@ -87,7 +84,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_argument'. Id: {idd}");
+            _logger.LogInformation("Removed {Count} row(s) from alias_argument. Id: {IdAliases}", cnt, idd);
         }
 
         private void ClearAliasName(params long[] ids)
@@ -98,7 +95,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_name'. Id: {idd}");
+            _logger.LogInformation("Removed {RemovedCount} row(s) from alias_name. Id: {IdAliases}", cnt, idd);
         }
 
         private void ClearAliasUsage(params long[] ids)
@@ -109,11 +106,8 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var cnt = _db.ExecuteMany(sql, ids);
             var idd = string.Join(", ", ids);
-            _log.Info($"Removed {cnt} row(s) from 'alias_usage'. Id: {idd}");
+            _logger.LogInformation("Removed {Count} row(s) from alias_usage. Id: {IdAliases}", cnt, idd);
         }
-
-        private void CreateAdditionalParameters(AliasQueryResult alias, SQLiteTransaction tx)
-            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
 
         internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
         {
@@ -169,6 +163,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @isHidden
                 );
                 select last_insert_rowid() from alias limit 1;";
+
             var param = new
             {
                 Arguments = alias.Parameters,
@@ -186,6 +181,8 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             var csv = alias.Synonyms.SplitCsv();
             var additionalParameters = alias.AdditionalParameters;
+
+            using var _ = _logger.BeginSingleScope("SqlCreateAlias", sqlAlias);
             var id = _db.WithinTransaction(tx =>
             {
                 var id = tx.Connection.ExecuteScalar<long>(sqlAlias, param);
@@ -236,18 +233,21 @@ namespace Lanceur.Infra.SQLite.DbActions
         }
 
         /// <summary>
-        /// Get the a first alias with the exact name. In case of multiple aliases
-        /// with same name, the one with greater counter is selected.
+        /// Get the a first alias with the exact name.
         /// </summary>
         /// <param name="name">The alias' exact name to find.</param>
         /// <param name="idSession">The session where the search occurs.</param>
         /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
         /// <returns>The exact match or <c>null</c> if not found.</returns>
+        /// <remarks>
+        /// For optimisation reason, there's no check of doubloons. Bear UI validates and
+        /// forbid to insert two aliases with same name.
+        /// </remarks>
         public AliasQueryResult GetExact(string name, long? idSession = null, bool includeHidden = false)
         {
             idSession ??= GetDefaultSessionId();
 
-            var sql = @$"
+            const string sql = @$"
                 select
                     n.Name        as {nameof(AliasQueryResult.Name)},
                     s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
@@ -261,25 +261,66 @@ namespace Lanceur.Infra.SQLite.DbActions
                     a.icon        as {nameof(AliasQueryResult.Icon)},
                     a.thumbnail   as {nameof(AliasQueryResult.Thumbnail)},
                     a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
-                    c.exec_count  as {nameof(AliasQueryResult.Count)},
+                    a.exec_count  as {nameof(AliasQueryResult.Count)},
                     a.hidden      as {nameof(AliasQueryResult.IsHidden)}
                 from
                     alias a
-                    left join alias_name n on a.id = n.id_alias
-                    left join stat_execution_count_v c on c.id_keyword = a.id
+                    left join alias_name n on a.id = n.id_alias                    
                     inner join data_alias_synonyms_v s on s.id_alias = a.id
                 where
                     a.id_session = @idSession
                     and n.Name = @name
                     and hidden in @hidden
                 order by
-                    c.exec_count desc,
+                    a.exec_count desc,
                     n.name";
 
             var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
             var arguments = new { idSession, name, hidden };
 
             return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault());
+        }
+
+        /// <summary>
+        /// Get all the alias that has an exact name in the specified list of names.
+        /// . In case of multiple aliases with same name, the one with greater counter
+        /// is selected.
+        /// </summary>
+        /// <param name="names">The list of names to find.</param>
+        /// <param name="idSession">The session where the search occurs.</param>
+        /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
+        /// <returns>The exact match or <c>null</c> if not found.</returns>
+        public IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, long? idSession = null, bool includeHidden = false)
+        {
+            idSession ??= GetDefaultSessionId();
+
+            const string sql = @$"
+            select
+                n.Name        as {nameof(AliasQueryResult.Name)},
+                a.Id          as {nameof(AliasQueryResult.Id)},
+                a.arguments   as {nameof(AliasQueryResult.Parameters)},
+                a.file_name   as {nameof(AliasQueryResult.FileName)},
+                a.notes       as {nameof(AliasQueryResult.Notes)},
+                a.run_as      as {nameof(AliasQueryResult.RunAs)},
+                a.start_mode  as {nameof(AliasQueryResult.StartMode)},
+                a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
+                a.icon        as {nameof(AliasQueryResult.Icon)},
+                a.thumbnail   as {nameof(AliasQueryResult.Thumbnail)},
+                a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
+                a.hidden      as {nameof(AliasQueryResult.IsHidden)}
+            from
+                alias a
+                left join alias_name n on a.id = n.id_alias
+            where
+                a.id_session = @idSession
+                and n.Name in @names
+                and hidden in @hidden
+            order by n.name";
+
+            var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
+            var arguments = new { idSession, names, hidden };
+
+            return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).ToArray());
         }
 
         public KeywordUsage GetHiddenKeyword(string name)
@@ -365,7 +406,23 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         public long Update(AliasQueryResult alias) => _db.WithinTransaction(tx =>
         {
-            tx.Connection.Execute(UpdateAliasSql, new
+            const string updateAliasSql = @"
+                update alias
+                set
+                    arguments   = @parameters,
+                    file_name   = @fileName,
+                    notes       = @notes,
+                    run_as      = @runAs,
+                    start_mode  = @startMode,
+                    working_dir = @WorkingDirectory,
+                    icon        = @Icon,
+                    thumbnail   = @thumbnail,
+                    lua_script  = @luaScript,
+                    exec_count  = @count
+                where id = @id;";
+
+            using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
+            tx.Connection.Execute(updateAliasSql, new
             {
                 alias.Parameters,
                 alias.FileName,
@@ -376,7 +433,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.Icon,
                 alias.Thumbnail,
                 alias.LuaScript,
-                id = alias.Id
+                alias.Count,
+                id = alias.Id,
             });
             CreateAdditionalParameters(alias, tx);
             UpdateName(alias, tx);

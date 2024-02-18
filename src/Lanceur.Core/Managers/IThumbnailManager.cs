@@ -12,7 +12,7 @@ namespace Lanceur.Core.Managers
         /// when thread has done its work
         /// </summary>
         /// <param name="results">The <see cref="QueryResult"/> to refresh</param>
-        Task RefreshThumbnails(IEnumerable<QueryResult> results);
+        void RefreshThumbnailsAsync(IEnumerable<QueryResult> results);
 
         #endregion Methods
     }

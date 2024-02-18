@@ -4,6 +4,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
+using Lanceur.Infra.Win32.Restart;
 using Lanceur.Schedulers;
 using Lanceur.Ui;
 using ReactiveUI;
@@ -15,7 +16,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using Lanceur.Infra.Win32.Restart;
+using Humanizer;
 
 namespace Lanceur.Views
 {
@@ -105,7 +106,7 @@ namespace Lanceur.Views
         private TimeSpan GetDelay()
         {
             var delay = _settingsFacade.Application.RestartDelay;
-            var time = TimeSpan.FromMilliseconds(delay);
+            var time = delay.Milliseconds();
             return time;
         }
 

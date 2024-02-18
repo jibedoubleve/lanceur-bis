@@ -22,29 +22,35 @@ internal class SqlBuilder
 
     #region Methods
 
-    public SqlBuilder AppendSynonyms(long idAlias, params string[] synonyms)
+    public SqlBuilder AppendAlias(long idAlias, string fileName = null, string arguments = null)
     {
-        if(synonyms is null || synonyms.Length == 0) { throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias"); }
+        fileName ??= Guid.NewGuid().ToString();
+        arguments ??= Guid.NewGuid().ToString();
         
-        foreach (var synonym in synonyms)
-        {
-            _sql.Append($"insert into alias_name(id_alias, name) values ({idAlias}, '{synonym}');");
-            _sql.AppendNewLine();
-        }
-        return this;
-    }
-
-    public SqlBuilder AppendAlias(long idAlias, string fileName, string arguments)
-    {
         _sql.Append($"insert into alias (id, file_name, arguments, id_session) values ({idAlias}, '{fileName}', '{arguments}', 1);");
         _sql.AppendNewLine();
         return this;
     }
 
-    public SqlBuilder AppendArgument(long idAlias, string name, string argument)
+    public SqlBuilder AppendArgument(long idAlias, string name = null, string argument = null)
     {
+        name ??= Guid.NewGuid().ToString();
+        argument ??= Guid.NewGuid().ToString();
+        
         _sql.Append($"insert into alias_argument(id_alias, name, argument) values ({idAlias}, '{name}', '{argument}');");
         _sql.AppendNewLine();
+        return this;
+    }
+
+    public SqlBuilder AppendSynonyms(long idAlias, params string[] synonyms)
+    {
+        if (synonyms is null || synonyms.Length == 0) { throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias"); }
+
+        foreach (var synonym in synonyms)
+        {
+            _sql.Append($"insert into alias_name(id_alias, name) values ({idAlias}, '{synonym}');");
+            _sql.AppendNewLine();
+        }
         return this;
     }
 

@@ -4,19 +4,29 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Constants;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.SQLite;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Functional
 {
-    public class SettingsShould : SQLiteTest
+    public class SettingsShould : TestBase
     {
+        #region Constructors
+
+        public SettingsShould(ITestOutputHelper output) : base(output)
+        {
+        }
+
+        #endregion Constructors
+
         #region Methods
 
-        private static void WithConfiguration(Action<IAppConfigRepository> assert)
+        private void WithConfiguration(Action<IAppConfigRepository> assert)
         {
-            using var connection = BuildFreshDb();
-            using var scope = new SQLiteMultiConnectionManager(connection);
+            using var c = BuildFreshDb();
+            using var scope = new DbSingleConnectionManager(c);
             var settingRepository = new SQLiteAppConfigRepository(scope);
 
             assert(settingRepository);
@@ -74,8 +84,8 @@ namespace Lanceur.Tests.Functional
         [Fact]
         public void HaveDefaultShowAtStartup()
         {
-            var conn = BuildFreshDb();
-            var scope = new SQLiteMultiConnectionManager(conn);
+            var c = BuildFreshDb();
+            var scope = new DbSingleConnectionManager(c);
             var settings = new SQLiteAppConfigRepository(scope);
 
             settings.Current.Window.ShowAtStartup.Should().BeTrue();
@@ -84,8 +94,8 @@ namespace Lanceur.Tests.Functional
         [Fact]
         public void HaveDefaultShowResult()
         {
-            var conn = BuildFreshDb();
-            var scope = new SQLiteMultiConnectionManager(conn);
+            var c = BuildFreshDb();
+            var scope = new DbSingleConnectionManager(c);
             var settings = new SQLiteAppConfigRepository(scope);
 
             settings.Current.Window.ShowResult.Should().BeFalse();

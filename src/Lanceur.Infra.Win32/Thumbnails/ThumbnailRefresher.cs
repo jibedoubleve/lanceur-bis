@@ -1,10 +1,12 @@
-using System.IO;
 using Lanceur.Core.Decorators;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
 using Lanceur.Infra.Win32.Images;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace Lanceur.Infra.Win32.Thumbnails;
 
@@ -14,37 +16,34 @@ public class ThumbnailRefresher : IThumbnailRefresher
 
     private const string WebIcon = "Web";
     private readonly IFavIconManager _favIconManager;
-    private readonly IAppLogger _log;
+    private readonly ILogger<ThumbnailRefresher> _logger;
     private readonly IPackagedAppSearchService _searchService;
 
     #endregion Fields
 
     #region Constructors
 
-    public ThumbnailRefresher(IAppLoggerFactory loggerFactory, IPackagedAppSearchService searchService, IFavIconManager favIconManager)
+    public ThumbnailRefresher(ILoggerFactory loggerFactory, IPackagedAppSearchService searchService, IFavIconManager favIconManager)
     {
-        _searchService  = searchService;
+        _searchService = searchService;
         _favIconManager = favIconManager;
-        _log            = loggerFactory.GetLogger<ThumbnailRefresher>();
+        _logger = loggerFactory.GetLogger<ThumbnailRefresher>();
     }
 
     #endregion Constructors
 
     #region Methods
 
-    public void RefreshCurrentThumbnail(EntityDecorator<QueryResult> query)
+    public async Task RefreshCurrentThumbnailAsync(EntityDecorator<QueryResult> query)
     {
         if (query.Entity is not AliasQueryResult alias) return;
         if (alias.FileName.IsNullOrEmpty()) return;
-        if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon)
-        {
-            _log.Trace($"A thumbnail already exists for '{alias.Name}'. Thumbnail: '{alias.Thumbnail ?? WebIcon}'");
-            return;
-        }
+
+        if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon) return; 
         if (alias.IsPackagedApplication())
         {
-            var response = _searchService.GetByInstalledDirectory(alias.FileName)
-                                         .FirstOrDefault();
+            var response = (await _searchService.GetByInstalledDirectory(alias.FileName))
+                                                .FirstOrDefault();
             if (response is not null)
             {
                 alias.Thumbnail = response.Logo.LocalPath;
@@ -52,7 +51,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
             }
 
             alias.Thumbnail.CopyToImageRepository(alias.FileName);
-            _log.Trace($"Retrieved thumbnail for packaged app '{alias.Name}'. Thumbnail: '{alias.Thumbnail}'");
+            _logger.LogTrace("Retrieved thumbnail for packaged application {Name}. Thumbnail: {Thumbnail}", alias.Name, alias.Thumbnail);
             return;
         }
 
@@ -63,7 +62,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
             imageSource.CopyToImageRepository(file.Name);
             alias.Thumbnail = file.Name.ToAbsolutePath();
             query.Soil();
-            _log.Trace($"Retrieved thumbnail for win32 application'{alias.Name}'. Thumbnail: '{alias.Thumbnail}'");
+            _logger.LogTrace("Retrieved thumbnail for win32 application {Name}. Thumbnail: {Thumbnail}", alias.Name, alias.Thumbnail);
             return;
         }
 
@@ -80,11 +79,11 @@ public class ThumbnailRefresher : IThumbnailRefresher
             return;
         }
 
-        alias.Icon      = WebIcon;
+        alias.Icon = WebIcon;
         alias.Thumbnail = favicon;
 
         _ = _favIconManager.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
-        _log.Trace($"Retrieved favicon for alias '{alias.Name}'. Favicon '{alias.FileName}'");
+        _logger.LogTrace("Retrieved favicon for alias {Name}. Favicon {FileName}", alias.Name, alias.FileName);
     }
 
     #endregion Methods

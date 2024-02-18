@@ -7,10 +7,12 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Tests.Utils.Builders;
 using Lanceur.Tests.Utils.ReservedAliases;
+using Microsoft.Extensions.Logging;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
 using System.Reactive.Concurrency;
+using FluentAssertions.Extensions;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels
@@ -25,11 +27,11 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 
-                scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new NotExecutableTestAlias());
+                scheduler.Schedule(0.Ticks(), () => vm.CurrentAlias = new NotExecutableTestAlias());
 
                 var results = scheduler.Start(
                     () => vm.ExecuteAlias.CanExecute,
@@ -50,11 +52,11 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .Build();
 
-                scheduler.Schedule(TimeSpan.FromTicks(00), () => vm.CurrentAlias = new ExecutableTestAlias());
+                scheduler.Schedule(0.Ticks(), () => vm.CurrentAlias = new ExecutableTestAlias());
 
                 var results = scheduler.Start(
                     () => vm.ExecuteAlias.CanExecute,
@@ -93,7 +95,7 @@ namespace Lanceur.Tests.ViewModels
                         );
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(searchService)
                     .Build();
@@ -135,7 +137,7 @@ namespace Lanceur.Tests.ViewModels
                         );
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(searchService)
                     .Build();
@@ -162,7 +164,7 @@ namespace Lanceur.Tests.ViewModels
                 var executionManager = Substitute.For<IExecutionManager>();
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(executionManager)
                     .Build();
@@ -188,7 +190,7 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var logFactory = Substitute.For<IAppLoggerFactory>();
+                var logFactory = Substitute.For<ILoggerFactory>();
                 var wildcardManager = Substitute.For<IWildcardManager>();
                 var dataService = Substitute.For<IDbRepository>();
                 var cmdlineManager = Substitute.For<ICmdlineManager>();
@@ -201,7 +203,7 @@ namespace Lanceur.Tests.ViewModels
                 );
 
                 var vm = new MainViewModelBuilder()
-                    .With(_output)
+                    .With(OutputHelper)
                     .With(scheduler)
                     .With(executionManager)
                     .Build();

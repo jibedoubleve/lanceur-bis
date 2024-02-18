@@ -3,7 +3,6 @@ using Splat;
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using Lanceur.Infra.Formatters;
 
 namespace Lanceur.Converters
 {
@@ -24,7 +23,7 @@ namespace Lanceur.Converters
         public QueryDescriptionConverter(IStringFormatter formatter, IReadonlyDependencyResolver locator = null)
         {
             var l = locator ?? Locator.Current;
-            _formatter = formatter ?? l.GetService<IStringFormatter>();
+            _formatter = formatter ?? l.GetService<IStringFormatter>("limitedSize");
             ArgumentNullException.ThrowIfNull(_formatter);
         }
 
@@ -38,11 +37,8 @@ namespace Lanceur.Converters
             {
                 return "Packaged Application";
             }
-            else
-            {
-                var msg = _formatter.Format(value);
-                return new LimitedStringLengthFormatter().Format(msg);
-            }
+
+            return  _formatter.Format(value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

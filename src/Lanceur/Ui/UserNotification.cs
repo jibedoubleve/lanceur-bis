@@ -1,7 +1,11 @@
 ﻿using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
+using Microsoft.Extensions.Logging;
 using Splat;
 using System;
+using System.Net.Mime;
+using System.Windows;
+using Lanceur.Utils;
 
 namespace Lanceur.Ui
 {
@@ -9,16 +13,16 @@ namespace Lanceur.Ui
     {
         #region Fields
 
-        private readonly IAppLogger _log;
+        private readonly ILogger<UserNotification> _logger;
         private readonly INotification _notification;
 
         #endregion Fields
 
         #region Constructors
 
-        public UserNotification(IAppLoggerFactory logFactory = null, INotification notification = null)
+        public UserNotification(ILoggerFactory logFactory = null, INotification notification = null)
         {
-            _log = Locator.Current.GetLogger<UserNotification>(logFactory);
+            _logger = logFactory.GetLogger<UserNotification>();
             _notification = notification ?? Locator.Current.GetService<INotification>(); ;
         }
 
@@ -26,16 +30,39 @@ namespace Lanceur.Ui
 
         #region Methods
 
-        public void Error(string message, Exception ex)
+        private static void HandleCrashingNotification(string message, Exception ex, Exception e)
         {
-            _log.Error(message, ex);
-            _notification.Error(message);
+            StaticLoggerFactory.GetLogger<UserNotification>()
+                               .LogWarning(ex, "User notification failed ({Message}). Show message in a MessageBox", e.Message);
+            MessageBox.Show(Application.Current.MainWindow!, $"{message}. {(ex is null ? "" : $"{Environment.NewLine}{ex}")}", "Warning");
         }
 
+        //TODO: refactor logging... It's not optimised
+        public void Error(string message, Exception ex)
+        {
+            try
+            {
+                _logger.LogError(ex, "An error occured. {Message}", ex.Message);
+                _notification.Error(message);
+            }
+            catch (Exception e)
+            {
+                HandleCrashingNotification(message, ex, e);
+            }
+        }
+
+        //TODO: refactor logging... It's not optimised
         public void Warning(string message, Exception ex = null)
         {
-            _log.Warning(message, ex);
-            _notification.Warning(message);
+            try
+            {
+                _logger.LogWarning(ex, "{Message}", message);
+                _notification.Warning(message);
+            }
+            catch (Exception e)
+            {
+                HandleCrashingNotification(message, ex, e);
+            }
         }
 
         #endregion Methods

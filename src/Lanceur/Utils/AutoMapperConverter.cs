@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Lanceur.Utils
 {
-    public class AutoMapperConverter : IConvertionService
+    public class AutoMapperConverter : IConversionService
     {
         #region Fields
 

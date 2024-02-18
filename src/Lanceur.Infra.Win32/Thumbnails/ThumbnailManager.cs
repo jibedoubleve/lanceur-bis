@@ -1,9 +1,11 @@
-﻿using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Decorators;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
 using Lanceur.SharedKernel.Utils;
-using Lanceur.Core.Decorators;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails
 {
@@ -12,7 +14,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
         #region Fields
 
         private readonly IDbRepository _dbRepository;
-        private readonly IAppLogger _log;
+        private readonly ILogger<ThumbnailManager> _logger;
         private readonly IThumbnailRefresher _thumbnailRefresher;
 
         #endregion Fields
@@ -20,13 +22,13 @@ namespace Lanceur.Infra.Win32.Thumbnails
         #region Constructors
 
         public ThumbnailManager(
-            IAppLoggerFactory loggerFactory,
+            ILoggerFactory loggerFactory,
             IDbRepository dbRepository,
             IThumbnailRefresher thumbnailRefresher)
         {
             _dbRepository = dbRepository;
             _thumbnailRefresher = thumbnailRefresher;
-            _log = loggerFactory.GetLogger<ThumbnailManager>();
+            _logger = loggerFactory.GetLogger<ThumbnailManager>();
         }
 
         #endregion Constructors
@@ -41,15 +43,16 @@ namespace Lanceur.Infra.Win32.Thumbnails
         /// All the alias are updated at once to avoid concurrency issues.Thumbnail
         /// </remarks>
         /// <param name="results">The list a queries that need to have an updated thumbnail.</param>
-        public async Task RefreshThumbnails(IEnumerable<QueryResult> results)
+        public void RefreshThumbnailsAsync(IEnumerable<QueryResult> results)
         {
             var queries = EntityDecorator<QueryResult>.FromEnumerable(results)
                                                       .ToArray();
 
-            using var m = TimePiece.Measure(this, m => _log.Info(m));
+            using var m = _logger.MeasureExecutionTime(this);
             try
             {
-                await Task.Run(() => Parallel.ForEach(queries, _thumbnailRefresher.RefreshCurrentThumbnail));
+                var tasks = queries.Select(q => _thumbnailRefresher.RefreshCurrentThumbnailAsync(q));
+                _ =  Task.WhenAll(tasks); // Fire & forget thumbnail refresh
 
                 var aliases = queries.Where(x => x.IsDirty)
                                      .Select(x => x.Entity)
@@ -62,7 +65,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
             }
             catch (Exception ex)
             {
-                _log.Warning($"An error occured during the refresh of the icons. ('{ex.Message}')", ex);
+                _logger.LogWarning(ex, "An error occured during the refresh of the icons");
             }
         }
 

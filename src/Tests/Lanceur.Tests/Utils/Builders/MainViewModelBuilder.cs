@@ -27,12 +27,6 @@ namespace Lanceur.Tests.Utils.Builders
 
         #region Methods
 
-        internal MainViewModelBuilder With(ISettingsFacade settingsFacade)
-        {
-            _appConfigService = settingsFacade;
-            return this;
-        }
-
         public MainViewModel Build()
         {
             ArgumentNullException.ThrowIfNull(_output);
@@ -43,14 +37,20 @@ namespace Lanceur.Tests.Utils.Builders
 
             return new(
                 schedulerProvider: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
-                logFactory: new XUnitLoggerFactory(_output),
                 searchService: _searchService ?? Substitute.For<ISearchService>(),
                 cmdlineService: new CmdlineManager(),
                 executor: _executionManager ?? Substitute.For<IExecutionManager>(),
                 notify: Substitute.For<IUserNotification>(),
                 appConfigService: _appConfigService ?? settingsFacade,
-                dataService: Substitute.For<IDbRepository>()
+                dataService: Substitute.For<IDbRepository>(),
+                loggerFactory: new MicrosoftLoggingLoggerFactory(_output)
             );
+        }
+
+        public MainViewModelBuilder With(ISettingsFacade settingsFacade)
+        {
+            _appConfigService = settingsFacade;
+            return this;
         }
 
         public MainViewModelBuilder With(ITestOutputHelper output)

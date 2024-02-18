@@ -3,9 +3,9 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
-using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Macros;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
@@ -26,7 +26,7 @@ namespace Lanceur.Tests.Functional
                 .Returns(cmdline);
 
             var mgr = new ExecutionManager(
-                Substitute.For<IAppLoggerFactory>(),
+                Substitute.For<ILoggerFactory>(),
                 Substitute.For<IWildcardManager>(),
                 Substitute.For<IDbRepository>(),
                 cmdlineManager

@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Utils;
 using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Windows;
@@ -131,7 +132,7 @@ namespace Lanceur.Controls
                 ReleaseMouseCapture();
                 Cursor = null;
             }
-            catch (Exception ex) { AppLogFactory.Get<ProcessFinderButton>().Error(ex.Message, ex); }
+            catch (Exception ex) { StaticLoggerFactory.GetLogger<ProcessFinderButton>().LogError(ex, "An error occured when trying to retrieve the path of the executable with the mouse"); }
         }
 
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)

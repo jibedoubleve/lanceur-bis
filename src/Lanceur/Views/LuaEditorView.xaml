@@ -51,6 +51,7 @@
                     Kind="ControlPlay" />
             </Button>
         </Grid>
+        
         <avalonEdit:TextEditor
             xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
             x:Name="Editor"

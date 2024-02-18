@@ -1,5 +1,9 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
+using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions
 {
@@ -7,18 +11,20 @@ namespace Lanceur.Infra.SQLite.DbActions
     {
         #region Fields
 
-        private readonly IConvertionService _converter;
+        private readonly IConversionService _converter;
         private readonly IDbConnectionManager _db;
-        private readonly IAppLoggerFactory _log;
+        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
 
         #endregion Fields
 
         #region Constructors
 
-        public MacroDbAction(IDbConnectionManager db, IAppLoggerFactory log, IConvertionService converter)
+        public MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IConversionService converter)
         {
             _db = db;
-            _log = log;
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<MacroDbAction>();
             _converter = converter;
         }
 
@@ -35,18 +41,27 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// <returns>The hydrated <see cref="QueryResult"/> or <paramref name="item"/></returns>
         private AliasQueryResult Hydrate(AliasQueryResult item)
         {
+            _logger.BeginSingleScope("AliasToHydrate", item);
             if (!item.IsComposite()) { return item; }
 
-            var action = new AliasDbAction(_db, _log);
+            var action = new AliasDbAction(_db, _loggerFactory);
             var subAliases = new List<AliasQueryResult>();
 
-            int delay = 0;
-            foreach (var name in item?.Parameters?.Split("@") ?? Array.Empty<string>())
+            var names = item?.Parameters?.Split("@") ?? Array.Empty<string>();
+            var aliases = action.GetExact(names).ToArray();
+
+            var delay = 0;
+            foreach (var name in names)
             {
                 if (name == string.Empty) { delay++; }
                 else
                 {
-                    var alias = action.GetExact(name);
+                    var alias = aliases.FirstOrDefault(a => a.Name == name);
+                    if (alias is null)
+                    {
+                        _logger.LogWarning("Impossible to create composite alias {AliasName}. Check all the items of the composite exists in the database", name);
+                        continue;
+                    }
                     alias.Delay = delay;
 
                     subAliases.Add(alias);
@@ -54,7 +69,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                 }
             }
 
-            return _converter.ToAliasQueryResultComposite(item, subAliases);
+            var result = _converter.ToAliasQueryResultComposite(item, subAliases);
+            return result;
         }
 
         /// <summary>
@@ -66,8 +82,19 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// The collection with all element that are upgradable
         /// to composite, upgraded
         /// </returns>
-        public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection) 
-            => collection.Select(Hydrate).ToList();
+        public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)
+        {
+            using var _ = _logger.MeasureExecutionTime(this);
+            var list = new List<AliasQueryResult>(collection);
+            var composites = list.Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
+                                 .Select(Hydrate)
+                                 .ToArray();
+
+            list.RemoveAll(x => composites.Select(c => c.Id).Contains(x.Id));
+            list.AddRange(composites);
+            
+            return list.ToArray();
+        }
 
         #endregion Methods
     }

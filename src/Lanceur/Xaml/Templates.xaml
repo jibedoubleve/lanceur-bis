@@ -117,49 +117,26 @@
             Padding="3"
             HorizontalAlignment="Stretch"
             Background="Transparent">
-            <DockPanel Background="Transparent">
-                <Border
-                    Margin="5,5,15,5"
-                    Background="{StaticResource MidGrayColour}"
-                    CornerRadius="8">
-                    <Grid Margin="5" Background="{StaticResource MidGrayColour}">
-                        <iconPacks:PackIconMaterial
-                            Width="{StaticResource DefaultIconSize}"
-                            Height="{StaticResource DefaultIconSize}"
-                            VerticalAlignment="Center"
-                            Foreground="{StaticResource MidBlackColour}"
-                            Kind="{Binding Icon}"
-                            Visibility="{Binding ElementName=ImageIcon, Path=Visibility, Converter={StaticResource InvertVisibilityConverter}}" />
-                        <Image
-                            x:Name="ImageIcon"
-                            Width="{StaticResource DefaultIconSize}"
-                            Height="{StaticResource DefaultIconSize}"
-                            VerticalAlignment="Center"
-                            Source="{Binding Thumbnail, UpdateSourceTrigger=PropertyChanged}"
-                            Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
-                    </Grid>
-                </Border>
-                <DockPanel Margin="0" Background="Transparent">
+            <DockPanel Margin="0" Background="Transparent">
+                <TextBlock
+                    x:Name="Name"
+                    Margin="0"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Top"
+                    FontSize="20"
+                    Text="{Binding Name}"
+                    Visibility="{Binding ElementName=Name, Path=Text, Converter={StaticResource StringToVisibilityConverter}}" />
+                <ScrollViewer
+                    MaxHeight="{StaticResource ResultBoxHeight}"
+                    VerticalScrollBarVisibility="Visible"
+                    Visibility="{Binding ElementName=Description, Path=Text, Converter={StaticResource StringToVisibilityConverter}}">
                     <TextBlock
-                        x:Name="Name"
-                        Margin="0"
+                        x:Name="Description"
                         VerticalAlignment="Center"
-                        DockPanel.Dock="Top"
-                        FontSize="20"
-                        Text="{Binding Name}"
-                        Visibility="{Binding ElementName=Name, Path=Text, Converter={StaticResource StringToVisibilityConverter}}" />
-                    <ScrollViewer
-                        MaxHeight="{StaticResource ResultBoxHeight}"
-                        VerticalScrollBarVisibility="Visible"
-                        Visibility="{Binding ElementName=Description, Path=Text, Converter={StaticResource StringToVisibilityConverter}}">
-                        <TextBlock
-                            x:Name="Description"
-                            VerticalAlignment="Center"
-                            FontFamily="Consolas"
-                            FontSize="12"
-                            Text="{Binding Description, Converter={StaticResource QueryDescriptionConverter}}" />
-                    </ScrollViewer>
-                </DockPanel>
+                        FontFamily="Consolas"
+                        FontSize="12"
+                        Text="{Binding Description}" />
+                </ScrollViewer>
             </DockPanel>
         </Border>
     </DataTemplate>

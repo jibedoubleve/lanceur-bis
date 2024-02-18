@@ -3,10 +3,11 @@ using FluentAssertions;
 using System.Reflection;
 using System.SQLite.Updater;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.SQLite
 {
-    public class DatabaseUpdaterShould : SQLiteTest
+    public class DatabaseUpdaterShould : TestBase
     {
         #region Fields
 
@@ -14,6 +15,14 @@ namespace Lanceur.Tests.SQLite
         private static readonly Assembly asm = Assembly.GetExecutingAssembly();
 
         #endregion Fields
+
+        #region Constructors
+
+        public DatabaseUpdaterShould(ITestOutputHelper outputHelper) : base(outputHelper)
+        {
+        }
+
+        #endregion Constructors
 
         #region Methods
 

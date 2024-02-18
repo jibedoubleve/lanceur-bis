@@ -5,6 +5,7 @@
         #region Fields
 
         private readonly string _description;
+        private string _icon;
 
         #endregion Fields
 
@@ -14,16 +15,21 @@
         {
             Name = name;
             _description = description;
-            Icon = iconKind;
+            _icon = iconKind;
         }
 
         #endregion Constructors
 
         #region Properties
 
+        public static IEnumerable<QueryResult> NoResultFound
+            => SingleFromResult("No result found", iconKind: "AlertCircleOutline");
+
         public override string Description => _description;
 
         public override bool IsResult => false;
+
+        public override string Icon { get=> _icon; set => _icon = value; }
 
         #endregion Properties
 
@@ -36,9 +42,6 @@
                 new DisplayQueryResult(text, subtext, iconKind)
             };
         }
-
-        public static IEnumerable<QueryResult> NoResultFound 
-            => SingleFromResult("No result found", iconKind: "AlertCircleOutline");
 
         #endregion Methods
     }

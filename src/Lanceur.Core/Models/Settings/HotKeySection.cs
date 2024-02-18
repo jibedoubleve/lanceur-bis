@@ -18,8 +18,16 @@
         #region Properties
 
         public static HotKeySection Default => new(3, 18);
-        public int Key { get; set; }
-        public int ModifierKey { get; set; }
+        
+        /// <remarks>
+        /// Setter is used for serialization
+        /// </remarks>
+        public int Key { get;  set; }
+        
+        /// <remarks>
+        /// Setter is used for serialization
+        /// </remarks>
+        public int ModifierKey { get;  set; }
 
         #endregion Properties
 

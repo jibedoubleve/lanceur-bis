@@ -1,4 +1,5 @@
 ﻿using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using System;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace Lanceur.Views
                         History.Plot.Legend();
                         History.Refresh();
                     }
-                    else { AppLogFactory.Get<HistoryView>().Warning("No history to display."); }
+                    else { StaticLoggerFactory.GetLogger<HistoryView>().LogWarning("No history to display"); }
                 };
 
                 ViewModel.Activate.Execute().Subscribe();

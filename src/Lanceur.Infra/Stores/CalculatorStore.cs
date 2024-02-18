@@ -1,8 +1,12 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Logging;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Utils;
+using Microsoft.Extensions.Logging;
+using Splat;
 
 namespace Lanceur.Infra.Stores
 {
@@ -12,8 +16,22 @@ namespace Lanceur.Infra.Stores
         #region Fields
 
         private static readonly ICalculatorService Calculator = new CodingSebCalculatorService();
+        private readonly ILogger<CalculatorStore> _logger;
 
         #endregion Fields
+
+        #region Constructors
+
+        public CalculatorStore()
+        {
+            var factory = Locator.GetLocator()
+                                 .GetService<ILoggerFactory>();
+            _logger = factory is not null
+                ? factory.CreateLogger<CalculatorStore>()
+                : new TraceLogger<CalculatorStore>();
+        }
+
+        #endregion Constructors
 
         #region Methods
 
@@ -24,6 +42,7 @@ namespace Lanceur.Infra.Stores
 
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
+            using var time = _logger.MeasureExecutionTime(this);
             var (isError, result) = Calculator.Evaluate(query.ToString());
 
             /* Hack: if user search for 'gc' the result is

@@ -52,7 +52,6 @@ namespace Lanceur.Utils.PackagedApps
             var apps = helper.GetAppsFromManifest(stream);
 
             return apps.Count > 0 ? visitor(apps[0]) : string.Empty;
-
         }
 
         private static PackageVersion InitPackageVersion(string[] namespaces)
@@ -71,9 +70,6 @@ namespace Lanceur.Utils.PackagedApps
                     return versionFromNamespace[n];
                 }
             }
-
-            //_log.Warning($"Trying to get the package version of the UWP program, but a unknown UWP appmanifest version is returned.");
-
             return PackageVersion.Unknown;
         }
 
@@ -106,24 +102,18 @@ namespace Lanceur.Utils.PackagedApps
         /// http://www.hanselman.com/blog/GetNamespacesFromAnXMLDocumentWithXPathDocumentAndLINQToXML.aspx
         private static string[] XmlNamespaces(string path)
         {
-            XDocument z = XDocument.Load(path);
-            if (z.Root != null)
-            {
-                var namespaces = z.Root.Attributes().
-                    Where(a => a.IsNamespaceDeclaration).
-                    GroupBy(
-                        a => a.Name.Namespace == XNamespace.None ? string.Empty : a.Name.LocalName,
-                        a => XNamespace.Get(a.Value)
-                    ).Select(
-                        g => g.First().ToString()
-                    ).ToArray();
-                return namespaces;
-            }
-            else
-            {
-                //_log.Error($"Error occurred while trying to get the XML from '{path}'", new ArgumentNullException());
-                return Array.Empty<string>();
-            }
+            var document = XDocument.Load(path);
+            if (document.Root == null) return Array.Empty<string>();
+
+            var namespaces = document.Root.Attributes().
+                               Where(a => a.IsNamespaceDeclaration).
+                               GroupBy(
+                                   a => a.Name.Namespace == XNamespace.None ? string.Empty : a.Name.LocalName,
+                                   a => XNamespace.Get(a.Value)
+                               ).Select(
+                                   g => g.First().ToString()
+                               ).ToArray();
+            return namespaces;
         }
 
         internal static string GetAppUserModelId(Package package)
@@ -199,51 +189,37 @@ namespace Lanceur.Utils.PackagedApps
                 {
                     return selected;
                 }
-                else
+
+                var appIconSize = 36;
+                var targetSizes = new List<int> { 16, 24, 30, 36, 44, 60, 72, 96, 128, 180, 256 }.AsParallel();
+                var pathFactorPairs = new Dictionary<string, int>();
+
+                foreach (var factor in targetSizes)
                 {
-                    int appIconSize = 36;
-                    var targetSizes = new List<int> { 16, 24, 30, 36, 44, 60, 72, 96, 128, 180, 256 }.AsParallel();
-                    Dictionary<string, int> pathFactorPairs = new Dictionary<string, int>();
+                    var simplePath = $"{prefix}.targetsize-{factor}{extension}";
+                    var suffixThemePath = $"{prefix}.targetsize-{factor}_{theme}{extension}";
+                    var prefixThemePath = $"{prefix}.{theme}_targetsize-{factor}{extension}";
 
-                    foreach (var factor in targetSizes)
-                    {
-                        string simplePath = $"{prefix}.targetsize-{factor}{extension}";
-                        string suffixThemePath = $"{prefix}.targetsize-{factor}_{theme}{extension}";
-                        string prefixThemePath = $"{prefix}.{theme}_targetsize-{factor}{extension}";
+                    paths.Add(simplePath);
+                    paths.Add(suffixThemePath);
+                    paths.Add(prefixThemePath);
 
-                        paths.Add(simplePath);
-                        paths.Add(suffixThemePath);
-                        paths.Add(prefixThemePath);
-
-                        pathFactorPairs.Add(simplePath, factor);
-                        pathFactorPairs.Add(suffixThemePath, factor);
-                        pathFactorPairs.Add(prefixThemePath, factor);
-                    }
-
-                    paths = paths.OrderByDescending(x => x.Contains(theme)).ToList();
-                    var selectedIconPath = paths.OrderBy(x =>
-                    {
-                        var val = pathFactorPairs.ContainsKey(x) ? pathFactorPairs[x] : default;
-                        return Math.Abs(val - appIconSize);
-                    }).FirstOrDefault(File.Exists);
-
-                    if (!string.IsNullOrEmpty(selectedIconPath))
-                    {
-                        return selectedIconPath;
-                    }
-                    else
-                    {
-                        //_log.Warning($"{uwp.UserModelId} can't find logo uri for {uri} in package location: {uwp.Location}");
-                        return string.Empty;
-                    }
+                    pathFactorPairs.Add(simplePath, factor);
+                    pathFactorPairs.Add(suffixThemePath, factor);
+                    pathFactorPairs.Add(prefixThemePath, factor);
                 }
+
+                paths = paths.OrderByDescending(x => x.Contains(theme)).ToList();
+                var selectedIconPath = paths.OrderBy(x =>
+                {
+                    var val = pathFactorPairs.ContainsKey(x) ? pathFactorPairs[x] : default;
+                    return Math.Abs(val - appIconSize);
+                }).FirstOrDefault(File.Exists);
+
+                return !string.IsNullOrEmpty(selectedIconPath) ? selectedIconPath : string.Empty;
             }
-            else
-            {
-                //_log.Error($"|Unable to find extension from {uri} for {UserModelId} "
-                //         + $"in package location {location}", new FileNotFoundException());
-                return string.Empty;
-            }
+
+            return string.Empty;
         }
 
         [DllImport("UXTheme.dll", SetLastError = true, EntryPoint = "#138")]

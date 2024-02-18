@@ -49,7 +49,7 @@ namespace Lanceur.Tests.Converters
             var converter = new QueryDescriptionConverter(formatter);
 
             var description = converter.Convert(input, null, null, null) as string;
-            
+
             description.Should().NotBeNull();
             description!.Length.Should().BeLessOrEqualTo(LimitedStringLengthFormatter.MaxLength + 5);
         }

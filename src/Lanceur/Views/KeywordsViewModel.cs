@@ -1,15 +1,14 @@
-﻿using DynamicData;
-using DynamicData.Binding;
-using Lanceur.Core.LuaScripting;
+﻿using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Utils;
+using Lanceur.Infra.Logging;
 using Lanceur.Schedulers;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Abstractions;
@@ -18,13 +17,22 @@ using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Splat;
 using System;
-using System.Collections.Generic;
+using System.Collections;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using DynamicData;
+using Humanizer;
+using Lanceur.Core.BusinessLogic;
+using Lanceur.SharedKernel.Utils;
+using Lanceur.Utils;
+using System.Reflection;
+using Lanceur.Core;
+using Lanceur.Infra.Utils;
 
 namespace Lanceur.Views
 {
@@ -32,22 +40,22 @@ namespace Lanceur.Views
     {
         #region Fields
 
-        private readonly SourceList<QueryResult> _aliases = new();
         private readonly IDbRepository _aliasService;
         private readonly Scope<bool> _busyScope;
-        private readonly IAppLogger _log;
+        private readonly ILogger<KeywordsViewModel> _logger;
         private readonly INotification _notification;
         private readonly IUserNotification _notify;
         private readonly IPackagedAppSearchService _packagedAppSearchService;
         private readonly ISchedulerProvider _schedulers;
         private readonly IThumbnailManager _thumbnailManager;
+        private readonly MacroLister _macroLister;
 
         #endregion Fields
 
         #region Constructors
 
         public KeywordsViewModel(
-            IAppLoggerFactory logFactory = null,
+            ILoggerFactory logFactory = null,
             IDbRepository searchService = null,
             ISchedulerProvider schedulers = null,
             IUserNotification notify = null,
@@ -62,12 +70,13 @@ namespace Lanceur.Views
             _notify = notify ?? l.GetService<IUserNotification>();
             _packagedAppSearchService = packagedAppSearchService ?? l.GetService<IPackagedAppSearchService>();
             _notification = notification ?? l.GetService<INotification>();
-            _log = l.GetLogger<KeywordsViewModel>(logFactory);
+            _logger = logFactory.GetLogger<KeywordsViewModel>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
             _aliasService = searchService ?? l.GetService<IDbRepository>();
 
             ConfirmRemove = Interactions.YesNoQuestion(_schedulers.MainThreadScheduler);
             AskLuaEditor = new();
+            _macroLister = new MacroLister(this);
 
             this.WhenActivated(Activate);
         }
@@ -76,13 +85,15 @@ namespace Lanceur.Views
 
         #region Properties
 
-        private ReactiveCommand<SearchRequest, IEnumerable<QueryResult>> Search { get; set; }
+        private ReactiveCommand<SearchRequest, ObservableCollection<QueryResult>> Search { get; set; }
 
         public ViewModelActivator Activator { get; } = new();
 
-        public IObservableCollection<QueryResult> Aliases { get; } = new ObservableCollectionExtended<QueryResult>();
+        [Reactive] public ObservableCollection<QueryResult> Aliases { get; set; } = new(); 
 
         [Reactive] public AliasQueryResult AliasToCreate { get; set; }
+
+        [Reactive] public ObservableCollection<string> MacroCollection { get; set; }
 
         public Interaction<Script, string> AskLuaEditor { get; }
 
@@ -90,15 +101,15 @@ namespace Lanceur.Views
 
         public Interaction<string, bool> ConfirmRemove { get; }
 
-        public ReactiveCommand<Unit, Unit> CreatingAlias { get; private set; }
+        public ReactiveCommand<Unit, QueryResult> CreatingAlias { get; private set; }
 
         public ReactiveCommand<Unit, string> EditLuaScript { get; private set; }
 
         [Reactive] public bool IsBusy { get; set; }
 
-        public ReactiveCommand<AliasQueryResult, Unit> RemoveAlias { get; private set; }
+        public ReactiveCommand<AliasQueryResult, AliasQueryResult> RemoveAlias { get; private set; }
 
-        public ReactiveCommand<AliasQueryResult, AliasQueryResult> SaveOrUpdateAlias { get; private set; }
+        public ReactiveCommand<AliasQueryResult, QueryResult> SaveOrUpdateAlias { get; private set; }
 
         [Reactive] public string SearchQuery { get; set; }
 
@@ -106,7 +117,7 @@ namespace Lanceur.Views
 
         public ValidationHelper ValidationAliasExists { get; private set; }
 
-        public ValidationContext ValidationContext { get; } = new ValidationContext();
+        public ValidationContext ValidationContext { get; } = new();
 
         public ValidationHelper ValidationFileName { get; private set; }
 
@@ -114,13 +125,11 @@ namespace Lanceur.Views
 
         #region Methods
 
-        private void OnCreatingAlias()
+        private QueryResult OnCreatingAlias()
         {
-            if (Aliases.Any(x => x.Id == 0)) return;
-
-            var newAlias = AliasQueryResult.EmptyForCreation;
-            _aliases.Insert(0, newAlias);
-            SelectedAlias = newAlias;
+            return Aliases.Any(x => x.Id == 0) 
+                ? null 
+                : AliasQueryResult.EmptyForCreation;
         }
 
         private async Task<string> OnEditLuaScript()
@@ -130,34 +139,37 @@ namespace Lanceur.Views
             return output;
         }
 
-        private async Task<Unit> OnRemoveAliasAsync(AliasQueryResult alias)
+        private async Task<AliasQueryResult> OnRemoveAliasAsync(AliasQueryResult alias)
         {
-            if (alias == null) return Unit.Default;
+            using var _ = _logger.BeginSingleScope("RemovedAlias", alias);
+            if (alias == null) return null;
 
             var remove = await ConfirmRemove.Handle(alias.Name);
-            if (remove)
+            if (!remove)
             {
-                _log.Info($"User removed alias '{alias.Name}'");
-                _aliasService.Remove(alias);
-
-                if (_aliases.Remove(alias)) { _notification.Information($"Removed alias '{alias.Name}'."); }
-                else { _log.Warning($"Impossible to remove the alias '{alias.Name}'"); }
+                _logger.LogDebug("User cancelled the remove of {Name}", alias.Name);
+                return alias;
             }
-            else { _log.Debug($"User cancelled the remove of '{alias.Name}'."); }
-            return Unit.Default;
+
+            _aliasService.Remove(alias);
+            _logger.LogInformation("User removed alias {Name}", alias.Name);
+            return alias;
         }
 
-        private AliasQueryResult OnSaveOrUpdateAlias(AliasQueryResult alias)
+        private async Task<QueryResult> OnSaveOrUpdateAlias(AliasQueryResult alias)
         {
+            using var _ = _logger.BeginSingleScope("AliasToSaveOrUpdate", alias);
+            
             var created = alias.Id == 0;
             BusyMessage = "Saving alias...";
             using (_busyScope.Open())
+            using (_logger.MeasureExecutionTime(this))
             {
                 try
                 {
                     alias.SetName();
-                    var response = _packagedAppSearchService.GetByInstalledDirectory(alias.FileName)
-                                                            .FirstOrDefault();
+                    var response = (await _packagedAppSearchService.GetByInstalledDirectory(alias.FileName))
+                                                                   .FirstOrDefault();
                     if (response is not null) // This is a packaged application
                     {
                         alias.FileName = $"package:{response.AppUserModelId}";
@@ -168,9 +180,9 @@ namespace Lanceur.Views
                 }
                 catch (ApplicationException ex)
                 {
-                    _log.Warning(ex.Message);
-                    _notify.Warning($"Error when {(created ? "creating" : "updating")} the alias: {ex.Message}");
-                    return alias;
+                    _logger.LogWarning(ex, "An error occured while saving or updating alias");
+                    _notify.Warning($"Error when {(created ? "creating" : "updating")} the alias.");
+                    return null;
                 }
             }
             _notification.Information($"Alias '{alias.Name}' {(created ? "created" : "updated")}.");
@@ -178,44 +190,44 @@ namespace Lanceur.Views
             return alias;
         }
 
-        private IEnumerable<QueryResult> OnSearch(SearchRequest request)
+        private ObservableCollection<QueryResult> OnSearch(SearchRequest request)
         {
             var results = request.Query.IsNullOrEmpty()
                 ? _aliasService.GetAll().ToList()
                 : _aliasService.Search(request.Query).ToList();
-            _thumbnailManager.RefreshThumbnails(results);
+            _thumbnailManager.RefreshThumbnailsAsync(results);
 
-            if (request.AliasToCreate == null) return results;
+            results.SortCollection(a => a.Name);
+            if (request.AliasToCreate == null) return new(results);
 
             results.Insert(0, request.AliasToCreate);
-            return results;
-        }
-
-        private void SetAliases(IEnumerable<QueryResult> x)
-        {
-            var selected = Aliases.FirstOrDefault(a => a.Id == SelectedAlias?.Id);
-            _aliases.Clear();
-            _aliases.AddRange(x);
-
-            if (selected is AliasQueryResult alias)
-            {
-                SelectedAlias = alias;
-            }
+            return new(results);
         }
 
         private void SetupBindings(IScheduler uiThread, CompositeDisposable d)
         {
-            _aliases
-                .Connect()
-                .ObserveOn(uiThread)
-                .Bind(Aliases)
-                .Subscribe()
+            // REMOVING ALIAS
+            this.WhenAnyObservable(vm => vm.RemoveAlias)
+                .Where(x => x is not null)
+                .Subscribe(x => Aliases.Remove(x))
                 .DisposeWith(d);
-
+            
+            // ADDING ALIAS
+            this.WhenAnyObservable(vm => vm.CreatingAlias)
+                .Select(x => x as AliasQueryResult)
+                .Where(x => x is not null)
+                .Subscribe(newAlias =>
+                {
+                    Aliases.Insert(0, newAlias);
+                    SelectedAlias = newAlias;
+                })
+                .DisposeWith(d);
+            
+            // SEARCH ALIAS
             this.WhenAnyObservable(vm => vm.Search)
-                .DistinctUntilChanged()
-                .Log(this, "Setting aliases", c => $"Count {c.Count()}")
-                .Subscribe(SetAliases)
+                .Select(x => x.ToObservableCollection())
+                .Log(this, "Search executed", c => $"Found {c.Count} item(s)")
+                .BindTo(this, vm => vm.Aliases)
                 .DisposeWith(d);
 
             this.WhenAnyObservable(vm => vm.Search)
@@ -225,34 +237,71 @@ namespace Lanceur.Views
                 .Log(this, "Selecting an alias", c => $"Id: {c.Id} - Name: {c.Name}")
                 .BindTo(this, vm => vm.SelectedAlias)
                 .DisposeWith(d);
-
-            this.WhenAnyObservable(vm => vm.SaveOrUpdateAlias)
-                .Where(alias => alias is not null)
-                .Log(this, "Saved or updated alias.", c => $"Id: {c.Id} - Name: {c.Name}")
-                .Subscribe(UpdateAliasWithSynonyms)
-                .DisposeWith(d);
-
+            
+            // USER SEARCH QUERY 
             this.WhenAnyValue(vm => vm.SearchQuery)
                 .DistinctUntilChanged()
-                .Throttle(TimeSpan.FromMilliseconds(10), scheduler: uiThread)
+                .Throttle(10.Milliseconds(), scheduler: uiThread)
                 .Select(x => new SearchRequest(x?.Trim(), AliasToCreate))
                 .Log(this, "Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{c.AliasToCreate?.Name ?? "<EMPTY>"}'")
                 .InvokeCommand(Search)
                 .DisposeWith(d);
+
+            // SAVE OR UPDATE ALIAS
+            this.WhenAnyObservable(vm => vm.SaveOrUpdateAlias)
+                .Where(x => x is not null)
+                .Subscribe(AfterSaveOrUpdateAlias)
+                .DisposeWith(d);
+        }
+
+        private void AfterSaveOrUpdateAlias(QueryResult updated)
+        {
+            try
+            {
+                if (updated is not AliasQueryResult updatedAlias) return;
+
+                using var _ = new LogScope(_logger).Add("UpdatedAlias", updatedAlias)
+                                                   .Add("TypeOfQueryResult", updated.GetType())
+                                                   .BeginScope();
+                // Remove all synonyms ... 
+                var toDel = Aliases.Where(a => a.Id == updated.Id).ToList();
+                Aliases.Remove(toDel);
+
+                // ... and recreate them
+                var toAdd = updatedAlias.CloneFromSynonyms();
+                Aliases.Add(toAdd);
+
+                // Sort and display selected alias
+                Aliases.SortCollection(criterion => criterion.Name);
+                SelectedAlias = Aliases.Where(a=>a.Id == updated.Id)
+                                       .Cast<AliasQueryResult>()
+                                       .FirstOrDefault() ;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogWarning(
+                    ex, "An error occured while cloning synonyms of {UpdatedName} after a save or update",
+                    updated.Name);
+                _notification.Warning($"Error occured while creating synonyms of {updated.Name}");
+            }
         }
 
         private void SetupCommands(IScheduler uiThread, IUserNotification notify, CompositeDisposable d)
         {
-            Search = ReactiveCommand.Create<SearchRequest, IEnumerable<QueryResult>>(OnSearch, outputScheduler: uiThread).DisposeWith(d);
+            Search = ReactiveCommand
+                     .Create<SearchRequest, ObservableCollection<QueryResult>>(OnSearch, outputScheduler: uiThread)
+                     .DisposeWith(d);
             Search.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             CreatingAlias = ReactiveCommand.Create(OnCreatingAlias, outputScheduler: uiThread).DisposeWith(d);
             CreatingAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            RemoveAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, Unit>(OnRemoveAliasAsync, outputScheduler: uiThread).DisposeWith(d);
+            RemoveAlias = ReactiveCommand
+                          .CreateFromTask<AliasQueryResult, AliasQueryResult>(OnRemoveAliasAsync, outputScheduler: uiThread)
+                          .DisposeWith(d);
             RemoveAlias.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SaveOrUpdateAlias = ReactiveCommand.Create<AliasQueryResult, AliasQueryResult>(
+            SaveOrUpdateAlias = ReactiveCommand.CreateFromTask<AliasQueryResult, QueryResult>(
                 OnSaveOrUpdateAlias,
                 this.IsValid(),
                 outputScheduler: uiThread
@@ -267,8 +316,14 @@ namespace Lanceur.Views
         {
             var validateFileNameExists = this.WhenAnyValue(
                 x => x.SelectedAlias.FileName,
-                x => !x.IsNullOrEmpty()
-            );
+                x =>
+                {
+                    if (x.IsNullOrEmpty()) return false;
+                    if (!x.StartsWith('@')) return true;
+                    
+                    return x.StartsWith('@') && _macroLister.GetAttributes().Any(a => a.Name == x.ToUpper());
+                });
+            
             var validateNameExists = this.WhenAnyValue(
                 x => x.SelectedAlias.SynonymsToAdd,
                 x => _aliasService.SelectNames(x.SplitCsv())
@@ -277,7 +332,7 @@ namespace Lanceur.Views
             ValidationFileName = this.ValidationRule(
                    vm => vm.SelectedAlias.FileName,
                    validateFileNameExists,
-                   "The path to the file shouldn't be empty."
+                   "Either the path to the file is empty or the macro does not exist."
              );
             ValidationFileName.DisposeWith(d);
 
@@ -288,45 +343,12 @@ namespace Lanceur.Views
                    response =>
                    {
                        if (response == null) return "The names should not be empty.";
-                       
+
                        return !response.Exists && !response.ExistingNames.Any()
                            ? "The names should not be empty."
                            : $"'{response.ExistingNames.JoinCsv()}' {(response.ExistingNames.Length <= 1 ? "is" : "are")} already used as alias.";
                    });
             ValidationAliasExists.DisposeWith(d);
-        }
-
-        private void UpdateAliasWithSynonyms(AliasQueryResult alias)
-        {
-            var toDel = _aliases.Items
-                                .Where(a => a.Id == alias.Id)
-                                .ToArray();
-            foreach (var item in toDel)
-            {
-                _aliases.Remove(item);
-            }
-
-            var names = alias.Synonyms.SplitCsv();
-            var errors = new List<Exception>();
-            
-            foreach (var name in names)
-            {
-                try
-                {
-                    _log.Trace($"Cloning alias (type: '{alias.GetType()}'. Thumbnail: '{alias.Thumbnail}'");
-                    var toAdd = alias.CloneObject();
-                    toAdd.Name = name;
-                    _log.Trace($"Add cloned object (which is a synonym) to the list of alias (name: '{name}')");
-                    _aliases.Add(toAdd);
-                }
-                catch (Exception ex)
-                {
-                    _log.Warning($"Error occured while cloning object of type '{alias.GetType()}' with name '{name}'", ex);
-                    errors.Add(ex);
-                }
-            }
-
-            if (errors.Any()) throw new AggregateException($"Errors occured while updating synonyms of alias with these synonyms: {alias.Synonyms}", errors);
         }
 
         /// <summary>
@@ -348,6 +370,12 @@ namespace Lanceur.Views
             SetupValidations(d);
             SetupCommands(_schedulers.MainThreadScheduler, _notify, d);
             SetupBindings(_schedulers.MainThreadScheduler, d);
+            
+            //load macros
+            var macros = _macroLister.GetVisibleAttributes()
+                                     .Select(x => x.Name)
+                                     .ToArray();
+            MacroCollection = new(macros);
         }
 
         public void HydrateSelectedAlias() => _aliasService.HydrateAlias(SelectedAlias);

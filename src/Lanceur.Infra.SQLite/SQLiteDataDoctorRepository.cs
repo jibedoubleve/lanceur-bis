@@ -2,7 +2,9 @@ using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite;
 
@@ -10,15 +12,14 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
 {
     #region Fields
 
-    private readonly GetAllAliasDbAction _dbAction;
+    private readonly AliasSearchDbAction _dbAction;
 
     #endregion Fields
 
     #region Constructors
 
-    public SQLiteDataDoctorRepository(
-        IDbConnectionManager manager,
-        IAppLoggerFactory logFactory) : base(manager) => _dbAction = new(DB, logFactory);
+    public SQLiteDataDoctorRepository(IDbConnectionManager manager, ILoggerFactory loggerFactory, IConversionService converter) : base(manager) 
+        => _dbAction = new(DB, loggerFactory, converter);
 
     #endregion Constructors
 
@@ -40,7 +41,7 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
 
     public Task FixIconsForHyperlinksAsync()
     {
-        var aliases = _dbAction.GetAll()
+        var aliases = _dbAction.Search()
                                .ToArray();
         Update(aliases);
         return Task.CompletedTask;

@@ -7,7 +7,7 @@ public interface IThumbnailRefresher
 {
     #region Methods
 
-    void RefreshCurrentThumbnail(EntityDecorator<QueryResult> query);
+    Task RefreshCurrentThumbnailAsync(EntityDecorator<QueryResult> query);
 
     #endregion Methods
 }

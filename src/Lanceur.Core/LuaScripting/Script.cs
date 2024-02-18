@@ -8,10 +8,10 @@ namespace Lanceur.Core.LuaScripting
 
         public static Script Clone(this Script script, string scriptCode)
         {
-            return new Script
+            return new()
             {
                 Code = scriptCode,
-                Context = script.Context,
+                Context = script?.Context ?? new(),
             };
         }
 
@@ -28,6 +28,12 @@ namespace Lanceur.Core.LuaScripting
             };
         }
 
+        public static ScriptResult ToScriptResult(this Script src) => new()
+        {
+            Code = src?.Code ?? string.Empty,
+            Context = src?.Context ?? new ()
+        };
+
         #endregion Methods
     }
 
@@ -35,15 +41,9 @@ namespace Lanceur.Core.LuaScripting
     {
         #region Properties
 
-        public string Code { get; init; }
+        public string Code { get; init; } = string.Empty;
 
-        public ScriptContext Context { get; init; }
-
-        public ScriptResult EmptyResult => new ScriptResult
-        {
-            Code = Code,
-            Context = ScriptContext.Empty
-        };
+        public ScriptContext Context { get; init; } = ScriptContext.Empty;
 
         #endregion Properties
     }

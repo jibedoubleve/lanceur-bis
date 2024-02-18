@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Models;
@@ -6,15 +7,25 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Tests.SQLite;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System.Data.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
+using Xunit.Abstractions;
 using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Tests.BusinessLogic
 {
-    public class AliasManagementShould : SQLiteTest
+    public class AliasManagementShould : TestBase
     {
+        #region Constructors
+
+        public AliasManagementShould(ITestOutputHelper outputHelper) : base(outputHelper)
+        {
+        }
+
+        #endregion Constructors
+
         #region Methods
 
         private static AliasQueryResult BuildAlias(string name = null, RunAs runAs = RunAs.CurrentUser)
@@ -33,19 +44,19 @@ namespace Lanceur.Tests.BusinessLogic
             };
         }
 
-        private static AliasDbAction BuildAliasDbAction(SQLiteConnection connection)
+        private static AliasDbAction BuildAliasDbAction(IDbConnection connection)
         {
-            var scope = new SQLiteSingleConnectionManager(connection);
-            var log = Substitute.For<IAppLoggerFactory>();
+            var scope = new DbSingleConnectionManager(connection);
+            var log = Substitute.For<ILoggerFactory>();
             var action = new AliasDbAction(scope, log);
             return action;
         }
 
-        private static SQLiteRepository BuildDataService(SQLiteConnection connection)
+        private static SQLiteRepository BuildDataService(IDbConnection connection)
         {
-            var scope = new SQLiteSingleConnectionManager(connection);
-            var log = Substitute.For<IAppLoggerFactory>();
-            var conv = Substitute.For<IConvertionService>();
+            var scope = new DbSingleConnectionManager(connection);
+            var log = Substitute.For<ILoggerFactory>();
+            var conv = Substitute.For<IConversionService>();
             var service = new SQLiteRepository(scope, log, conv);
             return service;
         }
@@ -184,6 +195,8 @@ namespace Lanceur.Tests.BusinessLogic
 
             var alias = BuildAlias("admin", RunAs.Admin);
             service.SaveOrUpdate(ref alias);
+
+            var r = connection.Query<AliasQueryResult>("select * from alias");
 
             var results = service.Search("admin").ToArray();
 
