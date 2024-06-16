@@ -125,8 +125,8 @@
                                     <ComboBox
                                         x:Name="BoxFileName"
                                         Margin="5"
-                                        DisplayMemberPath="."
                                         HorizontalAlignment="Stretch"
+                                        DisplayMemberPath="."
                                         IsEditable="True"
                                         Text="{Binding ElementName=Aliases, Path=SelectedItem.FileName, UpdateSourceTrigger=PropertyChanged}"
                                         Validation.ErrorTemplate="{StaticResource TextControlValidationErrorTemplate}" />
@@ -180,6 +180,12 @@
                                     </ComboBox.Items>
                                 </ComboBox>
                             </StackPanel>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Confirm before executing">
+                            <ui:ToggleSwitch
+                                IsOn="{Binding ElementName=Aliases, Path=SelectedItem.IsExecutionConfirmationRequired}"
+                                OffContent="Execute without confirmation"
+                                OnContent="Confirm before executing" />
                         </HeaderedContentControl>
                         <HeaderedContentControl Header="Working directory">
                             <TextBox

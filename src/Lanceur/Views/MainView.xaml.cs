@@ -20,8 +20,14 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using ScottPlot.Renderable;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using ListView = System.Windows.Controls.ListView;
+using MessageBox = System.Windows.Forms.MessageBox;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Lanceur.Views
 {
@@ -81,6 +87,12 @@ namespace Lanceur.Views
                          .Log(ViewModel, $"Hiding control.", v => $"KeepAlive = {v}")
                          .Subscribe(_ => HideControl())
                          .DisposeWith(d);
+                
+                ViewModel!.ConfirmExecution.RegisterHandler(interaction =>
+                {
+                    var result = MessageBox.Show(interaction.Input, "Question", MessageBoxButtons.YesNo);
+                    interaction.SetOutput(result == System.Windows.Forms.DialogResult.Yes);
+                });
 
                 #region QueryTextBox
 

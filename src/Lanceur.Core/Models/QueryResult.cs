@@ -41,6 +41,12 @@ public abstract class QueryResult : ObservableModel
     public long Id { get; set; }
 
     /// <summary>
+    /// Indicates whether the application should ask for confirmation from the
+    /// user before executing this alias.
+    /// </summary>
+    public bool IsExecutionConfirmationRequired { get; set; }
+
+    /// <summary>
     /// Indicates whether this item is the result of a search or if it is an
     /// item used to provide information to the user.
     /// </summary>
