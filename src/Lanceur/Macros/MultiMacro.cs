@@ -1,9 +1,9 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.Ui;
 using Splat;
 using System;
 using System.Collections.Generic;
@@ -62,20 +62,13 @@ namespace Lanceur.Macros
         {
             var items = Parameters?.Split('@') ?? Array.Empty<string>();
 
-            foreach (var item in items)
+            var aliases = new List<AliasQueryResult>();
+            foreach(var item in items)
             {
-                await Task.Delay(_delay);
-                var alias = GetAlias(item);
-                if (alias is not null)
-                {
-                    //https://stackoverflow.com/a/20364016/389529
-                    _ = _executionManager.ExecuteAsync(new()
-                    {
-                     
-                        QueryResult = alias,
-                    }).ConfigureAwait(false);
-                }
+                aliases.Add(GetAlias(item));
             }
+
+            _ = _executionManager.ExecuteMultiple(aliases, _delay);
 
             return await NoResultAsync;
         }

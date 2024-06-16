@@ -183,6 +183,23 @@ namespace Lanceur.Infra.Managers
             }
         }
 
+        private async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request, int delay)
+        {
+            await Task.Delay(delay);
+            return await ExecuteAsync(request);
+        }
+
+        public ExecutionResponse ExecuteMultiple(IEnumerable<QueryResult> queryResults, int delay = 0)
+        {
+            var currentDelay = 0; ;
+            foreach (QueryResult queryResult in queryResults)
+            {
+                currentDelay += delay;
+                _ = ExecuteAsync(new() { QueryResult = queryResult }, currentDelay);
+            }
+            return ExecutionResponse.NoResult;
+        }
+
         #endregion Methods
     }
 }
