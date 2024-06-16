@@ -12,8 +12,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #tool nuget:?package=vswhere&version=3.0.1
-#tool nuget:?package=GitVersion.CommandLine&version=5.10.1
-#tool nuget:?package=GitReleaseManager&version=0.13.0
+#tool nuget:?package=GitVersion.CommandLine&version=5.12.0
+#tool nuget:?package=GitReleaseManager&version=0.17.0
 
 #addin nuget:?package=Cake.Figlet&version=2.0.1
 
