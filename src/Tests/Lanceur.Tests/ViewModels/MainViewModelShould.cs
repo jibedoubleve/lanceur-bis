@@ -19,15 +19,9 @@ using ReactiveUI.Testing;
 using Splat;
 using System.Reactive.Concurrency;
 using FluentAssertions.Extensions;
-using Lanceur.Infra.SQLite.DataAccess;
-using Lanceur.Tests.Logging;
-using Lanceur.Tests.SQL;
 using Lanceur.Tests.SQLite;
 using Xunit;
 using Xunit.Abstractions;
-using Dapper;
-using Lanceur.Infra.SQLite;
-using Lanceur.Infra.SQLite.DbActions;
 
 namespace Lanceur.Tests.ViewModels
 {
@@ -161,8 +155,6 @@ namespace Lanceur.Tests.ViewModels
                 vm.CurrentAlias.Name.Should().Be(aliasName);
             });
         }
-
-
 
         [Fact]
         public void ShowAutoCompleteWhenCallingDebugMacro()

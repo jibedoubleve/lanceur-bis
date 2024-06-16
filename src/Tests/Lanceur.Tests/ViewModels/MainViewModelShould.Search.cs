@@ -276,7 +276,45 @@ namespace Lanceur.Tests.ViewModels
                 vm.CurrentAlias.Name.Should().Be("world");
             });
         }
+        
+        [Theory]
+        [InlineData(true, true, 1)]  // Confirmation asked    ; User refused ; Alias NOT executed
+        [InlineData(true, false, 0)] // Confirmation asked    ; User accepted; Alias executed
+        [InlineData(false, null, 1)] // Confirmation NOT asked;              ; Alias is executed
+        public void ExecutingAlias_Execute_When_Confirmation(bool isConfirmationAsked, bool? userAnswer, int executionCount)
+        {
+            new TestScheduler().With(async scheduler =>
+            {
+                // ARRANGE
+                var alias = ExecutableTestAlias.FromName("alias1");
+                alias.IsExecutionConfirmationRequired = isConfirmationAsked;
 
+                var executor = Substitute.For<IExecutionManager>();   
+                executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                        .Returns(new ExecutionResponse());
+                
+                var vm = new MainViewModelBuilder()
+                    .With(OutputHelper)
+                    .With(scheduler)
+                    .With(executor)
+                    .Build();
+
+                // if user answer is null then set to false. It'll prove the confirmation is not used
+                vm.ConfirmExecution.RegisterHandler(i => i.SetOutput(userAnswer ?? false));
+
+                // ACT
+                vm.CurrentAlias = alias;
+                var request = vm.BuildExecutionRequest("alias1");
+                vm.ExecuteAlias.Execute(request).Subscribe();
+
+                scheduler.Start();
+
+                // ASSERT
+                await executor.Received(executionCount)
+                        .ExecuteAsync(Arg.Any<ExecutionRequest>());
+            });
+        } 
+        
         #endregion Methods
     }
 }
