@@ -68,13 +68,12 @@ namespace Lanceur.Macros
                 var alias = GetAlias(item);
                 if (alias is not null)
                 {
-#pragma warning disable 4014
                     //https://stackoverflow.com/a/20364016/389529
-                    _executionManager.ExecuteAsync(new ExecutionRequest
+                    _ = _executionManager.ExecuteAsync(new()
                     {
+                     
                         QueryResult = alias,
                     }).ConfigureAwait(false);
-#pragma warning disable 4014
                 }
             }
 

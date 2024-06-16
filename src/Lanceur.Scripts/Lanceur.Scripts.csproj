@@ -13,6 +13,7 @@
     <EmbeddedResource Include="SQL\script-0.13.sql" />
     <EmbeddedResource Include="SQL\script-0.14.sql" />
     <EmbeddedResource Include="SQL\script-0.14.1.sql" />
+    <EmbeddedResource Include="SQL\script-0.16.sql" />
     <EmbeddedResource Include="SQL\script-0.2.sql" />
     <EmbeddedResource Include="SQL\script-0.3.sql" />
     <EmbeddedResource Include="SQL\script-0.4.1.sql" />

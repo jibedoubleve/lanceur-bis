@@ -36,21 +36,22 @@ public class AliasSearchDbAction
         using var _ = _logger.MeasureExecutionTime(this);
         var sql = @$"
                 select
-                    an.Name       as {nameof(AliasQueryResult.Name)},
-                    a.Id          as {nameof(AliasQueryResult.Id)},
-                    a.arguments   as {nameof(AliasQueryResult.Parameters)},
-                    a.file_name   as {nameof(AliasQueryResult.FileName)},
-                    a.notes       as {nameof(AliasQueryResult.Notes)},
-                    a.run_as      as {nameof(AliasQueryResult.RunAs)},
-                    a.start_mode  as {nameof(AliasQueryResult.StartMode)},
-                    a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
-                    a.icon        as {nameof(AliasQueryResult.Icon)},
-                    a.thumbnail   as {nameof(AliasQueryResult.Thumbnail)},
-                    a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
-                    a.exec_count  as {nameof(AliasQueryResult.Count)},
-                    s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
-                    s.Synonyms    as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
-                    a.exec_count  as {nameof(AliasQueryResult.Count)}
+                    an.Name                 as {nameof(AliasQueryResult.Name)},
+                    a.Id                    as {nameof(AliasQueryResult.Id)},
+                    a.arguments             as {nameof(AliasQueryResult.Parameters)},
+                    a.file_name             as {nameof(AliasQueryResult.FileName)},
+                    a.notes                 as {nameof(AliasQueryResult.Notes)},
+                    a.run_as                as {nameof(AliasQueryResult.RunAs)},
+                    a.start_mode            as {nameof(AliasQueryResult.StartMode)},
+                    a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
+                    a.icon                  as {nameof(AliasQueryResult.Icon)},
+                    a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
+                    a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
+                    a.exec_count            as {nameof(AliasQueryResult.Count)},
+                    s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
+                    s.Synonyms              as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
+                    a.exec_count            as {nameof(AliasQueryResult.Count)},
+                    a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
                 from
                     alias a
                     left join alias_name            an on a.id         = an.id_alias                    

@@ -19,7 +19,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Humanizer;
-using Lanceur.SharedKernel.Utils;
+using Lanceur.Ui;
 
 namespace Lanceur.Views
 {
@@ -33,6 +33,7 @@ namespace Lanceur.Views
         private readonly ILogger<MainViewModel> _logger;
         private readonly ISearchService _searchService;
         private readonly ISettingsFacade _settingsFacade;
+        private readonly Interaction<string, bool> _confirmExecution;
 
         #endregion Fields
 
@@ -58,7 +59,8 @@ namespace Lanceur.Views
             _dbRepository = dataService ?? l.GetService<IDbRepository>();
             _executor = executor ?? l.GetService<IExecutionManager>();
             _settingsFacade = appConfigService ?? l.GetService<ISettingsFacade>();
-
+            _confirmExecution = Interactions.YesNoQuestion(schedulerProvider.MainThreadScheduler);
+            
             #region Commands
 
             AutoComplete = ReactiveCommand.Create(OnAutoComplete);
@@ -210,9 +212,9 @@ namespace Lanceur.Views
         #endregion Constructors
 
         #region Properties
-
         public ReactiveCommand<Unit, AliasResponse> Activate { get; }
         public ReactiveCommand<Unit, string> AutoComplete { get; }
+        public Interaction<string, bool> ConfirmExecution => _confirmExecution;
         [Reactive] public QueryResult CurrentAlias { get; set; }
         [Reactive] public string CurrentSessionName { get; set; }
         public ReactiveCommand<AliasExecutionRequest, AliasResponse> ExecuteAlias { get; }
@@ -266,6 +268,13 @@ namespace Lanceur.Views
             using var _ = _logger.BeginSingleScope("ExecuteAliasRequest", request);
 
             if (request.AliasToExecute is null) { return new(); }
+            if (request.AliasToExecute.IsExecutionConfirmationRequired)
+            {
+                if(false == await ConfirmExecution.Handle($"Do you want to execute '{request.AliasToExecute.Name}' ?"))
+                {
+                    return new();
+                }
+            }
 
             var response = await _executor.ExecuteAsync(new()
             {
@@ -301,7 +310,7 @@ namespace Lanceur.Views
             var results = _searchService.Search(query)
                                         .ToArray();
 
-            _logger.LogInformation("Search: {Criterion} (Found {Length} element(s))",criterion, results.Length);
+            _logger.LogInformation("Search: {Criterion} (Found {Length} element(s))", criterion, results.Length);
             return new AliasResponse()
             {
                 Results = results,

@@ -30,27 +30,6 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Methods
 
-        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
-        {
-            using var _ = _logger.BeginSingleScope("Parameters", parameters);
-            const string sql1 = "delete from alias_argument where id_alias = @idAlias";
-            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
-
-            // Remove existing additional alias parameters
-            var deletedRowsCount = tx.Connection.Execute(sql1, new { idAlias });
-
-            // Create alias additional parameters
-            var addedRowsCount = tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
-
-            if (deletedRowsCount > 0 && addedRowsCount == 0)
-            {
-                _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);
-            }
-        }
-
-        private void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx)
-            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
-
         private static void UpdateName(AliasQueryResult alias, IDbTransaction tx)
         {
             //Remove all names
@@ -109,6 +88,27 @@ namespace Lanceur.Infra.SQLite.DbActions
             _logger.LogInformation("Removed {Count} row(s) from alias_usage. Id: {IdAliases}", cnt, idd);
         }
 
+        private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
+        {
+            using var _ = _logger.BeginSingleScope("Parameters", parameters);
+            const string sql1 = "delete from alias_argument where id_alias = @idAlias";
+            const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
+
+            // Remove existing additional alias parameters
+            var deletedRowsCount = tx.Connection.Execute(sql1, new { idAlias });
+
+            // Create alias additional parameters
+            var addedRowsCount = tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+
+            if (deletedRowsCount > 0 && addedRowsCount == 0)
+            {
+                _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);
+            }
+        }
+
+        private void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx)
+            => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
+
         internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
         {
             var sql = @$"
@@ -148,7 +148,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                     icon,
                     thumbnail,
                     lua_script,
-                    hidden
+                    hidden,
+                    confirmation_required
                 ) values (
                     @arguments,
                     @fileName,
@@ -160,7 +161,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @icon,
                     @thumbnail,
                     @luaScript,
-                    @isHidden
+                    @isHidden,
+                    @isExecutionConfirmationRequired
                 );
                 select last_insert_rowid() from alias limit 1;";
 
@@ -176,7 +178,8 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.Icon,
                 alias.Thumbnail,
                 alias.LuaScript,
-                alias.IsHidden
+                alias.IsHidden,
+                alias.IsExecutionConfirmationRequired
             };
 
             var csv = alias.Synonyms.SplitCsv();
@@ -249,23 +252,24 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             const string sql = @$"
                 select
-                    n.Name        as {nameof(AliasQueryResult.Name)},
-                    s.synonyms    as {nameof(AliasQueryResult.Synonyms)},
-                    a.Id          as {nameof(AliasQueryResult.Id)},
-                    a.arguments   as {nameof(AliasQueryResult.Parameters)},
-                    a.file_name   as {nameof(AliasQueryResult.FileName)},
-                    a.notes       as {nameof(AliasQueryResult.Notes)},
-                    a.run_as      as {nameof(AliasQueryResult.RunAs)},
-                    a.start_mode  as {nameof(AliasQueryResult.StartMode)},
-                    a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
-                    a.icon        as {nameof(AliasQueryResult.Icon)},
-                    a.thumbnail   as {nameof(AliasQueryResult.Thumbnail)},
-                    a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
-                    a.exec_count  as {nameof(AliasQueryResult.Count)},
-                    a.hidden      as {nameof(AliasQueryResult.IsHidden)}
+                    n.Name                  as {nameof(AliasQueryResult.Name)},
+                    s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
+                    a.Id                    as {nameof(AliasQueryResult.Id)},
+                    a.arguments             as {nameof(AliasQueryResult.Parameters)},
+                    a.file_name             as {nameof(AliasQueryResult.FileName)},
+                    a.notes                 as {nameof(AliasQueryResult.Notes)},
+                    a.run_as                as {nameof(AliasQueryResult.RunAs)},
+                    a.start_mode            as {nameof(AliasQueryResult.StartMode)},
+                    a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
+                    a.icon                  as {nameof(AliasQueryResult.Icon)},
+                    a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
+                    a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
+                    a.exec_count            as {nameof(AliasQueryResult.Count)},
+                    a.hidden                as {nameof(AliasQueryResult.IsHidden)},
+                    a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
                 from
                     alias a
-                    left join alias_name n on a.id = n.id_alias                    
+                    left join alias_name n on a.id = n.id_alias
                     inner join data_alias_synonyms_v s on s.id_alias = a.id
                 where
                     a.id_session = @idSession
@@ -296,18 +300,19 @@ namespace Lanceur.Infra.SQLite.DbActions
 
             const string sql = @$"
             select
-                n.Name        as {nameof(AliasQueryResult.Name)},
-                a.Id          as {nameof(AliasQueryResult.Id)},
-                a.arguments   as {nameof(AliasQueryResult.Parameters)},
-                a.file_name   as {nameof(AliasQueryResult.FileName)},
-                a.notes       as {nameof(AliasQueryResult.Notes)},
-                a.run_as      as {nameof(AliasQueryResult.RunAs)},
-                a.start_mode  as {nameof(AliasQueryResult.StartMode)},
-                a.working_dir as {nameof(AliasQueryResult.WorkingDirectory)},
-                a.icon        as {nameof(AliasQueryResult.Icon)},
-                a.thumbnail   as {nameof(AliasQueryResult.Thumbnail)},
-                a.lua_script  as {nameof(AliasQueryResult.LuaScript)},
-                a.hidden      as {nameof(AliasQueryResult.IsHidden)}
+                n.Name                  as {nameof(AliasQueryResult.Name)},
+                a.Id                    as {nameof(AliasQueryResult.Id)},
+                a.arguments             as {nameof(AliasQueryResult.Parameters)},
+                a.file_name             as {nameof(AliasQueryResult.FileName)},
+                a.notes                 as {nameof(AliasQueryResult.Notes)},
+                a.run_as                as {nameof(AliasQueryResult.RunAs)},
+                a.start_mode            as {nameof(AliasQueryResult.StartMode)},
+                a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
+                a.icon                  as {nameof(AliasQueryResult.Icon)},
+                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
+                a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
+                a.hidden                as {nameof(AliasQueryResult.IsHidden)},
+                a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
             from
                 alias a
                 left join alias_name n on a.id = n.id_alias
@@ -409,16 +414,17 @@ namespace Lanceur.Infra.SQLite.DbActions
             const string updateAliasSql = @"
                 update alias
                 set
-                    arguments   = @parameters,
-                    file_name   = @fileName,
-                    notes       = @notes,
-                    run_as      = @runAs,
-                    start_mode  = @startMode,
-                    working_dir = @WorkingDirectory,
-                    icon        = @Icon,
-                    thumbnail   = @thumbnail,
-                    lua_script  = @luaScript,
-                    exec_count  = @count
+                    arguments             = @parameters,
+                    file_name             = @fileName,
+                    notes                 = @notes,
+                    run_as                = @runAs,
+                    start_mode            = @startMode,
+                    working_dir           = @WorkingDirectory,
+                    icon                  = @Icon,
+                    thumbnail             = @thumbnail,
+                    lua_script            = @luaScript,
+                    exec_count            = @count,
+                    confirmation_required = @isExecutionConfirmationRequired
                 where id = @id;";
 
             using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
@@ -435,6 +441,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.LuaScript,
                 alias.Count,
                 id = alias.Id,
+                alias.IsExecutionConfirmationRequired,
             });
             CreateAdditionalParameters(alias, tx);
             UpdateName(alias, tx);
