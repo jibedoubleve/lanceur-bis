@@ -19,12 +19,12 @@ namespace Lanceur.Tests.Utils
                     Results = await macro.ExecuteAsync(new("debug")),
                 };
             }
-            else
-            {
-                Assert.True(false, "Request not containing a 'DebugMacro'");
-                return null;
-            }
+
+            Assert.True(false, "Request not containing a 'DebugMacro'");
+            return null;
         }
+
+        public ExecutionResponse ExecuteMultiple(IEnumerable<QueryResult> queryResults, int delay = 0) => throw new NotImplementedException();
 
         #endregion Methods
     }
