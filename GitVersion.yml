@@ -1,5 +1,5 @@
 assembly-versioning-scheme: MajorMinorPatchTag
-next-version: 2.6.0
+next-version: 2.7.0
 branches:
   master:
     is-release-branch: true  
