@@ -42,13 +42,16 @@ namespace Lanceur.Infra.Managers
 
         public async Task RetrieveFaviconAsync(string fileName)
         {
+            
             if (fileName is null) return;
             if (IsMacro.Match(fileName).Success) return;
             if (!Uri.TryCreate(fileName, UriKind.Absolute, out var uri)) return;
-            if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return;
-
-            using var m = _logger.MeasureExecutionTime(this);
+            
             var output = Path.Combine(AppPaths.ImageRepository, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
+            if (File.Exists(output)) return;
+            
+            if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return;
+            using var m = _logger.MeasureExecutionTime(this);
             await _favIconDownloader.SaveToFileAsync(uri, output);
         }
 

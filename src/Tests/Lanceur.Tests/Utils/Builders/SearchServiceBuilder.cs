@@ -22,7 +22,7 @@ public class SearchServiceBuilder
 
     #region Methods
 
-    public ISearchService Build()
+    public IAsyncSearchService Build()
     {
         return new SearchService(
             _storeLoader,

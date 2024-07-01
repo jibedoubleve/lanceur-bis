@@ -2,6 +2,9 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 using Splat;
 
 namespace Lanceur.Infra.Stores;
@@ -12,6 +15,7 @@ public class AdditionalParametersStore : ISearchService
     #region Fields
 
     private readonly IDbRepository _aliasService;
+    private readonly ILogger<AdditionalParametersStore> _logger;
 
     #endregion Fields
 
@@ -21,18 +25,34 @@ public class AdditionalParametersStore : ISearchService
     {
     }
 
-    public AdditionalParametersStore(IDbRepository aliasService)
+    public AdditionalParametersStore(IDbRepository aliasService = null, ILoggerFactory loggerFactory = null)
     {
         _aliasService = aliasService ?? Locator.Current.GetService<IDbRepository>();
+
+        loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
+        _logger = loggerFactory.GetLogger<AdditionalParametersStore>();
     }
 
     #endregion Constructors
 
+    #region Properties
+
+    /// <inheritdoc />
+    public Orchestration Orchestration { get; } = Orchestration.Shared(".*:.*");
+
+    #endregion Properties
+
     #region Methods
 
+    /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll() => _aliasService.GetAllAliasWithAdditionalParameters();
 
-    public IEnumerable<QueryResult> Search(Cmdline query) => _aliasService.SearchAliasWithAdditionalParameters(query.Name);
+    /// <inheritdoc />
+    public IEnumerable<QueryResult> Search(Cmdline query)
+    {
+        using var _ = _logger.MeasureExecutionTime(this);
+        return _aliasService.SearchAliasWithAdditionalParameters(query.Name);
+    }
 
     #endregion Methods
 }

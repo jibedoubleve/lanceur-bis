@@ -25,7 +25,16 @@ public abstract class QueryResult : ObservableModel
     protected static Task<IEnumerable<QueryResult>> NoResultAsync => Task.FromResult(NoResult);
 
     public static IEnumerable<QueryResult> NoResult => new List<QueryResult>();
+
+    /// <summary>
+    /// Gets or sets the count of how many times this QueryResult has been executed.
+    /// </summary>
+    /// <remarks>
+    /// If the value is negative, it indicates that the counter is not used
+    /// (In this case the UI should not display this information).
+    /// </remarks>
     public int Count { get; set; }
+
     public virtual string Description { get; set; }
 
     /// <summary>
@@ -52,7 +61,14 @@ public abstract class QueryResult : ObservableModel
     /// </summary>
     public virtual bool IsResult => true;
 
+    /// <summary>
+    /// Indicates whether the thumbnail should be disabled. If disabled, then the
+    /// icon is used as a fallback.
+    /// </summary>
+    public bool IsThumbnailDisabled { get; set; }
+
     public string Name { get; set; } = string.Empty;
+    
     public Cmdline Query { get; set; } = Cmdline.Empty;
 
     /// <summary>

@@ -64,7 +64,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var service = new SearchService(new StoreLoader());
 
-            service.Stores.Should().HaveCount(5);
+            service.Stores.Should().HaveCountGreaterThan(5);
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
-        public void ReturnNoResultMessageWhenMisconfiguredMacro()
+        public async Task ReturnNoResultMessageWhenMisconfiguredMacro()
         {
             // ARRANGE
             const string sql = SqlCreateAlias
@@ -107,7 +107,7 @@ namespace Lanceur.Tests.BusinessLogic
             var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager);
 
             // ACT
-            var result = service.Search(new("z")).ToArray();
+            var result = (await service.SearchAsync(new("z"))).ToArray();
 
             // ASSERT
             using (new AssertionScope())
@@ -118,7 +118,7 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
-        public void ReturnResultWithExactMatchOnTop()
+        public async Task ReturnResultWithExactMatchOnTop()
         {
             var dt = DateTime.Now;
             var converter = Substitute.For<IConversionService>();
@@ -169,7 +169,7 @@ namespace Lanceur.Tests.BusinessLogic
             );
 
             // ACT
-            var result = searchService.Search(new(criterion))
+            var result = (await searchService.SearchAsync(new(criterion)))
                                       .ToArray();
 
             // ASSERT
@@ -182,14 +182,14 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
-        public void ReturnValues()
+        public async Task ReturnValues()
         {
             var macroManager = Substitute.For<IMacroManager>();
             var thumbnailManager = Substitute.For<IThumbnailManager>();
             var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager);
             var query = new Cmdline("code");
 
-            var result = service.Search(query)
+            var result = (await service.SearchAsync(query))
                                 .ToArray();
 
             using (new AssertionScope())

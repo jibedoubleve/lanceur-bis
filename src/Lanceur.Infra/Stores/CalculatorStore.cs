@@ -22,24 +22,27 @@ namespace Lanceur.Infra.Stores
 
         #region Constructors
 
-        public CalculatorStore()
+        public CalculatorStore() : this(null)
         {
-            var factory = Locator.GetLocator()
-                                 .GetService<ILoggerFactory>();
-            _logger = factory is not null
-                ? factory.CreateLogger<CalculatorStore>()
-                : new TraceLogger<CalculatorStore>();
+            
+        }
+        public CalculatorStore(ILoggerFactory loggerFactory = null)
+        {
+            loggerFactory ??= Locator.GetLocator().GetService<ILoggerFactory>();
+            _logger = loggerFactory.CreateLogger<CalculatorStore>();
         }
 
         #endregion Constructors
 
         #region Methods
 
-        public IEnumerable<QueryResult> GetAll()
-        {
-            return new List<QueryResult>();
-        }
+        /// <inheritdoc />
+        public Orchestration Orchestration => Orchestration.Shared(@"^\s{0,}[0-9(]");
 
+        /// <inheritdoc />
+        public IEnumerable<QueryResult> GetAll() => QueryResult.NoResult;
+
+        /// <inheritdoc />
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
             using var time = _logger.MeasureExecutionTime(this);

@@ -13,6 +13,7 @@ using NSubstitute;
 using ReactiveUI.Testing;
 using System.Reactive.Concurrency;
 using FluentAssertions.Extensions;
+using Lanceur.Infra.Services;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels
@@ -78,8 +79,8 @@ namespace Lanceur.Tests.ViewModels
             {
                 // ARRANGE
                 var names = new[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4", };
-                var searchService = Substitute.For<ISearchService>();
-                searchService.Search(Arg.Any<Cmdline>())
+                var searchService = Substitute.For<IAsyncSearchService>();
+                searchService.SearchAsync(Arg.Any<Cmdline>())
                         .Returns(
                             new List<QueryResult>()
                             {
@@ -120,9 +121,9 @@ namespace Lanceur.Tests.ViewModels
             {
                 // ARRANGE
                 var names = new[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4", };
-                var searchService = Substitute.For<ISearchService>();
-                searchService.Search(Arg.Any<Cmdline>())
-                        .Returns(
+                var searchService = Substitute.For<IAsyncSearchService>();
+                searchService.SearchAsync(Arg.Any<Cmdline>())
+                             .Returns(
                             new List<QueryResult>()
                             {
                                 ExecutableTestAlias.FromName(names[0]),

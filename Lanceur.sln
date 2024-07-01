@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IO.FileOps.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Infra.Win32", "src\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj", "{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everything.Wrapper", "src\Libraries\Everything.Wrapper\Everything.Wrapper.csproj", "{B4265078-7EE2-4DC2-9A4D-DD2FF995CA3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4265078-7EE2-4DC2-9A4D-DD2FF995CA3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4265078-7EE2-4DC2-9A4D-DD2FF995CA3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4265078-7EE2-4DC2-9A4D-DD2FF995CA3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4265078-7EE2-4DC2-9A4D-DD2FF995CA3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,6 +103,7 @@ Global
 		{3811D960-E387-4A2A-A635-1C77E6A66353} = {42FC3E6A-9D1C-464D-A828-2D02E12F7192}
 		{A725F28A-C8D4-4125-B78F-BC89E2FCA2F1} = {8B2E553D-1F68-4EE2-80D1-61940075435B}
 		{084BD3F9-987B-4E68-9CD8-F6FF94146072} = {8B2E553D-1F68-4EE2-80D1-61940075435B}
+		{B4265078-7EE2-4DC2-9A4D-DD2FF995CA3C} = {42FC3E6A-9D1C-464D-A828-2D02E12F7192}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F1CB5DA-802E-408C-B009-A94BE0FE61F3}

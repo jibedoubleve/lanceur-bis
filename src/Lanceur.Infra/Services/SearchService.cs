@@ -4,14 +4,15 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
 using Splat;
 
 namespace Lanceur.Infra.Services
 {
-    public class SearchService : SearchServiceCache, ISearchService
+    public class SearchService : SearchServiceCache, IAsyncSearchService
     {
+        private readonly ISearchServiceOrchestrator _orchestrator;
+
         #region Fields
 
         private readonly IMacroManager _macroManager;
@@ -26,11 +27,13 @@ namespace Lanceur.Infra.Services
             IStoreLoader storeLoader = null, 
             IMacroManager macroManager = null, 
             IThumbnailManager thumbnailManager = null,
-            ILoggerFactory loggerFactory = null) : base(storeLoader)
+            ILoggerFactory loggerFactory = null,
+            ISearchServiceOrchestrator orchestrator = null) : base(storeLoader)
         {
             var l = Locator.Current;
             _macroManager = macroManager ?? l.GetService<IMacroManager>();
             _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
+            _orchestrator = orchestrator ?? l.GetService<ISearchServiceOrchestrator>();
 
             loggerFactory ??= l.GetService<ILoggerFactory>();
             _logger = loggerFactory.GetLogger<SearchService>();
@@ -60,22 +63,52 @@ namespace Lanceur.Infra.Services
                 : DisplayQueryResult.NoResultFound;
         }
 
-        public IEnumerable<QueryResult> GetAll()
+        public async Task<IEnumerable<QueryResult>> GetAllAsync()
         {
-            var results = Stores.SelectMany(store => store.GetAll())
-                                .ToArray();
-
+            using var measurement = _logger.MeasureExecutionTime(this);
+            
+            var tasks = Stores.Select(store => Task.Run(store.GetAll));
+            var results = (await Task.WhenAll(tasks))
+                          .SelectMany(x => x)
+                          .ToArray();
+            
             return SetupAndSort(results);
         }
 
-        public IEnumerable<QueryResult> Search(Cmdline query)
+        public async Task<IEnumerable<QueryResult>> SearchAsync(Cmdline query)
         {
-            using var _ = _logger.MeasureExecutionTime(this);
+            using var measurement = _logger.MeasureExecutionTime(this);
             if (query == null) { return new List<QueryResult>(); }
 
-            var results = Stores
-                .SelectMany(store => store.Search(query))
-                .ToArray();
+            //Get the alive stores
+            var aliveStores = Stores.Where(service => _orchestrator.IsAlive(service, query))
+                                    .ToArray();
+            var tasks = new List<Task<IEnumerable<QueryResult>>>();
+            
+            // I've got a services that stunt all the others, then
+            // I execute the search for this one only
+            if (aliveStores.Any(x => x.Orchestration.IdleOthers))
+            {
+                var store = aliveStores.First(x => x.Orchestration.IdleOthers);
+                tasks.Add(Task.Run(() => store.Search(query)));
+            }
+            // No store that stunt all the other stores, execute aggregated search
+            else
+            {
+                tasks = aliveStores.Select(store => Task.Run(() => store.Search(query)))
+                                   .ToList();
+            }
+            
+            _logger.LogInformation(
+                "For the query '{Query}', {IdleCount} store(s) IDLE and {ActiveCount} store(s) ALIVE", 
+                query,
+                Stores.Count() - tasks.Count, 
+                tasks.Count
+            );
+            
+            measurement.LogSplitTime("Before");
+            var results = (await Task.WhenAll(tasks)).SelectMany(x => x).ToArray();
+            
 
             // Remember the query
             foreach (var result in results) { result.Query = query; }

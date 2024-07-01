@@ -32,7 +32,7 @@ namespace Lanceur.Macros
 
         #region Constructors
 
-        public MultiMacro() : this(null, null, null)
+        public MultiMacro() : this(null)
         {
         }
 
@@ -61,12 +61,7 @@ namespace Lanceur.Macros
         public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
         {
             var items = Parameters?.Split('@') ?? Array.Empty<string>();
-
-            var aliases = new List<AliasQueryResult>();
-            foreach(var item in items)
-            {
-                aliases.Add(GetAlias(item));
-            }
+            var aliases = items.Select(GetAlias).ToList();
 
             _ = _executionManager.ExecuteMultiple(aliases, _delay);
 

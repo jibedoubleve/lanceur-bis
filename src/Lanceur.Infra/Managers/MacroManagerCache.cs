@@ -51,9 +51,9 @@ namespace Lanceur.Infra.Managers
         {
             if (_macroInstances is not null) return;
 
-            var found = from t in _asm.GetTypes()
-                        where t.GetCustomAttributes<MacroAttribute>().Any()
-                        select t;
+            var found = _asm.GetTypes()
+                            .Where(t => t.GetCustomAttributes<MacroAttribute>().Any());
+
             var macroInstances = new Dictionary<string, ISelfExecutable>();
             foreach (var type in found)
             {

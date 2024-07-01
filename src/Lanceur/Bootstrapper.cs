@@ -111,12 +111,13 @@ public class Bootstrapper
         l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
 
         l.Register<IStoreLoader>(() => new StoreLoader());
-        l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
+        l.Register<IAsyncSearchService>(() => new SearchService(Get<IStoreLoader>()));
         l.Register<ICmdlineManager>(() => new CmdlineManager());
         l.Register<IExecutionManager>(() => new ExecutionManager(Get<ILoggerFactory>(),
                                                                  Get<IWildcardManager>(),
                                                                  Get<IDbRepository>(),
                                                                  Get<ICmdlineManager>()));
+        l.Register<ISearchServiceOrchestrator>(()=> new SearchServiceOrchestrator());
         l.Register<IDbRepository>(() =>
                                       new SQLiteRepository(Get<IDbConnectionManager>(),
                                                            Get<ILoggerFactory>(),
@@ -135,7 +136,7 @@ public class Bootstrapper
         l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<ILoggerFactory>(), Get<IDbRepository>(), Get<IThumbnailRefresher>()));
         l.RegisterLazySingleton<IPackagedAppManager>(() => new PackagedAppManager());
         l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService(Get<ILoggerFactory>()));
-        l.Register<IFavIconDownloader>(() => new FavIconDownloader());
+        l.RegisterLazySingleton<IFavIconDownloader>(() => new FavIconDownloader(Get<ILoggerFactory>().GetLogger<IFavIconDownloader>()));
         l.Register<IFavIconManager>(() => new FavIconManager(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>(), Get<ILoggerFactory>()));
 
         // Formatters

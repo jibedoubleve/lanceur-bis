@@ -9,6 +9,7 @@ using Lanceur.Tests.Logging;
 using Lanceur.Views;
 using NSubstitute;
 using System.Reactive.Concurrency;
+using Lanceur.Infra.Services;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Utils.Builders
@@ -21,7 +22,7 @@ namespace Lanceur.Tests.Utils.Builders
         private IExecutionManager _executionManager;
         private ITestOutputHelper _output;
         private ISchedulerProvider _schedulerProvider;
-        private ISearchService _searchService;
+        private IAsyncSearchService _searchService;
 
         #endregion Fields
 
@@ -37,7 +38,7 @@ namespace Lanceur.Tests.Utils.Builders
 
             return new(
                 schedulerProvider: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
-                searchService: _searchService ?? Substitute.For<ISearchService>(),
+                searchService: _searchService ?? Substitute.For<IAsyncSearchService>(),
                 cmdlineService: new CmdlineManager(),
                 executor: _executionManager ?? Substitute.For<IExecutionManager>(),
                 notify: Substitute.For<IUserNotification>(),
@@ -59,7 +60,7 @@ namespace Lanceur.Tests.Utils.Builders
             return this;
         }
 
-        public MainViewModelBuilder With(ISearchService searchService)
+        public MainViewModelBuilder With(IAsyncSearchService searchService)
         {
             _searchService = searchService;
             return this;

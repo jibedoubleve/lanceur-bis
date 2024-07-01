@@ -19,6 +19,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Humanizer;
+using Lanceur.Infra.Services;
 using Lanceur.Ui;
 
 namespace Lanceur.Views
@@ -31,7 +32,7 @@ namespace Lanceur.Views
         private readonly IDbRepository _dbRepository;
         private readonly IExecutionManager _executor;
         private readonly ILogger<MainViewModel> _logger;
-        private readonly ISearchService _searchService;
+        private readonly IAsyncSearchService _searchService;
         private readonly ISettingsFacade _settingsFacade;
         private readonly Interaction<string, bool> _confirmExecution;
 
@@ -42,7 +43,7 @@ namespace Lanceur.Views
         public MainViewModel(
             ISchedulerProvider schedulerProvider = null,
             ILoggerFactory loggerFactory = null,
-            ISearchService searchService = null,
+            IAsyncSearchService searchService = null,
             ICmdlineManager cmdlineService = null,
             IUserNotification notify = null,
             IDbRepository dataService = null,
@@ -54,7 +55,7 @@ namespace Lanceur.Views
             var l = Locator.Current;
             notify ??= l.GetService<IUserNotification>();
             _logger = loggerFactory.GetLogger<MainViewModel>();
-            _searchService = searchService ?? l.GetService<ISearchService>();
+            _searchService = searchService ?? l.GetService<IAsyncSearchService>();
             _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
             _dbRepository = dataService ?? l.GetService<IDbRepository>();
             _executor = executor ?? l.GetService<IExecutionManager>();
@@ -66,7 +67,7 @@ namespace Lanceur.Views
             AutoComplete = ReactiveCommand.Create(OnAutoComplete);
             AutoComplete.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            Activate = ReactiveCommand.Create(OnActivate, outputScheduler: schedulerProvider.MainThreadScheduler);
+            Activate = ReactiveCommand.CreateFromTask(OnActivate, outputScheduler: schedulerProvider.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             var canSearch = Query.WhenAnyValue(x => x.IsActive);
@@ -242,12 +243,12 @@ namespace Lanceur.Views
             return currentAlias.SingleOrDefault();
         }
 
-        private AliasResponse OnActivate()
+        private async Task<AliasResponse> OnActivate()
         {
             var sessionName = _dbRepository.GetDefaultSession()?.Name ?? "N.A.";
 
             var aliases = _settingsFacade.Application.Window.ShowResult
-                ? _searchService.GetAll().ToArray()
+                ? (await _searchService.GetAllAsync()).ToArray()
                 : Array.Empty<AliasQueryResult>();
 
             _logger.LogInformation(
@@ -290,16 +291,15 @@ namespace Lanceur.Views
             };
         }
 
-        private Task<AliasResponse> OnSearchAliasAsync(string criterion)
+        private async Task<AliasResponse> OnSearchAliasAsync(string criterion)
         {
             using var _ = _logger.MeasureExecutionTime(this);
             var showResult = _settingsFacade.Application.Window.ShowResult;
             if (criterion.IsNullOrWhiteSpace() && showResult) { return new AliasResponse(); }
             if (criterion.IsNullOrWhiteSpace() && !showResult)
             {
-                var all = _searchService.GetAll()
-                                        .ToArray();
-                return new AliasResponse
+                var all = (await _searchService.GetAllAsync()).ToArray();
+                return new()
                 {
                     Results = all,
                     KeepAlive = all.Any()
@@ -307,7 +307,7 @@ namespace Lanceur.Views
             }
 
             var query = _cmdlineManager.BuildFromText(criterion);
-            var results = _searchService.Search(query)
+            var results = (await _searchService.SearchAsync(query))
                                         .ToArray();
 
             _logger.LogInformation("Search: {Criterion} (Found {Length} element(s))", criterion, results.Length);
