@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using Splat;
 using System.Reflection;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Infra.Stores
 {
@@ -31,12 +30,11 @@ namespace Lanceur.Infra.Stores
 
         #region Constructors
 
-        private PluginStore(
+        public PluginStore(
             IPluginStoreContext context = null,
             IPluginManager pluginManager = null,
             IDbRepository dbRepository = null,
-            ILoggerFactory loggerFactory = null
-        )
+            ILoggerFactory loggerFactory = null)
         {
             var l = Locator.Current;
 
@@ -69,6 +67,10 @@ namespace Lanceur.Infra.Stores
                        .ToList();
         }
 
+        /// <inheritdoc />
+        public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
+
+        /// <inheritdoc />
         public IEnumerable<QueryResult> GetAll()
         {
             LoadPlugins();
@@ -87,6 +89,7 @@ namespace Lanceur.Infra.Stores
             }).ToArray();
         }
 
+        /// <inheritdoc />
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
             using var _ = _logger.MeasureExecutionTime(this);

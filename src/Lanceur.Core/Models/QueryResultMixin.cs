@@ -5,6 +5,12 @@ namespace Lanceur.Core.Models
 {
     public static class QueryResultMixin
     {
+        #region Fields
+
+        private static readonly Regex Regex = new("@([a-zA-Z]*)@");
+
+        #endregion Fields
+
         #region Methods
 
         private static bool Is(this AliasQueryResult @this, CompositeMacros macro) => @this.FileName.ToLower().Contains($"@{macro.ToLowerString()}@".ToLower());
@@ -13,9 +19,8 @@ namespace Lanceur.Core.Models
         {
             if (@this is null) return string.Empty;
 
-            var regex = new Regex("@(.*)@");
-            var result = regex.IsMatch(@this.FileName ?? string.Empty)
-                ? regex.Match(@this.FileName ?? string.Empty).Groups[1].Value
+            var result = Regex.IsMatch(@this.FileName ?? string.Empty)
+                ? Regex.Match(@this.FileName ?? string.Empty).Groups[1].Value
                 : string.Empty;
             return result.ToUpper();
         }

@@ -49,6 +49,8 @@ public static class ThumbnailMixin
     {
         var destination = fileName.ToAbsolutePath();
 
+        if (File.Exists(destination)) return;
+
         lock (Locker)
         {
             if (File.Exists(destination)) return;

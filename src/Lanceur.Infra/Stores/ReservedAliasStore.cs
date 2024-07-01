@@ -20,8 +20,8 @@ namespace Lanceur.Infra.Stores
 
         private readonly Assembly _assembly;
         private readonly IDbRepository _dataService;
-        private IEnumerable<QueryResult> _reservedAliases;
         private readonly ILogger<ReservedAliasStore> _logger;
+        private IEnumerable<QueryResult> _reservedAliases;
 
         #endregion Fields
 
@@ -33,13 +33,9 @@ namespace Lanceur.Infra.Stores
         /// <remarks>
         /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
         /// </remarks>
-        public ReservedAliasStore()
-        {
+        public ReservedAliasStore() : this(null)
+        {           
             _assembly = Assembly.GetEntryAssembly();
-            _dataService = Locator.Current.GetService<IDbRepository>();
-
-            var loggerFactory = Locator.Current.GetService<ILoggerFactory>();
-            _logger = loggerFactory.GetLogger<ReservedAliasStore>();
         }
 
         /// <summary>
@@ -55,7 +51,7 @@ namespace Lanceur.Infra.Stores
         {
             _assembly = assembly;
             _dataService = dataService ?? Locator.Current.GetService<IDbRepository>();
-            
+
             loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
             _logger = loggerFactory.GetLogger<ReservedAliasStore>();
         }
@@ -66,47 +62,50 @@ namespace Lanceur.Infra.Stores
 
         private void LoadAliases()
         {
-            if (_reservedAliases == null)
+            if (_reservedAliases != null) return;
+
+            var types = _assembly.GetTypes();
+
+            var found = (from t in types
+                         where t.GetCustomAttributes<ReservedAliasAttribute>().Any()
+                         select t).ToList();
+            var foundItems = new List<QueryResult>();
+            foreach (var type in found)
             {
-                var types = _assembly.GetTypes();
+                var instance = Activator.CreateInstance(type);
 
-                var found = (from t in types
-                             where t.GetCustomAttributes<ReservedAliasAttribute>().Any()
-                             select t).ToList();
-                var foundItems = new List<QueryResult>();
-                foreach (var type in found)
+                if (instance is not SelfExecutableQueryResult qr) continue;
+
+                var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
+                var keyword = _dataService.GetKeyword(name);
+
+                qr.Name = name;
+                if (keyword is not null)
                 {
-                    var instance = Activator.CreateInstance(type);
-
-                    if (instance is SelfExecutableQueryResult qr)
-                    {
-                        var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
-                        var keyword = _dataService.GetKeyword(name);
-
-                        qr.Name = name;
-                        if (keyword is not null)
-                        {
-                            qr.Id = keyword.Id;
-                            qr.Count = keyword.Count;
-                        }
-
-                        qr.Description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
-                        qr.Icon = "ApplicationCogOutline";
-
-                        foundItems.Add(qr);
-                    }
+                    qr.Id = keyword.Id;
+                    qr.Count = keyword.Count;
                 }
 
-                _reservedAliases = foundItems;
+                qr.Description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
+                qr.Icon = "ApplicationCogOutline";
+
+                foundItems.Add(qr);
             }
+
+            _reservedAliases = foundItems;
         }
 
+        /// <inheritdoc />
+        public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
+
+        /// <inheritdoc />
         public IEnumerable<QueryResult> GetAll()
         {
             if (_reservedAliases == null) { LoadAliases(); }
             return _dataService.RefreshUsage(_reservedAliases);
         }
 
+        /// <inheritdoc />
         public IEnumerable<QueryResult> Search(Cmdline query)
         {
             using var _ = _logger.MeasureExecutionTime(this);

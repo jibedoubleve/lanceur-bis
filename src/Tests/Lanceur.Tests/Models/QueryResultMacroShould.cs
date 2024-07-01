@@ -20,6 +20,28 @@ namespace Lanceur.Tests.Models
             item.IsComposite().Should().Be(expected);
         }
 
+        [Fact]
+        public void BeMacroWhenSurroundedWithArobase()
+        {
+            var queryResult = new AliasQueryResult { FileName = "@name@" };
+            queryResult.IsMacro().Should().BeTrue();
+        }
+
+        [Theory]
+        [InlineData("aze")]
+        [InlineData("@aze")]
+        [InlineData("aze@")]
+        [InlineData("une/deux/trois/aze@")]
+        [InlineData("une/deux/trois/@aze")]
+        [InlineData(@"une\deux\trois\aze@")]
+        [InlineData(@"une\deux\trois\@aze")]
+        [InlineData(@"C:\Users\jibedoubleve\AppData\Local\Microsoft\TypeScript\4.4\node_modules\@types\sass-loader\node_modules\@types")]
+        public void NotBeMacroWhenNotSurroundedWithArobase(string name)
+        {
+            var queryResult = new AliasQueryResult { FileName = name };
+            queryResult.IsMacro().Should().BeFalse();
+        }
+
         #endregion Methods
     }
 }

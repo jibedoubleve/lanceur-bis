@@ -61,7 +61,8 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         FontSize="9"
-                        Foreground="{DynamicResource TextColourBrush}">
+                        Foreground="{DynamicResource TextColourBrush}"
+                        Visibility="{Binding Count, Converter={StaticResource IntegerToVisibilityConverter}}">
                         <Run Text="Count:" />
                         <Run Text="{Binding Count}" />
                     </TextBlock>

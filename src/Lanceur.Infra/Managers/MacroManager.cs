@@ -3,15 +3,21 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
+using Lanceur.SharedKernel.Mixins;
+using Splat;
 
 namespace Lanceur.Infra.Managers
 {
     public class MacroManager : MacroManagerCache, IMacroManager
     {
+        private readonly ILogger<IMacroManager> _log;
+
         #region Constructors
 
         public MacroManager(Assembly asm, ILoggerFactory logFactory = null, IDbRepository repository = null) : base(asm, logFactory, repository)
         {
+             logFactory ??= Locator.Current.GetService<ILoggerFactory>();
+             _log = logFactory.CreateLogger<IMacroManager>();
         }
 
         #endregion Constructors
@@ -30,9 +36,10 @@ namespace Lanceur.Infra.Managers
         /// <inheritdoc/>
         public IEnumerable<QueryResult> Handle(QueryResult[] collection)
         {
+            using var _ = _log.MeasureExecutionTime(this);
             var result = collection.Select(Handle)
-                                    .Where(item => item is not null)
-                                    .ToArray();
+                                   .Where(item => item is not null)
+                                   .ToArray();
             return result;
         }
 
@@ -43,8 +50,10 @@ namespace Lanceur.Infra.Managers
             {
                 return item;
             }
+            var macroInstances = MacroInstances;
+            var macroName = alias.GetMacroName();
 
-            if (!MacroInstances.ContainsKey(alias.GetMacroName()))
+            if (!macroInstances.TryGetValue(macroName, out var instance))
             {
                 /* Well, this is a misconfigured macro, log it and forget it */
                 Logger.LogWarning(
@@ -53,7 +62,6 @@ namespace Lanceur.Infra.Managers
                 return null;
             }
 
-            var instance = MacroInstances[alias.GetMacroName()];
             if (instance is not MacroQueryResult i) throw new NotSupportedException($"Cannot cast '{instance.GetType()}' into '{typeof(MacroQueryResult)}'");
 
             var macro = i.Clone();

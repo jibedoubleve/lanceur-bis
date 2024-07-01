@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using Windows.ApplicationModel.Activation;
+using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -28,9 +29,9 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 OutputHelper.Arrange();
-                var searchService = Substitute.For<ISearchService>();
+                var searchService = Substitute.For<IAsyncSearchService>();
                 searchService
-                    .Search(Arg.Any<Cmdline>())
+                    .SearchAsync(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
 
                 var vm = new MainViewModelBuilder()
@@ -55,19 +56,12 @@ namespace Lanceur.Tests.ViewModels
             {
                 //Arrange
                 OutputHelper.Arrange();
-                var results = new List<SelfExecutableQueryResult> { new ExecutableTestAlias() };
-                var store = Substitute.For<ISearchService>();
-                store.Search(Arg.Any<Cmdline>())
-                     .Returns(results);
+                var @params = "parameters";
+                var results = new List<SelfExecutableQueryResult> { new ExecutableTestAlias { Query = new("", @params) } };
 
-                var storeLoader = Substitute.For<IStoreLoader>();
-                storeLoader.Load().Returns(new List<ISearchService> { store });
-
-                var macroMgr = Substitute.For<IMacroManager>();
-                macroMgr.Handle(Arg.Any<QueryResult[]>()).Returns(results);
-
-                var thumbnailManager = Substitute.For<IThumbnailManager>();
-                var searchService = new SearchService(storeLoader, macroMgr, thumbnailManager);
+                var searchService = Substitute.For<IAsyncSearchService>(); //new SearchService(storeLoader, macroMgr, thumbnailManager);
+                searchService.SearchAsync(Arg.Any<Cmdline>())
+                             .Returns(results);
 
                 var vm = new MainViewModelBuilder()
                     .With(OutputHelper)
@@ -77,14 +71,13 @@ namespace Lanceur.Tests.ViewModels
 
                 //Act
                 OutputHelper.Act();
-                var @params = "parameters";
                 vm.SearchAlias.Execute("Search " + @params).Subscribe();
                 scheduler.Start();
 
                 //Assert
                 OutputHelper.Assert();
                 vm.Results.Count.Should().BeGreaterThan(0);
-                vm.Results.ElementAt(0)?.Query.Parameters.Should().Be(@params);
+                vm.Results.ElementAt(0).Query.Parameters.Should().Be(@params);
             });
         }
 
@@ -94,12 +87,12 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 var query = "1 un";
-                var searchService = Substitute.For<ISearchService>();
+                var searchService = Substitute.For<IAsyncSearchService>();
                 var results = MainViewModelTestHelper.BuildResults(5)
                                                      .ToArray();
 
                 searchService
-                    .Search(Arg.Any<Cmdline>())
+                    .SearchAsync(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { results.First() });
 
                 OutputHelper.Arrange();

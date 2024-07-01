@@ -19,6 +19,7 @@ using ReactiveUI.Testing;
 using Splat;
 using System.Reactive.Concurrency;
 using FluentAssertions.Extensions;
+using Lanceur.Infra.Services;
 using Lanceur.Tests.SQLite;
 using Xunit;
 using Xunit.Abstractions;
@@ -79,7 +80,7 @@ namespace Lanceur.Tests.ViewModels
             //https://stackoverflow.com/questions/49338867/unit-testing-viewmodel-property-bound-to-reactivecommand-isexecuting
             new TestScheduler().With(scheduler =>
             {
-                var searchService = Substitute.For<ISearchService>();
+                var searchService = Substitute.For<IAsyncSearchService>();
                 var vm = new MainViewModelBuilder()
                     .With(OutputHelper)
                     .With(scheduler)
@@ -94,7 +95,7 @@ namespace Lanceur.Tests.ViewModels
                 scheduler.AdvanceTo(1_000.Milliseconds().Ticks);
 
                 searchService.ReceivedWithAnyArgs(4)
-                             .Search(default);
+                             .SearchAsync(default);
             });
         }
 
@@ -104,8 +105,8 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var searchService = Substitute.For<ISearchService>();
-                searchService.Search(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
+                var searchService = Substitute.For<IAsyncSearchService>();
+                searchService.SearchAsync(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
                 var vm = new MainViewModelBuilder()
                     .With(OutputHelper)
                     .With(scheduler)
@@ -163,8 +164,8 @@ namespace Lanceur.Tests.ViewModels
             new TestScheduler().With(scheduler =>
             {
                 // ARRANGE
-                var searchService = Substitute.For<ISearchService>();
-                searchService.Search(Arg.Any<Cmdline>())
+                var searchService = Substitute.For<IAsyncSearchService>();
+                searchService.SearchAsync(Arg.Any<Cmdline>())
                         .Returns(
                             new List<QueryResult>
                             {
@@ -213,8 +214,8 @@ namespace Lanceur.Tests.ViewModels
                     }
                 });
 
-                var searchService = Substitute.For<ISearchService>();
-                searchService.GetAll().Returns(new AliasQueryResult[]
+                var searchService = Substitute.For<IAsyncSearchService>();
+                searchService.GetAllAsync().Returns(new AliasQueryResult[]
                 {
                     new(),
                     new(),

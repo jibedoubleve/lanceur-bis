@@ -1,10 +1,18 @@
 using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.SharedKernel.Web
 {
     ///<inheritdoc />
     public class FavIconDownloader : IFavIconDownloader
     {
+        private readonly ILogger _logger;
+        private readonly HashSet<string> _failedPaths = new();
+
+        public FavIconDownloader(ILogger logger)
+        {
+            _logger = logger;
+        }
         #region Methods
 
         public async Task<bool> CheckExistsAsync(Uri url)
@@ -26,6 +34,7 @@ namespace Lanceur.SharedKernel.Web
                 ArgumentNullException.ThrowIfNull(url);
                 ArgumentNullException.ThrowIfNull(path);
 
+                if (_failedPaths.Contains(path)) return false;
                 if (File.Exists(path)) return true;
 
                 var uri = new Uri($"{url.Scheme}://{url.Host}/favicon.ico");
@@ -36,8 +45,10 @@ namespace Lanceur.SharedKernel.Web
                 await File.WriteAllBytesAsync(path, bytes);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _failedPaths.Add(path);
+                _logger.LogError(ex, "An error occured while saving FavIcon {Path}", path);
                 return false;
             }
         }

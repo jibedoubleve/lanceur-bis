@@ -36,11 +36,15 @@ public class ThumbnailRefresher : IThumbnailRefresher
 
     public async Task RefreshCurrentThumbnailAsync(EntityDecorator<QueryResult> query)
     {
+        if (query.Entity?.IsThumbnailDisabled ?? true) return;
         if (query.Entity is not AliasQueryResult alias) return;
         if (alias.FileName.IsNullOrEmpty()) return;
 
-        if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon) return; 
-        if (alias.IsPackagedApplication())
+        if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon) return;
+
+        var filePath = alias.FileName.ToAbsolutePath();
+        if (File.Exists(filePath)) alias.Thumbnail = filePath;
+        else if (alias.IsPackagedApplication())
         {
             var response = (await _searchService.GetByInstalledDirectory(alias.FileName))
                                                 .FirstOrDefault();
@@ -80,7 +84,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
         }
 
         alias.Icon = WebIcon;
-        alias.Thumbnail = favicon;
+        alias.Thumbnail = null;
 
         _ = _favIconManager.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
         _logger.LogTrace("Retrieved favicon for alias {Name}. Favicon {FileName}", alias.Name, alias.FileName);
