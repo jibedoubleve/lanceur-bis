@@ -4,6 +4,7 @@ using Lanceur.Core.Repositories;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging.Abstractions;
 using Splat;
 
 namespace Lanceur.Infra.Managers
@@ -17,7 +18,7 @@ namespace Lanceur.Infra.Managers
         public MacroManager(Assembly asm, ILoggerFactory logFactory = null, IDbRepository repository = null) : base(asm, logFactory, repository)
         {
              logFactory ??= Locator.Current.GetService<ILoggerFactory>();
-             _log = logFactory.CreateLogger<IMacroManager>();
+             _log = logFactory?.CreateLogger<IMacroManager>() ?? new NullLogger<IMacroManager>();
         }
 
         #endregion Constructors

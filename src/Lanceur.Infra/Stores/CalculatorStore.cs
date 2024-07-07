@@ -1,11 +1,10 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Lanceur.Infra.Logging;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Splat;
 
 namespace Lanceur.Infra.Stores
@@ -29,7 +28,7 @@ namespace Lanceur.Infra.Stores
         public CalculatorStore(ILoggerFactory loggerFactory = null)
         {
             loggerFactory ??= Locator.GetLocator().GetService<ILoggerFactory>();
-            _logger = loggerFactory.CreateLogger<CalculatorStore>();
+            _logger = loggerFactory?.CreateLogger<CalculatorStore>() ?? new NullLogger<CalculatorStore>();
         }
 
         #endregion Constructors
