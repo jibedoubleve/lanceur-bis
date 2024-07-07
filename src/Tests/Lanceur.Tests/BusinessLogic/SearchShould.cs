@@ -19,6 +19,7 @@ using Lanceur.Tests.Utils;
 using Lanceur.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Splat;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -62,7 +63,10 @@ namespace Lanceur.Tests.BusinessLogic
         [Fact]
         public void HaveStores()
         {
-            var service = new SearchService(new StoreLoader());
+            var loggerFactory = Substitute.For<ILoggerFactory>();
+            var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
+            
+            var service = new SearchService(new StoreLoader(loggerFactory, orchestrator), loggerFactory: loggerFactory);
 
             service.Stores.Should().HaveCountGreaterThan(5);
         }
@@ -101,10 +105,11 @@ namespace Lanceur.Tests.BusinessLogic
             var converter = Substitute.For<IConversionService>();
             var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
             var storeLoader = Substitute.For<IStoreLoader>();
+            var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
             storeLoader.Load().Returns(new[] { new AliasStore(repository) });
 
             var asm = Assembly.GetExecutingAssembly();
-            var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager);
+            var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager, orchestrator: orchestrator);
 
             // ACT
             var result = (await service.SearchAsync(new("z"))).ToArray();
@@ -162,15 +167,19 @@ namespace Lanceur.Tests.BusinessLogic
             macroManager.Handle(Arg.Any<QueryResult[]>())
                         .Returns(results);
 
+            var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
+            orchestrator.IsAlive(Arg.Any<ISearchService>(), Arg.Any<Cmdline>())
+                        .Returns(true);
+
             var searchService = new SearchService(
                 stores,
                 macroManager,
-                Substitute.For<IThumbnailManager>()
+                Substitute.For<IThumbnailManager>(),
+                orchestrator: orchestrator
             );
 
             // ACT
-            var result = (await searchService.SearchAsync(new(criterion)))
-                                      .ToArray();
+            var result = (await searchService.SearchAsync(new(criterion))).ToArray();
 
             // ASSERT
             using (new AssertionScope())
@@ -186,8 +195,11 @@ namespace Lanceur.Tests.BusinessLogic
         {
             var macroManager = Substitute.For<IMacroManager>();
             var thumbnailManager = Substitute.For<IThumbnailManager>();
-            var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager);
             var query = new Cmdline("code");
+            var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
+            orchestrator.IsAlive(Arg.Any<ISearchService>(), Arg.Any<Cmdline>())
+                        .Returns(true);
+            var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager, orchestrator: orchestrator);
 
             var result = (await service.SearchAsync(query))
                                 .ToArray();

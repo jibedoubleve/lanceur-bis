@@ -26,7 +26,7 @@ namespace Lanceur.Infra.Stores
         {
         }
 
-        private StoreLoader(ILoggerFactory loggerFactory = null, ISearchServiceOrchestrator orchestrator = null)
+        public StoreLoader(ILoggerFactory loggerFactory = null, ISearchServiceOrchestrator orchestrator = null)
         {
             loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
             _logger = loggerFactory.GetLogger<StoreLoader>();
@@ -43,14 +43,12 @@ namespace Lanceur.Infra.Stores
             
             using var _ = _logger.MeasureExecutionTime(this);
             var asm = Assembly.GetAssembly(typeof(SearchService));
-            var types = asm.GetTypes();
+            var types = asm?.GetTypes() ?? Array.Empty<Type>();
 
-            var found = (from t in types
-                         where t.GetCustomAttributes(typeof(StoreAttribute)).Any()
-                         select t).ToList();
+            var found = types.Where(t => t.GetCustomAttributes(typeof(StoreAttribute)).Any())
+                             .ToList();
 
-            _cachedStores = found.Select(type => (ISearchService)Activator.CreateInstance(type))
-                                 .ToArray();
+            _cachedStores = found.Select(type => (ISearchService)Activator.CreateInstance(type)).ToArray();
             _orchestrator.Register(_cachedStores.ToArray());
             return _cachedStores;
         }

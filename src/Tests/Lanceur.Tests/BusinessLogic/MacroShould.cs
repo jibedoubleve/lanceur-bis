@@ -89,8 +89,11 @@ public class MacroShould : TestBase
     [InlineData("some", "a z e r t y")]
     public async Task BeExecutable(string name, string parameters)
     {
+        var logFactory = Substitute.For<ILoggerFactory>();
+        var repository = Substitute.For<IDbRepository>();
+        
         var asm = Assembly.GetExecutingAssembly();
-        var macroMgr = new MacroManager(asm);
+        var macroMgr = new MacroManager(asm, logFactory, repository);
         var macro = new MultiMacroTest(parameters);
         var handler = (SelfExecutableQueryResult)macroMgr.Handle(macro);
 
@@ -105,8 +108,11 @@ public class MacroShould : TestBase
     [Fact]
     public void BeExecutableQueryResult()
     {
+        var logFactory = Substitute.For<ILoggerFactory>();
+        var repository = Substitute.For<IDbRepository>();
+        
         var asm = Assembly.GetExecutingAssembly();
-        var macroMgr = new MacroManager(asm);
+        var macroMgr = new MacroManager(asm, logFactory, repository);
         var macro = new MultiMacroTest();
         var result = macroMgr.Handle(macro);
 

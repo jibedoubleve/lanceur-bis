@@ -8,8 +8,8 @@ using System.ComponentModel;
 using System.Reflection;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Lanceur.Infra.Stores
 {
@@ -53,7 +53,7 @@ namespace Lanceur.Infra.Stores
             _dataService = dataService ?? Locator.Current.GetService<IDbRepository>();
 
             loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
-            _logger = loggerFactory.GetLogger<ReservedAliasStore>();
+            _logger = loggerFactory?.GetLogger<ReservedAliasStore>() ?? new NullLogger<ReservedAliasStore>();
         }
 
         #endregion Constructors
