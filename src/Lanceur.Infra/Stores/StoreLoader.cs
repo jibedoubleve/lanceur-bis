@@ -49,7 +49,6 @@ namespace Lanceur.Infra.Stores
                              .ToList();
 
             _cachedStores = found.Select(type => (ISearchService)Activator.CreateInstance(type)).ToArray();
-            _orchestrator.Register(_cachedStores.ToArray());
             return _cachedStores;
         }
 

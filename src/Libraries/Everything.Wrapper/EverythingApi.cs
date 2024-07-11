@@ -221,7 +221,7 @@ public class EverythingApi : IEverythingApi
     [DllImport("Everything64.dll")]
     private static extern void Everything_SortResultsByPath();
 
-    public ResultSet Search(string query, bool isIconActivated)
+    public ResultSet Search(string query)
     {
         uint i;
         const int fileAndPathSize = 260;
@@ -245,19 +245,17 @@ public class EverythingApi : IEverythingApi
             {
                 Name = Marshal.PtrToStringUni(Everything_GetResultFileName(i)) ?? string.Empty,
                 Path = stringBuilder.ToString(),
-                ResultType = GetResultType(i, true),
+                ResultType = GetResultType(i),
             });
         }
 
         return result;
     }
 
-    private static ResultType GetResultType(uint resultIndex, bool iconActivated)
+    private static ResultType GetResultType(uint resultIndex)
     {
         if (Everything_IsFileResult(resultIndex))
         {
-            if (!iconActivated) return ResultType.File;
-
             var extensionPtr = Everything_GetResultExtension(resultIndex);
             var extension = Marshal.PtrToStringUni(extensionPtr);
 

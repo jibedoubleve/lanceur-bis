@@ -12,7 +12,7 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
     #region Fields
 
     private readonly Dictionary<string, ISearchService> _stores = new();
-    private readonly ILogger<object> _log;
+    private readonly ILogger<SearchServiceOrchestrator> _log;
 
     #endregion Fields
 
@@ -30,20 +30,7 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
         var regex = new Regex(searchService.Orchestration.AlivePattern);
         var isAlive = regex.IsMatch(query.Name);
         return isAlive;
-    }
-
-    /// <inheritdoc />
-    public void Register(params ISearchService[] services)
-    {
-        foreach (var service in services)
-        {
-            var key = service?.GetType()?.FullName;
-
-            if (key is null) continue;
-
-            var added = _stores.TryAdd(key, service);
-            if (added) _log.LogDebug("Register store {StoreName} for orchestration", key);
-        }
+    
     }
 
     #endregion Methods
