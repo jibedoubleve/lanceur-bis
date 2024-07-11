@@ -53,7 +53,6 @@ public static class ThumbnailMixin
 
         lock (Locker)
         {
-            if (File.Exists(destination)) return;
             if (!Directory.Exists(AppPaths.ImageRepository)) Directory.CreateDirectory(AppPaths.ImageRepository);
             File.Copy(imageSource, destination, true);
         }

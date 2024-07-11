@@ -43,6 +43,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Reflection;
+using Everything.Wrapper;
 using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur;
@@ -109,7 +110,7 @@ public class Bootstrapper
                                                                         Get<IAppConfigRepository>()));
 
         l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
-
+        l.Register<IEverythingApi>(() => new EverythingApi());
         l.Register<IStoreLoader>(() => new StoreLoader());
         l.Register<IAsyncSearchService>(() => new SearchService(Get<IStoreLoader>()));
         l.Register<ICmdlineManager>(() => new CmdlineManager());

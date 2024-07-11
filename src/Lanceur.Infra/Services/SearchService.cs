@@ -106,7 +106,6 @@ namespace Lanceur.Infra.Services
                 tasks.Count
             );
             
-            measurement.LogSplitTime("Before");
             var results = (await Task.WhenAll(tasks)).SelectMany(x => x).ToArray();
             
 

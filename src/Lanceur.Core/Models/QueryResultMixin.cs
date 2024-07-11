@@ -19,9 +19,8 @@ namespace Lanceur.Core.Models
         {
             if (@this is null) return string.Empty;
 
-            var result = Regex.IsMatch(@this.FileName ?? string.Empty)
-                ? Regex.Match(@this.FileName ?? string.Empty).Groups[1].Value
-                : string.Empty;
+            var matches = Regex.Match(@this.FileName ?? string.Empty);
+            var result = matches.Success ? matches.Groups[1].Value : string.Empty;
             return result.ToUpper();
         }
 

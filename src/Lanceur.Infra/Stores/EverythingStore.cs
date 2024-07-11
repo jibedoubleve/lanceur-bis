@@ -30,7 +30,7 @@ public class EverythingStore : ISearchService
     public EverythingStore(ILoggerFactory loggerFactory = null, IEverythingApi everythingApi = null, ISettingsFacade settings = null)
     {
         var l = Locator.Current;
-        _everythingApi = everythingApi ?? new EverythingApi();
+        _everythingApi = everythingApi ?? Locator.Current.GetService<IEverythingApi>();
         _settings = settings ?? l.GetService<ISettingsFacade>();
 
         var factory = loggerFactory ?? l.GetService<ILoggerFactory>();
@@ -52,7 +52,7 @@ public class EverythingStore : ISearchService
     {
         if (query.Name != SearchAlias) return Array.Empty<QueryResult>();
 
-        return _everythingApi.Search(query.Parameters, _settings.Application.EverythingResultsShowIcon)
+        return _everythingApi.Search(query.Parameters)
                              .Select(item => new AliasQueryResult
                              {
                                  Name = item.Name,
