@@ -4,6 +4,7 @@ using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
+using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;

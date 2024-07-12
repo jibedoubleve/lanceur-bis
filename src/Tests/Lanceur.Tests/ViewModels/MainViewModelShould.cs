@@ -19,6 +19,7 @@ using ReactiveUI.Testing;
 using Splat;
 using System.Reactive.Concurrency;
 using FluentAssertions.Extensions;
+using Lanceur.Core.Responses;
 using Lanceur.Infra.Services;
 using Lanceur.Tests.SQLite;
 using Xunit;

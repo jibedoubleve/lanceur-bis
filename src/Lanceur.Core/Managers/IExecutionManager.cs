@@ -1,5 +1,6 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
+using Lanceur.Core.Responses;
 
 namespace Lanceur.Core.Managers
 {

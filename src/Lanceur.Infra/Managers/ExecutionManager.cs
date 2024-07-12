@@ -8,6 +8,7 @@ using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using Lanceur.Core.BusinessLogic;
+using Lanceur.Core.Responses;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Utils;
 
