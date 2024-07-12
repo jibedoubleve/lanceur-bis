@@ -13,19 +13,20 @@ namespace Lanceur.Infra.Stores;
 [Store]
 public class EverythingStore : ISearchService
 {
-    private readonly ISettingsFacade _settings;
-
     #region Fields
 
     private const string SearchAlias = ":";
     private readonly IEverythingApi _everythingApi;
     private readonly ILogger<EverythingStore> _logger;
+    private readonly ISettingsFacade _settings;
 
     #endregion Fields
 
     #region Constructors
 
-    public EverythingStore() : this(null) { }
+    public EverythingStore() : this(null)
+    {
+    }
 
     public EverythingStore(ILoggerFactory loggerFactory = null, IEverythingApi everythingApi = null, ISettingsFacade settings = null)
     {
@@ -39,10 +40,30 @@ public class EverythingStore : ISearchService
 
     #endregion Constructors
 
-    #region Methods
+    #region Properties
 
     /// <inheritdoc />
     public Orchestration Orchestration => Orchestration.Exclusive(@"^\s{0,}:.*");
+
+    #endregion Properties
+
+    #region Methods
+
+    private static string GetIcon(ResultType itemResultType) => itemResultType switch
+    {
+        ResultType.File => "FileOutline",
+        ResultType.Excel => "FileExcelOutline",
+        ResultType.Pdf => "FilePdfBox",
+        ResultType.Zip => "ZipBoxOutline",
+        ResultType.Image => "FileImageOutline",
+        ResultType.Word => "FileWordBoxOutline",
+        ResultType.Directory => "FolderOutline",
+        ResultType.Music => "FileMusicOutline",
+        ResultType.Text => "FileDocumentOutline",
+        ResultType.Code => "FileCodeOutline",
+        ResultType.Executable => "FileCogOutline",
+        _ => "HelpCircleOutline"
+    };
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll() => QueryResult.NoResult;
@@ -60,26 +81,10 @@ public class EverythingStore : ISearchService
                                  Icon = GetIcon(item.ResultType),
                                  Thumbnail = null,
                                  IsThumbnailDisabled = true,
-                                 Count = -1
+                                 Count = -1,
                              }).Cast<QueryResult>()
                              .ToList();
     }
-    
-    private string GetIcon(ResultType itemResultType) => itemResultType switch
-    {
-        ResultType.File       => "FileOutline",
-        ResultType.Excel      => "FileExcelOutline",
-        ResultType.Pdf        => "FilePdfBox",
-        ResultType.Zip        => "ZipBoxOutline",
-        ResultType.Image      => "FileImageOutline",
-        ResultType.Word       => "FileWordBoxOutline",
-        ResultType.Directory  => "FolderOutline",
-        ResultType.Music      => "FileMusicOutline",
-        ResultType.Text       => "FileDocumentOutline",
-        ResultType.Code       => "FileCodeOutline",
-        ResultType.Executable => "FileCogOutline",
-        _                     => "HelpCircleOutline"
-    };
 
     #endregion Methods
 }
