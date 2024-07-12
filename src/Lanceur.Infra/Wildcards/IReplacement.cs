@@ -4,6 +4,9 @@
     {
         #region Properties
 
+        /// <summary>
+        /// Indicates the value of the wildcards
+        /// </summary>
         string Wildcard { get; }
 
         #endregion Properties

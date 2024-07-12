@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Services;
+﻿using System.Text.RegularExpressions;
+using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Wildcards
 {
@@ -8,6 +9,8 @@ namespace Lanceur.Infra.Wildcards
     /// </summary>
     public class RawClipboardReplacement : IReplacement
     {
+        
+        private static readonly Regex Regex = new(@"\$[rR]\$");
         #region Fields
 
         private readonly IClipboardService _clipboard;
@@ -25,19 +28,20 @@ namespace Lanceur.Infra.Wildcards
 
         #region Properties
 
+        /// <inheritdoc />
         public string Wildcard => Wildcards.RawClipboard;
 
         #endregion Properties
 
         #region Methods
 
-        public string Replace(string text, string param)
+        /// <inheritdoc/>
+        public string Replace(string text, string replacement)
         {
-            var clipboard = _clipboard.GetText();
-            return text
-                    ?.Replace(Wildcard.ToLower(), clipboard ?? "")
-                    ?.Replace(Wildcard.ToUpper(), clipboard ?? "")
-                    ?? "";
+            var clipboard = _clipboard.GetText() ?? string.Empty;
+            text ??= string.Empty;
+
+            return Regex.Replace(text, clipboard);
         }
 
         #endregion Methods

@@ -6,16 +6,16 @@
 
         /// <summary>
         /// Will go through all the replacement actions and execute them.
-        /// A replacement action is implementing <see cref="IReplacement"/>
+        /// A replacement action is implementing <see cref="Lanceur.Core.Wildcards.IReplacement"/>
         /// </summary>
         /// <param name="text">The text where the replacement will take place</param>
-        /// <param name="replacement">The replacement text</param>
+        /// <param name="replacement">Replacement text</param>
         /// <returns></returns>
         string Replace(string text, string replacement);
 
         /// <summary>
         /// Will go through all the replacement actions and execute them.
-        /// A replacement action is implementing <see cref="IReplacement"/>.
+        /// A replacement action is implementing <see cref="Lanceur.Core.Wildcards.IReplacement"/>.
         /// If the specified <paramref name="text"/> is null, then return the
         /// <paramref name="replacement"/>
         /// </summary>

@@ -1,21 +1,31 @@
-﻿namespace Lanceur.Infra.Wildcards
+using System.Text.RegularExpressions;
+
+namespace Lanceur.Infra.Wildcards
 {
     public class TextReplacement : IReplacement
     {
+        #region Fields
+
+        private static readonly Regex Regex = new(@"\$[Ii]\$");
+
+        #endregion Fields
+
         #region Properties
 
+        /// <inheritdoc />
         public string Wildcard => Wildcards.Text;
 
         #endregion Properties
 
         #region Methods
 
-        public string Replace(string text, string with)
+        /// <inheritdoc />
+        public string Replace(string text, string replacement)
         {
-            return text
-                    ?.Replace(Wildcard.ToLower(), with ?? "")
-                    ?.Replace(Wildcard.ToUpper(), with ?? "")
-                    ?? "";
+            text ??= string.Empty;
+            replacement ??= string.Empty;
+
+            return Regex.Replace(text, replacement);
         }
 
         #endregion Methods

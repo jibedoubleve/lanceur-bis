@@ -1,24 +1,33 @@
 ﻿using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.Wildcards
 {
     public class WebTextReplacement : IReplacement
     {
+        #region Fields
+
+        private static readonly Regex Regex = new(@"\$[Ww]\$");
+
+        #endregion Fields
+
         #region Properties
 
+        /// <inheritdoc />
         public string Wildcard => Wildcards.Url;
 
         #endregion Properties
 
         #region Methods
 
-        public string Replace(string text, string param)
+        /// <inheritdoc />
+        public string Replace(string text, string replacement)
         {
-            var p = WebUtility.UrlEncode(param ?? "")?.ToLower() ?? "";
-            return text
-                ?.Replace(Wildcard.ToLower(), p)
-                ?.Replace(Wildcard.ToUpper(), p)
-                ?? "";
+            replacement ??= string.Empty;
+            text ??= string.Empty;
+
+            var webParam = WebUtility.UrlEncode(replacement).ToLower();
+            return Regex.Replace(text, webParam);
         }
 
         #endregion Methods
