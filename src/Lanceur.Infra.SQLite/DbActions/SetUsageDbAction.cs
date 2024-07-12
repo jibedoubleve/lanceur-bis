@@ -33,8 +33,12 @@ namespace Lanceur.Infra.SQLite.DbActions
         public void SetUsage(ref QueryResult alias, long idSession)
         {
             ArgumentNullException.ThrowIfNull(alias);
-            
-            if ((alias?.Id ?? 0) == 0)
+
+            // When counter is set to -1, it means
+            //   * usage should neither be maintained nor saved in history 
+            //   * counter shouldn't be visible to the user
+            if (alias.Count < 0) return;
+            if (alias.Id  == 0)
             {
                 if (_aliasDbAction.GetExact(alias?.Name) is { } a)
                 {

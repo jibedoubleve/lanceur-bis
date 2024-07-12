@@ -68,6 +68,7 @@
   <Class Name="Lanceur.Core.Models.SessionExecutableQueryResult">
     <Position X="5" Y="11" Width="2.25" />
     <Members>
+      <Field Name="_logger" Hidden="true" />
       <Field Name="_service" Hidden="true" />
       <Method Name="SessionExecutableQueryResult" Hidden="true" />
     </Members>
@@ -79,6 +80,7 @@
   <Class Name="Lanceur.Core.Models.PluginExecutableQueryResult">
     <Position X="7.75" Y="11" Width="2.5" />
     <Members>
+      <Field Name="_logger" Hidden="true" />
       <Field Name="_plugin" Hidden="true" />
       <Method Name="PluginExecutableQueryResult" Hidden="true" />
     </Members>
