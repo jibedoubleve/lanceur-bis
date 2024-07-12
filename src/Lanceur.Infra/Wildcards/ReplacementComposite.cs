@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Managers;
+﻿using System.Collections.Generic;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
 
@@ -29,13 +30,14 @@ namespace Lanceur.Infra.Wildcards
 
         #region Properties
 
+        /// <inheritdoc />
         public string Wildcard => string.Empty;
 
         #endregion Properties
 
         #region Methods
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="IWildcardManager"/>
         public string Replace(string text, string withThis)
         {
             foreach (var replacement in _replacements)
@@ -47,11 +49,11 @@ namespace Lanceur.Infra.Wildcards
         }
 
         /// <inheritdoc />
-        public string ReplaceOrReplacementOnNull(string text, string withThis)
+        public string ReplaceOrReplacementOnNull(string text, string replacement)
         {
             return text.IsNullOrWhiteSpace()
-                ? withThis
-                : Replace(text, withThis);
+                ? replacement
+                : Replace(text, replacement);
         }
 
         #endregion Methods
