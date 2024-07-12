@@ -1,7 +1,7 @@
-using Lanceur.SharedKernel.Mixins;
 using System.Text;
+using Lanceur.SharedKernel.Mixins;
 
-namespace Lanceur.Tests.SQL;
+namespace Lanceur.Tests.Tooling.SQL;
 
 internal class SqlBuilder
 {

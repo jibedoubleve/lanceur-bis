@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.SharedKernel.Mixins;
 
-namespace Lanceur.Tests.Utils.ReservedAliases
+namespace Lanceur.Tests.Tooling.ReservedAliases
 {
     public class ExecutableWithResultsTestAlias : MacroQueryResult
     {

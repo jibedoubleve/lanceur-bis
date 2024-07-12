@@ -10,7 +10,6 @@ using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Utils;
 using Lanceur.Macros;
 using Lanceur.Tests.SQLite;
-using Lanceur.Tests.Utils.Macros;
 using Lanceur.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -18,6 +17,7 @@ using System.Data.SQLite;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Tests.Tooling.Macros;
 using Xunit;
 using Xunit.Abstractions;
 

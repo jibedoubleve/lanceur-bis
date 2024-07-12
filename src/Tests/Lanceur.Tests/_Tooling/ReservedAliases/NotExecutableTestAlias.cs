@@ -1,9 +1,9 @@
-﻿using Lanceur.Core;
-using Lanceur.Core.Models;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
+using Lanceur.Core;
+using Lanceur.Core.Models;
 
-namespace Lanceur.Tests.Utils.ReservedAliases
+namespace Lanceur.Tests.Tooling.ReservedAliases
 {
     [ReservedAlias("Invalid"), Description("To be a keyword, you should be executable")]
     [DebuggerDisplay("Name: {Name}")]

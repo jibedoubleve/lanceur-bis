@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Logging
+namespace Lanceur.Tests.Tooling.Logging
 {
     public static class TestOutputHelperMixin
     {

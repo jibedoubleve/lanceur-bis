@@ -1,18 +1,17 @@
-﻿using Lanceur.Core.Managers;
+﻿using System.Reactive.Concurrency;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
 using Lanceur.Schedulers;
-using Lanceur.Tests.Logging;
+using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Views;
 using NSubstitute;
-using System.Reactive.Concurrency;
-using Lanceur.Infra.Services;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Utils.Builders
+namespace Lanceur.Tests.Tooling.Builders
 {
     internal class MainViewModelBuilder
     {

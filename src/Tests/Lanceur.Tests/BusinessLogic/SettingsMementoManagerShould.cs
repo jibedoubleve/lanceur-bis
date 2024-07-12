@@ -7,7 +7,7 @@ using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 using NSubstitute;
 using System.Text.RegularExpressions;
-using Lanceur.Tests.Utils;
+using Lanceur.Tests.Tooling;
 using Xunit;
 using Xunit.Abstractions;
 

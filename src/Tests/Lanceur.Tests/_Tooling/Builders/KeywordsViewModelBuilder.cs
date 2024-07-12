@@ -1,16 +1,16 @@
+using System.Reactive.Concurrency;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Schedulers;
-using Lanceur.Tests.Logging;
+using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Ui;
 using Lanceur.Views;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System.Reactive.Concurrency;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Utils.Builders;
+namespace Lanceur.Tests.Tooling.Builders;
 
 internal class KeywordsViewModelBuilder
 {

@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Lanceur.Tests.Utils.Builders;
+using Lanceur.Tests.Tooling.Builders;
 using Microsoft.Reactive.Testing;
 using ReactiveUI.Testing;
 using Xunit;
