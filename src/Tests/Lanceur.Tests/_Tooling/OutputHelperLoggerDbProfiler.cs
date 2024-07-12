@@ -4,7 +4,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 using StackExchange.Profiling.Data;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Utils;
+namespace Lanceur.Tests.Tooling;
 
 public class OutputHelperLoggerDbProfiler : LoggerDbProfiler
 {

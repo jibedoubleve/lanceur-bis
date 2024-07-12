@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Lanceur.Tests.Utils
+namespace Lanceur.Tests.Tooling
 {
     // https://gist.github.com/xpl0t/0d223222696a1c92d7d23cf8368800bf
     public static class ObjectExtensions

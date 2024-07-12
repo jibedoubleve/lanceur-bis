@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Logging
+namespace Lanceur.Tests.Tooling.Logging
 {
     public class TestOutputHelperDecoratorForMicrosoftLogging : BaseTestOutputHelperDecorator, ILogger
     {

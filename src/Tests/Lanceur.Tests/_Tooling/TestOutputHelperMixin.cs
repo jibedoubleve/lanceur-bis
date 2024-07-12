@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Utils;
+namespace Lanceur.Tests.Tooling;
 
 public static class TestOutputHelperMixin
 {

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Lanceur.Tests.Logging;
+namespace Lanceur.Tests.Tooling.Logging;
 
 public class TestOutputHelperDisposable : IDisposable
 {

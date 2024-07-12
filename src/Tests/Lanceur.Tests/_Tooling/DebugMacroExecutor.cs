@@ -5,7 +5,7 @@ using Lanceur.Core.Responses;
 using Lanceur.Macros.Development;
 using Xunit;
 
-namespace Lanceur.Tests.Utils
+namespace Lanceur.Tests.Tooling
 {
     internal class DebugMacroExecutor : IExecutionManager
     {

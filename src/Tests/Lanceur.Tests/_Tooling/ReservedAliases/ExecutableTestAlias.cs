@@ -1,9 +1,9 @@
-﻿using Lanceur.Core;
+﻿using System.ComponentModel;
+using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel.Mixins;
-using System.ComponentModel;
 
-namespace Lanceur.Tests.Utils.ReservedAliases
+namespace Lanceur.Tests.Tooling.ReservedAliases
 {
     [ReservedAlias("anothertest"), Description("description")]
     public class ExecutableTestAlias : MacroQueryResult

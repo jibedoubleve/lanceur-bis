@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
-using Lanceur.Tests.Utils;
 using Lanceur.Ui;
 using Lanceur.Views;
 using ReactiveUI;
 using System.Globalization;
 using System.Reflection;
+using Lanceur.Tests.Tooling;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels

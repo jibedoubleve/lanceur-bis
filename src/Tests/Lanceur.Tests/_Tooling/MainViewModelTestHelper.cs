@@ -1,8 +1,8 @@
 ﻿using Lanceur.Core.Models;
-using Lanceur.Tests.Utils.ReservedAliases;
+using Lanceur.Tests.Tooling.ReservedAliases;
 using Lanceur.Views;
 
-namespace Lanceur.Tests.Utils
+namespace Lanceur.Tests.Tooling
 {
     public static class MainViewModelTestHelper
     {

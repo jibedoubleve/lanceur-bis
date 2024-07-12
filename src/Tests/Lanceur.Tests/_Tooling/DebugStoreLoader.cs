@@ -1,11 +1,11 @@
-﻿using Lanceur.Core.Repositories;
+﻿using System.Reflection;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Stores;
 using NSubstitute;
-using System.Reflection;
 
-namespace Lanceur.Tests.Utils
+namespace Lanceur.Tests.Tooling
 {
     internal class DebugStoreLoader : IStoreLoader
     {

@@ -1,10 +1,10 @@
 ﻿using Dapper;
 using Lanceur.Scripts;
-using Lanceur.Tests.Utils;
 using StackExchange.Profiling.Data;
 using System.Data;
 using System.Data.SQLite;
 using System.SQLite.Updater;
+using Lanceur.Tests.Tooling;
 using Microsoft.Reactive.Testing;
 using Xunit.Abstractions;
 

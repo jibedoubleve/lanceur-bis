@@ -2,7 +2,7 @@ using Lanceur.Core.Decorators;
 using Lanceur.Core.Models;
 using Lanceur.Infra.Win32.Thumbnails;
 
-namespace Lanceur.Tests.Mocks;
+namespace Lanceur.Tests.Tooling.Mocks;
 
 public class MockThumbnailRefresher : IThumbnailRefresher
 {

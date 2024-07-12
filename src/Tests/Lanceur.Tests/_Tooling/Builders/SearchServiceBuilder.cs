@@ -2,12 +2,12 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
-using Lanceur.Tests.Logging;
+using Lanceur.Tests.Tooling.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Utils.Builders;
+namespace Lanceur.Tests.Tooling.Builders;
 
 public class SearchServiceBuilder
 {

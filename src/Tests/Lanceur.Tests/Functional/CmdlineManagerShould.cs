@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Lanceur.Infra.Managers;
-using Lanceur.Tests.Utils.Macros;
+using Lanceur.Tests.Tooling.Macros;
 using Xunit;
 
 namespace Lanceur.Tests.Functional

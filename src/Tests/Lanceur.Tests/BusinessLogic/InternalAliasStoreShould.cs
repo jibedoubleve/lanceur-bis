@@ -2,10 +2,10 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Infra.Stores;
-using Lanceur.Tests.Utils.ReservedAliases;
 using Lanceur.Views;
 using NSubstitute;
 using System.Reflection;
+using Lanceur.Tests.Tooling.ReservedAliases;
 using Xunit;
 
 namespace Lanceur.Tests.BusinessLogic

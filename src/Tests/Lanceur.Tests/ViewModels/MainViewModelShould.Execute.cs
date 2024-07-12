@@ -5,8 +5,6 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
-using Lanceur.Tests.Utils.Builders;
-using Lanceur.Tests.Utils.ReservedAliases;
 using Microsoft.Extensions.Logging;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
@@ -14,6 +12,8 @@ using ReactiveUI.Testing;
 using System.Reactive.Concurrency;
 using FluentAssertions.Extensions;
 using Lanceur.Infra.Services;
+using Lanceur.Tests.Tooling.Builders;
+using Lanceur.Tests.Tooling.ReservedAliases;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels
