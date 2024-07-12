@@ -19,6 +19,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Humanizer;
+using Lanceur.Core.Responses;
 using Lanceur.Infra.Services;
 using Lanceur.Ui;
 

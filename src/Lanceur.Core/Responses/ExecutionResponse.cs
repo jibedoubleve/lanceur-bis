@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Requests
+namespace Lanceur.Core.Responses
 {
     public class ExecutionResponse
     {
@@ -28,7 +28,8 @@ namespace Lanceur.Core.Requests
 
         public static ExecutionResponse FromResults(IEnumerable<QueryResult> results)
         {
-            return new ExecutionResponse
+            results = results?.ToArray() ?? Array.Empty<QueryResult>();
+            return new()
             {
                 Results = results,
                 HasResult = results.Any(),

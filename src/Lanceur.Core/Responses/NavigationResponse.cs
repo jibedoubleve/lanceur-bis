@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Requests
+namespace Lanceur.Core.Responses
 {
     public class NavigationResponse
     {

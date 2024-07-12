@@ -1,6 +1,7 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
+using Lanceur.Core.Responses;
 using Lanceur.Macros.Development;
 using Xunit;
 
