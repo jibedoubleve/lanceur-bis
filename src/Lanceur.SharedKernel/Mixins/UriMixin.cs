@@ -10,5 +10,13 @@ public static class UriMixin
 
     public static Uri ToUriRelative(this string path) => path.ToUri(UriKind.Relative);
 
+    public static Uri GetAuthority(this Uri baseUri) => new(baseUri.GetLeftPart(UriPartial.Authority));
+    
+    public static Uri GetFavicon(this Uri baseUri )
+    {
+        var uri = baseUri.GetAuthority();
+        return new(uri, "favicon.ico");
+    }
+
     #endregion Methods
 }
