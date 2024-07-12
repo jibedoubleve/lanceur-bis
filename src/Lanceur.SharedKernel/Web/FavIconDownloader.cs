@@ -1,4 +1,5 @@
 using System.Net;
+using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.SharedKernel.Web
@@ -36,8 +37,9 @@ namespace Lanceur.SharedKernel.Web
 
                 if (_failedPaths.Contains(path)) return false;
                 if (File.Exists(path)) return true;
-
-                var uri = new Uri($"{url.Scheme}://{url.Host}/favicon.ico");
+                
+                var uri = url.GetFavicon();
+                
                 var httpClient = new HttpClient();
                 var bytes = await httpClient.GetByteArrayAsync(uri);
                 if (bytes.Length == 0) return true;

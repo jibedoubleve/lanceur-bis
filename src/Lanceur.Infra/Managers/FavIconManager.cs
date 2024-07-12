@@ -1,7 +1,6 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Constants;
-using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
@@ -17,7 +16,7 @@ namespace Lanceur.Infra.Managers
         /// A regex to check whether the specified text
         /// is the template of a Macro
         /// </summary>
-        private static readonly Regex IsMacro = new("@.*@");
+        private static readonly Regex IsMacroRegex = new("@.*@");
 
         private readonly IFavIconDownloader _favIconDownloader;
         private readonly ILogger<IFavIconManager> _logger;
@@ -42,16 +41,17 @@ namespace Lanceur.Infra.Managers
 
         public async Task RetrieveFaviconAsync(string fileName)
         {
+            using var m = _logger.MeasureExecutionTime(this);
             
             if (fileName is null) return;
-            if (IsMacro.Match(fileName).Success) return;
+            if (IsMacroRegex.Match(fileName).Success) return;
             if (!Uri.TryCreate(fileName, UriKind.Absolute, out var uri)) return;
             
             var output = Path.Combine(AppPaths.ImageRepository, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
             if (File.Exists(output)) return;
             
             if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return;
-            using var m = _logger.MeasureExecutionTime(this);
+
             await _favIconDownloader.SaveToFileAsync(uri, output);
         }
 
