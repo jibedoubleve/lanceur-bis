@@ -242,6 +242,44 @@ namespace Lanceur.Tests.BusinessLogic
             connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
                          .Should().Be(3);
         }
+        
+        [Fact]
+        public void NotSetUsageWhenCounterIsNegative()
+        {
+            /*
+             * Create a new alias with usage set to -1
+             * Execute it 4 times
+             * Check counter is still -1 
+             */
+            OutputHelper.Arrange();
+            var sql = new SqlBuilder().AppendAlias(1)
+                                      .AppendSynonyms(1, "a")
+                                      .ToString();
+            var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
+            var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
+            var converter = Substitute.For<IConversionService>();
+            QueryResult alias = new AliasQueryResult
+            {
+                Id = 1,
+                Name = "a",
+                Count = -1,
+            };
+
+            var repository = new SQLiteRepository(connectionMgr, logger, converter);
+
+            OutputHelper.Act();
+            
+            for (var i = 0; i < 5; i++)
+            {
+                repository.SetUsage(alias);
+            }
+
+            OutputHelper.Assert();
+            const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
+
+            connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
+                         .Should().Be(0);
+        }
 
         #endregion Methods
     }
