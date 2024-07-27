@@ -7,7 +7,7 @@ namespace Lanceur.Core.Repositories.Config
         #region Properties
 
         AppConfig Application { get; }
-        IDatabaseConfig Database { get; }
+        ILocalConfig Local { get; }
 
         #endregion Properties
 

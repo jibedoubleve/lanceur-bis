@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Repositories.Config
 {
-    public interface IDatabaseConfigRepository : IConfigRepository<IDatabaseConfig>
+    public interface ILocalConfigRepository : IConfigRepository<ILocalConfig>
     {
     }
 }

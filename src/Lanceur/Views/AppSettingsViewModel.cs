@@ -71,10 +71,8 @@ namespace Lanceur.Views
                     DbPath = response.DbPath;
                     HotKeySection = response.AppSettings.HotKey;
                     RestartDelay = response.AppSettings.RestartDelay;
-                    Sessions = new ObservableCollection<Session>(response.Sessions);
-                    CurrentSession = (from s in Sessions
-                                      where s.Id == response.AppSettings.IdSession
-                                      select s).SingleOrDefault();
+                    Sessions = new(response.Sessions);
+                    CurrentSession = Sessions.SingleOrDefault(s => s.Id == response.AppSettings.IdSession);
                     SettingsMemento = response.SettingsMemento;
                 });
 
@@ -110,28 +108,18 @@ namespace Lanceur.Views
             return time;
         }
 
-        private ActivationContext OnActivate()
+        private ActivationContext OnActivate() => new()
         {
-            var appSettings = _settingsFacade.Application;
-            var dbPath = _settingsFacade.Database.DbPath;
-
-            var settingsMemento = SettingsMementoManager.InitialState(_settingsFacade);
-
-            var context = new ActivationContext()
-            {
-                AppSettings = appSettings,
-                DbPath = dbPath,
-                Sessions = _service.GetSessions(),
-                SettingsMemento = settingsMemento
-            };
-
-            return context;
-        }
+            AppSettings = _settingsFacade.Application,
+            DbPath = _settingsFacade.Local.DbPath,
+            Sessions = _service.GetSessions(),
+            SettingsMemento = SettingsMementoManager.GetInitialState(_settingsFacade)
+        };
 
         private async void OnSaveSettings()
         {
             //Save DB Path in property file
-            _settingsFacade.Database.DbPath = DbPath?.Replace("\"", "");
+            _settingsFacade.Local.DbPath = DbPath?.Replace("\"", "");
 
             // Save hotkey & Session in DB
             _settingsFacade.Application.Window.ShowResult = ShowResult;
@@ -145,7 +133,7 @@ namespace Lanceur.Views
 
             if (SettingsMemento.HasStateChanged(_settingsFacade))
             {
-                TimeSpan time = GetDelay();
+                var time = GetDelay();
 
                 _notification.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
                 await _delay.Of(time);

@@ -226,7 +226,7 @@ namespace Lanceur.Views
             // SEARCH ALIAS
             this.WhenAnyObservable(vm => vm.Search)
                 .Select(x => x.ToObservableCollection())
-                .Log(this, "Search executed", c => $"Found {c.Count} item(s)")
+                .WriteLog("Search executed", c => $"Found {c.Count} item(s)")
                 .BindTo(this, vm => vm.Aliases)
                 .DisposeWith(d);
 
@@ -234,7 +234,7 @@ namespace Lanceur.Views
                 .Where(x => x.Any())
                 .Select(x => x.ElementAt(0) as AliasQueryResult)
                 .Where(x => x is not null)
-                .Log(this, "Selecting an alias", c => $"Id: {c.Id} - Name: {c.Name}")
+                .WriteLog("Selecting an alias", c => $"Id: {c.Id} - Name: {c.Name}")
                 .BindTo(this, vm => vm.SelectedAlias)
                 .DisposeWith(d);
             
@@ -243,7 +243,7 @@ namespace Lanceur.Views
                 .DistinctUntilChanged()
                 .Throttle(10.Milliseconds(), scheduler: uiThread)
                 .Select(x => new SearchRequest(x?.Trim(), AliasToCreate))
-                .Log(this, "Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{c.AliasToCreate?.Name ?? "<EMPTY>"}'")
+                .WriteLog("Invoking search.", c => $"With criterion '{c.Query}' and alias to create '{c.AliasToCreate?.Name ?? "<EMPTY>"}'")
                 .InvokeCommand(Search)
                 .DisposeWith(d);
 

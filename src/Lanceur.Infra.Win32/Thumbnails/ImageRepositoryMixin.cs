@@ -16,7 +16,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
         {
             ArgumentNullException.ThrowIfNull(address);
             return Uri.TryCreate(address, new UriCreationOptions(), out _)
-                ? $"{AppPaths.FaviconPrefix}{new Uri(address).Host}"
+                ? $"{Paths.FaviconPrefix}{new Uri(address).Host}"
                 : string.Empty;
         }
 

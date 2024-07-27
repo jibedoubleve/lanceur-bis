@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Macros
 {
@@ -18,13 +19,8 @@ namespace Lanceur.Macros
     {
         #region Fields
 
-#if DEBUG
-        private const int DefaultDelay = 0;
-#else
-        private const int DefaultDelay = 1_000;
-#endif
+        private static readonly Conditional<int> DefaultDelay = new(0, 1_000);
         private readonly int _delay;
-
         private readonly IExecutionManager _executionManager;
         private readonly ISearchService _searchService;
 

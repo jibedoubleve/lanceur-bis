@@ -8,15 +8,15 @@ namespace Lanceur.Infra.Repositories
         #region Fields
 
         private readonly IAppConfigRepository _appConfigRepository;
-        private readonly IDatabaseConfigRepository _databaseConfigRepository;
+        private readonly ILocalConfigRepository _localConfigRepository;
 
         #endregion Fields
 
         #region Constructors
 
-        public SettingsFacade(IDatabaseConfigRepository databaseConfigRepository, IAppConfigRepository appConfigRepository)
+        public SettingsFacade(ILocalConfigRepository localConfigRepository, IAppConfigRepository appConfigRepository)
         {
-            _databaseConfigRepository = databaseConfigRepository;
+            _localConfigRepository = localConfigRepository;
             _appConfigRepository = appConfigRepository;
         }
 
@@ -25,7 +25,7 @@ namespace Lanceur.Infra.Repositories
         #region Properties
 
         public AppConfig Application => _appConfigRepository.Current;
-        public IDatabaseConfig Database => _databaseConfigRepository.Current;
+        public ILocalConfig Local => _localConfigRepository.Current;
 
         #endregion Properties
 
@@ -33,7 +33,7 @@ namespace Lanceur.Infra.Repositories
 
         public void Save()
         {
-            _databaseConfigRepository.Save();
+            _localConfigRepository.Save();
             _appConfigRepository.Save();
         }
 

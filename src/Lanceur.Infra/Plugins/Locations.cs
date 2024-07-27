@@ -40,7 +40,7 @@ namespace Lanceur.Infra.Plugins
                 RelativePath
             );
 
-            MaintenanceLogBookPath = Environment.ExpandEnvironmentVariables(AppPaths.PluginUninstallLogs);
+            MaintenanceLogBookPath = Environment.ExpandEnvironmentVariables(Paths.PluginUninstallLogs);
         }
 
         #endregion Constructors

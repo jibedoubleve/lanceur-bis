@@ -6,6 +6,7 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.SQLite;
+using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -36,19 +37,19 @@ namespace Lanceur.Tests.Functional
         public void CreateFileWhenNotExists()
         {
             var file = Path.GetTempFileName();
-            var stg = new JsonDatabaseConfigRepository(file);
+            var stg = new JsonLocalConfigRepository(file);
             File.Delete(file);
 
             var value = stg.Current.DbPath;
 
-            value.Should().Be(AppPaths.DefaultDbPath);
+            value.Should().Be(Paths.DefaultDb);
         }
 
         [Fact]
         public void GetAndSetData()
         {
             var file = Path.GetTempFileName();
-            var stg = new JsonDatabaseConfigRepository(file);
+            var stg = new JsonLocalConfigRepository(file);
             var expected = "undeuxtrois";
 
             stg.Current.DbPath = expected;
@@ -121,14 +122,20 @@ namespace Lanceur.Tests.Functional
         public void SaveJsonData()
         {
             var file = Path.GetTempFileName();
-            var stg = new JsonDatabaseConfigRepository(file);
+            var stg = new JsonLocalConfigRepository(file)
+            {
+                Current =
+                {
+                    DbPath = "un_deux_trois"
+                }
+            };
 
-            stg.Current.DbPath = "undeuxtrois";
             stg.Save();
 
+            var asThisJson = JsonConvert.SerializeObject(stg.Current);
             var json = File.ReadAllText(file);
 
-            json.Should().Be("{\"DbPath\":\"undeuxtrois\"}");
+            json.Should().Be(asThisJson);
         }
 
         [Theory]

@@ -92,10 +92,10 @@ namespace Lanceur.Tests.BusinessLogic
             secondDbPath = secondDbPath.IsNullOrWhiteSpace() ? dbPath : secondDbPath;
 
             // Setup SettingsFacade
-            var databaseConfig = Substitute.For<IDatabaseConfig>();
+            var databaseConfig = Substitute.For<ILocalConfig>();
             databaseConfig.DbPath.Returns(dbPath, secondDbPath);
 
-            var databaseConfigRepository = Substitute.For<IDatabaseConfigRepository>();
+            var databaseConfigRepository = Substitute.For<ILocalConfigRepository>();
             databaseConfigRepository.Current.Returns(databaseConfig);
 
             var appConfigRepository = Substitute.For<IAppConfigRepository>();
@@ -104,7 +104,7 @@ namespace Lanceur.Tests.BusinessLogic
             var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
 
             // ACT
-            var memento = SettingsMementoManager.InitialState(settingsFacade);
+            var memento = SettingsMementoManager.GetInitialState(settingsFacade);
 
             // ASSERT
             memento.HasStateChanged(settingsFacade)
@@ -125,10 +125,10 @@ namespace Lanceur.Tests.BusinessLogic
             var secondDbPath = dbPath;
 
             // Setup SettingsFacade
-            var databaseConfig = Substitute.For<IDatabaseConfig>();
+            var databaseConfig = Substitute.For<ILocalConfig>();
             databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
 
-            var databaseConfigRepository = Substitute.For<IDatabaseConfigRepository>();
+            var databaseConfigRepository = Substitute.For<ILocalConfigRepository>();
             databaseConfigRepository.Current.Returns(databaseConfig);
 
             var appConfigRepository = Substitute.For<IAppConfigRepository>();
@@ -137,7 +137,7 @@ namespace Lanceur.Tests.BusinessLogic
             var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
 
             // ACT
-            var memento = SettingsMementoManager.InitialState(settingsFacade);
+            var memento = SettingsMementoManager.GetInitialState(settingsFacade);
 
             // ASSERT
             memento.HasStateChanged(settingsFacade).Should().BeFalse();
