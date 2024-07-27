@@ -15,7 +15,11 @@
 #tool nuget:?package=GitVersion.CommandLine&version=5.12.0
 #tool nuget:?package=GitReleaseManager&version=0.17.0
 
-#addin nuget:?package=Cake.Figlet&version=2.0.1
+///////////////////////////////////////////////////////////////////////////////
+/// USINGS & NAMESPACES
+///////////////////////////////////////////////////////////////////////////////
+#r "Spectre.Console"
+using Spectre.Console
 
 ///////////////////////////////////////////////////////////////////////////////
 // PREPARATION
@@ -65,7 +69,11 @@ Setup(ctx =>
         throw new NotImplementedException($"{repoName} should only run on Windows");
     }
     
-    Information(Figlet($"{repoName}"));
+    
+    AnsiConsole.Write(
+        new FigletText($"{repoName}")
+            .LeftJustified()
+            .Color(Color.Red));
 
     Information("Configuration             : {0}", configuration);
     Information("Branch                    : {0}", branchName);

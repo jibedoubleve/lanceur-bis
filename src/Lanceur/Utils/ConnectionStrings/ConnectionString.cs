@@ -18,7 +18,7 @@ namespace Lanceur.Utils.ConnectionStrings
         #region Constructors
 
         // TODO: STG-Provide settings instead of service
-        public ConnectionString(IDatabaseConfigRepository stg)
+        public ConnectionString(ILocalConfigRepository stg)
         {
             var s = stg.Current;
             _dbPath = Environment.ExpandEnvironmentVariables(s.DbPath);

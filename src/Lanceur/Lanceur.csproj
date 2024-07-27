@@ -29,10 +29,12 @@
     <PackageReference Include="ReactiveUI.Validation" Version="3.0.*" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.4.*" />
     <PackageReference Include="ScottPlot.WPF" Version="4.1.*" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="8.0.0" />
     <PackageReference Include="Splat.Serilog" Version="14.8.12" />
   </ItemGroup>
   <ItemGroup>

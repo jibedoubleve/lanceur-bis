@@ -22,11 +22,11 @@ namespace Lanceur.Infra.Managers
 
         #region Methods
 
-        private static int GetStateHash(AppConfig appCfg, IDatabaseConfig dbCfg) => (appCfg.HotKey, dbCfg.DbPath).GetHashCode();
+        private static int GetStateHash(AppConfig appCfg, ILocalConfig dbCfg) => (appCfg.HotKey, dbCfg.DbPath).GetHashCode();
 
-        public static SettingsMementoManager InitialState(ISettingsFacade settings) => new(GetStateHash(settings.Application, settings.Database));
+        public static SettingsMementoManager GetInitialState(ISettingsFacade settings) => new(GetStateHash(settings.Application, settings.Local));
 
-        public bool HasStateChanged(ISettingsFacade settings) => GetStateHash(settings.Application, settings.Database) != _stateHash;
+        public bool HasStateChanged(ISettingsFacade settings) => GetStateHash(settings.Application, settings.Local) != _stateHash;
 
         #endregion Methods
     }

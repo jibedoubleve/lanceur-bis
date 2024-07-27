@@ -20,8 +20,8 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Humanizer;
 using Lanceur.Core.Responses;
-using Lanceur.Infra.Services;
 using Lanceur.Ui;
+using Lanceur.Utils;
 
 namespace Lanceur.Views
 {
@@ -106,7 +106,7 @@ namespace Lanceur.Views
                           this.WhenAnyObservable(vm => vm.SearchAlias.IsExecuting)
                       ).DistinctUntilChanged()
                       .Select(x => x.Any(x => x))
-                      .Log(this, "ViewModel is busy.", x => $"{x}")
+                      .WriteLog("ViewModel is busy.", x => $"{x}")
                       .ObserveOn(schedulerProvider.MainThreadScheduler)
                       .BindTo(this, vm => vm.IsBusy);
 
@@ -122,8 +122,8 @@ namespace Lanceur.Views
             nav.Select(x => x.Result).BindTo(this, vm => vm.CurrentAlias);
 
             nav.Where(x => x.Result?.Query?.Name is not null)
-               .Log(this, "Navigation occured",
-                    x => $"Current alias: '{(x?.Result?.Name ?? "<NULL>")}' is {(x?.IsActive ?? false ? "ACTIVE" : "INACTIVE")}")
+               .WriteLog("Navigation occured",
+                         x => $"Current alias: '{(x?.Result?.Name ?? "<NULL>")}' is {(x?.IsActive ?? false ? "ACTIVE" : "INACTIVE")}")
                .Subscribe(x =>
                {
                    Query.IsActive = x.IsActive;
@@ -146,13 +146,13 @@ namespace Lanceur.Views
                 .Throttle(100.Milliseconds(), schedulerProvider.TaskpoolScheduler)
                 .Select(x => x.Trim())
                 .Where(x => !x.IsNullOrWhiteSpace())
-                .Log(this, "Query changed.", x => $"'{x}'")
+                .WriteLog("Query changed.", x => $"'{x}'")
                 .ObserveOn(schedulerProvider.MainThreadScheduler)
                 .InvokeCommand(this, vm => vm.SearchAlias);
 
             this.WhenAnyValue(vm => vm.Query.Value)
                 .Where(string.IsNullOrEmpty)
-                .Log(this, "Query is empty, clearing the view.", x => $"'{x}'")
+                .WriteLog("Query is empty, clearing the view.", x => $"'{x}'")
                 .Subscribe(_ =>
                 {
                     Query.Value = string.Empty;
@@ -166,7 +166,7 @@ namespace Lanceur.Views
             this.WhenAnyValue(vm => vm.Results)
                 .Where(x => x is not null)
                 .Select(x => x.FirstOrDefault())
-                .Log(this, "Results changed.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
+                .WriteLog("Results changed.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
                 .ObserveOn(schedulerProvider.MainThreadScheduler)
                 .BindTo(this, vm => vm.CurrentAlias);
 
@@ -178,11 +178,11 @@ namespace Lanceur.Views
 
             obs.Where(r => (r?.Results?.Count() ?? 0) > 0)
                .Select(r => r?.Results?.ElementAt(0))
-               .Log(this, "Command 'ExecuteAlias' or 'SearchAlias' triggered.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
+               .WriteLog("Command 'ExecuteAlias' or 'SearchAlias' triggered.", x => $"Current alias: '{(x?.Name ?? "<NULL>")}'")
                .BindTo(this, vm => vm.CurrentAlias);
 
             obs.Select(r => r.Results.ToObservableCollection())
-               .Log(this, "New results.", x => $"{x?.Count ?? -1} element(s)")
+               .WriteLog("New results.", x => $"{x?.Count ?? -1} element(s)")
                .BindTo(this, vm => vm.Results);
 
             obs.Select(r => r.KeepAlive)
@@ -197,17 +197,17 @@ namespace Lanceur.Views
                 .ObserveOn(schedulerProvider.MainThreadScheduler);
 
             activated.Select(x => x.CurrentSessionName)
-                     .Log(this, "Activated: get current session name.", x => $"Session name: '{x}'.")
+                     .WriteLog("Activated: get current session name.", x => $"Session name: '{x}'.")
                      .BindTo(this, vm => vm.CurrentSessionName);
 
             activated.Select(x => x.Results.ToObservableCollection())
-                     .Log(this, "Activated: set all results.", x => $"Found {x.Count} item(s).")
+                     .WriteLog("Activated: set all results.", x => $"Found {x.Count} item(s).")
                      .BindTo(this, vm => vm.Results);
 
             activated.Select(x => x.Results)
                      .Where(x => x.Any())
                      .Select(x => x.First())
-                     .Log(this, "Activated: Select current alias.", x => $"Current alias is '{x.Name}'.")
+                     .WriteLog("Activated: Select current alias.", x => $"Current alias is '{x.Name}'.")
                      .BindTo(this, vm => vm.CurrentAlias);
         }
 
@@ -311,7 +311,7 @@ namespace Lanceur.Views
             var results = (await _searchService.SearchAsync(query))
                                         .ToArray();
 
-            _logger.LogInformation("Search: {Criterion} (Found {Length} element(s))", criterion, results.Length);
+            _logger.LogTrace("Search: {Criterion} (Found {Length} element(s))", criterion, results.Length);
             return new AliasResponse()
             {
                 Results = results,

@@ -1,20 +1,23 @@
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Infra.Constants;
 
-public static class AppPaths
+public static class Paths
 {
     #region Fields
 
+    private static readonly Conditional<string> LogUrlValue = new("http://localhost:5341", "http://ec2-15-237-113-93.eu-west-3.compute.amazonaws.com:5341");
     public const string FaviconPrefix = "favicon_";
 
     #endregion Fields
 
     #region Properties
 
-    public static string DefaultDbPath { get; } = @"%appdata%\probel\lanceur2\data.sqlite".ExpandPath();
+    public static string DefaultDb { get; } = @"%appdata%\probel\lanceur2\data.sqlite".ExpandPath();
     public static string ImageRepository { get; } = @"%appdata%\probel\lanceur2\thumbnails".ExpandPath();
-    public static string LogFilePath { get; } = @"%appdata%\probel\lanceur2\logs\probel-lanceur..clef".ExpandPath();
+    public static string LogFile { get; } = @"%appdata%\probel\lanceur2\logs\probel-lanceur..clef".ExpandPath();
+    public static string LogUrl => LogUrlValue;
     public static string PluginUninstallLogs { get; } = @"%appdata%\probel\lanceur2\.plugin-uninstall".ExpandPath();
     public static string Settings { get; } = @"%appdata%\probel\lanceur2\settings.json".ExpandPath();
 

@@ -28,7 +28,7 @@ public static class ThumbnailMixin
         lock (Locker)
         {
             if (File.Exists(destination)) return;
-            if (!Directory.Exists(AppPaths.ImageRepository)) Directory.CreateDirectory(AppPaths.ImageRepository);
+            if (!Directory.Exists(Paths.ImageRepository)) Directory.CreateDirectory(Paths.ImageRepository);
             if (imageSource is not BitmapSource bitmapSource) return;
 
             var encoder = new PngBitmapEncoder();
@@ -53,7 +53,7 @@ public static class ThumbnailMixin
 
         lock (Locker)
         {
-            if (!Directory.Exists(AppPaths.ImageRepository)) Directory.CreateDirectory(AppPaths.ImageRepository);
+            if (!Directory.Exists(Paths.ImageRepository)) Directory.CreateDirectory(Paths.ImageRepository);
             File.Copy(imageSource, destination, true);
         }
     }
@@ -64,7 +64,7 @@ public static class ThumbnailMixin
     /// </summary>
     /// <param name="fileName">The <c>alias.Name</c></param>
     /// <returns>The absolute path to the thumbnail of the specified <c>alias.Name</c></returns>
-    public static string ToAbsolutePath(this string fileName) => Path.Combine(AppPaths.ImageRepository, $"{fileName.Replace("package:", "")}.png");
+    public static string ToAbsolutePath(this string fileName) => Path.Combine(Paths.ImageRepository, $"{fileName.Replace("package:", "")}.png");
 
     #endregion Methods
 }

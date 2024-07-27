@@ -11,7 +11,7 @@ namespace Lanceur.Utils.ConnectionStrings
 
         private static string _connectionString;
 
-        private readonly string _dbPath = AppPaths.DefaultDbPath;
+        private readonly string _dbPath = Paths.DefaultDb;
 
         #endregion Fields
 

@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Models.Settings
 {
-    public interface IDatabaseConfig
+    public interface ILocalConfig
     {
         #region Properties
 

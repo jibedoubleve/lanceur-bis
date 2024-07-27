@@ -57,6 +57,8 @@ public partial class App
 
     protected override void OnExit(ExitEventArgs e)
     {
+        Bootstrapper.TearDown();
+        
         ToastNotificationManagerCompat.Uninstall();
         SingleInstance.ReleaseMutex();
     }

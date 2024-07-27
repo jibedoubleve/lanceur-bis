@@ -34,7 +34,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Serilog;
-using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Splat;
 using Splat.Serilog;
@@ -45,12 +44,22 @@ using System.Linq;
 using System.Reflection;
 using Everything.Wrapper;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.SharedKernel.Utils;
+using Serilog.Events;
+using Serilog.Filters;
 
 namespace Lanceur;
 
 public class Bootstrapper
 {
-    private static ServiceProvider _serviceCollection;
+    #region Fields
+
+    private static readonly Conditional<Func<ILocalConfigRepository>> LocalConfigRepository =
+        new(() => new MemoryLocalConfigRepository(), () => new JsonLocalConfigRepository());
+
+    private static ServiceProvider _serviceProvider;
+
+    #endregion Fields
 
     #region Methods
 
@@ -77,15 +86,20 @@ public class Bootstrapper
 
     private static void RegisterLoggers()
     {
-        var config = new LoggerConfiguration().MinimumLevel.Verbose()
-                                              .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+        Log.Logger = new LoggerConfiguration().MinimumLevel.Verbose()
                                               .Enrich.FromLogContext()
+                                              .Enrich.WithEnvironmentUserName()
+                                              //.Filter.ByExcluding(Matching.WithProperty("SourceContext", "ReactiveUI.POCOObservableForProperty"))
                                               .WriteTo.File(new CompactJsonFormatter(),
-                                                            AppPaths.LogFilePath,
+                                                            Paths.LogFile,
                                                             rollingInterval: RollingInterval.Day)
-                                              .WriteTo.Console();
-        _serviceCollection = new ServiceCollection().AddLogging(b => b.AddSerilog(config.CreateLogger()))
-                                                    .BuildServiceProvider();
+                                              .WriteTo.Console()
+                                              .WriteTo.Seq(Paths.LogUrl)
+                                              .CreateLogger();
+        _serviceProvider = new ServiceCollection().AddLogging(b => b.AddSerilog(Log.Logger))
+                                                  .BuildServiceProvider();
+        
+        Locator.CurrentMutable.UseSerilogFullLogger(Log.Logger);
     }
 
     private static void RegisterServices()
@@ -98,15 +112,10 @@ public class Bootstrapper
         l.RegisterLazySingleton<IPluginStoreContext>(() => new PluginStoreContext());
         l.RegisterLazySingleton<IDelay>(() => new Delay());
         l.RegisterLazySingleton<IAppRestart>(() => new AppRestart());
-
-#if DEBUG
-        l.Register<IDatabaseConfigRepository>(() => new MemoryDatabaseConfigRepository());
-#else
-        l.Register<IDatabaseConfigRepository>(() => new JsonDatabaseConfigRepository());
-#endif
+        l.Register(() => LocalConfigRepository.Value?.Invoke());
         l.Register<IAppConfigRepository>(() => new SQLiteAppConfigRepository(Get<IDbConnectionManager>()));
         l.RegisterLazySingleton<ISettingsFacade>(() =>
-                                                     new SettingsFacade(Get<IDatabaseConfigRepository>(),
+                                                     new SettingsFacade(Get<ILocalConfigRepository>(),
                                                                         Get<IAppConfigRepository>()));
 
         l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
@@ -118,13 +127,13 @@ public class Bootstrapper
                                                                  Get<IWildcardManager>(),
                                                                  Get<IDbRepository>(),
                                                                  Get<ICmdlineManager>()));
-        l.Register<ISearchServiceOrchestrator>(()=> new SearchServiceOrchestrator());
+        l.Register<ISearchServiceOrchestrator>(() => new SearchServiceOrchestrator());
         l.Register<IDbRepository>(() =>
                                       new SQLiteRepository(Get<IDbConnectionManager>(),
                                                            Get<ILoggerFactory>(),
                                                            Get<IConversionService>()));
         l.Register<IDataDoctorRepository>(() => new SQLiteDataDoctorRepository(
-                                              Get<IDbConnectionManager>(), 
+                                              Get<IDbConnectionManager>(),
                                               Get<ILoggerFactory>(),
                                               Get<IConversionService>()));
         l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
@@ -169,12 +178,12 @@ public class Bootstrapper
 
         l.Register<IDbConnection>(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
         l.Register<IDbConnectionFactory>(() => new SQLiteProfiledConnectionFactory(
-                                             Get<IConnectionString>().ToString(), 
+                                             Get<IConnectionString>().ToString(),
                                              Get<ILoggerFactory>())
         );
         l.Register<IDbConnectionManager>(() => new DbMultiConnectionManager(Get<SQLiteConnectionFactory>()));
 
-        l.Register<IConnectionString>(() => new ConnectionString(Get<IDatabaseConfigRepository>()));
+        l.Register<IConnectionString>(() => new ConnectionString(Get<ILocalConfigRepository>()));
 
         l.Register((Func<IDataStoreVersionManager>)(() => new SQLiteVersionManager(Get<IDbConnectionManager>())));
 
@@ -184,24 +193,23 @@ public class Bootstrapper
                            Get<IDbConnection>(),
                            ScriptRepository.Asm,
                            ScriptRepository.DbScriptEmbededResourcePattern)));
-        
+
         // Logging
-        l.UseSerilogFullLogger();
-        l.Register(() => _serviceCollection?.GetService<ILoggerFactory>() ?? new DefaultLoggerFactory());
+        l.Register(() => _serviceProvider?.GetService<ILoggerFactory>() ?? new DefaultLoggerFactory());
     }
 
     private static void RegisterViewModels()
     {
         var l = Locator.CurrentMutable;
-        var log = Locator.Current.GetService<ILogManager>().GetLogger<Bootstrapper>();
+        var log = Locator.Current.GetService<ILoggerFactory>().GetLogger<Bootstrapper>();
 
         // Misc
         l.RegisterLazySingleton<INotification>(() => new ToastNotification());
 
         // ViewModels
-        var vmTypeCollection = (from type in Assembly.GetAssembly(typeof(MainViewModel))!.GetTypes()
-                                where type.Name.EndsWith("ViewModel")
-                                select type).ToList();
+        var vmTypeCollection = Assembly.GetAssembly(typeof(MainViewModel))!.GetTypes()
+                                       .Where(type => type.Name.EndsWith("ViewModel"))
+                                       .ToList();
 
         foreach (var vmType in vmTypeCollection)
         {
@@ -210,7 +218,7 @@ public class Bootstrapper
 
             if (ctorCollection.Length == 0)
             {
-                log.Info("Add ViewModel {FullName} into IOC. Ctor has no ctor.", vmType.FullName);
+                log.LogTrace("Add ViewModel {FullName} into IOC. Ctor has no ctor", vmType.FullName);
                 l.RegisterLazySingleton(() => Activator.CreateInstance(vmType));
                 continue;
             }
@@ -218,7 +226,7 @@ public class Bootstrapper
             var ctor = vmType.GetConstructors()[0];
             var pCount = ctor.GetParameters().Length;
 
-            log.Info("Add ViewModel {FullName} into IOC. Ctor has {pCount} parameter(s).", vmType.FullName, pCount);
+            log.LogTrace("Add ViewModel {FullName} into IOC. Ctor has {Count} parameter(s)", vmType.FullName, pCount);
             l.RegisterLazySingleton(() => ctor.Invoke(new object[pCount]), vmType);
         }
     }
@@ -226,15 +234,14 @@ public class Bootstrapper
     private static void RegisterViews()
     {
         var l = Locator.CurrentMutable;
-        l.RegisterLazySingleton(() => new ConventionalViewLocator(), typeof(IViewFor));
         l.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
     }
 
     internal static void Initialise()
     {
+        RegisterServices();
         RegisterLoggers();
         RegisterViews();
-        RegisterServices();
         RegisterViewModels();
 
         var l = Locator.Current;
@@ -245,6 +252,8 @@ public class Bootstrapper
 
         sqlite.Update(stg.ToString());
     }
+
+    public static void TearDown() => Log.CloseAndFlush();
 
     #endregion Methods
 }

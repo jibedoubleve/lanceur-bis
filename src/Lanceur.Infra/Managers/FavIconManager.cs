@@ -47,7 +47,7 @@ namespace Lanceur.Infra.Managers
             if (IsMacroRegex.Match(fileName).Success) return;
             if (!Uri.TryCreate(fileName, UriKind.Absolute, out var uri)) return;
             
-            var output = Path.Combine(AppPaths.ImageRepository, $"{AppPaths.FaviconPrefix}{uri.Host}.png");
+            var output = Path.Combine(Paths.ImageRepository, $"{Paths.FaviconPrefix}{uri.Host}.png");
             if (File.Exists(output)) return;
             
             if (!await _favIconDownloader.CheckExistsAsync(new($"{uri.Scheme}://{uri.Host}"))) return;
