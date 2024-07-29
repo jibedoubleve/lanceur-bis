@@ -45,7 +45,7 @@ using System.Reflection;
 using Everything.Wrapper;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Utils;
-using Serilog.Events;
+using Serilog.Core;
 using Serilog.Filters;
 
 namespace Lanceur;
@@ -84,12 +84,14 @@ public class Bootstrapper
         });
     }
 
+    /// <remarks>Should be executed after <see cref="RegisterServices"/>.</remarks>
     private static void RegisterLoggers()
     {
-        Log.Logger = new LoggerConfiguration().MinimumLevel.Verbose()
+        var lvlSwitch = Locator.Current.GetService<LoggingLevelSwitch>();
+        Log.Logger = new LoggerConfiguration().MinimumLevel.ControlledBy(lvlSwitch)
                                               .Enrich.FromLogContext()
                                               .Enrich.WithEnvironmentUserName()
-                                              //.Filter.ByExcluding(Matching.WithProperty("SourceContext", "ReactiveUI.POCOObservableForProperty"))
+                                              .Filter.ByExcluding(Matching.WithProperty("SourceContext", "ReactiveUI.POCOObservableForProperty"))
                                               .WriteTo.File(new CompactJsonFormatter(),
                                                             Paths.LogFile,
                                                             rollingInterval: RollingInterval.Day)
@@ -106,6 +108,7 @@ public class Bootstrapper
     {
         var l = Locator.CurrentMutable;
 
+        l.RegisterConstant(new LoggingLevelSwitch());
         l.RegisterLazySingleton<IMapper>(() => new Mapper(GetAutoMapperCfg()));
         l.RegisterLazySingleton<IUserNotification>(() => new UserNotification());
         l.RegisterLazySingleton(() => new RoutingState());
@@ -193,8 +196,7 @@ public class Bootstrapper
                            Get<IDbConnection>(),
                            ScriptRepository.Asm,
                            ScriptRepository.DbScriptEmbededResourcePattern)));
-
-        // Logging
+        
         l.Register(() => _serviceProvider?.GetService<ILoggerFactory>() ?? new DefaultLoggerFactory());
     }
 
@@ -218,7 +220,7 @@ public class Bootstrapper
 
             if (ctorCollection.Length == 0)
             {
-                log.LogTrace("Add ViewModel {FullName} into IOC. Ctor has no ctor", vmType.FullName);
+                log.LogDebug("Add ViewModel {FullName} into IOC. Ctor has no ctor", vmType.FullName);
                 l.RegisterLazySingleton(() => Activator.CreateInstance(vmType));
                 continue;
             }
@@ -226,7 +228,7 @@ public class Bootstrapper
             var ctor = vmType.GetConstructors()[0];
             var pCount = ctor.GetParameters().Length;
 
-            log.LogTrace("Add ViewModel {FullName} into IOC. Ctor has {Count} parameter(s)", vmType.FullName, pCount);
+            log.LogDebug("Add ViewModel {FullName} into IOC. Ctor has {Count} parameter(s)", vmType.FullName, pCount);
             l.RegisterLazySingleton(() => ctor.Invoke(new object[pCount]), vmType);
         }
     }

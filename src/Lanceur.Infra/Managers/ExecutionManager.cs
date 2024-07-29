@@ -111,7 +111,7 @@ namespace Lanceur.Infra.Managers
             
             using (Process.Start(psi))
             {
-                _logger.LogDebug("Executing process for alias {AliasName}", query.Name);
+                _logger.LogInformation("Executing process for alias {AliasName}", query.Name);
                 return QueryResult.NoResult;
             }
         }

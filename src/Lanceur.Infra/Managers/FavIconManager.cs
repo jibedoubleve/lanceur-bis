@@ -41,8 +41,6 @@ namespace Lanceur.Infra.Managers
 
         public async Task RetrieveFaviconAsync(string fileName)
         {
-            using var m = _logger.MeasureExecutionTime(this);
-            
             if (fileName is null) return;
             if (IsMacroRegex.Match(fileName).Success) return;
             if (!Uri.TryCreate(fileName, UriKind.Absolute, out var uri)) return;

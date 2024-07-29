@@ -99,7 +99,7 @@ namespace Lanceur.Infra.Services
                                    .ToList();
             }
             
-            _logger.LogInformation(
+            _logger.LogTrace(
                 "For the query '{Query}', {IdleCount} store(s) IDLE and {ActiveCount} store(s) ALIVE", 
                 query,
                 Stores.Count() - tasks.Count, 

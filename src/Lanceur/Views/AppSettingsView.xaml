@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:Lanceur.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:logging="clr-namespace:Microsoft.Extensions.Logging;assembly=Microsoft.Extensions.Logging.Abstractions"
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rxui="http://reactiveui.net"
@@ -16,77 +17,91 @@
     <UserControl.Resources>
         <conv:MahAppsHotKeyToSettingsHotKey x:Key="MahAppsHotKeyToSettingsHotKey" />
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <StackPanel Margin="10">
-            <GroupBox Header="Window">
-                <StackPanel>
-                    <HeaderedContentControl Margin="5" Header="Hot key">
-                        <mah:HotKeyBox
-                            x:Name="BoxHotKey"
-                            Margin="5"
-                            BorderBrush="{StaticResource DialogBorderBrush}"
-                            BorderThickness="1" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Margin="10">
+                <GroupBox Header="Window">
+                    <StackPanel>
+                        <HeaderedContentControl Margin="5" Header="Hot key">
+                            <mah:HotKeyBox
+                                x:Name="BoxHotKey"
+                                Margin="5"
+                                BorderBrush="{StaticResource DialogBorderBrush}"
+                                BorderThickness="1" />
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Margin="5" Header="Show all?">
+                            <ui:ToggleSwitch
+                                x:Name="ShowResultToggle"
+                                OffContent="Don't show result when showing search box"
+                                OnContent="Show all result when showing search box" />
+                        </HeaderedContentControl>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Database">
+                    <StackPanel>
+                        <HeaderedContentControl Header="Database path">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="TbDatabasePath" Margin="5" />
+                                <Button
+                                    x:Name="BtnSelectDatabase"
+                                    Grid.Column="1"
+                                    Margin="5,0,0,0"
+                                    Content="Select database" />
+                            </Grid>
+                        </HeaderedContentControl>
+                        <HeaderedContentControl Header="Default session">
+                            <ComboBox
+                                x:Name="CbSessions"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                DisplayMemberPath="FullName" />
+                        </HeaderedContentControl>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Miscellaneous">
+                    <StackPanel>
+                        <TextBlock Text="{Binding ElementName=SlRestartDelay, Path=Value, StringFormat=Delay before restart after you saved the settings: {0} milliseconds}" />
+                        <Slider
+                            x:Name="SlRestartDelay"
+                            IsSnapToTickEnabled="True"
+                            Maximum="5000"
+                            Minimum="0"
+                            TickFrequency="250"
+                            TickPlacement="BottomRight" />
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Logging">
+                    <HeaderedContentControl Header="Minimum Logging Threshold (Temporary)" ToolTip="This change will take effect until you restart the application or adjust it again here.">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton
+                                x:Name="RbInfo"
+                                Content="Information"
+                                IsChecked="True" />
+                            <RadioButton x:Name="RbDebug" Content="Debug" />
+                            <RadioButton x:Name="RbVerbose" Content="Verbose" />
+                        </StackPanel>
                     </HeaderedContentControl>
-                    <HeaderedContentControl Margin="5" Header="Show all?">
-                        <ui:ToggleSwitch
-                            x:Name="ShowResultToggle"
-                            OffContent="Don't show result when showing search box"
-                            OnContent="Show all result when showing search box" />
-                    </HeaderedContentControl>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Database">
-                <StackPanel>
-                    <HeaderedContentControl Header="Database path">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBox x:Name="TbDatabasePath" Margin="5" />
-                            <Button
-                                x:Name="BtnSelectDatabase"
-                                Grid.Column="1"
-                                Margin="5,0,0,0"
-                                Content="Select database" />
-                        </Grid>
-                    </HeaderedContentControl>
-                    <HeaderedContentControl Header="Default session">
-                        <ComboBox
-                            x:Name="CbSessions"
-                            Margin="5"
-                            HorizontalAlignment="Stretch"
-                            DisplayMemberPath="FullName" />
-                    </HeaderedContentControl>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Miscellaneous">
-                <StackPanel>
-                    <TextBlock Text="{Binding ElementName=SlRestartDelay, Path=Value, StringFormat=Delay before restart after you saved the settings: {0} milliseconds}" />
-                    <Slider
-                        x:Name="SlRestartDelay"
-                        IsSnapToTickEnabled="True"
-                        Maximum="5000"
-                        Minimum="0"
-                        TickFrequency="250"
-                        TickPlacement="BottomRight" />
-                </StackPanel>
-            </GroupBox>
-        </StackPanel>
-        <StackPanel
-            Grid.Row="1"
-            HorizontalAlignment="Right"
-            Orientation="Horizontal">
-            <Button
-                x:Name="BtnSaveSettings"
-                Width="90"
-                Margin="5"
-                Content="Save"
-                Style="{StaticResource AccentButtonStyle}" />
-        </StackPanel>
-    </Grid>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel
+                Grid.Row="1"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    x:Name="BtnSaveSettings"
+                    Width="90"
+                    Margin="5"
+                    Content="Save"
+                    Style="{StaticResource AccentButtonStyle}" />
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </rxui:ReactiveUserControl>

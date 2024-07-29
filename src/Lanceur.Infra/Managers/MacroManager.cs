@@ -57,7 +57,7 @@ namespace Lanceur.Infra.Managers
             if (!macroInstances.TryGetValue(macroName, out var instance))
             {
                 /* Well, this is a misconfigured macro, log it and forget it */
-                Logger.LogWarning(
+                Logger.LogInformation(
                     "User has misconfigured a Macro with name {FileName}. Fix the name of the macro or remove the alias from the database",
                     alias.FileName);
                 return null;
