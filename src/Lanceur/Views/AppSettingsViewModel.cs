@@ -17,6 +17,11 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Humanizer;
+using Lanceur.Infra.Logging;
+using Lanceur.Utils;
+using Microsoft.Extensions.Logging;
+using Serilog.Core;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Lanceur.Views
 {
@@ -26,6 +31,8 @@ namespace Lanceur.Views
 
         private readonly Interaction<Unit, string> _askFile;
         private readonly IDelay _delay;
+        private readonly ILogger<AppSettingsView> _logger;
+        private readonly LoggingLevelSwitch _logLevelSwitch;
         private readonly INotification _notification;
         private readonly IAppRestart _restart;
         private readonly IDbRepository _service;
@@ -42,12 +49,17 @@ namespace Lanceur.Views
             IDbRepository dataService = null,
             IDelay delay = null,
             IAppRestart restart = null,
-            INotification notification = null
-            )
+            INotification notification = null,
+            ILoggerFactory factory = null,
+            LoggingLevelSwitch logLevelSwitch = null
+        )
         {
             var l = Locator.Current;
             schedulers ??= l.GetService<ISchedulerProvider>();
+            factory ??= l.GetService<ILoggerFactory>();
+            _logger = factory.GetLogger<AppSettingsView>();
             _askFile = Interactions.SelectFile(schedulers.MainThreadScheduler);
+            _logLevelSwitch = logLevelSwitch ?? l.GetService<LoggingLevelSwitch>();
             _service = dataService ?? l.GetService<IDbRepository>();
             notify ??= l.GetService<IUserNotification>();
             _delay = delay ?? l.GetService<IDelay>();
@@ -55,13 +67,18 @@ namespace Lanceur.Views
             _notification = notification ?? l.GetService<INotification>();
             _settingsFacade = settingsFacade ?? l.GetService<ISettingsFacade>();
 
+            ChangeLogVerbosity =
+                ReactiveCommand.Create<LogLevel>(OnChangeLogVerbosity, outputScheduler: schedulers.MainThreadScheduler);
+            ChangeLogVerbosity.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+
             Activate = ReactiveCommand.Create(OnActivate, outputScheduler: schedulers.MainThreadScheduler);
             Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             SaveSettings = ReactiveCommand.Create(OnSaveSettings, outputScheduler: schedulers.MainThreadScheduler);
             SaveSettings.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-            SelectDatabase = ReactiveCommand.CreateFromTask(async () => await AskFile.Handle(Unit.Default), outputScheduler: schedulers.MainThreadScheduler);
+            SelectDatabase = ReactiveCommand.CreateFromTask(async () => await AskFile.Handle(Unit.Default),
+                                                            outputScheduler: schedulers.MainThreadScheduler);
             SelectDatabase.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
             this.WhenAnyObservable(vm => vm.Activate)
@@ -86,15 +103,27 @@ namespace Lanceur.Views
         #region Properties
 
         private SettingsMementoManager SettingsMemento { get; set; }
+
         public ReactiveCommand<Unit, ActivationContext> Activate { get; }
+
         public Interaction<Unit, string> AskFile => _askFile;
+
+        public ReactiveCommand<LogLevel, Unit> ChangeLogVerbosity { get; }
+
         [Reactive] public Session CurrentSession { get; set; }
+
         [Reactive] public string DbPath { get; set; }
+
         [Reactive] public HotKeySection HotKeySection { get; set; }
+
         [Reactive] public double RestartDelay { get; set; }
+
         public ReactiveCommand<Unit, Unit> SaveSettings { get; }
+
         public ReactiveCommand<Unit, string> SelectDatabase { get; }
+
         [Reactive] public ObservableCollection<Session> Sessions { get; set; }
+
         [Reactive] public bool ShowResult { get; set; }
 
         #endregion Properties
@@ -116,6 +145,12 @@ namespace Lanceur.Views
             SettingsMemento = SettingsMementoManager.GetInitialState(_settingsFacade)
         };
 
+        private void OnChangeLogVerbosity(LogLevel level)
+        {
+            _logger.LogInformation("Set logging level threshold to {Level}", level);
+            _logLevelSwitch.MinimumLevel = level.ToSerilogLogLevel();
+        }
+
         private async void OnSaveSettings()
         {
             //Save DB Path in property file
@@ -126,7 +161,7 @@ namespace Lanceur.Views
             _settingsFacade.Application.RestartDelay = RestartDelay;
             _settingsFacade.Application.HotKey = HotKeySection;
             _settingsFacade.Application.Window.ShowAtStartup = ShowResult;
-            if (CurrentSession is not null) { _settingsFacade.Application.IdSession = CurrentSession.Id; }
+            if (CurrentSession is not null) _settingsFacade.Application.IdSession = CurrentSession.Id;
 
             //Save settings
             _settingsFacade.Save();
@@ -135,11 +170,15 @@ namespace Lanceur.Views
             {
                 var time = GetDelay();
 
-                _notification.Information($"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
+                _notification.Information(
+                    $"Application settings saved. Restart in {time.TotalMilliseconds} milliseconds");
                 await _delay.Of(time);
                 _restart.Restart();
             }
-            else { _notification.Information("Saved configuration."); }
+            else
+            {
+                _notification.Information("Saved configuration.");
+            }
         }
 
         #endregion Methods

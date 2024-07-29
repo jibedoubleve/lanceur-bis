@@ -83,7 +83,7 @@ namespace Lanceur.Views
 
                 ViewModel.WhenAnyValue(vm => vm.KeepAlive)
                          .Where(v => v == false)
-                         .Log(ViewModel, $"Hiding control.", v => $"KeepAlive = {v}")
+                         .WriteLog("Hiding control.", v => $"KeepAlive = {v}")
                          .Subscribe(_ => HideControl())
                          .DisposeWith(d);
                 
@@ -156,12 +156,10 @@ namespace Lanceur.Views
                     .Select(x =>
                     {
                         var context = x.OriginalSource as FrameworkElement;
+                        
                         var alias = context?.DataContext as QueryResult;
-                        var source = (x.Source as ListView).ItemsSource as IEnumerable<QueryResult>;
-
-                        var currentAlias = (from s in source
-                                            where s.GetHashCode() == alias.GetHashCode()
-                                            select s).FirstOrDefault();
+                        var source = (x.Source as ListView)?.ItemsSource as IEnumerable<QueryResult>;
+                        var currentAlias = source?.FirstOrDefault(s => s.GetHashCode() == alias?.GetHashCode());
 
                         return new AliasExecutionRequest
                         {
@@ -278,7 +276,7 @@ namespace Lanceur.Views
 
         protected override void OnDeactivated(EventArgs e)
         {
-            _logger.LogInformation("Window deactivated");
+            _logger.LogTrace("Window deactivated");
             HideControl();
         }
 
@@ -295,7 +293,7 @@ namespace Lanceur.Views
 
         public void ShowWindow()
         {
-            _logger.LogInformation("Window showing");
+            _logger.LogTrace("Window showing");
             ViewModel!.Activate.Execute().Subscribe();
             if (_isStoryBoardsFree)
             {

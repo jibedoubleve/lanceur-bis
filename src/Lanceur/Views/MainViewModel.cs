@@ -251,10 +251,7 @@ namespace Lanceur.Views
             var aliases = _settingsFacade.Application.Window.ShowResult
                 ? (await _searchService.GetAllAsync()).ToArray()
                 : Array.Empty<AliasQueryResult>();
-
-            _logger.LogInformation(
-                "MainViewModel activated. There is {Length} alias(es) to show. (Show all results on search box show: {ShowResult})",
-                aliases.Length, _settingsFacade.Application.Window.ShowResult);
+            
             return new()
             {
                 CurrentSessionName = sessionName,
@@ -296,7 +293,7 @@ namespace Lanceur.Views
         {
             using var _ = _logger.MeasureExecutionTime(this);
             var showResult = _settingsFacade.Application.Window.ShowResult;
-            if (criterion.IsNullOrWhiteSpace() && showResult) { return new AliasResponse(); }
+            if (criterion.IsNullOrWhiteSpace() && showResult) { return new(); }
             if (criterion.IsNullOrWhiteSpace() && !showResult)
             {
                 var all = (await _searchService.GetAllAsync()).ToArray();
@@ -312,7 +309,7 @@ namespace Lanceur.Views
                                         .ToArray();
 
             _logger.LogTrace("Search: {Criterion} (Found {Length} element(s))", criterion, results.Length);
-            return new AliasResponse()
+            return new()
             {
                 Results = results,
                 KeepAlive = results.Any()

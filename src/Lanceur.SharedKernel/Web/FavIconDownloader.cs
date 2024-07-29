@@ -50,7 +50,7 @@ namespace Lanceur.SharedKernel.Web
             catch (Exception ex)
             {
                 _failedPaths.Add(path);
-                _logger.LogError(ex, "An error occured while saving FavIcon {Path}", path);
+                _logger.LogInformation(ex, "An error occured while saving FavIcon {Path}", path);
                 return false;
             }
         }

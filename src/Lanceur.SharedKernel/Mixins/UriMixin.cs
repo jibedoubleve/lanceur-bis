@@ -4,19 +4,17 @@ public static class UriMixin
 {
     #region Methods
 
-    public static Uri ToUri(this string path, UriKind kind) => new(path, kind);
+    private static Uri GetAuthority(this Uri baseUri) => new(baseUri.GetLeftPart(UriPartial.Authority));
 
-    public static Uri ToUriAbsolute(this string path) => path.ToUri(UriKind.Absolute);
+    private static Uri ToUri(this string path, UriKind kind) => new(path, kind);
 
-    public static Uri ToUriRelative(this string path) => path.ToUri(UriKind.Relative);
-
-    public static Uri GetAuthority(this Uri baseUri) => new(baseUri.GetLeftPart(UriPartial.Authority));
-    
-    public static Uri GetFavicon(this Uri baseUri )
+    public static Uri GetFavicon(this Uri baseUri)
     {
         var uri = baseUri.GetAuthority();
         return new(uri, "favicon.ico");
     }
+
+    public static Uri ToUriRelative(this string path) => path.ToUri(UriKind.Relative);
 
     #endregion Methods
 }
