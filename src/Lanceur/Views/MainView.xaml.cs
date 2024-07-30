@@ -241,16 +241,20 @@ namespace Lanceur.Views
 
         private void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            //TODO value from settings
-            var stg = _settings.Current;
-            var hk = stg.HotKey;
+            var settings = _settings.Current;
+            var hk = settings.HotKey;
             SetShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);
-
-            //var coordinate = ScreenRuler.GetCenterCoordinate(ScreenRuler.DefaultTopOffset);
-            var coordinate = new Coordinate(stg.Window.Position.Left, stg.Window.Position.Top);
+            
+            var coordinate = new Coordinate(settings.Window.Position.Left, settings.Window.Position.Top);
 
             if (coordinate.IsEmpty) ScreenRuler.SetDefaultPosition();
             else ScreenRuler.SetWindowPosition(coordinate);
+
+            if (ScreenRuler.IsWindowOutOfScreen())
+            {
+                _logger.LogInformation("Window is out of screen. Set it to default position at centre of the screen");
+                ScreenRuler.SetDefaultPosition();
+            } 
 
             ShowWindow();
         }
