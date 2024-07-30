@@ -11,8 +11,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
         #region Fields
 
         private const int ThumbnailSize = 64;
-        private static readonly Microsoft.Extensions.Logging.ILogger _logger;
-        private static readonly ILoggerFactory AppLogFactory = Locator.Current.GetService<ILoggerFactory>()!;
+        private static readonly Microsoft.Extensions.Logging.ILogger Logger;
         private static readonly Dictionary<string, ImageSource> Cache = new();
 
         private static readonly string[] ImageExtensions =
@@ -33,24 +32,10 @@ namespace Lanceur.Infra.Win32.Thumbnails
         static ThumbnailLoader()
         {
             var factory = Locator.Current.GetService<ILoggerFactory>();
-            _logger = factory.GetLogger(typeof(ThumbnailLoader));
+            Logger = factory.GetLogger(typeof(ThumbnailLoader));
         }
 
         #endregion Constructors
-
-        #region Enums
-
-        private enum ImageType
-        {
-            File,
-            Folder,
-            Data,
-            ImageFile,
-            Error,
-            Cache
-        }
-
-        #endregion Enums
 
         #region Methods
 
@@ -101,7 +86,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Failed to extract thumbnail for {Path}", path);
+                Logger.LogWarning(ex, "Failed to extract thumbnail for {Path}", path);
             }
 
             //Return the value event if null;
