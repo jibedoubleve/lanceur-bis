@@ -23,7 +23,7 @@ public class Conditional<T>
     /// <summary>
     /// Create an instance of this object
     /// </summary>
-    /// <param name="onDebug">If <c>#if DEBUG</c> is set then return this value</param>
+    /// <param name="onDebug">If <c>DEBUG</c> constant is defined then return this value</param>
     /// <param name="onRelease">Otherwise return this value.</param>
     public Conditional(T onDebug, T onRelease)
     {
