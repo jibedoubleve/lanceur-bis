@@ -449,7 +449,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             return alias.Id;
         });
 
-        public long[] UpdateThumbnails(IEnumerable<AliasQueryResult> aliases)
+        public IEnumerable<long> UpdateThumbnails(IEnumerable<AliasQueryResult> aliases)
         {
             const string sql = "update alias set thumbnail = @thumbnail where id = @id";
             var ids = new List<long>();

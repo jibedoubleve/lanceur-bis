@@ -375,7 +375,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         else action.Update(session);
     }
 
-    public long[] UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateThumbnails(aliases);
+    public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateThumbnails(aliases);
 
     #endregion Methods
 }
