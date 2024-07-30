@@ -131,6 +131,7 @@
                     x:Name="QueryResults"
                     Grid.Row="1"
                     Grid.ColumnSpan="2"
+                    VirtualizingStackPanel.IsVirtualizing="True"
                     MaxHeight="{StaticResource ResultBoxHeight}"
                     HorizontalContentAlignment="Stretch"
                     Background="Transparent"

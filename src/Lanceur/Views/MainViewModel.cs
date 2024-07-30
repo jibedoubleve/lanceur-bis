@@ -143,7 +143,7 @@ namespace Lanceur.Views
             #region Query
 
             this.WhenAnyValue(vm => vm.Query.Value)
-                .Throttle(100.Milliseconds(), schedulerProvider.TaskpoolScheduler)
+                .Throttle(10.Milliseconds(), schedulerProvider.TaskpoolScheduler)
                 .Select(x => x.Trim())
                 .Where(x => !x.IsNullOrWhiteSpace())
                 .WriteLog("Query changed.", x => $"'{x}'")
