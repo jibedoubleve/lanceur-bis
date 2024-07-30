@@ -20,6 +20,8 @@ public static class ObservableLoggingOverrideMixin
 
     private static void WriteLog(LogLevel logLevel, string message, params object[] arguments)
     {
+        if (Logger is null) return;
+        
         switch (logLevel)
         {
             case LogLevel.Trace:
