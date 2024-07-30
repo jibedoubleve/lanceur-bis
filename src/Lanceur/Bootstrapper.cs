@@ -46,7 +46,9 @@ using Everything.Wrapper;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Utils;
 using Serilog.Core;
+using Serilog.Events;
 using Serilog.Filters;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Lanceur;
 
@@ -108,7 +110,9 @@ public class Bootstrapper
     {
         var l = Locator.CurrentMutable;
 
-        l.RegisterConstant(new LoggingLevelSwitch());
+        var conditional = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
+        l.RegisterConstant(new LoggingLevelSwitch(conditional));
+        
         l.RegisterLazySingleton<IMapper>(() => new Mapper(GetAutoMapperCfg()));
         l.RegisterLazySingleton<IUserNotification>(() => new UserNotification());
         l.RegisterLazySingleton(() => new RoutingState());
@@ -150,7 +154,9 @@ public class Bootstrapper
         l.RegisterLazySingleton<IPackagedAppManager>(() => new PackagedAppManager());
         l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService(Get<ILoggerFactory>()));
         l.RegisterLazySingleton<IFavIconDownloader>(() => new FavIconDownloader(Get<ILoggerFactory>().GetLogger<IFavIconDownloader>()));
-        l.Register<IFavIconManager>(() => new FavIconManager(Get<IPackagedAppSearchService>(), Get<IFavIconDownloader>(), Get<ILoggerFactory>()));
+        l.Register<IFavIconManager>(() => new FavIconManager(Get<IPackagedAppSearchService>(),
+                                                             Get<IFavIconDownloader>(), 
+                                                             Get<ILoggerFactory>()));
 
         // Formatters
         l.Register<IStringFormatter>(() => new DefaultStringFormatter());

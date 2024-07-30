@@ -20,9 +20,9 @@ namespace Lanceur.SharedKernel.Web
         /// favicon, nothing is saved
         /// </summary>
         /// <param name="url">The url of the website</param>
-        /// <param name="path">The path of the file to create.</param>
+        /// <param name="outputPath">The path of the file to create.</param>
         /// <returns><c>True</c> if favicon was found at the specified address; otherwise <c>False</c></returns>
-        Task<bool> SaveToFileAsync(Uri url, string path);
+        Task<bool> SaveToFileAsync(Uri url, string outputPath);
 
         #endregion Methods
     }

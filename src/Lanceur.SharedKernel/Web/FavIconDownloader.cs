@@ -16,6 +16,7 @@ namespace Lanceur.SharedKernel.Web
         }
         #region Methods
 
+        ///<inheritdoc />
         public async Task<bool> CheckExistsAsync(Uri url)
         {
             try
@@ -28,29 +29,36 @@ namespace Lanceur.SharedKernel.Web
         }
 
         ///<inheritdoc />
-        public async Task<bool> SaveToFileAsync(Uri url, string path)
+        public async Task<bool> SaveToFileAsync(Uri url, string outputPath)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(url);
-                ArgumentNullException.ThrowIfNull(path);
+                ArgumentNullException.ThrowIfNull(outputPath);
 
-                if (_failedPaths.Contains(path)) return false;
-                if (File.Exists(path)) return true;
+                if (_failedPaths.Contains(outputPath)) return false;
+                if (File.Exists(outputPath)) return true;
                 
-                var uri = url.GetFavicon();
-                
+                var uris = url.GetFavicons();
                 var httpClient = new HttpClient();
-                var bytes = await httpClient.GetByteArrayAsync(uri);
-                if (bytes.Length == 0) return true;
 
-                await File.WriteAllBytesAsync(path, bytes);
-                return true;
+                foreach (var uri in uris)
+                {
+                    _logger.LogTrace("Checking favicon url {Url}", uri);
+                    if (! await CheckExistsAsync(uri)) continue;
+                    
+                    var bytes = await httpClient.GetByteArrayAsync(uri);
+                    if (bytes.Length == 0) continue;
+                    
+                    await File.WriteAllBytesAsync(outputPath, bytes);
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
-                _failedPaths.Add(path);
-                _logger.LogInformation(ex, "An error occured while saving FavIcon {Path}", path);
+                _failedPaths.Add(outputPath);
+                _logger.LogInformation(ex, "An error occured while saving FavIcon {Path}", outputPath);
                 return false;
             }
         }

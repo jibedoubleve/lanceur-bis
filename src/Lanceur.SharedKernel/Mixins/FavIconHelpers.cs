@@ -1,12 +1,11 @@
-using Lanceur.Infra.Constants;
-
-namespace Lanceur.Infra.Win32.Thumbnails
+namespace Lanceur.SharedKernel.Mixins
 {
-    internal static class ImageRepositoryMixin
+    public static class FavIconHelpers
     {
         #region Fields
 
         private static readonly string[] SupportedSchemes = { "http", "https" };
+        public const string FilePrefix = "favicon_";
 
         #endregion Fields
 
@@ -16,7 +15,7 @@ namespace Lanceur.Infra.Win32.Thumbnails
         {
             ArgumentNullException.ThrowIfNull(address);
             return Uri.TryCreate(address, new UriCreationOptions(), out _)
-                ? $"{Paths.FaviconPrefix}{new Uri(address).Host}"
+                ? $"{FilePrefix}{new Uri(address).Host}"
                 : string.Empty;
         }
 
