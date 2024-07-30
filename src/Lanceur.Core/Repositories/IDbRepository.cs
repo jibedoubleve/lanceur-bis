@@ -166,11 +166,11 @@ namespace Lanceur.Core.Repositories
         /// <remarks>
         /// This method does not create new aliases. If the id of an alias is 0
         /// No update will occur as this alias is considered as non existing.
-        ///
+        /// 
         /// This methods will only update thumbnails, all other properties
         /// will be ignored.
         /// </remarks>
-        long[] UpdateThumbnails(IEnumerable<AliasQueryResult> aliases);
+        void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases);
 
         #endregion Methods
     }
