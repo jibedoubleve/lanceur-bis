@@ -27,7 +27,7 @@ internal class SqlBuilder
         fileName ??= Guid.NewGuid().ToString();
         arguments ??= Guid.NewGuid().ToString();
         
-        _sql.Append($"insert into alias (id, file_name, arguments, id_session) values ({idAlias}, '{fileName}', '{arguments}', 1);");
+        _sql.Append($"insert into alias (id, file_name, arguments) values ({idAlias}, '{fileName}', '{arguments}');");
         _sql.AppendNewLine();
         return this;
     }

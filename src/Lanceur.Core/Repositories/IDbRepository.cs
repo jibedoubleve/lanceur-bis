@@ -17,13 +17,13 @@ namespace Lanceur.Core.Repositories
         /// <summary>
         /// Get all the aliases
         /// </summary>
-        /// <returns>All the aliases related to the specified session (or the default one if not specified).</returns>
+        /// <returns>All the aliases.</returns>
         IEnumerable<AliasQueryResult> GetAll();
 
         /// <summary>
         /// Get all the alias that has additional parameters.
         /// </summary>
-        /// <returns>All the aliases related to the specified session (or the default one if not specified).</returns>
+        /// <returns>All the aliases.</returns>
         IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters();
 
         /// <summary>
@@ -49,8 +49,7 @@ namespace Lanceur.Core.Repositories
         KeywordUsage GetKeyword(string name);
 
         /// <summary>
-        /// Get list of all the aliases with count greater than 0 and from the specified session
-        /// If no session is specified, it'll take the default one
+        /// Get list of all the aliases with count greater than 0
         /// </summary>
         /// <returns>The list of aliases</returns>
         IEnumerable<QueryResult> GetMostUsedAliases();
@@ -97,25 +96,22 @@ namespace Lanceur.Core.Repositories
         void Remove(IEnumerable<SelectableAliasQueryResult> doubloons);
 
         /// <summary>
-        /// Create a new alias if its id is '0' to the specified session (if not specified, to the default session)
-        /// If the id exists, it'll update with the new information
+        /// Creates a new alias if the ID is '0'; otherwise, updates the existing alias.
         /// </summary>
-        /// <param name="alias">The alias to create or update. In case of creation, if id will be set</param>
+        /// <param name="alias">The alias to create or update.</param>
+        /// <returns>The ID of the created or updated alias.</returns>
+
         void SaveOrUpdate(ref AliasQueryResult alias);
 
         /// <summary>
-        /// Search all the alias that correspond to the criterion and that are linked to the specified session.
-        /// If session is omitted, the default session is selected
+        /// Search all the alias that correspond to the criterion
         /// </summary>
         /// <param name="criteria">Criteria to find the aliases</param>
         /// <returns>Resulting aliases</returns>
         IEnumerable<AliasQueryResult> Search(string criteria);
 
         /// <summary>
-        /// Search all the alias with additional parameters that
-        /// correspond to the criterion and that are linked to the
-        /// specified session.  If session is omitted, the default
-        /// session is selected
+        /// Search all the alias with additional parameters that correspond to the criterion 
         /// </summary>
         /// <param name="criteria">Criteria to find the aliases</param>
         /// <returns>Resulting aliases</returns>

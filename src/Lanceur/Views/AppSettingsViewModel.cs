@@ -149,7 +149,7 @@ namespace Lanceur.Views
             //Save DB Path in property file
             _settingsFacade.Local.DbPath = DbPath?.Replace("\"", "");
 
-            // Save hotkey & Session in DB
+            // Save hotkey in DB
             _settingsFacade.Application.Window.ShowResult = ShowResult;
             _settingsFacade.Application.RestartDelay = RestartDelay;
             _settingsFacade.Application.HotKey = HotKeySection;

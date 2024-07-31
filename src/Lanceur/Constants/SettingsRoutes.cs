@@ -10,7 +10,6 @@
         public const string Keywords = "keywordsview";
         public const string MostUsed = "mostusedview";
         public const string Plugin = "pluginsview";
-        public const string Sessions = "sessionsview";
         public const string Settings = "settings";
         public const string Trends = "trendsview";
 
