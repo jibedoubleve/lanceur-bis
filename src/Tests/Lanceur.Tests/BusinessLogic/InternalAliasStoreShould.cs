@@ -26,7 +26,6 @@ namespace Lanceur.Tests.BusinessLogic
         [Theory]
         [InlineData("add")]
         [InlineData("quit")]
-        [InlineData("sessions")]
         [InlineData("setup")]
         [InlineData("version")]
         public void ReturnSpecifiedReservedAliasFromLanceur(string criterion)

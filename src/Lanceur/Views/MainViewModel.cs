@@ -196,10 +196,6 @@ namespace Lanceur.Views
                 .DistinctUntilChanged()
                 .ObserveOn(schedulerProvider.MainThreadScheduler);
 
-            activated.Select(x => x.CurrentSessionName)
-                     .WriteLog("Activated: get current session name.", x => $"Session name: '{x}'.")
-                     .BindTo(this, vm => vm.CurrentSessionName);
-
             activated.Select(x => x.Results.ToObservableCollection())
                      .WriteLog("Activated: set all results.", x => $"Found {x.Count} item(s).")
                      .BindTo(this, vm => vm.Results);
@@ -246,17 +242,11 @@ namespace Lanceur.Views
 
         private async Task<AliasResponse> OnActivate()
         {
-            var sessionName = _dbRepository.GetDefaultSession()?.Name ?? "N.A.";
-
             var aliases = _settingsFacade.Application.Window.ShowResult
                 ? (await _searchService.GetAllAsync()).ToArray()
                 : Array.Empty<AliasQueryResult>();
             
-            return new()
-            {
-                CurrentSessionName = sessionName,
-                Results = aliases
-            };
+            return new() { Results = aliases };
         }
 
         private string OnAutoComplete() => CurrentAlias?.Name ?? string.Empty;

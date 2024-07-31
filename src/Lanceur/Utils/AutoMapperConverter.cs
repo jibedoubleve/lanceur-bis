@@ -41,11 +41,6 @@ namespace Lanceur.Utils
             return _mapper.Map<IEnumerable<QueryResult>, IEnumerable<SelectableAliasQueryResult>>(source);
         }
 
-        public IEnumerable<SessionExecutableQueryResult> ToSessionExecutableQueryResult(IEnumerable<Session> source)
-        {
-            return _mapper.Map<IEnumerable<Session>, IEnumerable<SessionExecutableQueryResult>>(source);
-        }
-
         #endregion Methods
     }
 }

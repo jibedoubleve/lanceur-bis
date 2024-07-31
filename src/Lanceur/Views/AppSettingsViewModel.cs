@@ -135,7 +135,6 @@ namespace Lanceur.Views
         {
             AppSettings = _settingsFacade.Application,
             DbPath = _settingsFacade.Local.DbPath,
-            Sessions = _service.GetSessions(),
             SettingsMemento = SettingsMementoManager.GetInitialState(_settingsFacade)
         };
 
@@ -184,7 +183,6 @@ namespace Lanceur.Views
 
             public AppConfig AppSettings { get; internal set; }
             public string DbPath { get; internal set; }
-            public IEnumerable<Session> Sessions { get; set; }
             public SettingsMementoManager SettingsMemento { get; set; }
 
             #endregion Properties

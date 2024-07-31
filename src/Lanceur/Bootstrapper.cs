@@ -21,7 +21,6 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.PackagedApp;
 using Lanceur.Infra.Win32.Restart;
 using Lanceur.Infra.Win32.Thumbnails;
-using Lanceur.Models;
 using Lanceur.Schedulers;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Web;
@@ -71,18 +70,11 @@ public class Bootstrapper
     {
         return new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Session, SessionModel>();
             cfg.CreateMap<QueryResult, SelectableAliasQueryResult>();
             cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>();
 
             cfg.CreateMap<string, DisplayQueryResult>()
                .ConstructUsing(x => new($"@{x}@", "This is a macro", "LinkVariant"));
-
-            cfg.CreateMap<Session, SessionExecutableQueryResult>()
-               .ConstructUsing(x =>
-                                   new(x.Name, x.Notes, Get<ILoggerFactory>().GetLogger<SessionExecutableQueryResult>(),
-                                       Get<IDbRepository>()))
-               .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
         });
     }
 

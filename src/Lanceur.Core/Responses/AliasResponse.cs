@@ -6,7 +6,6 @@ namespace Lanceur.Core.Responses
     {
         #region Properties
 
-        public string CurrentSessionName { get; set; }
         public bool KeepAlive { get; set; }
         public IEnumerable<QueryResult> Results { get; set; } = new List<QueryResult>();
 

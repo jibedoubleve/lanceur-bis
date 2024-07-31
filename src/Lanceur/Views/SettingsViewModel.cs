@@ -94,8 +94,7 @@ namespace Lanceur.Views
             switch (route.ToLower())
             {
                 case "keywordsview":
-                    var sessionName = _service.GetDefaultSession()?.FullName ?? "N.A.";
-                    Title = $"Manage aliases of '{sessionName}'";
+                    Title = $"Manage aliases";
                     return Router.Navigate.Execute(_keywordVm);
 
                 case "doubloonsview":

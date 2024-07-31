@@ -28,7 +28,6 @@ namespace Lanceur.Tests.BusinessLogic
         ""Key"": 18,
         ""ModifierKey"": 3
     },
-    ""IdSession"": 0,
     ""Repository"": {
         ""ScoreLimit"": 0
     },
@@ -64,7 +63,6 @@ namespace Lanceur.Tests.BusinessLogic
         [InlineData("ModifierKey", "100", "", true)]
         [InlineData("", "", "newDbPath", true)]
         // Should NOT show state changed
-        [InlineData("IdSession", "100", "", false)]
         [InlineData("ScoreLimit", "100", "", false)]
         [InlineData("RestartDelay", "100", "", false)]
         [InlineData("Left", "100.0", "", false)]
