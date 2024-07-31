@@ -241,15 +241,10 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     }
 
     ///<inheritdoc/>
-    public IEnumerable<AliasQueryResult> Search(string name)
-    {
-        return _aliasSearchDbAction.Search(name);
-    }
+    public IEnumerable<AliasQueryResult> Search(string name) => _aliasSearchDbAction.Search(name);
 
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria)
-    {
-        return _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria);
-    }
+    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) 
+        => _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria);
 
     ///<inheritdoc/>
     public ExistingNameResponse SelectNames(string[] names)
