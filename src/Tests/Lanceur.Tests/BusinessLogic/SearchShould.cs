@@ -30,13 +30,13 @@ namespace Lanceur.Tests.BusinessLogic
         #region Fields
 
         private const string SqlCreateAlias = @"
-                insert into alias (id, file_name, arguments, id_session) values (1000, '@multi@', '@alias2@@alias3', 1);
+                insert into alias (id, file_name, arguments) values (1000, '@multi@', '@alias2@@alias3');
                 insert into alias_name (id, id_alias, name) values (1000, 1000, 'alias1');
 
-                insert into alias (id, file_name, arguments,id_session) values (2000, 'arg', 'c:\dummy\dummy.exe', 1);
+                insert into alias (id, file_name, arguments) values (2000, 'arg', 'c:\dummy\dummy.exe');
                 insert into alias_name (id, id_alias, name) values (2000, 2000, 'alias2');
 
-                insert into alias (id, file_name, arguments,id_session) values (3000, 'arg', 'c:\dummy\dummy.exe', 1);
+                insert into alias (id, file_name, arguments) values (3000, 'arg', 'c:\dummy\dummy.exe');
                 insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');";
 
         private readonly ILoggerFactory _testLoggerFactory;
@@ -95,7 +95,7 @@ namespace Lanceur.Tests.BusinessLogic
             // ARRANGE
             const string sql = SqlCreateAlias
                                + @"
-                insert into alias (id, file_name, id_session) values (4000, '@zzzz@', 1);
+                insert into alias (id, file_name) values (4000, '@zzzz@');
                 insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');";
 
             using var db = BuildFreshDb(sql);
@@ -128,29 +128,29 @@ namespace Lanceur.Tests.BusinessLogic
             var dt = DateTime.Now;
             var converter = Substitute.For<IConversionService>();
             var sql = @$"
-            insert into alias (id, file_name, arguments, id_session) values (1000, 'un', '@alias2@@alias3', 1);
+            insert into alias (id, file_name, arguments) values (1000, 'un', '@alias2@@alias3');
             insert into alias_name (id, id_alias, name) values (1001, 1000, 'un');
 
-            insert into alias (id, file_name, arguments, id_session) values (2000, 'deux', '@alias2@@alias3', 1);
+            insert into alias (id, file_name, arguments) values (2000, 'deux', '@alias2@@alias3');
             insert into alias_name (id, id_alias, name) values (1002, 2000, 'deux');
 
-            insert into alias (id, file_name, arguments, id_session) values (3000, 'trois', '@alias2@@alias3', 1);
+            insert into alias (id, file_name, arguments) values (3000, 'trois', '@alias2@@alias3');
             insert into alias_name (id, id_alias, name) values (1003, 3000, 'trois');
             --
-            insert into alias (id, file_name, arguments, id_session) values (4000, 'u', '@alias2@@alias3', 1);
+            insert into alias (id, file_name, arguments) values (4000, 'u', '@alias2@@alias3');
             insert into alias_name (id, id_alias, name) values (1004, 4000, 'u');
             --
-            insert into alias_usage (id_alias, id_session, time_stamp) values (1000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, id_session, time_stamp) values (1000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, id_session, time_stamp) values (1000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
             ---
-            insert into alias_usage (id_alias, id_session, time_stamp) values (2000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, id_session, time_stamp) values (2000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, id_session, time_stamp) values (2000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
             ---
-            insert into alias_usage (id_alias, id_session, time_stamp) values (3000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, id_session, time_stamp) values (3000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, id_session, time_stamp) values (3000, 1, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+            insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
          ";
 
             // ARRANGE
