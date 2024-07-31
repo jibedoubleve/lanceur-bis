@@ -9,7 +9,7 @@ on:
       - synchronize
       - ready_for_review
     branches: 
-      - develop
+      - master
 jobs:
   build:
     name: Build and Test
