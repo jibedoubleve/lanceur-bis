@@ -196,20 +196,16 @@ namespace Lanceur.Tests.BusinessLogic
             var alias = BuildAlias("admin", RunAs.Admin);
             service.SaveOrUpdate(ref alias);
 
-            var r = connection.Query<AliasQueryResult>("select * from alias");
-
-            var results = service.Search("admin").ToArray();
-
-            results.Should().HaveCount(1);
-
-            results.ElementAt(0).RunAs.Should().Be(RunAs.Admin);
+            var sut = service.Search("admin").ToArray();
+            sut.Should().HaveCount(1);
+            sut.ElementAt(0).RunAs.Should().Be(RunAs.Admin);
         }
 
         [Fact]
         public void FindExact()
         {
             // ARRANGE
-            var sql = @"
+            const string sql = @"
                 insert into alias(id) values (100);
                 insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);

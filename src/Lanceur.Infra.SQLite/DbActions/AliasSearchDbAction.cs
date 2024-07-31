@@ -60,7 +60,7 @@ public class AliasSearchDbAction
         {
             sql += @"
                 where
-                    and an.Name like @name
+                    an.Name like @name
                     and a.hidden = 0";
         }
         sql += @"
