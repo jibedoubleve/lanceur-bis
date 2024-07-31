@@ -57,13 +57,6 @@
                                     Content="Select database" />
                             </Grid>
                         </HeaderedContentControl>
-                        <HeaderedContentControl Header="Default session">
-                            <ComboBox
-                                x:Name="CbSessions"
-                                Margin="5"
-                                HorizontalAlignment="Stretch"
-                                DisplayMemberPath="FullName" />
-                        </HeaderedContentControl>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Miscellaneous">

@@ -30,7 +30,6 @@ namespace Lanceur.Tests.ViewModels
         [InlineData(typeof(MainViewModel))]
         [InlineData(typeof(MostUsedViewModel))]
         [InlineData(typeof(PluginsViewModel))]
-        [InlineData(typeof(SessionsViewModel))]
         [InlineData(typeof(SettingsViewModel))]
         [InlineData(typeof(TrendsViewModel))]
         public void InstantiateWithoutError(Type vmType)

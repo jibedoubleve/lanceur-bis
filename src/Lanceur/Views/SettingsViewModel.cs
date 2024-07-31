@@ -22,7 +22,6 @@ namespace Lanceur.Views
         private readonly MostUsedViewModel _mostUsedVm;
         private readonly PluginsViewModel _pluginsViewModel;
         private readonly IDbRepository _service;
-        private readonly SessionsViewModel _sessionsVm;
         private readonly TrendsViewModel _trendsVm;
         public readonly AppSettingsViewModel _settingsVm;
 
@@ -33,7 +32,6 @@ namespace Lanceur.Views
         public SettingsViewModel(
             ILoggerFactory logFactory = null,
             KeywordsViewModel keywordVm = null,
-            SessionsViewModel sessionsVm = null,
             AppSettingsViewModel settingsVm = null,
             DoubloonsViewModel doubloonsViewModel = null,
             InvalidAliasViewModel invalidAliasVm = null,
@@ -50,7 +48,6 @@ namespace Lanceur.Views
             notify ??= l.GetService<IUserNotification>();
             _logger = logFactory.GetLogger<SettingsViewModel>();
             _keywordVm = keywordVm ?? l.GetService<KeywordsViewModel>();
-            _sessionsVm = sessionsVm ?? l.GetService<SessionsViewModel>();
             _settingsVm = settingsVm ?? l.GetService<AppSettingsViewModel>();
             _doubloonsVm = doubloonsViewModel ?? l.GetService<DoubloonsViewModel>();
             _invalidAliasVm = invalidAliasVm ?? l.GetService<InvalidAliasViewModel>();
@@ -100,10 +97,6 @@ namespace Lanceur.Views
                     var sessionName = _service.GetDefaultSession()?.FullName ?? "N.A.";
                     Title = $"Manage aliases of '{sessionName}'";
                     return Router.Navigate.Execute(_keywordVm);
-
-                case "sessionsview":
-                    Title = "Manage sessions";
-                    return Router.Navigate.Execute(_sessionsVm);
 
                 case "doubloonsview":
                     Title = "Manage doubloons";
