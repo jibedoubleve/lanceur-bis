@@ -267,13 +267,13 @@ public class MacroShould : TestBase
         #region Fields
 
         public const string SqlForAliases = @"
-                insert into alias (id, file_name, arguments, id_session) values (1000, '@multi@', '@alias2@@alias3', 1);
+                insert into alias (id, file_name, arguments) values (1000, '@multi@', '@alias2@@alias3');
                 insert into alias_name (id, id_alias, name) values (1000, 1000, 'alias1');
 
-                insert into alias (id, file_name, id_session) values (2000, 'c:\dummy\dummy.exe', 1);
+                insert into alias (id, file_name) values (2000, 'c:\dummy\dummy.exe');
                 insert into alias_name (id, id_alias, name) values (2000, 2000, 'alias2');
 
-                insert into alias (id, file_name, id_session) values (3000, 'c:\dummy\dummy.exe', 1);
+                insert into alias (id, file_name) values (3000, 'c:\dummy\dummy.exe');
                 insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');";
 
         #endregion Fields

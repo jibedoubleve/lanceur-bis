@@ -66,9 +66,9 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // ARRANGE
             const string sql = @"
-                insert into alias(id, id_session) values (1001, 1);
-                insert into alias(id, id_session) values (1002, 1);
-                insert into alias(id, id_session) values (1003, 1);
+                insert into alias(id) values (1001);
+                insert into alias(id) values (1002);
+                insert into alias(id) values (1003);
 
                 insert into alias_name(id, name, id_alias) values (1000, 'noname', 1001);
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
@@ -127,9 +127,9 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // ARRANGE
             var sql = @"
-                insert into alias(id, id_session) values (1001, 1);
-                insert into alias(id, id_session) values (1002, 1);
-                insert into alias(id, id_session) values (1003, 1);
+                insert into alias(id) values (1001);
+                insert into alias(id) values (1002);
+                insert into alias(id) values (1003);
 
                 insert into alias_name(id, name, id_alias) values (1000, 'noname', 1001);
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
@@ -210,7 +210,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // ARRANGE
             var sql = @"
-                insert into alias(id, id_session) values (100, 1);
+                insert into alias(id) values (100);
                 insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
                 insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
@@ -234,7 +234,7 @@ namespace Lanceur.Tests.BusinessLogic
         {
             // ARRANGE
             var sql = @"
-                insert into alias(id, id_session) values (100, 1);
+                insert into alias(id) values (100);
                 insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
                 insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
                 insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
@@ -300,17 +300,17 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
-        public void RemoveAliasWithDbActionSQL()
+        public void RemoveAliasWithDbActionSql()
         {
             // ARRANGE
             var sql = @"
-                insert into alias (id, arguments, file_name, id_session) values (256, 'no args', 'no file name', 1);
+                insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
                 insert into alias_name(name, id_alias) values ('noname', 256);
 
-                insert into alias (id, arguments, file_name, id_session) values (257, 'no args', 'no file name', 1);
+                insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
                 insert into alias_name(name, id_alias) values ('noname', 257);
 
-                insert into alias (id, arguments, file_name, id_session) values (258, 'no args', 'no file name', 1);
+                insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
                 insert into alias_name(name, id_alias) values ('noname', 258);";
             var connection = BuildFreshDb(sql);
 
@@ -331,17 +331,17 @@ namespace Lanceur.Tests.BusinessLogic
         }
 
         [Fact]
-        public void RemoveAliasWithServiceSQL()
+        public void RemoveAliasWithServiceSql()
         {
             // ARRANGE
             var sql = @"
-                insert into alias (id, arguments, file_name, id_session) values (256, 'no args', 'no file name', 1);
+                insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
                 insert into alias_name(name, id_alias) values ('noname', 256);
 
-                insert into alias (id, arguments, file_name, id_session) values (257, 'no args', 'no file name', 1);
+                insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
                 insert into alias_name(name, id_alias) values ('noname', 257);
 
-                insert into alias (id, arguments, file_name, id_session) values (258, 'no args', 'no file name', 1);
+                insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
                 insert into alias_name(name, id_alias) values ('noname', 258);";
             var connection = BuildFreshDb(sql);
 
