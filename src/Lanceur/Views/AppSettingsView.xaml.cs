@@ -35,10 +35,6 @@ namespace Lanceur.Views
                     interaction.SetOutput(file);
                 });
 
-                this.OneWayBind(ViewModel, vm => vm.Sessions, v => v.CbSessions.ItemsSource).DisposeWith(d);
-
-                this.Bind(ViewModel, vm => vm.CurrentSession, v => v.CbSessions.SelectedItem).DisposeWith(d);
-
                 this.Bind(ViewModel, vm => vm.DbPath, v => v.TbDatabasePath.Text).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.RestartDelay, v => v.SlRestartDelay.Value).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.HotKeySection, v => v.BoxHotKey.HotKey, v => v.ToMahAppHotKey(), vm => vm.ToHotKeySection()).DisposeWith(d);

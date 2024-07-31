@@ -88,8 +88,6 @@ namespace Lanceur.Views
                     DbPath = response.DbPath;
                     HotKeySection = response.AppSettings.HotKey;
                     RestartDelay = response.AppSettings.RestartDelay;
-                    Sessions = new(response.Sessions);
-                    CurrentSession = Sessions.SingleOrDefault(s => s.Id == response.AppSettings.IdSession);
                     SettingsMemento = response.SettingsMemento;
                 });
 
@@ -110,8 +108,6 @@ namespace Lanceur.Views
 
         public ReactiveCommand<LogLevel, Unit> ChangeLogVerbosity { get; }
 
-        [Reactive] public Session CurrentSession { get; set; }
-
         [Reactive] public string DbPath { get; set; }
 
         [Reactive] public HotKeySection HotKeySection { get; set; }
@@ -121,8 +117,6 @@ namespace Lanceur.Views
         public ReactiveCommand<Unit, Unit> SaveSettings { get; }
 
         public ReactiveCommand<Unit, string> SelectDatabase { get; }
-
-        [Reactive] public ObservableCollection<Session> Sessions { get; set; }
 
         [Reactive] public bool ShowResult { get; set; }
 
@@ -161,7 +155,6 @@ namespace Lanceur.Views
             _settingsFacade.Application.RestartDelay = RestartDelay;
             _settingsFacade.Application.HotKey = HotKeySection;
             _settingsFacade.Application.Window.ShowAtStartup = ShowResult;
-            if (CurrentSession is not null) _settingsFacade.Application.IdSession = CurrentSession.Id;
 
             //Save settings
             _settingsFacade.Save();

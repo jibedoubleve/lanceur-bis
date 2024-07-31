@@ -66,9 +66,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\SessionsViewModel.cs">
-      <DependentUpon>SessionsView.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Views\SettingsViewModel.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
