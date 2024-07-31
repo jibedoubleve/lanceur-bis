@@ -4,6 +4,7 @@ branches:
   feature:
     is-release-branch: true  
     regex: ^release?[\/-]    
+  master:
     tag: beta
     increment: Patch
   feature:
