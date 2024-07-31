@@ -30,7 +30,7 @@ namespace Lanceur.Infra.SQLite.DbActions
 
         #region Methods
 
-        public void SetUsage(ref QueryResult alias, long idSession)
+        public void SetUsage(ref QueryResult alias)
         {
             ArgumentNullException.ThrowIfNull(alias);
 
@@ -47,7 +47,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 else { _aliasDbAction.CreateInvisible(ref alias); }
             }
             
-            AddHistory(ref alias, idSession);
+            AddHistory(ref alias);
             IncrementCounter(alias);
         }
 
@@ -64,21 +64,19 @@ namespace Lanceur.Infra.SQLite.DbActions
             _db.WithinTransaction(tx => tx.Connection.Execute(sql, param));
         }
 
-        private void AddHistory(ref QueryResult alias, long idSession)
+        private void AddHistory(ref QueryResult alias)
         {
             const string sql = @"
                     insert into alias_usage (
                         id_alias,
-                        id_session,
                         time_stamp
 
                     ) values (
                         @idAlias,
-                        @idSession,
                         @now
                     )";
 
-            var param = new { idAlias = alias.Id, idSession, now = DateTime.Now };
+            var param = new { idAlias = alias.Id, now = DateTime.Now };
             _db.WithinTransaction(tx => tx.Connection.Execute(sql, param));
         }
 

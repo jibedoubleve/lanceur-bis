@@ -82,9 +82,9 @@ namespace Lanceur.Tests.BusinessLogic
             var alias3 = BuildAlias();
 
             // ACT
-            action.Create(ref alias1, 1);
-            action.Create(ref alias2, 1);
-            action.Create(ref alias3, 1);
+            action.Create(ref alias1);
+            action.Create(ref alias2);
+            action.Create(ref alias3);
 
             //ASSERT
             using (new AssertionScope())
@@ -262,7 +262,7 @@ namespace Lanceur.Tests.BusinessLogic
             var alias = BuildAlias();
 
             // ACT
-            action.Create(ref alias, 1);
+            action.Create(ref alias);
             action.Remove(alias);
 
             //ASSERT

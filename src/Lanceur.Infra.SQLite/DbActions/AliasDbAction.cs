@@ -134,7 +134,7 @@ namespace Lanceur.Infra.SQLite.DbActions
             return dbResultAr;
         }
 
-        public long Create(ref AliasQueryResult alias, long idSession)
+        public long Create(ref AliasQueryResult alias)
         {
             const string sqlAlias = @"
                 insert into alias (
@@ -144,7 +144,6 @@ namespace Lanceur.Infra.SQLite.DbActions
                     run_as,
                     start_mode,
                     working_dir,
-                    id_session,
                     icon,
                     thumbnail,
                     lua_script,
@@ -157,7 +156,6 @@ namespace Lanceur.Infra.SQLite.DbActions
                     @runAs,
                     @startMode,
                     @workingDirectory,
-                    @idSession,
                     @icon,
                     @thumbnail,
                     @luaScript,
@@ -174,7 +172,6 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias.RunAs,
                 alias.StartMode,
                 alias.WorkingDirectory,
-                idSession,
                 alias.Icon,
                 alias.Thumbnail,
                 alias.LuaScript,
@@ -224,15 +221,7 @@ namespace Lanceur.Infra.SQLite.DbActions
                 IsHidden = true,
                 Icon = "PageHidden"
             };
-            var idSession = GetDefaultSessionId();
-            alias.Id = Create(ref queryResult, idSession);
-        }
-
-        public long GetDefaultSessionId()
-        {
-            var sql = "select s_value from settings where lower(s_key) = 'idsession'";
-            var result = _db.WithinTransaction(tx => tx.Connection.Query<long>(sql).FirstOrDefault());
-            return result;
+            alias.Id = Create(ref queryResult);
         }
 
         /// <summary>
@@ -248,8 +237,6 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// </remarks>
         public AliasQueryResult GetExact(string name, long? idSession = null, bool includeHidden = false)
         {
-            idSession ??= GetDefaultSessionId();
-
             const string sql = @$"
                 select
                     n.Name                  as {nameof(AliasQueryResult.Name)},
@@ -296,8 +283,6 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// <returns>The exact match or <c>null</c> if not found.</returns>
         public IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, long? idSession = null, bool includeHidden = false)
         {
-            idSession ??= GetDefaultSessionId();
-
             const string sql = @$"
             select
                 n.Name                  as {nameof(AliasQueryResult.Name)},
@@ -371,39 +356,30 @@ namespace Lanceur.Infra.SQLite.DbActions
             ClearAlias(ids);
         }
 
-        public bool SelectNames(AliasQueryResult alias, long idSession)
+        public bool SelectNames(AliasQueryResult alias)
         {
             const string sql = @"
             select count(*)
             from
 	            alias_name an
                 inner join alias a on an.id_alias = a.id
-            where
-            	lower(name) = @name
-                and a.id_session = @idSession";
+            where lower(name) = @name";
 
-            var count = _db.WithinTransaction(tx => tx.Connection.ExecuteScalar<int>(sql, new
-            {
-                name = alias.Name,
-                idSession
-            }));
+            var count = _db.WithinTransaction(tx => tx.Connection.ExecuteScalar<int>(sql, new { name = alias.Name }));
             return count > 0;
         }
 
-        public ExistingNameResponse SelectNames(string[] names, long idSession)
+        public ExistingNameResponse SelectNames(string[] names)
         {
             const string sql = @"
                 select an.name
                 from
                 	alias_name an
                 	inner join alias a on a.id = an.id_alias
-                where
-                    an.name in @names
-                    and a.id_session = @idSession";
+                where an.name in @names";
 
             var result = _db.WithinTransaction(
-                tx => tx.Connection.Query<string>(sql, new { names, idSession })
-                            .ToArray()
+                tx => tx.Connection.Query<string>(sql, new { names }).ToArray()
             );
 
             return new(result);

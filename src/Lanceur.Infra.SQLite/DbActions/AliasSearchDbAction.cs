@@ -31,7 +31,7 @@ public class AliasSearchDbAction
 
     #region Methods
 
-    public IEnumerable<AliasQueryResult> Search(string name = null, long? idSession = null)
+    public IEnumerable<AliasQueryResult> Search(string name = null)
     {
         using var _ = _logger.MeasureExecutionTime(this);
         var sql = @$"
@@ -56,11 +56,10 @@ public class AliasSearchDbAction
                     alias a
                     left join alias_name            an on a.id         = an.id_alias                    
                     inner join data_alias_synonyms_v s on s.id_alias   = a.id";
-        if (!name.IsNullOrEmpty() && idSession.HasValue)
+        if (!name.IsNullOrEmpty())
         {
             sql += @"
                 where
-                    a.id_session = @idSession
                     and an.Name like @name
                     and a.hidden = 0";
         }
@@ -70,13 +69,13 @@ public class AliasSearchDbAction
                   an.name";
 
         name = $"{name ?? string.Empty}%";
-        var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name, idSession }));
+        var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name }));
 
         results = _macroManager.UpgradeToComposite(results);
         return results ?? AliasQueryResult.NoResult;
     }
 
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string name, long idSession)
+    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string name)
     {
         const string sql = @$"
                 select
@@ -101,15 +100,14 @@ public class AliasSearchDbAction
                     inner join alias_argument       aa on a.id         = aa.id_alias                    
                     inner join data_alias_synonyms_v s on s.id_alias   = a.id
                 where
-                    a.id_session = @idSession
-                    and an.Name || ':' || aa.name  like @name
+                    an.Name || ':' || aa.name  like @name
                     and a.hidden = 0
                 order by
                     a.exec_count desc,
                     an.name";
 
         name = $"{name ?? string.Empty}%";
-        var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name, idSession }));
+        var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name }));
 
         results = _macroManager.UpgradeToComposite(results);
         return results ?? AliasQueryResult.NoResult;
