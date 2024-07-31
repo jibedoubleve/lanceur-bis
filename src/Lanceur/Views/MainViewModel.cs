@@ -214,7 +214,6 @@ namespace Lanceur.Views
         public ReactiveCommand<Unit, string> AutoComplete { get; }
         public Interaction<string, bool> ConfirmExecution => _confirmExecution;
         [Reactive] public QueryResult CurrentAlias { get; set; }
-        [Reactive] public string CurrentSessionName { get; set; }
         public ReactiveCommand<AliasExecutionRequest, AliasResponse> ExecuteAlias { get; }
         [Reactive] public bool IsBusy { get; set; }
         [Reactive] public bool IsOnError { get; set; }

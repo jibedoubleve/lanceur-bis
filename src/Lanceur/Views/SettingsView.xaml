@@ -33,10 +33,6 @@
                     Icon="Keyboard"
                     Tag="KeywordsView" />
                 <ui:NavigationViewItem
-                    Content="Sessions"
-                    Icon="Globe"
-                    Tag="SessionsView" />
-                <ui:NavigationViewItem
                     Content="Plugins"
                     Icon="Manage"
                     Tag="PluginsView" />

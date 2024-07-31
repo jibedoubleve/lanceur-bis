@@ -228,14 +228,13 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// Get the a first alias with the exact name.
         /// </summary>
         /// <param name="name">The alias' exact name to find.</param>
-        /// <param name="idSession">The session where the search occurs.</param>
         /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
         /// <returns>The exact match or <c>null</c> if not found.</returns>
         /// <remarks>
         /// For optimisation reason, there's no check of doubloons. Bear UI validates and
         /// forbid to insert two aliases with same name.
         /// </remarks>
-        public AliasQueryResult GetExact(string name, long? idSession = null, bool includeHidden = false)
+        public AliasQueryResult GetExact(string name, bool includeHidden = false)
         {
             const string sql = @$"
                 select
@@ -259,15 +258,14 @@ namespace Lanceur.Infra.SQLite.DbActions
                     left join alias_name n on a.id = n.id_alias
                     inner join data_alias_synonyms_v s on s.id_alias = a.id
                 where
-                    a.id_session = @idSession
-                    and n.Name = @name
+                    n.Name = @name
                     and hidden in @hidden
                 order by
                     a.exec_count desc,
                     n.name";
 
             var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
-            var arguments = new { idSession, name, hidden };
+            var arguments = new { name, hidden };
 
             return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault());
         }
@@ -278,10 +276,9 @@ namespace Lanceur.Infra.SQLite.DbActions
         /// is selected.
         /// </summary>
         /// <param name="names">The list of names to find.</param>
-        /// <param name="idSession">The session where the search occurs.</param>
         /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
         /// <returns>The exact match or <c>null</c> if not found.</returns>
-        public IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, long? idSession = null, bool includeHidden = false)
+        public IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, bool includeHidden = false)
         {
             const string sql = @$"
             select
@@ -302,13 +299,12 @@ namespace Lanceur.Infra.SQLite.DbActions
                 alias a
                 left join alias_name n on a.id = n.id_alias
             where
-                a.id_session = @idSession
-                and n.Name in @names
+                n.Name in @names
                 and hidden in @hidden
             order by n.name";
 
             var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
-            var arguments = new { idSession, names, hidden };
+            var arguments = new { names, hidden };
 
             return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).ToArray());
         }

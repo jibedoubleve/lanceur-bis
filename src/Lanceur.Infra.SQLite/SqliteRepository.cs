@@ -212,11 +212,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         _aliasDbAction.Remove(selectableAliasQueryResults);
     }
 
-    /// <summary>
-    /// Creates a new alias if the ID is '0'; otherwise, updates the existing alias.
-    /// </summary>
-    /// <param name="alias">The alias to create or update.</param>
-    /// <returns>The ID of the created or updated alias.</returns>
+    /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias)
     {
         ArgumentNullException.ThrowIfNull(alias, nameof(alias));
