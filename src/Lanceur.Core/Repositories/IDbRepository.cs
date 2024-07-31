@@ -28,8 +28,6 @@ namespace Lanceur.Core.Repositories
         /// <returns>All the aliases related to the specified session (or the default one if not specified).</returns>
         IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(long? idSession = null);
 
-        Session GetDefaultSession();
-
         long GetDefaultSessionId();
 
         /// <summary>
@@ -61,8 +59,6 @@ namespace Lanceur.Core.Repositories
         /// <param name="idSession"></param>
         /// <returns>The list of aliases</returns>
         IEnumerable<QueryResult> GetMostUsedAliases(long? idSession = null);
-
-        IEnumerable<Session> GetSessions();
 
         /// <summary>
         /// Returns usage trends. The result is meant to be dislayed as a chart
@@ -103,8 +99,6 @@ namespace Lanceur.Core.Repositories
         IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result);
 
         void Remove(AliasQueryResult alias);
-
-        void Remove(Session session);
 
         void Remove(IEnumerable<SelectableAliasQueryResult> doubloons);
 
@@ -155,8 +149,6 @@ namespace Lanceur.Core.Repositories
         /// </summary>
         /// <param name="alias"></param>
         void SetUsage(QueryResult alias);
-
-        void Update(ref Session session);
 
         /// <summary>
         /// Updates thumbnail of many aliases at once.

@@ -71,23 +71,6 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     }
 
     ///<inheritdoc/>
-    public Session GetDefaultSession()
-    {
-        var id = GetDefaultSessionId();
-        const string sql = @$"
-                select
-	                id    as {nameof(Session.Id)},
-	                name  as {nameof(Session.Name)},
-                    notes as {nameof(Session.Notes)}
-                from
-	                alias_session
-                where
-	                id = @id";
-        var result = DB.WithinTransaction(tx => tx.Connection.Query<Session>(sql, new { id }).SingleOrDefault());
-        return result;
-    }
-
-    ///<inheritdoc/>
     public long GetDefaultSessionId() => _aliasDbAction.GetDefaultSessionId();
 
     ///<inheritdoc/>
@@ -149,19 +132,6 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                 order
                     by exec_count desc";
         return DB.WithinTransaction(tx => tx.Connection.Query<DisplayUsageQueryResult>(sql, new { idSession }));
-    }
-
-    ///<inheritdoc/>
-    public IEnumerable<Session> GetSessions()
-    {
-        const string sql = @$"
-            select
-	            id    as {nameof(Session.Id)},
-                name  as {nameof(Session.Name)},
-                notes as {nameof(Session.Notes)}
-            from alias_session";
-        var result = DB.WithinTransaction(tx => tx.Connection.Query<Session>(sql));
-        return result;
     }
 
     ///<inheritdoc/>
@@ -266,14 +236,6 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         _aliasDbAction.Remove(selectableAliasQueryResults);
     }
 
-    ///<inheritdoc/>
-    public void Remove(Session session)
-    {
-        _logger.LogInformation("Removes session with name {Name}. Session: {@Session}", session.Name, session);
-        var action = new SessionDbAction(DB);
-        action.Remove(session);
-    }
-
     /// <summary>
     ///     Create a new alias if its id is '0' to the specified session (if not specified, to the default session)
     ///     If the id exists, it'll update with the new information
@@ -364,16 +326,6 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     }
 
     public void SetUsage(string aliasName) => SetUsage(new AliasQueryResult() { Name = aliasName });
-
-    ///<inheritdoc/>
-    public void Update(ref Session session)
-    {
-        var action = new SessionDbAction(DB);
-
-        if (session == null) throw new ArgumentNullException(nameof(session));
-        else if (session.Id == 0) action.Create(ref session);
-        else action.Update(session);
-    }
 
     public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateThumbnails(aliases);
 

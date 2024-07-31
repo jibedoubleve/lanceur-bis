@@ -12,8 +12,6 @@ namespace Lanceur.Core.Services
 
         IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<QueryResult> source);
 
-        IEnumerable<SessionExecutableQueryResult> ToSessionExecutableQueryResult(IEnumerable<Session> source);
-
         #endregion Methods
     }
 }

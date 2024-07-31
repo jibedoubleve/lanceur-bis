@@ -71,7 +71,6 @@ namespace Lanceur.Views
                 this.Bind(ViewModel, vm => vm.KeepAlive, v => v.KeepAlive).DisposeWith(d);
 
                 this.OneWayBind(ViewModel, vm => vm.IsBusy, v => v.ProgressBar.Visibility, x => x ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.CurrentSessionName, v => v.CurrentSessionName.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.CurrentAlias, v => v.QueryResults.SelectedItem).DisposeWith(d);
 
                 this.OneWayBind(ViewModel, vm => vm.Results, v => v.QueryResults.ItemsSource).DisposeWith(d);

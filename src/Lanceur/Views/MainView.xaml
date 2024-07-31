@@ -145,19 +145,11 @@
                 <DockPanel Margin="3" LastChildFill="True">
                     <TextBlock
                         VerticalAlignment="Center"
-                        DockPanel.Dock="Left"
+                        HorizontalAlignment="Right"
+                        DockPanel.Dock="Right"
                         Foreground="{DynamicResource TextColourBrush}">
                         <Run x:Name="ResultCounter" />
                         <Run Text="item(s) found." />
-                    </TextBlock>
-                    <TextBlock
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        DockPanel.Dock="Right"
-                        Foreground="{DynamicResource TextColourBrush}" />
-                    <TextBlock HorizontalAlignment="Right" Foreground="{DynamicResource TextColourBrush}">
-                        <Run Text="Session:" />
-                        <Run x:Name="CurrentSessionName" FontWeight="Bold" />
                     </TextBlock>
                 </DockPanel>
             </Border>
