@@ -16,7 +16,7 @@ create table alias_usage (
     id_alias   integer,
     id_session integer,
     time_stamp timestamp default current_timestamp,
-    foreign key(id_alias)   references alias
+    foreign key(id_alias)   references alias,
     foreign key(id_session) references alias_session
 );
 
