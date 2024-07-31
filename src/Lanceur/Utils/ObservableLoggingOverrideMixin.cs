@@ -12,7 +12,7 @@ public static class ObservableLoggingOverrideMixin
 {
     #region Fields
 
-    private static readonly ILogger Logger = Locator.Current.GetService<ILoggerFactory>()?.GetLogger(typeof(ObservableLoggingOverrideMixin)) ?? throw new NullReferenceException();
+    private static readonly ILogger Logger = Locator.Current.GetService<ILoggerFactory>()?.GetLogger(typeof(ObservableLoggingOverrideMixin));
 
     #endregion Fields
 
