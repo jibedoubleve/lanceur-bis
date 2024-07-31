@@ -1,8 +1,9 @@
 assembly-versioning-scheme: MajorMinorPatchTag
 next-version: 2.8.0
 branches:
-  master:
+  feature:
     is-release-branch: true  
+    regex: ^release?[\/-]    
   develop:
     tag: beta
     increment: Patch
