@@ -27,5 +27,7 @@
     <EmbeddedResource Include="SQL\script-0.9.sql" />
     <None Remove="SQL\script-0.15.sql" />
     <EmbeddedResource Include="SQL\script-0.15.sql" />
+    <None Remove="SQL\script-1.0.0.sql" />
+    <EmbeddedResource Include="SQL\script-1.0.0.sql" />
   </ItemGroup>
 </Project>

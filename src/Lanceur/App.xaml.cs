@@ -14,6 +14,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using ScottPlot.Renderable;
+using Serilog;
 
 namespace Lanceur;
 
@@ -52,6 +53,10 @@ public partial class App
         {
             logger.LogCritical(ex, "Application crashed. See error for further information");
             MessageBox.Show(Current.MainWindow, $"A fatal error occured: {ex.Message}");
+        }
+        finally
+        {
+            Bootstrapper.TearDown();
         }
     }
 

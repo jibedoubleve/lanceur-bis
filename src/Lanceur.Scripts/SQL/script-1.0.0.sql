@@ -19,6 +19,7 @@ drop view if exists data_not_used_v;
 drop view if exists stat_execution_count_v;
 drop view if exists stat_history_v;
 drop view if exists data_doubloons_v;
+
 ----------------------------------------
 ---- TABLE ALIAS_USAGE              ----
 ----------------------------------------
@@ -117,37 +118,36 @@ select
     day_of_week      as day_of_week,
     day_name         as day_name
 from (
-         select *
-         from (
-                  select
-                      count(*)   as exec_count,
-                      case cast(strftime('%w', time_stamp) as integer)
-                          when 0 then 7
-                          else cast(strftime('%w', time_stamp) as integer)
-                          end as day_of_week,
-                      case cast(strftime('%w', time_stamp) as integer)
-                          when 0 then 'Sunday'
-                          when 1 then 'Monday'
-                          when 2 then 'Tuesday'
-                          when 3 then 'Wednesday'
-                          when 4 then 'Thursday'
-                          when 5 then 'Friday'
-                          when 6 then 'Saterday'
-                          else 'error'
-                          end as day_name
-                  from
-                      alias_usage
-                  group by
-                      strftime('%w', time_stamp)
-              )
-         union all
-         select
-             w.exec_count  as exec_count,
-             w.day_of_week as day_of_week,
-             w.day_name    as day_name
-         from
-             helper_day_in_week w,
-             alias_session s
+     select *
+     from (
+              select
+                  count(*)   as exec_count,
+                  case cast(strftime('%w', time_stamp) as integer)
+                      when 0 then 7
+                      else cast(strftime('%w', time_stamp) as integer)
+                      end as day_of_week,
+                  case cast(strftime('%w', time_stamp) as integer)
+                      when 0 then 'Sunday'
+                      when 1 then 'Monday'
+                      when 2 then 'Tuesday'
+                      when 3 then 'Wednesday'
+                      when 4 then 'Thursday'
+                      when 5 then 'Friday'
+                      when 6 then 'Saturday'
+                      else 'error'
+                      end as day_name
+              from
+                  alias_usage
+              group by
+                  strftime('%w', time_stamp)
+          )
+     union all
+     select
+         w.exec_count  as exec_count,
+         w.day_of_week as day_of_week,
+         w.day_name    as day_name
+     from
+         helper_day_in_week w
      )
 group by day_of_week
 order by
