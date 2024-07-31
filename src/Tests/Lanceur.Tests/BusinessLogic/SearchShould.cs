@@ -162,7 +162,7 @@ namespace Lanceur.Tests.BusinessLogic
             var stores = Substitute.For<IStoreLoader>();
             stores.Load().Returns(new[] { new AliasStore(repository) });
 
-            var results = repository.Search(criterion, 1).ToList();
+            var results = repository.Search(criterion).ToList();
             var macroManager = Substitute.For<IMacroManager>();
             macroManager.Handle(Arg.Any<QueryResult[]>())
                         .Returns(results);

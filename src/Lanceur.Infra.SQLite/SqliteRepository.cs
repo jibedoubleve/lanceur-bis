@@ -47,31 +47,12 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 
     #region Methods
 
-    /// <summary>
-    /// Returns all the alias of the specified session from the repository.
-    /// If no session is specified, it returns all the alias.
-    /// </summary>
-    /// <param name="idSession">
-    /// The alias should be link the the specified session.
-    /// If no session specified, all the alias are returned
-    /// </param>
-    /// <returns>The alias of the specified session or all if no session
-    /// specified</returns>
-    public IEnumerable<AliasQueryResult> GetAll(long? idSession = null)
-    {
-        idSession ??= GetDefaultSessionId();
-        return _aliasSearchDbAction.Search(idSession: idSession.Value);
-    }
+    /// <inheritdoc />
+    public IEnumerable<AliasQueryResult> GetAll() => _aliasSearchDbAction.Search();
 
     ///<inheritdoc/>
-    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(long? idSession = null)
-    {
-        idSession ??= GetDefaultSessionId();
-        return _getAllAliasDbAction.GetAllAliasWithAdditionalParameters(idSession.Value);
-    }
-
-    ///<inheritdoc/>
-    public long GetDefaultSessionId() => _aliasDbAction.GetDefaultSessionId();
+    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() 
+        => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters();
 
     ///<inheritdoc/>
     public IEnumerable<QueryResult> GetDoubloons()
@@ -94,9 +75,8 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     /// with same name, the one with greater counter is selected.
     /// </summary>
     /// <param name="name">The alias' exact name to find.</param>
-    /// <param name="idSession">The session where the search occurs.</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
-    public AliasQueryResult GetExact(string name, long? idSession = null) => _aliasDbAction.GetExact(name, idSession);
+    public AliasQueryResult GetExact(string name) => _aliasDbAction.GetExact(name);
 
     public IEnumerable<SelectableAliasQueryResult> GetInvalidAliases()
     {
@@ -118,33 +98,29 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public KeywordUsage GetKeyword(string name) => _aliasDbAction.GetHiddenKeyword(name);
 
     ///<inheritdoc/>
-    public IEnumerable<QueryResult> GetMostUsedAliases(long? idSession = null)
+    public IEnumerable<QueryResult> GetMostUsedAliases()
     {
-        idSession ??= GetDefaultSessionId();
         const string sql = @$"
                 select
 	                keywords   as {nameof(DisplayUsageQueryResult.Name)},
                     exec_count as {nameof(DisplayUsageQueryResult.Count)}
                 from
                     stat_execution_count_v
-                where
-                    id_session = @idSession
                 order
                     by exec_count desc";
-        return DB.WithinTransaction(tx => tx.Connection.Query<DisplayUsageQueryResult>(sql, new { idSession }));
+        return DB.WithinTransaction(tx => tx.Connection.Query<DisplayUsageQueryResult>(sql));
     }
 
     ///<inheritdoc/>
-    public IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, long? idSession = null)
+    public IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per)
     {
-        idSession ??= GetDefaultSessionId();
         var action = new HistoryDbAction(DB);
         return per switch
         {
-            Per.Hour => action.PerHour(idSession.Value),
-            Per.Day => action.PerDay(idSession.Value),
-            Per.DayOfWeek => action.PerDayOfWeek(idSession.Value),
-            Per.Month => action.PerMonth(idSession.Value),
+            Per.Hour => action.PerHour(),
+            Per.Day => action.PerDay(),
+            Per.DayOfWeek => action.PerDayOfWeek(),
+            Per.Month => action.PerMonth(),
             _ => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
         };
     }
@@ -237,18 +213,11 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     }
 
     /// <summary>
-    ///     Create a new alias if its id is '0' to the specified session (if not specified, to the default session)
-    ///     If the id exists, it'll update with the new information
+    /// Creates a new alias if the ID is '0'; otherwise, updates the existing alias.
     /// </summary>
-    /// <param name="alias">The alias to create or update</param>
-    /// <param name="idSession">
-    ///     If the alias has to be created, it'll be linked to this session. This argument is ignored if the alias
-    ///     needs to be updated. If not specified, the default session is selected.
-    /// </param>
-    /// <returns>
-    ///     The id of the updated/created alias
-    /// </returns>
-    public void SaveOrUpdate(ref AliasQueryResult alias, long? idSession = null)
+    /// <param name="alias">The alias to create or update.</param>
+    /// <returns>The ID of the created or updated alias.</returns>
+    public void SaveOrUpdate(ref AliasQueryResult alias)
     {
         ArgumentNullException.ThrowIfNull(alias, nameof(alias));
         ArgumentNullException.ThrowIfNull(alias.Synonyms, nameof(alias.Synonyms));
@@ -257,12 +226,11 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         alias.SanitizeSynonyms();
 
         using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
-        idSession ??= GetDefaultSessionId();
 
         switch (alias.Id)
         {
-            case 0 when !_aliasDbAction.SelectNames(alias, idSession.Value):
-                _aliasDbAction.Create(ref alias, idSession.Value);
+            case 0 when !_aliasDbAction.SelectNames(alias):
+                _aliasDbAction.Create(ref alias);
                 _logger.LogInformation("Created new alias {AliasName}", alias.Name);
                 break;
 
@@ -277,34 +245,20 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     }
 
     ///<inheritdoc/>
-    public IEnumerable<AliasQueryResult> Search(string name, long? idSession = null)
+    public IEnumerable<AliasQueryResult> Search(string name)
     {
-        idSession ??= GetDefaultSessionId();
-        return _aliasSearchDbAction.Search(name, idSession.Value);
+        return _aliasSearchDbAction.Search(name);
     }
 
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria, long? idSession = null)
+    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria)
     {
-        idSession ??= GetDefaultSessionId();
-        return _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria, idSession.Value);
+        return _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria);
     }
 
     ///<inheritdoc/>
-    public ExistingNameResponse SelectNames(string[] names, long? idSession = null)
+    public ExistingNameResponse SelectNames(string[] names)
     {
-        idSession ??= GetDefaultSessionId();
-        return _aliasDbAction.SelectNames(names, idSession.Value);
-    }
-
-    public void SetDefaultSession(long idSession)
-    {
-        var sql = @"
-            update settings
-            set
-                s_value = @idSession
-            where
-                lower(s_key) = 'idsession'";
-        DB.WithinTransaction(tx => tx.Connection.Execute(sql, new { idSession }));
+        return _aliasDbAction.SelectNames(names);
     }
 
     public void SetUsage(QueryResult alias)
@@ -321,8 +275,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
             return;
         }
 
-        var idSession = GetDefaultSessionId();
-        _setUsageDbAction.SetUsage(ref alias, idSession);
+        _setUsageDbAction.SetUsage(ref alias);
     }
 
     public void SetUsage(string aliasName) => SetUsage(new AliasQueryResult() { Name = aliasName });

@@ -17,18 +17,14 @@ namespace Lanceur.Core.Repositories
         /// <summary>
         /// Get all the aliases
         /// </summary>
-        /// <param name="idSession">The session linked to the aliases. If null, it'll take the default session</param>
         /// <returns>All the aliases related to the specified session (or the default one if not specified).</returns>
-        IEnumerable<AliasQueryResult> GetAll(long? idSession = null);
+        IEnumerable<AliasQueryResult> GetAll();
 
         /// <summary>
         /// Get all the alias that has additional parameters.
         /// </summary>
-        /// <param name="idSession">The session linked to the aliases. If null, it'll take the default session</param>
         /// <returns>All the aliases related to the specified session (or the default one if not specified).</returns>
-        IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(long? idSession = null);
-
-        long GetDefaultSessionId();
+        IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters();
 
         /// <summary>
         /// Get the list of all the doubloons in the database
@@ -41,7 +37,7 @@ namespace Lanceur.Core.Repositories
         /// </summary>
         /// <param name="name">The name of the alias to find</param>
         /// <returns>The alias to find or null if do not exist</returns>
-        AliasQueryResult GetExact(string name, long? idSession = null);
+        AliasQueryResult GetExact(string name);
 
         IEnumerable<SelectableAliasQueryResult> GetInvalidAliases();
 
@@ -56,17 +52,15 @@ namespace Lanceur.Core.Repositories
         /// Get list of all the aliases with count greater than 0 and from the specified session
         /// If no session is specified, it'll take the default one
         /// </summary>
-        /// <param name="idSession"></param>
         /// <returns>The list of aliases</returns>
-        IEnumerable<QueryResult> GetMostUsedAliases(long? idSession = null);
+        IEnumerable<QueryResult> GetMostUsedAliases();
 
         /// <summary>
         /// Returns usage trends. The result is meant to be dislayed as a chart
         /// </summary>
         /// <param name="per">The level of the trend. Can be hour, day, day of week or month</param>
-        /// <param name="idSession">The session used to retrieve the usage</param>
         /// <returns>Points of the chart</returns>
-        IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, long? idSession = null);
+        IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per);
 
         /// <summary>
         /// Update the id and the counter of <paramref name="queryResult"/>
@@ -107,20 +101,15 @@ namespace Lanceur.Core.Repositories
         /// If the id exists, it'll update with the new information
         /// </summary>
         /// <param name="alias">The alias to create or update. In case of creation, if id will be set</param>
-        /// <param name="idSession">
-        /// If the alias has to be created, it'll be linked to this session. This argument is ignored if the alias
-        /// needs to be updated. If not specified, the default session is selected.
-        /// </param>
-        void SaveOrUpdate(ref AliasQueryResult alias, long? idSession = null);
+        void SaveOrUpdate(ref AliasQueryResult alias);
 
         /// <summary>
         /// Search all the alias that correspond to the criterion and that are linked to the specified session.
         /// If session is omitted, the default session is selected
         /// </summary>
         /// <param name="criteria">Criteria to find the aliases</param>
-        /// <param name="idSession">ID of the session</param>
         /// <returns>Resulting aliases</returns>
-        IEnumerable<AliasQueryResult> Search(string criteria, long? idSession = null);
+        IEnumerable<AliasQueryResult> Search(string criteria);
 
         /// <summary>
         /// Search all the alias with additional parameters that
@@ -129,19 +118,15 @@ namespace Lanceur.Core.Repositories
         /// session is selected
         /// </summary>
         /// <param name="criteria">Criteria to find the aliases</param>
-        /// <param name="idSession">ID of the session</param>
         /// <returns>Resulting aliases</returns>
-        IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria, long? idSession = null);
+        IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria);
 
         /// <summary>
         /// Returns all the names that exists in the database AND in the specified list of <see cref="names"/>
         /// </summary>
         /// <param name="names">The names to find in the database</param>
-        /// <param name="idSession">The id of the session. If not specified, will take default session</param>
         /// <returns></returns>
-        public ExistingNameResponse SelectNames(string[] names, long? idSession = null);
-
-        void SetDefaultSession(long idSession);
+        public ExistingNameResponse SelectNames(string[] names);
 
         /// <summary>
         /// Increment counter for execution of an alias. This is the recommended way to
