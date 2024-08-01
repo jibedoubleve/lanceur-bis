@@ -182,7 +182,7 @@ public class Bootstrapper
                                              Get<IConnectionString>().ToString(),
                                              Get<ILoggerFactory>())
         );
-        l.Register<IDbConnectionManager>(() => new DbMultiConnectionManager(Get<SQLiteConnectionFactory>()));
+        l.Register<IDbConnectionManager>(() => new DbMultiConnectionManager(Get<IDbConnectionFactory>()));
 
         l.Register<IConnectionString>(() => new ConnectionString(Get<ILocalConfigRepository>()));
 
