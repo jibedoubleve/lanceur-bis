@@ -94,7 +94,7 @@ public class Bootstrapper
                                                   rollingInterval: RollingInterval.Day
                                               )
                                               .WriteTo.Console()
-                                              .WriteTo.Seq(Paths.LogUrl)
+                                              .WriteTo.Seq(Paths.TelemetryUrl)
                                               .CreateLogger();
         _serviceProvider = new ServiceCollection().AddLogging(b => b.AddSerilog(Log.Logger))
                                                   .BuildServiceProvider();
