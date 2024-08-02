@@ -7,7 +7,7 @@ public static class Paths
 {
     #region Fields
 
-    private static readonly Conditional<string> LogUrlValue = new("http://localhost:5341", "http://ec2-15-237-113-93.eu-west-3.compute.amazonaws.com:5341");
+    private static readonly Conditional<string> LogUrlValue = new("http://localhost:5341", "http://ec2-35-180-121-110.eu-west-3.compute.amazonaws.com:5341");
 
     #endregion Fields
 
