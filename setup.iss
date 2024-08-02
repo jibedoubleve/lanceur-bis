@@ -38,10 +38,20 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-; Name: startup; Description: "Automatically start on login"; GroupDescription: "{cm:AdditionalIcons}"
+; Chose how the appplications starts up
+Name: "startregistry"; Description: "Start the application via the registry"; GroupDescription: "Startup options"
+Name: "starttask"; Description: "Start the application via a scheduled task"; GroupDescription: "Startup options"
 
 [Registry]
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Lanceur 2"; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletevalue
+
+[Run]
+Filename: "schtasks"; \
+    Parameters: "/Create /F /SC ONLOGON /TN ""Autorun Lanceur 2"" /TR ""'{app}\{#MyAppExeName}' par1"""; \
+    Flags: runhidden
+
+[UninstallRun]
+Filename: "schtasks"; Parameters: "/Delete /TN {#MyAppName} /F"; Flags: runhidden
 
 [Files]
 Source: "{#BinDirectory}{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
