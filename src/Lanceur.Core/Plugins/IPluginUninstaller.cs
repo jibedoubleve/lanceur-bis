@@ -1,22 +1,21 @@
-﻿namespace Lanceur.Core.Plugins
+﻿namespace Lanceur.Core.Plugins;
+
+public interface IPluginUninstaller
 {
-    public interface IPluginUninstaller
-    {
-        #region Properties
+    #region Properties
 
-        /// <summary>
-        /// Represents the plugins the user asked to delete
-        /// </summary>
-        public IEnumerable<IPluginManifest> UninstallationCandidates { get; }
+    /// <summary>
+    /// Represents the plugins the user asked to delete
+    /// </summary>
+    public IEnumerable<IPluginManifest> UninstallationCandidates { get; }
 
-        #endregion Properties
+    #endregion Properties
 
-        #region Methods
+    #region Methods
 
-        Task<bool> HasMaintenanceAsync();
+    Task<bool> HasMaintenanceAsync();
 
-        Task SubscribeForUninstallAsync(IPluginManifest pluginManifest);
+    Task SubscribeForUninstallAsync(IPluginManifest pluginManifest);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

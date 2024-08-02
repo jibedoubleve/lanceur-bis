@@ -21,7 +21,7 @@ public static class ObservableLoggingOverrideMixin
     private static void WriteLog(LogLevel logLevel, string message, params object[] arguments)
     {
         if (Logger is null) return;
-        
+
         switch (logLevel)
         {
             case LogLevel.Trace:
@@ -68,20 +68,21 @@ public static class ObservableLoggingOverrideMixin
         this IObservable<T> @this,
         string message,
         Func<T, string> stringifier = null,
-        LogLevel logLevel = LogLevel.Trace)
+        LogLevel logLevel = LogLevel.Trace
+    )
     {
         if (stringifier is not null)
-        {
             return @this.Do(
                 x => WriteLog(logLevel, "{0} OnNext: {1}", message, stringifier(x)),
                 ex => Logger.LogWarning(ex, "{Message}. OnError", message),
-                () => WriteLog(logLevel, "{0} OnCompleted", message));
-        }
+                () => WriteLog(logLevel, "{0} OnCompleted", message)
+            );
 
         return @this.Do(
             x => WriteLog(logLevel, "{0} OnNext: {1}", message, x),
             ex => Logger.LogWarning(ex, "{Message}  OnError", message),
-            () => WriteLog(logLevel, "{0} OnCompleted", message));
+            () => WriteLog(logLevel, "{0} OnCompleted", message)
+        );
     }
 
     #endregion Methods

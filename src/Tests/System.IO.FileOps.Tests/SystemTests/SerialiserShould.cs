@@ -64,7 +64,8 @@ public class SerialiserShould : IDisposable
         var deserializedScheduler = await OperationSchedulerFactory.RetrieveFromFileAsync(_jsonFile);
         deserializedScheduler.GetState()
                              .OperationCount
-                             .Should().Be(2);
+                             .Should()
+                             .Be(2);
     }
 
     public void Dispose()
@@ -101,14 +102,17 @@ public class SerialiserShould : IDisposable
 
         // ASSERT
         Directory.Exists(_directory)
-                 .Should().BeFalse();
+                 .Should()
+                 .BeFalse();
 
         File.Exists(_jsonFile)
-            .Should().BeTrue($"'{_jsonFile}' should exist");
+            .Should()
+            .BeTrue($"'{_jsonFile}' should exist");
 
         Directory.GetFiles(_destinationDir)
                  .Length
-                 .Should().BeGreaterThan(0);
+                 .Should()
+                 .BeGreaterThan(0);
     }
 
     #endregion Methods

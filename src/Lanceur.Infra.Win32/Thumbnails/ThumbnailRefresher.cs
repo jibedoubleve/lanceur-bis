@@ -43,11 +43,11 @@ public class ThumbnailRefresher : IThumbnailRefresher
         if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon) return;
 
         var filePath = alias.FileName.ToAbsolutePath();
-        if (File.Exists(filePath)) alias.Thumbnail = filePath;
+        if (File.Exists(filePath)) { alias.Thumbnail = filePath; }
         else if (alias.IsPackagedApplication())
         {
             var response = (await _searchService.GetByInstalledDirectory(alias.FileName))
-                                                .FirstOrDefault();
+                .FirstOrDefault();
             if (response is not null)
             {
                 alias.Thumbnail = response.Logo.LocalPath;

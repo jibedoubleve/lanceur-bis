@@ -1,13 +1,12 @@
 ﻿using Lanceur.Core.Models.Settings;
 
-namespace Lanceur.Core.Repositories.Config
+namespace Lanceur.Core.Repositories.Config;
+
+public interface IAppConfigRepository : IConfigRepository<AppConfig>
 {
-    public interface IAppConfigRepository : IConfigRepository<AppConfig>
-    {
-        #region Methods
+    #region Methods
 
-        void Edit(Action<AppConfig> action);
+    void Edit(Action<AppConfig> action);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

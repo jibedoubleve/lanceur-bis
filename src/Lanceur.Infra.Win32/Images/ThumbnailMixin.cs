@@ -28,6 +28,7 @@ public static class ThumbnailMixin
         lock (Locker)
         {
             if (File.Exists(destination)) return;
+
             if (!Directory.Exists(Paths.ImageRepository)) Directory.CreateDirectory(Paths.ImageRepository);
             if (imageSource is not BitmapSource bitmapSource) return;
 

@@ -21,12 +21,8 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
 
     #region Constructors
 
-    public DbSingleConnectionManager(IDbConnection connection)
-    {
-        Connection =
-            connection
-            ?? throw new ArgumentNullException(nameof(connection), "Cannot create a connection scope with an empty connection (NULL).");
-    }
+    public DbSingleConnectionManager(IDbConnection connection) => Connection =
+        connection ?? throw new ArgumentNullException(nameof(connection), "Cannot create a connection scope with an empty connection (NULL).");
 
     #endregion Constructors
 
@@ -36,11 +32,13 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
 
     public void WithinTransaction(Action<IDbTransaction> action)
     {
-        WithinTransaction(tx =>
-        {
-            action(tx);
-            return default(object);
-        });
+        WithinTransaction(
+            tx =>
+            {
+                action(tx);
+                return default(object);
+            }
+        );
     }
 
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)

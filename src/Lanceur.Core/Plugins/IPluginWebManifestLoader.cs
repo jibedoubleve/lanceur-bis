@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core.Plugins
+﻿namespace Lanceur.Core.Plugins;
+
+public interface IPluginWebManifestLoader
 {
-    public interface IPluginWebManifestLoader
-    {
-        #region Methods
+    #region Methods
 
-        Task<IEnumerable<IPluginWebManifest>> LoadFromWebAsync();
+    Task<IEnumerable<IPluginWebManifest>> LoadFromWebAsync();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

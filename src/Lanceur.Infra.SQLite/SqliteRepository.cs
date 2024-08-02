@@ -30,7 +30,8 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public SQLiteRepository(
         IDbConnectionManager manager,
         ILoggerFactory logFactory,
-        IConversionService converter) : base(manager)
+        IConversionService converter
+    ) : base(manager)
     {
         ArgumentNullException.ThrowIfNull(logFactory);
         ArgumentNullException.ThrowIfNull(converter);
@@ -51,8 +52,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public IEnumerable<AliasQueryResult> GetAll() => _aliasSearchDbAction.Search();
 
     ///<inheritdoc/>
-    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() 
-        => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters();
+    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters();
 
     ///<inheritdoc/>
     public IEnumerable<QueryResult> GetDoubloons()
@@ -84,11 +84,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         var abs = new Regex(@"[a-zA-Z]:\\");
 
         var result = from a in GetAll()
-                     where a.Description != null
-                           && Uri.TryCreate(a.Description, UriKind.RelativeOrAbsolute, out _)
-                           && File.Exists(a.Description) == false
-                           && macro.IsMatch(a.Description) == false
-                           && abs.IsMatch(a.Description)
+                     where a.Description != null && Uri.TryCreate(a.Description, UriKind.RelativeOrAbsolute, out _) && File.Exists(a.Description) == false && macro.IsMatch(a.Description) == false && abs.IsMatch(a.Description)
                      select a;
 
         return _converter.ToSelectableQueryResult(result);
@@ -117,11 +113,11 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         var action = new HistoryDbAction(DB);
         return per switch
         {
-            Per.Hour => action.PerHour(),
-            Per.Day => action.PerDay(),
+            Per.Hour      => action.PerHour(),
+            Per.Day       => action.PerDay(),
             Per.DayOfWeek => action.PerDayOfWeek(),
-            Per.Month => action.PerMonth(),
-            _ => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
+            Per.Month     => action.PerMonth(),
+            _             => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
         };
     }
 
@@ -184,22 +180,23 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
             group by
 	            a.id;";
 
-        DB.WithinTransaction(tx =>
-        {
-            var results = tx.Connection.Query<dynamic>(sql, new { name = alias.Name });
+        DB.WithinTransaction(
+            tx =>
+            {
+                var results = tx.Connection.Query<dynamic>(sql, new { name = alias.Name });
 
-            var enumerable = results as dynamic[] ?? results.ToArray();
-            if (enumerable.Length != 1) return;
+                var enumerable = results as dynamic[] ?? results.ToArray();
+                if (enumerable.Length != 1) return;
 
-            var item = enumerable.ElementAt(0);
-            alias.Id = item.Id;
-            alias.Count = (int)item.Count;
-        });
+                var item = enumerable.ElementAt(0);
+                alias.Id = item.Id;
+                alias.Count = (int)item.Count;
+            }
+        );
     }
 
     ///<inheritdoc/>
-    public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) =>
-        _aliasDbAction.RefreshUsage(result);
+    public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => _aliasDbAction.RefreshUsage(result);
 
     ///<inheritdoc/>
     public void Remove(AliasQueryResult alias) => _aliasDbAction.Remove(alias);
@@ -218,7 +215,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         ArgumentNullException.ThrowIfNull(alias, nameof(alias));
         ArgumentNullException.ThrowIfNull(alias.Synonyms, nameof(alias.Synonyms));
         ArgumentNullException.ThrowIfNull(alias.Id, nameof(alias.Id));
-        
+
         alias.SanitizeSynonyms();
 
         using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
@@ -243,14 +240,10 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     ///<inheritdoc/>
     public IEnumerable<AliasQueryResult> Search(string name) => _aliasSearchDbAction.Search(name);
 
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) 
-        => _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria);
+    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria);
 
     ///<inheritdoc/>
-    public ExistingNameResponse SelectNames(string[] names)
-    {
-        return _aliasDbAction.SelectNames(names);
-    }
+    public ExistingNameResponse SelectNames(string[] names) => _aliasDbAction.SelectNames(names);
 
     public void SetUsage(QueryResult alias)
     {

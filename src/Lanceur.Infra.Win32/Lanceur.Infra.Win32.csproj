@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj" />
-      <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
+        <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj"/>
+        <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj"/>
     </ItemGroup>
 
 </Project>

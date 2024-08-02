@@ -1,250 +1,250 @@
 ﻿<?xml version="1.0"?>
 
 <SyntaxDefinition name="LUA" extensions=".lua" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
-	<Color name="Comment"       foreground="Gray"       fontStyle="oblique"     exampleText="-- comment" />
-	<Color name="String"        foreground="#FF5E5EAE"                          exampleText="text = &quot;Hello, World!&quot;" />
-	<Color name="Operators"     foreground="#FFFF0F27"                          exampleText="= + * /" />
-	<Color name="Keywords"      foreground="#FF569CD6"   fontWeight="bold"      exampleText="if then else end function" />
-	<Color name="Extra"         foreground="#FFE07534"   fontWeight="bold"      exampleText="self" />
-	<Color name="Functions"     foreground="#FF0080C0"   fontWeight="bold"      exampleText="print" />
-	<Color name="Number"        foreground="#FF9812C1"                          exampleText="123 0x45" />
-	<Color name="Class"         foreground="Crimson"                            exampleText="context" />
-	<Color name="ClassMembers"  foreground="#FF7910C0"                          exampleText="context.FileName" />
+    <Color name="Comment" foreground="Gray" fontStyle="oblique" exampleText="-- comment"/>
+    <Color name="String" foreground="#FF5E5EAE" exampleText="text = &quot;Hello, World!&quot;"/>
+    <Color name="Operators" foreground="#FFFF0F27" exampleText="= + * /"/>
+    <Color name="Keywords" foreground="#FF569CD6" fontWeight="bold" exampleText="if then else end function"/>
+    <Color name="Extra" foreground="#FFE07534" fontWeight="bold" exampleText="self"/>
+    <Color name="Functions" foreground="#FF0080C0" fontWeight="bold" exampleText="print"/>
+    <Color name="Number" foreground="#FF9812C1" exampleText="123 0x45"/>
+    <Color name="Class" foreground="Crimson" exampleText="context"/>
+    <Color name="ClassMembers" foreground="#FF7910C0" exampleText="context.FileName"/>
 
-	<RuleSet ignoreCase="false">
+    <RuleSet ignoreCase="false">
 
-		<Span color="Comment" multiline="true">
-			<Begin><![CDATA[--\[\[]]></Begin>
-			<End><![CDATA[]]]]></End>
-		</Span>
+        <Span color="Comment" multiline="true">
+            <Begin><![CDATA[--\[\[]]></Begin>
+            <End><![CDATA[]]]]></End>
+        </Span>
 
-		<Span color="Comment">
-			<Begin>--</Begin>
-		</Span>
+        <Span color="Comment">
+            <Begin>--</Begin>
+        </Span>
 
-		<Span color="String" multiline="true">
-			<Begin><![CDATA[\[\[]]></Begin>
-			<End><![CDATA[]]]]></End>
-			<RuleSet>
-				<Span begin="\\" end="." />
-			</RuleSet>
-		</Span>
+        <Span color="String" multiline="true">
+            <Begin><![CDATA[\[\[]]></Begin>
+            <End><![CDATA[]]]]></End>
+            <RuleSet>
+                <Span begin="\\" end="."/>
+            </RuleSet>
+        </Span>
 
-		<Span color="String">
-			<Begin>'</Begin>
-			<End>'</End>
-			<RuleSet>
-				<Span begin="\\" end="." />
-			</RuleSet>
-		</Span>
+        <Span color="String">
+            <Begin>'</Begin>
+            <End>'</End>
+            <RuleSet>
+                <Span begin="\\" end="."/>
+            </RuleSet>
+        </Span>
 
-		<Span color="String">
-			<Begin>"</Begin>
-			<End>"</End>
-			<RuleSet>
-				<Span begin="\\" end="." />
-			</RuleSet>
-		</Span>
+        <Span color="String">
+            <Begin>"</Begin>
+            <End>"</End>
+            <RuleSet>
+                <Span begin="\\" end="."/>
+            </RuleSet>
+        </Span>
 
-		<Keywords color="Class">
-			<Word>context</Word>
-		</Keywords>
+        <Keywords color="Class">
+            <Word>context</Word>
+        </Keywords>
 
-		<Keywords color="ClassMembers">
-			<Word>FileName</Word>
-			<Word>Parameters</Word>
-		</Keywords>
+        <Keywords color="ClassMembers">
+            <Word>FileName</Word>
+            <Word>Parameters</Word>
+        </Keywords>
 
-		<Keywords color="Extra" fontStyle="oblique">
-			<Word>self</Word>
-		</Keywords>
+        <Keywords color="Extra" fontStyle="oblique">
+            <Word>self</Word>
+        </Keywords>
 
-		<Keywords color="Operators" fontStyle="oblique">
-			<Word><![CDATA[+]]></Word>
-			<Word><![CDATA[-]]></Word>
-			<Word><![CDATA[*]]></Word>
-			<Word><![CDATA[/]]></Word>
-			<Word><![CDATA[%]]></Word>
-			<Word><![CDATA[^]]></Word>
-			<Word><![CDATA[#]]></Word>
-			<Word><![CDATA[==]]></Word>
-			<Word><![CDATA[~=]]></Word>
-			<Word><![CDATA[<=]]></Word>
-			<Word><![CDATA[>=]]></Word>
-			<Word><![CDATA[<]]></Word>
-			<Word><![CDATA[>]]></Word>
-			<Word><![CDATA[=]]></Word>
-			<Word><![CDATA[(]]></Word>
-			<Word><![CDATA[)]]></Word>
-			<Word><![CDATA[{]]></Word>
-			<Word><![CDATA[}]]></Word>
-			<Word><![CDATA[[]]></Word>
-			<Word><![CDATA[]]]></Word>
-			<Word><![CDATA[;]]></Word>
-			<Word><![CDATA[:]]></Word>
-			<Word><![CDATA[,]]></Word>
-			<Word><![CDATA[.]]></Word>
-			<Word><![CDATA[..]]></Word>
-			<Word><![CDATA[...]]></Word>
-		</Keywords>
+        <Keywords color="Operators" fontStyle="oblique">
+            <Word><![CDATA[+]]></Word>
+            <Word><![CDATA[-]]></Word>
+            <Word><![CDATA[*]]></Word>
+            <Word><![CDATA[/]]></Word>
+            <Word><![CDATA[%]]></Word>
+            <Word><![CDATA[^]]></Word>
+            <Word><![CDATA[#]]></Word>
+            <Word><![CDATA[==]]></Word>
+            <Word><![CDATA[~=]]></Word>
+            <Word><![CDATA[<=]]></Word>
+            <Word><![CDATA[>=]]></Word>
+            <Word><![CDATA[<]]></Word>
+            <Word><![CDATA[>]]></Word>
+            <Word><![CDATA[=]]></Word>
+            <Word><![CDATA[(]]></Word>
+            <Word><![CDATA[)]]></Word>
+            <Word><![CDATA[{]]></Word>
+            <Word><![CDATA[}]]></Word>
+            <Word><![CDATA[[]]></Word>
+            <Word><![CDATA[]]]></Word>
+            <Word><![CDATA[;]]></Word>
+            <Word><![CDATA[:]]></Word>
+            <Word><![CDATA[,]]></Word>
+            <Word><![CDATA[.]]></Word>
+            <Word><![CDATA[..]]></Word>
+            <Word><![CDATA[...]]></Word>
+        </Keywords>
 
-		<Keywords color="Keywords">
-			<Word>and</Word>
-			<Word>break</Word>
-			<Word>do</Word>
-			<Word>else</Word>
-			<Word>elseif</Word>
-			<Word>end</Word>
-			<Word>false</Word>
-			<Word>for</Word>
-			<Word>function</Word>
-			<Word>if</Word>
-			<Word>in</Word>
-			<Word>local</Word>
-			<Word>nil</Word>
-			<Word>not</Word>
-			<Word>or</Word>
-			<Word>repeat</Word>
-			<Word>return</Word>
-			<Word>then</Word>
-			<Word>true</Word>
-			<Word>until</Word>
-			<Word>while</Word>
-		</Keywords>
+        <Keywords color="Keywords">
+            <Word>and</Word>
+            <Word>break</Word>
+            <Word>do</Word>
+            <Word>else</Word>
+            <Word>elseif</Word>
+            <Word>end</Word>
+            <Word>false</Word>
+            <Word>for</Word>
+            <Word>function</Word>
+            <Word>if</Word>
+            <Word>in</Word>
+            <Word>local</Word>
+            <Word>nil</Word>
+            <Word>not</Word>
+            <Word>or</Word>
+            <Word>repeat</Word>
+            <Word>return</Word>
+            <Word>then</Word>
+            <Word>true</Word>
+            <Word>until</Word>
+            <Word>while</Word>
+        </Keywords>
 
-		<Keywords color="Functions">
-			<Word>abs</Word>
-			<Word>acos</Word>
-			<Word>acos</Word>
-			<Word>asin</Word>
-			<Word>asin</Word>
-			<Word>assert</Word>
-			<Word>atan</Word>
-			<Word>atan</Word>
-			<Word>atan2</Word>
-			<Word>atan2</Word>
-			<Word>ceil</Word>
-			<Word>collectgarbage</Word>
-			<Word>cos</Word>
-			<Word>cos</Word>
-			<Word>date</Word>
-			<Word>debugbreak</Word>
-			<Word>debugdump</Word>
-			<Word>debughook</Word>
-			<Word>debuginfo</Word>
-			<Word>debugload</Word>
-			<Word>debuglocals</Word>
-			<Word>debugprint</Word>
-			<Word>debugprofilestart</Word>
-			<Word>debugprofilestop</Word>
-			<Word>debugstack</Word>
-			<Word>debugtimestamp</Word>
-			<Word>deg</Word>
-			<Word>difftime</Word>
-			<Word>error</Word>
-			<Word>exp</Word>
-			<Word>floor</Word>
-			<Word>forceinsecure</Word>
-			<Word>foreach</Word>
-			<Word>foreachi</Word>
-			<Word>format</Word>
-			<Word>frexp</Word>
-			<Word>gcinfo</Word>
-			<Word>geterrorhandler</Word>
-			<Word>getfenv</Word>
-			<Word>getglobal</Word>
-			<Word>getmetatable</Word>
-			<Word>getn</Word>
-			<Word>getprinthandler</Word>
-			<Word>gmatch</Word>
-			<Word>gsub</Word>
-			<Word>hooksecurefunc</Word>
-			<Word>ipairs</Word>
-			<Word>issecure</Word>
-			<Word>issecurevariable</Word>
-			<Word>ldexp</Word>
-			<Word>loadstring</Word>
-			<Word>log</Word>
-			<Word>log10</Word>
-			<Word>max</Word>
-			<Word>message</Word>
-			<Word>min</Word>
-			<Word>mod</Word>
-			<Word>newproxy</Word>
-			<Word>next</Word>
-			<Word>pairs</Word>
-			<Word>pcall</Word>
-			<Word>print</Word>
-			<Word>rad</Word>
-			<Word>random</Word>
-			<Word>rawequal</Word>
-			<Word>rawget</Word>
-			<Word>rawset</Word>
-			<Word>scrub</Word>
-			<Word>securecall</Word>
-			<Word>select</Word>
-			<Word>seterrorhandler</Word>
-			<Word>setfenv</Word>
-			<Word>setglobal</Word>
-			<Word>setmetatable</Word>
-			<Word>setprinthandler</Word>
-			<Word>sin</Word>
-			<Word>sin</Word>
-			<Word>sort</Word>
-			<Word>sqrt</Word>
-			<Word>strbyte</Word>
-			<Word>strchar</Word>
-			<Word>strconcat</Word>
-			<Word>strfind</Word>
-			<Word>strjoin</Word>
-			<Word>strlen</Word>
-			<Word>strlenutf8</Word>
-			<Word>strlower</Word>
-			<Word>strmatch</Word>
-			<Word>strrep</Word>
-			<Word>strrev</Word>
-			<Word>strsplit</Word>
-			<Word>strsub</Word>
-			<Word>strtrim</Word>
-			<Word>strupper</Word>
-			<Word>tContains</Word>
-			<Word>tDelete</Word>
-			<Word>tan</Word>
-			<Word>tan</Word>
-			<Word>time</Word>
-			<Word>tinsert</Word>
-			<Word>tonumber</Word>
-			<Word>tostring</Word>
-			<Word>tostringall</Word>
-			<Word>tremove</Word>
-			<Word>type</Word>
-			<Word>unpack</Word>
-			<Word>wipe</Word>
-			<Word>xpcall</Word>
-			<Word>table</Word>
-			<Word>insert</Word>
-			<Word>remove</Word>
-			<Word>setn</Word>
-			<Word>getn</Word>
-			<Word>foreach</Word>
-			<Word>foreachi</Word>
-			<Word>bit</Word>
-			<Word>bit</Word>
-			<Word>band</Word>
-			<Word>bor</Word>
-			<Word>bnot</Word>
-			<Word>bxor</Word>
-		</Keywords>
+        <Keywords color="Functions">
+            <Word>abs</Word>
+            <Word>acos</Word>
+            <Word>acos</Word>
+            <Word>asin</Word>
+            <Word>asin</Word>
+            <Word>assert</Word>
+            <Word>atan</Word>
+            <Word>atan</Word>
+            <Word>atan2</Word>
+            <Word>atan2</Word>
+            <Word>ceil</Word>
+            <Word>collectgarbage</Word>
+            <Word>cos</Word>
+            <Word>cos</Word>
+            <Word>date</Word>
+            <Word>debugbreak</Word>
+            <Word>debugdump</Word>
+            <Word>debughook</Word>
+            <Word>debuginfo</Word>
+            <Word>debugload</Word>
+            <Word>debuglocals</Word>
+            <Word>debugprint</Word>
+            <Word>debugprofilestart</Word>
+            <Word>debugprofilestop</Word>
+            <Word>debugstack</Word>
+            <Word>debugtimestamp</Word>
+            <Word>deg</Word>
+            <Word>difftime</Word>
+            <Word>error</Word>
+            <Word>exp</Word>
+            <Word>floor</Word>
+            <Word>forceinsecure</Word>
+            <Word>foreach</Word>
+            <Word>foreachi</Word>
+            <Word>format</Word>
+            <Word>frexp</Word>
+            <Word>gcinfo</Word>
+            <Word>geterrorhandler</Word>
+            <Word>getfenv</Word>
+            <Word>getglobal</Word>
+            <Word>getmetatable</Word>
+            <Word>getn</Word>
+            <Word>getprinthandler</Word>
+            <Word>gmatch</Word>
+            <Word>gsub</Word>
+            <Word>hooksecurefunc</Word>
+            <Word>ipairs</Word>
+            <Word>issecure</Word>
+            <Word>issecurevariable</Word>
+            <Word>ldexp</Word>
+            <Word>loadstring</Word>
+            <Word>log</Word>
+            <Word>log10</Word>
+            <Word>max</Word>
+            <Word>message</Word>
+            <Word>min</Word>
+            <Word>mod</Word>
+            <Word>newproxy</Word>
+            <Word>next</Word>
+            <Word>pairs</Word>
+            <Word>pcall</Word>
+            <Word>print</Word>
+            <Word>rad</Word>
+            <Word>random</Word>
+            <Word>rawequal</Word>
+            <Word>rawget</Word>
+            <Word>rawset</Word>
+            <Word>scrub</Word>
+            <Word>securecall</Word>
+            <Word>select</Word>
+            <Word>seterrorhandler</Word>
+            <Word>setfenv</Word>
+            <Word>setglobal</Word>
+            <Word>setmetatable</Word>
+            <Word>setprinthandler</Word>
+            <Word>sin</Word>
+            <Word>sin</Word>
+            <Word>sort</Word>
+            <Word>sqrt</Word>
+            <Word>strbyte</Word>
+            <Word>strchar</Word>
+            <Word>strconcat</Word>
+            <Word>strfind</Word>
+            <Word>strjoin</Word>
+            <Word>strlen</Word>
+            <Word>strlenutf8</Word>
+            <Word>strlower</Word>
+            <Word>strmatch</Word>
+            <Word>strrep</Word>
+            <Word>strrev</Word>
+            <Word>strsplit</Word>
+            <Word>strsub</Word>
+            <Word>strtrim</Word>
+            <Word>strupper</Word>
+            <Word>tContains</Word>
+            <Word>tDelete</Word>
+            <Word>tan</Word>
+            <Word>tan</Word>
+            <Word>time</Word>
+            <Word>tinsert</Word>
+            <Word>tonumber</Word>
+            <Word>tostring</Word>
+            <Word>tostringall</Word>
+            <Word>tremove</Word>
+            <Word>type</Word>
+            <Word>unpack</Word>
+            <Word>wipe</Word>
+            <Word>xpcall</Word>
+            <Word>table</Word>
+            <Word>insert</Word>
+            <Word>remove</Word>
+            <Word>setn</Word>
+            <Word>getn</Word>
+            <Word>foreach</Word>
+            <Word>foreachi</Word>
+            <Word>bit</Word>
+            <Word>bit</Word>
+            <Word>band</Word>
+            <Word>bor</Word>
+            <Word>bnot</Word>
+            <Word>bxor</Word>
+        </Keywords>
 
-		<Rule color="Number">
-			\b0[xX][0-9a-fA-F]+  # hex number
-			|
-			(	\b\d+(\.[0-9]+)?   # number with optional floating point
-			|	\.[0-9]+           # or just starting with floating point
-			)
-			([eE][+-]?[0-9]+)?   # optional exponent
-		</Rule>
+        <Rule color="Number">
+            \b0[xX][0-9a-fA-F]+ # hex number
+            |
+            ( \b\d+(\.[0-9]+)? # number with optional floating point
+            | \.[0-9]+ # or just starting with floating point
+            )
+            ([eE][+-]?[0-9]+)? # optional exponent
+        </Rule>
 
-		<Rule color="Number">\b0[xX][0-9a-fA-F]+|(\b\d+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?</Rule>
-	</RuleSet>
+        <Rule color="Number">\b0[xX][0-9a-fA-F]+|(\b\d+(\.[0-9]+)?|\.[0-9]+)([eE][+-]?[0-9]+)?</Rule>
+    </RuleSet>
 </SyntaxDefinition>

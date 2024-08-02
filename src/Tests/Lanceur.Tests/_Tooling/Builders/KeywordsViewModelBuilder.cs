@@ -25,18 +25,15 @@ internal class KeywordsViewModelBuilder
 
     #region Methods
 
-    public KeywordsViewModel Build()
-    {
-        return new(
-            logFactory: _loggerFactory ?? throw new ArgumentNullException(nameof(_loggerFactory), "Log factory is mandatory"),
-            searchService: _dbRepository ?? Substitute.For<IDbRepository>(),
-            packagedAppSearchService: _packagedAppSearchService ?? Substitute.For<IPackagedAppSearchService>(),
-            schedulers: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
-            notify: Substitute.For<IUserNotification>(),
-            thumbnailManager: Substitute.For<IThumbnailManager>(),
-            notification: Substitute.For<INotification>()
-        );
-    }
+    public KeywordsViewModel Build() => new(
+        _loggerFactory ?? throw new ArgumentNullException(nameof(_loggerFactory), "Log factory is mandatory"),
+        _dbRepository ?? Substitute.For<IDbRepository>(),
+        packagedAppSearchService: _packagedAppSearchService ?? Substitute.For<IPackagedAppSearchService>(),
+        schedulers: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
+        notify: Substitute.For<IUserNotification>(),
+        thumbnailManager: Substitute.For<IThumbnailManager>(),
+        notification: Substitute.For<INotification>()
+    );
 
     public KeywordsViewModelBuilder With(IDbRepository dbRepository)
     {

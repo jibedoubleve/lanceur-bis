@@ -16,17 +16,11 @@ public class PluginUninstallShould
     {
         // ARRANGE
         var manifest = new PluginManifest() { Dll = "A", Version = new("1.0.0") };
-        var localManifests = new IPluginManifest[]
-        {
-            manifest
-        };
+        var localManifests = new IPluginManifest[] { manifest };
         var localManifestRepository = Substitute.For<IPluginManifestRepository>();
         localManifestRepository.GetPluginManifests().Returns(localManifests);
 
-        var webManifests = new IPluginWebManifest[]
-        {
-            new PluginWebManifest() { Dll = "A", Version = new("1.0.0") }
-        };
+        var webManifests = new IPluginWebManifest[] { new PluginWebManifest() { Dll = "A", Version = new("1.0.0") } };
         var webManifestRepository = Substitute.For<IPluginWebManifestLoader>();
         webManifestRepository.LoadFromWebAsync().Returns(webManifests);
 

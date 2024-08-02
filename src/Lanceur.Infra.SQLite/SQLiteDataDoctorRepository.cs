@@ -18,8 +18,7 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
 
     #region Constructors
 
-    public SQLiteDataDoctorRepository(IDbConnectionManager manager, ILoggerFactory loggerFactory, IConversionService converter) : base(manager) 
-        => _dbAction = new(DB, loggerFactory, converter);
+    public SQLiteDataDoctorRepository(IDbConnectionManager manager, ILoggerFactory loggerFactory, IConversionService converter) : base(manager) => _dbAction = new(DB, loggerFactory, converter);
 
     #endregion Constructors
 
@@ -33,10 +32,12 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
                     icon = @icon
                 where
                     id = @id";
-        DB.WithinTransaction(tx =>
-        {
-            foreach (var alias in aliases) tx.Connection.Execute(sql, new { id = alias.Id, icon = alias.Icon });
-        });
+        DB.WithinTransaction(
+            tx =>
+            {
+                foreach (var alias in aliases) tx.Connection.Execute(sql, new { id = alias.Id, icon = alias.Icon });
+            }
+        );
     }
 
     public Task FixIconsForHyperlinksAsync()

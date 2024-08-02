@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core.Plugins
+﻿namespace Lanceur.Core.Plugins;
+
+public interface IPluginManager
 {
-    public interface IPluginManager
-    {
-        #region Methods
+    #region Methods
 
-        IEnumerable<IPlugin> CreatePlugin(string assemblyPath);
+    IEnumerable<IPlugin> CreatePlugin(string assemblyPath);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

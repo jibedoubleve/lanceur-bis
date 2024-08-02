@@ -18,5 +18,4 @@ public static class ObservableCollectionMixin
     }
 
     #endregion Methods
-
 }

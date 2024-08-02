@@ -1,33 +1,30 @@
-﻿namespace Lanceur.Core.Models
+﻿namespace Lanceur.Core.Models;
+
+public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfExecutable
 {
-    public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfExecutable
+    #region Constructors
+
+    protected SelfExecutableQueryResult(string name, string description)
     {
-        #region Constructors
-
-        protected SelfExecutableQueryResult(string name, string description)
-        {
-            Name = name;
-            Description = description;
-        }
-
-        protected SelfExecutableQueryResult()
-        {
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public override string Icon => "Console";
-
-        #endregion Properties
-
-        #region Methods
-
-        public abstract Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
-
-        public override string ToQuery() => $"{Name} {Parameters}".Trim();
-
-        #endregion Methods
+        Name = name;
+        Description = description;
     }
+
+    protected SelfExecutableQueryResult() { }
+
+    #endregion Constructors
+
+    #region Properties
+
+    public override string Icon => "Console";
+
+    #endregion Properties
+
+    #region Methods
+
+    public abstract Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
+
+    public override string ToQuery() => $"{Name} {Parameters}".Trim();
+
+    #endregion Methods
 }

@@ -12,10 +12,7 @@ public class ResultSet : IEnumerable<Result>
 
     #region Constructors
 
-    public ResultSet(string query)
-    {
-        Query = query;
-    }
+    public ResultSet(string query) => Query = query;
 
     #endregion Constructors
 

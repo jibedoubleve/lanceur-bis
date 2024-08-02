@@ -1,14 +1,13 @@
-﻿namespace Lanceur.Core.Models.Settings
+﻿namespace Lanceur.Core.Models.Settings;
+
+public class PositionSection
 {
-    public class PositionSection
-    {
-        #region Properties
+    #region Properties
 
-        public static PositionSection Default => new() { Left = double.MaxValue, Top = double.MaxValue };
+    public static PositionSection Default => new() { Left = double.MaxValue, Top = double.MaxValue };
 
-        public double Left { get; set; }
-        public double Top { get; set; }
+    public double Left { get; set; }
+    public double Top { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

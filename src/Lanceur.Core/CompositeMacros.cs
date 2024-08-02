@@ -1,7 +1,3 @@
-﻿namespace Lanceur.Core
-{
-    public enum CompositeMacros
-    {
-        Multi,
-    }
-}
+﻿namespace Lanceur.Core;
+
+public enum CompositeMacros { Multi }

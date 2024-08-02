@@ -1,14 +1,13 @@
-﻿namespace Lanceur.Core.Models.Settings
+﻿namespace Lanceur.Core.Models.Settings;
+
+public class WindowSection
 {
-    public class WindowSection
-    {
-        #region Properties
+    #region Properties
 
-        public static WindowSection Default => new() { Position = PositionSection.Default };
-        public PositionSection Position { get; set; } = new PositionSection();
-        public bool ShowAtStartup { get; set; } = true;
-        public bool ShowResult { get; set; }
+    public static WindowSection Default => new() { Position = PositionSection.Default };
+    public PositionSection Position { get; set; } = new();
+    public bool ShowAtStartup { get; set; } = true;
+    public bool ShowResult { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

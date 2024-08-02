@@ -1,8 +1,3 @@
-﻿namespace Lanceur.Core.Plugins
-{
-    public enum MaintenanceAction
-    {
-        Install,
-        Uninstall,
-    }
-}
+﻿namespace Lanceur.Core.Plugins;
+
+public enum MaintenanceAction { Install, Uninstall }

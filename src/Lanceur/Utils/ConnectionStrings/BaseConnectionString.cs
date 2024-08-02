@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Utils.ConnectionStrings
+﻿namespace Lanceur.Utils.ConnectionStrings;
+
+public abstract class BaseConnectionString
 {
-    public abstract class BaseConnectionString
-    {
-        #region Fields
+    #region Fields
 
-        protected const string CSTRING_PATTERN = "Data Source={0};Version=3;";
+    protected const string CSTRING_PATTERN = "Data Source={0};Version=3;";
 
-        #endregion Fields
-    }
+    #endregion Fields
 }

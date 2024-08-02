@@ -14,10 +14,7 @@ public class SQLiteConnectionFactory : IDbConnectionFactory
 
     #region Constructors
 
-    public SQLiteConnectionFactory(string connectionString)
-    {
-        _connectionString = connectionString;
-    }
+    public SQLiteConnectionFactory(string connectionString) => _connectionString = connectionString;
 
     #endregion Constructors
 

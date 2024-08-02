@@ -11,10 +11,7 @@ public class IntegerToVisibilityConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is int integer)
-        {
-            return integer >= 0 ? Visibility.Visible : Visibility.Collapsed;
-        }
+        if (value is int integer) return integer >= 0 ? Visibility.Visible : Visibility.Collapsed;
 
         return value;
     }

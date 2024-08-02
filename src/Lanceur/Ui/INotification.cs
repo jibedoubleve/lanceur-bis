@@ -1,15 +1,14 @@
-﻿namespace Lanceur.Ui
+﻿namespace Lanceur.Ui;
+
+public interface INotification
 {
-    public interface INotification
-    {
-        #region Methods
+    #region Methods
 
-        void Error(string message);
+    void Error(string message);
 
-        void Information(string message);
+    void Information(string message);
 
-        void Warning(string message);
+    void Warning(string message);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

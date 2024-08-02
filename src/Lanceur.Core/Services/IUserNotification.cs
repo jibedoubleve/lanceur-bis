@@ -1,13 +1,12 @@
-﻿namespace Lanceur.Core.Services
+﻿namespace Lanceur.Core.Services;
+
+public interface IUserNotification
 {
-    public interface IUserNotification
-    {
-        #region Methods
+    #region Methods
 
-        void Error(string message, Exception ex);
+    void Error(string message, Exception ex);
 
-        void Warning(string message, Exception ex = null);
+    void Warning(string message, Exception ex = null);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

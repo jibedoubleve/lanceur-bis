@@ -24,9 +24,7 @@ public class EverythingStore : ISearchService
 
     #region Constructors
 
-    public EverythingStore() : this(null)
-    {
-    }
+    public EverythingStore() : this(null) { }
 
     public EverythingStore(ILoggerFactory loggerFactory = null, IEverythingApi everythingApi = null, ISettingsFacade settings = null)
     {
@@ -51,18 +49,18 @@ public class EverythingStore : ISearchService
 
     private static string GetIcon(ResultType itemResultType) => itemResultType switch
     {
-        ResultType.File => "FileOutline",
-        ResultType.Excel => "FileExcelOutline",
-        ResultType.Pdf => "FilePdfBox",
-        ResultType.Zip => "ZipBoxOutline",
-        ResultType.Image => "FileImageOutline",
-        ResultType.Word => "FileWordBoxOutline",
-        ResultType.Directory => "FolderOutline",
-        ResultType.Music => "FileMusicOutline",
-        ResultType.Text => "FileDocumentOutline",
-        ResultType.Code => "FileCodeOutline",
+        ResultType.File       => "FileOutline",
+        ResultType.Excel      => "FileExcelOutline",
+        ResultType.Pdf        => "FilePdfBox",
+        ResultType.Zip        => "ZipBoxOutline",
+        ResultType.Image      => "FileImageOutline",
+        ResultType.Word       => "FileWordBoxOutline",
+        ResultType.Directory  => "FolderOutline",
+        ResultType.Music      => "FileMusicOutline",
+        ResultType.Text       => "FileDocumentOutline",
+        ResultType.Code       => "FileCodeOutline",
         ResultType.Executable => "FileCogOutline",
-        _ => "HelpCircleOutline"
+        _                     => "HelpCircleOutline"
     };
 
     /// <inheritdoc />
@@ -74,15 +72,18 @@ public class EverythingStore : ISearchService
         if (query.Name != SearchAlias) return Array.Empty<QueryResult>();
 
         return _everythingApi.Search(query.Parameters)
-                             .Select(item => new AliasQueryResult
-                             {
-                                 Name = item.Name,
-                                 FileName = item.Path,
-                                 Icon = GetIcon(item.ResultType),
-                                 Thumbnail = null,
-                                 IsThumbnailDisabled = true,
-                                 Count = -1,
-                             }).Cast<QueryResult>()
+                             .Select(
+                                 item => new AliasQueryResult
+                                 {
+                                     Name = item.Name,
+                                     FileName = item.Path,
+                                     Icon = GetIcon(item.ResultType),
+                                     Thumbnail = null,
+                                     IsThumbnailDisabled = true,
+                                     Count = -1
+                                 }
+                             )
+                             .Cast<QueryResult>()
                              .ToList();
     }
 

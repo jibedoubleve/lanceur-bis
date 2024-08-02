@@ -40,17 +40,18 @@ public class IndexNavigatorShould
         action.Should().Throw<IndexOutOfRangeException>();
     }
 
-    [Theory]
-    [InlineData(-1, 0)]
-    [InlineData(0, 1)]
-    [InlineData(1, 2)]
-    [InlineData(2, 3)]
-    [InlineData(3, 4)]
-    [InlineData(4, 5)]
-    [InlineData(5, 0)]
+    [Theory, InlineData(-1, 0), InlineData(0, 1), InlineData(1, 2), InlineData(2, 3), InlineData(3, 4), InlineData(4, 5), InlineData(5, 0)]
     public void GetNextIndex(int current, int next)
     {
-        var list = new List<int>() { 0, 1, 2, 3, 4, 5 };
+        var list = new List<int>()
+        {
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+        };
 
         list[list.GetNextIndex(current)].Should().Be(next);
     }
@@ -64,31 +65,34 @@ public class IndexNavigatorShould
         subject.Should().Throw<IndexOutOfRangeException>();
     }
 
-    [Theory]
-    [InlineData(0, "un")]
-    [InlineData(1, "deux")]
-    [InlineData(2, "trois")]
-    [InlineData(3, "quatre")]
-    [InlineData(4, "cinq")]
-    [InlineData(5, "zero")]
+    [Theory, InlineData(0, "un"), InlineData(1, "deux"), InlineData(2, "trois"), InlineData(3, "quatre"), InlineData(4, "cinq"), InlineData(5, "zero")]
     public void GetNextItem(int next, string expected)
     {
-        var list = new List<string>() { "zero", "un", "deux", "trois", "quatre", "cinq" };
+        var list = new List<string>()
+        {
+            "zero",
+            "un",
+            "deux",
+            "trois",
+            "quatre",
+            "cinq"
+        };
 
         list.GetNextItem(next).Should().Be(expected);
     }
 
-    [Theory]
-    [InlineData(5, 4)]
-    [InlineData(4, 3)]
-    [InlineData(3, 2)]
-    [InlineData(2, 1)]
-    [InlineData(1, 0)]
-    [InlineData(0, 5)]
-    [InlineData(-1, 5)]
+    [Theory, InlineData(5, 4), InlineData(4, 3), InlineData(3, 2), InlineData(2, 1), InlineData(1, 0), InlineData(0, 5), InlineData(-1, 5)]
     public void GetPreviousIndex(int current, int previous)
     {
-        var list = new List<int>() { 0, 1, 2, 3, 4, 5 };
+        var list = new List<int>()
+        {
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+        };
 
         list[list.GetPreviousIndex(current)].Should().Be(previous);
     }
@@ -102,16 +106,18 @@ public class IndexNavigatorShould
         subject.Should().Throw<IndexOutOfRangeException>();
     }
 
-    [Theory]
-    [InlineData(0, "cinq")]
-    [InlineData(1, "zero")]
-    [InlineData(2, "un")]
-    [InlineData(3, "deux")]
-    [InlineData(4, "trois")]
-    [InlineData(5, "quatre")]
+    [Theory, InlineData(0, "cinq"), InlineData(1, "zero"), InlineData(2, "un"), InlineData(3, "deux"), InlineData(4, "trois"), InlineData(5, "quatre")]
     public void GetPreviousItem(int next, string expected)
     {
-        var list = new List<string>() { "zero", "un", "deux", "trois", "quatre", "cinq" };
+        var list = new List<string>()
+        {
+            "zero",
+            "un",
+            "deux",
+            "trois",
+            "quatre",
+            "cinq"
+        };
 
         list.GetPreviousItem(next).Should().Be(expected);
     }
@@ -144,9 +150,7 @@ public class IndexNavigatorShould
         list.CanNavigate().Should().Be(true);
     }
 
-    [Theory]
-    [InlineData(-2)]
-    [InlineData(1)]
+    [Theory, InlineData(-2), InlineData(1)]
     public void ThrowsWhenIndexBiggerThanCountOnNext(int index)
     {
         var list = new List<string>() { "un" };
@@ -154,9 +158,7 @@ public class IndexNavigatorShould
         subject.Should().Throw<IndexOutOfRangeException>();
     }
 
-    [Theory]
-    [InlineData(-2)]
-    [InlineData(1)]
+    [Theory, InlineData(-2), InlineData(1)]
     public void ThrowsWhenIndexBiggerThanCountOnPrevious(int index)
     {
         var list = new List<string>() { "un" };

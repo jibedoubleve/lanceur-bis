@@ -5,65 +5,66 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 
-namespace Lanceur.Infra.SQLite
+namespace Lanceur.Infra.SQLite;
+
+public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigRepository
 {
-    public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigRepository
+    #region Fields
+
+    private AppConfig _current;
+
+    #endregion Fields
+
+    #region Constructors
+
+    public SQLiteAppConfigRepository(IDbConnectionManager manager) : base(manager) { }
+
+    #endregion Constructors
+
+    #region Properties
+
+    public AppConfig Current
     {
-        #region Fields
-
-        private AppConfig _current;
-
-        #endregion Fields
-
-        #region Constructors
-
-        public SQLiteAppConfigRepository(IDbConnectionManager manager) : base(manager)
+        get
         {
+            if (_current is null) Load();
+            return _current;
         }
+    }
 
-        #endregion Constructors
+    #endregion Properties
 
-        #region Properties
+    #region Methods
 
-        public AppConfig Current
-        {
-            get
-            {
-                if (_current is null) { Load(); }
-                return _current;
-            }
-        }
+    public void Edit(Action<AppConfig> edit)
+    {
+        var stg = Current;
+        edit(stg);
+        Save();
+    }
 
-        #endregion Properties
-
-        #region Methods
-
-        public void Edit(Action<AppConfig> edit)
-        {
-            var stg = Current;
-            edit(stg);
-            Save();
-        }
-
-        public void Load()
-        {
-            const string sql = @"
+    public void Load()
+    {
+        const string sql = @"
                 select
                     s_value as Value
                 from settings
                 where s_key = 'json';";
-            var s = DB.WithinTransaction(tx =>
+        var s = DB.WithinTransaction(
+            tx =>
                 tx.Connection.Query<string>(sql)
-                    .FirstOrDefault());
+                  .FirstOrDefault()
+        );
 
-            _current = s.IsNullOrEmpty()
-                ? new AppConfig()
-                : JsonConvert.DeserializeObject<AppConfig>(s);
-        }
+        _current = s.IsNullOrEmpty()
+            ? new()
+            : JsonConvert.DeserializeObject<AppConfig>(s);
+    }
 
-        public void Save()
-        {
-            DB.WithinTransaction(tx =>
+    public void Save()
+    {
+        DB.WithinTransaction(
+            tx =>
             {
                 var sqlExists = "select count(*) from settings where s_key = 'json'";
                 var exists = tx.Connection.ExecuteScalar<long>(sqlExists) > 0;
@@ -77,9 +78,9 @@ namespace Lanceur.Infra.SQLite
                 var sql = "update settings set s_value = @value where s_key = 'json'";
                 var json = JsonConvert.SerializeObject(Current);
                 tx.Connection.Execute(sql, new { value = json });
-            });
-        }
-
-        #endregion Methods
+            }
+        );
     }
+
+    #endregion Methods
 }

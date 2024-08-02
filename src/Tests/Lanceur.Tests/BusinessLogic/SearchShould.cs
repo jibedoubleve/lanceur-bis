@@ -23,13 +23,13 @@ using Splat;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.BusinessLogic
-{
-    public class SearchShould : TestBase
-    {
-        #region Fields
+namespace Lanceur.Tests.BusinessLogic;
 
-        private const string SqlCreateAlias = @"
+public class SearchShould : TestBase
+{
+    #region Fields
+
+    private const string SqlCreateAlias = @"
                 insert into alias (id, file_name, arguments) values (1000, '@multi@', '@alias2@@alias3');
                 insert into alias_name (id, id_alias, name) values (1000, 1000, 'alias1');
 
@@ -39,95 +39,92 @@ namespace Lanceur.Tests.BusinessLogic
                 insert into alias (id, file_name, arguments) values (3000, 'arg', 'c:\dummy\dummy.exe');
                 insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');";
 
-        private readonly ILoggerFactory _testLoggerFactory;
+    private readonly ILoggerFactory _testLoggerFactory;
 
-        #endregion Fields
+    #endregion Fields
 
-        #region Constructors
+    #region Constructors
 
-        public SearchShould(ITestOutputHelper output) : base(output)
-        {
-            _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
-        }
+    public SearchShould(ITestOutputHelper output) : base(output) => _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
 
-        #endregion Constructors
+    #endregion Constructors
 
-        #region Methods
+    #region Methods
 
-        private static IConversionService GetConversionService()
-        {
-            var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
-            return new AutoMapperConverter(new Mapper(cfg));
-        }
+    private static IConversionService GetConversionService()
+    {
+        var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
+        return new AutoMapperConverter(new Mapper(cfg));
+    }
 
-        [Fact]
-        public void HaveStores()
-        {
-            var loggerFactory = Substitute.For<ILoggerFactory>();
-            var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-            
-            var service = new SearchService(new StoreLoader(loggerFactory, orchestrator), loggerFactory: loggerFactory);
+    [Fact]
+    public void HaveStores()
+    {
+        var loggerFactory = Substitute.For<ILoggerFactory>();
+        var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
 
-            service.Stores.Should().HaveCountGreaterThan(5);
-        }
+        var service = new SearchService(new StoreLoader(loggerFactory, orchestrator), loggerFactory: loggerFactory);
 
-        [Fact]
-        public void NOT_HaveNullParameters()
-        {
-            // arrange
-            var converter = GetConversionService();
-            using var db = BuildFreshDb(SqlCreateAlias);
-            using var conn = new DbSingleConnectionManager(db);
+        service.Stores.Should().HaveCountGreaterThan(5);
+    }
 
-            var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
+    [Fact]
+    public void NOT_HaveNullParameters()
+    {
+        // arrange
+        var converter = GetConversionService();
+        using var db = BuildFreshDb(SqlCreateAlias);
+        using var conn = new DbSingleConnectionManager(db);
 
-            // act
-            var results = repository.GetAll();
-            var parameters = results.Select(c => c.Parameters);
+        var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
 
-            //assert
-            parameters.Should().NotContain((string)null);
-        }
+        // act
+        var results = repository.GetAll();
+        var parameters = results.Select(c => c.Parameters);
 
-        [Fact]
-        public async Task ReturnNoResultMessageWhenMisconfiguredMacro()
-        {
-            // ARRANGE
-            const string sql = SqlCreateAlias
-                               + @"
+        //assert
+        parameters.Should().NotContain((string)null);
+    }
+
+    [Fact]
+    public async Task ReturnNoResultMessageWhenMisconfiguredMacro()
+    {
+        // ARRANGE
+        const string sql = SqlCreateAlias +
+                           @"
                 insert into alias (id, file_name) values (4000, '@zzzz@');
                 insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');";
 
-            using var db = BuildFreshDb(sql);
-            using var conn = new DbSingleConnectionManager(db);
+        using var db = BuildFreshDb(sql);
+        using var conn = new DbSingleConnectionManager(db);
 
-            var thumbnailManager = Substitute.For<IThumbnailManager>();
-            var converter = Substitute.For<IConversionService>();
-            var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
-            var storeLoader = Substitute.For<IStoreLoader>();
-            var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-            storeLoader.Load().Returns(new[] { new AliasStore(repository) });
+        var thumbnailManager = Substitute.For<IThumbnailManager>();
+        var converter = Substitute.For<IConversionService>();
+        var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
+        var storeLoader = Substitute.For<IStoreLoader>();
+        var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
+        storeLoader.Load().Returns(new[] { new AliasStore(repository) });
 
-            var asm = Assembly.GetExecutingAssembly();
-            var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager, orchestrator: orchestrator);
+        var asm = Assembly.GetExecutingAssembly();
+        var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager, orchestrator: orchestrator);
 
-            // ACT
-            var result = (await service.SearchAsync(new("z"))).ToArray();
+        // ACT
+        var result = (await service.SearchAsync(new("z"))).ToArray();
 
-            // ASSERT
-            using (new AssertionScope())
-            {
-                result.Should().HaveCountGreaterThan(0);
-                result[0].Name.Should().Be("No result found");
-            }
-        }
-
-        [Fact]
-        public async Task ReturnResultWithExactMatchOnTop()
+        // ASSERT
+        using (new AssertionScope())
         {
-            var dt = DateTime.Now;
-            var converter = Substitute.For<IConversionService>();
-            var sql = @$"
+            result.Should().HaveCountGreaterThan(0);
+            result[0].Name.Should().Be("No result found");
+        }
+    }
+
+    [Fact]
+    public async Task ReturnResultWithExactMatchOnTop()
+    {
+        var dt = DateTime.Now;
+        var converter = Substitute.For<IConversionService>();
+        var sql = @$"
             insert into alias (id, file_name, arguments) values (1000, 'un', '@alias2@@alias3');
             insert into alias_name (id, id_alias, name) values (1001, 1000, 'un');
 
@@ -153,134 +150,123 @@ namespace Lanceur.Tests.BusinessLogic
             insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
          ";
 
-            // ARRANGE
-            using var db = BuildFreshDb(sql);
-            using var conn = new DbSingleConnectionManager(db);
+        // ARRANGE
+        using var db = BuildFreshDb(sql);
+        using var conn = new DbSingleConnectionManager(db);
 
-            const string criterion = "u";
-            var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
-            var stores = Substitute.For<IStoreLoader>();
-            stores.Load().Returns(new[] { new AliasStore(repository) });
+        const string criterion = "u";
+        var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
+        var stores = Substitute.For<IStoreLoader>();
+        stores.Load().Returns(new[] { new AliasStore(repository) });
 
-            var results = repository.Search(criterion).ToList();
-            var macroManager = Substitute.For<IMacroManager>();
-            macroManager.Handle(Arg.Any<QueryResult[]>())
-                        .Returns(results);
+        var results = repository.Search(criterion).ToList();
+        var macroManager = Substitute.For<IMacroManager>();
+        macroManager.Handle(Arg.Any<QueryResult[]>())
+                    .Returns(results);
 
-            var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-            orchestrator.IsAlive(Arg.Any<ISearchService>(), Arg.Any<Cmdline>())
-                        .Returns(true);
+        var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
+        orchestrator.IsAlive(Arg.Any<ISearchService>(), Arg.Any<Cmdline>())
+                    .Returns(true);
 
-            var searchService = new SearchService(
-                stores,
-                macroManager,
-                Substitute.For<IThumbnailManager>(),
-                orchestrator: orchestrator
-            );
+        var searchService = new SearchService(
+            stores,
+            macroManager,
+            Substitute.For<IThumbnailManager>(),
+            orchestrator: orchestrator
+        );
 
-            // ACT
-            var result = (await searchService.SearchAsync(new(criterion))).ToArray();
+        // ACT
+        var result = (await searchService.SearchAsync(new(criterion))).ToArray();
 
-            // ASSERT
-            using (new AssertionScope())
-            {
-                result.Should().HaveCount(2);
-                result.First().Name.Should().Be("u");
-                result.First().Id.Should().Be(4000);
-            }
-        }
-
-        [Fact]
-        public async Task ReturnValues()
+        // ASSERT
+        using (new AssertionScope())
         {
-            var macroManager = Substitute.For<IMacroManager>();
-            var thumbnailManager = Substitute.For<IThumbnailManager>();
-            var query = new Cmdline("code");
-            var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-            orchestrator.IsAlive(Arg.Any<ISearchService>(), Arg.Any<Cmdline>())
-                        .Returns(true);
-            var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager, orchestrator: orchestrator);
-
-            var result = (await service.SearchAsync(query))
-                                .ToArray();
-
-            using (new AssertionScope())
-            {
-                result.Should().HaveCount(1);
-                result.ElementAt(0).IsResult.Should().BeFalse();
-            }
+            result.Should().HaveCount(2);
+            result.First().Name.Should().Be("u");
+            result.First().Id.Should().Be(4000);
         }
-
-        [Fact]
-        public void SetUsageDoesNotResetAdditionalParameters()
-        {
-            OutputHelper.Arrange();
-            var sql = new SqlBuilder().AppendAlias(1)
-                                      .AppendSynonyms(1, "a")
-                                      .AppendArgument(1)
-                                      .AppendArgument(1)
-                                      .AppendArgument(1)
-                                      .ToString();
-
-            var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
-            var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-            var converter = Substitute.For<IConversionService>();
-            QueryResult alias = new AliasQueryResult
-            {
-                Id = 1,
-                Name = "a"
-            };
-
-            var repository = new SQLiteRepository(connectionMgr, logger, converter);
-
-            OutputHelper.Act();
-            repository.SetUsage(alias);
-
-            OutputHelper.Assert();
-            const string sqlCount = "select count(*) from alias_argument";
-
-            connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
-                         .Should().Be(3);
-        }
-        
-        [Fact]
-        public void NotSetUsageWhenCounterIsNegative()
-        {
-            /*
-             * Create a new alias with usage set to -1
-             * Execute it 4 times
-             * Check counter is still -1 
-             */
-            OutputHelper.Arrange();
-            var sql = new SqlBuilder().AppendAlias(1)
-                                      .AppendSynonyms(1, "a")
-                                      .ToString();
-            var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
-            var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-            var converter = Substitute.For<IConversionService>();
-            QueryResult alias = new AliasQueryResult
-            {
-                Id = 1,
-                Name = "a",
-                Count = -1,
-            };
-
-            var repository = new SQLiteRepository(connectionMgr, logger, converter);
-
-            OutputHelper.Act();
-            
-            for (var i = 0; i < 5; i++)
-            {
-                repository.SetUsage(alias);
-            }
-
-            OutputHelper.Assert();
-            const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
-
-            connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
-                         .Should().Be(0);
-        }
-
-        #endregion Methods
     }
+
+    [Fact]
+    public async Task ReturnValues()
+    {
+        var macroManager = Substitute.For<IMacroManager>();
+        var thumbnailManager = Substitute.For<IThumbnailManager>();
+        var query = new Cmdline("code");
+        var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
+        orchestrator.IsAlive(Arg.Any<ISearchService>(), Arg.Any<Cmdline>())
+                    .Returns(true);
+        var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager, orchestrator: orchestrator);
+
+        var result = (await service.SearchAsync(query))
+            .ToArray();
+
+        using (new AssertionScope())
+        {
+            result.Should().HaveCount(1);
+            result.ElementAt(0).IsResult.Should().BeFalse();
+        }
+    }
+
+    [Fact]
+    public void SetUsageDoesNotResetAdditionalParameters()
+    {
+        OutputHelper.Arrange();
+        var sql = new SqlBuilder().AppendAlias(1)
+                                  .AppendSynonyms(1, "a")
+                                  .AppendArgument(1)
+                                  .AppendArgument(1)
+                                  .AppendArgument(1)
+                                  .ToString();
+
+        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
+        var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
+        var converter = Substitute.For<IConversionService>();
+        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
+
+        var repository = new SQLiteRepository(connectionMgr, logger, converter);
+
+        OutputHelper.Act();
+        repository.SetUsage(alias);
+
+        OutputHelper.Assert();
+        const string sqlCount = "select count(*) from alias_argument";
+
+        connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
+                     .Should()
+                     .Be(3);
+    }
+
+    [Fact]
+    public void NotSetUsageWhenCounterIsNegative()
+    {
+        /*
+         * Create a new alias with usage set to -1
+         * Execute it 4 times
+         * Check counter is still -1
+         */
+        OutputHelper.Arrange();
+        var sql = new SqlBuilder().AppendAlias(1)
+                                  .AppendSynonyms(1, "a")
+                                  .ToString();
+        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
+        var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
+        var converter = Substitute.For<IConversionService>();
+        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
+
+        var repository = new SQLiteRepository(connectionMgr, logger, converter);
+
+        OutputHelper.Act();
+
+        for (var i = 0; i < 5; i++) repository.SetUsage(alias);
+
+        OutputHelper.Assert();
+        const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
+
+        connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
+                     .Should()
+                     .Be(0);
+    }
+
+    #endregion Methods
 }

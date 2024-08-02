@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.1"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj"/>
+    </ItemGroup>
 </Project>

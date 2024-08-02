@@ -18,7 +18,7 @@ internal static class LogLevelMixin
         _                    => throw new ArgumentOutOfRangeException(nameof(level), level, null)
     };
 
-    public static LogLevel ToLogLevel(this LogEventLevel level) => level switch 
+    public static LogLevel ToLogLevel(this LogEventLevel level) => level switch
     {
         LogEventLevel.Verbose     => LogLevel.Trace,
         LogEventLevel.Debug       => LogLevel.Debug,

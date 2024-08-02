@@ -13,8 +13,7 @@ internal class FileOperationScheduler : AbstractOperationScheduler
 
     #region Constructors
 
-    public FileOperationScheduler(string fullName)
-    { _fullName = fullName; }
+    public FileOperationScheduler(string fullName) => _fullName = fullName;
 
     #endregion Constructors
 
@@ -30,8 +29,7 @@ internal class FileOperationScheduler : AbstractOperationScheduler
         {
             var json = await reader.ReadToEndAsync();
             var op =
-                JsonConvert.DeserializeObject<List<OperationConfiguration>>(json)
-                ?? new List<OperationConfiguration>();
+                JsonConvert.DeserializeObject<List<OperationConfiguration>>(json) ?? new List<OperationConfiguration>();
 
             operations.AddRange(op);
 

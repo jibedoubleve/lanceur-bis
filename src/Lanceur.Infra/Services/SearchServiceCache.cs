@@ -2,30 +2,26 @@
 using Lanceur.Core.Stores;
 using Splat;
 
-namespace Lanceur.Infra.Services
+namespace Lanceur.Infra.Services;
+
+public abstract class SearchServiceCache
 {
-    public abstract class SearchServiceCache
-    {
-        #region Fields
+    #region Fields
 
-        private readonly IStoreLoader _storeLoader;
-        private IEnumerable<ISearchService> _stores;
+    private readonly IStoreLoader _storeLoader;
+    private IEnumerable<ISearchService> _stores;
 
-        #endregion Fields
+    #endregion Fields
 
-        #region Constructors
+    #region Constructors
 
-        internal SearchServiceCache(IStoreLoader storeLoader)
-        {
-            _storeLoader = storeLoader ?? Locator.Current.GetService<IStoreLoader>();
-        }
+    internal SearchServiceCache(IStoreLoader storeLoader) => _storeLoader = storeLoader ?? Locator.Current.GetService<IStoreLoader>();
 
-        #endregion Constructors
+    #endregion Constructors
 
-        #region Properties
+    #region Properties
 
-        public IEnumerable<ISearchService> Stores => _stores ??= _storeLoader.Load();
+    public IEnumerable<ISearchService> Stores => _stores ??= _storeLoader.Load();
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

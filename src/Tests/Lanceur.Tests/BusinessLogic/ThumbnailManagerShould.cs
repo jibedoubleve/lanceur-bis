@@ -19,9 +19,7 @@ public class ThumbnailManagerShould : TestBase
 {
     #region Constructors
 
-    public ThumbnailManagerShould(ITestOutputHelper output): base(output)
-    {
-    }
+    public ThumbnailManagerShould(ITestOutputHelper output) : base(output) { }
 
     #endregion Constructors
 
@@ -50,10 +48,7 @@ public class ThumbnailManagerShould : TestBase
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
-        var cfg = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>();
-        });
+        var cfg = new MapperConfiguration(cfg => { cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
         var conversionService = new AutoMapperConverter(new Mapper(cfg));
         var dbRepository = new SQLiteRepository(connectionMgr, loggerFactory, conversionService);
         var thumbnailRefresher = new MockThumbnailRefresher();
@@ -66,7 +61,8 @@ public class ThumbnailManagerShould : TestBase
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))
-                     .Should().Be(6);
+                     .Should()
+                     .Be(6);
     }
 
     #endregion Methods

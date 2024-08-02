@@ -12,72 +12,70 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
-namespace Lanceur.Views
+namespace Lanceur.Views;
+
+public class PluginFromWebViewModel : ReactiveObject
 {
-    public class PluginFromWebViewModel : ReactiveObject
+    #region Fields
+
+    private readonly IPluginUninstaller _pluginUninstaller;
+    private readonly IPluginWebRepository _webRepository;
+
+    #endregion Fields
+
+    #region Constructors
+
+    public PluginFromWebViewModel(
+        IPluginUninstaller pluginUninstaller = null,
+        ISchedulerProvider schedulers = null,
+        IUserNotification notify = null,
+        IPluginWebRepository webRepository = null
+    )
     {
-        #region Fields
+        var l = Locator.Current;
+        notify ??= l.GetService<IUserNotification>();
+        schedulers ??= l.GetService<ISchedulerProvider>();
+        _pluginUninstaller = pluginUninstaller ?? l.GetService<IPluginUninstaller>();
+        _webRepository = webRepository ?? l.GetService<IPluginWebRepository>();
+        Activate = ReactiveCommand.CreateFromTask(OnActivateAsync, outputScheduler: schedulers.MainThreadScheduler);
+        Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-        private readonly IPluginUninstaller _pluginUninstaller;
-        private readonly IPluginWebRepository _webRepository;
+        this.WhenAnyObservable(vm => vm.Activate)
+            .ObserveOn(schedulers.MainThreadScheduler)
+            .Subscribe(response => { PluginManifests = new(response.PluginManifests); });
+    }
 
-        #endregion Fields
+    #endregion Constructors
 
-        #region Constructors
+    #region Properties
 
-        public PluginFromWebViewModel(IPluginUninstaller pluginUninstaller = null,
-                                      ISchedulerProvider schedulers = null,
-                                      IUserNotification notify = null,
-                                      IPluginWebRepository webRepository = null)
-        {
-            var l = Locator.Current;
-            notify ??= l.GetService<IUserNotification>();
-            schedulers ??= l.GetService<ISchedulerProvider>();
-            _pluginUninstaller = pluginUninstaller ?? l.GetService<IPluginUninstaller>();
-            _webRepository = webRepository ?? l.GetService<IPluginWebRepository>();
-            Activate = ReactiveCommand.CreateFromTask(OnActivateAsync, outputScheduler: schedulers.MainThreadScheduler);
-            Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
+    public ReactiveCommand<Unit, ActivationResponse> Activate { get; }
+    [Reactive] public ObservableCollection<PluginWebManifestViewModel> PluginManifests { get; set; }
+    [Reactive] public PluginWebManifestViewModel SelectedManifest { get; set; }
+    [Reactive] public bool SelectionValidated { get; set; } = false;
 
-            this.WhenAnyObservable(vm => vm.Activate)
-                .ObserveOn(schedulers.MainThreadScheduler)
-                .Subscribe(response =>
-                {
-                    PluginManifests = new(response.PluginManifests);
-                });
-        }
+    #endregion Properties
 
-        #endregion Constructors
+    #region Methods
 
+    private async Task<ActivationResponse> OnActivateAsync()
+    {
+        var manifests = await _webRepository.GetPluginListAsync(_pluginUninstaller.UninstallationCandidates);
+        return new() { PluginManifests = manifests.ToViewModel() };
+    }
+
+    #endregion Methods
+
+    #region Classes
+
+    public class ActivationResponse
+    {
         #region Properties
 
-        public ReactiveCommand<Unit, ActivationResponse> Activate { get; }
-        [Reactive] public ObservableCollection<PluginWebManifestViewModel> PluginManifests { get; set; }
-        [Reactive] public PluginWebManifestViewModel SelectedManifest { get; set; }
-        [Reactive] public bool SelectionValidated { get; set; } = false;
+        public IEnumerable<PluginWebManifestViewModel> PluginManifests { get; init; }
 
         #endregion Properties
-
-        #region Methods
-
-        private async Task<ActivationResponse> OnActivateAsync()
-        {
-            var manifests = await _webRepository.GetPluginListAsync(_pluginUninstaller.UninstallationCandidates);
-            return new() { PluginManifests = manifests.ToViewModel() };
-        }
-
-        #endregion Methods
-
-        #region Classes
-
-        public class ActivationResponse
-        {
-            #region Properties
-
-            public IEnumerable<PluginWebManifestViewModel> PluginManifests { get; init; }
-
-            #endregion Properties
-        }
-
-        #endregion Classes
     }
+
+    #endregion Classes
 }

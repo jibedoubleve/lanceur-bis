@@ -11,24 +11,15 @@ public class PluginUpdateShould
 {
     #region Methods
 
-    [Theory]
-    [InlineData("1.0.0", "2.0.0")]
-    [InlineData("1.0.0", "1.0.1")]
-    [InlineData("1.0.0", "1.1.0")]
+    [Theory, InlineData("1.0.0", "2.0.0"), InlineData("1.0.0", "1.0.1"), InlineData("1.0.0", "1.1.0")]
     public async Task SelectExistingPluginIfVersionIsHigher(string localVersion, string webVersion)
     {
         // ARRANGE
         var localManifestRepository = Substitute.For<IPluginManifestRepository>();
-        localManifestRepository.GetPluginManifests().Returns(new IPluginManifest[]
-        {
-            new PluginManifest() { Dll = "A", Version = new(localVersion) }
-        });
+        localManifestRepository.GetPluginManifests().Returns(new IPluginManifest[] { new PluginManifest() { Dll = "A", Version = new(localVersion) } });
 
         var webManifestRepository = Substitute.For<IPluginWebManifestLoader>();
-        webManifestRepository.LoadFromWebAsync().Returns(new IPluginWebManifest[]
-        {
-            new PluginWebManifest() { Dll = "A", Version = new Version(webVersion) }
-        });
+        webManifestRepository.LoadFromWebAsync().Returns(new IPluginWebManifest[] { new PluginWebManifest() { Dll = "A", Version = new(webVersion) } });
 
         var repository = new PluginWebRepository(localManifestRepository, webManifestRepository);
 
@@ -39,24 +30,15 @@ public class PluginUpdateShould
         installablePlugins.Should().HaveCount(1);
     }
 
-    [Theory]
-    [InlineData("1.0.0", "1.0.0")]
-    [InlineData("1.0.0", "0.0.9")]
-    [InlineData("1.0.0", "0.9.0")]
+    [Theory, InlineData("1.0.0", "1.0.0"), InlineData("1.0.0", "0.0.9"), InlineData("1.0.0", "0.9.0")]
     public async Task SelectNoPluginIfVersionIsLowerOrEqual(string localVersion, string webVersion)
     {
         // ARRANGE
-        var localManifests = new IPluginManifest[]
-        {
-            new PluginManifest() { Dll = "A", Version = new(localVersion) }
-        };
+        var localManifests = new IPluginManifest[] { new PluginManifest() { Dll = "A", Version = new(localVersion) } };
         var localManifestRepository = Substitute.For<IPluginManifestRepository>();
         localManifestRepository.GetPluginManifests().Returns(localManifests);
 
-        var webManifests = new IPluginWebManifest[]
-        {
-            new PluginWebManifest() { Dll = "A", Version = new Version(webVersion) }
-        };
+        var webManifests = new IPluginWebManifest[] { new PluginWebManifest() { Dll = "A", Version = new(webVersion) } };
         var webManifestRepository = Substitute.For<IPluginWebManifestLoader>();
         webManifestRepository.LoadFromWebAsync().Returns(webManifests);
 
@@ -69,37 +51,21 @@ public class PluginUpdateShould
         installablePlugins.Should().BeEmpty();
     }
 
-    [Theory]
-    [InlineData("1.0.0", "1.0.1", true)]
-    [InlineData("1.0.0", "1.1.0", true)]
-    [InlineData("1.0.0", "2.0.0", true)]
-    [InlineData("1.0.0", "1.0.0", false)]
-    [InlineData("1.0.0", "0.0.1", false)]
-    [InlineData("1.0.0", "0.1.0", false)]
+    [Theory, InlineData("1.0.0", "1.0.1", true), InlineData("1.0.0", "1.1.0", true), InlineData("1.0.0", "2.0.0", true), InlineData("1.0.0", "1.0.0", false), InlineData("1.0.0", "0.0.1", false), InlineData("1.0.0", "0.1.0", false)]
     public void ValidateOnlyWhenAlreadyInstalledPluginHasLowerVersion(
         string versionInstalled,
         string versionToInstall,
-        bool expectedValue)
+        bool expectedValue
+    )
     {
         // ARRANGE
         var path = Guid.NewGuid().ToString();
-        var manifestInstalled = new IPluginManifest[]
-        {
-            new PluginManifest()
-            {
-                Dll = path,
-                Version = new(versionInstalled)
-            }
-        };
+        var manifestInstalled = new IPluginManifest[] { new PluginManifest() { Dll = path, Version = new(versionInstalled) } };
         var manifestRepository = Substitute.For<IPluginManifestRepository>();
         manifestRepository.GetPluginManifests().Returns(manifestInstalled);
 
         var validationRule = new PluginValidationRule(manifestRepository);
-        var manifestToInstall = new PluginManifest()
-        {
-            Dll = path,
-            Version = new(versionToInstall)
-        };
+        var manifestToInstall = new PluginManifest() { Dll = path, Version = new(versionToInstall) };
 
         // ACT
         var result = validationRule.Check(manifestToInstall);
@@ -107,7 +73,8 @@ public class PluginUpdateShould
         // ASSERT
         result
             .IsValid
-            .Should().Be(expectedValue);
+            .Should()
+            .Be(expectedValue);
     }
 
     [Fact]
@@ -119,11 +86,7 @@ public class PluginUpdateShould
         manifestRepository.GetPluginManifests().Returns(Array.Empty<IPluginManifest>());
 
         var validationRule = new PluginValidationRule(manifestRepository);
-        var manifestToInstall = new PluginManifest()
-        {
-            Dll = path,
-            Version = new("1.0.0")
-        };
+        var manifestToInstall = new PluginManifest() { Dll = path, Version = new("1.0.0") };
 
         // ACT
         var result = validationRule.Check(manifestToInstall);
@@ -131,7 +94,8 @@ public class PluginUpdateShould
         // ASSERT
         result
             .IsValid
-            .Should().BeTrue();
+            .Should()
+            .BeTrue();
     }
 
     #endregion Methods

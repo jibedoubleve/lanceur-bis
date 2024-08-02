@@ -1,20 +1,19 @@
 ﻿using Humanizer;
 using Lanceur.Core.Formatters;
 
-namespace Lanceur.Infra.Formatters
+namespace Lanceur.Infra.Formatters;
+
+public class LimitedStringLengthFormatter : IStringFormatter
 {
-    public class LimitedStringLengthFormatter : IStringFormatter
-    {
-        #region Fields
+    #region Fields
 
-        public const int MaxLength = 90;
+    public const int MaxLength = 90;
 
-        #endregion Fields
+    #endregion Fields
 
-        #region Methods
+    #region Methods
 
-        public string Format(object value) => value?.ToString()?.Truncate(MaxLength, "(...)");
+    public string Format(object value) => value?.ToString()?.Truncate(MaxLength, "(...)");
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

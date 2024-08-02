@@ -27,7 +27,8 @@ public class SchedulerShould
         // ASSERT
         scheduler.GetState()
                  .OperationCount
-                 .Should().Be(3);
+                 .Should()
+                 .Be(3);
     }
 
     #endregion Methods

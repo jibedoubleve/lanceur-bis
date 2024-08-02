@@ -7,27 +7,26 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Lanceur.ReservedKeywords
+namespace Lanceur.ReservedKeywords;
+
+[ReservedAlias("quit"), Description("Quit lanceur")]
+public class QuitAlias : SelfExecutableQueryResult
 {
-    [ReservedAlias("quit"), Description("Quit lanceur")]
-    public class QuitAlias : SelfExecutableQueryResult
+    #region Properties
+
+    public override string Icon => "LocationExit";
+
+    #endregion Properties
+
+    #region Methods
+
+    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
-        #region Properties
+        Application.Current.Shutdown();
+        this.GetLogger().LogInformation("Quit the application from alias 'Quit'");
 
-        public override string Icon => "LocationExit";
-
-        #endregion Properties
-
-        #region Methods
-
-        public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
-        {
-            Application.Current.Shutdown();
-            this.GetLogger().LogInformation("Quit the application from alias 'Quit'");
-
-            return NoResultAsync;
-        }
-
-        #endregion Methods
+        return NoResultAsync;
     }
+
+    #endregion Methods
 }

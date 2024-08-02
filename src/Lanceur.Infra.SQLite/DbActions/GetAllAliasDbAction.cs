@@ -14,10 +14,7 @@ public class GetAllAliasDbAction
 
     #region Constructors
 
-    public GetAllAliasDbAction(IDbConnectionManager db)
-    {
-        _db = db;
-    }
+    public GetAllAliasDbAction(IDbConnectionManager db) => _db = db;
 
     #endregion Constructors
 

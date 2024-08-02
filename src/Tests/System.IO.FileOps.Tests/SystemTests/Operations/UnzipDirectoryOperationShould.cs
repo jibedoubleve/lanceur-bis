@@ -71,11 +71,11 @@ public class UnzipDirectoryOperationShould : IDisposable
         var path = Path.Combine(Destination, TextFileName);
         Directory.EnumerateFiles(Destination)
                  .Count(f => f == path)
-                 .Should().BeGreaterThan(0);
+                 .Should()
+                 .BeGreaterThan(0);
     }
 
-    public void Dispose()
-    { Cleanup(); }
+    public void Dispose() { Cleanup(); }
 
     #endregion Methods
 }

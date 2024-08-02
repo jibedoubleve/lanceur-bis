@@ -4,8 +4,12 @@ public class PluginInstallationResult
 {
     #region Constructors
 
-    private PluginInstallationResult(IPluginManifest pluginManifest, bool isInstallationSuccess, string errorMessage,
-        bool isUpdate)
+    private PluginInstallationResult(
+        IPluginManifest pluginManifest,
+        bool isInstallationSuccess,
+        string errorMessage,
+        bool isUpdate
+    )
     {
         ErrorMessage = errorMessage;
         IsUpdate = isUpdate;
@@ -27,11 +31,9 @@ public class PluginInstallationResult
 
     #region Methods
 
-    public static PluginInstallationResult Error(string errorMessage) =>
-        new(null, isInstallationSuccess: false, errorMessage, isUpdate: false);
+    public static PluginInstallationResult Error(string errorMessage) => new(null, false, errorMessage, false);
 
-    public static PluginInstallationResult Success(IPluginManifest manifest, bool isUpdate = false) =>
-        new(manifest, isInstallationSuccess: true, null, isUpdate);
+    public static PluginInstallationResult Success(IPluginManifest manifest, bool isUpdate = false) => new(manifest, true, null, isUpdate);
 
     #endregion Methods
 }

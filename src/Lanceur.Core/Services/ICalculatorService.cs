@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core.Services
+﻿namespace Lanceur.Core.Services;
+
+public interface ICalculatorService
 {
-    public interface ICalculatorService
-    {
-        #region Methods
+    #region Methods
 
-        (bool IsError, string Result) Evaluate(string expression);
+    (bool IsError, string Result) Evaluate(string expression);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

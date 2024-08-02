@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core.Models.Settings
+﻿namespace Lanceur.Core.Models.Settings;
+
+public interface ILocalConfig
 {
-    public interface ILocalConfig
-    {
-        #region Properties
+    #region Properties
 
-        string DbPath { get; set; }
+    string DbPath { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

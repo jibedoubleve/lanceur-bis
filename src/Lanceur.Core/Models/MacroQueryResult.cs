@@ -1,11 +1,10 @@
-namespace Lanceur.Core.Models
+namespace Lanceur.Core.Models;
+
+public abstract class MacroQueryResult : SelfExecutableQueryResult
 {
-    public abstract class MacroQueryResult : SelfExecutableQueryResult
-    {
-        #region Methods
+    #region Methods
 
-        public abstract SelfExecutableQueryResult Clone();
+    public abstract SelfExecutableQueryResult Clone();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

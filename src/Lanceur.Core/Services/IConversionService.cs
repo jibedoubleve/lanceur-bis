@@ -1,17 +1,16 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Services
+namespace Lanceur.Core.Services;
+
+public interface IConversionService
 {
-    public interface IConversionService
-    {
-        #region Methods
+    #region Methods
 
-        CompositeAliasQueryResult ToAliasQueryResultComposite(AliasQueryResult source, IEnumerable<AliasQueryResult> subaliases);
+    CompositeAliasQueryResult ToAliasQueryResultComposite(AliasQueryResult source, IEnumerable<AliasQueryResult> subaliases);
 
-        IEnumerable<QueryResult> ToQueryResult(IEnumerable<string> enumerable);
+    IEnumerable<QueryResult> ToQueryResult(IEnumerable<string> enumerable);
 
-        IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<QueryResult> source);
+    IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<QueryResult> source);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

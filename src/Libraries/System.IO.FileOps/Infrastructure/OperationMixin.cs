@@ -10,8 +10,7 @@ public static class OperationMixin
     #region Fields
 
     private static readonly IEnumerable<Type> Types =
-        Assembly.GetAssembly(typeof(AbstractOperation))?.GetTypes()
-        ?? Type.EmptyTypes;
+        Assembly.GetAssembly(typeof(AbstractOperation))?.GetTypes() ?? Type.EmptyTypes;
 
     #endregion Fields
 

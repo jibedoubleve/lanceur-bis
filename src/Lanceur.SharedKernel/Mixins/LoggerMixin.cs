@@ -17,17 +17,19 @@ public static class LoggerMixin
     /// <param name="executionThreshold">The time threshold in milliseconds. If execution time exceeds this value, a warning is logged.</param>
     /// <param name="callerMemberName">The name of the method or property that called this method, used for more detailed logging.</param>
     /// <returns>A <see cref="Measurement"/> object that logs the execution time when disposed.</returns>
-
     public static Measurement MeasureExecutionTime(
         this ILogger logger,
         object source,
         double executionThreshold = 100,
-        [CallerMemberName] string callerMemberName = null)
+        [CallerMemberName] string callerMemberName = null
+    )
     {
         return source is null
             ? Measurement.Empty
-            : TimeMeter.Measure((timespan, message) =>
-                LogTime(logger, source.GetType(), callerMemberName, timespan, message, executionThreshold));
+            : TimeMeter.Measure(
+                (timespan, message) =>
+                    LogTime(logger, source.GetType(), callerMemberName, timespan, message, executionThreshold)
+            );
     }
 
     private static void LogTime(ILogger logger, Type source, string memberName, TimeSpan elapsed, string message, double executionThreshold)
@@ -37,11 +39,18 @@ public static class LoggerMixin
         if (string.IsNullOrEmpty(message))
             logger.LogWarning(
                 "Slow execution of {SourceFullName}.{CallerMemberName} in {ElapsedMilliseconds} milliseconds",
-                source.FullName, memberName, elapsed.TotalMilliseconds);
+                source.FullName,
+                memberName,
+                elapsed.TotalMilliseconds
+            );
         else
             logger.LogWarning(
                 "Slow execution of {SourceFullName}.{CallerMemberName} in {ElapsedMilliseconds} milliseconds. ['{Message}']",
-                source.FullName, memberName, elapsed.TotalMilliseconds, message);
+                source.FullName,
+                memberName,
+                elapsed.TotalMilliseconds,
+                message
+            );
     }
 
     #endregion Methods

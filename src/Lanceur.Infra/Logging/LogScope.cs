@@ -13,10 +13,7 @@ public class LogScope
 
     #region Constructors
 
-    public LogScope(ILogger logger)
-    {
-        _logger = logger;
-    }
+    public LogScope(ILogger logger) => _logger = logger;
 
     #endregion Constructors
 
@@ -30,7 +27,7 @@ public class LogScope
 
     public LogScope AddDestructured(string key, object value)
     {
-        if (!key.StartsWith('@')) { key = $"@{key}"; }
+        if (!key.StartsWith('@')) key = $"@{key}";
         return Add(key, value);
     }
 

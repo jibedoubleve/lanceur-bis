@@ -42,7 +42,8 @@ public class PluginsViewModel : RoutableViewModel
         IPluginManifestRepository pluginConfigRepository = null,
         INotification notification = null,
         IAppRestart restart = null,
-        IPluginInstaller pluginInstaller = null)
+        IPluginInstaller pluginInstaller = null
+    )
     {
         var l = Locator.Current;
 
@@ -58,16 +59,20 @@ public class PluginsViewModel : RoutableViewModel
         _askFile = Interactions.SelectFile(schedulers1.MainThreadScheduler);
         _askWebFile = new();
 
-        Activate = ReactiveCommand.Create(OnActivate,
-                                          outputScheduler: schedulers1.MainThreadScheduler);
+        Activate = ReactiveCommand.Create(
+            OnActivate,
+            outputScheduler: schedulers1.MainThreadScheduler
+        );
         Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
         InstallPlugin =
             ReactiveCommand.CreateFromTask(OnInstallPluginAsync, outputScheduler: schedulers1.MainThreadScheduler);
         InstallPlugin.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
-        InstallPluginFromWeb = ReactiveCommand.CreateFromTask(OnInstallPluginFromWebAsync,
-                                                              outputScheduler: schedulers1.MainThreadScheduler);
+        InstallPluginFromWeb = ReactiveCommand.CreateFromTask(
+            OnInstallPluginFromWebAsync,
+            outputScheduler: schedulers1.MainThreadScheduler
+        );
         InstallPluginFromWeb.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));
 
         Restart = ReactiveCommand.Create(OnRestart, outputScheduler: schedulers1.MainThreadScheduler);
@@ -79,15 +84,18 @@ public class PluginsViewModel : RoutableViewModel
 
         this.WhenAnyObservable(
                 vm => vm.InstallPlugin,
-                vm => vm.InstallPluginFromWeb)
+                vm => vm.InstallPluginFromWeb
+            )
             .ObserveOn(schedulers1.MainThreadScheduler)
             .Where(response => response is not null)
-            .Subscribe(response =>
-            {
-                var viewmodel = response.ToViewModel();
-                RegisterInteraction(viewmodel);
-                PluginManifests.Add(viewmodel);
-            });
+            .Subscribe(
+                response =>
+                {
+                    var viewmodel = response.ToViewModel();
+                    RegisterInteraction(viewmodel);
+                    PluginManifests.Add(viewmodel);
+                }
+            );
     }
 
     #endregion Constructors
@@ -124,10 +132,7 @@ public class PluginsViewModel : RoutableViewModel
         var manifests = pluginManifests.ToViewModel();
         foreach (var manifest in manifests) RegisterInteraction(manifest);
 
-        var context = new ActivationContext()
-        {
-            PluginManifests = manifests
-        };
+        var context = new ActivationContext() { PluginManifests = manifests };
 
         return context;
     }
@@ -147,10 +152,7 @@ public class PluginsViewModel : RoutableViewModel
         if (installationResult.IsUpdate)
         {
             _notification.Information($"Update plugin at '{packagePath}'");
-            foreach (var manifest in PluginManifests.Where(x => x.Dll == installationResult.PluginManifest.Dll))
-            {
-                manifest.IsVisible = false;
-            }
+            foreach (var manifest in PluginManifests.Where(x => x.Dll == installationResult.PluginManifest.Dll)) manifest.IsVisible = false;
             return installationResult.PluginManifest;
         }
 

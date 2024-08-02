@@ -6,9 +6,7 @@ internal class RemoveDirectoryOperation : AbstractOperation, IOperation
 {
     #region Constructors
 
-    public RemoveDirectoryOperation(Dictionary<string, string> parameters) : base("rmdir", parameters)
-    {
-    }
+    public RemoveDirectoryOperation(Dictionary<string, string> parameters) : base("rmdir", parameters) { }
 
     #endregion Constructors
 

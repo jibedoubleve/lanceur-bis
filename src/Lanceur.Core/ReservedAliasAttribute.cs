@@ -1,21 +1,17 @@
-﻿namespace Lanceur.Core
+﻿namespace Lanceur.Core;
+
+[AttributeUsage(AttributeTargets.Class)]
+public class ReservedAliasAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public class ReservedAliasAttribute : Attribute
-    {
-        #region Constructors
+    #region Constructors
 
-        public ReservedAliasAttribute(string name)
-        {
-            Name = name;
-        }
+    public ReservedAliasAttribute(string name) => Name = name;
 
-        #endregion Constructors
+    #endregion Constructors
 
-        #region Properties
+    #region Properties
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

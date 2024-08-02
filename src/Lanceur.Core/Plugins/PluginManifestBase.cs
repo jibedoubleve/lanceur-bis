@@ -1,13 +1,12 @@
-﻿namespace Lanceur.Core.Plugins
+﻿namespace Lanceur.Core.Plugins;
+
+public abstract class PluginManifestBase
 {
-    public abstract class PluginManifestBase
-    {
-        #region Properties
+    #region Properties
 
-        public string Description { get; set; }
-        public string Name { get; set; }
-        public Version Version { get; set; }
+    public string Description { get; set; }
+    public string Name { get; set; }
+    public Version Version { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

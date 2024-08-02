@@ -8,9 +8,9 @@ public static class LoggerMixins
 {
     #region Methods
 
-    public static IDisposable ScopeProcessStartInfo(this ILogger logger, ProcessStartInfo psi)
-    {
-        return logger.BeginSingleScope("ProcessStartInfo", new
+    public static IDisposable ScopeProcessStartInfo(this ILogger logger, ProcessStartInfo psi) => logger.BeginSingleScope(
+        "ProcessStartInfo",
+        new
         {
             psi.FileName,
             psi.Verb,
@@ -18,8 +18,8 @@ public static class LoggerMixins
             psi.UseShellExecute,
             psi.WorkingDirectory,
             psi.WindowStyle
-        });
-    }
+        }
+    );
 
     #endregion Methods
 }

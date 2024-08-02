@@ -1,33 +1,26 @@
-﻿namespace Lanceur.Core.Models
+﻿namespace Lanceur.Core.Models;
+
+public class DisplayUsageQueryResult : QueryResult
 {
-    public class DisplayUsageQueryResult : QueryResult
+    #region Properties
+
+    public string Color
     {
-        #region Properties
-
-        public string Color
+        get
         {
-            get
+            return Count switch
             {
-                return Count switch
-                {
-                    > 500 => "green",
-                    <= 500 and > 100 => "lightgreen",
-                    <= 100 and > 50 => "orange",
-                    _ => "red",
-                };
-            }
+                > 500            => "green",
+                <= 500 and > 100 => "lightgreen",
+                <= 100 and > 50  => "orange",
+                _                => "red"
+            };
         }
-
-        public override string Icon
-        {
-            get
-            {
-                return (Count / 100) > 9
-                    ? "Numeric9PlusBoxMultipleOutline"
-                    : $"Numeric{Count / 100}BoxOutline";
-            }
-        }
-
-        #endregion Properties
     }
+
+    public override string Icon => Count / 100 > 9
+        ? "Numeric9PlusBoxMultipleOutline"
+        : $"Numeric{Count / 100}BoxOutline";
+
+    #endregion Properties
 }

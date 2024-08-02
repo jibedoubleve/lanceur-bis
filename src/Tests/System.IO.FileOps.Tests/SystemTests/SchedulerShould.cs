@@ -20,11 +20,8 @@ public class SchedulerShould : IDisposable
         var results = new List<OperationConfiguration>();
         for (var i = 0; i < count; i++)
             results.Add(
-                new OperationConfiguration
-                {
-                    Name = $"NoOperation_{i}",
-                    Parameters = new Dictionary<string, string> { { "1", "un" } }
-                });
+                new() { Name = $"NoOperation_{i}", Parameters = new()  { { "1", "un" } } }
+            );
         return results;
     }
 

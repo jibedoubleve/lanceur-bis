@@ -4,8 +4,7 @@ public class DummyAppRestart : IAppRestart
 {
     #region Methods
 
-    public void Restart()
-    { }
+    public void Restart() { }
 
     #endregion Methods
 }

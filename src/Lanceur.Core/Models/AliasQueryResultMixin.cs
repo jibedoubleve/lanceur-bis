@@ -11,8 +11,7 @@ public static class AliasQueryResultMixin
     /// </summary>
     /// <param name="alias">The alias ti check</param>
     /// <returns><c>True</c> if this is a packaged application; otherwise <c>False</c></returns>
-    public static bool IsPackagedApplication(this AliasQueryResult alias)
-        => alias.FileName.ToLower().StartsWith("package:");
+    public static bool IsPackagedApplication(this AliasQueryResult alias) => alias.FileName.ToLower().StartsWith("package:");
 
     /// <summary>
     /// Set first names defined in the synonyms as the name of the alias

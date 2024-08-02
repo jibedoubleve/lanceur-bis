@@ -7,9 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="Everything64.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="Everything64.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

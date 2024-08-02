@@ -13,10 +13,7 @@ public class TraceLoggerScope : IDisposable
 
     #region Constructors
 
-    public TraceLoggerScope(object state)
-    {
-        _state = state;
-    }
+    public TraceLoggerScope(object state) => _state = state;
 
     #endregion Constructors
 

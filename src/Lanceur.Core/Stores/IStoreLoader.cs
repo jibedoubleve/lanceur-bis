@@ -1,13 +1,12 @@
 ﻿using Lanceur.Core.Services;
 
-namespace Lanceur.Core.Stores
+namespace Lanceur.Core.Stores;
+
+public interface IStoreLoader
 {
-    public interface IStoreLoader
-    {
-        #region Methods
+    #region Methods
 
-        public IEnumerable<ISearchService> Load();
+    public IEnumerable<ISearchService> Load();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core.Services
+﻿namespace Lanceur.Core.Services;
+
+public interface IClipboardService
 {
-    public interface IClipboardService
-    {
-        #region Methods
+    #region Methods
 
-        string GetText();
+    string GetText();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

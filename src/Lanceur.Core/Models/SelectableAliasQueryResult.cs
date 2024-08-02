@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core.Models
+﻿namespace Lanceur.Core.Models;
+
+public class SelectableAliasQueryResult : AliasQueryResult
 {
-    public class SelectableAliasQueryResult : AliasQueryResult
-    {
-        #region Properties
+    #region Properties
 
-        public bool IsSelected { get; set; }
+    public bool IsSelected { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

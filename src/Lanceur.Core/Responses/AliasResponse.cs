@@ -1,20 +1,19 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Responses
+namespace Lanceur.Core.Responses;
+
+public class AliasResponse
 {
-    public class AliasResponse
-    {
-        #region Properties
+    #region Properties
 
-        public bool KeepAlive { get; set; }
-        public IEnumerable<QueryResult> Results { get; set; } = new List<QueryResult>();
+    public bool KeepAlive { get; set; }
+    public IEnumerable<QueryResult> Results { get; set; } = new List<QueryResult>();
 
-        #endregion Properties
+    #endregion Properties
 
-        #region Methods
+    #region Methods
 
-        public static implicit operator Task<AliasResponse>(AliasResponse src) => Task.FromResult(src);
+    public static implicit operator Task<AliasResponse>(AliasResponse src) => Task.FromResult(src);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

@@ -32,13 +32,13 @@ public sealed class Measurement : IDisposable
 
     private void Log(string message, bool stopTime)
     {
-        if(stopTime) _stopwatch.Stop();
+        if (stopTime) _stopwatch.Stop();
         _log(_stopwatch.Elapsed, message);
     }
 
-    public void Dispose() => Log(string.Empty, stopTime: true);
+    public void Dispose() => Log(string.Empty, true);
 
-    public void LogSplitTime(string message = null) => Log(message, stopTime: false);
+    public void LogSplitTime(string message = null) => Log(message, false);
 
     #endregion Methods
 }

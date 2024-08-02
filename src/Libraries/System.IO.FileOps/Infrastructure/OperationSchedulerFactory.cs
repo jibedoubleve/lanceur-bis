@@ -13,8 +13,7 @@ public static class OperationSchedulerFactory
         return scheduler;
     }
 
-    public static IOperationScheduler RetrieveFromMemory()
-    { return new MemoryOperationScheduler(); }
+    public static IOperationScheduler RetrieveFromMemory() => new MemoryOperationScheduler();
 
     #endregion Methods
 }

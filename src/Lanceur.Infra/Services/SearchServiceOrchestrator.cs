@@ -30,7 +30,6 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
         var regex = new Regex(searchService.Orchestration.AlivePattern);
         var isAlive = regex.IsMatch(query.Name);
         return isAlive;
-    
     }
 
     #endregion Methods

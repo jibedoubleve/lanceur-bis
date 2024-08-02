@@ -14,10 +14,7 @@ public class MacroLister
 
     #region Constructors
 
-    public MacroLister(object source)
-    {
-        _source = source;
-    }
+    public MacroLister(object source) => _source = source;
 
     #endregion Constructors
 
@@ -41,7 +38,9 @@ public class MacroLister
         _macros ??= GetMacroAttributes();
 
         return _macros.Where(t => t.IsVisible)
-                      .ToArray(); ;
+                      .ToArray();
+
+        ;
     }
 
     #endregion Methods

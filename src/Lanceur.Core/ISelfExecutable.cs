@@ -1,13 +1,12 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core
+namespace Lanceur.Core;
+
+public interface ISelfExecutable : IElevated
 {
-    public interface ISelfExecutable : IElevated
-    {
-        #region Methods
+    #region Methods
 
-        Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
+    Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

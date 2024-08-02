@@ -24,10 +24,7 @@ public class MoveDirectoryOperationShould : IDisposable
         Directory.CreateDirectory(Source);
 
         using (var fileStream = File.Create(Path.Combine(Source, "output.txt")))
-        using (var writer = new StreamWriter(fileStream))
-        {
-            writer.WriteLine("some random text");
-        }
+        using (var writer = new StreamWriter(fileStream)) { writer.WriteLine("some random text"); }
 
         Destination = Path.Combine(Path.GetTempPath(), DestinationName);
     }
@@ -60,15 +57,16 @@ public class MoveDirectoryOperationShould : IDisposable
 
         // ASSERT
         Directory.Exists(Destination)
-                 .Should().BeTrue($"'{Destination}' should be created");
+                 .Should()
+                 .BeTrue($"'{Destination}' should be created");
 
         Directory.EnumerateFiles(Destination)
                  .Count()
-                 .Should().BeGreaterThan(0);
+                 .Should()
+                 .BeGreaterThan(0);
     }
 
-    public void Dispose()
-    { Cleanup(); }
+    public void Dispose() { Cleanup(); }
 
     #endregion Methods
 }

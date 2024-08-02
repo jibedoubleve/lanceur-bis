@@ -283,7 +283,8 @@
                         FontWeight="ExtraLight"
                         Text="{Binding Version, StringFormat={} (v{0})}" />
                 </StackPanel>
-                <TextBlock Margin="5" Text="{Binding Description, Converter={StaticResource QueryDescriptionConverter}}" />
+                <TextBlock Margin="5"
+                           Text="{Binding Description, Converter={StaticResource QueryDescriptionConverter}}" />
             </StackPanel>
         </Grid>
     </DataTemplate>
