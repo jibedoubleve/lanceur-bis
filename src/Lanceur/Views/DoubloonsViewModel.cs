@@ -98,7 +98,7 @@ public class DoubloonsViewModel : RoutableViewModel, IActivatableViewModel
     private ObservableCollection<SelectableAliasQueryResult> OnActivate()
     {
         var doubloons = _service.GetDoubloons().ToArray();
-        _thumbnailManager.RefreshThumbnailsAsync(doubloons);
+        _thumbnailManager.RefreshThumbnails(doubloons);
         var results = new ObservableCollection<SelectableAliasQueryResult>(doubloons.Cast<SelectableAliasQueryResult>());
         return results;
     }
