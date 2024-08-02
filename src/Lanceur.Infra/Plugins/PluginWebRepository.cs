@@ -39,18 +39,12 @@ public class PluginWebRepository : IPluginWebRepository
         var installedPlugins = _localPluginManifestRepository.GetPluginManifests();
         uninstallationCandidates ??= Array.Empty<IPluginManifest>();
 
-        var plugins = from i in installedPlugins
-                      where uninstallationCandidates.All(x => x.Dll != i.Dll)
-                      select i;
+        var plugins = installedPlugins.Where(i => uninstallationCandidates.All(x => x.Dll != i.Dll));
 
         // If a plugin is already installed but web version is
         // newer, then show this new plugin
-        return (from p in webPlugins
-                where false ==
-                      plugins.Any(
-                          x => x.Dll == p.Dll && x.Version >= p.Version
-                      )
-                select p).ToArray();
+        return webPlugins.Where(p => false == plugins.Any(x => x.Dll == p.Dll && x.Version >= p.Version))
+                         .ToArray();
     }
 
     #endregion Methods

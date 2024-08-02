@@ -63,9 +63,8 @@ public class ReservedAliasStore : ISearchService
 
         var types = _assembly.GetTypes();
 
-        var found = (from t in types
-                     where t.GetCustomAttributes<ReservedAliasAttribute>().Any()
-                     select t).ToList();
+        var found = types.Where(t => t.GetCustomAttributes<ReservedAliasAttribute>().Any())
+                         .ToList();
         var foundItems = new List<QueryResult>();
         foreach (var type in found)
         {
@@ -106,9 +105,8 @@ public class ReservedAliasStore : ISearchService
     public IEnumerable<QueryResult> Search(Cmdline query)
     {
         using var _ = _logger.MeasureExecutionTime(this);
-        var result = (from k in GetAll()
-                      where k.Name.ToLower().StartsWith(query.Name)
-                      select k).ToList();
+        var result = GetAll().Where(k => k.Name.ToLower().StartsWith(query.Name))
+                             .ToList();
 
         var orderedResult = _dataService
                             .RefreshUsage(result)

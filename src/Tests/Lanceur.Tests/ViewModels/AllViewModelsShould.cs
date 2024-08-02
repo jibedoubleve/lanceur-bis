@@ -37,9 +37,8 @@ public class AllViewModelsShould
             )
             : Activator.CreateInstance(vmType);
 
-        var fields = from t in vmType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField)
-                     where t.IsInitOnly && t.IsPrivate
-                     select t;
+        var fields = vmType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField)
+                           .Where(t => t.IsInitOnly && t.IsPrivate);
 
         // Check whether all private readonly fields have a value...
         using (new AssertionScope())

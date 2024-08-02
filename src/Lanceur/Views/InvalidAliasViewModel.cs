@@ -77,9 +77,8 @@ public class InvalidAliasViewModel : RoutableViewModel
 
     private async Task OnRemoveSelected()
     {
-        var toDel = (from d in InvalidAliases
-                     where d.IsSelected
-                     select d).ToList();
+        var toDel = InvalidAliases.Where(d => d.IsSelected)
+                                  .ToList();
         var count = toDel?.Count() ?? 0;
         var remove = await _confirmRemove.Handle($"{count}");
         if (remove && count > 0)

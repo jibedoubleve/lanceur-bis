@@ -119,9 +119,9 @@ public class AliasDbAction
         );
 
         foreach (var result in dbResultAr)
-            result.Count = (from item in dbResults
-                            where item.Id == result.Id
-                            select item.Count).SingleOrDefault();
+            result.Count = dbResults.Where(item => item.Id == result.Id)
+                                    .Select(item => item.Count)
+                                    .SingleOrDefault();
         return dbResultAr;
     }
 

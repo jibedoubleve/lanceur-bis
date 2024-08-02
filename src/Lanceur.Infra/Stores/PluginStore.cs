@@ -96,9 +96,8 @@ public class PluginStore : ISearchService, IPluginManifestRepository
     {
         using var _ = _logger.MeasureExecutionTime(this);
         LoadPlugins();
-        var found = (from plugin in _plugins
-                     where plugin?.Name?.ToLower().StartsWith(query.Name.ToLower()) ?? false
-                     select plugin).ToArray();
+        var found = _plugins.Where(plugin => plugin?.Name?.ToLower().StartsWith(query.Name.ToLower()) ?? false)
+                            .ToArray();
         _logger.LogTrace("Found {Length} plugin(s)", found.Length);
 
         //Set count and name

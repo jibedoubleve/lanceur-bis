@@ -70,13 +70,8 @@ public class ScriptManager
         return new(new Dictionary<Version, string>(ordered));
     }
 
-    public IEnumerable<string> ListResources()
-    {
-        var result = from s in _asm.GetManifestResourceNames()
-                     where _regex.IsMatch(s)
-                     select s;
-        return result;
-    }
+    public IEnumerable<string> ListResources() => _asm.GetManifestResourceNames()
+                                                      .Where(s => _regex.IsMatch(s));
 
     #endregion Methods
 }

@@ -123,11 +123,10 @@ public class PluginsViewModel : RoutableViewModel
 
         // Get all candidates for uninstall
         // and remove them from the list
-        var pluginManifests = (from p in allPluginManifests
-                               where !(from c in _uninstaller.UninstallationCandidates
-                                       select c.Dll.GetDirectoryName()
-                                   ).Contains(p.Dll.GetDirectoryName())
-                               select p).ToList();
+        var pluginManifests = allPluginManifests.Where(p => !_uninstaller.UninstallationCandidates
+                                                                         .Select(c => c.Dll.GetDirectoryName())
+                                                                         .Contains(p.Dll.GetDirectoryName()))
+                                                .ToList();
 
         var manifests = pluginManifests.ToViewModel();
         foreach (var manifest in manifests) RegisterInteraction(manifest);

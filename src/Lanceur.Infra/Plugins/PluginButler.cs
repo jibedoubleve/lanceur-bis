@@ -94,9 +94,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
     public async Task<PluginInstallationResult> SubscribeForInstallAsync(string packagePath)
     {
         using var zip = ZipFile.OpenRead(packagePath);
-        var config = (from entry in zip.Entries
-                      where entry.Name == Locations.ManifestFileName
-                      select entry).SingleOrDefault();
+        var config = zip.Entries.SingleOrDefault(entry => entry.Name == Locations.ManifestFileName);
 
         if (config == null)
         {
