@@ -50,7 +50,6 @@ public class AliasSearchDbAction
                     a.exec_count            as {nameof(AliasQueryResult.Count)},
                     s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
                     s.Synonyms              as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
-                    a.exec_count            as {nameof(AliasQueryResult.Count)},
                     a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
                 from
                     alias a
