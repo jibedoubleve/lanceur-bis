@@ -19,10 +19,7 @@ internal abstract class AbstractOperationScheduler : IOperationScheduler
 
     #region Methods
 
-    private static IEnumerable<IOperation> GetOperations(IEnumerable<OperationConfiguration> configurations)
-    {
-        return configurations.Select(cfg => cfg.ToOperation()).ToList();
-    }
+    private static IEnumerable<IOperation> GetOperations(IEnumerable<OperationConfiguration> configurations) { return configurations.Select(cfg => cfg.ToOperation()).ToList(); }
 
     protected IOperationScheduler AddOperations(IEnumerable<OperationConfiguration> operations, bool resetList = true)
     {
@@ -54,15 +51,10 @@ internal abstract class AbstractOperationScheduler : IOperationScheduler
     public IOperationScheduler RemoveOperation(OperationInfo operationInfo)
     {
         var toDel = (from op in _operations
-                     where op.Name == operationInfo.Name
-                           && op.Parameters.ContainsKey(operationInfo.Key)
-                           && op.Parameters[operationInfo.Key] == operationInfo.Value
+                     where op.Name == operationInfo.Name && op.Parameters.ContainsKey(operationInfo.Key) && op.Parameters[operationInfo.Key] == operationInfo.Value
                      select op).FirstOrDefault();
 
-        if (toDel is not null)
-        {
-            _operations.Remove(toDel);
-        }
+        if (toDel is not null) _operations.Remove(toDel);
 
         return this;
     }

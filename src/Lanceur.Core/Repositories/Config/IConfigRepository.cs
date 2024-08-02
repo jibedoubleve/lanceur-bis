@@ -1,19 +1,18 @@
-﻿namespace Lanceur.Core.Repositories.Config
+﻿namespace Lanceur.Core.Repositories.Config;
+
+public interface IConfigRepository<TConfig>
 {
-    public interface IConfigRepository<TConfig>
-    {
-        #region Properties
+    #region Properties
 
-        TConfig Current { get; }
+    TConfig Current { get; }
 
-        #endregion Properties
+    #endregion Properties
 
-        #region Methods
+    #region Methods
 
-        void Load();
+    void Load();
 
-        void Save();
+    void Save();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

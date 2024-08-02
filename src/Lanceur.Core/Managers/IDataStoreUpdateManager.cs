@@ -1,19 +1,18 @@
-﻿namespace Lanceur.Core.Managers
+﻿namespace Lanceur.Core.Managers;
+
+public interface IDataStoreUpdateManager
 {
-    public interface IDataStoreUpdateManager
-    {
-        #region Methods
+    #region Methods
 
-        Version GetLatestVersion();
+    Version GetLatestVersion();
 
-        void SetLatestVersion();
+    void SetLatestVersion();
 
-        void UpdateFrom(string version);
+    void UpdateFrom(string version);
 
-        void UpdateFrom(Version version);
+    void UpdateFrom(Version version);
 
-        void UpdateFromScratch();
+    void UpdateFromScratch();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

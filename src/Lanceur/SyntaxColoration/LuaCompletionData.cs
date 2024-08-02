@@ -32,9 +32,11 @@ public class LuaCompletionData : ICompletionData
 
     #region Methods
 
-    public void Complete(TextArea textArea,
-                         ISegment completionSegment,
-                         EventArgs insertionRequestEventArgs)
+    public void Complete(
+        TextArea textArea,
+        ISegment completionSegment,
+        EventArgs insertionRequestEventArgs
+    )
     {
         textArea.Document.Replace(completionSegment, Text);
     }

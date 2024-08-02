@@ -228,8 +228,11 @@ public class EverythingApi : IEverythingApi
 
         Everything_SetMax(5_000);
         Everything_SetSearchW(query);
-        Everything_SetRequestFlags(EVERYTHING_REQUEST_FILE_NAME | EVERYTHING_REQUEST_PATH |
-                                  EVERYTHING_REQUEST_EXTENSION);
+        Everything_SetRequestFlags(
+            EVERYTHING_REQUEST_FILE_NAME |
+            EVERYTHING_REQUEST_PATH |
+            EVERYTHING_REQUEST_EXTENSION
+        );
         Everything_SetSort(13);
         Everything_QueryW(true);
 
@@ -241,12 +244,7 @@ public class EverythingApi : IEverythingApi
             var stringBuilder = new StringBuilder(fileAndPathSize);
             Everything_GetResultFullPathName(i, stringBuilder, fileAndPathSize);
 
-            result.Add(new()
-            {
-                Name = Marshal.PtrToStringUni(Everything_GetResultFileName(i)) ?? string.Empty,
-                Path = stringBuilder.ToString(),
-                ResultType = GetResultType(i),
-            });
+            result.Add(new() { Name = Marshal.PtrToStringUni(Everything_GetResultFileName(i)) ?? string.Empty, Path = stringBuilder.ToString(), ResultType = GetResultType(i) });
         }
 
         return result;

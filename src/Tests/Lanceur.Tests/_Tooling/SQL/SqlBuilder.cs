@@ -26,7 +26,7 @@ internal class SqlBuilder
     {
         fileName ??= Guid.NewGuid().ToString();
         arguments ??= Guid.NewGuid().ToString();
-        
+
         _sql.Append($"insert into alias (id, file_name, arguments) values ({idAlias}, '{fileName}', '{arguments}');");
         _sql.AppendNewLine();
         return this;
@@ -36,7 +36,7 @@ internal class SqlBuilder
     {
         name ??= Guid.NewGuid().ToString();
         argument ??= Guid.NewGuid().ToString();
-        
+
         _sql.Append($"insert into alias_argument(id_alias, name, argument) values ({idAlias}, '{name}', '{argument}');");
         _sql.AppendNewLine();
         return this;
@@ -44,13 +44,14 @@ internal class SqlBuilder
 
     public SqlBuilder AppendSynonyms(long idAlias, params string[] synonyms)
     {
-        if (synonyms is null || synonyms.Length == 0) { throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias"); }
+        if (synonyms is null || synonyms.Length == 0) throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias");
 
         foreach (var synonym in synonyms)
         {
             _sql.Append($"insert into alias_name(id_alias, name) values ({idAlias}, '{synonym}');");
             _sql.AppendNewLine();
         }
+
         return this;
     }
 

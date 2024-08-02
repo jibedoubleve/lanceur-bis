@@ -15,10 +15,7 @@ public struct PluginWebManifestMetadata
 
     public static string ToAbsoluteUrl(string relativeUrl)
     {
-        if (!relativeUrl.Trim('/').StartsWith("plugin"))
-        {
-            relativeUrl = $"plugins/{relativeUrl.Trim('/')}";
-        }
+        if (!relativeUrl.Trim('/').StartsWith("plugin")) relativeUrl = $"plugins/{relativeUrl.Trim('/')}";
 
         return $"{BaseUrl}{relativeUrl}";
     }

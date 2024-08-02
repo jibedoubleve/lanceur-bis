@@ -10,12 +10,7 @@ public class ToastNotification : INotification
 {
     #region Enums
 
-    private enum Level
-    {
-        Information,
-        Warning,
-        Error
-    };
+    private enum Level { Information, Warning, Error };
 
     #endregion Enums
 
@@ -26,9 +21,9 @@ public class ToastNotification : INotification
         var uri = level switch
         {
             Level.Information => Icon.Info,
-            Level.Warning => Icon.Warn,
-            Level.Error => Icon.Error,
-            _ => Icon.None
+            Level.Warning     => Icon.Warn,
+            Level.Error       => Icon.Error,
+            _                 => Icon.None
         };
         new ToastContentBuilder()
             .AddText(title)

@@ -1,14 +1,13 @@
 ﻿using Lanceur.Core.Models.Settings;
 using Lanceur.Infra.Constants;
 
-namespace Lanceur.Infra.Services
+namespace Lanceur.Infra.Services;
+
+public class LocalConfig : ILocalConfig
 {
-    public class LocalConfig : ILocalConfig
-    {
-        #region Properties
+    #region Properties
 
-        public string DbPath { get; set; } = Paths.DefaultDb;
+    public string DbPath { get; set; } = Paths.DefaultDb;
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

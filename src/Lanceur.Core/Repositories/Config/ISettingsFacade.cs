@@ -1,20 +1,19 @@
 ﻿using Lanceur.Core.Models.Settings;
 
-namespace Lanceur.Core.Repositories.Config
+namespace Lanceur.Core.Repositories.Config;
+
+public interface ISettingsFacade
 {
-    public interface ISettingsFacade
-    {
-        #region Properties
+    #region Properties
 
-        AppConfig Application { get; }
-        ILocalConfig Local { get; }
+    AppConfig Application { get; }
+    ILocalConfig Local { get; }
 
-        #endregion Properties
+    #endregion Properties
 
-        #region Methods
+    #region Methods
 
-        void Save();
+    void Save();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

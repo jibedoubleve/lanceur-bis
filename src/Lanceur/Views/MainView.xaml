@@ -25,24 +25,6 @@
     WindowStyle="None"
     mc:Ignorable="d">
     <Window.Resources>
-        <Storyboard x:Key="fadeOutStoryBoard">
-            <DoubleAnimation
-                Completed="OnFadeOutStoryBoardCompleted"
-                FillBehavior="HoldEnd"
-                Storyboard.TargetProperty="Opacity"
-                From="1"
-                To="0"
-                Duration="{StaticResource FadeOutDuration}" />
-        </Storyboard>
-        <Storyboard x:Key="fadeInStoryBoard">
-            <DoubleAnimation
-                Completed="OnFadeInStoryBoardCompleted"
-                FillBehavior="HoldEnd"
-                Storyboard.TargetProperty="Opacity"
-                From="0"
-                To="1"
-                Duration="{StaticResource FadeInDuration}" />
-        </Storyboard>
 
         <!--  TEMPLATES  -->
         <xaml:QueryResultSelector

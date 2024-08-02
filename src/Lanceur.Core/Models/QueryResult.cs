@@ -68,7 +68,7 @@ public abstract class QueryResult : ObservableModel
     public bool IsThumbnailDisabled { get; set; }
 
     public string Name { get; set; } = string.Empty;
-    
+
     public Cmdline Query { get; set; } = Cmdline.Empty;
 
     /// <summary>

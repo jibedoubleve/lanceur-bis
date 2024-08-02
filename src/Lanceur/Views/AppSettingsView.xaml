@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:Lanceur.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:logging="clr-namespace:Microsoft.Extensions.Logging;assembly=Microsoft.Extensions.Logging.Abstractions"
     xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:rxui="http://reactiveui.net"
@@ -15,7 +14,6 @@
     x:TypeArguments="vm:AppSettingsViewModel"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <conv:MahAppsHotKeyToSettingsHotKey x:Key="MahAppsHotKeyToSettingsHotKey" />
     </UserControl.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
@@ -61,7 +59,8 @@
                 </GroupBox>
                 <GroupBox Header="Miscellaneous">
                     <StackPanel>
-                        <TextBlock Text="{Binding ElementName=SlRestartDelay, Path=Value, StringFormat=Delay before restart after you saved the settings: {0} milliseconds}" />
+                        <TextBlock
+                            Text="{Binding ElementName=SlRestartDelay, Path=Value, StringFormat=Delay before restart after you saved the settings: {0} milliseconds}" />
                         <Slider
                             x:Name="SlRestartDelay"
                             IsSnapToTickEnabled="True"
@@ -72,7 +71,8 @@
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Logging">
-                    <HeaderedContentControl Header="Minimum Logging Threshold (Temporary)" ToolTip="This change will take effect until you restart the application or adjust it again here.">
+                    <HeaderedContentControl Header="Minimum Logging Threshold (Temporary)"
+                                            ToolTip="This change will take effect until you restart the application or adjust it again here.">
                         <StackPanel Orientation="Horizontal">
                             <RadioButton
                                 x:Name="RbInfo"

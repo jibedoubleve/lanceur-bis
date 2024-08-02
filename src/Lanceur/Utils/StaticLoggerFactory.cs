@@ -4,32 +4,28 @@ using Microsoft.Extensions.Logging;
 using Splat;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace Lanceur.Utils
+namespace Lanceur.Utils;
+
+internal static class StaticLoggerFactory
 {
-    internal static class StaticLoggerFactory
-    {
-        #region Methods
+    #region Methods
 
-        public static ILogger GetLogger<TCategory>() =>
-            Locator.Current.GetService<ILoggerFactory>().GetLogger(typeof(TCategory));
+    public static ILogger GetLogger<TCategory>() => Locator.Current.GetService<ILoggerFactory>().GetLogger(typeof(TCategory));
 
-        public static ILogger GetLogger(this QueryResult _) => GetLogger<QueryResult>();
+    public static ILogger GetLogger(this QueryResult _) => GetLogger<QueryResult>();
 
-        #endregion Methods
-    }
+    #endregion Methods
+}
 
-    internal class DefaultLoggerFactory : ILoggerFactory
-    {
-        #region Methods
+internal class DefaultLoggerFactory : ILoggerFactory
+{
+    #region Methods
 
-        public void AddProvider(ILoggerProvider provider)
-        { }
+    public void AddProvider(ILoggerProvider provider) { }
 
-        public ILogger CreateLogger(string categoryName) => new TraceLogger();
+    public ILogger CreateLogger(string categoryName) => new TraceLogger();
 
-        public void Dispose()
-        { }
+    public void Dispose() { }
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

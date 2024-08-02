@@ -1,20 +1,16 @@
-﻿namespace Lanceur.Core.Models
+﻿namespace Lanceur.Core.Models;
+
+public class CompositeAliasQueryResult : AliasQueryResult
 {
-    public class CompositeAliasQueryResult : AliasQueryResult
-    {
-        #region Constructors
+    #region Constructors
 
-        public CompositeAliasQueryResult(IEnumerable<AliasQueryResult> aliases)
-        {
-            Aliases = aliases;
-        }
+    public CompositeAliasQueryResult(IEnumerable<AliasQueryResult> aliases) => Aliases = aliases;
 
-        #endregion Constructors
+    #endregion Constructors
 
-        #region Properties
+    #region Properties
 
-        public IEnumerable<AliasQueryResult> Aliases { get; }
+    public IEnumerable<AliasQueryResult> Aliases { get; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

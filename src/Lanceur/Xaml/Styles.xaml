@@ -64,8 +64,11 @@
                                 <Style TargetType="{x:Type TextBlock}">
                                     <Setter Property="Foreground" Value="Transparent" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Path=Text, RelativeSource={RelativeSource TemplatedParent}}" Value="">
-                                            <Setter Property="Foreground" Value="{DynamicResource TextControlPlaceholderForeground}" />
+                                        <DataTrigger
+                                            Binding="{Binding Path=Text, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Value="">
+                                            <Setter Property="Foreground"
+                                                    Value="{DynamicResource TextControlPlaceholderForeground}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -86,7 +89,8 @@
                                 <ScrollViewer.ContentTemplate>
                                     <DataTemplate>
                                         <Grid Background="{Binding Background, ElementName=PART_ContentHost}">
-                                            <ContentPresenter Content="{Binding Path=Content, ElementName=PART_ContentHost}" />
+                                            <ContentPresenter
+                                                Content="{Binding Path=Content, ElementName=PART_ContentHost}" />
                                         </Grid>
                                     </DataTemplate>
                                 </ScrollViewer.ContentTemplate>
@@ -98,10 +102,12 @@
                             <Setter TargetName="border" Property="Opacity" Value="0.56" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource TextBox.MouseOver.Border}" />
+                            <Setter TargetName="border" Property="BorderBrush"
+                                    Value="{StaticResource TextBox.MouseOver.Border}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource TextBox.Focus.Border}" />
+                            <Setter TargetName="border" Property="BorderBrush"
+                                    Value="{StaticResource TextBox.Focus.Border}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -131,7 +137,8 @@
     <ControlTemplate x:Key="TextControlValidationErrorTemplate">
         <StackPanel>
             <AdornedElementPlaceholder x:Name="AdornedElementPlaceholder" />
-            <ItemsControl ItemsSource="{Binding ElementName=AdornedElementPlaceholder, Path=AdornedElement.TemplatedParent.(Validation.Errors)}">
+            <ItemsControl
+                ItemsSource="{Binding ElementName=AdornedElementPlaceholder, Path=AdornedElement.TemplatedParent.(Validation.Errors)}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Foreground="Red" Text="{Binding ErrorContent}" />

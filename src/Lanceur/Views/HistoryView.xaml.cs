@@ -4,20 +4,21 @@ using ReactiveUI;
 using System;
 using System.Linq;
 
-namespace Lanceur.Views
+namespace Lanceur.Views;
+
+/// <summary>
+/// Interaction logic for HistoryView.xaml
+/// </summary>
+public partial class HistoryView : IViewFor<HistoryViewModel>
 {
-    /// <summary>
-    /// Interaction logic for HistoryView.xaml
-    /// </summary>
-    public partial class HistoryView : IViewFor<HistoryViewModel>
+    #region Constructors
+
+    public HistoryView()
     {
-        #region Constructors
+        InitializeComponent();
 
-        public HistoryView()
-        {
-            InitializeComponent();
-
-            this.WhenActivated(disposable =>
+        this.WhenActivated(
+            disposable =>
             {
                 ViewModel.OnRefreshChart = (days, values) =>
                 {
@@ -26,13 +27,13 @@ namespace Lanceur.Views
                         var d = days.ToArray();
                         var v = values.ToArray();
 
-                        History.Plot.XAxis.TickLabelFormat("dd/MM/yyyy", dateTimeFormat: true);
+                        History.Plot.XAxis.TickLabelFormat("dd/MM/yyyy", true);
                         History.Plot.XAxis.Label("Day");
-                        History.Plot.XAxis.TickLabelNotation(multiplier: true);
+                        History.Plot.XAxis.TickLabelNotation(true);
 
                         History.Plot.YAxis.Label("Usage counter");
-                        History.Plot.YAxis.TickLabelFormat("N0", dateTimeFormat: false);
-                        History.Plot.YAxis.TickLabelNotation(multiplier: false);
+                        History.Plot.YAxis.TickLabelFormat("N0", false);
+                        History.Plot.YAxis.TickLabelNotation(false);
 
                         History.Plot.Style(ScottPlot.Style.Gray1);
                         History.Plot.AddBar(v, d);
@@ -43,9 +44,9 @@ namespace Lanceur.Views
                 };
 
                 ViewModel.Activate.Execute().Subscribe();
-            });
-        }
-
-        #endregion Constructors
+            }
+        );
     }
+
+    #endregion Constructors
 }

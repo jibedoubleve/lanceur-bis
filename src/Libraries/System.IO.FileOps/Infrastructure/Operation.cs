@@ -25,8 +25,7 @@ public struct OperationInfo
 
     #region Methods
 
-    public static OperationInfo UnZip(string key, string value) =>
-        new(typeof(UnzipOperation)?.FullName ?? "", key, value);
+    public static OperationInfo UnZip(string key, string value) => new(typeof(UnzipOperation)?.FullName ?? "", key, value);
 
     #endregion Methods
 }

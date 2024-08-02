@@ -1,21 +1,17 @@
-﻿namespace Lanceur.Core.LuaScripting
+﻿namespace Lanceur.Core.LuaScripting;
+
+public class ScriptResult : Script
 {
-    public class ScriptResult : Script
-    {
-        #region Properties
+    #region Properties
 
-        public Exception Exception { get; init; }
+    public Exception Exception { get; init; }
 
-        #endregion Properties
+    #endregion Properties
 
-        #region Methods
+    #region Methods
 
-        public override string ToString()
-        {
-            return $"File Name  : {Context.FileName}" +
-                 $"\nParameters : {Context.Parameters}";
-        }
+    public override string ToString() => $"File Name  : {Context.FileName}" +
+                                         $"\nParameters : {Context.Parameters}";
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

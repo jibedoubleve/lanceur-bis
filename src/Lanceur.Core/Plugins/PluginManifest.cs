@@ -1,16 +1,15 @@
-﻿namespace Lanceur.Core.Plugins
+﻿namespace Lanceur.Core.Plugins;
+
+/// <summary>
+/// Represents the configuration of a plugin
+/// </summary>
+public class PluginManifest : PluginManifestBase, IPluginManifest
 {
-    /// <summary>
-    /// Represents the configuration of a plugin
-    /// </summary>
-    public class PluginManifest : PluginManifestBase, IPluginManifest
-    {
-        #region Properties
+    #region Properties
 
-        public Version AppMinVersion { get; set; }
-        public string Author { get; set; }
-        public string Dll { get; set; }
+    public Version AppMinVersion { get; set; }
+    public string Author { get; set; }
+    public string Dll { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

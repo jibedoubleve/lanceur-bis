@@ -1,32 +1,31 @@
 ﻿using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace Lanceur.Views
+namespace Lanceur.Views;
+
+public class QueryViewModel : ReactiveObject
 {
-    public class QueryViewModel : ReactiveObject
-    {
-        #region Constructors
+    #region Constructors
 
-        private QueryViewModel(string value, bool isActive) => (Value, IsActive) = (value, isActive);
+    private QueryViewModel(string value, bool isActive) => (Value, IsActive) = (value, isActive);
 
-        #endregion Constructors
+    #endregion Constructors
 
-        #region Properties
+    #region Properties
 
-        public static QueryViewModel Empty => new(string.Empty, true);
+    public static QueryViewModel Empty => new(string.Empty, true);
 
-        [Reactive] public bool IsActive { get; set; }
+    [Reactive] public bool IsActive { get; set; }
 
-        [Reactive] public string Value { get; set; }
+    [Reactive] public string Value { get; set; }
 
-        #endregion Properties
+    #endregion Properties
 
-        #region Methods
+    #region Methods
 
-        public static implicit operator string(QueryViewModel query) => query.Value;
+    public static implicit operator string(QueryViewModel query) => query.Value;
 
-        public string Trim() => Value.Trim();
+    public string Trim() => Value.Trim();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

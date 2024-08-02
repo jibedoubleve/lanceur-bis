@@ -33,8 +33,9 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
     #region Constructors
 
     public PluginButler(
-            ILoggerFactory appLoggerFactory,
-            IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule)
+        ILoggerFactory appLoggerFactory,
+        IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule
+    )
     {
         ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
         ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
@@ -61,8 +62,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         ArgumentNullException.ThrowIfNull(manifest);
 
         var dir = Path.GetDirectoryName(manifest.Dll);
-        if (dir is null)
-            throw new NullReferenceException($"No directory defined in the manifest for plugin '{manifest.Name}'");
+        if (dir is null) throw new NullReferenceException($"No directory defined in the manifest for plugin '{manifest.Name}'");
 
         MutableUninstallationCandidates.TryAdd(dir, manifest);
     }
@@ -72,14 +72,12 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         ArgumentNullException.ThrowIfNull(manifest);
 
         var dir = Path.GetDirectoryName(manifest.Dll);
-        if (dir is null)
-            throw new NullReferenceException($"No directory defined in the manifest for plugin '{manifest.Name}'");
+        if (dir is null) throw new NullReferenceException($"No directory defined in the manifest for plugin '{manifest.Name}'");
 
         MutableUninstallationCandidates.Remove(dir);
     }
 
-    private async Task<IOperationScheduler> GetOperationSchedulerAsync() =>
-                await OperationSchedulerFactory.RetrieveFromFileAsync(Locations.MaintenanceLogBookPath);
+    private async Task<IOperationScheduler> GetOperationSchedulerAsync() => await OperationSchedulerFactory.RetrieveFromFileAsync(Locations.MaintenanceLogBookPath);
 
     public async Task ExecutePlanAsync()
     {
@@ -133,7 +131,8 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
 
         var os = await GetOperationSchedulerAsync();
         await os.AddOperation(
-                    OperationFactory.UnzipDirectory(tempPath, Locations.FromManifest(manifest).PluginDirectoryPath))
+                    OperationFactory.UnzipDirectory(tempPath, Locations.FromManifest(manifest).PluginDirectoryPath)
+                )
                 .SavePlanAsync();
 
         return PluginInstallationResult.Success(manifest, true);
@@ -154,10 +153,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         // Download & copy to temp directory
         using (var client = new HttpClient())
         using (var response = await client.GetAsync(url))
-        await using (var stream = new FileStream(path, FileMode.OpenOrCreate))
-        {
-            await response.Content.CopyToAsync(stream);
-        }
+        await using (var stream = new FileStream(path, FileMode.OpenOrCreate)) { await response.Content.CopyToAsync(stream); }
 
         return await SubscribeForInstallAsync(path);
     }
@@ -167,8 +163,7 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         var os = await GetOperationSchedulerAsync();
         var dir = Path.GetDirectoryName(manifest.Dll);
 
-        if (dir is null)
-            throw new DirectoryNotFoundException($"Cannot find plugin directory for plugin '{manifest.Name}'.");
+        if (dir is null) throw new DirectoryNotFoundException($"Cannot find plugin directory for plugin '{manifest.Name}'.");
 
         _logger.LogInformation("Add {Directory} to directory to remove", dir);
         AddCandidate(manifest);

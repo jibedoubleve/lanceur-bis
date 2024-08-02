@@ -1,14 +1,13 @@
 ﻿using Lanceur.Core.Services;
 using System.Windows;
 
-namespace Lanceur.Utils
+namespace Lanceur.Utils;
+
+public class WindowsClipboardService : IClipboardService
 {
-    public class WindowsClipboardService : IClipboardService
-    {
-        #region Methods
+    #region Methods
 
-        public string GetText() => Clipboard.GetText();
+    public string GetText() => Clipboard.GetText();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

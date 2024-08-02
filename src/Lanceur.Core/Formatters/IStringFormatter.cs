@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core.Formatters
+﻿namespace Lanceur.Core.Formatters;
+
+public interface IStringFormatter
 {
-    public interface IStringFormatter
-    {
-        #region Methods
+    #region Methods
 
-        string Format(object value);
+    string Format(object value);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

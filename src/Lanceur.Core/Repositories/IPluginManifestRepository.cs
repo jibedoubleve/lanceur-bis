@@ -1,17 +1,16 @@
 ﻿using Lanceur.Core.Plugins;
 
-namespace Lanceur.Core.Repositories
+namespace Lanceur.Core.Repositories;
+
+public interface IPluginManifestRepository
 {
-    public interface IPluginManifestRepository
-    {
-        #region Methods
+    #region Methods
 
-        /// <summary>
-        /// Get the configuration of all plugins installed
-        /// </summary>
-        /// <returns>The list of all configuration</returns>
-        IPluginManifest[] GetPluginManifests();
+    /// <summary>
+    /// Get the configuration of all plugins installed
+    /// </summary>
+    /// <returns>The list of all configuration</returns>
+    IPluginManifest[] GetPluginManifests();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

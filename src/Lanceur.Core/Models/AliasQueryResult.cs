@@ -89,7 +89,8 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     /// </summary>
     public string SynonymsToAdd => (from n in Synonyms.SplitCsv()
                                     where !SynonymsWhenLoaded.SplitCsv().Contains(n)
-                                    select n).ToArray().JoinCsv();
+                                    select n).ToArray()
+                                             .JoinCsv();
 
     /// <summary>
     /// Synonyms present when the entity was loaded

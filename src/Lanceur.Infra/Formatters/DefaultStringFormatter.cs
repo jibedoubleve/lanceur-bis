@@ -1,13 +1,12 @@
 ﻿using Lanceur.Core.Formatters;
 
-namespace Lanceur.Infra.Formatters
+namespace Lanceur.Infra.Formatters;
+
+public class DefaultStringFormatter : IStringFormatter
 {
-    public class DefaultStringFormatter : IStringFormatter
-    {
-        #region Methods
+    #region Methods
 
-        public string Format(object value) => value?.ToString();
+    public string Format(object value) => value?.ToString();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

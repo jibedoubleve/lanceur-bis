@@ -27,9 +27,7 @@ public class MacroShould : TestBase
 {
     #region Constructors
 
-    public MacroShould(ITestOutputHelper output) : base(output)
-    {
-    }
+    public MacroShould(ITestOutputHelper output) : base(output) { }
 
     #endregion Constructors
 
@@ -43,14 +41,10 @@ public class MacroShould : TestBase
         var asm = Assembly.GetAssembly(typeof(MultiMacro));
 
         var types = asm!.GetTypes()
-                       .Where(type =>
-                       {
-                           return type.Namespace != null
-                                  && type.Namespace.StartsWith(srcNamespace);
-                       })
-                       // I'll exclude all the anonymous class from the query
-                       .Where(type => !type.IsDefined(typeof(CompilerGeneratedAttribute), false))
-                       .ToArray();
+                        .Where(type => { return type.Namespace != null && type.Namespace.StartsWith(srcNamespace); })
+                        // I'll exclude all the anonymous class from the query
+                        .Where(type => !type.IsDefined(typeof(CompilerGeneratedAttribute), false))
+                        .ToArray();
         // ACT
         // ASSERT
         types.Length.Should().BeGreaterThan(0, "there are preconfigured macros");
@@ -69,13 +63,7 @@ public class MacroShould : TestBase
         }
     }
 
-    [Theory]
-    [InlineData("multi", true)]
-    [InlineData("MULTI", true)]
-    [InlineData("macro", false)]
-    [InlineData("MACRO", false)]
-    [InlineData("calendar", false)]
-    [InlineData("CALENDAR", false)]
+    [Theory, InlineData("multi", true), InlineData("MULTI", true), InlineData("macro", false), InlineData("MACRO", false), InlineData("calendar", false), InlineData("CALENDAR", false)]
     public void BeCompositeAsExpected(string macro, bool expected)
     {
         var alias = new AliasQueryResult { FileName = $"@{macro}@" };
@@ -83,15 +71,12 @@ public class MacroShould : TestBase
         alias.IsComposite().Should().Be(expected);
     }
 
-    [Theory]
-    [InlineData("init", "a@z@e@r@t@t")]
-    [InlineData("home", "azerty")]
-    [InlineData("some", "a z e r t y")]
+    [Theory, InlineData("init", "a@z@e@r@t@t"), InlineData("home", "azerty"), InlineData("some", "a z e r t y")]
     public async Task BeExecutable(string name, string parameters)
     {
         var logFactory = Substitute.For<ILoggerFactory>();
         var repository = Substitute.For<IDbRepository>();
-        
+
         var asm = Assembly.GetExecutingAssembly();
         var macroMgr = new MacroManager(asm, logFactory, repository);
         var macro = new MultiMacroTest(parameters);
@@ -110,7 +95,7 @@ public class MacroShould : TestBase
     {
         var logFactory = Substitute.For<ILoggerFactory>();
         var repository = Substitute.For<IDbRepository>();
-        
+
         var asm = Assembly.GetExecutingAssembly();
         var macroMgr = new MacroManager(asm, logFactory, repository);
         var macro = new MultiMacroTest();
@@ -165,9 +150,7 @@ public class MacroShould : TestBase
         manager.MacroCount.Should().BeGreaterThan(0);
     }
 
-    [Theory]
-    [InlineData(0, 1)]
-    [InlineData(1, 2)]
+    [Theory, InlineData(0, 1), InlineData(1, 2)]
     public void HaveDelayOnFirstElement(int index, int delay)
     {
         // Arrange
@@ -181,7 +164,7 @@ public class MacroShould : TestBase
         // Assert
         using (new AssertionScope())
         {
-            var composite = (results.ElementAt(0) as CompositeAliasQueryResult);
+            var composite = results.ElementAt(0) as CompositeAliasQueryResult;
             composite.Should().NotBeNull();
             composite?.Aliases.ElementAt(index).Delay.Should().Be(delay);
         }
@@ -225,12 +208,7 @@ public class MacroShould : TestBase
     [Fact]
     public void NotHaveDoubloonsWhenMacroUsedMultipleTimes()
     {
-        var queryResults = new AliasQueryResult[]
-        {
-            new() { Name = "macro_1", FileName = "@multi@" },
-            new() { Name = "macro_2", FileName = "@multi@" },
-            new() { Name = "macro_3", FileName = "@multi@" }
-        };
+        var queryResults = new AliasQueryResult[] { new() { Name = "macro_1", FileName = "@multi@" }, new() { Name = "macro_2", FileName = "@multi@" }, new() { Name = "macro_3", FileName = "@multi@" } };
 
         var logger = Substitute.For<ILoggerFactory>();
         var repository = Substitute.For<IDbRepository>();
@@ -247,10 +225,7 @@ public class MacroShould : TestBase
         }
     }
 
-    [Theory]
-    [InlineData("un")]
-    [InlineData("deux")]
-    [InlineData("trois")]
+    [Theory, InlineData("un"), InlineData("deux"), InlineData("trois")]
     public void RecogniseMacro(string macro)
     {
         var query = new AliasQueryResult() { FileName = $"@{macro}@" };

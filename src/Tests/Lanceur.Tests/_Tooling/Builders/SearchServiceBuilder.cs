@@ -22,14 +22,12 @@ public class SearchServiceBuilder
 
     #region Methods
 
-    public IAsyncSearchService Build()
-    {
-        return new SearchService(
-            _storeLoader,
-            _macroManager,
-            _thumbnailManager,
-            _loggerFactory);
-    }
+    public IAsyncSearchService Build() => new SearchService(
+        _storeLoader,
+        _macroManager,
+        _thumbnailManager,
+        _loggerFactory
+    );
 
     public SearchServiceBuilder With(IStoreLoader storeLoader)
     {

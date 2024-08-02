@@ -57,12 +57,10 @@ public class AliasSearchDbAction
                     left join alias_name            an on a.id         = an.id_alias                    
                     inner join data_alias_synonyms_v s on s.id_alias   = a.id";
         if (!name.IsNullOrEmpty())
-        {
             sql += @"
                 where
                     an.Name like @name
                     and a.hidden = 0";
-        }
         sql += @"
                 order by
                   a.exec_count desc,

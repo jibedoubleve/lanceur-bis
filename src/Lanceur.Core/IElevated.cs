@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core
+﻿namespace Lanceur.Core;
+
+public interface IElevated
 {
-    public interface IElevated
-    {
-        #region Properties
+    #region Properties
 
-        bool IsElevated { get; set; }
+    bool IsElevated { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

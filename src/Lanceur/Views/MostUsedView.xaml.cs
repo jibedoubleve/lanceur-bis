@@ -2,27 +2,28 @@
 using System;
 using System.Reactive.Disposables;
 
-namespace Lanceur.Views
+namespace Lanceur.Views;
+
+/// <summary>
+/// Interaction logic for MostUsedView.xaml
+/// </summary>
+public partial class MostUsedView : IViewFor<MostUsedViewModel>
 {
-    /// <summary>
-    /// Interaction logic for MostUsedView.xaml
-    /// </summary>
-    public partial class MostUsedView : IViewFor<MostUsedViewModel>
+    #region Constructors
+
+    public MostUsedView()
     {
-        #region Constructors
+        InitializeComponent();
 
-        public MostUsedView()
-        {
-            InitializeComponent();
-
-            this.WhenActivated(d =>
+        this.WhenActivated(
+            d =>
             {
                 this.OneWayBind(ViewModel, vm => vm.Aliases, v => v.Aliases.ItemsSource).DisposeWith(d);
 
                 ViewModel.Activate.Execute().Subscribe();
-            });
-        }
-
-        #endregion Constructors
+            }
+        );
     }
+
+    #endregion Constructors
 }

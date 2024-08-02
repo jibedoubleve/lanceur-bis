@@ -7,9 +7,7 @@ internal class UnzipOperation : AbstractOperation, IOperation
 {
     #region Constructors
 
-    public UnzipOperation(Dictionary<string, string> parameters) : base("unzip", parameters)
-    {
-    }
+    public UnzipOperation(Dictionary<string, string> parameters) : base("unzip", parameters) { }
 
     #endregion Constructors
 
@@ -27,14 +25,11 @@ internal class UnzipOperation : AbstractOperation, IOperation
     {
         if (!File.Exists(ArchiveFile)) return;
 
-        if (!Directory.Exists(Destination))
-        {
-            Directory.CreateDirectory(Destination);
-        }
+        if (!Directory.Exists(Destination)) Directory.CreateDirectory(Destination);
 
         if (!Directory.Exists(Destination))
         {
-            Directory.Delete(Destination, recursive: true);
+            Directory.Delete(Destination, true);
             Directory.CreateDirectory(Destination);
         }
 

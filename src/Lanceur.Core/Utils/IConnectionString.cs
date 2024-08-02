@@ -1,11 +1,10 @@
-﻿namespace Lanceur.Core.Utils
+﻿namespace Lanceur.Core.Utils;
+
+public interface IConnectionString
 {
-    public interface IConnectionString
-    {
-        #region Methods
+    #region Methods
 
-        public string ToString();
+    public string ToString();
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

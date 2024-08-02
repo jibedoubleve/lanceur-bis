@@ -54,16 +54,13 @@ public partial class App
             logger.LogCritical(ex, "Application crashed. See error for further information");
             MessageBox.Show(Current.MainWindow, $"A fatal error occured: {ex.Message}");
         }
-        finally
-        {
-            Bootstrapper.TearDown();
-        }
+        finally { Bootstrapper.TearDown(); }
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         Bootstrapper.TearDown();
-        
+
         ToastNotificationManagerCompat.Uninstall();
         SingleInstance.ReleaseMutex();
     }
@@ -86,10 +83,7 @@ public partial class App
         if (await installer.HasMaintenanceAsync())
         {
             var errors = await installer.SubscribeForInstallAsync();
-            if (!errors.IsNullOrEmpty())
-            {
-                log.LogError("Error occured when installing plugins on startup: {Errors}", errors);
-            }
+            if (!errors.IsNullOrEmpty()) log.LogError("Error occured when installing plugins on startup: {Errors}", errors);
         }
 
         File.Delete(Locations.MaintenanceLogBookPath);

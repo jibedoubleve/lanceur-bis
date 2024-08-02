@@ -1,12 +1,11 @@
-﻿namespace Lanceur.Core.Plugins
+﻿namespace Lanceur.Core.Plugins;
+
+public class PluginWebManifest : PluginManifestBase, IPluginWebManifest
 {
-    public class PluginWebManifest : PluginManifestBase, IPluginWebManifest
-    {
-        #region Properties
+    #region Properties
 
-        public string Dll { get; set; }
-        public string Url { get; set; }
+    public string Dll { get; set; }
+    public string Url { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

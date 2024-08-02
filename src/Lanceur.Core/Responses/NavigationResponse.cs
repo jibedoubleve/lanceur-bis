@@ -1,14 +1,13 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Responses
+namespace Lanceur.Core.Responses;
+
+public class NavigationResponse
 {
-    public class NavigationResponse
-    {
-        #region Properties
+    #region Properties
 
-        public QueryResult CurrentAlias { get; set; }
-        public string Query { get; set; }
+    public QueryResult CurrentAlias { get; set; }
+    public string Query { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

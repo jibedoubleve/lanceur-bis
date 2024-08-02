@@ -1,12 +1,11 @@
-﻿namespace Lanceur.Core.Models.Settings
+﻿namespace Lanceur.Core.Models.Settings;
+
+public class RepositorySection
 {
-    public class RepositorySection
-    {
-        #region Properties
+    #region Properties
 
-        public static RepositorySection Default => new();
-        public int ScoreLimit { get; set; }
+    public static RepositorySection Default => new();
+    public int ScoreLimit { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

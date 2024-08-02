@@ -1,35 +1,29 @@
 ﻿using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Tooling.Logging
+namespace Lanceur.Tests.Tooling.Logging;
+
+public class MicrosoftLoggingLoggerFactory : ILoggerFactory
 {
-    public class MicrosoftLoggingLoggerFactory : ILoggerFactory
-    {
-        #region Fields
+    #region Fields
 
-        private readonly ITestOutputHelper _output;
+    private readonly ITestOutputHelper _output;
 
-        #endregion Fields
+    #endregion Fields
 
-        #region Constructors
+    #region Constructors
 
-        public MicrosoftLoggingLoggerFactory(ITestOutputHelper output)
-        {
-            _output = output;
-        }
+    public MicrosoftLoggingLoggerFactory(ITestOutputHelper output) => _output = output;
 
-        #endregion Constructors
+    #endregion Constructors
 
-        #region Methods
+    #region Methods
 
-        public void AddProvider(ILoggerProvider provider)
-        { }
+    public void AddProvider(ILoggerProvider provider) { }
 
-        public ILogger CreateLogger(string categoryName) => new TestOutputHelperDecoratorForMicrosoftLogging(_output);
+    public ILogger CreateLogger(string categoryName) => new TestOutputHelperDecoratorForMicrosoftLogging(_output);
 
-        public void Dispose()
-        { }
+    public void Dispose() { }
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

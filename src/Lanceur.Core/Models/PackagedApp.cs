@@ -1,15 +1,14 @@
-namespace Lanceur.Core.Models
+namespace Lanceur.Core.Models;
+
+public class PackagedApp
 {
-    public class PackagedApp
-    {
-        #region Properties
+    #region Properties
 
-        public string AppUserModelId { get; init; }
-        public string Description { get; init; }
-        public string DisplayName { get; init; }
-        public string InstalledLocation { get; init; }
-        public Uri Logo { get; init; }
+    public string AppUserModelId { get; init; }
+    public string Description { get; init; }
+    public string DisplayName { get; init; }
+    public string InstalledLocation { get; init; }
+    public Uri Logo { get; init; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

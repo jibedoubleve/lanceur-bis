@@ -21,9 +21,7 @@ public class AdditionalParametersStore : ISearchService
 
     #region Constructors
 
-    public AdditionalParametersStore() : this(null)
-    {
-    }
+    public AdditionalParametersStore() : this(null) { }
 
     public AdditionalParametersStore(IDbRepository aliasService = null, ILoggerFactory loggerFactory = null)
     {

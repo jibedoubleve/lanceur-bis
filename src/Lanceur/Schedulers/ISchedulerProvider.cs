@@ -1,14 +1,13 @@
 ﻿using System.Reactive.Concurrency;
 
-namespace Lanceur.Schedulers
+namespace Lanceur.Schedulers;
+
+public interface ISchedulerProvider
 {
-    public interface ISchedulerProvider
-    {
-        #region Properties
+    #region Properties
 
-        IScheduler MainThreadScheduler { get; }
-        IScheduler TaskpoolScheduler { get; }
+    IScheduler MainThreadScheduler { get; }
+    IScheduler TaskpoolScheduler { get; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

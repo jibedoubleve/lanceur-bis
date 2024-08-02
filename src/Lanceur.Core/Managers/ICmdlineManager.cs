@@ -1,15 +1,14 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Managers
+namespace Lanceur.Core.Managers;
+
+public interface ICmdlineManager
 {
-    public interface ICmdlineManager
-    {
-        #region Methods
+    #region Methods
 
-        Cmdline BuildFromText(string commandline);
+    Cmdline BuildFromText(string commandline);
 
-        Cmdline CloneWithNewParameters(string newParameters, Cmdline cmd);
+    Cmdline CloneWithNewParameters(string newParameters, Cmdline cmd);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

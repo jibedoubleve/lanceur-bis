@@ -11,18 +11,18 @@ using Lanceur.Tests.Tooling;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.BusinessLogic
-{
-    public class SettingsMementoManagerShould
-    {
-        #region Fields
+namespace Lanceur.Tests.BusinessLogic;
 
-        /// <remarks>
-        ///  Spacing is very important. If you change this value,
-        ///  Check the regular expression to be sure it'll work
-        ///  as expected.
-        /// </remarks>
-        private const string _jsonAppConfig = @"
+public class SettingsMementoManagerShould
+{
+    #region Fields
+
+    /// <remarks>
+    ///  Spacing is very important. If you change this value,
+    ///  Check the regular expression to be sure it'll work
+    ///  as expected.
+    /// </remarks>
+    private const string _jsonAppConfig = @"
 {
     ""HotKey"": {
         ""Key"": 18,
@@ -42,105 +42,93 @@ namespace Lanceur.Tests.BusinessLogic
     }
 }";
 
-        private readonly ITestOutputHelper _output;
+    private readonly ITestOutputHelper _output;
 
-        #endregion Fields
+    #endregion Fields
 
-        #region Constructors
+    #region Constructors
 
-        public SettingsMementoManagerShould(ITestOutputHelper output)
-        {
-            _output = output;
-        }
+    public SettingsMementoManagerShould(ITestOutputHelper output) => _output = output;
 
-        #endregion Constructors
+    #endregion Constructors
 
-        #region Methods
+    #region Methods
 
-        [Theory]
-        // Should show state changed
-        [InlineData("Key", "100", "", true)]
-        [InlineData("ModifierKey", "100", "", true)]
-        [InlineData("", "", "newDbPath", true)]
-        // Should NOT show state changed
-        [InlineData("ScoreLimit", "100", "", false)]
-        [InlineData("RestartDelay", "100", "", false)]
-        [InlineData("Left", "100.0", "", false)]
-        [InlineData("Top", "100.0", "", false)]
-        [InlineData("ShowAtStartup", "false", "", false)]
-        [InlineData("ShowResult", "false", "", false)]
-        public void ReturnExpectedStateChange(string property, string newValue, string secondDbPath, bool isStateChanged)
-        {
-            // ARRANGE
-            var pattern = @$"(""{property}"": [a-zA-Z0-9.]*)";
-            var regex = new Regex(pattern, RegexOptions.Singleline);
-            var dbPath = Guid.NewGuid().ToString();
+    [Theory, InlineData("Key", "100", "", true), InlineData("ModifierKey", "100", "", true), InlineData("", "", "newDbPath", true), InlineData("ScoreLimit", "100", "", false), InlineData("RestartDelay", "100", "", false), InlineData("Left", "100.0", "", false), InlineData("Top", "100.0", "", false), InlineData("ShowAtStartup", "false", "", false), InlineData("ShowResult", "false", "", false)]
+    // Should show state changed
+    // Should NOT show state changed
+    public void ReturnExpectedStateChange(string property, string newValue, string secondDbPath, bool isStateChanged)
+    {
+        // ARRANGE
+        var pattern = @$"(""{property}"": [a-zA-Z0-9.]*)";
+        var regex = new Regex(pattern, RegexOptions.Singleline);
+        var dbPath = Guid.NewGuid().ToString();
 
-            // Initial state
-            var initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
-            _output.WriteJson("Initial AppConfig", initialAppConfig);
+        // Initial state
+        var initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
+        _output.WriteJson("Initial AppConfig", initialAppConfig);
 
-            // Second state
-            var replacement = @$"""{property}"": {newValue}";
-            var newJson = regex.Replace(_jsonAppConfig, replacement);
-            var secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(newJson);
-            _output.WriteJson("Second AppConfig", secondAppConfig);
-            _output.WriteLine($"Replacement: '{replacement}', Pattern: '{pattern}'");
-            
-            secondDbPath = secondDbPath.IsNullOrWhiteSpace() ? dbPath : secondDbPath;
+        // Second state
+        var replacement = @$"""{property}"": {newValue}";
+        var newJson = regex.Replace(_jsonAppConfig, replacement);
+        var secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(newJson);
+        _output.WriteJson("Second AppConfig", secondAppConfig);
+        _output.WriteLine($"Replacement: '{replacement}', Pattern: '{pattern}'");
 
-            // Setup SettingsFacade
-            var databaseConfig = Substitute.For<ILocalConfig>();
-            databaseConfig.DbPath.Returns(dbPath, secondDbPath);
+        secondDbPath = secondDbPath.IsNullOrWhiteSpace() ? dbPath : secondDbPath;
 
-            var databaseConfigRepository = Substitute.For<ILocalConfigRepository>();
-            databaseConfigRepository.Current.Returns(databaseConfig);
+        // Setup SettingsFacade
+        var databaseConfig = Substitute.For<ILocalConfig>();
+        databaseConfig.DbPath.Returns(dbPath, secondDbPath);
 
-            var appConfigRepository = Substitute.For<IAppConfigRepository>();
-            appConfigRepository.Current.Returns(initialAppConfig, secondAppConfig);
+        var databaseConfigRepository = Substitute.For<ILocalConfigRepository>();
+        databaseConfigRepository.Current.Returns(databaseConfig);
 
-            var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
+        var appConfigRepository = Substitute.For<IAppConfigRepository>();
+        appConfigRepository.Current.Returns(initialAppConfig, secondAppConfig);
 
-            // ACT
-            var memento = SettingsMementoManager.GetInitialState(settingsFacade);
+        var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
 
-            // ASSERT
-            memento.HasStateChanged(settingsFacade)
-                   .Should().Be(isStateChanged);
-        }
+        // ACT
+        var memento = SettingsMementoManager.GetInitialState(settingsFacade);
 
-        [Fact]
-        public void ReturnsNotChangedWhenNoChange()
-        {
-            // ARRANGE
-            // First state
-            var dbPath = Guid.NewGuid().ToString();
-            AppConfig initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
-            var initialDbPath = dbPath;
-
-            // Second state
-            AppConfig secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
-            var secondDbPath = dbPath;
-
-            // Setup SettingsFacade
-            var databaseConfig = Substitute.For<ILocalConfig>();
-            databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
-
-            var databaseConfigRepository = Substitute.For<ILocalConfigRepository>();
-            databaseConfigRepository.Current.Returns(databaseConfig);
-
-            var appConfigRepository = Substitute.For<IAppConfigRepository>();
-            appConfigRepository.Current.Returns(initialAppConfig, secondAppConfig);
-
-            var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
-
-            // ACT
-            var memento = SettingsMementoManager.GetInitialState(settingsFacade);
-
-            // ASSERT
-            memento.HasStateChanged(settingsFacade).Should().BeFalse();
-        }
-
-        #endregion Methods
+        // ASSERT
+        memento.HasStateChanged(settingsFacade)
+               .Should()
+               .Be(isStateChanged);
     }
+
+    [Fact]
+    public void ReturnsNotChangedWhenNoChange()
+    {
+        // ARRANGE
+        // First state
+        var dbPath = Guid.NewGuid().ToString();
+        var initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
+        var initialDbPath = dbPath;
+
+        // Second state
+        var secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
+        var secondDbPath = dbPath;
+
+        // Setup SettingsFacade
+        var databaseConfig = Substitute.For<ILocalConfig>();
+        databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
+
+        var databaseConfigRepository = Substitute.For<ILocalConfigRepository>();
+        databaseConfigRepository.Current.Returns(databaseConfig);
+
+        var appConfigRepository = Substitute.For<IAppConfigRepository>();
+        appConfigRepository.Current.Returns(initialAppConfig, secondAppConfig);
+
+        var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
+
+        // ACT
+        var memento = SettingsMementoManager.GetInitialState(settingsFacade);
+
+        // ASSERT
+        memento.HasStateChanged(settingsFacade).Should().BeFalse();
+    }
+
+    #endregion Methods
 }

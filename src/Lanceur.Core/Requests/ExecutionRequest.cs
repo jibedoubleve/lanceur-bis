@@ -1,15 +1,14 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Requests
+namespace Lanceur.Core.Requests;
+
+public class ExecutionRequest
 {
-    public class ExecutionRequest
-    {
-        #region Properties
+    #region Properties
 
-        public bool ExecuteWithPrivilege { get; init; }
-        public string Query { get; init; }
-        public QueryResult QueryResult { get; init; }
+    public bool ExecuteWithPrivilege { get; init; }
+    public string Query { get; init; }
+    public QueryResult QueryResult { get; init; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

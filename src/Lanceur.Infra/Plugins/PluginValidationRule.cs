@@ -13,10 +13,7 @@ public class PluginValidationRule : IPluginValidationRule<PluginValidationResult
 
     #region Constructors
 
-    public PluginValidationRule(IPluginManifestRepository manifestRepository)
-    {
-        _manifestRepository = manifestRepository;
-    }
+    public PluginValidationRule(IPluginManifestRepository manifestRepository) => _manifestRepository = manifestRepository;
 
     #endregion Constructors
 
@@ -28,10 +25,7 @@ public class PluginValidationRule : IPluginValidationRule<PluginValidationResult
 
         // If there's no plugin installed, of course this
         // one can be installed...
-        if (manifests.Length == 0)
-        {
-            return PluginValidationResult.Valid();
-        }
+        if (manifests.Length == 0) return PluginValidationResult.Valid();
 
         var installed =
             (from current in manifests
@@ -39,11 +33,10 @@ public class PluginValidationRule : IPluginValidationRule<PluginValidationResult
              select current).FirstOrDefault();
 
         if (installed is not null && installed.Version >= manifest.Version)
-        {
             return PluginValidationResult.Invalid(
                 $"Cannot install plugin '{manifest.Name} V{manifest.Version}' because " +
-                $"the installed version is already up to date.");
-        }
+                $"the installed version is already up to date."
+            );
 
         var isUpdate = (installed?.Version ?? new Version()) < manifest.Version;
         return PluginValidationResult.Valid(isUpdate);

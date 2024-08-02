@@ -1,14 +1,13 @@
-﻿namespace Lanceur.Infra.Wildcards
+﻿namespace Lanceur.Infra.Wildcards;
+
+internal struct Wildcards
 {
-    internal struct Wildcards
-    {
-        #region Fields
+    #region Fields
 
-        public const string RawClipboard = "$r$";
-        public const string Text = "$i$";
-        public const string Url = "$w$";
-        public const string WebClipboard = "$c$";
+    public const string RawClipboard = "$r$";
+    public const string Text = "$i$";
+    public const string Url = "$w$";
+    public const string WebClipboard = "$c$";
 
-        #endregion Fields
-    }
+    #endregion Fields
 }

@@ -1,33 +1,32 @@
-﻿namespace Lanceur.Core.Plugins
+﻿namespace Lanceur.Core.Plugins;
+
+public interface IPluginManifest : IPluginManifestBase
 {
-    public interface IPluginManifest : IPluginManifestBase
-    {
-        #region Properties
+    #region Properties
 
-        Version AppMinVersion { get; set; }
-        string Author { get; set; }
+    Version AppMinVersion { get; set; }
+    string Author { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
+}
 
-    public interface IPluginManifestBase
-    {
-        #region Properties
+public interface IPluginManifestBase
+{
+    #region Properties
 
-        string Description { get; set; }
-        string Dll { get; set; }
-        string Name { get; set; }
-        Version Version { get; set; }
+    string Description { get; set; }
+    string Dll { get; set; }
+    string Name { get; set; }
+    Version Version { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
+}
 
-    public interface IPluginWebManifest : IPluginManifestBase
-    {
-        #region Properties
+public interface IPluginWebManifest : IPluginManifestBase
+{
+    #region Properties
 
-        string Url { get; set; }
+    string Url { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

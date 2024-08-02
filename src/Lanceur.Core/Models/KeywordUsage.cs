@@ -1,12 +1,11 @@
-﻿namespace Lanceur.Core.Models
+﻿namespace Lanceur.Core.Models;
+
+public class KeywordUsage
 {
-    public class KeywordUsage
-    {
-        #region Properties
+    #region Properties
 
-        public int Count { get; set; }
-        public long Id { get; set; }
+    public int Count { get; set; }
+    public long Id { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

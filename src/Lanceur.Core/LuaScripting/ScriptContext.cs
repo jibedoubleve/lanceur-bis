@@ -1,13 +1,12 @@
-﻿namespace Lanceur.Core.LuaScripting
+﻿namespace Lanceur.Core.LuaScripting;
+
+public class ScriptContext
 {
-    public class ScriptContext
-    {
-        #region Properties
+    #region Properties
 
-        public static ScriptContext Empty => new();
-        public string FileName { get; init; } = string.Empty;
-        public string Parameters { get; init; } = string.Empty;
+    public static ScriptContext Empty => new();
+    public string FileName { get; init; } = string.Empty;
+    public string Parameters { get; init; } = string.Empty;
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

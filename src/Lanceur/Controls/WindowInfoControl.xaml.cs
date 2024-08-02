@@ -1,19 +1,15 @@
 ﻿using System.Windows.Controls;
 
-namespace Lanceur.Controls
+namespace Lanceur.Controls;
+
+/// <summary>
+/// Interaction logic for WindowInfoControl.xaml
+/// </summary>
+public partial class WindowInfoControl : UserControl
 {
-    /// <summary>
-    /// Interaction logic for WindowInfoControl.xaml
-    /// </summary>
-    public partial class WindowInfoControl : UserControl
-    {
-        #region Constructors
+    #region Constructors
 
-        public WindowInfoControl()
-        {
-            InitializeComponent();
-        }
+    public WindowInfoControl() { InitializeComponent(); }
 
-        #endregion Constructors
-    }
+    #endregion Constructors
 }

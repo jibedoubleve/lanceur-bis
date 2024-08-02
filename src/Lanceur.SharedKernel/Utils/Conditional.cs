@@ -29,7 +29,7 @@ public class Conditional<T>
     {
         ArgumentNullException.ThrowIfNull(onDebug);
         ArgumentNullException.ThrowIfNull(onRelease);
-        
+
         _value = onRelease;
         GetConditional(ref _value, onDebug);
     }
@@ -48,6 +48,7 @@ public class Conditional<T>
     private static void GetConditional(ref T result, T onDebug)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
+
         result = onDebug;
     }
 

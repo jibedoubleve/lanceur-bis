@@ -1,12 +1,11 @@
-﻿namespace Lanceur.Core.Utils
+﻿namespace Lanceur.Core.Utils;
+
+public struct PsInfo
 {
-    public struct PsInfo
-    {
-        #region Properties
+    #region Properties
 
-        public string FileName { get; set; }
-        public string HWnd { get; set; }
+    public string FileName { get; set; }
+    public string HWnd { get; set; }
 
-        #endregion Properties
-    }
+    #endregion Properties
 }

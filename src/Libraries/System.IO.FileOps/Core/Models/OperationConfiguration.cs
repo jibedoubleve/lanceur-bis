@@ -22,7 +22,7 @@ public class OperationConfiguration : IEquatable<OperationConfiguration>
 
         // https://stackoverflow.com/a/9547410/389529
         var areEqual = Parameters.OrderBy(kvp => kvp.Key)
-                                .SequenceEqual(other.Parameters.OrderBy(kvp => kvp.Key));
+                                 .SequenceEqual(other.Parameters.OrderBy(kvp => kvp.Key));
 
         return Name == other.Name && areEqual;
     }

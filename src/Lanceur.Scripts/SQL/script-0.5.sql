@@ -1,2 +1,2 @@
-﻿alter table alias 
-	add icon text;
+﻿alter table alias
+    add icon text;

@@ -3,4 +3,5 @@
  * executing an alias
  */
 
-alter table alias add confirmation_required integer default 0;
+alter table alias
+    add confirmation_required integer default 0;

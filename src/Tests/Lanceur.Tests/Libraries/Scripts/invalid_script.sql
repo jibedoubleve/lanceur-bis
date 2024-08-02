@@ -1,1 +1,2 @@
-﻿select * from dummyTable;
+﻿select *
+from dummyTable;

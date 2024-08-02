@@ -1,33 +1,29 @@
 ﻿using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 
-namespace Lanceur.Infra.Managers
+namespace Lanceur.Infra.Managers;
+
+public class SettingsMementoManager
 {
-    public class SettingsMementoManager
-    {
-        #region Fields
+    #region Fields
 
-        private readonly int _stateHash;
+    private readonly int _stateHash;
 
-        #endregion Fields
+    #endregion Fields
 
-        #region Constructors
+    #region Constructors
 
-        private SettingsMementoManager(int initialHash)
-        {
-            _stateHash = initialHash;
-        }
+    private SettingsMementoManager(int initialHash) => _stateHash = initialHash;
 
-        #endregion Constructors
+    #endregion Constructors
 
-        #region Methods
+    #region Methods
 
-        private static int GetStateHash(AppConfig appCfg, ILocalConfig dbCfg) => (appCfg.HotKey, dbCfg.DbPath).GetHashCode();
+    private static int GetStateHash(AppConfig appCfg, ILocalConfig dbCfg) => (appCfg.HotKey, dbCfg.DbPath).GetHashCode();
 
-        public static SettingsMementoManager GetInitialState(ISettingsFacade settings) => new(GetStateHash(settings.Application, settings.Local));
+    public static SettingsMementoManager GetInitialState(ISettingsFacade settings) => new(GetStateHash(settings.Application, settings.Local));
 
-        public bool HasStateChanged(ISettingsFacade settings) => GetStateHash(settings.Application, settings.Local) != _stateHash;
+    public bool HasStateChanged(ISettingsFacade settings) => GetStateHash(settings.Application, settings.Local) != _stateHash;
 
-        #endregion Methods
-    }
+    #endregion Methods
 }

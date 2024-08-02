@@ -2,16 +2,15 @@
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
 
-namespace Lanceur.Core.Managers
+namespace Lanceur.Core.Managers;
+
+public interface IExecutionManager
 {
-    public interface IExecutionManager
-    {
-        #region Methods
+    #region Methods
 
-        Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request);
+    Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request);
 
-        ExecutionResponse ExecuteMultiple(IEnumerable<QueryResult> queryResults, int delay = 0);
+    ExecutionResponse ExecuteMultiple(IEnumerable<QueryResult> queryResults, int delay = 0);
 
-        #endregion Methods
-    }
+    #endregion Methods
 }
