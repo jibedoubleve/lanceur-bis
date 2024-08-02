@@ -39,8 +39,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 ; Chose how the appplications starts up
-Name: "startregistry"; Description: "Start the application via the registry"; GroupDescription: "Startup options"
-Name: "starttask"; Description: "Start the application via a scheduled task"; GroupDescription: "Startup options"
+Name: "startregistry"; Description: "Start the application via the registry"; GroupDescription: "Startup options"; Flags: exclusive
+Name: "starttask"; Description: "Start the application via a scheduled task"; GroupDescription: "Startup options"; Flags: exclusive
 
 [Registry]
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Lanceur 2"; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletevalue
