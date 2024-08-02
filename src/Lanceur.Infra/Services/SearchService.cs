@@ -52,7 +52,7 @@ public class SearchService : SearchServiceCache, IAsyncSearchService
             : new();
 
         // Refresh the thumbnails
-        _thumbnailManager.RefreshThumbnailsAsync(results);
+        _thumbnailManager.RefreshThumbnails(results);
 
         // Order the list and return the result
         var orderedResults = results.OrderByDescending(e => e.Count)

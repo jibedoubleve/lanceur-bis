@@ -57,7 +57,7 @@ public class ThumbnailManagerShould : TestBase
         var aliases = dbRepository.Search("a");
 
         // ACT
-        thumbnailManager.RefreshThumbnailsAsync(aliases);
+        thumbnailManager.RefreshThumbnails(aliases);
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))

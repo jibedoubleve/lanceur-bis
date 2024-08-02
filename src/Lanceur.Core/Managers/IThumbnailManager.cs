@@ -12,7 +12,7 @@ public interface IThumbnailManager
     /// when thread has done its work
     /// </summary>
     /// <param name="results">The <see cref="QueryResult"/> to refresh</param>
-    void RefreshThumbnailsAsync(IEnumerable<QueryResult> results);
+    void RefreshThumbnails(IEnumerable<QueryResult> results);
 
     #endregion Methods
 }

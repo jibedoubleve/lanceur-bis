@@ -197,7 +197,7 @@ public class KeywordsViewModel : RoutableViewModel, IValidatableViewModel, IActi
         var results = request.Query.IsNullOrEmpty()
             ? _aliasService.GetAll().ToList()
             : _aliasService.Search(request.Query).ToList();
-        _thumbnailManager.RefreshThumbnailsAsync(results);
+        _thumbnailManager.RefreshThumbnails(results);
 
         results.SortCollection(a => a.Name);
         if (request.AliasToCreate == null) return new(results);

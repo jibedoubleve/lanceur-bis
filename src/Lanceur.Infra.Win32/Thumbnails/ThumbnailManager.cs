@@ -36,14 +36,15 @@ public class ThumbnailManager : IThumbnailManager
     #region Methods
 
     /// <summary>
-    /// Launch a thread to refresh the thumbnails and returns just after. Each time an thumbnail is found
-    /// the alias is updated and (because the alias is reactive) the UI should be updated.
+    /// Starts a thread to refresh the thumbnails asynchronously. This method returns immediately after starting the thread.
+    /// Each time a thumbnail is found, the corresponding alias is updated. Because the alias is reactive, the UI will
+    /// automatically reflect these updates.
     /// </summary>
     /// <remarks>
-    /// All the alias are updated at once to avoid concurrency issues.Thumbnail
+    /// All aliases are updated in a single operation to avoid concurrency issues.
     /// </remarks>
-    /// <param name="results">The list a queries that need to have an updated thumbnail.</param>
-    public void RefreshThumbnailsAsync(IEnumerable<QueryResult> results)
+    /// <param name="results">The list of queries for which thumbnails need to be updated.</param>
+    public void RefreshThumbnails(IEnumerable<QueryResult> results)
     {
         var queries = EntityDecorator<QueryResult>.FromEnumerable(results)
                                                   .ToArray();
