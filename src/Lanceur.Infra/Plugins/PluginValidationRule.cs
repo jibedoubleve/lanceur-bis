@@ -27,10 +27,7 @@ public class PluginValidationRule : IPluginValidationRule<PluginValidationResult
         // one can be installed...
         if (manifests.Length == 0) return PluginValidationResult.Valid();
 
-        var installed =
-            (from current in manifests
-             where manifest.Dll == current.Dll
-             select current).FirstOrDefault();
+        var installed = manifests.FirstOrDefault(current => manifest.Dll == current.Dll);
 
         if (installed is not null && installed.Version >= manifest.Version)
             return PluginValidationResult.Invalid(

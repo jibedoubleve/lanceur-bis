@@ -20,12 +20,10 @@ public static class DataDebugger
 
     public static IEnumerable<Doubloon> GetDoubloons(this IEnumerable<QueryResult> result)
     {
-        return (from r in result
-                group new Doubloon { Name = r.Name, Description = r.Description, Content = r, HashCode = r.GetHashCode() } by r.GetHashCode()
-                into gr
-                where gr.Count() > 1
-                select gr.Select(t => t)
-                         .First()).ToArray();
+        return result.GroupBy(r => r.GetHashCode(), r => new Doubloon { Name = r.Name, Description = r.Description, Content = r, HashCode = r.GetHashCode() })
+                     .Where(gr => gr.Count() > 1)
+                     .Select(gr => gr.Select(t => t).First())
+                     .ToArray();
     }
 
     #endregion Methods

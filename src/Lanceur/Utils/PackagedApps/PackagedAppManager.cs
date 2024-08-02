@@ -56,9 +56,8 @@ public class PackagedAppManager : IPackagedAppManager
                 var srcDir = Path.GetDirectoryName(fileName);
 
                 var packages = new PackageManager().FindPackagesForUser(userId);
-                var results = (from p in packages
-                               where p.HasInstallationPath() && p.IsInDirectory(srcDir)
-                               select p).ToList();
+                var results = packages.Where(p => p.HasInstallationPath() && p.IsInDirectory(srcDir))
+                                      .ToList();
 
                 var currentPkg = results.FirstOrDefault() ?? throw new NullReferenceException($"No package for '{fileName}' found for the current user");
 

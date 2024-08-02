@@ -105,9 +105,8 @@ public class DoubloonsViewModel : RoutableViewModel, IActivatableViewModel
 
     private async Task OnRemoveSelected()
     {
-        var toDel = (from d in Doubloons
-                     where d.IsSelected
-                     select d).ToList();
+        var toDel = Doubloons.Where(d => d.IsSelected)
+                             .ToList();
 
         var count = toDel.Count;
         var remove = await _confirmRemove.Handle($"{count}");

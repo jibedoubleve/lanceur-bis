@@ -116,9 +116,7 @@ public class SearchService : SearchServiceCache, IAsyncSearchService
         // If there's an exact match, promote it to the top
         // of the list.
         var orderedResults = SetupAndSort(results).ToList();
-        var match = (from r in orderedResults
-                     where r.Name == query.Name
-                     select r).FirstOrDefault();
+        var match = orderedResults.FirstOrDefault(r => r.Name == query.Name);
         if (match is not null) orderedResults.Move(match, 0);
 
         return !orderedResults.Any()

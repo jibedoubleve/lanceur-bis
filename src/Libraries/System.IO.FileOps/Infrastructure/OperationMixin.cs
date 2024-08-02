@@ -18,10 +18,7 @@ public static class OperationMixin
 
     public static IOperation ToOperation(this OperationConfiguration cfg)
     {
-        var type =
-            (from t in Types
-             where t.FullName == cfg.Name
-             select t).FirstOrDefault();
+        var type = Types.FirstOrDefault(t => t.FullName == cfg.Name);
 
         return type is null
             ? throw new NotSupportedException($"Cannot find operation '{cfg.Name}'")

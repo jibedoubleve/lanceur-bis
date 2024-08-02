@@ -244,9 +244,8 @@ public partial class MainViewModel : ReactiveObject
     private QueryResult GetCurrentAlias()
     {
         var hash = CurrentAlias?.GetHashCode() ?? 0;
-        var currentAlias = (from r in Results
-                            where r.GetHashCode() == hash
-                            select r).ToArray();
+        var currentAlias = Results.Where(r => r.GetHashCode() == hash)
+                                  .ToArray();
 
         return currentAlias.SingleOrDefault();
     }

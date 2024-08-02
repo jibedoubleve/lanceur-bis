@@ -50,9 +50,12 @@ internal abstract class AbstractOperationScheduler : IOperationScheduler
 
     public IOperationScheduler RemoveOperation(OperationInfo operationInfo)
     {
-        var toDel = (from op in _operations
-                     where op.Name == operationInfo.Name && op.Parameters.ContainsKey(operationInfo.Key) && op.Parameters[operationInfo.Key] == operationInfo.Value
-                     select op).FirstOrDefault();
+        var toDel = _operations
+            .FirstOrDefault(op => 
+                                op.Name == operationInfo.Name 
+                                && op.Parameters.ContainsKey(operationInfo.Key) 
+                                && op.Parameters[operationInfo.Key] == operationInfo.Value
+                            );
 
         if (toDel is not null) _operations.Remove(toDel);
 
