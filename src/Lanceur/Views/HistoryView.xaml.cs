@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using System;
 using System.Linq;
+using Splat;
 
 namespace Lanceur.Views;
 
@@ -40,7 +41,7 @@ public partial class HistoryView : IViewFor<HistoryViewModel>
                         History.Plot.Legend();
                         History.Refresh();
                     }
-                    else { StaticLoggerFactory.GetLogger<HistoryView>().LogWarning("No history to display"); }
+                    else { Locator.Current.GetLogger<HistoryView>().LogWarning("No history to display"); }
                 };
 
                 ViewModel.Activate.Execute().Subscribe();

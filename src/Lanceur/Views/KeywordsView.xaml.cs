@@ -7,6 +7,7 @@ using ReactiveUI.Validation.Extensions;
 using System.Reactive.Disposables;
 using System.Windows;
 using System.Windows.Controls;
+using Splat;
 
 namespace Lanceur.Views;
 
@@ -25,7 +26,7 @@ public partial class KeywordsView
         this.WhenActivated(
             d =>
             {
-                StaticLoggerFactory.GetLogger<KeywordsView>().LogActivate<KeywordsView>();
+                Locator.Current.GetLogger<KeywordsView>().LogActivate<KeywordsView>();
 
                 ViewModel.AskLuaEditor.RegisterHandler(
                     interaction =>

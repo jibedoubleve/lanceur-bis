@@ -43,7 +43,7 @@ public partial class App
 
     private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        var logger = StaticLoggerFactory.GetLogger<App>();
+        var logger = Locator.Current.GetLogger<App>();
         try
         {
             var notify = Locator.Current.GetService<IUserNotification>();
@@ -67,11 +67,13 @@ public partial class App
 
     protected override async void OnStartup(StartupEventArgs e)
     {
-        var log = StaticLoggerFactory.GetLogger<App>();
+        var log = Locator.Current.GetLogger<App>();
         _notifyIcon ??= new();
 
+        // THEME
         ThemeManager.Current.SetTheme();
 
+        // SINGLE INSTANCE
         if (!SingleInstance.WaitOne())
         {
             var notify = Locator.Current.GetService<IUserNotification>();
@@ -79,6 +81,7 @@ public partial class App
             Environment.Exit(0);
         }
 
+        // PLUGINS
         var installer = Locator.Current.GetService<IPluginInstaller>();
         if (await installer.HasMaintenanceAsync())
         {
@@ -87,6 +90,9 @@ public partial class App
         }
 
         File.Delete(Locations.MaintenanceLogBookPath);
+        
+        // PRELOAD
+        // var srv = Locator.Current
     }
 
     #endregion Methods

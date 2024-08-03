@@ -10,8 +10,8 @@ internal static class StaticLoggerFactory
 {
     #region Methods
 
-    public static ILogger GetLogger<TCategory>() => Locator.Current.GetService<ILoggerFactory>().GetLogger(typeof(TCategory));
-
+    private static ILogger GetLogger<TCategory>() => Locator.Current.GetService<ILoggerFactory>().GetLogger(typeof(TCategory));
+    public static ILogger GetLogger<TCategory>(this IReadonlyDependencyResolver locator) => locator.GetService<ILoggerFactory>().GetLogger(typeof(TCategory));
     public static ILogger GetLogger(this QueryResult _) => GetLogger<QueryResult>();
 
     #endregion Methods

@@ -76,7 +76,7 @@ public class DebugMacro : MacroQueryResult
             _       => new List<QueryResult> { new DebugMacro("debug all",  "List all the aliases",  Cmdline("debug all")), new DebugMacro("debug echo", "Echo some text in a message box. (This is useless!)",  Cmdline("debug echo")), new DebugMacro("debug macro", "Provide the list of all macros",  Cmdline("debug macro")), new DebugMacro("debug cache", "Displays thumbnails in the cache",  Cmdline("debug cache")) }
         };
         result = result.ToList();
-        StaticLoggerFactory.GetLogger<DebugMacro>().LogDebug("Executed 'debug {Name}' and found {Result} item(s)", cl.Name.ToLower(), result.Count());
+        Locator.Current.GetLogger<DebugMacro>().LogDebug("Executed 'debug {Name}' and found {Result} item(s)", cl.Name.ToLower(), result.Count());
         return Task.FromResult(result);
     }
 

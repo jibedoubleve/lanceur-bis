@@ -33,8 +33,8 @@ public class UserNotification : IUserNotification
 
     private static void HandleCrashingNotification(string message, Exception ex, Exception e)
     {
-        StaticLoggerFactory.GetLogger<UserNotification>()
-                           .LogWarning(ex, "User notification failed ({Message}). Show message in a MessageBox", e.Message);
+        Locator.Current.GetLogger<UserNotification>()
+               .LogWarning(ex, "User notification failed ({Message}). Show message in a MessageBox", e.Message);
         MessageBox.Show(Application.Current.MainWindow!, $"{message}. {(ex is null ? "" : $"{Environment.NewLine}{ex}")}", "Warning");
     }
 

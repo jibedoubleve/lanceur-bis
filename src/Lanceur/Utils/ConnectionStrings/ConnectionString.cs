@@ -4,6 +4,7 @@ using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
+using Splat;
 
 namespace Lanceur.Utils.ConnectionStrings;
 
@@ -32,7 +33,7 @@ public class ConnectionString : BaseConnectionString, IConnectionString
 
     public override string ToString()
     {
-        if (!File.Exists(_dbPath)) StaticLoggerFactory.GetLogger<ConnectionString>().LogWarning("The path {DbPath} doesn't exist. A new database should be created!", _dbPath);
+        if (!File.Exists(_dbPath)) Locator.Current.GetLogger<ConnectionString>().LogWarning("The path {DbPath} doesn't exist. A new database should be created!", _dbPath);
         var path = Environment.ExpandEnvironmentVariables(_dbPath);
         return CSTRING_PATTERN.Format(path);
     }
