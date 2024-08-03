@@ -5,6 +5,7 @@ using ScottPlot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Splat;
 
 namespace Lanceur.Views;
 
@@ -50,7 +51,7 @@ public partial class TrendsView : IViewFor<TrendsViewModel>
             ctrl.Plot.Legend();
             ctrl.Refresh();
         }
-        else { StaticLoggerFactory.GetLogger<TrendsView>().LogWarning("No history to display"); }
+        else { Locator.Current.GetLogger<TrendsView>().LogWarning("No history to display"); }
     }
 
     #endregion Methods

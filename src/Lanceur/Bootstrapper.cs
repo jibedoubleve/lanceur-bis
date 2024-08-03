@@ -292,7 +292,7 @@ public class Bootstrapper
         var stg = l.GetService<IConnectionString>();
         var sqlite = l.GetService<SQLiteUpdater>();
 
-        StaticLoggerFactory.GetLogger<Bootstrapper>().LogInformation("Settings DB path: {Settings}", stg);
+        Locator.Current.GetLogger<Bootstrapper>().LogInformation("Settings DB path: {Settings}", stg);
 
         sqlite.Update(stg.ToString());
     }

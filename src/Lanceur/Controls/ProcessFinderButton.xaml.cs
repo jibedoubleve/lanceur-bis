@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Splat;
 
 namespace Lanceur.Controls;
 
@@ -135,7 +136,7 @@ public partial class ProcessFinderButton : UserControl
             ReleaseMouseCapture();
             Cursor = null;
         }
-        catch (Exception ex) { StaticLoggerFactory.GetLogger<ProcessFinderButton>().LogError(ex, "An error occured when trying to retrieve the path of the executable with the mouse"); }
+        catch (Exception ex) { Locator.Current.GetLogger<ProcessFinderButton>().LogError(ex, "An error occured when trying to retrieve the path of the executable with the mouse"); }
     }
 
     protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)

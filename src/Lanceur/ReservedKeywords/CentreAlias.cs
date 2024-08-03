@@ -37,12 +37,12 @@ public class CentreAlias : SelfExecutableQueryResult
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
         var coordinate = ScreenRuler.SetDefaultPosition();
-        StaticLoggerFactory.GetLogger<CentreAlias>()
-                           .LogInformation(
-                               "Put window at default position. (x: {X} - y: {Y}",
-                               coordinate.X,
-                               coordinate.Y
-                           );
+        Locator.Current.GetLogger<CentreAlias>()
+               .LogInformation(
+                   "Put window at default position. (x: {X} - y: {Y}",
+                   coordinate.X,
+                   coordinate.Y
+               );
 
         Save(coordinate);
         return NoResultAsync;
