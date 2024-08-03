@@ -23,7 +23,7 @@ public static class ThumbnailMixin
     /// <param name="fileName">The file name of the thumbnail</param>
     public static void CopyToImageRepository(this ImageSource imageSource, string fileName)
     {
-        var destination = fileName.ToAbsolutePath();
+        var destination = fileName.GetThumbnailPath();
 
         lock (Locker)
         {
@@ -48,7 +48,7 @@ public static class ThumbnailMixin
     /// <param name="fileName">The file name of the thumbnail</param>
     public static void CopyToImageRepository(this string imageSource, string fileName)
     {
-        var destination = fileName.ToAbsolutePath();
+        var destination = fileName.GetThumbnailPath();
 
         if (File.Exists(destination)) return;
 
@@ -60,12 +60,11 @@ public static class ThumbnailMixin
     }
 
     /// <summary>
-    /// With the <c>alias.Name</c>, it'll get the path where the thumbnail
-    /// should be or should be saved.
+    /// Generates the absolute path for the thumbnail image associated with the specified file name.
     /// </summary>
-    /// <param name="fileName">The <c>alias.Name</c></param>
-    /// <returns>The absolute path to the thumbnail of the specified <c>alias.Name</c></returns>
-    public static string ToAbsolutePath(this string fileName) => Path.Combine(Paths.ImageRepository, $"{fileName.Replace("package:", "")}.png");
+    /// <param name="fileName">The file name, possibly containing a prefix like "package:", for which to generate the thumbnail path.</param>
+    /// <returns>The absolute path to the thumbnail image corresponding to the given file name.</returns>
+    public static string GetThumbnailPath(this string fileName) => Path.Combine(Paths.ImageRepository, $"{fileName.Replace("package:", "")}.png");
 
     #endregion Methods
 }
