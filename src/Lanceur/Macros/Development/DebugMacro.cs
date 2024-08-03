@@ -43,7 +43,7 @@ public class DebugMacro : MacroQueryResult
     private static ICmdlineManager CmdlineProcessor => Locator.Current.GetService<ICmdlineManager>();
     private static IConversionService Converter => Locator.Current.GetService<IConversionService>();
     private static IMacroManager MacroManager => Locator.Current.GetService<IMacroManager>();
-    private static ISearchService SearchService => Locator.Current.GetService<ISearchService>();
+    private static IAsyncSearchService SearchService => Locator.Current.GetService<IAsyncSearchService>();
 
     public override string Icon => "BugOutline";
 
@@ -64,20 +64,25 @@ public class DebugMacro : MacroQueryResult
 
     public override SelfExecutableQueryResult Clone() => this.CloneObject();
 
-    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+    public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
         var cl = CmdlineProcessor.BuildFromText(cmdline?.Parameters ?? string.Empty);
 
         var result = cl.Name.ToLower() switch
         {
             "echo"  => Echo(cl),
-            "all"   => SearchService.GetAll(),
+            "all"   => await SearchService.GetAllAsync(),
             "macro" => Converter.ToQueryResult(MacroManager.GetAll()),
-            _       => new List<QueryResult> { new DebugMacro("debug all",  "List all the aliases",  Cmdline("debug all")), new DebugMacro("debug echo", "Echo some text in a message box. (This is useless!)",  Cmdline("debug echo")), new DebugMacro("debug macro", "Provide the list of all macros",  Cmdline("debug macro")), new DebugMacro("debug cache", "Displays thumbnails in the cache",  Cmdline("debug cache")) }
+            _       => new List<QueryResult>
+            {
+                new DebugMacro("debug all",  "List all the aliases",  Cmdline("debug all")),
+                new DebugMacro("debug echo", "Echo some text in a message box. (This is useless!)",  Cmdline("debug echo")),
+                new DebugMacro("debug macro", "Provide the list of all macros",  Cmdline("debug macro"))
+            }
         };
         result = result.ToList();
         Locator.Current.GetLogger<DebugMacro>().LogDebug("Executed 'debug {Name}' and found {Result} item(s)", cl.Name.ToLower(), result.Count());
-        return Task.FromResult(result);
+        return result;
     }
 
     public override string ToQuery() => $"debug {Query?.Parameters}".Trim().ToLower();
