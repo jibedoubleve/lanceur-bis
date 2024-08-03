@@ -11,10 +11,10 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Splat;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using ScottPlot.Renderable;
-using Serilog;
+using Lanceur.Infra.Win32.Thumbnails;
 
 namespace Lanceur;
 
@@ -52,7 +52,9 @@ public partial class App
         catch (Exception ex)
         {
             logger.LogCritical(ex, "Application crashed. See error for further information");
-            MessageBox.Show(Current.MainWindow, $"A fatal error occured: {ex.Message}");
+
+            if (Current?.MainWindow is not null) { MessageBox.Show(Current.MainWindow, $"A fatal error occured: {ex.Message}"); }
+            else { MessageBox.Show($"A fatal error occured: {ex.Message}"); }
         }
         finally { Bootstrapper.TearDown(); }
     }
@@ -67,7 +69,7 @@ public partial class App
 
     protected override async void OnStartup(StartupEventArgs e)
     {
-        var log = Locator.Current.GetLogger<App>();
+        var logger = Locator.Current.GetLogger<App>();
         _notifyIcon ??= new();
 
         // THEME
@@ -86,13 +88,14 @@ public partial class App
         if (await installer.HasMaintenanceAsync())
         {
             var errors = await installer.SubscribeForInstallAsync();
-            if (!errors.IsNullOrEmpty()) log.LogError("Error occured when installing plugins on startup: {Errors}", errors);
+            if (!errors.IsNullOrEmpty()) logger.LogError("Error occured when installing plugins on startup: {Errors}", errors);
         }
 
         File.Delete(Locations.MaintenanceLogBookPath);
         
         // PRELOAD
-        // var srv = Locator.Current
+        _ = Locator.Current.GetService<IAsyncSearchService>()
+                   ?.GetAllAsync();
     }
 
     #endregion Methods

@@ -275,11 +275,8 @@ public class Bootstrapper
         }
     }
 
-    private static void RegisterViews()
-    {
-        var l = Locator.CurrentMutable;
-        l.RegisterViewsForViewModels(Assembly.GetCallingAssembly());
-    }
+    private static void RegisterViews() => Locator.CurrentMutable
+                                                  .RegisterViewsForViewModels(Assembly.GetCallingAssembly());
 
     internal static void Initialise()
     {

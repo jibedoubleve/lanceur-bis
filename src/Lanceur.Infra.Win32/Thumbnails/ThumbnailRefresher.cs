@@ -42,7 +42,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
 
         if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon) return;
 
-        var filePath = alias.FileName.ToAbsolutePath();
+        var filePath = alias.FileName.GetThumbnailPath();
         if (File.Exists(filePath)) { alias.Thumbnail = filePath; }
         else if (alias.IsPackagedApplication())
         {
@@ -64,7 +64,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
         {
             var file = new FileInfo(alias.FileName);
             imageSource.CopyToImageRepository(file.Name);
-            alias.Thumbnail = file.Name.ToAbsolutePath();
+            alias.Thumbnail = file.Name.GetThumbnailPath();
             query.Soil();
             _logger.LogTrace("Retrieved thumbnail for win32 application {Name}. Thumbnail: {Thumbnail}", alias.Name, alias.Thumbnail);
             return;
@@ -74,7 +74,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
 
         var favicon = alias.FileName
                            .GetKeyForFavIcon()
-                           .ToAbsolutePath();
+                           .GetThumbnailPath();
 
         if (File.Exists(favicon))
         {
