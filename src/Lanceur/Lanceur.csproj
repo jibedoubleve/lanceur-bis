@@ -22,7 +22,7 @@
         <PackageReference Include="NHotkey.Wpf" Version="2.1.*" />
         <PackageReference Include="ReactiveUI.Events.WPF" Version="15.1.*" />
         <PackageReference Include="ReactiveUI.Fody" Version="18.4.*" />
-        <PackageReference Include="ReactiveUI.Validation" Version="3.0.*" />
+        <PackageReference Include="ReactiveUI.Validation" Version="3.1.7" />
         <PackageReference Include="ReactiveUI.WPF" Version="18.4.*" />
         <PackageReference Include="ScottPlot.WPF" Version="4.1.*" />
         <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />

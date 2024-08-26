@@ -5,41 +5,41 @@
         <Nullable>disable</Nullable>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Remove="UI\**"/>
-        <EmbeddedResource Remove="UI\**"/>
-        <None Remove="UI\**"/>
+        <Compile Remove="UI\**" />
+        <EmbeddedResource Remove="UI\**" />
+        <None Remove="UI\**" />
     </ItemGroup>
     <ItemGroup>
-        <None Remove="Libraries\Scripts\invalid_script.sql"/>
-        <None Remove="Libraries\Scripts\script-0.1.sql"/>
-        <None Remove="Libraries\Scripts\script-0.2.1.sql"/>
-        <None Remove="Libraries\Scripts\script-0.2.sql"/>
+        <None Remove="Libraries\Scripts\invalid_script.sql" />
+        <None Remove="Libraries\Scripts\script-0.1.sql" />
+        <None Remove="Libraries\Scripts\script-0.2.1.sql" />
+        <None Remove="Libraries\Scripts\script-0.2.sql" />
     </ItemGroup>
     <ItemGroup>
-        <EmbeddedResource Include="Libraries\Scripts\invalid_script.sql"/>
-        <EmbeddedResource Include="Libraries\Scripts\script-0.2.1.sql"/>
-        <EmbeddedResource Include="Libraries\Scripts\script-0.2.sql"/>
-        <EmbeddedResource Include="Libraries\Scripts\script-0.1.sql"/>
+        <EmbeddedResource Include="Libraries\Scripts\invalid_script.sql" />
+        <EmbeddedResource Include="Libraries\Scripts\script-0.2.1.sql" />
+        <EmbeddedResource Include="Libraries\Scripts\script-0.2.sql" />
+        <EmbeddedResource Include="Libraries\Scripts\script-0.1.sql" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="FluentAssertions" Version="6.9.*"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.*"/>
-        <PackageReference Include="NSubstitute" Version="4.4.*"/>
-        <PackageReference Include="ReactiveUI.Testing" Version="18.4.*"/>
-        <PackageReference Include="xunit" Version="2.4.*"/>
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.*">
+        <PackageReference Include="FluentAssertions" Version="6.12.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+        <PackageReference Include="NSubstitute" Version="4.4.*" />
+        <PackageReference Include="ReactiveUI.Testing" Version="18.4.*" />
+        <PackageReference Include="xunit" Version="2.9.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
-        <ProjectReference Include="..\..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj"/>
-        <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj"/>
-        <ProjectReference Include="..\..\Lanceur\Lanceur.csproj"/>
-        <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj"/>
-        <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj"/>
-        <ProjectReference Include="..\..\Lanceur\Lanceur.csproj"/>
-        <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj"/>
+        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
+        <ProjectReference Include="..\..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
+        <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj" />
+        <ProjectReference Include="..\..\Lanceur\Lanceur.csproj" />
+        <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj" />
+        <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
+        <ProjectReference Include="..\..\Lanceur\Lanceur.csproj" />
+        <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj" />
     </ItemGroup>
 </Project>
