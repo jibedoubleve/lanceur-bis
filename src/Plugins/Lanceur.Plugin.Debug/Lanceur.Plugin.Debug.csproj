@@ -6,7 +6,7 @@
         <EnableDynamicLoading>true</EnableDynamicLoading>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.1"/>
+        <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.2" />
     </ItemGroup>
     <ItemGroup>
         <None Update="manifest.json">
@@ -16,19 +16,19 @@
         </None>
     </ItemGroup>
     <ItemGroup>
-        <None Include=".build\pack.ps1"/>
+        <None Include=".build\pack.ps1" />
     </ItemGroup>
     <Target Name="PostBuild" AfterTargets="GetVersion">
-        <Exec Command="powershell -NoProfile -ExecutionPolicy RemoteSigned $(ProjectDir).build\pack.ps1 -name $(AssemblyName) -version $(VersionInfo) -output $(ProjectDir)$(OutDir)"/>
+        <Exec Command="powershell -NoProfile -ExecutionPolicy RemoteSigned $(ProjectDir).build\pack.ps1 -name $(AssemblyName) -version $(VersionInfo) -output $(ProjectDir)$(OutDir)" />
     </Target>
     <Target Name="GetVersion" AfterTargets="PostBuildEvent">
         <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
-            <Output TaskParameter="Assemblies" ItemName="AssemblyInfo"/>
+            <Output TaskParameter="Assemblies" ItemName="AssemblyInfo" />
         </GetAssemblyIdentity>
         <PropertyGroup>
             <VersionInfo>%(AssemblyInfo.Version)</VersionInfo>
         </PropertyGroup>
         <!--And use it after like any other variable:-->
-        <Message Text="VersionInfo = $(VersionInfo)" Importance="high"/>
+        <Message Text="VersionInfo = $(VersionInfo)" Importance="high" />
     </Target>
 </Project>

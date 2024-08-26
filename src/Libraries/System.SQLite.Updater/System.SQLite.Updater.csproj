@@ -5,12 +5,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Remove="Utils\**"/>
-        <EmbeddedResource Remove="Utils\**"/>
-        <None Remove="Utils\**"/>
+        <Compile Remove="Utils\**" />
+        <EmbeddedResource Remove="Utils\**" />
+        <None Remove="Utils\**" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.0.*"/>
-        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.117"/>
+        <PackageReference Include="Dapper" Version="2.0.*" />
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
     </ItemGroup>
 </Project>
