@@ -1,4 +1,4 @@
-﻿<ResourceDictionary
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
@@ -283,8 +283,7 @@
                         FontWeight="ExtraLight"
                         Text="{Binding Version, StringFormat={} (v{0})}" />
                 </StackPanel>
-                <TextBlock Margin="5"
-                           Text="{Binding Description, Converter={StaticResource QueryDescriptionConverter}}" />
+                <TextBlock Margin="5" Text="{Binding Description, Converter={StaticResource QueryDescriptionConverter}}" />
             </StackPanel>
         </Grid>
     </DataTemplate>

@@ -238,7 +238,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     }
 
     ///<inheritdoc/>
-    public IEnumerable<AliasQueryResult> Search(string name) => _aliasSearchDbAction.Search(name);
+    public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false) => _aliasSearchDbAction.Search(name, isReturnAllIfEmpty);
 
     public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria);
 

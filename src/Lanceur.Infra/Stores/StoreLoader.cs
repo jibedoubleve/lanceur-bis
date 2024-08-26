@@ -2,15 +2,15 @@
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using System.Reflection;
-using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
-using Splat;
 
 namespace Lanceur.Infra.Stores;
 
 public class StoreLoader : IStoreLoader
 {
+    private readonly IServiceProvider _serviceProvider;
+
     #region Fields
 
     private readonly ISearchServiceOrchestrator _orchestrator;
@@ -20,14 +20,16 @@ public class StoreLoader : IStoreLoader
     #endregion Fields
 
     #region Constructors
-
-    public StoreLoader() : this(null) { }
-
-    public StoreLoader(ILoggerFactory loggerFactory = null, ISearchServiceOrchestrator orchestrator = null)
+    
+    public StoreLoader(ILogger<StoreLoader> logger, ISearchServiceOrchestrator orchestrator, IServiceProvider serviceProvider)
     {
-        loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
-        _logger = loggerFactory.GetLogger<StoreLoader>();
-        _orchestrator = orchestrator ?? Locator.Current.GetService<ISearchServiceOrchestrator>();
+        ArgumentNullException.ThrowIfNull(nameof(logger));
+        ArgumentNullException.ThrowIfNull(nameof(orchestrator));
+        ArgumentNullException.ThrowIfNull(nameof(serviceProvider));
+        
+        _serviceProvider = serviceProvider;
+        _logger = logger;
+        _orchestrator = orchestrator;
     }
 
     #endregion Constructors
@@ -45,7 +47,8 @@ public class StoreLoader : IStoreLoader
         var found = types.Where(t => t.GetCustomAttributes(typeof(StoreAttribute)).Any())
                          .ToList();
 
-        _cachedStores = found.Select(type => (ISearchService)Activator.CreateInstance(type)).ToArray();
+        object[] args = [_serviceProvider];
+        _cachedStores = found.Select(type => (ISearchService)Activator.CreateInstance(type, args)).ToArray();
         return _cachedStores;
     }
 

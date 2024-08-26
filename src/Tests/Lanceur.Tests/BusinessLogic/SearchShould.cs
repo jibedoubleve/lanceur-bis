@@ -17,6 +17,7 @@ using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Splat;
@@ -60,10 +61,14 @@ public class SearchShould : TestBase
     [Fact]
     public void HaveStores()
     {
-        var loggerFactory = Substitute.For<ILoggerFactory>();
+        var logger = Substitute.For<ILogger<StoreLoader>>();
         var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
+        var serviceProvider
+            = new ServiceCollection().AddTransient(_ => Substitute.For<ILoggerFactory>())
+                                     .AddTransient(_ => Substitute.For<ISearchServiceOrchestrator>())
+                                     .BuildServiceProvider();
 
-        var service = new SearchService(new StoreLoader(loggerFactory, orchestrator), loggerFactory: loggerFactory);
+        var service = new SearchService(new StoreLoader(logger, orchestrator, serviceProvider));
 
         service.Stores.Should().HaveCountGreaterThan(5);
     }

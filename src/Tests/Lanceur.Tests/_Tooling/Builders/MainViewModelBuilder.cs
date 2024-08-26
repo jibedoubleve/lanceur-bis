@@ -1,4 +1,4 @@
-﻿using System.Reactive.Concurrency;
+using System.Reactive.Concurrency;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
@@ -38,7 +38,6 @@ internal class MainViewModelBuilder
         return new(
             _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
             searchService: _searchService ?? Substitute.For<IAsyncSearchService>(),
-            cmdlineService: new CmdlineManager(),
             executor: _executionManager ?? Substitute.For<IExecutionManager>(),
             notify: Substitute.For<IUserNotification>(),
             appConfigService: _appConfigService ?? settingsFacade,

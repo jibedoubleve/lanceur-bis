@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Lanceur.Core.Formatters;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -127,9 +127,8 @@ public class Bootstrapper
 
         l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
         l.Register<IEverythingApi>(() => new EverythingApi());
-        l.Register<IStoreLoader>(() => new StoreLoader());
+        l.Register<IStoreLoader>(() => new StoreLoader(null, Get<SearchServiceOrchestrator>(), Get<ServiceProvider>()));
         l.Register<IAsyncSearchService>(() => new SearchService(Get<IStoreLoader>()));
-        l.Register<ICmdlineManager>(() => new CmdlineManager());
         l.Register<IExecutionManager>(
             () => new ExecutionManager(
                 Get<ILoggerFactory>(),
@@ -164,7 +163,7 @@ public class Bootstrapper
         l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<ILoggerFactory>(), Get<IDbRepository>(), Get<IThumbnailRefresher>()));
         l.RegisterLazySingleton<IPackagedAppManager>(() => new PackagedAppManager());
         l.Register<IPackagedAppSearchService>(() => new PackagedAppSearchService(Get<ILoggerFactory>()));
-        l.RegisterLazySingleton<IFavIconDownloader>(() => new FavIconDownloader(Get<ILoggerFactory>().GetLogger<IFavIconDownloader>()));
+        l.RegisterLazySingleton<IFavIconDownloader>(() => new FavIconDownloader(null));
         l.Register<IFavIconManager>(
             () => new FavIconManager(
                 Get<IPackagedAppSearchService>(),
@@ -219,8 +218,8 @@ public class Bootstrapper
         l.Register<IDbConnection>(() => new SQLiteConnection(Get<IConnectionString>().ToString()));
         l.Register<IDbConnectionFactory>(
             () => new SQLiteProfiledConnectionFactory(
-                Get<IConnectionString>().ToString(),
-                Get<ILoggerFactory>()
+                Get<IConnectionString>(),
+                Get<ILoggerFactory>().GetLogger<SQLiteProfiledConnectionFactory>()
             )
         );
         l.Register<IDbConnectionManager>(() => new DbMultiConnectionManager(Get<IDbConnectionFactory>()));

@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using Splat;
 using System.Reflection;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.DependencyInjection;
+using ILogger = Splat.ILogger;
 
 namespace Lanceur.Infra.Stores;
 
@@ -30,6 +32,17 @@ public class PluginStore : ISearchService, IPluginManifestRepository
 
     #region Constructors
 
+    public PluginStore(IServiceProvider serviceProvider)
+    {
+        _logger = serviceProvider.GetService<ILogger<PluginStore>>();
+
+        _dbRepository = serviceProvider.GetService<IDbRepository>();
+        _pluginManager = serviceProvider.GetService<IPluginManager>();
+        _context = serviceProvider.GetService<IPluginStoreContext>();
+        _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+    }
+    
+    [Obsolete("Use ctor with service provider instead")]
     public PluginStore(
         IPluginStoreContext context = null,
         IPluginManager pluginManager = null,

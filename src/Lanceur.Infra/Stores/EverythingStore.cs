@@ -5,6 +5,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Splat;
 
@@ -24,8 +25,14 @@ public class EverythingStore : ISearchService
 
     #region Constructors
 
-    public EverythingStore() : this(null) { }
+    public EverythingStore(IServiceProvider serviceProvider)
+    {
+        _logger = serviceProvider.GetService<ILogger<EverythingStore>>();
+        _everythingApi = serviceProvider.GetService<IEverythingApi>();
+        _settings = serviceProvider.GetService<ISettingsFacade>();
+    }
 
+    [Obsolete("Use ctor with service provider instead")]
     public EverythingStore(ILoggerFactory loggerFactory = null, IEverythingApi everythingApi = null, ISettingsFacade settings = null)
     {
         var l = Locator.Current;

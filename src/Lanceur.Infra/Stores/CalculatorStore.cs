@@ -3,6 +3,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Splat;
@@ -21,8 +22,13 @@ public class CalculatorStore : ISearchService
 
     #region Constructors
 
-    public CalculatorStore() : this(null) { }
 
+    public CalculatorStore(IServiceProvider serviceProvider)
+    {
+        _logger = serviceProvider.GetService<ILogger<CalculatorStore>>();
+    }
+
+    [Obsolete("Use ctor with service provider instead")]
     public CalculatorStore(ILoggerFactory loggerFactory = null)
     {
         loggerFactory ??= Locator.GetLocator().GetService<ILoggerFactory>();

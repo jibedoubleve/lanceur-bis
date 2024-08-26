@@ -29,7 +29,6 @@ public partial class MainViewModel : ReactiveObject
 {
     #region Fields
 
-    private readonly ICmdlineManager _cmdlineManager;
     private readonly IDbRepository _dbRepository;
     private readonly IExecutionManager _executor;
     private readonly ILogger<MainViewModel> _logger;
@@ -45,7 +44,6 @@ public partial class MainViewModel : ReactiveObject
         ISchedulerProvider schedulerProvider = null,
         ILoggerFactory loggerFactory = null,
         IAsyncSearchService searchService = null,
-        ICmdlineManager cmdlineService = null,
         IUserNotification notify = null,
         IDbRepository dataService = null,
         IExecutionManager executor = null,
@@ -58,7 +56,6 @@ public partial class MainViewModel : ReactiveObject
         notify ??= l.GetService<IUserNotification>();
         _logger = loggerFactory.GetLogger<MainViewModel>();
         _searchService = searchService ?? l.GetService<IAsyncSearchService>();
-        _cmdlineManager = cmdlineService ?? l.GetService<ICmdlineManager>();
         _dbRepository = dataService ?? l.GetService<IDbRepository>();
         _executor = executor ?? l.GetService<IExecutionManager>();
         _settingsFacade = appConfigService ?? l.GetService<ISettingsFacade>();
@@ -143,7 +140,7 @@ public partial class MainViewModel : ReactiveObject
             .Select(
                 x =>
                 {
-                    var param = _cmdlineManager.BuildFromText(Query);
+                    var param = CmdlineManager.BuildFromText(Query);
                     return new Cmdline(x, param.Parameters).ToString();
                 }
             )
@@ -289,7 +286,7 @@ public partial class MainViewModel : ReactiveObject
             return new() { Results = all, KeepAlive = all.Any() };
         }
 
-        var query = _cmdlineManager.BuildFromText(criterion);
+        var query = CmdlineManager.BuildFromText(criterion);
         var results = (await _searchService.SearchAsync(query))
             .ToArray();
 

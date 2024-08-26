@@ -76,10 +76,12 @@ public class SearchService : SearchServiceCache, IAsyncSearchService
         return SetupAndSort(results);
     }
 
-    public async Task<IEnumerable<QueryResult>> SearchAsync(Cmdline query)
+    public async Task<IEnumerable<QueryResult>> SearchAsync(Cmdline query, bool doesReturnAllIfEmpty = false)
     {
         using var measurement = _logger.MeasureExecutionTime(this);
-        if (query == null) return new List<QueryResult>();
+
+        if (doesReturnAllIfEmpty && query is null) return await GetAllAsync();
+        if (query is null || query.IsEmpty) return new List<QueryResult>();
 
         //Get the alive stores
         var aliveStores = Stores.Where(service => _orchestrator.IsAlive(service, query))

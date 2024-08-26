@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Lanceur.Infra.Managers;
+using Lanceur.Core.Managers;
 using Lanceur.Tests.Tooling.Macros;
 using Xunit;
 
@@ -13,10 +13,9 @@ public partial class CmdlineManagerShould
     public void BuildCommand(string cmdline, string parameters)
     {
         parameters ??= string.Empty;
-        var cmdlineManager = new CmdlineManager();
         var macro = new MultiMacroTest(parameters);
 
-        var cmd = cmdlineManager.Build(cmdline, macro);
+        var cmd = CmdlineManager.Build(cmdline, macro);
 
         cmd.Parameters.Should().Be(parameters);
     }
@@ -25,10 +24,9 @@ public partial class CmdlineManagerShould
     public void BuildCommandWithParameters(string cmdline, string macroParams, string expected)
     {
         expected ??= string.Empty;
-        var mgr = new CmdlineManager();
         var macro = new MultiMacroTest(macroParams);
 
-        var cmd = mgr.Build(cmdline, macro);
+        var cmd = CmdlineManager.Build(cmdline, macro);
 
         cmd.Parameters.Should().Be(expected);
     }
@@ -37,12 +35,11 @@ public partial class CmdlineManagerShould
     public void CloneCmdline(string name, string parameters, string newParameters)
     {
         // Arrange
-        var mgr = new CmdlineManager();
         var cmdline = $"{name} {parameters}";
-        var cmd = mgr.BuildFromText(cmdline);
+        var cmd = CmdlineManager.BuildFromText(cmdline);
 
         // Act
-        var newCmd = mgr.CloneWithNewParameters(newParameters, cmd);
+        var newCmd = CmdlineManager.CloneWithNewParameters(newParameters, cmd);
 
         // Assert
         newCmd.Name.Should().Be(name);
@@ -53,13 +50,12 @@ public partial class CmdlineManagerShould
     public void CloneCmdlineWithEmptyParameters(string newParameters)
     {
         // Arrange
-        var mgr = new CmdlineManager();
         var name = "init";
         var parameters = "un deux trois";
-        var cmd = mgr.BuildFromText($"{name} {parameters}");
+        var cmd = CmdlineManager.BuildFromText($"{name} {parameters}");
 
         // Act
-        var newCmd = mgr.CloneWithNewParameters(newParameters, cmd);
+        var newCmd = CmdlineManager.CloneWithNewParameters(newParameters, cmd);
 
         // Assert
         newCmd.Name.Should().Be(name);

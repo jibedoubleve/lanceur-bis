@@ -103,11 +103,14 @@ public interface IDbRepository
     void SaveOrUpdate(ref AliasQueryResult alias);
 
     /// <summary>
-    /// Search all the alias that correspond to the criterion
+    /// Searches for all aliases that match the specified criteria.
     /// </summary>
-    /// <param name="criteria">Criteria to find the aliases</param>
-    /// <returns>Resulting aliases</returns>
-    IEnumerable<AliasQueryResult> Search(string criteria);
+    /// <param name="criteria">The criteria used to search for aliases.</param>
+    /// <param name="isReturnAllIfEmpty">Specifies the behavior when <paramref name="criteria"/> is null or empty: 
+    /// if <c>true</c>, all aliases are returned; if <c>false</c>, no results are returned.</param>
+    /// <returns>A collection of aliases that match the search criteria.</returns>
+
+    IEnumerable<AliasQueryResult> Search(string criteria, bool isReturnAllIfEmpty = false);
 
     /// <summary>
     /// Search all the alias with additional parameters that correspond to the criterion 

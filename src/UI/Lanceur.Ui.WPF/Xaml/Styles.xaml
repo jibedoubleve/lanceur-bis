@@ -1,0 +1,13 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!--  SIZES  -->
+    <sys:Double x:Key="DefaultIconSize">35</sys:Double>
+    <sys:Double x:Key="DefaultIconContainerSize">55</sys:Double>
+    <sys:Double x:Key="ResultBoxHeight">350</sys:Double>
+
+    <!--  DURATIONS  -->
+    <Duration x:Key="FadeInDuration">0:0:0:0.01</Duration>
+    <Duration x:Key="FadeOutDuration">0:0:0:0.01</Duration>
+</ResourceDictionary>
