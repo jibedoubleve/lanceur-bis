@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Infra.Managers;
 using Xunit;
 
 namespace Lanceur.Tests.Models;
@@ -50,10 +50,9 @@ public class CmdlineShould
      InlineData(".AAAA aa")]
     public void HandleSpecialCmdCharacter(string cmdline)
     {
-        var builder = new CmdlineManager();
-        builder.BuildFromText(cmdline)
-               .Name.Should()
-               .Be(cmdline[0].ToString());
+        CmdlineManager.BuildFromText(cmdline)
+                      .Name.Should()
+                      .Be(cmdline[0].ToString());
     }
 
     #endregion Methods

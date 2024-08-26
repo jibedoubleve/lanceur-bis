@@ -1,0 +1,82 @@
+<fw:AcrylicWindow
+    x:Class="Lanceur.Ui.WPF.Views.MainView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
+    xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="Self"
+    Width="720"
+    AcrylicWindowStyle="None"
+    AllowDrop="True"
+    Background="Transparent"
+    BorderThickness="0.55"
+    FocusManager.FocusedElement="{Binding ElementName=QueryTextBox}"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    Loaded="OnLoaded"
+    MouseDown="OnMouseDown"
+    PreviewKeyDown="OnPreviewKeyDown"
+    ResizeMode="NoResize"
+    ShowInTaskbar="False"
+    SizeToContent="Height"
+    Topmost="True"
+    mc:Ignorable="d">
+    <Border Background="{DynamicResource ApplicationBackgroundBrush}" Opacity="0.7">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid>
+                <!--  QUERY BOX  -->
+                <ui:TextBox
+                    x:Name="QueryTextBox"
+                    Margin="15"
+                    Panel.ZIndex="2"
+                    Background="Transparent"
+                    FontSize="24"
+                    KeyDown="OnPreviewKeyDown"
+                    Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}">
+                    <ui:TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding ExecuteCommand}" />
+                    </ui:TextBox.InputBindings>
+                    <interactivity:Interaction.Triggers>
+                        <interactivity:EventTrigger EventName="TextChanged">
+                            <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" />
+                        </interactivity:EventTrigger>
+                    </interactivity:Interaction.Triggers>
+                </ui:TextBox>
+                <ui:TextBlock
+                    Margin="28,24,27,27"
+                    FontSize="24"
+                    Foreground="{DynamicResource TextFillColorDisabledBrush}"
+                    Text="{Binding Suggestion}"/>
+            </Grid>
+
+            <!--  RESULT BOX  -->
+            <ui:ListView
+                x:Name="QueryResultControl"
+                Grid.Row="1"
+                MaxHeight="600"
+                Margin="15,5,15,0"
+                ItemTemplate="{StaticResource QueryResultTemplate}"
+                ItemsSource="{Binding Results}"
+                SelectedItem="{Binding SelectedResult}" />
+
+            <!--  STATUS BAR  -->
+            <StackPanel
+                Grid.Row="2"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}">
+                <ui:TextBlock
+                    Margin="0,15,5,5"
+                    FontTypography="Caption"
+                    Text="{Binding Results.Count, StringFormat={}{0} Item(s) found.}" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</fw:AcrylicWindow>

@@ -14,6 +14,7 @@
     <Position X="2.75" Y="6.25" Width="2" />
     <Members>
       <Field Name="_description" Hidden="true" />
+      <Field Name="_icon" Hidden="true" />
       <Method Name="DisplayQueryResult" Hidden="true" />
     </Members>
     <Compartments>

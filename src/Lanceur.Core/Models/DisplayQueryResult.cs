@@ -26,6 +26,10 @@ public class DisplayQueryResult : QueryResult
 
     public override string Description => _description;
 
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="QueryResult"/> represents an actual result to display 
+    /// or a message indicating that there are no results to show.
+    /// </summary>
     public override bool IsResult => false;
 
     public override string Icon

@@ -4,6 +4,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Splat;
 
@@ -21,8 +22,13 @@ public class AliasStore : ISearchService
 
     #region Constructors
 
-    public AliasStore() : this(null) { }
+    public AliasStore(IServiceProvider serviceProvider)
+    {
+        _aliasService = serviceProvider.GetService<IDbRepository>();
+        _logger = serviceProvider.GetService<ILogger<AliasStore>>();
+    }
 
+    [Obsolete("Use ctor with service provider instead")]
     public AliasStore(IDbRepository aliasService = null, ILoggerFactory loggerFactory = null)
     {
         _aliasService = aliasService ?? Locator.Current.GetService<IDbRepository>();

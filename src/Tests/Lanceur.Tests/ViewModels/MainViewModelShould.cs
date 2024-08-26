@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -155,7 +155,6 @@ public partial class MainViewModelShould : TestBase
     [Fact]
     public void ShowAutoCompleteWhenCallingDebugMacro()
     {
-        Locator.CurrentMutable.Register<ICmdlineManager>(() => new CmdlineManager());
         new TestScheduler().With(
             scheduler =>
             {

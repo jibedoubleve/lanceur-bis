@@ -17,6 +17,7 @@ public class SQLiteLoggerDbProfiler : LoggerDbProfiler, IDbProfiler
 
     public SQLiteLoggerDbProfiler(ILogger logger, bool doFullLogging = false) : base(doFullLogging) => _logger = logger;
 
+    [Obsolete("Use version with ILogger")]
     public SQLiteLoggerDbProfiler(ILoggerFactory loggerFactory, bool doFullLogging = false) : base(doFullLogging)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Reflection;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -30,10 +31,17 @@ public class ReservedAliasStore : ISearchService
     /// <summary>
     /// Generate a new instance. Look into the Executing Assembly to find reserved aliases.
     /// </summary>
+    /// <param name="serviceProvider">Service Provider used to inject dependencies</param>
     /// <remarks>
     /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
     /// </remarks>
-    public ReservedAliasStore() : this(null) => _assembly = Assembly.GetEntryAssembly();
+    public ReservedAliasStore(IServiceProvider serviceProvider)
+    {
+        _assembly = Assembly.GetEntryAssembly();
+        _dataService =serviceProvider.GetService<IDbRepository>();
+        _logger = serviceProvider.GetService<ILogger<ReservedAliasStore>>();
+
+    }
 
     /// <summary>
     /// Generate a new instance
@@ -44,6 +52,7 @@ public class ReservedAliasStore : ISearchService
     /// <remarks>
     /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
     /// </remarks>
+    [Obsolete("Use ctor with service provider instead")]
     public ReservedAliasStore(Assembly assembly, IDbRepository dataService = null, ILoggerFactory loggerFactory = null)
     {
         _assembly = assembly;

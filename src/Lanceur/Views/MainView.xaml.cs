@@ -1,4 +1,4 @@
-﻿using Lanceur.Converters.Reactive;
+using Lanceur.Converters.Reactive;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;

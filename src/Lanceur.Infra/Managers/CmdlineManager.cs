@@ -1,9 +1,10 @@
-﻿using Lanceur.Core.Managers;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Managers;
 
+[Obsolete("Use Lanceur.Core.Manager.CmdlineManager instead")]
 public class CmdlineManager : ICmdlineManager
 {
     #region Fields
