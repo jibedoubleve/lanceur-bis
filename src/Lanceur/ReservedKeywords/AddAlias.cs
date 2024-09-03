@@ -21,12 +21,11 @@ public class AddAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
-        if (cmdline is not null)
-        {
-            var view = new SettingsView();
-            view.Show();
-            view.ViewModel.AddAlias.Execute(cmdline.Parameters).Subscribe();
-        }
+        if (cmdline is null) return NoResultAsync;
+
+        var view = new SettingsView();
+        view.Show();
+        view.ViewModel.AddAlias.Execute(cmdline.Parameters).Subscribe();
 
         return NoResultAsync;
     }

@@ -1,24 +1,23 @@
-﻿using Lanceur.Core;
+
+using System.Diagnostics;
+using Lanceur.Core;
+using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
-using Lanceur.Infra.Logging;
-using Lanceur.SharedKernel.Mixins;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
-using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Responses;
+using Lanceur.Infra.Logging;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Utils;
-
+using Lanceur.SharedKernel.Mixins;
+using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Managers;
 
 public class ExecutionManager : IExecutionManager
 {
     #region Fields
-
-    private readonly ICmdlineManager _cmdlineManager;
+    
     private readonly IDbRepository _dataService;
     private readonly ILogger<ExecutionManager> _logger;
     private readonly IWildcardManager _wildcardManager;
@@ -30,14 +29,12 @@ public class ExecutionManager : IExecutionManager
     public ExecutionManager(
         ILoggerFactory logFactory,
         IWildcardManager wildcardManager,
-        IDbRepository dataService,
-        ICmdlineManager cmdlineManager
+        IDbRepository dataService
     )
     {
         _logger = logFactory.GetLogger<ExecutionManager>();
         _wildcardManager = wildcardManager;
         _dataService = dataService;
-        _cmdlineManager = cmdlineManager;
     }
 
     #endregion Constructors
@@ -165,7 +162,7 @@ public class ExecutionManager : IExecutionManager
                 _logger.LogInformation("Executing self executable {Name}", name);
                 exec.IsElevated = request.ExecuteWithPrivilege;
                 return ExecutionResponse.FromResults(
-                    await exec.ExecuteAsync(_cmdlineManager.BuildFromText(request.Query))
+                    await exec.ExecuteAsync(Lanceur.Core.Managers.CmdlineManager.BuildFromText(request.Query))
                 );
 
             default: throw new NotSupportedException($"Cannot execute query result '{request.QueryResult?.Name ?? "<EMPTY>"}'");

@@ -43,6 +43,7 @@ using System.Linq;
 using System.Reflection;
 using Everything.Wrapper;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.Utils;
 using Serilog.Core;
 using Serilog.Events;
@@ -133,8 +134,7 @@ public class Bootstrapper
             () => new ExecutionManager(
                 Get<ILoggerFactory>(),
                 Get<IWildcardManager>(),
-                Get<IDbRepository>(),
-                Get<ICmdlineManager>()
+                Get<IDbRepository>()
             )
         );
         l.Register<ISearchServiceOrchestrator>(() => new SearchServiceOrchestrator());
@@ -157,7 +157,7 @@ public class Bootstrapper
         l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
         l.Register<IConversionService>(() => new AutoMapperConverter(Get<IMapper>()));
         l.Register<IClipboardService>(() => new WindowsClipboardService());
-        l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly()));
+        l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly(), null, null, null));
         l.Register<IPluginManager>(() => new PluginManager(Get<ILoggerFactory>()));
         l.Register<IThumbnailRefresher>(() => new ThumbnailRefresher(Get<ILoggerFactory>(), Get<IPackagedAppSearchService>(), Get<IFavIconManager>()));
         l.Register<IThumbnailManager>(() => new ThumbnailManager(Get<ILoggerFactory>(), Get<IDbRepository>(), Get<IThumbnailRefresher>()));

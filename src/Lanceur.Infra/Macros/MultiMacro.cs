@@ -1,35 +1,37 @@
-﻿using Lanceur.Core;
+﻿using System.ComponentModel;
+using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.Mixins;
-using Lanceur.Ui;
-using Splat;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using Windows.UI.WebUI;
 using Lanceur.SharedKernel.Utils;
+using Microsoft.Extensions.DependencyInjection;
+using Splat;
 
-namespace Lanceur.Macros;
+namespace Lanceur.Infra.Macros;
 
 [Macro("multi"), Description("Allow to start multiple alias at once")]
 public class MultiMacro : MacroQueryResult
 {
     #region Fields
 
-    private static readonly Conditional<int> DefaultDelay = new(0, 1_000);
     private readonly int _delay;
     private readonly IExecutionManager _executionManager;
     private readonly IAsyncSearchService _searchService;
+    private readonly IServiceProvider _serviceProvider;
 
-    #endregion Fields
+    private static readonly Conditional<int> DefaultDelay = new(0, 1_000);
+
+    #endregion
 
     #region Constructors
 
-    public MultiMacro() : this(null) { }
+    public MultiMacro(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+        _executionManager = serviceProvider.GetService<IExecutionManager>();
+        _searchService = serviceProvider.GetService<IAsyncSearchService>();
+        _delay = DefaultDelay;
+    }
 
     public MultiMacro(int? delay = null, IExecutionManager executionManager = null, IAsyncSearchService searchService = null)
     {
@@ -38,7 +40,7 @@ public class MultiMacro : MacroQueryResult
         _searchService = searchService ?? Locator.Current.GetService<IAsyncSearchService>();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -49,7 +51,7 @@ public class MultiMacro : MacroQueryResult
         return macro as AliasQueryResult;
     }
 
-    public override SelfExecutableQueryResult Clone() => this.CloneObject();
+    public override SelfExecutableQueryResult Clone() => new MultiMacro(_serviceProvider);
 
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
@@ -67,5 +69,5 @@ public class MultiMacro : MacroQueryResult
         return await NoResultAsync;
     }
 
-    #endregion Methods
+    #endregion
 }

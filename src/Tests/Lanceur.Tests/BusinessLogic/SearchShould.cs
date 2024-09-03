@@ -46,7 +46,10 @@ public class SearchShould : TestBase
 
     #region Constructors
 
-    public SearchShould(ITestOutputHelper output) : base(output) => _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
+    public SearchShould(ITestOutputHelper output) : base(output)
+    {
+        _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
+    }
 
     #endregion Constructors
 
@@ -111,7 +114,8 @@ public class SearchShould : TestBase
         storeLoader.Load().Returns(new[] { new AliasStore(repository) });
 
         var asm = Assembly.GetExecutingAssembly();
-        var service = new SearchService(storeLoader, new MacroManager(asm, repository: repository), thumbnailManager, orchestrator: orchestrator);
+        ILogger<MacroManager> logger = new TestOutputHelperDecoratorForMicrosoftLogging<MacroManager>(OutputHelper);
+        var service = new SearchService(storeLoader, new MacroManager(asm, logger, repository, new ServiceCollection().BuildServiceProvider()), thumbnailManager, orchestrator: orchestrator);
 
         // ACT
         var result = (await service.SearchAsync(new("z"))).ToArray();

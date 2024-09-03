@@ -3,8 +3,9 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
+using Lanceur.Core.Services;
+using Lanceur.Infra.Macros;
 using Lanceur.Infra.Managers;
-using Lanceur.Macros;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -19,28 +20,23 @@ public class ExecutionManagerShould
     public async Task ExecuteMultiMacro(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
-        var cmdlineManager = Substitute.For<ICmdlineManager>();
-        cmdlineManager
-            .BuildFromText(cmdline.ToString())
-            .Returns(cmdline);
-
-        var mgr = new ExecutionManager(
+        var executionManager = new ExecutionManager(
             Substitute.For<ILoggerFactory>(),
             Substitute.For<IWildcardManager>(),
-            Substitute.For<IDbRepository>(),
-            cmdlineManager
+            Substitute.For<IDbRepository>()
         );
 
-        var macro = Substitute.For<MultiMacro>();
-        await macro.ExecuteAsync(
-            Arg.Do<Cmdline>(
-                x => x.Should().NotBeNull()
-            )
-        );
+        var macro =new MultiMacro(0, Substitute.For<IExecutionManager>(),Substitute.For<IAsyncSearchService>());
+        await macro.ExecuteAsync(cmdline);
 
-        var request = new ExecutionRequest { Query = cmdline.ToString(), ExecuteWithPrivilege = false, QueryResult = macro };
+        var request = new ExecutionRequest
+        {
+            Query = cmdline.ToString(),
+            ExecuteWithPrivilege = false, 
+            QueryResult = macro
+        };
 
-        await mgr.ExecuteAsync(request);
+        await executionManager.ExecuteAsync(request);
     }
 
     #endregion Methods

@@ -11,14 +11,13 @@ namespace Lanceur.Infra.Managers;
 
 public class MacroManager : MacroManagerCache, IMacroManager
 {
-    private readonly ILogger<IMacroManager> _log;
+    private readonly ILogger<IMacroManager> _logger;
 
     #region Constructors
 
-    public MacroManager(Assembly asm, ILoggerFactory logFactory = null, IDbRepository repository = null) : base(asm, logFactory, repository)
+    public MacroManager(Assembly asm, ILogger<MacroManager> logger, IDbRepository dbRepository, IServiceProvider serviceProvider) : base(asm, logger, dbRepository, serviceProvider)
     {
-        logFactory ??= Locator.Current.GetService<ILoggerFactory>();
-        _log = logFactory?.CreateLogger<IMacroManager>() ?? new NullLogger<IMacroManager>();
+        _logger = logger;
     }
 
     #endregion Constructors
@@ -37,7 +36,7 @@ public class MacroManager : MacroManagerCache, IMacroManager
     /// <inheritdoc/>
     public IEnumerable<QueryResult> Handle(QueryResult[] collection)
     {
-        using var _ = _log.MeasureExecutionTime(this);
+        using var _ = _logger.MeasureExecutionTime(this);
         var result = collection.Select(Handle)
                                .Where(item => item is not null)
                                .ToArray();

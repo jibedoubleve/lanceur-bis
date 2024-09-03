@@ -1,9 +1,13 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Logging;
+using Lanceur.Ui.Core.Messages;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.ViewModels;
@@ -19,6 +23,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
     private readonly IAsyncSearchService _searchService;
+    private readonly IExecutionManager _executionManager;
     [ObservableProperty] private QueryResult? _selectedResult;
     [ObservableProperty] private string? _suggestion;
 
@@ -27,9 +32,15 @@ public partial class MainViewModel : ObservableObject
     #region Constructors
 
     /// <inheritdoc />
-    public MainViewModel(ILogger<MainViewModel> logger, IAsyncSearchService searchService, ISettingsFacade settingsFacade)
+    public MainViewModel(ILogger<MainViewModel> logger, IAsyncSearchService searchService, ISettingsFacade settingsFacade, IExecutionManager executionManager)
     {
+        ArgumentNullException.ThrowIfNull(nameof(logger));
+        ArgumentNullException.ThrowIfNull(nameof(searchService));
+        ArgumentNullException.ThrowIfNull(nameof(settingsFacade));
+        ArgumentNullException.ThrowIfNull(nameof(executionManager));
+
         _searchService = searchService;
+        _executionManager = executionManager;
         _doesReturnAllIfEmpty = settingsFacade.Application.Window.ShowResult;
         _logger = logger;
     }
@@ -41,20 +52,29 @@ public partial class MainViewModel : ObservableObject
     private bool CanSearch() => _lastCriterion.Name != (Cmdline.BuildFromText(Query)?.Name ?? "");
 
     [RelayCommand]
-    private async Task Execute()
+    private async Task Execute(bool runAsAdmin)
     {
         _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
-        await Task.CompletedTask;
+        var response = await _executionManager.ExecuteAsync( new()
+        {
+            Query = Query,
+            QueryResult = SelectedResult,
+            ExecuteWithPrivilege = runAsAdmin
+        });
+
+        WeakReferenceMessenger.Default.Send(new KeepAliveRequest(response.HasResult));
+        if (response.HasResult)
+        {
+            Results = new(response.Results);
+        }
     }
 
     private string GetSuggestion(string query, QueryResult? selectedItem)
     {
         var name = selectedItem?.Name ?? string.Empty;
-        var suggestion = name.Contains(query) || !name.Contains(' ')
+        return name.Contains(query) || !name.Contains(' ')
             ? name
             : string.Empty;
-        _logger.LogTrace("Suggestion {Suggestion}", suggestion);
-        return suggestion;
     }
 
     [RelayCommand(CanExecute = nameof(CanSearch))]
