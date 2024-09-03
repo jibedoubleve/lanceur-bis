@@ -184,13 +184,11 @@ public partial class MainViewModelShould
                 var logFactory = Substitute.For<ILoggerFactory>();
                 var wildcardManager = Substitute.For<IWildcardManager>();
                 var dataService = Substitute.For<IDbRepository>();
-                var cmdlineManager = Substitute.For<ICmdlineManager>();
 
                 var executionManager = new ExecutionManager(
                     logFactory,
                     wildcardManager,
-                    dataService,
-                    cmdlineManager
+                    dataService
                 );
 
                 var vm = new MainViewModelBuilder()

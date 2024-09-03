@@ -1,7 +1,7 @@
-﻿using Lanceur.Core.Services;
-using System.Windows;
+﻿using System.Windows;
+using Lanceur.Core.Services;
 
-namespace Lanceur.Utils;
+namespace Lanceur.Infra.Win32.Services;
 
 public class WindowsClipboardService : IClipboardService
 {

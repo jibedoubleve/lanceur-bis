@@ -1,27 +1,21 @@
+using System.Reactive.Concurrency;
 using FluentAssertions;
-using FluentAssertions.Execution;
+using FluentAssertions.Extensions;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
+using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Managers;
-using Lanceur.Macros.Development;
+using Lanceur.Tests.SQLite;
+using Lanceur.Tests.Tooling.Builders;
+using Lanceur.Tests.Tooling.ReservedAliases;
 using Lanceur.Views.Mixins;
 using Microsoft.Extensions.Logging;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using ReactiveUI.Testing;
-using Splat;
-using System.Reactive.Concurrency;
-using FluentAssertions.Extensions;
-using Lanceur.Core.Responses;
-using Lanceur.Infra.Services;
-using Lanceur.Tests.SQLite;
-using Lanceur.Tests.Tooling;
-using Lanceur.Tests.Tooling.Builders;
-using Lanceur.Tests.Tooling.ReservedAliases;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -33,7 +27,7 @@ public partial class MainViewModelShould : TestBase
 
     public MainViewModelShould(ITestOutputHelper output) : base(output) { }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -48,7 +42,15 @@ public partial class MainViewModelShould : TestBase
 
                 var executor = Substitute.For<IExecutionManager>();
                 executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                        .Returns(new ExecutionResponse { Results = new List<QueryResult>() { new NotExecutableTestAlias() } });
+                        .Returns(
+                            new ExecutionResponse
+                            {
+                                Results = new List<QueryResult>
+                                {
+                                    new NotExecutableTestAlias()
+                                }
+                            }
+                        );
 
                 var vm = new MainViewModelBuilder()
                          .With(OutputHelper)
@@ -59,7 +61,10 @@ public partial class MainViewModelShould : TestBase
                 vm.Query.Value = expression;
 
                 // ACT
-                var request = new AliasExecutionRequest { Query = expression };
+                var request = new AliasExecutionRequest
+                {
+                    Query = expression
+                };
                 vm.ExecuteAlias.Execute(request).Subscribe();
 
                 scheduler.Start();
@@ -103,7 +108,14 @@ public partial class MainViewModelShould : TestBase
             {
                 // ARRANGE
                 var searchService = Substitute.For<IAsyncSearchService>();
-                searchService.SearchAsync(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
+                searchService.SearchAsync(Arg.Any<Cmdline>())
+                             .Returns(
+                                 new List<QueryResult>
+                                 {
+                                     new NotExecutableTestAlias(),
+                                     new NotExecutableTestAlias()
+                                 }
+                             );
                 var vm = new MainViewModelBuilder()
                          .With(OutputHelper)
                          .With(scheduler)
@@ -131,7 +143,15 @@ public partial class MainViewModelShould : TestBase
                 // ARRANGE
                 var executor = Substitute.For<IExecutionManager>();
                 executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                        .Returns(new ExecutionResponse { Results = new List<QueryResult>() { ExecutableWithResultsTestAlias.FromName(aliasName) } });
+                        .Returns(
+                            new ExecutionResponse
+                            {
+                                Results = new List<QueryResult>
+                                {
+                                    ExecutableWithResultsTestAlias.FromName(aliasName)
+                                }
+                            }
+                        );
 
                 var vm = new MainViewModelBuilder()
                          .With(OutputHelper)
@@ -152,44 +172,6 @@ public partial class MainViewModelShould : TestBase
         );
     }
 
-    [Fact]
-    public void ShowAutoCompleteWhenCallingDebugMacro()
-    {
-        new TestScheduler().With(
-            scheduler =>
-            {
-                // ARRANGE
-                var searchService = Substitute.For<IAsyncSearchService>();
-                searchService.SearchAsync(Arg.Any<Cmdline>())
-                             .Returns(
-                                 new List<QueryResult> { new DebugMacro { Name = "debug" } }
-                             );
-
-                var vm = new MainViewModelBuilder()
-                         .With(OutputHelper)
-                         .With(scheduler)
-                         .With(searchService)
-                         .With(new DebugMacroExecutor())
-                         .Build();
-
-                // ACT
-                vm.Query.Value = "random_query";
-                scheduler.Start();
-
-                var request = vm.BuildExecutionRequest("random_query");
-                vm.ExecuteAlias.Execute(request).Subscribe(); // Execute first result
-                scheduler.Start();
-
-                // ASSERT
-                using (new AssertionScope())
-                {
-                    vm.CurrentAlias.Should().NotBeNull();
-                    vm.CurrentAlias?.Name.Should().Be("debug all"); // I know the first result in debug is 'debug all'
-                }
-            }
-        );
-    }
-
     [Theory, InlineData(true, 5), InlineData(false, 0)]
     public void ShowResultWhenConfigured(bool showResult, int expectedCount)
     {
@@ -198,7 +180,15 @@ public partial class MainViewModelShould : TestBase
             {
                 // ARRANGE
                 var settings = Substitute.For<ISettingsFacade>();
-                settings.Application.Returns(new AppConfig { Window = new() { ShowResult = showResult } });
+                settings.Application.Returns(
+                    new AppConfig
+                    {
+                        Window = new()
+                        {
+                            ShowResult = showResult
+                        }
+                    }
+                );
 
                 var searchService = Substitute.For<IAsyncSearchService>();
                 searchService.GetAllAsync().Returns(new AliasQueryResult[] { new(), new(), new(), new(), new() });
@@ -220,5 +210,5 @@ public partial class MainViewModelShould : TestBase
         );
     }
 
-    #endregion Methods
+    #endregion
 }

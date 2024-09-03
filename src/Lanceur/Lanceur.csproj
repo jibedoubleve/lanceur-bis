@@ -100,4 +100,7 @@
             <DependentUpon>AppSettingsView.xaml</DependentUpon>
         </Compile>
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Macros\" />
+    </ItemGroup>
 </Project>

@@ -269,7 +269,12 @@ public partial class MainViewModel : ReactiveObject
             if (false == await ConfirmExecution.Handle($"Do you want to execute '{request.AliasToExecute.Name}' ?"))
                 return new();
 
-        var response = await _executor.ExecuteAsync(new() { Query = Query, QueryResult = request.AliasToExecute, ExecuteWithPrivilege = request.RunAsAdmin });
+        var response = await _executor.ExecuteAsync(new()
+        {
+            Query = Query, 
+            QueryResult = request.AliasToExecute, 
+            ExecuteWithPrivilege = request.RunAsAdmin
+        });
 
         return new() { Results = response.Results ?? Array.Empty<QueryResult>(), KeepAlive = response.HasResult };
     }

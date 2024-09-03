@@ -18,7 +18,6 @@ public record Cmdline
     #region Properties
 
     private bool HasParameters => !Parameters.IsNullOrEmpty();
-
     public static Cmdline Empty => new(string.Empty, string.Empty);
     public bool IsEmpty => Name.IsNullOrEmpty() && !HasParameters;
     public string Name { get; }

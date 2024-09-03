@@ -41,7 +41,7 @@ public class PluginStore : ISearchService, IPluginManifestRepository
         _context = serviceProvider.GetService<IPluginStoreContext>();
         _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
     }
-    
+
     [Obsolete("Use ctor with service provider instead")]
     public PluginStore(
         IPluginStoreContext context = null,
@@ -60,8 +60,6 @@ public class PluginStore : ISearchService, IPluginManifestRepository
         _context = context ?? l.GetService<IPluginStoreContext>();
         _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
     }
-
-    public PluginStore() : this(null) { }
 
     #endregion Constructors
 

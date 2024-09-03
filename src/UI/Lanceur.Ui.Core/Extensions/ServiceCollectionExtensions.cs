@@ -10,6 +10,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
+using Lanceur.Infra.Macros;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Plugins;
 using Lanceur.Infra.Repositories;
@@ -17,7 +18,9 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Stores;
+using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.PackagedApp;
+using Lanceur.Infra.Win32.Services;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
@@ -38,8 +41,11 @@ public static class ServiceCollectionExtensions
     #region Methods
 
     public static IServiceCollection AddViewModels(this IServiceCollection serviceCollection) => serviceCollection.AddTransient<MainViewModel>();
+
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddTransient<Assembly>(_ => Assembly.GetExecutingAssembly());
+        
         serviceCollection.AddSingleton<IServiceProvider>(x => x);
         serviceCollection.AddTransient<IDbRepository, SQLiteRepository>();
         serviceCollection.AddTransient<IDbConnectionManager, DbMultiConnectionManager>();
@@ -48,8 +54,13 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<IConversionService, AutoMapperConverter>();
         serviceCollection.AddTransient<IAsyncSearchService, SearchService>();
         serviceCollection.AddTransient<IStoreLoader, StoreLoader>();
-        serviceCollection.AddSingleton<Assembly>(_ => Assembly.GetExecutingAssembly());
-        serviceCollection.AddTransient<IMacroManager, MacroManager>();
+        serviceCollection.AddTransient<IMacroManager, MacroManager>(s => 
+            new(
+                Assembly.GetAssembly(typeof(MultiMacro)), 
+                s.GetService<ILogger<MacroManager>>(),
+                s.GetService<IDbRepository>(),
+                s.GetService<IServiceProvider>())
+        );
         serviceCollection.AddTransient<ILoggerFactory, LoggerFactory>();
         serviceCollection.AddTransient<IThumbnailManager, ThumbnailManager>();
         serviceCollection.AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>();
@@ -57,23 +68,28 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<IThumbnailRefresher, ThumbnailRefresher>();
         serviceCollection.AddTransient<IPackagedAppSearchService, PackagedAppSearchService>();
         serviceCollection.AddTransient<IFavIconManager, FavIconManager>();
-        serviceCollection.AddTransient < IFavIconDownloader, FavIconDownloader>();
-        serviceCollection.AddTransient < IPluginManager, PluginManager>();
-        serviceCollection.AddTransient < IPluginStoreContext, PluginStoreContext>();
-        serviceCollection.AddTransient < IEverythingApi, EverythingApi>();
-        
+        serviceCollection.AddTransient<IFavIconDownloader, FavIconDownloader>();
+        serviceCollection.AddTransient<IPluginManager, PluginManager>();
+        serviceCollection.AddTransient<IPluginStoreContext, PluginStoreContext>();
+        serviceCollection.AddTransient<IEverythingApi, EverythingApi>();
+        serviceCollection.AddTransient<IExecutionManager, ExecutionManager>();
+        serviceCollection.AddTransient<IWildcardManager, ReplacementComposite>();
+        serviceCollection.AddTransient<IClipboardService, WindowsClipboardService>();
+
         Conditional<Func<ILocalConfigRepository>> localConfigRepository =
             new(() => new MemoryLocalConfigRepository(), () => new JsonLocalConfigRepository());
         serviceCollection.AddSingleton(localConfigRepository.Value?.Invoke() ?? throw new ArgumentNullException(nameof(localConfigRepository)));
-        
+
         return serviceCollection;
     }
+
     public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<IAppConfigRepository, SQLiteAppConfigRepository>();
         serviceCollection.AddTransient<ISettingsFacade, SettingsFacade>();
         return serviceCollection;
     }
+
     public static IServiceCollection AddMapping(this IServiceCollection serviceCollection)
     {
         var mapping = new MapperConfiguration(
@@ -90,6 +106,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton<IMapper>(mapper);
         return serviceCollection;
     }
+
     public static IServiceCollection AddLoggers(this IServiceCollection serviceCollection)
     {
         var conditional = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);

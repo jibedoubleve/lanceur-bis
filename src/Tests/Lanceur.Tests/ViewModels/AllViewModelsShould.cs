@@ -32,7 +32,7 @@ public class AllViewModelsShould
                 BindingFlags.Instance |
                 BindingFlags.OptionalParamBinding,
                 null,
-                new[] { Type.Missing },
+                [Type.Missing],
                 CultureInfo.CurrentCulture
             )
             : Activator.CreateInstance(vmType);
