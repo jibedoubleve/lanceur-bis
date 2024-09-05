@@ -39,7 +39,7 @@ public class ProcessHelper
             var ps = Process.GetProcessById((int)processId);
             var fileName = ps.MainModule.FileName;
 
-            return new() { HWnd = $"ThreadId: {threadId} - ProcessId: {processId} - hWnd: {hWnd}", FileName = fileName.ToString() };
+            return new() { HWnd = $"ThreadId: {threadId} - ProcessId: {processId} - hWnd: {hWnd}", FileName = fileName };
         }
         catch (Win32Exception ex)
         {

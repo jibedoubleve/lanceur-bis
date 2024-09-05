@@ -31,7 +31,7 @@ public class ExecutionManagerShould
 
         var request = new ExecutionRequest
         {
-            Query = cmdline.ToString(),
+            Query = cmdline,
             ExecuteWithPrivilege = false, 
             QueryResult = macro
         };

@@ -256,17 +256,6 @@ public partial class MainView : IViewFor<MainViewModel>
 
         var coordinate = new Coordinate(settings.Window.Position.Left, settings.Window.Position.Top);
 
-        if (coordinate.IsEmpty)
-            ScreenRuler.SetDefaultPosition();
-        else
-            ScreenRuler.SetWindowPosition(coordinate);
-
-        if (ScreenRuler.IsWindowOutOfScreen())
-        {
-            _logger.LogWarning("Window is out of screen. Set it to default position at centre of the screen");
-            ScreenRuler.SetDefaultPosition();
-        }
-
         ShowWindow();
     }
 
