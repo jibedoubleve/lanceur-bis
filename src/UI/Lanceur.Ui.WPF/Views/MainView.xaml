@@ -73,7 +73,13 @@
                 Margin="15,5,15,0"
                 ItemTemplate="{StaticResource QueryResultTemplate}"
                 ItemsSource="{Binding Results}"
-                SelectedItem="{Binding SelectedResult}" />
+                SelectedItem="{Binding SelectedResult}">
+                <interactivity:Interaction.Triggers>
+                    <interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}"/>
+                    </interactivity:EventTrigger>
+                </interactivity:Interaction.Triggers>
+            </ui:ListView>
 
             <!--  STATUS BAR  -->
             <StackPanel

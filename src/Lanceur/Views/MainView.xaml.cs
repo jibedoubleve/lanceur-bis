@@ -263,7 +263,7 @@ public partial class MainView : IViewFor<MainViewModel>
 
         if (ScreenRuler.IsWindowOutOfScreen())
         {
-            _logger.LogInformation("Window is out of screen. Set it to default position at centre of the screen");
+            _logger.LogWarning("Window is out of screen. Set it to default position at centre of the screen");
             ScreenRuler.SetDefaultPosition();
         }
 
