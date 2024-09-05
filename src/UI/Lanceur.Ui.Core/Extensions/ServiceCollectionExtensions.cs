@@ -24,6 +24,7 @@ using Lanceur.Infra.Win32.Services;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
+using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.ViewModels;
@@ -45,7 +46,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<Assembly>(_ => Assembly.GetExecutingAssembly());
-        
+        serviceCollection.AddTransient<IMemoryStorageService, MemoryStorageService>();
         serviceCollection.AddSingleton<IServiceProvider>(x => x);
         serviceCollection.AddTransient<IDbRepository, SQLiteRepository>();
         serviceCollection.AddTransient<IDbConnectionManager, DbMultiConnectionManager>();

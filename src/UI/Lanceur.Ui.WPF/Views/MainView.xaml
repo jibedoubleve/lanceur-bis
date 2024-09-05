@@ -9,7 +9,6 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="Self"
     Width="720"
-    
     AcrylicWindowStyle="None"
     AllowDrop="True"
     Background="Transparent"
