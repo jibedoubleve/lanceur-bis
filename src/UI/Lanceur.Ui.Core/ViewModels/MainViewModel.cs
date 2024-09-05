@@ -69,7 +69,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private string GetSuggestion(string query, QueryResult? selectedItem)
+    private static string GetSuggestion(string query, QueryResult? selectedItem)
     {
         var name = selectedItem?.Name ?? string.Empty;
         return name.Contains(query) || !name.Contains(' ')

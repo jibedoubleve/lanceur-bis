@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
+using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.Tools;
 using Microsoft.Extensions.Logging;
 using NHotkey;
@@ -71,13 +72,14 @@ public partial class MainView
 
     private void OnMouseUp(object _, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left)
-        {
-            _logger.LogInformation("Save new coordinate ({Top},{Left})", Top, Left);
-            _settings!.Current.Window.Position.Top = Top;
-            _settings!.Current.Window.Position.Left = Left;
-            _settings.Save();
-        }
+        var coordinate = _settings!.Current.Window.Position;
+
+        if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) return;
+        
+        _logger.LogInformation("Save new coordinate ({Top},{Left})", Top, Left);
+        coordinate.Top = Top;
+        coordinate.Left = Left;
+        _settings.Save();
     }
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
@@ -129,7 +131,7 @@ public partial class MainView
 
         if (this.IsOutOfScreen())
         {
-            _logger.LogInformation("Window is out of screen. Set it to default position at centre of the screen");
+            _logger.LogWarning("Window is out of screen. Set it to default position at centre of the screen");
             this.SetDefaultPosition();
         }
     }
