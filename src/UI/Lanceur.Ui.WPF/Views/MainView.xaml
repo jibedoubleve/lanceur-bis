@@ -51,10 +51,16 @@
                             Command="{Binding ExecuteCommand}"
                             CommandParameter="{StaticResource True}"
                             Modifiers="Control" />
+                        <KeyBinding Key="Tab" Command="{Binding SuggestCommand}" />
                     </ui:TextBox.InputBindings>
                     <interactivity:Interaction.Triggers>
                         <interactivity:EventTrigger EventName="TextChanged">
                             <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" />
+                        </interactivity:EventTrigger>
+                        <interactivity:EventTrigger EventName="PreviewKeyDown">
+                            <interactivity:InvokeCommandAction Command="{Binding NavigateCommand}"
+                                                               PassEventArgsToCommand="True"
+                                                               EventArgsConverter="{StaticResource KeyToDirectionConverter}" />
                         </interactivity:EventTrigger>
                     </interactivity:Interaction.Triggers>
                 </ui:TextBox>
@@ -76,7 +82,8 @@
                 SelectedItem="{Binding SelectedResult}">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}"/>
+                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
+                                                           CommandParameter="{StaticResource False}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ui:ListView>

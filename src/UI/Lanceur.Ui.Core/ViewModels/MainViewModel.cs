@@ -2,11 +2,12 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Everything.Wrapper;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui.Core.Messages;
 using Microsoft.Extensions.Logging;
 
@@ -52,21 +53,49 @@ public partial class MainViewModel : ObservableObject
     private bool CanSearch() => _lastCriterion.Name != (Cmdline.BuildFromText(Query)?.Name ?? "");
 
     [RelayCommand]
+    private void Suggest()
+    {
+        var cmd = Cmdline.BuildFromText(Query);
+        Query = cmd with { Name = Suggestion };
+    }
+
+    [RelayCommand]
     private async Task Execute(bool runAsAdmin)
     {
         _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
-        var response = await _executionManager.ExecuteAsync( new()
-        {
-            Query = Query,
-            QueryResult = SelectedResult,
-            ExecuteWithPrivilege = runAsAdmin
-        });
+        var response = await _executionManager.ExecuteAsync(
+            new()
+            {
+                Query = Query,
+                QueryResult = SelectedResult,
+                ExecuteWithPrivilege = runAsAdmin
+            }
+        );
 
         WeakReferenceMessenger.Default.Send(new KeepAliveRequest(response.HasResult));
-        if (response.HasResult)
+        if (response.HasResult) Results = new(response.Results);
+    }
+
+    [RelayCommand]
+    private void Navigate(Direction direction)
+    {
+        if (SelectedResult == null)
         {
-            Results = new(response.Results);
+            SelectedResult = Results.FirstOrDefault();
+            return;
         }
+
+        var currentIndex = Results.IndexOf(SelectedResult);
+        var index  = direction switch
+        {
+            Direction.Up      => Results.GetPreviousIndex(currentIndex),
+            Direction.Down    => Results.GetNextIndex(currentIndex),
+            Direction.PageUp => 1,
+            Direction.PageDown => 1,
+            _                 => currentIndex,
+        };
+        SelectedResult = Results.ElementAt(index);
+        Suggestion = SelectedResult?.Name;
     }
 
     private static string GetSuggestion(string query, QueryResult? selectedItem)

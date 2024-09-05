@@ -7,4 +7,5 @@
     <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
     <conv:InvertNullToVisibilityConverter x:Key="InvertNullToVisibilityConverter" />
     <conv:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter" />
+    <conv:KeyToDirectionConverter x:Key="KeyToDirectionConverter" />
 </ResourceDictionary>

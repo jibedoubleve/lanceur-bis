@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
+using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
@@ -34,16 +35,15 @@ public partial class MainView
         _logger = Ioc.Default.GetService<ILogger<MainView>>() ?? throw new ArgumentNullException(nameof(_logger));
         DataContext = Ioc.Default.GetService<MainViewModel>() ?? throw new ArgumentNullException(nameof(DataContext));
 
-        WeakReferenceMessenger.Default.Register<KeepAliveRequest>(
-            this,
-            (_, m) =>
-            {
-                if (m.Value)
-                    ShowWindow();
-                else
-                    HideWindow();
-            }
-        );
+        WeakReferenceMessenger.Default.Register<KeepAliveRequest>(this, (_, m) =>
+        {
+            if (m.Value) ShowWindow();
+            else HideWindow();
+        });
+        WeakReferenceMessenger.Default.Register<ChangeCoordinateRequest>(this, (_, m) =>
+        {
+            SetWindowPosition(m.Value);
+        });
     }
 
     #endregion
@@ -84,21 +84,9 @@ public partial class MainView
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape)
-        {
-            HideWindow();
-            return;
-        }
-
-        var max = QueryResultControl.Items.Count - 1;
-        var current = QueryResultControl.SelectedIndex;
-
-        QueryResultControl.SelectedIndex = e.Key switch
-        {
-            Key.Down => current >= max ? 0 : current + 1,
-            Key.Up   => current == 0 ? max : current - 1,
-            _        => QueryResultControl.SelectedIndex
-        };
+        if (e.Key != Key.Escape) { return; }
+        
+        HideWindow(); 
     }
 
     private void OnShowWindow(object? sender, HotkeyEventArgs? e)
@@ -118,11 +106,9 @@ public partial class MainView
         }
     }
 
-    private void SetWindowPosition()
+    private void SetWindowPosition(Coordinate? coordinate = null)
     {
-        var top = _settings!.Current.Window.Position.Top;
-        var left = _settings!.Current.Window.Position.Left;
-        var coordinate = new Coordinate(top, left);
+        coordinate ??= _settings!.Current.Window.Position.ToCoordinate();
 
         if (coordinate.IsEmpty)
             this.SetDefaultPosition();
@@ -131,7 +117,7 @@ public partial class MainView
 
         if (this.IsOutOfScreen())
         {
-            _logger.LogWarning("Window is out of screen. Set it to default position at centre of the screen");
+            _logger.LogWarning("Window is out of screen {Coordinate}. Set it to default position at centre of the screen", this.ToCoordinate());
             this.SetDefaultPosition();
         }
     }

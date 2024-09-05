@@ -20,7 +20,7 @@ public record Cmdline
     private bool HasParameters => !Parameters.IsNullOrEmpty();
     public static Cmdline Empty => new(string.Empty, string.Empty);
     public bool IsEmpty => Name.IsNullOrEmpty() && !HasParameters;
-    public string Name { get; }
+    public string Name { get; init; }
     public string Parameters { get; }
 
     #endregion
@@ -32,6 +32,13 @@ public record Cmdline
     public bool IsNullOrEmpty() => Name.IsNullOrWhiteSpace();
 
     public override string ToString() => $"{Name ?? string.Empty} {Parameters ?? string.Empty}".Trim();
+
+    /// <summary>
+    /// Implicitly converts a <see cref="Cmdline"/> object to a <see cref="string"/> by invoking its <see cref="ToString"/> method.
+    /// </summary>
+    /// <param name="source">The <see cref="Cmdline"/> object to be converted to a string.</param>
+    /// <returns>A <see cref="string"/> representation of the <paramref name="source"/>.</returns>
+    public static implicit operator string(Cmdline source) => source.ToString();
 
     #endregion
 }
