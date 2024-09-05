@@ -17,6 +17,8 @@ namespace Lanceur.Infra.Stores;
 [Store]
 public class ReservedAliasStore : ISearchService
 {
+    private readonly IServiceProvider _serviceProvider;
+
     #region Fields
 
     private readonly Assembly _assembly;
@@ -37,6 +39,7 @@ public class ReservedAliasStore : ISearchService
     /// </remarks>
     public ReservedAliasStore(IServiceProvider serviceProvider)
     {
+        _serviceProvider = serviceProvider;
         _assembly = Assembly.GetEntryAssembly();
         _dataService =serviceProvider.GetService<IDbRepository>();
         _logger = serviceProvider.GetService<ILogger<ReservedAliasStore>>();
@@ -77,7 +80,7 @@ public class ReservedAliasStore : ISearchService
         var foundItems = new List<QueryResult>();
         foreach (var type in found)
         {
-            var instance = Activator.CreateInstance(type);
+            var instance = Activator.CreateInstance(type, [_serviceProvider]);
 
             if (instance is not SelfExecutableQueryResult qr) continue;
 

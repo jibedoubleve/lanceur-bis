@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.WPF;
 
@@ -20,5 +21,13 @@ public partial class App : Application
                                    .AddLoggers()
                                    .BuildServiceProvider()
         );
+        Ioc.Default.GetService<ILogger<App>>()!
+           .LogInformation("Application started...");
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {        
+        Ioc.Default.GetService<ILogger<App>>()!
+           .LogInformation("Application has closed");
     }
 }
