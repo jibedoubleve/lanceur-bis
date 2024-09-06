@@ -56,12 +56,7 @@ public partial class MainViewModel : ObservableObject
     {
         _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
         var response = await _executionManager.ExecuteAsync(
-            new()
-            {
-                Query = Query,
-                QueryResult = SelectedResult,
-                ExecuteWithPrivilege = runAsAdmin
-            }
+            new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
         );
 
         WeakReferenceMessenger.Default.Send(new KeepAliveRequest(response.HasResult));
@@ -90,8 +85,8 @@ public partial class MainViewModel : ObservableObject
         {
             Direction.Up       => Results.GetPreviousIndex(currentIndex),
             Direction.Down     => Results.GetNextIndex(currentIndex),
-            Direction.PageUp   => 1,
-            Direction.PageDown => 1,
+            Direction.PageUp   => Results.GetPreviousPage(currentIndex, 9),
+            Direction.PageDown => Results.GetNextPage(currentIndex, 9),
             _                  => currentIndex
         };
         SelectedResult = Results.ElementAt(index);
@@ -119,7 +114,7 @@ public partial class MainViewModel : ObservableObject
     private void SetQuery()
     {
         if (SelectedResult is null) return;
-        
+
         var query = Cmdline.BuildFromText(Query);
         var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
         WeakReferenceMessenger.Default.Send<SetQueryRequest>(new(cmd));

@@ -1,5 +1,7 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Models;
@@ -142,4 +144,10 @@ public partial class MainView
     }
 
     #endregion
+    
+    private void OnSelectorSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var current = ResultListView.SelectedItem;
+        ResultListView.ScrollIntoView(current);
+    }
 }

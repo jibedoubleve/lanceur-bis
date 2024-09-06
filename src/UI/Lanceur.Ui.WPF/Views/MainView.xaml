@@ -73,10 +73,12 @@
 
             <!--  RESULT BOX  -->
             <ui:ListView
+                x:Name="ResultListView"
                 Grid.Row="1"
                 MaxHeight="600"
                 Margin="15,5,15,0"
                 ItemTemplate="{StaticResource QueryResultTemplate}"
+                SelectionChanged="OnSelectorSelectionChanged"
                 ItemsSource="{Binding Results}"
                 SelectedItem="{Binding SelectedResult}">
                 <interactivity:Interaction.Triggers>
