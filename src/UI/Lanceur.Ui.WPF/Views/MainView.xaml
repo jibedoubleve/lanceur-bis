@@ -51,7 +51,7 @@
                             Command="{Binding ExecuteCommand}"
                             CommandParameter="{StaticResource True}"
                             Modifiers="Control" />
-                        <KeyBinding Key="Tab" Command="{Binding SuggestCommand}" />
+                        <KeyBinding Key="Tab" Command="{Binding SetQueryCommand}" />
                     </ui:TextBox.InputBindings>
                     <interactivity:Interaction.Triggers>
                         <interactivity:EventTrigger EventName="TextChanged">
@@ -73,7 +73,6 @@
 
             <!--  RESULT BOX  -->
             <ui:ListView
-                x:Name="QueryResultControl"
                 Grid.Row="1"
                 MaxHeight="600"
                 Margin="15,5,15,0"

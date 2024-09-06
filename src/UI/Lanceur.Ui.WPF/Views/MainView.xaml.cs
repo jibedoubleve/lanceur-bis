@@ -35,15 +35,20 @@ public partial class MainView
         _logger = Ioc.Default.GetService<ILogger<MainView>>() ?? throw new ArgumentNullException(nameof(_logger));
         DataContext = Ioc.Default.GetService<MainViewModel>() ?? throw new ArgumentNullException(nameof(DataContext));
 
-        WeakReferenceMessenger.Default.Register<KeepAliveRequest>(this, (_, m) =>
+        var msgr =WeakReferenceMessenger.Default;
+        msgr.Register<KeepAliveRequest>(this, (_, m) =>
         {
             if (m.Value) ShowWindow();
             else HideWindow();
         });
-        WeakReferenceMessenger.Default.Register<ChangeCoordinateRequest>(this, (_, m) =>
-        {
-            SetWindowPosition(m.Value);
-        });
+        msgr.Register<ChangeCoordinateRequest>(this, (_, m) => SetWindowPosition(m.Value));
+        msgr.Register<SetQueryRequest>(this, (_, m) => SetQuery(m.Value));
+    }
+
+    private void SetQuery(string suggestion)
+    {
+        QueryTextBox.Text = suggestion;
+        QueryTextBox.Select(QueryTextBox.Text.Length, 0);
     }
 
     #endregion

@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Everything.Wrapper;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -18,13 +17,13 @@ public partial class MainViewModel : ObservableObject
     #region Fields
 
     private readonly bool _doesReturnAllIfEmpty;
+    private readonly IExecutionManager _executionManager;
 
     private Cmdline _lastCriterion = Cmdline.Empty;
     private readonly ILogger<MainViewModel> _logger;
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
     private readonly IAsyncSearchService _searchService;
-    private readonly IExecutionManager _executionManager;
     [ObservableProperty] private QueryResult? _selectedResult;
     [ObservableProperty] private string? _suggestion;
 
@@ -53,13 +52,6 @@ public partial class MainViewModel : ObservableObject
     private bool CanSearch() => _lastCriterion.Name != (Cmdline.BuildFromText(Query)?.Name ?? "");
 
     [RelayCommand]
-    private void Suggest()
-    {
-        var cmd = Cmdline.BuildFromText(Query);
-        Query = cmd with { Name = Suggestion };
-    }
-
-    [RelayCommand]
     private async Task Execute(bool runAsAdmin)
     {
         _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
@@ -76,6 +68,14 @@ public partial class MainViewModel : ObservableObject
         if (response.HasResult) Results = new(response.Results);
     }
 
+    private static string GetSuggestion(string query, QueryResult? selectedItem)
+    {
+        var name = selectedItem?.Name ?? string.Empty;
+        return !name.Contains(query) || name.Contains(' ')
+            ? string.Empty
+            : name;
+    }
+
     [RelayCommand]
     private void Navigate(Direction direction)
     {
@@ -88,22 +88,14 @@ public partial class MainViewModel : ObservableObject
         var currentIndex = Results.IndexOf(SelectedResult);
         var index  = direction switch
         {
-            Direction.Up      => Results.GetPreviousIndex(currentIndex),
-            Direction.Down    => Results.GetNextIndex(currentIndex),
-            Direction.PageUp => 1,
+            Direction.Up       => Results.GetPreviousIndex(currentIndex),
+            Direction.Down     => Results.GetNextIndex(currentIndex),
+            Direction.PageUp   => 1,
             Direction.PageDown => 1,
-            _                 => currentIndex,
+            _                  => currentIndex
         };
         SelectedResult = Results.ElementAt(index);
-        Suggestion = SelectedResult?.Name;
-    }
-
-    private static string GetSuggestion(string query, QueryResult? selectedItem)
-    {
-        var name = selectedItem?.Name ?? string.Empty;
-        return name.Contains(query) || !name.Contains(' ')
-            ? name
-            : string.Empty;
+        Suggestion = GetSuggestion(Query ?? "", SelectedResult);
     }
 
     [RelayCommand(CanExecute = nameof(CanSearch))]
@@ -121,6 +113,16 @@ public partial class MainViewModel : ObservableObject
 
         _lastCriterion = criterion;
         _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
+    }
+
+    [RelayCommand]
+    private void SetQuery()
+    {
+        if (SelectedResult is null) return;
+        
+        var query = Cmdline.BuildFromText(Query);
+        var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
+        WeakReferenceMessenger.Default.Send<SetQueryRequest>(new(cmd));
     }
 
     #endregion
