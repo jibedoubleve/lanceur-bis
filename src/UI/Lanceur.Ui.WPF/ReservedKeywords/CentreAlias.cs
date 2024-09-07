@@ -57,7 +57,7 @@ public class CentreAlias : SelfExecutableQueryResult
             coordinate.Y
         );
         Save(coordinate);
-        WeakReferenceMessenger.Default.Send(new ChangeCoordinateRequest(coordinate));
+        WeakReferenceMessenger.Default.Send(new ChangeCoordinateMessage(coordinate));
         return NoResultAsync;
     }
 

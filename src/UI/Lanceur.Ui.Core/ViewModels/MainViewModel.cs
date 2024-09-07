@@ -59,7 +59,7 @@ public partial class MainViewModel : ObservableObject
             new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
         );
 
-        WeakReferenceMessenger.Default.Send(new KeepAliveRequest(response.HasResult));
+        WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
         if (response.HasResult) Results = new(response.Results);
     }
 
@@ -117,7 +117,7 @@ public partial class MainViewModel : ObservableObject
 
         var query = Cmdline.BuildFromText(Query);
         var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
-        WeakReferenceMessenger.Default.Send<SetQueryRequest>(new(cmd));
+        WeakReferenceMessenger.Default.Send<SetQueryMessage>(new(cmd));
     }
 
     #endregion
