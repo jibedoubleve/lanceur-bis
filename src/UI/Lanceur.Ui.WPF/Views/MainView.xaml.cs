@@ -76,6 +76,8 @@ public partial class MainView
         ShowWindow();
     }
 
+    private void OnLostKeyboardFocus(object sender, RoutedEventArgs e) { HideWindow(); }
+
     private void OnMouseDown(object _, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left) DragMove();

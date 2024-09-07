@@ -23,6 +23,7 @@
     ShowInTaskbar="False"
     SizeToContent="Height"
     Topmost="True"
+    LostKeyboardFocus="OnLostKeyboardFocus"
     mc:Ignorable="d">
     <Border Background="{DynamicResource ApplicationBackgroundBrush}" Opacity="0.7">
         <Grid>

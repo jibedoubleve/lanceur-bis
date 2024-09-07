@@ -3,7 +3,6 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Infra.Logging;
-using Lanceur.Infra.Win32.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Utils;
 using Lanceur.Views.Mixins;
