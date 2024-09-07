@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
@@ -37,18 +37,25 @@
         <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
     </ItemGroup>
     <ItemGroup>
+        <None Update="Assets\IconError.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\IconInfo.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Assets\IconWarn.png">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
         <None Update="Properties\Settings.settings">
             <Generator>SettingsSingleFileGenerator</Generator>
             <LastGenOutput>Settings.Designer.cs</LastGenOutput>
         </None>
     </ItemGroup>
     <ItemGroup>
-        <None Remove="Assets\Modern-InformationCircle.png" />
+        <None Remove="Assets\appIcon.ico" />
         <None Remove="SyntaxColoration\LUA-Mode.xml" />
-        <None Remove="Assets\Modern-WarningCircle.png" />
     </ItemGroup>
     <ItemGroup>
-        <None Remove="Assets\IconError.png" />
         <EmbeddedResource Include="SyntaxColoration\LUA-Mode.xml" />
     </ItemGroup>
     <ItemGroup>
@@ -88,5 +95,8 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Macros\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Resource Include="Assets\appIcon.ico" />
     </ItemGroup>
 </Project>
