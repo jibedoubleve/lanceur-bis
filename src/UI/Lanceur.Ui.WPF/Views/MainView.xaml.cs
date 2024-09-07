@@ -54,12 +54,6 @@ public partial class MainView
 
     #endregion
 
-    #region Properties
-
-    private MainViewModel ViewModel => DataContext as MainViewModel ?? throw new ArgumentNullException($"DataContext should be of type {typeof(MainViewModel)} and not be <NULL>");
-
-    #endregion
-
     #region Methods
 
     private void HideWindow()
@@ -68,7 +62,7 @@ public partial class MainView
         Hide();
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
+    private void OnLoaded(object _, RoutedEventArgs e)
     {
         SystemThemeWatcher.Watch(this);
 
@@ -79,7 +73,16 @@ public partial class MainView
         ShowWindow();
     }
 
-    private void OnLostKeyboardFocus(object sender, RoutedEventArgs e) { HideWindow(); }
+    private void OnLostKeyboardFocus(object _, RoutedEventArgs e)
+    {
+        if( e is KeyboardFocusChangedEventArgs { NewFocus: ListViewItem })
+        {
+            /* This is how I handle a click on a result. I don't hide the window immediately;
+             * I let the 'ExecuteCommand' run, which will handle hiding the window itself. */
+            return;
+        }
+        HideWindow();
+    }
 
     private void OnMouseDown(object _, MouseButtonEventArgs e)
     {
@@ -98,18 +101,18 @@ public partial class MainView
         _settings.Save();
     }
 
-    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    private void OnPreviewKeyDown(object _, KeyEventArgs e)
     {
         if (e.Key == Key.Escape) HideWindow();
     }
 
-    private void OnSelectorSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void OnSelectorSelectionChanged(object _, SelectionChangedEventArgs e)
     {
         var current = ResultListView.SelectedItem;
         ResultListView.ScrollIntoView(current);
     }
 
-    private void OnShowWindow(object? sender, HotkeyEventArgs? e)
+    private void OnShowWindow(object? _, HotkeyEventArgs? e)
     {
         ShowWindow();
         if (e is not null) e.Handled = true;
@@ -171,9 +174,11 @@ public partial class MainView
         switch (menuItem.Tag)
         {
             case "showquery":
-            case "settings": ShowWindow();
+            case "settings":
+                ShowWindow();
                 break;
-            case "quit": Application.Current.Shutdown();
+            case "quit":
+                Application.Current.Shutdown();
                 break;
         }
     }
