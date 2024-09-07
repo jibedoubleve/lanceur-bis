@@ -11,15 +11,23 @@ public class KeyToDirectionConverter : IValueConverter
     {
         if (value is not KeyEventArgs keyEventArgs) return value;
 
-        return keyEventArgs.Key switch
+        var direction = keyEventArgs.Key switch
         {
             Key.Up       => Direction.Up,
             Key.Down     => Direction.Down,
             Key.PageUp   => Direction.PageUp,
             Key.PageDown => Direction.PageDown,
-            _            => Direction.None,
+            _            => Direction.None
         };
 
+        /*
+         * If the direction is "none", the event should be handled elsewhere.
+         * Otherwise, it indicates navigation within the results, and executing
+         * the command is the only behavior required.
+         */
+        if (direction !=  Direction.None) keyEventArgs.Handled = true;
+        return direction;
     }
+
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 }
