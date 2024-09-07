@@ -82,7 +82,7 @@
                 ItemsSource="{Binding Results}"
                 SelectedItem="{Binding SelectedResult}">
                 <interactivity:Interaction.Triggers>
-                    <interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                    <interactivity:EventTrigger EventName="MouseLeftButtonUp">
                         <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
                                                            CommandParameter="{StaticResource False}" />
                     </interactivity:EventTrigger>

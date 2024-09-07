@@ -1,7 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Models;
@@ -37,21 +36,26 @@ public partial class MainView
         _logger = Ioc.Default.GetService<ILogger<MainView>>() ?? throw new ArgumentNullException(nameof(_logger));
         DataContext = Ioc.Default.GetService<MainViewModel>() ?? throw new ArgumentNullException(nameof(DataContext));
 
-        var msgr =WeakReferenceMessenger.Default;
-        msgr.Register<KeepAliveRequest>(this, (_, m) =>
-        {
-            if (m.Value) ShowWindow();
-            else HideWindow();
-        });
+        var msgr = WeakReferenceMessenger.Default;
+        msgr.Register<KeepAliveRequest>(
+            this,
+            (_, m) =>
+            {
+                if (m.Value)
+                    ShowWindow();
+                else
+                    HideWindow();
+            }
+        );
         msgr.Register<ChangeCoordinateRequest>(this, (_, m) => SetWindowPosition(m.Value));
         msgr.Register<SetQueryRequest>(this, (_, m) => SetQuery(m.Value));
     }
 
-    private void SetQuery(string suggestion)
-    {
-        QueryTextBox.Text = suggestion;
-        QueryTextBox.Select(QueryTextBox.Text.Length, 0);
-    }
+    #endregion
+
+    #region Properties
+
+    private MainViewModel ViewModel => DataContext as MainViewModel ?? throw new ArgumentNullException($"DataContext should be of type {typeof(MainViewModel)} and not be <NULL>");
 
     #endregion
 
@@ -82,7 +86,7 @@ public partial class MainView
         var coordinate = _settings!.Current.Window.Position;
 
         if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) return;
-        
+
         _logger.LogInformation("Save new coordinate ({Top},{Left})", Top, Left);
         coordinate.Top = Top;
         coordinate.Left = Left;
@@ -91,9 +95,13 @@ public partial class MainView
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key != Key.Escape) { return; }
-        
-        HideWindow(); 
+        if (e.Key == Key.Escape) HideWindow();
+    }
+
+    private void OnSelectorSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var current = ResultListView.SelectedItem;
+        ResultListView.ScrollIntoView(current);
     }
 
     private void OnShowWindow(object? sender, HotkeyEventArgs? e)
@@ -111,6 +119,12 @@ public partial class MainView
             _logger.LogWarning(ex, "Impossible to set shortcut. (Key: {Key}, Modifier: {Modifier})", key, modifier);
             SetGlobalShortcut(Key.R, ModifierKeys.Shift | ModifierKeys.Windows);
         }
+    }
+
+    private void SetQuery(string suggestion)
+    {
+        QueryTextBox.Text = suggestion;
+        QueryTextBox.Select(QueryTextBox.Text.Length, 0);
     }
 
     private void SetWindowPosition(Coordinate? coordinate = null)
@@ -144,10 +158,4 @@ public partial class MainView
     }
 
     #endregion
-    
-    private void OnSelectorSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        var current = ResultListView.SelectedItem;
-        ResultListView.ScrollIntoView(current);
-    }
 }
