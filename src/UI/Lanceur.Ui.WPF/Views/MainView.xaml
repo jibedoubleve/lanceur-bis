@@ -6,6 +6,7 @@
     xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
     xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="Self"
     Width="720"
@@ -25,82 +26,100 @@
     Topmost="True"
     LostKeyboardFocus="OnLostKeyboardFocus"
     mc:Ignorable="d">
-    <Border Background="{DynamicResource ApplicationBackgroundBrush}" Opacity="0.7">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid>
+        <Border Background="{DynamicResource ApplicationBackgroundBrush}" Opacity="0.7">
             <Grid>
-                <!--  QUERY BOX  -->
-                <ui:TextBox
-                    x:Name="QueryTextBox"
-                    Margin="15"
-                    Panel.ZIndex="2"
-                    Background="Transparent"
-                    FontSize="24"
-                    KeyDown="OnPreviewKeyDown"
-                    Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}">
-                    <ui:TextBox.InputBindings>
-                        <KeyBinding
-                            Key="Enter"
-                            Command="{Binding ExecuteCommand}"
-                            CommandParameter="{StaticResource False}" />
-                        <KeyBinding
-                            Key="Enter"
-                            Command="{Binding ExecuteCommand}"
-                            CommandParameter="{StaticResource True}"
-                            Modifiers="Control" />
-                        <KeyBinding Key="Tab" Command="{Binding SetQueryCommand}" />
-                    </ui:TextBox.InputBindings>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <!--  QUERY BOX  -->
+                    <ui:TextBox
+                        x:Name="QueryTextBox"
+                        Margin="15"
+                        Panel.ZIndex="2"
+                        Background="Transparent"
+                        FontSize="24"
+                        KeyDown="OnPreviewKeyDown"
+                        Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}">
+                        <ui:TextBox.InputBindings>
+                            <KeyBinding
+                                Key="Enter"
+                                Command="{Binding ExecuteCommand}"
+                                CommandParameter="{StaticResource False}" />
+                            <KeyBinding
+                                Key="Enter"
+                                Command="{Binding ExecuteCommand}"
+                                CommandParameter="{StaticResource True}"
+                                Modifiers="Control" />
+                            <KeyBinding Key="Tab" Command="{Binding SetQueryCommand}" />
+                        </ui:TextBox.InputBindings>
+                        <interactivity:Interaction.Triggers>
+                            <interactivity:EventTrigger EventName="TextChanged">
+                                <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" />
+                            </interactivity:EventTrigger>
+                            <interactivity:EventTrigger EventName="PreviewKeyDown">
+                                <interactivity:InvokeCommandAction Command="{Binding NavigateCommand}"
+                                                                   PassEventArgsToCommand="True"
+                                                                   EventArgsConverter="{StaticResource KeyToDirectionConverter}" />
+                            </interactivity:EventTrigger>
+                        </interactivity:Interaction.Triggers>
+                    </ui:TextBox>
+                    <ui:TextBlock
+                        Margin="28,24,27,27"
+                        FontSize="24"
+                        Foreground="{DynamicResource TextFillColorDisabledBrush}"
+                        Text="{Binding Suggestion}" />
+                </Grid>
+
+                <!--  RESULT BOX  -->
+                <ui:ListView
+                    x:Name="ResultListView"
+                    Grid.Row="1"
+                    MaxHeight="600"
+                    Margin="15,5,15,0"
+                    ItemTemplate="{StaticResource QueryResultTemplate}"
+                    SelectionChanged="OnSelectorSelectionChanged"
+                    ItemsSource="{Binding Results}"
+                    SelectedItem="{Binding SelectedResult}">
                     <interactivity:Interaction.Triggers>
-                        <interactivity:EventTrigger EventName="TextChanged">
-                            <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" />
-                        </interactivity:EventTrigger>
-                        <interactivity:EventTrigger EventName="PreviewKeyDown">
-                            <interactivity:InvokeCommandAction Command="{Binding NavigateCommand}"
-                                                               PassEventArgsToCommand="True"
-                                                               EventArgsConverter="{StaticResource KeyToDirectionConverter}" />
+                        <interactivity:EventTrigger EventName="MouseLeftButtonUp">
+                            <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
+                                                               CommandParameter="{StaticResource False}" />
                         </interactivity:EventTrigger>
                     </interactivity:Interaction.Triggers>
-                </ui:TextBox>
-                <ui:TextBlock
-                    Margin="28,24,27,27"
-                    FontSize="24"
-                    Foreground="{DynamicResource TextFillColorDisabledBrush}"
-                    Text="{Binding Suggestion}" />
+                </ui:ListView>
+
+                <!--  STATUS BAR  -->
+                <StackPanel
+                    Grid.Row="2"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal"
+                    Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}">
+                    <ui:TextBlock
+                        Margin="0,15,5,5"
+                        FontTypography="Caption"
+                        Text="{Binding Results.Count, StringFormat={}{0} Item(s) found.}" />
+                </StackPanel>
             </Grid>
-
-            <!--  RESULT BOX  -->
-            <ui:ListView
-                x:Name="ResultListView"
-                Grid.Row="1"
-                MaxHeight="600"
-                Margin="15,5,15,0"
-                ItemTemplate="{StaticResource QueryResultTemplate}"
-                SelectionChanged="OnSelectorSelectionChanged"
-                ItemsSource="{Binding Results}"
-                SelectedItem="{Binding SelectedResult}">
-                <interactivity:Interaction.Triggers>
-                    <interactivity:EventTrigger EventName="MouseLeftButtonUp">
-                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
-                                                           CommandParameter="{StaticResource False}" />
-                    </interactivity:EventTrigger>
-                </interactivity:Interaction.Triggers>
-            </ui:ListView>
-
-            <!--  STATUS BAR  -->
-            <StackPanel
-                Grid.Row="2"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal"
-                Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}">
-                <ui:TextBlock
-                    Margin="0,15,5,5"
-                    FontTypography="Caption"
-                    Text="{Binding Results.Count, StringFormat={}{0} Item(s) found.}" />
-            </StackPanel>
-        </Grid>
-    </Border>
+        </Border>
+        <tray:NotifyIcon
+            Grid.Row="0"
+            FocusOnLeftClick="True"
+            Icon="../Assets/appIcon.ico"
+            MenuOnRightClick="True"
+            TooltipText="Lanceur">
+            <tray:NotifyIcon.Menu>
+                <ContextMenu>
+                    <ContextMenu.Items>
+                        <MenuItem Header="Show..." Click="OnSettingsClick" Tag="showquery" />
+                        <MenuItem Header="Settings..." Click="OnSettingsClick" Tag="settings"/>
+                        <MenuItem Header="Quit" Click="OnSettingsClick" Tag="quit"/>
+                    </ContextMenu.Items>
+                </ContextMenu>
+            </tray:NotifyIcon.Menu>
+        </tray:NotifyIcon>
+    </Grid>
 </fw:AcrylicWindow>

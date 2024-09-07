@@ -26,6 +26,11 @@
       <PackageReference Include="NHotkey" Version="2.1.1" />
       <PackageReference Include="NHotkey.Wpf" Version="2.1.1" />
       <PackageReference Include="WPF-UI" Version="3.0.5" />
+      <PackageReference Include="WPF-UI.Tray" Version="3.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="Assets\appIcon.ico" />
     </ItemGroup>
 
 </Project>

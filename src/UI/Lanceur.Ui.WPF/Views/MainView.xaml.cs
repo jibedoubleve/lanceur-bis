@@ -12,6 +12,7 @@ using Lanceur.Ui.WPF.Tools;
 using Microsoft.Extensions.Logging;
 using NHotkey;
 using NHotkey.Wpf;
+using Wpf.Ui.Appearance;
 
 namespace Lanceur.Ui.WPF.Views;
 
@@ -37,7 +38,7 @@ public partial class MainView
         DataContext = Ioc.Default.GetService<MainViewModel>() ?? throw new ArgumentNullException(nameof(DataContext));
 
         var msgr = WeakReferenceMessenger.Default;
-        msgr.Register<KeepAliveRequest>(
+        msgr.Register<KeepAliveMessage>(
             this,
             (_, m) =>
             {
@@ -47,8 +48,8 @@ public partial class MainView
                     HideWindow();
             }
         );
-        msgr.Register<ChangeCoordinateRequest>(this, (_, m) => SetWindowPosition(m.Value));
-        msgr.Register<SetQueryRequest>(this, (_, m) => SetQuery(m.Value));
+        msgr.Register<ChangeCoordinateMessage>(this, (_, m) => SetWindowPosition(m.Value));
+        msgr.Register<SetQueryMessage>(this, (_, m) => SetQuery(m.Value));
     }
 
     #endregion
@@ -69,6 +70,8 @@ public partial class MainView
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        SystemThemeWatcher.Watch(this);
+
         var hk = _settings!.Current.HotKey;
         SetGlobalShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);
         SetWindowPosition();
@@ -160,4 +163,18 @@ public partial class MainView
     }
 
     #endregion
+
+    private void OnSettingsClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem) return;
+
+        switch (menuItem.Tag)
+        {
+            case "showquery":
+            case "settings": ShowWindow();
+                break;
+            case "quit": Application.Current.Shutdown();
+                break;
+        }
+    }
 }
