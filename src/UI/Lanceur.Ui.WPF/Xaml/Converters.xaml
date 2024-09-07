@@ -8,4 +8,6 @@
     <conv:InvertNullToVisibilityConverter x:Key="InvertNullToVisibilityConverter" />
     <conv:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter" />
     <conv:KeyToDirectionConverter x:Key="KeyToDirectionConverter" />
+    <conv:DebugToVisibility x:Key="DebugToVisibility" />
+    <conv:TextToTruncatedTextConverter x:Key="TextToTruncatedTextConverter" />
 </ResourceDictionary>

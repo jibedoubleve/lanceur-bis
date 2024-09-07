@@ -2,10 +2,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <!-- BOOLEANS -->
+    <!--  BOOLEANS  -->
     <sys:Boolean x:Key="True">True</sys:Boolean>
     <sys:Boolean x:Key="False">False</sys:Boolean>
-    
+
     <!--  SIZES  -->
     <sys:Double x:Key="DefaultIconSize">35</sys:Double>
     <sys:Double x:Key="DefaultIconContainerSize">55</sys:Double>

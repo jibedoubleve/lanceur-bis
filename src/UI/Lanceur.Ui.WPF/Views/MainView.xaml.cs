@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -5,6 +6,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Helpers;
@@ -24,32 +26,35 @@ public partial class MainView
     #region Fields
 
     private readonly ILogger<MainView> _logger;
-    private readonly IAppConfigRepository? _settings;
+    private readonly IAppConfigRepository _appConfig;
 
     #endregion
 
     #region Constructors
 
-    public MainView()
+    public MainView(MainViewModel viewModel, IAppConfigRepository appConfigRepository, ILogger<MainView> logger)
     {
-        InitializeComponent();
-        _settings = Ioc.Default.GetService<IAppConfigRepository>() ?? throw new ArgumentNullException(nameof(_settings));
-        _logger = Ioc.Default.GetService<ILogger<MainView>>() ?? throw new ArgumentNullException(nameof(_logger));
-        DataContext = Ioc.Default.GetService<MainViewModel>() ?? throw new ArgumentNullException(nameof(DataContext));
+        ArgumentNullException.ThrowIfNull(nameof(appConfigRepository));
+        ArgumentNullException.ThrowIfNull(nameof(logger));
+        ArgumentNullException.ThrowIfNull(nameof(viewModel));
 
-        var msgr = WeakReferenceMessenger.Default;
-        msgr.Register<KeepAliveMessage>(
+        InitializeComponent();
+
+        _appConfig = appConfigRepository;
+        _logger = logger; ;
+        DataContext = viewModel;
+
+        var messenger = WeakReferenceMessenger.Default;
+        messenger.Register<KeepAliveMessage>(
             this,
             (_, m) =>
             {
-                if (m.Value)
-                    ShowWindow();
-                else
-                    HideWindow();
+                if (m.Value) ShowWindow();
+                else HideWindow();
             }
         );
-        msgr.Register<ChangeCoordinateMessage>(this, (_, m) => SetWindowPosition(m.Value));
-        msgr.Register<SetQueryMessage>(this, (_, m) => SetQuery(m.Value));
+        messenger.Register<ChangeCoordinateMessage>(this, (_, m) => SetWindowPosition(m.Value));
+        messenger.Register<SetQueryMessage>(this, (_, m) => SetQuery(m.Value));
     }
 
     #endregion
@@ -64,10 +69,13 @@ public partial class MainView
 
     private void OnLoaded(object _, RoutedEventArgs e)
     {
+        //TODO Handle this automatic Theme
         SystemThemeWatcher.Watch(this);
+        // ApplicationThemeManager.Apply(ApplicationTheme.Light);
 
-        var hk = _settings!.Current.HotKey;
+        var hk = _appConfig!.Current.HotKey;
         SetGlobalShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);
+
         SetWindowPosition();
 
         ShowWindow();
@@ -75,13 +83,14 @@ public partial class MainView
 
     private void OnLostKeyboardFocus(object _, RoutedEventArgs e)
     {
-        if( e is KeyboardFocusChangedEventArgs { NewFocus: ListViewItem })
-        {
-            /* This is how I handle a click on a result. I don't hide the window immediately;
-             * I let the 'ExecuteCommand' run, which will handle hiding the window itself. */
-            return;
-        }
+        /* This is how I handle a click on a result. I don't hide the window immediately;
+         * I let the 'ExecuteCommand' run, which will handle hiding the window itself. 
+         */
+        if (e is KeyboardFocusChangedEventArgs { NewFocus: ListViewItem }) return;
+
+#if !DEBUG
         HideWindow();
+#endif
     }
 
     private void OnMouseDown(object _, MouseButtonEventArgs e)
@@ -91,14 +100,14 @@ public partial class MainView
 
     private void OnMouseUp(object _, MouseButtonEventArgs e)
     {
-        var coordinate = _settings!.Current.Window.Position;
+        var coordinate = _appConfig!.Current.Window.Position;
 
         if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) return;
 
         _logger.LogInformation("Save new coordinate ({Top},{Left})", Top, Left);
         coordinate.Top = Top;
         coordinate.Left = Left;
-        _settings.Save();
+        _appConfig.Save();
     }
 
     private void OnPreviewKeyDown(object _, KeyEventArgs e)
@@ -110,6 +119,22 @@ public partial class MainView
     {
         var current = ResultListView.SelectedItem;
         ResultListView.ScrollIntoView(current);
+    }
+
+    private void OnSettingsClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem) return;
+
+        switch (menuItem.Tag)
+        {
+            case "showquery":
+            case "settings":
+                ShowWindow();
+                break;
+            case "quit":
+                Application.Current.Shutdown();
+                break;
+        }
     }
 
     private void OnShowWindow(object? _, HotkeyEventArgs? e)
@@ -137,18 +162,17 @@ public partial class MainView
 
     private void SetWindowPosition(Coordinate? coordinate = null)
     {
-        coordinate ??= _settings!.Current.Window.Position.ToCoordinate();
+        coordinate ??= _appConfig!.Current.Window.Position.ToCoordinate();
 
         if (coordinate.IsEmpty)
             this.SetDefaultPosition();
         else
             this.SetPosition(coordinate);
 
-        if (this.IsOutOfScreen())
-        {
-            _logger.LogWarning("Window is out of screen {Coordinate}. Set it to default position at centre of the screen", this.ToCoordinate());
-            this.SetDefaultPosition();
-        }
+        if (!this.IsOutOfScreen()) return;
+
+        _logger.LogWarning("Window is out of screen {Coordinate}. Set it to default position at centre of the screen", this.ToCoordinate());
+        this.SetDefaultPosition();
     }
 
     private void ShowWindow()
@@ -167,19 +191,15 @@ public partial class MainView
 
     #endregion
 
-    private void OnSettingsClick(object sender, RoutedEventArgs e)
+    private void OnToggleSwitchClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuItem menuItem) return;
-
-        switch (menuItem.Tag)
+        if (ToggleTheme.IsChecked ?? false)
         {
-            case "showquery":
-            case "settings":
-                ShowWindow();
-                break;
-            case "quit":
-                Application.Current.Shutdown();
-                break;
+            ApplicationThemeManager.Apply(ApplicationTheme.Light);
+        }
+        else
+        {
+            ApplicationThemeManager.Apply(ApplicationTheme.Dark);
         }
     }
 }
