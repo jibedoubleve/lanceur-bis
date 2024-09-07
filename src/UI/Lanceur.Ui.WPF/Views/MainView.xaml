@@ -85,6 +85,10 @@
                     ItemsSource="{Binding Results}"
                     SelectedItem="{Binding SelectedResult}">
                     <interactivity:Interaction.Triggers>
+                        <interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                            <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
+                                                               CommandParameter="{StaticResource False}" />
+                        </interactivity:EventTrigger>
                         <interactivity:EventTrigger EventName="MouseLeftButtonUp">
                             <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
                                                                CommandParameter="{StaticResource False}" />
@@ -115,8 +119,8 @@
                 <ContextMenu>
                     <ContextMenu.Items>
                         <MenuItem Header="Show..." Click="OnSettingsClick" Tag="showquery" />
-                        <MenuItem Header="Settings..." Click="OnSettingsClick" Tag="settings"/>
-                        <MenuItem Header="Quit" Click="OnSettingsClick" Tag="quit"/>
+                        <MenuItem Header="Settings..." Click="OnSettingsClick" Tag="settings" />
+                        <MenuItem Header="Quit" Click="OnSettingsClick" Tag="quit" />
                     </ContextMenu.Items>
                 </ContextMenu>
             </tray:NotifyIcon.Menu>

@@ -1,13 +1,15 @@
-﻿using Lanceur.SharedKernel.Mixins;
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Mixins;
+using Lanceur.Ui.Core.Services;
 using Microsoft.Toolkit.Uwp.Notifications;
-using FileLocation = System.IO.Path;
 
-namespace Lanceur.Ui;
+namespace Lanceur.Ui.WPF.Services;
 
-public class ToastNotification : INotification
-{
+public class ToastUiNotificationService : IUiNotificationService
+{    
     #region Enums
 
     private enum Level { Information, Warning, Error };
@@ -26,7 +28,6 @@ public class ToastNotification : INotification
             _                 => Icon.None
         };
         new ToastContentBuilder()
-            .AddAttributionText("Lanceur")
             .AddText(title)
             .AddText(message)
             .AddAppLogoOverride(uri.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
@@ -49,10 +50,10 @@ public class ToastNotification : INotification
 
         static Icon()
         {
-            var path = FileLocation.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Info = FileLocation.Combine(path, @"Assets\IconInfo.png");
-            Warn = FileLocation.Combine(path, @"Assets\IconWarn.png");
-            Error = FileLocation.Combine(path, @"Assets\IconError.png");
+            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+            Info = Path.Combine(path, @"Assets\IconInfo.png");
+            Warn = Path.Combine(path, @"Assets\IconWarn.png");
+            Error = Path.Combine(path, @"Assets\IconError.png");
         }
 
         #endregion Constructors
