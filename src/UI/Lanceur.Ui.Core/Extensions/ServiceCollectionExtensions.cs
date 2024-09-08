@@ -41,7 +41,12 @@ public static class ServiceCollectionExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddViewModels(this IServiceCollection serviceCollection) => serviceCollection.AddTransient<MainViewModel>();
+    public static IServiceCollection AddViewModels(this IServiceCollection serviceCollection)
+    {
+        return serviceCollection.AddTransient<MainViewModel>()
+                                .AddTransient<SettingsViewModel>(); 
+        
+    }
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {

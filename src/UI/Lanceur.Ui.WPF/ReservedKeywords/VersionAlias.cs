@@ -18,7 +18,7 @@ public class VersionAlias : SelfExecutableQueryResult
 
     #region Properties
 
-    public override string Icon => "InformationOutline";
+    public override string Icon => "BookInformation24";
 
     #endregion
 

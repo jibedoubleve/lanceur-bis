@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddViews(this IServiceCollection serviceCollection)
     {
         return serviceCollection.AddTransient<IUiNotificationService, ToastUiNotificationService>()
-                                .AddSingleton<MainView>();
+                                .AddSingleton<MainView>()
+                                .AddTransient<SettingsView>();
     }
 }

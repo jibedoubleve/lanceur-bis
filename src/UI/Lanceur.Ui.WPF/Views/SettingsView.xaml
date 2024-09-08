@@ -1,0 +1,32 @@
+<ui:FluentWindow
+    x:Class="Lanceur.Ui.WPF.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Lanceur"
+    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    d:DesignWidth="1280"
+    d:DesignHeight="720"
+    ExtendsContentIntoTitleBar="True"
+    mc:Ignorable="d"
+    WindowBackdropType="Mica"
+    WindowCornerPreference="Round"
+    WindowStartupLocation="CenterScreen">
+    <ui:NavigationView>
+        <ui:NavigationView.MenuItems>
+            <ui:NavigationViewItem Content="Keywords" Icon="{ui:SymbolIcon Keyboard24}" />
+            <ui:NavigationViewItem Content="Plugins" Icon="{ui:SymbolIcon PlugConnected24}" />
+            <ui:NavigationViewItem Content="Doubloons" Icon="{ui:SymbolIcon ColumnDoubleCompare20}" />
+            <ui:NavigationViewItem Content="Empty Keywords" Icon="{ui:SymbolIcon PaintBrush24}" />
+            <ui:NavigationViewItem Content="History" Icon="{ui:SymbolIcon History24}" />
+            <ui:NavigationViewItem Content="Trends" Icon="{ui:SymbolIcon ChartMultiple24}" />
+            <ui:NavigationViewItem Content="Most used" Icon="{ui:SymbolIcon TextWordCount24}" />
+        </ui:NavigationView.MenuItems>
+        <ui:NavigationView.FooterMenuItems>
+            <ui:NavigationViewItem Content="Settings" Icon="{ui:SymbolIcon Settings24}" />
+        </ui:NavigationView.FooterMenuItems>
+    </ui:NavigationView>
+</ui:FluentWindow>
