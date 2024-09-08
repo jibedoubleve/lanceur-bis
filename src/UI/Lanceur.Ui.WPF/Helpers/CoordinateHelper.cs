@@ -1,7 +1,6 @@
 using System.Windows;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
-using Lanceur.Ui.WPF.Tools;
 
 namespace Lanceur.Ui.WPF.Helpers;
 

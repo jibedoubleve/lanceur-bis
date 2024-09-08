@@ -8,6 +8,7 @@ using Splat;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows;
 using Coordinate = Lanceur.Core.Models.Coordinate;
 
 namespace Lanceur.ReservedKeywords;
@@ -37,7 +38,7 @@ public class CentreAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
-        var coordinate = ScreenRuler.GetCenterCoordinate();
+        var coordinate = Application.Current.MainWindow!.GetCenterCoordinate();
         Locator.Current.GetLogger<CentreAlias>()
                .LogInformation("Put window at default position. {Coordinate}", coordinate);
 

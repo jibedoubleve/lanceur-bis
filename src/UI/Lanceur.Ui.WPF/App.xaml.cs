@@ -19,18 +19,18 @@ public partial class App
 {
     #region Fields
 
-    private static readonly IHost _host = Host
-        .CreateDefaultBuilder()
-        .ConfigureServices((_, services) =>
-        {
-            services.AddViewModels()
-                    .AddServices()
-                    .AddViews()
-                    .AddMapping()
-                    .AddConfiguration()
-                    .AddLoggers();
-        })
-        .Build();
+    private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
+                                                  .CreateDefaultBuilder()
+                                                  .ConfigureServices((_, services) =>
+                                                  {
+                                                      services.AddViews()
+                                                              .AddViewModels()
+                                                              .AddServices()
+                                                              .AddMapping()
+                                                              .AddConfiguration()
+                                                              .AddLoggers();
+                                                  })
+                                                  .Build();
 
     #endregion Fields
 
@@ -44,28 +44,28 @@ public partial class App
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        var logger = _host.Services.GetRequiredService<ILogger<App>>();
-        var notify = _host.Services.GetRequiredService<IUiNotificationService>();
+        var logger = Host.Services.GetRequiredService<ILogger<App>>();
+        var notify = Host.Services.GetRequiredService<IUiNotificationService>();
 
-        logger?.LogCritical(e.Exception, "Fatal error: {Message}", e.Exception.Message);
-        notify?.Error(e.Exception.Message);
+        logger.LogCritical(e.Exception, "Fatal error: {Message}", e.Exception.Message);
+        notify.Error(e.Exception.Message);
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
-        _host.Services.GetRequiredService<ILogger<App>>()!
-           .LogInformation("Application has closed");
+        Host.Services.GetRequiredService<ILogger<App>>()!
+            .LogInformation("Application has closed");
     }
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        Ioc.Default.ConfigureServices(_host.Services);
-        _host.Start();
-        _host.Services
+        Ioc.Default.ConfigureServices(Host.Services);
+        Host.Start();
+        Host.Services
             .GetRequiredService<MainView>()
             .Show();
-        _host.Services.GetRequiredService<ILogger<App>>()!
-           .LogInformation("Application started...");
+        Host.Services.GetRequiredService<ILogger<App>>()!
+            .LogInformation("Application started...");
     }
 
     #endregion Methods
