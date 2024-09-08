@@ -9,6 +9,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="Self"
     Width="720"
+    MinHeight="0"
     AllowDrop="True"
     Background="Transparent"
     BorderThickness="0.55"
@@ -29,8 +30,10 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <!--  THEME & QUERY BOXES  -->
             <StackPanel>
                 <Grid>
                     <!--  QUERY BOX  -->
@@ -40,6 +43,7 @@
                         Panel.ZIndex="2"
                         FontSize="24"
                         KeyDown="OnPreviewKeyDown"
+                        Opacity=".7"
                         Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}">
                         <ui:TextBox.InputBindings>
                             <KeyBinding
@@ -65,12 +69,13 @@
                             </interactivity:EventTrigger>
                         </interactivity:Interaction.Triggers>
                     </ui:TextBox>
+
                     <ui:TextBlock
                         Margin="28,24,27,27"
                         FontSize="24"
-                        Foreground="{DynamicResource TextFillColorDisabledBrush}"
                         Text="{Binding Suggestion}" />
                 </Grid>
+                <!--  THEME BOX  -->
                 <ui:ToggleSwitch
                     x:Name="ToggleTheme"
                     Margin="15,5,5,5"
@@ -102,14 +107,17 @@
             </ui:ListView>
 
             <!--  STATUS BAR  -->
+            <Separator Grid.Row="2" Margin="5,6,5,2" />
             <StackPanel
-                Grid.Row="2"
+                Grid.Row="3"
                 HorizontalAlignment="Right"
+                VerticalAlignment="Center"
                 Orientation="Horizontal"
                 Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}">
                 <ui:TextBlock
-                    Margin="0,15,5,5"
+                    Margin="0,0,15,6"
                     FontTypography="Caption"
+                    Opacity="{StaticResource SecondaryTextOpacity}"
                     Text="{Binding Results.Count, StringFormat={}{0} Item(s) found.}" />
             </StackPanel>
         </Grid>
