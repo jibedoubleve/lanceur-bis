@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core;
 using Lanceur.Core.Models;
@@ -50,7 +51,7 @@ public class CentreAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
-        var coordinate = ScreenRuler.GetCenterCoordinate();
+        var coordinate = Application.Current.MainWindow!.GetCenterCoordinate();
         _logger!.LogInformation(
             "Put window at default position. (x: {X} - y: {Y})",
             coordinate.X,

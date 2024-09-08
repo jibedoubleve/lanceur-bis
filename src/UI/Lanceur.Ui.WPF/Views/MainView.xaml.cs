@@ -1,16 +1,13 @@
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.SharedKernel.Utils;
+using Lanceur.Infra.Win32.Utils;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Helpers;
-using Lanceur.Ui.WPF.Tools;
 using Microsoft.Extensions.Logging;
 using NHotkey;
 using NHotkey.Wpf;
@@ -25,10 +22,10 @@ public partial class MainView
 {
     #region Fields
 
-    private readonly ILogger<MainView> _logger;
     private readonly IAppConfigRepository _appConfig;
+    private readonly ILogger<MainView> _logger;
 
-    #endregion
+    #endregion Fields
 
     #region Constructors
 
@@ -37,12 +34,12 @@ public partial class MainView
         ArgumentNullException.ThrowIfNull(nameof(appConfigRepository));
         ArgumentNullException.ThrowIfNull(nameof(logger));
         ArgumentNullException.ThrowIfNull(nameof(viewModel));
-
-        InitializeComponent();
-
+        
         _appConfig = appConfigRepository;
         _logger = logger; ;
         DataContext = viewModel;
+
+        InitializeComponent();
 
         var messenger = WeakReferenceMessenger.Default;
         messenger.Register<KeepAliveMessage>(
@@ -57,7 +54,7 @@ public partial class MainView
         messenger.Register<SetQueryMessage>(this, (_, m) => SetQuery(m.Value));
     }
 
-    #endregion
+    #endregion Constructors
 
     #region Methods
 
@@ -84,7 +81,7 @@ public partial class MainView
     private void OnLostKeyboardFocus(object _, RoutedEventArgs e)
     {
         /* This is how I handle a click on a result. I don't hide the window immediately;
-         * I let the 'ExecuteCommand' run, which will handle hiding the window itself. 
+         * I let the 'ExecuteCommand' run, which will handle hiding the window itself.
          */
         if (e is KeyboardFocusChangedEventArgs { NewFocus: ListViewItem }) return;
 
@@ -131,6 +128,7 @@ public partial class MainView
             case "settings":
                 ShowWindow();
                 break;
+
             case "quit":
                 Application.Current.Shutdown();
                 break;
@@ -141,6 +139,18 @@ public partial class MainView
     {
         ShowWindow();
         if (e is not null) e.Handled = true;
+    }
+
+    private void OnToggleSwitchClick(object sender, RoutedEventArgs e)
+    {
+        if (ToggleTheme.IsChecked ?? false)
+        {
+            ApplicationThemeManager.Apply(ApplicationTheme.Light);
+        }
+        else
+        {
+            ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+        }
     }
 
     private void SetGlobalShortcut(Key key, ModifierKeys modifier)
@@ -189,17 +199,5 @@ public partial class MainView
         Focus();
     }
 
-    #endregion
-
-    private void OnToggleSwitchClick(object sender, RoutedEventArgs e)
-    {
-        if (ToggleTheme.IsChecked ?? false)
-        {
-            ApplicationThemeManager.Apply(ApplicationTheme.Light);
-        }
-        else
-        {
-            ApplicationThemeManager.Apply(ApplicationTheme.Dark);
-        }
-    }
+    #endregion Methods
 }

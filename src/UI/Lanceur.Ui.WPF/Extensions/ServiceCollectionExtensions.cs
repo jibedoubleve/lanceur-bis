@@ -1,6 +1,4 @@
-using Windows.UI.Notifications;
 using Lanceur.Core.Services;
-using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Lanceur.Ui.WPF.Views;
@@ -11,8 +9,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddViews(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<IUiNotificationService, ToastUiNotificationService>()
-                         .AddSingleton<MainView>();
-        return serviceCollection;
+        return serviceCollection.AddTransient<IUiNotificationService, ToastUiNotificationService>()
+                                .AddSingleton<MainView>();
     }
 }
