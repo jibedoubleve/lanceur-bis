@@ -32,7 +32,7 @@ public class CentreAlias : SelfExecutableQueryResult
 
     #region Properties
 
-    public override string Icon => "BookmarkPlusOutline";
+    public override string Icon => "CenterHorizontal24";
 
     #endregion
 

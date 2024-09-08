@@ -29,7 +29,7 @@ public class QuitAlias : SelfExecutableQueryResult
 
     #region Properties
 
-    public override string Icon => "LocationExit";
+    public override string Icon => "ArrowExit20";
 
     #endregion
 

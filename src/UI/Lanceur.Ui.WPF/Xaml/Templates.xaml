@@ -29,7 +29,7 @@
                             VerticalAlignment="Center"
                             Filled="False"
                             FontSize="35"
-                            Symbol="{Binding Icon, Converter={StaticResource MahAppsIconNameToSymbolIconConverter}}"
+                            Symbol="{Binding Icon}"
                             Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
                     </Grid>
                 </Border>

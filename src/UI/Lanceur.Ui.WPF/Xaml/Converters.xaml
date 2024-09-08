@@ -10,5 +10,4 @@
     <conv:KeyToDirectionConverter x:Key="KeyToDirectionConverter" />
     <conv:DebugToVisibility x:Key="DebugToVisibility" />
     <conv:TextToTruncatedTextConverter x:Key="TextToTruncatedTextConverter" />
-    <conv:MahAppsIconNameToSymbolIconConverter x:Key="MahAppsIconNameToSymbolIconConverter" />
 </ResourceDictionary>
