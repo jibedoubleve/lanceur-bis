@@ -14,4 +14,9 @@
     <!--  DURATIONS  -->
     <Duration x:Key="FadeInDuration">0:0:0:0.01</Duration>
     <Duration x:Key="FadeOutDuration">0:0:0:0.01</Duration>
+
+    <!--  OPACITY  -->
+    <sys:Double x:Key="PrimaryTextOpacity">1</sys:Double>
+    <sys:Double x:Key="SecondaryTextOpacity">0.7</sys:Double>
+    <sys:Double x:Key="TerciaryTextOpacity">0.4</sys:Double>
 </ResourceDictionary>

@@ -37,14 +37,22 @@
                     <StackPanel Orientation="Horizontal">
                         <ui:TextBlock
                             Margin="12,0,0,0"
-                            FontTypography="Title"
+                            FontTypography="Subtitle"
+                            Opacity="{StaticResource PrimaryTextOpacity}"
+                            Foreground="{DynamicResource TextFillColorPrimarydBrush}"
                             Text="{Binding Name}" />
                     </StackPanel>
                     <DockPanel Margin="12,0,15,0" Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <ui:TextBlock FontTypography="Body" Text="{Binding Description, Converter={StaticResource TextToTruncatedTextConverter}}" />
+                        <ui:TextBlock
+                            FontTypography="Body"
+                            Foreground="{DynamicResource TextFillColorTerciarydBrush}"
+                            Opacity="{StaticResource SecondaryTextOpacity}"
+                            Text="{Binding Description, Converter={StaticResource TextToTruncatedTextConverter}}" />
                         <ui:TextBlock
                             HorizontalAlignment="Right"
                             FontTypography="Caption"
+                            Opacity="{StaticResource SecondaryTextOpacity}"
+                            Foreground="{DynamicResource TextFillColorTerciarydBrush}"
                             Text="{Binding Count, StringFormat=Count: {0}}" />
                     </DockPanel>
                 </StackPanel>
