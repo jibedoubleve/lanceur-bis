@@ -27,9 +27,9 @@
                             Height="{StaticResource DefaultIconSize}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Filled="True"
+                            Filled="False"
                             FontSize="35"
-                            Symbol="Rocket24"
+                            Symbol="{Binding Icon, Converter={StaticResource MahAppsIconNameToSymbolIconConverter}}"
                             Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
                     </Grid>
                 </Border>
