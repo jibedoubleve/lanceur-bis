@@ -8,6 +8,8 @@ using Lanceur.Infra.Win32.Utils;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Helpers;
+using Lanceur.Ui.WPF.Views.Pages;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NHotkey;
 using NHotkey.Wpf;
@@ -24,19 +26,22 @@ public partial class MainView
 
     private readonly IAppConfigRepository _appConfig;
     private readonly ILogger<MainView> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
     #endregion Fields
 
     #region Constructors
 
-    public MainView(MainViewModel viewModel, IAppConfigRepository appConfigRepository, ILogger<MainView> logger)
+    public MainView(MainViewModel viewModel, IAppConfigRepository appConfigRepository, ILogger<MainView> logger, IServiceProvider serviceProvider)
     {
         ArgumentNullException.ThrowIfNull(nameof(appConfigRepository));
         ArgumentNullException.ThrowIfNull(nameof(logger));
         ArgumentNullException.ThrowIfNull(nameof(viewModel));
         
         _appConfig = appConfigRepository;
-        _logger = logger; ;
+        _logger = logger;
+        _serviceProvider = serviceProvider;
+        ;
         DataContext = viewModel;
 
         InitializeComponent();
@@ -125,8 +130,13 @@ public partial class MainView
         switch (menuItem.Tag)
         {
             case "showquery":
-            case "settings":
                 ShowWindow();
+                break;
+            
+            case "settings":
+                var view = _serviceProvider.GetService<SettingsView>()!;
+                view.Show();
+                view.Navigate<KeywordsView>();
                 break;
 
             case "quit":

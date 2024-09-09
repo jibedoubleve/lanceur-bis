@@ -2,6 +2,7 @@
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Ui.WPF.Views;
+using Lanceur.Ui.WPF.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Ui.WPF.ReservedKeywords;
@@ -27,6 +28,7 @@ public class AddAlias : SelfExecutableQueryResult
 
         var view = _serviceProvider.GetService<SettingsView>()!;
         view.Show();
+        view.Navigate<KeywordsView>();
 
         return NoResultAsync;
     }
