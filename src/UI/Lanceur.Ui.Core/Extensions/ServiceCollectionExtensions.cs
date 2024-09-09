@@ -28,6 +28,7 @@ using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.ViewModels;
+using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -44,7 +45,15 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddViewModels(this IServiceCollection serviceCollection)
     {
         return serviceCollection.AddTransient<MainViewModel>()
-                                .AddTransient<SettingsViewModel>(); 
+                                .AddTransient<SettingsViewModel>()
+                                .AddTransient<DoubloonsViewModel>()
+                                .AddTransient<EmptyKeywordsModel>()
+                                .AddTransient<HistoryViewModel>()
+                                .AddTransient<KeywordsViewModel>()
+                                .AddTransient<MostUsedViewModel>()
+                                .AddTransient<PluginsViewModel>() 
+                                .AddTransient<TrendsViewModel>() 
+                                .AddTransient<ApplicationSettingsViewModel>(); 
         
     }
 

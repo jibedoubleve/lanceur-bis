@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="clr-namespace:Lanceur.Ui.WPF.Views.Pages"
     Title="Lanceur"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -15,18 +16,21 @@
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen">
-    <ui:NavigationView>
-        <ui:NavigationView.MenuItems>
-            <ui:NavigationViewItem Content="Keywords" Icon="{ui:SymbolIcon Keyboard24}" />
-            <ui:NavigationViewItem Content="Plugins" Icon="{ui:SymbolIcon PlugConnected24}" />
-            <ui:NavigationViewItem Content="Doubloons" Icon="{ui:SymbolIcon ColumnDoubleCompare20}" />
-            <ui:NavigationViewItem Content="Empty Keywords" Icon="{ui:SymbolIcon PaintBrush24}" />
-            <ui:NavigationViewItem Content="History" Icon="{ui:SymbolIcon History24}" />
-            <ui:NavigationViewItem Content="Trends" Icon="{ui:SymbolIcon ChartMultiple24}" />
-            <ui:NavigationViewItem Content="Most used" Icon="{ui:SymbolIcon TextWordCount24}" />
-        </ui:NavigationView.MenuItems>
-        <ui:NavigationView.FooterMenuItems>
-            <ui:NavigationViewItem Content="Settings" Icon="{ui:SymbolIcon Settings24}" />
-        </ui:NavigationView.FooterMenuItems>
-    </ui:NavigationView>
+    <DockPanel LastChildFill="True">
+        <ui:TitleBar Title="Lanceur - Settings" DockPanel.Dock="Top" Height="30" />
+        <ui:NavigationView x:Name="PageNavigationView">
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem TargetPageType="{x:Type pages:KeywordsView}" Content="Keywords" Icon="{ui:SymbolIcon Keyboard24}" />
+                <ui:NavigationViewItem TargetPageType="{x:Type pages:PluginsView}" Content="Plugins" Icon="{ui:SymbolIcon PlugConnected24}" />
+                <ui:NavigationViewItem TargetPageType="{x:Type pages:DoubloonsView}" Content="Doubloons" Icon="{ui:SymbolIcon ColumnDoubleCompare20}" />
+                <ui:NavigationViewItem TargetPageType="{x:Type pages:EmptyKeywords}" Content="Empty Keywords" Icon="{ui:SymbolIcon PaintBrush24}" />
+                <ui:NavigationViewItem TargetPageType="{x:Type pages:HistoryView}" Content="History" Icon="{ui:SymbolIcon History24}" />
+                <ui:NavigationViewItem TargetPageType="{x:Type pages:TrendsView}" Content="Trends" Icon="{ui:SymbolIcon ChartMultiple24}" />
+                <ui:NavigationViewItem TargetPageType="{x:Type pages:MostUsedView}" Content="Most used" Icon="{ui:SymbolIcon TextWordCount24}" />
+            </ui:NavigationView.MenuItems>
+            <ui:NavigationView.FooterMenuItems>
+                <ui:NavigationViewItem Content="Settings" TargetPageType="{x:Type pages:ApplicationSettingsView}" Icon="{ui:SymbolIcon Settings24}" />
+            </ui:NavigationView.FooterMenuItems>
+        </ui:NavigationView>
+    </DockPanel>
 </ui:FluentWindow>
