@@ -16,7 +16,7 @@ public class MultiMacro : MacroQueryResult
 
     private readonly int _delay;
     private readonly IExecutionManager _executionManager;
-    private readonly IAsyncSearchService _searchService;
+    private readonly ISearchService _searchService;
     private readonly IServiceProvider _serviceProvider;
 
     private static readonly Conditional<int> DefaultDelay = new(0, 1_000);
@@ -29,15 +29,15 @@ public class MultiMacro : MacroQueryResult
     {
         _serviceProvider = serviceProvider;
         _executionManager = serviceProvider.GetService<IExecutionManager>();
-        _searchService = serviceProvider.GetService<IAsyncSearchService>();
+        _searchService = serviceProvider.GetService<ISearchService>();
         _delay = DefaultDelay;
     }
 
-    public MultiMacro(int? delay = null, IExecutionManager executionManager = null, IAsyncSearchService searchService = null)
+    public MultiMacro(int? delay = null, IExecutionManager executionManager = null, ISearchService searchService = null)
     {
         _delay = delay ?? DefaultDelay;
         _executionManager = executionManager ?? Locator.Current.GetService<IExecutionManager>();
-        _searchService = searchService ?? Locator.Current.GetService<IAsyncSearchService>();
+        _searchService = searchService ?? Locator.Current.GetService<ISearchService>();
     }
 
     #endregion

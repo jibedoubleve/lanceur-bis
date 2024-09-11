@@ -11,7 +11,7 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
 {
     #region Fields
 
-    private readonly Dictionary<string, ISearchService> _stores = new();
+    private readonly Dictionary<string, IStorehService> _stores = new();
     private readonly ILogger<SearchServiceOrchestrator> _log;
 
     #endregion Fields
@@ -25,9 +25,9 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
     #region Methods
 
     /// <inheritdoc />
-    public bool IsAlive(ISearchService searchService, Cmdline query)
+    public bool IsAlive(IStorehService storehService, Cmdline query)
     {
-        var regex = new Regex(searchService.Orchestration.AlivePattern);
+        var regex = new Regex(storehService.Orchestration.AlivePattern);
         var isAlive = regex.IsMatch(query.Name);
         return isAlive;
     }

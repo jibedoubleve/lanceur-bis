@@ -15,7 +15,7 @@ public class StoreLoader : IStoreLoader
 
     private readonly ISearchServiceOrchestrator _orchestrator;
     private readonly ILogger<StoreLoader> _logger;
-    private IEnumerable<ISearchService> _cachedStores;
+    private IEnumerable<IStorehService> _cachedStores;
 
     #endregion Fields
 
@@ -36,7 +36,7 @@ public class StoreLoader : IStoreLoader
 
     #region Methods
 
-    public IEnumerable<ISearchService> Load()
+    public IEnumerable<IStorehService> Load()
     {
         if (_cachedStores != null) return _cachedStores;
 
@@ -48,7 +48,7 @@ public class StoreLoader : IStoreLoader
                          .ToList();
 
         object[] args = [_serviceProvider];
-        _cachedStores = found.Select(type => (ISearchService)Activator.CreateInstance(type, args)).ToArray();
+        _cachedStores = found.Select(type => (IStorehService)Activator.CreateInstance(type, args)).ToArray();
         return _cachedStores;
     }
 

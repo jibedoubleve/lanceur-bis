@@ -12,7 +12,7 @@ using Splat;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class EverythingStore : ISearchService
+public class EverythingStore : IStorehService
 {
     #region Fields
 

@@ -81,7 +81,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>();
         serviceCollection.AddTransient<IConnectionString, ConnectionString>();
         serviceCollection.AddTransient<IConversionService, AutoMapperConverter>();
-        serviceCollection.AddTransient<IAsyncSearchService, SearchService>();
+        serviceCollection.AddTransient<ISearchService, SearchService>();
         serviceCollection.AddTransient<IStoreLoader, StoreLoader>();
         serviceCollection.AddTransient<IMacroManager, MacroManager>(
             s =>

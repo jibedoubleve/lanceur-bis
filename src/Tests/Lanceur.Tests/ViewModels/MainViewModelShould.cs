@@ -80,7 +80,7 @@ public partial class MainViewModelShould : TestBase
         new TestScheduler().With(
             scheduler =>
             {
-                var searchService = Substitute.For<IAsyncSearchService>();
+                var searchService = Substitute.For<ISearchService>();
                 var vm = new MainViewModelBuilder()
                          .With(OutputHelper)
                          .With(scheduler)
@@ -107,7 +107,7 @@ public partial class MainViewModelShould : TestBase
             scheduler =>
             {
                 // ARRANGE
-                var searchService = Substitute.For<IAsyncSearchService>();
+                var searchService = Substitute.For<ISearchService>();
                 searchService.SearchAsync(Arg.Any<Cmdline>())
                              .Returns(
                                  new List<QueryResult>
@@ -190,7 +190,7 @@ public partial class MainViewModelShould : TestBase
                     }
                 );
 
-                var searchService = Substitute.For<IAsyncSearchService>();
+                var searchService = Substitute.For<ISearchService>();
                 searchService.GetAllAsync().Returns(new AliasQueryResult[] { new(), new(), new(), new(), new() });
 
                 var vm = new MainViewModelBuilder()

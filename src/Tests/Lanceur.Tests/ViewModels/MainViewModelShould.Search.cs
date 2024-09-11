@@ -31,7 +31,7 @@ public partial class MainViewModelShould
             scheduler =>
             {
                 OutputHelper.Arrange();
-                var searchService = Substitute.For<IAsyncSearchService>();
+                var searchService = Substitute.For<ISearchService>();
                 searchService
                     .SearchAsync(Arg.Any<Cmdline>())
                     .Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
@@ -63,7 +63,7 @@ public partial class MainViewModelShould
                 var @params = "parameters";
                 var results = new List<SelfExecutableQueryResult> { new ExecutableTestAlias { Query = new("", @params) } };
 
-                var searchService = Substitute.For<IAsyncSearchService>(); //new SearchService(storeLoader, macroMgr, thumbnailManager);
+                var searchService = Substitute.For<ISearchService>(); //new SearchService(storeLoader, macroMgr, thumbnailManager);
                 searchService.SearchAsync(Arg.Any<Cmdline>())
                              .Returns(results);
 
@@ -93,7 +93,7 @@ public partial class MainViewModelShould
             scheduler =>
             {
                 var query = "1 un";
-                var searchService = Substitute.For<IAsyncSearchService>();
+                var searchService = Substitute.For<ISearchService>();
                 var results = MainViewModelTestHelper.BuildResults(5)
                                                      .ToArray();
 

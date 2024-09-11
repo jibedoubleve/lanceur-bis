@@ -9,7 +9,7 @@ using Splat;
 
 namespace Lanceur.Infra.Services;
 
-public class SearchService : SearchServiceCache, IAsyncSearchService
+public class SearchService : SearchServiceCache, ISearchService
 {
     private readonly ISearchServiceOrchestrator _orchestrator;
 

@@ -11,7 +11,7 @@ using Splat;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class CalculatorStore : ISearchService
+public class CalculatorStore : IStorehService
 {
     #region Fields
 
