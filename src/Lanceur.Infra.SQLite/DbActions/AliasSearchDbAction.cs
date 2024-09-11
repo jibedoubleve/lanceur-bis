@@ -53,7 +53,8 @@ public class AliasSearchDbAction
                        a.exec_count            as {nameof(AliasQueryResult.Count)},
                        s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
                        s.Synonyms              as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
-                       a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
+                       a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)},
+                       a.hidden                as {nameof(AliasQueryResult.IsHidden)}
                    from
                        alias a
                        left join alias_name            an on a.id         = an.id_alias                    

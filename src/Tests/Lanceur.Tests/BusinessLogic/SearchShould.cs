@@ -174,7 +174,7 @@ public class SearchShould : TestBase
                     .Returns(results);
 
         var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-        orchestrator.IsAlive(Arg.Any<IStorehService>(), Arg.Any<Cmdline>())
+        orchestrator.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
                     .Returns(true);
 
         var searchService = new SearchService(
@@ -203,7 +203,7 @@ public class SearchShould : TestBase
         var thumbnailManager = Substitute.For<IThumbnailManager>();
         var query = new Cmdline("code");
         var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-        orchestrator.IsAlive(Arg.Any<IStorehService>(), Arg.Any<Cmdline>())
+        orchestrator.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
                     .Returns(true);
         var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager, orchestrator: orchestrator);
 

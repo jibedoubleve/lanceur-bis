@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Services;
 
-public interface IStorehService
+public interface IStoreService
 {
     #region Methods
 

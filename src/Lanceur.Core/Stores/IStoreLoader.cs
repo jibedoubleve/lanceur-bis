@@ -6,7 +6,7 @@ public interface IStoreLoader
 {
     #region Methods
 
-    public IEnumerable<IStorehService> Load();
+    public IEnumerable<IStoreService> Load();
 
     #endregion Methods
 }

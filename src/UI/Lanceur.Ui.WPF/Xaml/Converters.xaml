@@ -10,4 +10,7 @@
     <conv:KeyToDirectionConverter x:Key="KeyToDirectionConverter" />
     <conv:DebugToVisibility x:Key="DebugToVisibility" />
     <conv:TextToTruncatedTextConverter x:Key="TextToTruncatedTextConverter" />
+    <conv:InvertBooleanToVisibilityConverter x:Key="InvertBooleanToVisibilityConverter" />
+    <conv:StringToRunAsConverter x:Key="StringToRunAsConverter" />
+    <conv:StringToStartModeConverter x:Key="StringToStartModeConverter" />
 </ResourceDictionary>

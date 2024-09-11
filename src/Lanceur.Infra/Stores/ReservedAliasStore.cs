@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class ReservedAliasStore : IStorehService
+public class ReservedAliasStore : IStoreService
 {
     private readonly IServiceProvider _serviceProvider;
 
