@@ -9,7 +9,7 @@ public abstract class SearchServiceCache
     #region Fields
 
     private readonly IStoreLoader _storeLoader;
-    private IEnumerable<IStorehService> _stores;
+    private IEnumerable<IStoreService> _stores;
 
     #endregion Fields
 
@@ -21,7 +21,7 @@ public abstract class SearchServiceCache
 
     #region Properties
 
-    public IEnumerable<IStorehService> Stores => _stores ??= _storeLoader.Load();
+    public IEnumerable<IStoreService> Stores => _stores ??= _storeLoader.Load();
 
     #endregion Properties
 }

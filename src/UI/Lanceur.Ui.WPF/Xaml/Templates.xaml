@@ -64,23 +64,23 @@
         <Border HorizontalAlignment="Stretch" Background="Transparent">
             <DockPanel>
                 <Border
-                    Width="{StaticResource DefaultIconContainerSize}"
-                    Height="{StaticResource DefaultIconContainerSize}"
+                    Width="{StaticResource SmallIconContainerSize}"
+                    Height="{StaticResource SmallIconContainerSize}"
                     Margin="10,0,5,0"
                     Background="{ui:ThemeResource AccentTextFillColorTertiaryBrush}"
                     CornerRadius="8"
                     Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
                         <Image
-                            Width="{StaticResource DefaultIconSize}"
-                            Height="{StaticResource DefaultIconSize}"
+                            Width="{StaticResource SmallIconSize}"
+                            Height="{StaticResource SmallIconSize}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Source="{Binding Thumbnail}"
                             Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
                         <ui:SymbolIcon
-                            Width="{StaticResource DefaultIconSize}"
-                            Height="{StaticResource DefaultIconSize}"
+                            Width="{StaticResource SmallIconSize}"
+                            Height="{StaticResource SmallIconSize}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Filled="False"
@@ -93,7 +93,8 @@
                     <StackPanel Orientation="Horizontal">
                         <ui:TextBlock
                             Margin="12,0,0,0"
-                            FontTypography="Subtitle"
+                            VerticalAlignment="Center"
+                            FontTypography="BodyStrong"
                             Foreground="{DynamicResource TextFillColorPrimarydBrush}"
                             Opacity="{StaticResource PrimaryTextOpacity}"
                             Text="{Binding Name}" />

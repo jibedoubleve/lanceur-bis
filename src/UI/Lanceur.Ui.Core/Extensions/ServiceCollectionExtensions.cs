@@ -52,7 +52,13 @@ public static class ServiceCollectionExtensions
                                 .AddTransient<DoubloonsViewModel>()
                                 .AddTransient<EmptyKeywordsModel>()
                                 .AddTransient<HistoryViewModel>()
-                                .AddTransient<KeywordsViewModel>(sp => new(new AliasStore(sp), sp.GetService<ILogger<KeywordsViewModel>>()!))
+                                .AddTransient<KeywordsViewModel>(
+                                    sp => new(
+                                        new AliasStoreDecorator(new(sp)),
+                                        sp.GetService<IThumbnailManager>()!,
+                                        sp.GetService<ILogger<KeywordsViewModel>>()!
+                                    )
+                                )
                                 .AddTransient<MostUsedViewModel>()
                                 .AddTransient<PluginsViewModel>()
                                 .AddTransient<TrendsViewModel>()

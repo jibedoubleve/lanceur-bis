@@ -11,9 +11,9 @@ internal class DebugStoreLoader : IStoreLoader
 {
     #region Methods
 
-    public IEnumerable<IStorehService> Load()
+    public IEnumerable<IStoreService> Load()
     {
-        var results = new List<IStorehService> { new ReservedAliasStore(Assembly.GetExecutingAssembly(), Substitute.For<IDbRepository>()) };
+        var results = new List<IStoreService> { new ReservedAliasStore(Assembly.GetExecutingAssembly(), Substitute.For<IDbRepository>()) };
         return results;
     }
 
