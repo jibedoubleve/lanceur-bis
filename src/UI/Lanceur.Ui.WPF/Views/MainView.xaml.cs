@@ -34,14 +34,14 @@ public partial class MainView
 
     public MainView(MainViewModel viewModel, IAppConfigRepository appConfigRepository, ILogger<MainView> logger, IServiceProvider serviceProvider)
     {
-        ArgumentNullException.ThrowIfNull(nameof(appConfigRepository));
-        ArgumentNullException.ThrowIfNull(nameof(logger));
-        ArgumentNullException.ThrowIfNull(nameof(viewModel));
+        ArgumentNullException.ThrowIfNull(appConfigRepository);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(viewModel);
         
         _appConfig = appConfigRepository;
         _logger = logger;
         _serviceProvider = serviceProvider;
-        ;
+        
         DataContext = viewModel;
 
         InitializeComponent();

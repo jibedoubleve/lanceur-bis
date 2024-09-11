@@ -49,7 +49,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     #region Methods
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> GetAll() => _aliasSearchDbAction.Search();
+    public IEnumerable<AliasQueryResult> GetAll() => _aliasSearchDbAction.Search(isReturnAllIfEmpty: true);
 
     ///<inheritdoc/>
     public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters();
@@ -212,9 +212,9 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias)
     {
-        ArgumentNullException.ThrowIfNull(alias, nameof(alias));
-        ArgumentNullException.ThrowIfNull(alias.Synonyms, nameof(alias.Synonyms));
-        ArgumentNullException.ThrowIfNull(alias.Id, nameof(alias.Id));
+        ArgumentNullException.ThrowIfNull(alias);
+        ArgumentNullException.ThrowIfNull(alias.Synonyms);
+        ArgumentNullException.ThrowIfNull(alias.Id);
 
         alias.SanitizeSynonyms();
 

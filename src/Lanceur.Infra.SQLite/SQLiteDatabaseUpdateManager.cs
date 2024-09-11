@@ -19,6 +19,12 @@ public class SQLiteDatabaseUpdateManager : IDataStoreUpdateManager
 
     public SQLiteDatabaseUpdateManager(IDataStoreVersionManager versionManager, IDbConnection db, Assembly asm, string pattern)
     {
+        ArgumentNullException.ThrowIfNull(versionManager);
+        ArgumentNullException.ThrowIfNull(db);
+        ArgumentNullException.ThrowIfNull(asm);
+
+        if (string.IsNullOrEmpty(db.ConnectionString)) throw new ArgumentNullException(nameof(db.ConnectionString), "ConnectionString should have a value");
+
         _dbUpdater = new(db, asm, pattern);
         _versionManager = versionManager;
     }

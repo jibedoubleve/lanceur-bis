@@ -23,6 +23,7 @@
       <ProjectReference Include="..\..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
       <ProjectReference Include="..\..\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj" />
       <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj" />
+      <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
     </ItemGroup>
 
 </Project>

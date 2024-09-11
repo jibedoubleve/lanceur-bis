@@ -38,8 +38,8 @@
                         <ui:TextBlock
                             Margin="12,0,0,0"
                             FontTypography="Subtitle"
-                            Opacity="{StaticResource PrimaryTextOpacity}"
                             Foreground="{DynamicResource TextFillColorPrimarydBrush}"
+                            Opacity="{StaticResource PrimaryTextOpacity}"
                             Text="{Binding Name}" />
                     </StackPanel>
                     <DockPanel Margin="12,0,15,0" Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -51,10 +51,53 @@
                         <ui:TextBlock
                             HorizontalAlignment="Right"
                             FontTypography="Caption"
-                            Opacity="{StaticResource SecondaryTextOpacity}"
                             Foreground="{DynamicResource TextFillColorTerciarydBrush}"
+                            Opacity="{StaticResource SecondaryTextOpacity}"
                             Text="{Binding Count, StringFormat=Count: {0}}" />
                     </DockPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="AliasSettingsTemplate" DataType="{x:Type vm:QueryResult}">
+        <Border HorizontalAlignment="Stretch" Background="Transparent">
+            <DockPanel>
+                <Border
+                    Width="{StaticResource DefaultIconContainerSize}"
+                    Height="{StaticResource DefaultIconContainerSize}"
+                    Margin="10,0,5,0"
+                    Background="{ui:ThemeResource AccentTextFillColorTertiaryBrush}"
+                    CornerRadius="8"
+                    Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <Image
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Source="{Binding Thumbnail}"
+                            Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
+                        <ui:SymbolIcon
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Filled="False"
+                            FontSize="35"
+                            Symbol="{Binding Icon}"
+                            Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
+                    </Grid>
+                </Border>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:TextBlock
+                            Margin="12,0,0,0"
+                            FontTypography="Subtitle"
+                            Foreground="{DynamicResource TextFillColorPrimarydBrush}"
+                            Opacity="{StaticResource PrimaryTextOpacity}"
+                            Text="{Binding Name}" />
+                    </StackPanel>
                 </StackPanel>
             </DockPanel>
         </Border>

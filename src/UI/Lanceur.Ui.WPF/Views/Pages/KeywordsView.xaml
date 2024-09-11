@@ -1,13 +1,26 @@
-<Page x:Class="Lanceur.Ui.WPF.Views.Pages.KeywordsView"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      mc:Ignorable="d"
-      Title="KeywordsView">
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.KeywordsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="KeywordsView"
+    mc:Ignorable="d">
+    <interactivity:Interaction.Triggers>
+        <interactivity:EventTrigger EventName="Loaded">
+            <interactivity:InvokeCommandAction Command="{Binding LoadAliasesCommand}" />
+        </interactivity:EventTrigger>
+    </interactivity:Interaction.Triggers>
     <Grid>
-        <Label VerticalAlignment="Center" 
-               HorizontalAlignment="Center"
-               Content="Lanceur.Ui.WPF.Views.Pages.KeywordsView" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+        <ui:ListView
+            ItemTemplate="{StaticResource AliasSettingsTemplate}"
+            ItemsSource="{Binding Aliases}"
+            SelectedItem="{Binding SelectedAlias}" />
     </Grid>
 </Page>

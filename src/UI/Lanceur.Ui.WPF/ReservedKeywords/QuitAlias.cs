@@ -20,7 +20,7 @@ public class QuitAlias : SelfExecutableQueryResult
 
     public QuitAlias(IServiceProvider serviceProvider)
     {
-        ArgumentNullException.ThrowIfNull(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         _logger = serviceProvider.GetService<ILogger<QuitAlias>>() ?? throw new ArgumentNullException(nameof(_logger));
     }

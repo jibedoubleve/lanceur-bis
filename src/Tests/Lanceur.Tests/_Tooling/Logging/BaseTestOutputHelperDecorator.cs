@@ -15,7 +15,7 @@ public class BaseTestOutputHelperDecorator
 
     protected BaseTestOutputHelperDecorator(ITestOutputHelper output)
     {
-        ArgumentNullException.ThrowIfNull(nameof(output));
+        ArgumentNullException.ThrowIfNull(output);
         _output = output;
     }
 

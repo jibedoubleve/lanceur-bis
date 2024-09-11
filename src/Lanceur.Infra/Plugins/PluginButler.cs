@@ -37,8 +37,8 @@ public sealed class PluginButler : IPluginInstaller, IPluginUninstaller
         IPluginValidationRule<PluginValidationResult, PluginManifest> pluginValidationRule
     )
     {
-        ArgumentNullException.ThrowIfNull(appLoggerFactory, nameof(appLoggerFactory));
-        ArgumentNullException.ThrowIfNull(pluginValidationRule, nameof(pluginValidationRule));
+        ArgumentNullException.ThrowIfNull(appLoggerFactory);
+        ArgumentNullException.ThrowIfNull(pluginValidationRule);
 
         _pluginValidationRule = pluginValidationRule;
         _logger = appLoggerFactory.GetLogger<PluginButler>();

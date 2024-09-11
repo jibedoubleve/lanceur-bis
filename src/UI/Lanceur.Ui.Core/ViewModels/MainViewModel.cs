@@ -34,10 +34,10 @@ public partial class MainViewModel : ObservableObject
     /// <inheritdoc />
     public MainViewModel(ILogger<MainViewModel> logger, IAsyncSearchService searchService, ISettingsFacade settingsFacade, IExecutionManager executionManager)
     {
-        ArgumentNullException.ThrowIfNull(nameof(logger));
-        ArgumentNullException.ThrowIfNull(nameof(searchService));
-        ArgumentNullException.ThrowIfNull(nameof(settingsFacade));
-        ArgumentNullException.ThrowIfNull(nameof(executionManager));
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(searchService);
+        ArgumentNullException.ThrowIfNull(settingsFacade);
+        ArgumentNullException.ThrowIfNull(executionManager);
 
         _searchService = searchService;
         _executionManager = executionManager;
