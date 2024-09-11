@@ -129,7 +129,7 @@ public class Bootstrapper
         l.Register<ISchedulerProvider>(() => new RxAppSchedulerProvider());
         l.Register<IEverythingApi>(() => new EverythingApi());
         l.Register<IStoreLoader>(() => new StoreLoader(null, Get<SearchServiceOrchestrator>(), Get<ServiceProvider>()));
-        l.Register<IAsyncSearchService>(() => new SearchService(Get<IStoreLoader>()));
+        l.Register<ISearchService>(() => new SearchService(Get<IStoreLoader>()));
         l.Register<IExecutionManager>(
             () => new ExecutionManager(
                 Get<ILoggerFactory>(),

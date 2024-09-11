@@ -23,7 +23,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ILogger<MainViewModel> _logger;
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
-    private readonly IAsyncSearchService _searchService;
+    private readonly ISearchService _searchService;
     [ObservableProperty] private QueryResult? _selectedResult;
     [ObservableProperty] private string? _suggestion;
 
@@ -32,7 +32,7 @@ public partial class MainViewModel : ObservableObject
     #region Constructors
 
     /// <inheritdoc />
-    public MainViewModel(ILogger<MainViewModel> logger, IAsyncSearchService searchService, ISettingsFacade settingsFacade, IExecutionManager executionManager)
+    public MainViewModel(ILogger<MainViewModel> logger, ISearchService searchService, ISettingsFacade settingsFacade, IExecutionManager executionManager)
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(searchService);

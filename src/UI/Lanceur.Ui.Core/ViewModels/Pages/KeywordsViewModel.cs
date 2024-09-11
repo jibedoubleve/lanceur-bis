@@ -12,7 +12,7 @@ public partial class KeywordsViewModel : ObservableObject
     #region Fields
 
     private readonly ILogger<KeywordsViewModel> _logger;
-    private readonly ISearchService _searchService;
+    private readonly IStorehService _storehService;
     [ObservableProperty] private ObservableCollection<QueryResult> _aliases;
     [ObservableProperty] private QueryResult _selectedAlias;
 
@@ -20,12 +20,12 @@ public partial class KeywordsViewModel : ObservableObject
 
     #region Constructors
 
-    public KeywordsViewModel(ISearchService searchService, ILogger<KeywordsViewModel> logger)
+    public KeywordsViewModel(IStorehService storehService, ILogger<KeywordsViewModel> logger)
     {
-        ArgumentNullException.ThrowIfNull(searchService);
+        ArgumentNullException.ThrowIfNull(storehService);
         ArgumentNullException.ThrowIfNull(logger);
 
-        _searchService = searchService;
+        _storehService = storehService;
         _logger = logger;
     }
 
@@ -34,7 +34,7 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task LoadAliases()
     {
-        var aliases = await Task.Run(() => _searchService.GetAll());
+        var aliases = await Task.Run(() => _storehService.GetAll());
         Aliases = new(aliases);
     }
 }

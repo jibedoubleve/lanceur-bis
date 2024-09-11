@@ -94,7 +94,7 @@ public partial class App
         File.Delete(Locations.MaintenanceLogBookPath);
         
         // PRELOAD
-        _ = Locator.Current.GetService<IAsyncSearchService>()
+        _ = Locator.Current.GetService<ISearchService>()
                    ?.GetAllAsync();
     }
 

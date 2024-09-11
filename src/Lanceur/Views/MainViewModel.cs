@@ -32,7 +32,7 @@ public partial class MainViewModel : ReactiveObject
     private readonly IDbRepository _dbRepository;
     private readonly IExecutionManager _executor;
     private readonly ILogger<MainViewModel> _logger;
-    private readonly IAsyncSearchService _searchService;
+    private readonly ISearchService _searchService;
     private readonly ISettingsFacade _settingsFacade;
     private readonly Interaction<string, bool> _confirmExecution;
 
@@ -43,7 +43,7 @@ public partial class MainViewModel : ReactiveObject
     public MainViewModel(
         ISchedulerProvider schedulerProvider = null,
         ILoggerFactory loggerFactory = null,
-        IAsyncSearchService searchService = null,
+        ISearchService searchService = null,
         IUserNotification notify = null,
         IDbRepository dataService = null,
         IExecutionManager executor = null,
@@ -55,7 +55,7 @@ public partial class MainViewModel : ReactiveObject
         var l = Locator.Current;
         notify ??= l.GetService<IUserNotification>();
         _logger = loggerFactory.GetLogger<MainViewModel>();
-        _searchService = searchService ?? l.GetService<IAsyncSearchService>();
+        _searchService = searchService ?? l.GetService<ISearchService>();
         _dbRepository = dataService ?? l.GetService<IDbRepository>();
         _executor = executor ?? l.GetService<IExecutionManager>();
         _settingsFacade = appConfigService ?? l.GetService<ISettingsFacade>();

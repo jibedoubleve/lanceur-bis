@@ -16,7 +16,7 @@ using ILogger = Splat.ILogger;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class PluginStore : ISearchService, IPluginManifestRepository
+public class PluginStore : IStorehService, IPluginManifestRepository
 {
     #region Fields
 

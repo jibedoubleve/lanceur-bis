@@ -21,7 +21,7 @@ internal class MainViewModelBuilder
     private IExecutionManager _executionManager;
     private ITestOutputHelper _output;
     private ISchedulerProvider _schedulerProvider;
-    private IAsyncSearchService _searchService;
+    private ISearchService _searchService;
 
     #endregion Fields
 
@@ -37,7 +37,7 @@ internal class MainViewModelBuilder
 
         return new(
             _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
-            searchService: _searchService ?? Substitute.For<IAsyncSearchService>(),
+            searchService: _searchService ?? Substitute.For<ISearchService>(),
             executor: _executionManager ?? Substitute.For<IExecutionManager>(),
             notify: Substitute.For<IUserNotification>(),
             appConfigService: _appConfigService ?? settingsFacade,
@@ -58,7 +58,7 @@ internal class MainViewModelBuilder
         return this;
     }
 
-    public MainViewModelBuilder With(IAsyncSearchService searchService)
+    public MainViewModelBuilder With(ISearchService searchService)
     {
         _searchService = searchService;
         return this;

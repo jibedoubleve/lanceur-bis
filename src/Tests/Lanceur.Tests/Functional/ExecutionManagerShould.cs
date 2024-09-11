@@ -26,7 +26,7 @@ public class ExecutionManagerShould
             Substitute.For<IDbRepository>()
         );
 
-        var macro =new MultiMacro(0, Substitute.For<IExecutionManager>(),Substitute.For<IAsyncSearchService>());
+        var macro =new MultiMacro(0, Substitute.For<IExecutionManager>(),Substitute.For<ISearchService>());
         await macro.ExecuteAsync(cmdline);
 
         var request = new ExecutionRequest

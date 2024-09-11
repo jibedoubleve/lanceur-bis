@@ -84,7 +84,7 @@ public partial class MainViewModelShould
             {
                 // ARRANGE
                 var names = new[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4" };
-                var searchService = Substitute.For<IAsyncSearchService>();
+                var searchService = Substitute.For<ISearchService>();
                 searchService.SearchAsync(Arg.Any<Cmdline>())
                              .Returns(
                                  new List<QueryResult>() { ExecutableTestAlias.FromName(names[0]), ExecutableTestAlias.FromName(names[1]), ExecutableTestAlias.FromName(names[2]), ExecutableTestAlias.FromName(names[3]) },
@@ -119,7 +119,7 @@ public partial class MainViewModelShould
             {
                 // ARRANGE
                 var names = new[] { "Alias_1", "Alias_2", "Alias_3", "Alias_4" };
-                var searchService = Substitute.For<IAsyncSearchService>();
+                var searchService = Substitute.For<ISearchService>();
                 searchService.SearchAsync(Arg.Any<Cmdline>())
                              .Returns(
                                  new List<QueryResult>() { ExecutableTestAlias.FromName(names[0]), ExecutableTestAlias.FromName(names[1]), ExecutableTestAlias.FromName(names[2]), ExecutableTestAlias.FromName(names[3]) },
