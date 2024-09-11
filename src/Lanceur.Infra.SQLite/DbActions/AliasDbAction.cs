@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Infra.Logging;
@@ -204,8 +204,7 @@ public class AliasDbAction
             Name = alias.Name,
             FileName = alias.Name,
             Synonyms = alias.Name,
-            IsHidden = true,
-            Icon = "PageHidden"
+            IsHidden = true
         };
         alias.Id = Create(ref queryResult);
     }
@@ -329,7 +328,7 @@ public class AliasDbAction
 
     public void Remove(IEnumerable<SelectableAliasQueryResult> alias)
     {
-        ArgumentNullException.ThrowIfNull(nameof(alias));
+        ArgumentNullException.ThrowIfNull(alias);
         var ids = alias.Select(x => x.Id).ToArray();
 
         ClearAliasUsage(ids);

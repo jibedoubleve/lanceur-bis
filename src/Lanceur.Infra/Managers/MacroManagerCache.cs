@@ -23,10 +23,10 @@ public abstract class MacroManagerCache
 
     internal MacroManagerCache(Assembly asm, ILogger logger, IDbRepository dbRepository, IServiceProvider serviceProvider)
     {
-        ArgumentNullException.ThrowIfNull(nameof(asm));
-        ArgumentNullException.ThrowIfNull(nameof(logger));
-        ArgumentNullException.ThrowIfNull(nameof(dbRepository));
-        ArgumentNullException.ThrowIfNull(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(asm);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(dbRepository);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
         
         _asm = asm;
         Logger = logger;

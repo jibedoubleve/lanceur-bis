@@ -22,7 +22,7 @@ public class CentreAlias : SelfExecutableQueryResult
 
     public CentreAlias(IServiceProvider serviceProvider)
     {
-        ArgumentNullException.ThrowIfNull(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(serviceProvider);
 
         _logger = serviceProvider.GetService<ILogger<CentreAlias>>() ?? throw new ArgumentNullException(nameof(_logger));
         _appConfig = serviceProvider.GetService<IAppConfigRepository>() ?? throw new ArgumentNullException(nameof(_appConfig));

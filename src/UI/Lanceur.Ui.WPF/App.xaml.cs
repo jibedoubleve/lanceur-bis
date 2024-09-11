@@ -2,6 +2,8 @@ using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Lanceur.Core.Services;
+using Lanceur.Core.Utils;
+using Lanceur.Infra.SQLite;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Views;
@@ -65,7 +67,14 @@ public partial class App
             .GetRequiredService<MainView>()
             .Show();
         Host.Services.GetRequiredService<ILogger<App>>()!
-            .LogInformation("Application started...");
+            .LogInformation("Application started");
+
+        /* Check wether database update is needed...
+         */
+        var cs = Ioc.Default.GetService<IConnectionString>()!;
+        Ioc.Default.GetService<SQLiteUpdater>()!
+                   .Update(cs.ToString());
+
     }
 
     #endregion Methods

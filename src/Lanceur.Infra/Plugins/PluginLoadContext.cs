@@ -15,7 +15,7 @@ internal class PluginLoadContext : AssemblyLoadContext
 
     public PluginLoadContext(string pluginPath)
     {
-        ArgumentNullException.ThrowIfNull(pluginPath, nameof(pluginPath));
+        ArgumentNullException.ThrowIfNull(pluginPath);
 
         if (!File.Exists(pluginPath)) throw new ArgumentException($"Cannot load plugin. Specified path doesn't exist. (Path: '{pluginPath}')", nameof(pluginPath));
 

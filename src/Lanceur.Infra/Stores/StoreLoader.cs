@@ -23,9 +23,9 @@ public class StoreLoader : IStoreLoader
     
     public StoreLoader(ILogger<StoreLoader> logger, ISearchServiceOrchestrator orchestrator, IServiceProvider serviceProvider)
     {
-        ArgumentNullException.ThrowIfNull(nameof(logger));
-        ArgumentNullException.ThrowIfNull(nameof(orchestrator));
-        ArgumentNullException.ThrowIfNull(nameof(serviceProvider));
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(orchestrator);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
         
         _serviceProvider = serviceProvider;
         _logger = logger;

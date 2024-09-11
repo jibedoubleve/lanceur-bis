@@ -1,3 +1,5 @@
+using System.Data;
+using System.Data.SQLite;
 using System.Reflection;
 using AutoMapper;
 using Everything.Wrapper;
@@ -22,6 +24,7 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.PackagedApp;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Infra.Win32.Thumbnails;
+using Lanceur.Scripts;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
 using Lanceur.Ui.Core.Services;
@@ -49,32 +52,45 @@ public static class ServiceCollectionExtensions
                                 .AddTransient<DoubloonsViewModel>()
                                 .AddTransient<EmptyKeywordsModel>()
                                 .AddTransient<HistoryViewModel>()
-                                .AddTransient<KeywordsViewModel>()
+                                .AddTransient<KeywordsViewModel>(sp => new(new AliasStore(sp), sp.GetService<ILogger<KeywordsViewModel>>()!))
                                 .AddTransient<MostUsedViewModel>()
-                                .AddTransient<PluginsViewModel>() 
-                                .AddTransient<TrendsViewModel>() 
-                                .AddTransient<ApplicationSettingsViewModel>(); 
-        
+                                .AddTransient<PluginsViewModel>()
+                                .AddTransient<TrendsViewModel>()
+                                .AddTransient<ApplicationSettingsViewModel>();
     }
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<Assembly>(_ => Assembly.GetExecutingAssembly());
-        serviceCollection.AddTransient<IMemoryStorageService, MemoryStorageService>();
         serviceCollection.AddSingleton<IServiceProvider>(x => x);
+        serviceCollection.AddSingleton<SQLiteUpdater>();
+
+        serviceCollection.AddTransient<IDataStoreVersionManager, SQLiteVersionManager>();
+        serviceCollection.AddTransient<IDataStoreUpdateManager>(
+            sp =>  new SQLiteDatabaseUpdateManager(
+                sp.GetService<IDataStoreVersionManager>(),
+                sp.GetService<IDbConnection>(),
+                ScriptRepository.Asm,
+                ScriptRepository.DbScriptEmbededResourcePattern
+            )
+        );
+        serviceCollection.AddTransient(_ => Assembly.GetExecutingAssembly()); //TODO THIS IS WRONG, remove this line and fix the issue...
+        serviceCollection.AddTransient<IMemoryStorageService, MemoryStorageService>();
         serviceCollection.AddTransient<IDbRepository, SQLiteRepository>();
+        serviceCollection.AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()));
         serviceCollection.AddTransient<IDbConnectionManager, DbMultiConnectionManager>();
         serviceCollection.AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>();
         serviceCollection.AddTransient<IConnectionString, ConnectionString>();
         serviceCollection.AddTransient<IConversionService, AutoMapperConverter>();
         serviceCollection.AddTransient<IAsyncSearchService, SearchService>();
         serviceCollection.AddTransient<IStoreLoader, StoreLoader>();
-        serviceCollection.AddTransient<IMacroManager, MacroManager>(s => 
-            new(
-                Assembly.GetAssembly(typeof(MultiMacro)), 
-                s.GetService<ILogger<MacroManager>>(),
-                s.GetService<IDbRepository>(),
-                s.GetService<IServiceProvider>())
+        serviceCollection.AddTransient<IMacroManager, MacroManager>(
+            s =>
+                new(
+                    Assembly.GetAssembly(typeof(MultiMacro)),
+                    s.GetService<ILogger<MacroManager>>(),
+                    s.GetService<IDbRepository>(),
+                    s.GetService<IServiceProvider>()
+                )
         );
         serviceCollection.AddTransient<ILoggerFactory, LoggerFactory>();
         serviceCollection.AddTransient<IThumbnailManager, ThumbnailManager>();
@@ -141,7 +157,7 @@ public static class ServiceCollectionExtensions
                                               .CreateLogger();
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true))
                          .BuildServiceProvider();
-        Log.Logger.Information("Logger configured...");
+        Log.Logger.Information("Logger configured");
         return serviceCollection;
     }
 
