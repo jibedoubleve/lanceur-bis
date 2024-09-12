@@ -7,14 +7,15 @@
     xmlns:pages="clr-namespace:Lanceur.Ui.WPF.Views.Pages"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="Lanceur"
-    d:DesignHeight="720"
-    d:DesignWidth="1280"
+    Width="1920"
+    Height="1080"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
+    Closing="OnClosing"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
@@ -62,6 +63,12 @@
                     Icon="{ui:SymbolIcon Settings24}"
                     TargetPageType="{x:Type pages:ApplicationSettingsView}" />
             </ui:NavigationView.FooterMenuItems>
+            <ui:NavigationView.ContentOverlay>
+                <Grid>
+                    <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
+                </Grid>
+            </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
+        <ContentPresenter x:Name="ContentPresenterForDialogs" Grid.RowSpan="2" Grid.Row="0" />
     </Grid>
 </ui:FluentWindow>

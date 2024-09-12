@@ -10,8 +10,12 @@
     <!--  SIZES  -->
     <sys:Double x:Key="SmallIconSize">17.5</sys:Double>
     <sys:Double x:Key="DefaultIconSize">35</sys:Double>
+    <sys:Double x:Key="BigIconSize">52.5</sys:Double>
+
     <sys:Double x:Key="SmallIconContainerSize">27.5</sys:Double>
     <sys:Double x:Key="DefaultIconContainerSize">55</sys:Double>
+    <sys:Double x:Key="BigIconContainerSize">82.5</sys:Double>
+
     <sys:Double x:Key="ResultBoxHeight">350</sys:Double>
 
     <!--  DURATIONS  -->

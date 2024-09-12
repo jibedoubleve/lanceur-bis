@@ -1,4 +1,5 @@
 using Lanceur.Core.Services;
+using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Lanceur.Ui.WPF.Views;
@@ -11,17 +12,26 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddViews(this IServiceCollection serviceCollection)
     {
-        return serviceCollection.AddTransient<IUiNotificationService, ToastUiNotificationService>()
-                                .AddSingleton<IPageService, PageService>()
-                                .AddSingleton<MainView>()
-                                .AddTransient<SettingsView>()
-                                .AddTransient<DoubloonsView>()
-                                .AddTransient<EmptyKeywords>()
-                                .AddTransient<HistoryView>()
-                                .AddTransient<KeywordsView>()
-                                .AddTransient<MostUsedView>()
-                                .AddTransient<PluginsView>()
-                                .AddTransient<TrendsView>()
-                                .AddTransient<ApplicationSettingsView>();
+        return serviceCollection.AddSingleton<MainView>()
+                                .AddSingleton<SettingsView>()
+                                .AddSingleton<DoubloonsView>()
+                                .AddSingleton<EmptyKeywords>()
+                                .AddSingleton<HistoryView>()
+                                .AddSingleton<KeywordsView>()
+                                .AddSingleton<MostUsedView>()
+                                .AddSingleton<PluginsView>()
+                                .AddSingleton<TrendsView>()
+                                .AddSingleton<ApplicationSettingsView>();
+    }
+
+    public static IServiceCollection AddWpfServices(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSingleton<IUiNotificationService, ToastUiNotificationService>()
+                         .AddSingleton<IPageService, PageService>()
+                         .AddSingleton<IContentDialogService, ContentDialogService>()
+                         .AddSingleton<ISnackbarService, SnackbarService>()
+                         .AddSingleton<INotificationService, NotificationService>();
+        
+        return serviceCollection;
     }
 }

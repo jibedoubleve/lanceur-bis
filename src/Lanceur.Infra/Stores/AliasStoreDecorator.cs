@@ -35,13 +35,13 @@ public class AliasStoreDecorator : IStoreService
     public IEnumerable<QueryResult> GetAll() => _aliasStore.GetAll()
                                                            .Cast<AliasQueryResult>()
                                                            .Where(x => x.IsHidden == false)
-                                                           .OrderBy(x=>x.Name).Take(25);
+                                                           .OrderBy(x=>x.Name);
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query) => _aliasStore.Search(query)
                                                                         .Cast<AliasQueryResult>()
                                                                         .Where(x => x.IsHidden == false)
-                                                                        .OrderBy(x=>x.Name).Take(25);
+                                                                        .OrderBy(x=>x.Name);
 
     #endregion
 }
