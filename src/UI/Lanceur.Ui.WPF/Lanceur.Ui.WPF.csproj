@@ -17,6 +17,16 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
+        <Page Update="Views\Controls\ProcessFinderButton.xaml">
+          <Generator>MSBuild:Compile</Generator>
+          <XamlRuntime>Wpf</XamlRuntime>
+          <SubType>Designer</SubType>
+        </Page>
+        <Page Update="Views\Controls\WindowInfoControl.xaml">
+          <Generator>MSBuild:Compile</Generator>
+          <XamlRuntime>Wpf</XamlRuntime>
+          <SubType>Designer</SubType>
+        </Page>
     </ItemGroup>
 
     <ItemGroup>
@@ -47,6 +57,12 @@
         <None Update="Assets\IconWarn.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\Controls\ProcessFinderButton.xaml.cs">
+        <DependentUpon>ProcessFinderButton.xaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

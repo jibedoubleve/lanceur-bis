@@ -45,73 +45,64 @@ public static class ServiceCollectionExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddViewModels(this IServiceCollection serviceCollection)
-    {
-        return serviceCollection.AddTransient<MainViewModel>()
-                                .AddTransient<SettingsViewModel>()
-                                .AddTransient<DoubloonsViewModel>()
-                                .AddTransient<EmptyKeywordsModel>()
-                                .AddTransient<HistoryViewModel>()
-                                .AddTransient<KeywordsViewModel>(
-                                    sp => new(
-                                        new AliasStoreDecorator(new(sp)),
-                                        sp.GetService<IThumbnailManager>()!,
-                                        sp.GetService<ILogger<KeywordsViewModel>>()!
-                                    )
-                                )
-                                .AddTransient<MostUsedViewModel>()
-                                .AddTransient<PluginsViewModel>()
-                                .AddTransient<TrendsViewModel>()
-                                .AddTransient<ApplicationSettingsViewModel>();
-    }
+    public static IServiceCollection AddViewModels(this IServiceCollection serviceCollection) => serviceCollection.AddTransient<MainViewModel>()
+                                                                                                                  .AddTransient<SettingsViewModel>()
+                                                                                                                  .AddTransient<DoubloonsViewModel>()
+                                                                                                                  .AddTransient<EmptyKeywordsModel>()
+                                                                                                                  .AddTransient<HistoryViewModel>()
+                                                                                                                  .AddTransient<KeywordsViewModel>()
+                                                                                                                  .AddTransient<MostUsedViewModel>()
+                                                                                                                  .AddTransient<PluginsViewModel>()
+                                                                                                                  .AddTransient<TrendsViewModel>()
+                                                                                                                  .AddTransient<ApplicationSettingsViewModel>();
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IServiceProvider>(x => x);
-        serviceCollection.AddSingleton<SQLiteUpdater>();
-
-        serviceCollection.AddTransient<IDataStoreVersionManager, SQLiteVersionManager>();
-        serviceCollection.AddTransient<IDataStoreUpdateManager>(
-            sp =>  new SQLiteDatabaseUpdateManager(
-                sp.GetService<IDataStoreVersionManager>(),
-                sp.GetService<IDbConnection>(),
-                ScriptRepository.Asm,
-                ScriptRepository.DbScriptEmbededResourcePattern
-            )
-        );
-        serviceCollection.AddTransient(_ => Assembly.GetExecutingAssembly()); //TODO THIS IS WRONG, remove this line and fix the issue...
-        serviceCollection.AddTransient<IMemoryStorageService, MemoryStorageService>();
-        serviceCollection.AddTransient<IDbRepository, SQLiteRepository>();
-        serviceCollection.AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()));
-        serviceCollection.AddTransient<IDbConnectionManager, DbMultiConnectionManager>();
-        serviceCollection.AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>();
-        serviceCollection.AddTransient<IConnectionString, ConnectionString>();
-        serviceCollection.AddTransient<IConversionService, AutoMapperConverter>();
-        serviceCollection.AddTransient<ISearchService, SearchService>();
-        serviceCollection.AddTransient<IStoreLoader, StoreLoader>();
-        serviceCollection.AddTransient<IMacroManager, MacroManager>(
-            s =>
-                new(
-                    Assembly.GetAssembly(typeof(MultiMacro)),
-                    s.GetService<ILogger<MacroManager>>(),
-                    s.GetService<IDbRepository>(),
-                    s.GetService<IServiceProvider>()
-                )
-        );
-        serviceCollection.AddTransient<ILoggerFactory, LoggerFactory>();
-        serviceCollection.AddTransient<IThumbnailManager, ThumbnailManager>();
-        serviceCollection.AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>();
-        serviceCollection.AddTransient<IThumbnailManager, ThumbnailManager>();
-        serviceCollection.AddTransient<IThumbnailRefresher, ThumbnailRefresher>();
-        serviceCollection.AddTransient<IPackagedAppSearchService, PackagedAppSearchService>();
-        serviceCollection.AddTransient<IFavIconManager, FavIconManager>();
-        serviceCollection.AddTransient<IFavIconDownloader, FavIconDownloader>();
-        serviceCollection.AddTransient<IPluginManager, PluginManager>();
-        serviceCollection.AddTransient<IPluginStoreContext, PluginStoreContext>();
-        serviceCollection.AddTransient<IEverythingApi, EverythingApi>();
-        serviceCollection.AddTransient<IExecutionManager, ExecutionManager>();
-        serviceCollection.AddTransient<IWildcardManager, ReplacementComposite>();
-        serviceCollection.AddTransient<IClipboardService, WindowsClipboardService>();
+        serviceCollection.AddSingleton<IServiceProvider>(x => x)
+                         .AddSingleton<SQLiteUpdater>()
+                         .AddTransient<IDataStoreVersionManager, SQLiteVersionManager>()
+                         .AddTransient<IDataStoreUpdateManager>(
+                             sp =>  new SQLiteDatabaseUpdateManager(
+                                 sp.GetService<IDataStoreVersionManager>(),
+                                 sp.GetService<IDbConnection>(),
+                                 ScriptRepository.Asm,
+                                 ScriptRepository.DbScriptEmbededResourcePattern
+                             )
+                         )
+                         .AddTransient<IAliasManagementService, AliasManagementService>()
+                         .AddTransient(_ => Assembly.GetExecutingAssembly()) //TODO THIS IS WRONG, remove this line and fix the issue..
+                         .AddTransient<IMemoryStorageService, MemoryStorageService>()
+                         .AddTransient<IDbRepository, SQLiteRepository>()
+                         .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))
+                         .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
+                         .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
+                         .AddTransient<IConnectionString, ConnectionString>()
+                         .AddTransient<IConversionService, AutoMapperConverter>()
+                         .AddTransient<ISearchService, SearchService>()
+                         .AddTransient<IStoreLoader, StoreLoader>()
+                         .AddTransient<IMacroManager, MacroManager>(
+                             s =>
+                                 new(
+                                     Assembly.GetAssembly(typeof(MultiMacro)),
+                                     s.GetService<ILogger<MacroManager>>(),
+                                     s.GetService<IDbRepository>(),
+                                     s.GetService<IServiceProvider>()
+                                 )
+                         )
+                         .AddTransient<ILoggerFactory, LoggerFactory>()
+                         .AddTransient<IThumbnailManager, ThumbnailManager>()
+                         .AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
+                         .AddTransient<IThumbnailManager, ThumbnailManager>()
+                         .AddTransient<IThumbnailRefresher, ThumbnailRefresher>()
+                         .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
+                         .AddTransient<IFavIconManager, FavIconManager>()
+                         .AddTransient<IFavIconDownloader, FavIconDownloader>()
+                         .AddTransient<IPluginManager, PluginManager>()
+                         .AddTransient<IPluginStoreContext, PluginStoreContext>()
+                         .AddTransient<IEverythingApi, EverythingApi>()
+                         .AddTransient<IExecutionManager, ExecutionManager>()
+                         .AddTransient<IWildcardManager, ReplacementComposite>()
+                         .AddTransient<IClipboardService, WindowsClipboardService>();
 
         Conditional<Func<ILocalConfigRepository>> localConfigRepository =
             new(() => new MemoryLocalConfigRepository(), () => new JsonLocalConfigRepository());

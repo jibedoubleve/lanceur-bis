@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NHotkey;
 using NHotkey.Wpf;
+using Wpf.Ui;
 using Wpf.Ui.Appearance;
 
 namespace Lanceur.Ui.WPF.Views;

@@ -28,6 +28,7 @@ public partial class App
                                                       services.AddViews()
                                                               .AddViewModels()
                                                               .AddServices()
+                                                              .AddWpfServices()
                                                               .AddMapping()
                                                               .AddConfiguration()
                                                               .AddLoggers();

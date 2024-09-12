@@ -66,7 +66,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
             from
                 data_doubloons_v
             order by file_name";
-        var results = DB.WithinTransaction(tx => tx.Connection.Query<SelectableAliasQueryResult>(sql));
+        var results = DB.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
         return results;
     }
 
@@ -104,7 +104,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                     stat_execution_count_v
                 order
                     by exec_count desc";
-        return DB.WithinTransaction(tx => tx.Connection.Query<DisplayUsageQueryResult>(sql));
+        return DB.WithinTransaction(tx => tx.Connection!.Query<DisplayUsageQueryResult>(sql));
     }
 
     ///<inheritdoc/>
@@ -124,16 +124,18 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     ///<inheritdoc/>
     public void Hydrate(QueryResult queryResult)
     {
-        const string sql = @"
-                select
-	                a.id        as id,
-                    count(a.id) as count
-                from
-	                alias a
-                    inner join alias_name  an on a.id = an.id_alias
-                    inner join alias_usage au on a.id = au.id_alias
-                where an.name = @name
-                group by a.id";
+        const string sql = 
+            """
+            select
+            a.id        as id,
+               count(a.id) as count
+            from
+            	alias a
+                inner join alias_name  an on a.id = an.id_alias
+                inner join alias_usage au on a.id = au.id_alias
+            where an.name = @name
+            group by a.id;
+            """;
 
         var result = DB.WithinTransaction(
             tx => tx.Connection
@@ -153,37 +155,39 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     {
         if (alias is null) return;
 
-        const string sql = @"
-            select
-                id       as id,
-                name     as name,
-                argument as parameter
-            from alias_argument
-            where id_alias = @idAlias";
+        const string sql = """
+                           select
+                               id       as id,
+                               name     as name,
+                               argument as parameter
+                           from alias_argument
+                           where id_alias = @idAlias
+                           """;
         var parameters =
-            DB.WithinTransaction(tx => tx.Connection.Query<QueryResultAdditionalParameters>(sql, new { idAlias = alias.Id }));
+            DB.WithinTransaction(tx => tx.Connection!.Query<QueryResultAdditionalParameters>(sql, new { idAlias = alias.Id }));
         alias.AdditionalParameters = new(parameters);
     }
 
     ///<inheritdoc/>
     public void HydrateMacro(QueryResult alias)
     {
-        const string sql = @$"
-            select
-	            a.id        as {nameof(QueryResult.Id)},
-                count(a.id) as {nameof(QueryResult.Count)}
-            from
-	            alias a
-                inner join alias_usage au on a.id = au.id_alias
-            where
-	            file_name like @name
-            group by
-	            a.id;";
+        const string sql = $"""
+                            select
+                            	a.id        as {nameof(QueryResult.Id)},
+                                count(a.id) as {nameof(QueryResult.Count)}
+                            from
+                            	alias a
+                                inner join alias_usage au on a.id = au.id_alias
+                            where
+                            	file_name like @name
+                            group by
+                            	a.id;
+                            """;
 
         DB.WithinTransaction(
             tx =>
             {
-                var results = tx.Connection.Query<dynamic>(sql, new { name = alias.Name });
+                var results = tx.Connection!.Query<dynamic>(sql, new { name = alias.Name });
 
                 var enumerable = results as dynamic[] ?? results.ToArray();
                 if (enumerable.Length != 1) return;
