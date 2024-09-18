@@ -20,6 +20,7 @@ public partial class KeywordsViewModel : ObservableObject
     private IList<AliasQueryResult> _bufferedAliases = Array.Empty<AliasQueryResult>();
     private readonly ILogger<KeywordsViewModel> _logger;
     private readonly INotificationService _notificationService;
+    private readonly IAliasValidationService _validationService;
     private AliasQueryResult? _selectedAlias;
     private readonly IThumbnailManager _thumbnailManager;
 
@@ -27,14 +28,22 @@ public partial class KeywordsViewModel : ObservableObject
 
     #region Constructors
 
-    public KeywordsViewModel(IAliasManagementService aliasManagementService, IThumbnailManager thumbnailManager, ILogger<KeywordsViewModel> logger, INotificationService notificationService)
+    public KeywordsViewModel(
+        IAliasManagementService aliasManagementService,
+        IThumbnailManager thumbnailManager,
+        ILogger<KeywordsViewModel> logger,
+        INotificationService notificationService,
+        IAliasValidationService validationService
+    )
     {
         ArgumentNullException.ThrowIfNull(aliasManagementService);
         ArgumentNullException.ThrowIfNull(notificationService);
         ArgumentNullException.ThrowIfNull(thumbnailManager);
         ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(validationService);
 
         _notificationService = notificationService;
+        _validationService = validationService;
         _aliasManagementService = aliasManagementService;
         _thumbnailManager = thumbnailManager;
         _logger = logger;
@@ -89,8 +98,9 @@ public partial class KeywordsViewModel : ObservableObject
     private async Task OnLoadAliases()
     {
         if (_bufferedAliases.Count > 0) return;
+
         await Task.Delay(50);
-        
+
         _bufferedAliases = await Task.Run(() => _aliasManagementService.GetAll()!.ToList());
 
         SelectedAlias = _bufferedAliases[0];
@@ -109,6 +119,14 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
     private async Task OnSaveCurrentAliasAsync()
     {
+        var result = _validationService.IsValid(SelectedAlias);
+        if (!result.IsSuccess)
+        {
+            _notificationService.Warn("Validation failed", result.ErrorContent);
+            _logger.LogInformation("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
+            return;
+        }
+
         _logger.LogTrace("Saving alias {AliasName}", SelectedAlias!.Name);
         var alias = SelectedAlias;
         await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));

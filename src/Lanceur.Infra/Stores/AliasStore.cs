@@ -15,7 +15,7 @@ public class AliasStore : IStoreService
 {
     #region Fields
 
-    private readonly IDbRepository _aliasService;
+    private readonly IDbRepository _dbRepository;
     private readonly ILogger<AliasStore> _logger;
 
     #endregion Fields
@@ -24,14 +24,14 @@ public class AliasStore : IStoreService
 
     public AliasStore(IServiceProvider serviceProvider)
     {
-        _aliasService = serviceProvider.GetService<IDbRepository>();
+        _dbRepository = serviceProvider.GetService<IDbRepository>();
         _logger = serviceProvider.GetService<ILogger<AliasStore>>();
     }
 
     [Obsolete("Use ctor with service provider instead")]
-    public AliasStore(IDbRepository aliasService = null, ILoggerFactory loggerFactory = null)
+    public AliasStore(IDbRepository dbRepository = null, ILoggerFactory loggerFactory = null)
     {
-        _aliasService = aliasService ?? Locator.Current.GetService<IDbRepository>();
+        _dbRepository = dbRepository ?? Locator.Current.GetService<IDbRepository>();
 
         loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
         _logger = loggerFactory.GetLogger<AliasStore>();
@@ -45,13 +45,13 @@ public class AliasStore : IStoreService
     public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll() => _aliasService.GetAll();
+    public IEnumerable<QueryResult> GetAll() => _dbRepository.GetAll();
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query)
     {
         using var _ = _logger.MeasureExecutionTime(this);
-        return _aliasService.Search(query.Name);
+        return _dbRepository.Search(query.Name);
     }
 
     #endregion Methods

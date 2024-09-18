@@ -39,6 +39,14 @@ public interface IDbRepository
     /// <returns>The alias to find or null if do not exist</returns>
     AliasQueryResult GetExact(string name);
 
+    /// <summary>
+    ///     Checks which aliases from the provided list exist in the database.
+    /// </summary>
+    /// <param name="names">A list of aliases to check for existence in the database.</param>
+    /// <param name="idAlias">Id of the alias to validate</param>
+    /// <returns>An IEnumerable containing the aliases that exist in both the provided list and the database.</returns>
+    public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
+
     IEnumerable<SelectableAliasQueryResult> GetInvalidAliases();
 
     /// <summary>

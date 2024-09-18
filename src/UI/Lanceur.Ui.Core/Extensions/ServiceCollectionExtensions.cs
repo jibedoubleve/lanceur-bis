@@ -9,6 +9,7 @@ using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Core.Services.Validators;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
@@ -69,6 +70,7 @@ public static class ServiceCollectionExtensions
                                  ScriptRepository.DbScriptEmbededResourcePattern
                              )
                          )
+                         .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()
                          .AddTransient(_ => Assembly.GetExecutingAssembly()) //TODO THIS IS WRONG, remove this line and fix the issue..
                          .AddTransient<IMemoryStorageService, MemoryStorageService>()

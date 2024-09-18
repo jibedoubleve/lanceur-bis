@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Runtime.InteropServices.ComTypes;
+using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -77,6 +78,22 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     /// <param name="name">The alias' exact name to find.</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
     public AliasQueryResult GetExact(string name) => _aliasDbAction.GetExact(name);
+
+    /// <summary>
+    /// Checks which aliases from the provided list exist in the database.
+    /// </summary>
+    /// <param name="aliasesToCheck">A list of aliases to check for existence in the database.</param>
+    /// <returns>An IEnumerable containing the aliases that exist in both the provided list and the database.</returns>
+    public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)
+    {        const string  sql = """
+                       select name
+                       from alias_name
+                       where 
+                           name in @names
+                           and id_alias != @idAlias
+                       """;
+        return DB.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
+    }
 
     public IEnumerable<SelectableAliasQueryResult> GetInvalidAliases()
     {

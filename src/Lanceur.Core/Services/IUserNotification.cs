@@ -1,5 +1,6 @@
 ﻿namespace Lanceur.Core.Services;
 
+[Obsolete($"Use {nameof(IUiNotificationService)} instead")]
 public interface IUserNotification
 {
     #region Methods

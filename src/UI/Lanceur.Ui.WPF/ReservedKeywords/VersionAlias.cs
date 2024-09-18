@@ -1,18 +1,22 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
-using System.Windows;
 using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.Core.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Ui.WPF.ReservedKeywords;
 
-[ReservedAlias("version"), Description("Indicates the version of the application")]
+[ReservedAlias("version")]
+[Description("Indicates the version of the application")]
 public class VersionAlias : SelfExecutableQueryResult
 {
+    private readonly IUiUserInteractionService _interaction;
+
     #region Constructors
 
-    public VersionAlias(IServiceProvider serviceProvider) { }
+    public VersionAlias(IServiceProvider serviceProvider) => _interaction = serviceProvider.GetService<IUiUserInteractionService>()!;
 
     #endregion
 
@@ -31,13 +35,8 @@ public class VersionAlias : SelfExecutableQueryResult
         var semverSplit = semver?.Split(["+"], StringSplitOptions.RemoveEmptyEntries);
         semver = semverSplit?.Length > 0 ? semverSplit[0] : semver;
 
-        var messageBox = new Wpf.Ui.Controls.MessageBox
-        {
-            Title = $"Lanceur {semver}",
-            Content = "Written by Jean-Baptiste Wautier",
-        };
-        await messageBox.ShowDialogAsync();
-        
+        await _interaction.ShowAsync($"Lanceur {semver}", "Written by Jean-Baptiste Wautier");
+            
         return await NoResultAsync;
     }
 

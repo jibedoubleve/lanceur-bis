@@ -14,4 +14,5 @@
     <conv:StringToRunAsConverter x:Key="StringToRunAsConverter" />
     <conv:StringToStartModeConverter x:Key="StringToStartModeConverter" />
     <conv:NumberToBooleanConverter x:Key="NumberToBooleanConverter" />
+    <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
 </ResourceDictionary>
