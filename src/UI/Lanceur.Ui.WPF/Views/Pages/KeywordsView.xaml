@@ -41,7 +41,8 @@
                 IconPlacement="Right">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="TextChanged">
-                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=TbSearch, Path=Text}" />
+                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}"
+                                                           CommandParameter="{Binding ElementName=TbSearch, Path=Text}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ui:TextBox>
@@ -91,15 +92,23 @@
                         <ui:CardControl.Header>
                             <ui:TextBlock FontTypography="Body" Text="Alias name" />
                         </ui:CardControl.Header>
-                        <ui:TextBox PlaceholderText="Names are separated by commas...">
-                            <ui:TextBox.Text>
-                                <Binding Path="SelectedAlias.Synonyms" UpdateSourceTrigger="PropertyChanged">
-                                    <Binding.ValidationRules>
-                                        <v:NotEmptyRule />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </ui:TextBox.Text>
-                        </ui:TextBox>
+                        <StackPanel>
+                            <ui:TextBox PlaceholderText="Names are separated by commas..." x:Name="TbName">
+                                <TextBox.Resources>
+                                </TextBox.Resources>
+                                <ui:TextBox.Text>
+                                    <Binding Path="SelectedAlias.Synonyms" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <v:AliasNameRule ValidatesOnTargetUpdated="True" />
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </ui:TextBox.Text>
+                            </ui:TextBox>
+                            <Label
+                                Content="{Binding ElementName=TbName, Path=(Validation.Errors)/ErrorContent}"
+                                FontSize="10"
+                                Foreground="Red" />
+                        </StackPanel>
                     </ui:CardControl>
                     <!--  PROCESS  -->
                     <ui:CardExpander
@@ -112,10 +121,6 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
                                 <ui:TextBlock
                                     Grid.Row="0"
                                     Grid.Column="0"
@@ -126,27 +131,36 @@
                         <StackPanel>
                             <!--  FILE NAME  -->
                             <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Label Margin="0,0,3,0" Target="{Binding ElementName=TbFilename}">File name</Label>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Label Margin="6,0,6,3" Target="{Binding ElementName=TbFilename}">File name</Label>
                                 <ui:TextBox
                                     x:Name="TbFilename"
+                                    Grid.Column="0"
                                     Grid.Row="1"
+                                    VerticalAlignment="Center"
                                     PlaceholderText="Use the crosshair to determine the process path...">
                                     <ui:TextBox.Text>
                                         <Binding Path="SelectedAlias.FileName" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <v:NotEmptyRule />
+                                                <v:AliasFileNameRule ValidatesOnTargetUpdated="True" />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </ui:TextBox.Text>
                                 </ui:TextBox>
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Content="{Binding ElementName=TbFilename, Path=(Validation.Errors)/ErrorContent}"
+                                    FontSize="10"
+                                    Foreground="Red" />
                                 <controls:ProcessFinderButton
                                     Grid.Row="1"
                                     Grid.Column="1"
@@ -177,7 +191,8 @@
                             <ui:TextBlock FontTypography="Body" Text="Run as" />
                         </ui:CardControl.Header>
                         <StackPanel>
-                            <ComboBox SelectedIndex="1" SelectedItem="{Binding SelectedAlias.RunAs, Converter={StaticResource StringToRunAsConverter}}">
+                            <ComboBox SelectedIndex="1"
+                                      SelectedItem="{Binding SelectedAlias.RunAs, Converter={StaticResource StringToRunAsConverter}}">
                                 <ComboBox.Items>
                                     <sys:String>Admin</sys:String>
                                     <sys:String>CurrentUser</sys:String>
@@ -213,8 +228,8 @@
                         <StackPanel>
                             <ui:ToggleSwitch
                                 IsChecked="{Binding SelectedAlias.IsExecutionConfirmationRequired}"
-                                OffContent="Ask confirmation before executing"
-                                OnContent="Execute without confirmation" />
+                                OffContent="Execute without confirmation"
+                                OnContent="Ask confirmation before executing" />
                         </StackPanel>
                     </ui:CardControl>
                     <!--  LUA SCRIPT  -->

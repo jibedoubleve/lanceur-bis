@@ -30,18 +30,36 @@ public partial class SettingsView
         contentDialogService.SetDialogHost(ContentPresenterForDialogs);
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         
-        WeakReferenceMessenger.Default.Register<SettingsView, SuccessMessage>(this, (_, m) => NotifySuccess(m));
+        WeakReferenceMessenger.Default.Register<SettingsView, NotificationMessage>(this, (_, m) => Notify(m));
     }
 
-    private void NotifySuccess(SuccessMessage message)
+    private void Notify(NotificationMessage message)
     {
         _snackbarService.Show(
-            message.Value.Item1,
             message.Value.Item2,
-            ControlAppearance.Success,
-            new SymbolIcon(SymbolRegular.Checkmark24),
-            4.Seconds());
+            message.Value.Item3,
+            MapAppearance(message.Value.Item1),
+            MapIcon(message.Value.Item1),
+            5.Seconds());
     }
+
+    private IconElement MapIcon(MessageLevel level)
+    {
+        var icon = level switch
+        {
+            MessageLevel.Success => SymbolRegular.Checkmark24,
+            MessageLevel.Warning => SymbolRegular.Warning24,
+            _ => throw new ArgumentOutOfRangeException(nameof(level), level, null)
+        };
+        return new SymbolIcon(icon);
+    }
+
+    private ControlAppearance MapAppearance(MessageLevel level) => level switch
+    {
+        MessageLevel.Success => ControlAppearance.Success,
+        MessageLevel.Warning => ControlAppearance.Caution,
+        _                    => throw new ArgumentOutOfRangeException(nameof(level), level, null),
+    };
 
     #endregion
 

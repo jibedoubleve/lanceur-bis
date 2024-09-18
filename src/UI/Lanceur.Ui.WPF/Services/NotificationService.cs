@@ -6,5 +6,6 @@ namespace Lanceur.Ui.WPF.Services;
 
 public class NotificationService : INotificationService
 {
-    public void Success(string title, string message) => WeakReferenceMessenger.Default.Send(new SuccessMessage((title, message)));
+    public void Success(string title, string message) => WeakReferenceMessenger.Default.Send(new NotificationMessage((MessageLevel.Success, title, message)));
+    public void Warn(string title, string message) => WeakReferenceMessenger.Default.Send(new NotificationMessage((MessageLevel.Warning, title, message)));
 }

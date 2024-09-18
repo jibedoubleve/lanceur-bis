@@ -20,4 +20,9 @@ public class AskDeleteAlias(string aliasName) : AsyncRequestMessage<bool>
 /*
  * SNACKBARS
  */
-public class SuccessMessage((string Title, string Message) value) : ValueChangedMessage<(string, string)>(value);
+public enum MessageLevel
+{
+    Success,
+    Warning
+}
+public class NotificationMessage((MessageLevel level , string Title, string Message) value) : ValueChangedMessage<(MessageLevel, string, string)>(value);

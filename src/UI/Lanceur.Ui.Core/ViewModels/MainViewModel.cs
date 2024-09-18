@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -18,6 +19,7 @@ public partial class MainViewModel : ObservableObject
 
     private readonly bool _doesReturnAllIfEmpty;
     private readonly IExecutionManager _executionManager;
+    private readonly IUiUserInteractionService _userInteractionService;
 
     private Cmdline _lastCriterion = Cmdline.Empty;
     private readonly ILogger<MainViewModel> _logger;
@@ -32,7 +34,13 @@ public partial class MainViewModel : ObservableObject
     #region Constructors
 
     /// <inheritdoc />
-    public MainViewModel(ILogger<MainViewModel> logger, ISearchService searchService, ISettingsFacade settingsFacade, IExecutionManager executionManager)
+    public MainViewModel(
+        ILogger<MainViewModel> logger,
+        ISearchService searchService,
+        ISettingsFacade settingsFacade,
+        IExecutionManager executionManager,
+        IUiUserInteractionService userInteractionService
+    )
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(searchService);
@@ -41,6 +49,7 @@ public partial class MainViewModel : ObservableObject
 
         _searchService = searchService;
         _executionManager = executionManager;
+        _userInteractionService = userInteractionService;
         _doesReturnAllIfEmpty = settingsFacade.Application.Window.ShowResult;
         _logger = logger;
     }
@@ -54,6 +63,14 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task Execute(bool runAsAdmin)
     {
+        if (SelectedResult is null) return;
+
+        if(SelectedResult.IsExecutionConfirmationRequired)
+        {
+            var result = await _userInteractionService.AskAsync("Execute", $"Do you want to execute alias '{SelectedResult.Name}'?");
+            if (!result) return;
+        } 
+        
         _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
         var response = await _executionManager.ExecuteAsync(
             new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
@@ -81,7 +98,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         var currentIndex = Results.IndexOf(SelectedResult);
-        var index  = direction switch
+        var index = direction switch
         {
             Direction.Up       => Results.GetPreviousIndex(currentIndex),
             Direction.Down     => Results.GetNextIndex(currentIndex),

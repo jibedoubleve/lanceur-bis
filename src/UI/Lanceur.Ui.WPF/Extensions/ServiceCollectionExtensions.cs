@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton<IUiNotificationService, ToastUiNotificationService>()
                          .AddSingleton<IPageService, PageService>()
                          .AddSingleton<IContentDialogService, ContentDialogService>()
+                         .AddSingleton<IUiUserInteractionService, UserInteractionService>()
                          .AddSingleton<ISnackbarService, SnackbarService>()
                          .AddSingleton<INotificationService, NotificationService>();
         
