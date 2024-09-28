@@ -51,11 +51,12 @@ public static class ServiceCollectionExtensions
                                                                                                                   .AddTransient<DoubloonsViewModel>()
                                                                                                                   .AddTransient<EmptyKeywordsModel>()
                                                                                                                   .AddTransient<HistoryViewModel>()
-                                                                                                                  .AddTransient<KeywordsViewModel>()
                                                                                                                   .AddTransient<MostUsedViewModel>()
                                                                                                                   .AddTransient<PluginsViewModel>()
                                                                                                                   .AddTransient<TrendsViewModel>()
-                                                                                                                  .AddTransient<ApplicationSettingsViewModel>();
+                                                                                                                  .AddTransient<CodeEditorViewModel>()
+                                                                                                                  .AddTransient<ApplicationSettingsViewModel>()
+                                                                                                                  .AddSingleton<KeywordsViewModel>();
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {

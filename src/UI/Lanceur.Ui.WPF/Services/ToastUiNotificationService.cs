@@ -18,7 +18,7 @@ public class ToastUiNotificationService : IUiNotificationService
 
     #region Methods
 
-    private static void Show(Level level, string message, [CallerMemberName] string title = null)
+    private static void Show(Level level, string message, [CallerMemberName] string? title = null)
     {
         var uri = level switch
         {

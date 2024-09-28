@@ -28,7 +28,7 @@ public partial class MainView
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -37,11 +37,11 @@ public partial class MainView
         ArgumentNullException.ThrowIfNull(appConfigRepository);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewModel);
-        
+
         _appConfig = appConfigRepository;
         _logger = logger;
         _serviceProvider = serviceProvider;
-        
+
         DataContext = viewModel;
 
         InitializeComponent();
@@ -59,7 +59,7 @@ public partial class MainView
         messenger.Register<SetQueryMessage>(this, (_, m) => SetQuery(m.Value));
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -68,6 +68,10 @@ public partial class MainView
         QueryTextBox.SelectAll();
         Hide();
     }
+
+    private void OnClickDarkTheme(object sender, RoutedEventArgs e) => ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+
+    private void OnClickLightTheme(object sender, RoutedEventArgs e) => ApplicationThemeManager.Apply(ApplicationTheme.Light);
 
     private void OnLoaded(object _, RoutedEventArgs e)
     {
@@ -132,7 +136,7 @@ public partial class MainView
             case "showquery":
                 ShowWindow();
                 break;
-            
+
             case "settings":
                 var view = _serviceProvider.GetService<SettingsView>()!;
                 view.Show();
@@ -149,18 +153,6 @@ public partial class MainView
     {
         ShowWindow();
         if (e is not null) e.Handled = true;
-    }
-
-    private void OnToggleSwitchClick(object sender, RoutedEventArgs e)
-    {
-        if (ToggleTheme.IsChecked ?? false)
-        {
-            ApplicationThemeManager.Apply(ApplicationTheme.Light);
-        }
-        else
-        {
-            ApplicationThemeManager.Apply(ApplicationTheme.Dark);
-        }
     }
 
     private void SetGlobalShortcut(Key key, ModifierKeys modifier)
@@ -209,5 +201,5 @@ public partial class MainView
         Focus();
     }
 
-    #endregion Methods
+    #endregion
 }

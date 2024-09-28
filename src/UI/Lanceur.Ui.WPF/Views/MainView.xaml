@@ -75,14 +75,6 @@
                         FontSize="24"
                         Text="{Binding Suggestion}" />
                 </Grid>
-                <!--  THEME BOX  -->
-                <ui:ToggleSwitch
-                    x:Name="ToggleTheme"
-                    Margin="15,5,5,5"
-                    Click="OnToggleSwitchClick"
-                    OffContent="Dark"
-                    OnContent="Light"
-                    Visibility="{Binding ElementName=ToggleTheme, Path=Visibility, Converter={StaticResource DebugToVisibility}}" />
             </StackPanel>
 
             <!--  RESULT BOX  -->
@@ -98,16 +90,19 @@
                 SelectionChanged="OnSelectorSelectionChanged">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}" />
+                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
+                                                           CommandParameter="{StaticResource False}" />
                     </interactivity:EventTrigger>
                     <interactivity:EventTrigger EventName="MouseLeftButtonUp">
-                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}" />
+                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
+                                                           CommandParameter="{StaticResource False}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ui:ListView>
 
             <!--  STATUS BAR  -->
-            <Separator Grid.Row="2" Margin="5,6,5,2" />
+            <Separator Grid.Row="2" Margin="5,6,5,2"
+                       Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}" />
             <StackPanel
                 Grid.Row="3"
                 HorizontalAlignment="Right"
@@ -131,6 +126,10 @@
             <tray:NotifyIcon.Menu>
                 <ContextMenu>
                     <ContextMenu.Items>
+                        <MenuItem Header="Theme">
+                            <MenuItem Header="Light Theme" Click="OnClickLightTheme" />
+                            <MenuItem Header="Dark Theme" Click="OnClickDarkTheme" />
+                        </MenuItem>
                         <MenuItem
                             Click="OnSettingsClick"
                             Header="Show..."
@@ -139,6 +138,7 @@
                             Click="OnSettingsClick"
                             Header="Settings..."
                             Tag="settings" />
+                        <Separator />
                         <MenuItem
                             Click="OnSettingsClick"
                             Header="Quit"

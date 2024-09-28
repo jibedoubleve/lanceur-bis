@@ -71,8 +71,15 @@ public partial class KeywordsViewModel : ObservableObject
     private bool CanExecuteCurrentAlias() => SelectedAlias != null;
 
     [RelayCommand]
-    private void CreateAlias()
+    private void OnCreateAlias()
     {
+        if (Aliases.Any(x => x.Id == 0))
+        {
+            SelectedAlias = Aliases.Single(x => x.Id == 0);
+            _logger.LogTrace("Reselect alias to be created.");
+            return;
+        }
+
         _logger.LogTrace("Creating new alias");
         Aliases.Insert(0, AliasQueryResult.EmptyForCreation);
         SelectedAlias = Aliases[0];
@@ -82,15 +89,21 @@ public partial class KeywordsViewModel : ObservableObject
     private async Task OnDeleteCurrentAliasAsync()
     {
         var aliasName = SelectedAlias!.Name;
+        if (SelectedAlias.Id == 0)
+        {
+            Aliases.Remove(SelectedAlias);
+            _notificationService.Success("Cancel creation.", $"Abort creation of alias {aliasName}.");
+            return;
+        }
+
         _logger.LogTrace("Deleting alias {AliasName}", aliasName);
         var response = await WeakReferenceMessenger.Default.Send<AskDeleteAlias>(new(SelectedAlias.Name));
 
         if (!response) return;
 
-        await Task.Run(() =>   _aliasManagementService.Delete(SelectedAlias));
+        await Task.Run(() => _aliasManagementService.Delete(SelectedAlias));
         var toDelete = Aliases.Where(x => x.Id == SelectedAlias.Id).ToArray();
         foreach (var item in toDelete) Aliases.Remove(item);
-
         _notificationService.Success("Item deleted.", $"Alias {aliasName} deleted.");
     }
 

@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Windows;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
@@ -31,15 +30,18 @@ public partial class SettingsView
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         
         WeakReferenceMessenger.Default.Register<SettingsView, NotificationMessage>(this, (_, m) => Notify(m));
+        WeakReferenceMessenger.Default.Register<SettingsView, NavigationMessage>(this, (_, m) => NavigateTo(m));
     }
+
+    private void NavigateTo(NavigationMessage message) => PageNavigationView.Navigate(message.Value);
 
     private void Notify(NotificationMessage message)
     {
         _snackbarService.Show(
-            message.Value.Item2,
-            message.Value.Item3,
-            MapAppearance(message.Value.Item1),
-            MapIcon(message.Value.Item1),
+            message.Value.Title,
+            message.Value.Message,
+            MapAppearance(message.Value.Level),
+            MapIcon(message.Value.Level),
             5.Seconds());
     }
 
@@ -65,7 +67,7 @@ public partial class SettingsView
 
     #region Methods
 
-    public void Navigate<T>() where T : Page => PageNavigationView.Navigate(typeof(KeywordsView));
+    public void Navigate<T>() where T : Page => PageNavigationView.Navigate(typeof(T));
 
     #endregion
 

@@ -1,4 +1,5 @@
 using System.Windows;
+using Microsoft.Extensions.Logging;
 using Wpf.Ui;
 
 namespace Lanceur.Ui.WPF.Services;
@@ -11,12 +12,15 @@ public class PageService : IPageService
     /// </summary>
     private readonly IServiceProvider _serviceProvider;
 
+    private readonly ILogger<PageService> _logger;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PageService"/> class and attaches the <see cref="IServiceProvider"/>.
     /// </summary>
-    public PageService(IServiceProvider serviceProvider)
+    public PageService(IServiceProvider serviceProvider, ILogger<PageService> logger)
     {
         _serviceProvider = serviceProvider;
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -39,6 +43,7 @@ public class PageService : IPageService
             throw new InvalidOperationException("The page should be a WPF control.");
         }
 
+        _logger.LogTrace("Get page {Page}", pageType.Name);
         return _serviceProvider.GetService(pageType) as FrameworkElement;
     }
 }

@@ -15,12 +15,13 @@ public static class ServiceCollectionExtensions
         return serviceCollection.AddSingleton<MainView>()
                                 .AddSingleton<SettingsView>()
                                 .AddSingleton<DoubloonsView>()
-                                .AddSingleton<EmptyKeywords>()
+                                .AddSingleton<EmptyKeywordsView>()
                                 .AddSingleton<HistoryView>()
                                 .AddSingleton<KeywordsView>()
                                 .AddSingleton<MostUsedView>()
                                 .AddSingleton<PluginsView>()
                                 .AddSingleton<TrendsView>()
+                                .AddSingleton<CodeEditorView>()
                                 .AddSingleton<ApplicationSettingsView>();
     }
 

@@ -49,7 +49,7 @@ public class CentreAlias : SelfExecutableQueryResult
         );
     }
 
-    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         var coordinate = Application.Current.MainWindow!.GetCenterCoordinate();
         _logger!.LogInformation(
