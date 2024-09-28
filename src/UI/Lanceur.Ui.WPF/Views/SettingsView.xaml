@@ -43,7 +43,7 @@
                 <ui:NavigationViewItem
                     Content="Empty Keywords"
                     Icon="{ui:SymbolIcon PaintBrush24}"
-                    TargetPageType="{x:Type pages:EmptyKeywords}" />
+                    TargetPageType="{x:Type pages:EmptyKeywordsView}" />
                 <ui:NavigationViewItem
                     Content="History"
                     Icon="{ui:SymbolIcon History24}"

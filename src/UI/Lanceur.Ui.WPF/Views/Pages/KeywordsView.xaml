@@ -15,9 +15,6 @@
     d:DesignWidth="800"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
-    <Page.Resources>
-        <ResourceDictionary />
-    </Page.Resources>
     <interactivity:Interaction.Triggers>
         <interactivity:EventTrigger EventName="Loaded">
             <interactivity:InvokeCommandAction Command="{Binding LoadAliasesCommand}" />
@@ -41,8 +38,7 @@
                 IconPlacement="Right">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="TextChanged">
-                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}"
-                                                           CommandParameter="{Binding ElementName=TbSearch, Path=Text}" />
+                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=TbSearch, Path=Text}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ui:TextBox>
@@ -93,9 +89,8 @@
                             <ui:TextBlock FontTypography="Body" Text="Alias name" />
                         </ui:CardControl.Header>
                         <StackPanel>
-                            <ui:TextBox PlaceholderText="Names are separated by commas..." x:Name="TbName">
-                                <TextBox.Resources>
-                                </TextBox.Resources>
+                            <ui:TextBox x:Name="TbName" PlaceholderText="Names are separated by commas...">
+                                <TextBox.Resources />
                                 <ui:TextBox.Text>
                                     <Binding Path="SelectedAlias.Synonyms" UpdateSourceTrigger="PropertyChanged">
                                         <Binding.ValidationRules>
@@ -143,8 +138,8 @@
                                 <Label Margin="6,0,6,3" Target="{Binding ElementName=TbFilename}">File name</Label>
                                 <ui:TextBox
                                     x:Name="TbFilename"
-                                    Grid.Column="0"
                                     Grid.Row="1"
+                                    Grid.Column="0"
                                     VerticalAlignment="Center"
                                     PlaceholderText="Use the crosshair to determine the process path...">
                                     <ui:TextBox.Text>
@@ -191,8 +186,7 @@
                             <ui:TextBlock FontTypography="Body" Text="Run as" />
                         </ui:CardControl.Header>
                         <StackPanel>
-                            <ComboBox SelectedIndex="1"
-                                      SelectedItem="{Binding SelectedAlias.RunAs, Converter={StaticResource StringToRunAsConverter}}">
+                            <ComboBox SelectedIndex="1" SelectedItem="{Binding SelectedAlias.RunAs, Converter={StaticResource StringToRunAsConverter}}">
                                 <ComboBox.Items>
                                     <sys:String>Admin</sys:String>
                                     <sys:String>CurrentUser</sys:String>
@@ -238,7 +232,9 @@
                             <ui:TextBlock FontTypography="Body" Text="Lua scipt" />
                         </ui:CardControl.Header>
                         <StackPanel>
-                            <ui:Button>Open editor</ui:Button>
+                            <ui:Button Click="OnClickCodeEditor">
+                                Open editor
+                            </ui:Button>
                         </StackPanel>
                     </ui:CardControl>
                     <!--  ADDITIONNAL ARGUMENTS  -->

@@ -1,4 +1,4 @@
-﻿namespace Lanceur.Core.LuaScripting;
+namespace Lanceur.Core.LuaScripting;
 
 public class ScriptResult : Script
 {
@@ -10,8 +10,10 @@ public class ScriptResult : Script
 
     #region Methods
 
-    public override string ToString() => $"File Name  : {Context.FileName}" +
-                                         $"\nParameters : {Context.Parameters}";
+    public override string ToString() => $"""
+                                         File Name  : {Context.FileName}
+                                         Parameters : {Context.Parameters}
+                                         """;
 
     #endregion Methods
 }

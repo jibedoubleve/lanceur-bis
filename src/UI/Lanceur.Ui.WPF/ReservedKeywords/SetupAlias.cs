@@ -27,7 +27,7 @@ public class SetupAlias : SelfExecutableQueryResult
 
     #region Methods
 
-    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         var view = _serviceProvider.GetService<SettingsView>()!;
         view.Show();

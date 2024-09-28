@@ -20,9 +20,11 @@ public class AskDeleteAlias(string aliasName) : AsyncRequestMessage<bool>
 /*
  * SNACKBARS
  */
-public enum MessageLevel
-{
-    Success,
-    Warning
-}
-public class NotificationMessage((MessageLevel level , string Title, string Message) value) : ValueChangedMessage<(MessageLevel, string, string)>(value);
+public enum MessageLevel { Success, Warning }
+
+public class NotificationMessage((MessageLevel Level, string Title, string Message) value) : ValueChangedMessage<(MessageLevel Level, string Title, string Message)>(value);
+
+/*
+ * NAVIGATION
+ */
+public class NavigationMessage(Type value) : ValueChangedMessage<Type>(value);
