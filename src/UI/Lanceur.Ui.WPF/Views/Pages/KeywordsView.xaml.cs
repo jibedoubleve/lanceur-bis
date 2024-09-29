@@ -28,7 +28,7 @@ public partial class KeywordsView : IDisposable
         _contentDialogService = contentDialogService;
         _codeEditorView = codeEditorView;
         DataContext = ViewModel = viewModel;
-        WeakReferenceMessenger.Default.Register<KeywordsView, AskDeleteAlias>(this, (_, m) => m.Reply(HandleMessageBoxAsync(m)));
+        WeakReferenceMessenger.Default.Register<KeywordsView, Ask>(this, (_, m) => m.Reply(HandleMessageBoxAsync(m)));
         InitializeComponent();
     }
 
@@ -42,10 +42,10 @@ public partial class KeywordsView : IDisposable
 
     #region Methods
 
-    private async Task<bool> HandleMessageBoxAsync(AskDeleteAlias request)
+    private async Task<bool> HandleMessageBoxAsync(Ask ask)
     {
         var result = await _contentDialogService.ShowSimpleDialogAsync(
-            new() { Title = "DELETE", Content = $"Do you want to delete the alias '{request.AliasName}'?", PrimaryButtonText = "Delete", CloseButtonText = "Cancel" }
+            new() { Title = ask.Title, Content = ask.Question, PrimaryButtonText = ask.YesText, CloseButtonText = ask.NoText }
         );
         return result == ContentDialogResult.Primary;
     }

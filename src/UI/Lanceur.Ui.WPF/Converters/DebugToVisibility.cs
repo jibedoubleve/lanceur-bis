@@ -9,7 +9,7 @@ namespace Lanceur.Ui.WPF.Converters
     {
         #region Fields
 
-        private Conditional<Visibility> _conditional = new Conditional<Visibility>(Visibility.Visible, Visibility.Collapsed);
+        private Conditional<Visibility> _conditional = new(Visibility.Visible, Visibility.Collapsed);
 
         #endregion Fields
 
