@@ -74,10 +74,8 @@ public partial class MainView
     private void OnClickLightTheme(object sender, RoutedEventArgs e) => ApplicationThemeManager.Apply(ApplicationTheme.Light);
 
     private void OnLoaded(object _, RoutedEventArgs e)
-    {
-        //TODO Handle this automatic Theme
+    {        
         SystemThemeWatcher.Watch(this);
-        // ApplicationThemeManager.Apply(ApplicationTheme.Light);
 
         var hk = _appConfig!.Current.HotKey;
         SetGlobalShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);

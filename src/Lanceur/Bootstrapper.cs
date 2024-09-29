@@ -57,7 +57,7 @@ public class Bootstrapper
     #region Fields
 
     private static readonly Conditional<Func<ILocalConfigRepository>> LocalConfigRepository =
-        new(() => new MemoryLocalConfigRepository(), () => new JsonLocalConfigRepository());
+        new(() => new MemoryLocalConfigRepository(null), () => new JsonLocalConfigRepository());
 
     private static ServiceProvider _serviceProvider;
 

@@ -4,8 +4,6 @@ public class HotKeySection
 {
     #region Constructors
 
-    private HotKeySection() { }
-
     public HotKeySection(int modifier, int key)
     {
         Key = key;

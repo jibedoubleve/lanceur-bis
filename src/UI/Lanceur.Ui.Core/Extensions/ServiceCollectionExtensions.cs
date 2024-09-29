@@ -9,7 +9,6 @@ using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Validators;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
@@ -107,9 +106,11 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWildcardManager, ReplacementComposite>()
                          .AddTransient<IClipboardService, WindowsClipboardService>();
 
-        Conditional<Func<ILocalConfigRepository>> localConfigRepository =
-            new(() => new MemoryLocalConfigRepository(), () => new JsonLocalConfigRepository());
-        serviceCollection.AddSingleton(localConfigRepository.Value?.Invoke() ?? throw new ArgumentNullException(nameof(localConfigRepository)));
+        ConditionalExecution.Set(
+            serviceCollection,
+            s => s.AddSingleton<ILocalConfigRepository, MemoryLocalConfigRepository>(),
+            s => s.AddSingleton<ILocalConfigRepository, JsonLocalConfigRepository>()
+        );
 
         return serviceCollection;
     }
@@ -142,6 +143,7 @@ public static class ServiceCollectionExtensions
     {
         var conditional = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
         var levelSwitch = new LoggingLevelSwitch(conditional);
+        
         serviceCollection.AddSingleton(levelSwitch);
 
         Log.Logger = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch)

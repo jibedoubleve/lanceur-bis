@@ -1,13 +1,12 @@
 using System.Diagnostics;
-using System.Xml.Serialization;
 
 namespace Lanceur.SharedKernel.Utils;
 
 /// <summary>
-/// Gets a value based on the compilation symbol.
+///     Gets a value based on the compilation symbol.
 /// </summary>
 /// <returns>
-/// Returns a different value depending on whether the DEBUG symbol is defined.
+///     Returns a different value depending on whether the DEBUG symbol is defined.
 /// </returns>
 /// <typeparam name="T">The type of the value to return</typeparam>
 public class Conditional<T>
@@ -16,12 +15,12 @@ public class Conditional<T>
 
     private readonly T _value;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     /// <summary>
-    /// Create an instance of this object
+    ///     Create an instance of this object
     /// </summary>
     /// <param name="onDebug">If <c>DEBUG</c> constant is defined then return this value</param>
     /// <param name="onRelease">Otherwise return this value.</param>
@@ -34,13 +33,13 @@ public class Conditional<T>
         GetConditional(ref _value, onDebug);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     public T Value => _value;
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -54,5 +53,5 @@ public class Conditional<T>
 
     public static implicit operator T(Conditional<T> src) => src.Value;
 
-    #endregion Methods
+    #endregion
 }

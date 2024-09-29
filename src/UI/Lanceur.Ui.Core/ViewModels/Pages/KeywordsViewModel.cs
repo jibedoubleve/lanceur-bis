@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Services;
 using Microsoft.Extensions.Logging;
@@ -97,7 +98,7 @@ public partial class KeywordsViewModel : ObservableObject
         }
 
         _logger.LogTrace("Deleting alias {AliasName}", aliasName);
-        var response = await WeakReferenceMessenger.Default.Send<AskDeleteAlias>(new(SelectedAlias.Name));
+        var response = await WeakReferenceMessenger.Default.Send<Ask>(new("Do you want to delete '{0}'?".Format(SelectedAlias.Name)));
 
         if (!response) return;
 
