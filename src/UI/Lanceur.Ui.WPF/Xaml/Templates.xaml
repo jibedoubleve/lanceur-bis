@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:vm="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core">
-    <!--  TEMPATES  -->
+    <!--  TEMPLATES  -->
     <DataTemplate x:Key="QueryResultTemplate" DataType="{x:Type vm:QueryResult}">
         <Border HorizontalAlignment="Stretch" Background="Transparent">
             <DockPanel>
