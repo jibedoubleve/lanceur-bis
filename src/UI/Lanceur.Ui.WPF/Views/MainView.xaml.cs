@@ -9,6 +9,7 @@ using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.Views.Pages;
+using Lanceur.Ui.WPF.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NHotkey;
@@ -187,6 +188,7 @@ public partial class MainView
 
     private void ShowWindow()
     {
+        WindowBlurHelper.EnableBlur(this);
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();
 

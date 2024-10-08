@@ -1,4 +1,4 @@
-<ui:FluentWindow
+<Window
     x:Class="Lanceur.Ui.WPF.Views.MainView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -11,8 +11,10 @@
     Width="720"
     MinHeight="0"
     AllowDrop="True"
+    AllowsTransparency="True"
     Background="Transparent"
-    BorderThickness="0.55"
+    BorderBrush="{DynamicResource AccentTextFillColorTertiaryBrush}"
+    BorderThickness=".25"
     FocusManager.FocusedElement="{Binding ElementName=QueryTextBox}"
     Loaded="OnLoaded"
     LostKeyboardFocus="OnLostKeyboardFocus"
@@ -23,8 +25,23 @@
     ShowInTaskbar="False"
     SizeToContent="Height"
     Topmost="True"
+    WindowStyle="None"
     mc:Ignorable="d">
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{DynamicResource ApplicationBackgroundBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="Margin" Value="8" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="BorderThickness" Value=".3" />
+            <Setter Property="CaretBrush" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        </Style>
+    </Window.Resources>
     <Grid>
+        <!--<Grid Background="{DynamicResource ApplicationBackgroundBrush}" Opacity="0.01"/>-->
+        <Grid Background="{DynamicResource ApplicationBackgroundBrush}" Opacity=".01" />
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -34,18 +51,16 @@
             </Grid.RowDefinitions>
 
             <!--  THEME & QUERY BOXES  -->
-            <StackPanel>
+            <StackPanel Opacity="1">
                 <Grid>
                     <!--  QUERY BOX  -->
-                    <ui:TextBox
+                    <TextBox
                         x:Name="QueryTextBox"
-                        Margin="15"
                         Panel.ZIndex="2"
-                        FontSize="24"
+                        Background="Transparent"
                         KeyDown="OnPreviewKeyDown"
-                        Opacity=".7"
                         Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}">
-                        <ui:TextBox.InputBindings>
+                        <TextBox.InputBindings>
                             <KeyBinding
                                 Key="Enter"
                                 Command="{Binding ExecuteCommand}"
@@ -56,7 +71,7 @@
                                 CommandParameter="{StaticResource True}"
                                 Modifiers="Control" />
                             <KeyBinding Key="Tab" Command="{Binding SetQueryCommand}" />
-                        </ui:TextBox.InputBindings>
+                        </TextBox.InputBindings>
                         <interactivity:Interaction.Triggers>
                             <interactivity:EventTrigger EventName="TextChanged">
                                 <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" />
@@ -68,11 +83,10 @@
                                     PassEventArgsToCommand="True" />
                             </interactivity:EventTrigger>
                         </interactivity:Interaction.Triggers>
-                    </ui:TextBox>
-
-                    <ui:TextBlock
-                        Margin="28,24,27,27"
-                        FontSize="24"
+                    </TextBox>
+                    <TextBox
+                        Panel.ZIndex="0"
+                        IsEnabled="False"
                         Text="{Binding Suggestion}" />
                 </Grid>
             </StackPanel>
@@ -90,19 +104,19 @@
                 SelectionChanged="OnSelectorSelectionChanged">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
-                                                           CommandParameter="{StaticResource False}" />
+                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}" />
                     </interactivity:EventTrigger>
                     <interactivity:EventTrigger EventName="MouseLeftButtonUp">
-                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
-                                                           CommandParameter="{StaticResource False}" />
+                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ui:ListView>
 
             <!--  STATUS BAR  -->
-            <Separator Grid.Row="2" Margin="5,6,5,2"
-                       Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}" />
+            <Separator
+                Grid.Row="2"
+                Margin="5,6,5,2"
+                Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}" />
             <StackPanel
                 Grid.Row="3"
                 HorizontalAlignment="Right"
@@ -112,6 +126,7 @@
                 <ui:TextBlock
                     Margin="0,0,15,6"
                     FontTypography="Caption"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Opacity="{StaticResource SecondaryTextOpacity}"
                     Text="{Binding Results.Count, StringFormat={}{0} Item(s) found.}" />
             </StackPanel>
@@ -127,8 +142,8 @@
                 <ContextMenu>
                     <ContextMenu.Items>
                         <MenuItem Header="Theme">
-                            <MenuItem Header="Light Theme" Click="OnClickLightTheme" />
-                            <MenuItem Header="Dark Theme" Click="OnClickDarkTheme" />
+                            <MenuItem Click="OnClickLightTheme" Header="Light Theme" />
+                            <MenuItem Click="OnClickDarkTheme" Header="Dark Theme" />
                         </MenuItem>
                         <MenuItem
                             Click="OnSettingsClick"
@@ -148,4 +163,4 @@
             </tray:NotifyIcon.Menu>
         </tray:NotifyIcon>
     </Grid>
-</ui:FluentWindow>
+</Window>
