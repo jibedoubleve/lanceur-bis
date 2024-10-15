@@ -72,8 +72,7 @@ public abstract class QueryResult : ObservableModel
     public Cmdline Query { get; set; } = Cmdline.Empty;
 
     /// <summary>
-    /// Contains a thumbnail that can be displayed on the UI. Put <c>null</c> if you want
-    /// to let <see cref="Icon"/> handle this.
+    /// Represents a thumbnail to display in the UI. Set to <c>null</c> to display the <see cref="Icon"/> instead.
     /// </summary>
     public string Thumbnail
     {

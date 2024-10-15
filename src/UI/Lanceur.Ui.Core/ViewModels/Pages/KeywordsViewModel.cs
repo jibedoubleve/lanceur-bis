@@ -111,16 +111,13 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnLoadAliases()
     {
-        if (_bufferedAliases.Count > 0) return;
-
-        await Task.Delay(50);
-
         _bufferedAliases = await Task.Run(() => _aliasManagementService.GetAll()!.ToList());
 
-        SelectedAlias = _bufferedAliases[0];
+        SelectedAlias = _bufferedAliases.ReselectAlias(SelectedAlias);
+
         Aliases = new(_bufferedAliases);
         _thumbnailManager.RefreshThumbnails(_bufferedAliases);
-        _logger.LogTrace("Loaded {Count} alias(es)", _bufferedAliases.Count());
+        _logger.LogTrace("Loaded {Count} alias(es)", _bufferedAliases.Count);
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
