@@ -26,4 +26,10 @@
       <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="ViewModels\Pages\KeywordsViewModelHelpers.cs">
+        <DependentUpon>KeywordsViewModel.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
