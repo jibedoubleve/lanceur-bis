@@ -32,13 +32,13 @@ public class InvalidAliasViewModel : RoutableViewModel
     public InvalidAliasViewModel(
         ISchedulerProvider schedulers = null,
         IScheduler poolThread = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         IDbRepository service = null,
         INotification notificataion = null
     )
     {
         var l = Locator.Current;
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
         _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
         _service = service ?? l.GetService<IDbRepository>();
         _notificataion = notificataion ?? l.GetService<INotification>();
@@ -84,7 +84,7 @@ public class InvalidAliasViewModel : RoutableViewModel
         if (remove && count > 0)
         {
             foreach (var item in toDel) InvalidAliases.Remove(item);
-            _service.Remove(toDel);
+            _service.RemoveMany(toDel);
             _notificataion.Information($"Removed {toDel.Count} alias(es).");
         }
     }

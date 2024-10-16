@@ -28,7 +28,6 @@ public partial class KeywordsView : IDisposable
         _contentDialogService = contentDialogService;
         _codeEditorView = codeEditorView;
         DataContext = ViewModel = viewModel;
-        WeakReferenceMessenger.Default.Register<KeywordsView, Ask>(this, (_, m) => m.Reply(HandleMessageBoxAsync(m)));
         InitializeComponent();
     }
 
@@ -41,14 +40,6 @@ public partial class KeywordsView : IDisposable
     #endregion
 
     #region Methods
-
-    private async Task<bool> HandleMessageBoxAsync(Ask ask)
-    {
-        var result = await _contentDialogService.ShowSimpleDialogAsync(
-            new() { Title = ask.Title, Content = ask.Question, PrimaryButtonText = ask.YesText, CloseButtonText = ask.NoText }
-        );
-        return result == ContentDialogResult.Primary;
-    }
 
     private void OnClickCodeEditor(object sender, RoutedEventArgs e)
     {

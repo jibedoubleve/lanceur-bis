@@ -54,7 +54,7 @@ public class AliasManagementShould : TestBase
     {
         var scope = new DbSingleConnectionManager(connection);
         var log = Substitute.For<ILoggerFactory>();
-        var conv = Substitute.For<IConversionService>();
+        var conv = Substitute.For<IMappingService>();
         var service = new SQLiteRepository(scope, log, conv);
         return service;
     }

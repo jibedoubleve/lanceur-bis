@@ -46,7 +46,7 @@ public partial class App
         var logger = Locator.Current.GetLogger<App>();
         try
         {
-            var notify = Locator.Current.GetService<IUserNotification>();
+            var notify = Locator.Current.GetService<IUiNotification>();
             notify.Error(e.Exception.Message, e.Exception);
         }
         catch (Exception ex)
@@ -78,7 +78,7 @@ public partial class App
         // SINGLE INSTANCE
         if (!SingleInstance.WaitOne())
         {
-            var notify = Locator.Current.GetService<IUserNotification>();
+            var notify = Locator.Current.GetService<IUiNotification>();
             notify.Warning("An instance of Lanceur is already running.");
             Environment.Exit(0);
         }

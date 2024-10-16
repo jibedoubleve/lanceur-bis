@@ -3,12 +3,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.Ui.Core.Services;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Lanceur.Ui.WPF.Services;
 
-public class ToastUiNotificationService : IUiNotificationService
+public class ToastUserNotificationService : IUserGlobalNotificationService
 {    
     #region Enums
 

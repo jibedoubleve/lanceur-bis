@@ -19,7 +19,7 @@ public partial class MainViewModel : ObservableObject
 
     private readonly bool _doesReturnAllIfEmpty;
     private readonly IExecutionManager _executionManager;
-    private readonly IUiUserInteractionService _userInteractionService;
+    private readonly IUserInteractionService _userUserInteractionService;
 
     private Cmdline _lastCriterion = Cmdline.Empty;
     private readonly ILogger<MainViewModel> _logger;
@@ -39,7 +39,7 @@ public partial class MainViewModel : ObservableObject
         ISearchService searchService,
         ISettingsFacade settingsFacade,
         IExecutionManager executionManager,
-        IUiUserInteractionService userInteractionService
+        IUserInteractionService userUserInteractionService
     )
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -49,7 +49,7 @@ public partial class MainViewModel : ObservableObject
 
         _searchService = searchService;
         _executionManager = executionManager;
-        _userInteractionService = userInteractionService;
+        _userUserInteractionService = userUserInteractionService;
         _doesReturnAllIfEmpty = settingsFacade.Application.Window.ShowResult;
         _logger = logger;
     }
@@ -67,7 +67,7 @@ public partial class MainViewModel : ObservableObject
 
         if(SelectedResult.IsExecutionConfirmationRequired)
         {
-            var result = await _userInteractionService.AskAsync("Execute", $"Do you want to execute alias '{SelectedResult.Name}'?");
+            var result = await _userUserInteractionService.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
             if (!result) return;
         } 
         

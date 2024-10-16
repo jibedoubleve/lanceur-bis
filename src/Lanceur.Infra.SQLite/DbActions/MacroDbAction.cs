@@ -11,7 +11,7 @@ internal class MacroDbAction
 {
     #region Fields
 
-    private readonly IConversionService _converter;
+    private readonly IMappingService _converter;
     private readonly IDbConnectionManager _db;
     private readonly ILogger _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -20,7 +20,7 @@ internal class MacroDbAction
 
     #region Constructors
 
-    public MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IConversionService converter)
+    public MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IMappingService converter)
     {
         _db = db;
         _loggerFactory = loggerFactory;

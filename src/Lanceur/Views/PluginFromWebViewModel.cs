@@ -28,12 +28,12 @@ public class PluginFromWebViewModel : ReactiveObject
     public PluginFromWebViewModel(
         IPluginUninstaller pluginUninstaller = null,
         ISchedulerProvider schedulers = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         IPluginWebRepository webRepository = null
     )
     {
         var l = Locator.Current;
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
         schedulers ??= l.GetService<ISchedulerProvider>();
         _pluginUninstaller = pluginUninstaller ?? l.GetService<IPluginUninstaller>();
         _webRepository = webRepository ?? l.GetService<IPluginWebRepository>();

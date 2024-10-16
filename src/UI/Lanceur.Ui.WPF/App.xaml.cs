@@ -1,16 +1,17 @@
+using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite;
+using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Wpf.Ui.Appearance;
 
 namespace Lanceur.Ui.WPF;
 
@@ -23,16 +24,18 @@ public partial class App
 
     private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
                                                   .CreateDefaultBuilder()
-                                                  .ConfigureServices((_, services) =>
-                                                  {
-                                                      services.AddViews()
-                                                              .AddViewModels()
-                                                              .AddServices()
-                                                              .AddWpfServices()
-                                                              .AddMapping()
-                                                              .AddConfiguration()
-                                                              .AddLoggers();
-                                                  })
+                                                  .ConfigureServices(
+                                                      (_, services) =>
+                                                      {
+                                                          services.Register("View", Assembly.Load("Lanceur.Ui.WPF"))
+                                                                  .Register("ViewModel", Assembly.Load("Lanceur.Ui.Core"))
+                                                                  .AddServices()
+                                                                  .AddWpfServices()
+                                                                  .AddMapping()
+                                                                  .AddConfiguration()
+                                                                  .AddLoggers();
+                                                      }
+                                                  )
                                                   .Build();
 
     #endregion Fields
@@ -48,7 +51,7 @@ public partial class App
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         var logger = Host.Services.GetRequiredService<ILogger<App>>();
-        var notify = Host.Services.GetRequiredService<IUiNotificationService>();
+        var notify = Host.Services.GetRequiredService<IUserGlobalNotificationService>();
 
         logger.LogCritical(e.Exception, "Fatal error: {Message}", e.Exception.Message);
         notify.Error(e.Exception.Message);
@@ -70,7 +73,7 @@ public partial class App
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application started");
 
-        /* Check wether database update is needed...
+        /* Check whether database update is needed...
          */
         var cs = Ioc.Default.GetService<IConnectionString>()!;
         Ioc.Default.GetService<SQLiteUpdater>()!

@@ -3,7 +3,7 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
-public static class KeywordsViewModelHelpers
+public static class KeywordsViewModelExtensions
 {
     #region Methods
 

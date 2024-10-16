@@ -9,20 +9,20 @@ using Lanceur.Utils;
 
 namespace Lanceur.Ui;
 
-public class UserNotification : IUserNotification
+public class UiNotification : IUiNotification
 {
     #region Fields
 
-    private readonly ILogger<UserNotification> _logger;
+    private readonly ILogger<UiNotification> _logger;
     private readonly INotification _notification;
 
     #endregion Fields
 
     #region Constructors
 
-    public UserNotification(ILoggerFactory logFactory = null, INotification notification = null)
+    public UiNotification(ILoggerFactory logFactory = null, INotification notification = null)
     {
-        _logger = logFactory.GetLogger<UserNotification>();
+        _logger = logFactory.GetLogger<UiNotification>();
         _notification = notification ?? Locator.Current.GetService<INotification>();
         ;
     }
@@ -33,7 +33,7 @@ public class UserNotification : IUserNotification
 
     private static void HandleCrashingNotification(string message, Exception ex, Exception e)
     {
-        Locator.Current.GetLogger<UserNotification>()
+        Locator.Current.GetLogger<UiNotification>()
                .LogWarning(ex, "User notification failed ({Message}). Show message in a MessageBox", e.Message);
         MessageBox.Show(Application.Current.MainWindow!, $"{message}. {(ex is null ? "" : $"{Environment.NewLine}{ex}")}", "Warning");
     }

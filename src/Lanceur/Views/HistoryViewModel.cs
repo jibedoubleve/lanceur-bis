@@ -29,14 +29,14 @@ public class HistoryViewModel : RoutableViewModel
         ISchedulerProvider schedulers = null,
         IDbRepository service = null,
         ILoggerFactory logFactory = null,
-        IUserNotification notify = null
+        IUiNotification notify = null
     )
     {
         var l = Locator.Current;
         _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
         _service = service ?? l.GetService<IDbRepository>();
         _logger = logFactory.GetLogger<HistoryViewModel>();
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
 
         Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
         Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));

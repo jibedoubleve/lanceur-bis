@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
+using System.Reflection;
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -7,8 +7,8 @@ using Lanceur.Infra.Logging;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
 using Lanceur.Core.BusinessLogic;
+using Lanceur.Infra.Macros;
 using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite;
@@ -19,19 +19,20 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 
     private readonly AliasDbAction _aliasDbAction;
     private readonly AliasSearchDbAction _aliasSearchDbAction;
-    private readonly IConversionService _converter;
+    private readonly IMappingService _converter;
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly ILogger<SQLiteRepository> _logger;
     private readonly SetUsageDbAction _setUsageDbAction;
+    private static readonly MacroValidator MacroValidator = new(Assembly.GetAssembly(typeof(GuidMacro)));
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public SQLiteRepository(
         IDbConnectionManager manager,
         ILoggerFactory logFactory,
-        IConversionService converter
+        IMappingService converter
     ) : base(manager)
     {
         ArgumentNullException.ThrowIfNull(logFactory);
@@ -45,7 +46,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         _aliasSearchDbAction = new(DB, logFactory, converter);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -56,19 +57,27 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters();
 
     ///<inheritdoc/>
-    public IEnumerable<QueryResult> GetDoubloons()
+    public AliasQueryResult GetByIdAndName(long id, string name) => _aliasDbAction.GetByIdAndName(id, name);
+
+    ///<inheritdoc/>
+    public IEnumerable<SelectableAliasQueryResult> GetDoubloons()
     {
-        const string sql = @$"
-            select
-                id        as {nameof(SelectableAliasQueryResult.Id)},
-                file_name as {nameof(SelectableAliasQueryResult.Description)},
-                file_name as {nameof(SelectableAliasQueryResult.FileName)},
-                name      as {nameof(SelectableAliasQueryResult.Name)}
-            from
-                data_doubloons_v
-            order by file_name";
+        const string sql = $"""
+                           select
+                               id        as {nameof(SelectableAliasQueryResult.Id)},
+                               notes     as {nameof(SelectableAliasQueryResult.Description)},
+                               file_name as {nameof(SelectableAliasQueryResult.FileName)},
+                               arguments as {nameof(SelectableAliasQueryResult.Parameters)},
+                               name      as {nameof(SelectableAliasQueryResult.Name)},
+                               icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                               thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
+                           from
+                               data_doubloons_v
+                           order by file_name
+                           """;
         var results = DB.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
-        return results;
+        var r = _converter.ToSelectableQueryResult(results);
+        return r;
     }
 
     /// <summary>
@@ -79,31 +88,24 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     /// <returns>The exact match or <c>null</c> if not found.</returns>
     public AliasQueryResult GetExact(string name) => _aliasDbAction.GetExact(name);
 
-    /// <summary>
-    /// Checks which aliases from the provided list exist in the database.
-    /// </summary>
-    /// <param name="aliasesToCheck">A list of aliases to check for existence in the database.</param>
-    /// <returns>An IEnumerable containing the aliases that exist in both the provided list and the database.</returns>
+    ///<inheritdoc/>
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)
-    {        const string  sql = """
-                       select name
-                       from alias_name
-                       where 
-                           name in @names
-                           and id_alias != @idAlias
-                       """;
+    {
+        const string  sql = """
+                            select name
+                            from alias_name
+                            where 
+                                name in @names
+                                and id_alias != @idAlias
+                            """;
         return DB.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
     }
 
+    ///<inheritdoc/>
     public IEnumerable<SelectableAliasQueryResult> GetInvalidAliases()
     {
-        var macro = new Regex("^@.*@$");
-        var abs = new Regex(@"[a-zA-Z]:\\");
-
-        var result = from a in GetAll()
-                     where a.Description != null && Uri.TryCreate(a.Description, UriKind.RelativeOrAbsolute, out _) && File.Exists(a.Description) == false && macro.IsMatch(a.Description) == false && abs.IsMatch(a.Description)
-                     select a;
-
+        var result = GetAll().Where(a => MacroValidator.IsMacroFormat(a.FileName) && MacroValidator.IsValid(a.FileName))
+                             .ToArray();
         return _converter.ToSelectableQueryResult(result);
     }
 
@@ -141,7 +143,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     ///<inheritdoc/>
     public void Hydrate(QueryResult queryResult)
     {
-        const string sql = 
+        const string sql =
             """
             select
             a.id        as id,
@@ -155,7 +157,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
             """;
 
         var result = DB.WithinTransaction(
-            tx => tx.Connection
+            tx => tx.Connection!
                     .Query<AliasQueryResult>(sql, new { queryResult.Name })
                     .ToArray()
         );
@@ -223,11 +225,11 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public void Remove(AliasQueryResult alias) => _aliasDbAction.Remove(alias);
 
     ///<inheritdoc/>
-    public void Remove(IEnumerable<SelectableAliasQueryResult> doubloons)
+    public void RemoveMany(IEnumerable<AliasQueryResult> aliases)
     {
-        var selectableAliasQueryResults = doubloons as SelectableAliasQueryResult[] ?? doubloons.ToArray();
-        _logger.LogInformation("Removing {Length} alias(es)", selectableAliasQueryResults.Length);
-        _aliasDbAction.Remove(selectableAliasQueryResults);
+        var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
+        _logger.LogInformation("Removing {Length} alias(es)", list.Length);
+        _aliasDbAction.RemoveMany(list);
     }
 
     /// <inheritdoc />
@@ -243,7 +245,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 
         switch (alias.Id)
         {
-            case 0 when !_aliasDbAction.SelectNames(alias):
+            case 0 when !_aliasDbAction.HasNames(alias):
                 _aliasDbAction.Create(ref alias);
                 _logger.LogInformation("Created new alias {AliasName}", alias.Name);
                 break;
@@ -261,11 +263,13 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     ///<inheritdoc/>
     public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false) => _aliasSearchDbAction.Search(name, isReturnAllIfEmpty);
 
+    ///<inheritdoc/>
     public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria);
 
     ///<inheritdoc/>
     public ExistingNameResponse SelectNames(string[] names) => _aliasDbAction.SelectNames(names);
 
+    ///<inheritdoc/>
     public void SetUsage(QueryResult alias)
     {
         if (alias is null)
@@ -283,9 +287,8 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         _setUsageDbAction.SetUsage(ref alias);
     }
 
-    public void SetUsage(string aliasName) => SetUsage(new AliasQueryResult() { Name = aliasName });
-
+    ///<inheritdoc/>
     public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateThumbnails(aliases);
 
-    #endregion Methods
+    #endregion
 }

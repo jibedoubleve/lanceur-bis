@@ -39,7 +39,7 @@ internal class MainViewModelBuilder
             _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
             searchService: _searchService ?? Substitute.For<ISearchService>(),
             executor: _executionManager ?? Substitute.For<IExecutionManager>(),
-            notify: Substitute.For<IUserNotification>(),
+            notify: Substitute.For<IUiNotification>(),
             appConfigService: _appConfigService ?? settingsFacade,
             dataService: Substitute.For<IDbRepository>(),
             loggerFactory: new MicrosoftLoggingLoggerFactory(_output)

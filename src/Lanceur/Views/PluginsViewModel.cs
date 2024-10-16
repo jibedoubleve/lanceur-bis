@@ -37,7 +37,7 @@ public class PluginsViewModel : RoutableViewModel
 
     public PluginsViewModel(
         ISchedulerProvider schedulers = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         IPluginUninstaller uninstaller = null,
         IPluginManifestRepository pluginConfigRepository = null,
         INotification notification = null,
@@ -47,7 +47,7 @@ public class PluginsViewModel : RoutableViewModel
     {
         var l = Locator.Current;
 
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
 
         var schedulers1 = schedulers ?? l.GetService<ISchedulerProvider>();
         _uninstaller = uninstaller ?? l.GetService<IPluginUninstaller>();

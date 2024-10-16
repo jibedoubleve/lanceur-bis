@@ -27,10 +27,25 @@ public interface IDbRepository
     IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters();
 
     /// <summary>
+    /// Retrieves an <see cref="AliasQueryResult"/> object based on its unique identifier.
+    /// The <paramref name="name"/> is used to filter the results, ensuring that only one result is returned for the given <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The unique identifier of the <see cref="AliasQueryResult"/>. It must be greater than zero.</param>
+    /// <param name="name">The name used to filter the results corresponding to the specified <paramref name="id"/>.</param>
+    /// <returns>
+    /// An <see cref="AliasQueryResult"/> object that matches the specified <paramref name="id"/> and <paramref name="name"/>.
+    /// Returns null if no matching object is found.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the <paramref name="id"/> is less than or equal to zero.
+    /// </exception>
+    AliasQueryResult GetByIdAndName(long id, string name);
+
+    /// <summary>
     ///     Get the list of all the doubloons in the database
     /// </summary>
     /// <returns>The list of doubloons</returns>
-    IEnumerable<QueryResult> GetDoubloons();
+    IEnumerable<SelectableAliasQueryResult> GetDoubloons();
 
     /// <summary>
     ///     Get the alias with the exact name.
@@ -47,7 +62,14 @@ public interface IDbRepository
     /// <returns>An IEnumerable containing the aliases that exist in both the provided list and the database.</returns>
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
 
+    /// <summary>
+    /// Retrieves a collection of aliases that are incorrectly configured,
+    /// indicating they are invalid.
+    /// </summary>
+    /// <returns>An enumerable collection of <see cref="SelectableAliasQueryResult"/> 
+    /// representing the aliases that have been poorly configured and are therefore invalid.</returns>
     IEnumerable<SelectableAliasQueryResult> GetInvalidAliases();
+
 
     /// <summary>
     ///     Search into the hidden aliases the one with the specified name and returns its ID
@@ -99,9 +121,17 @@ public interface IDbRepository
     /// <returns></returns>
     IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result);
 
+    /// <summary>
+    /// Removed an alias from the repository
+    /// </summary>
+    /// <param name="alias">The alias to remove from the repository</param>
     void Remove(AliasQueryResult alias);
 
-    void Remove(IEnumerable<SelectableAliasQueryResult> doubloons);
+    /// <summary>
+    /// Removes the specified list of aliases from the repository
+    /// </summary>
+    /// <param name="doubloons">The list of aliases to remove from the repository</param>
+    void RemoveMany(IEnumerable<AliasQueryResult> aliases);
 
     /// <summary>
     ///     Creates a new alias if the ID is '0'; otherwise, updates the existing alias.
@@ -134,12 +164,12 @@ public interface IDbRepository
     /// <param name="names">The names to find in the database</param>
     /// <returns></returns>
     public ExistingNameResponse SelectNames(string[] names);
-
+    
     /// <summary>
-    ///     Increment counter for execution of an alias. This is the recommended way to
-    ///     use counter for an executable alias
+    /// Increments the execution counter for a given alias. 
+    /// This method is the recommended way to track usage of an executable alias.
     /// </summary>
-    /// <param name="alias"></param>
+    /// <param name="alias">The alias whose execution is being tracked.</param>
     void SetUsage(QueryResult alias);
 
     /// <summary>

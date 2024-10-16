@@ -3,12 +3,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Restart;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Services;
 using Serilog.Core;
 using Serilog.Events;
+using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
@@ -23,9 +25,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
 
-    private readonly INotificationService _notificationService;
+    private readonly IUserNotificationService _userNotificationService;
     private readonly IAppRestart _appRestart;
     [ObservableProperty] private ISettingsFacade _settings;
+    private readonly IUserInteractionService _userInteraction;
     [ObservableProperty] private bool _showResults;
     [ObservableProperty] private  bool _isTraceEnabled;
 
@@ -34,18 +37,20 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     #region Constructors
 
     public ApplicationSettingsViewModel(
-        INotificationService notificationService,
+        IUserNotificationService userNotificationService,
         IAppRestart appRestart,
         ISettingsFacade settings,
-        LoggingLevelSwitch loggingLevelSwitch
+        LoggingLevelSwitch loggingLevelSwitch,
+        IUserInteractionService userInteraction
     )
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appRestart);
 
-        _notificationService = notificationService;
+        _userNotificationService = userNotificationService;
         _appRestart = appRestart;
         _settings = settings;
+        _userInteraction = userInteraction;
 
         // Hotkey
         var hk = _settings.Application.HotKey;
@@ -93,12 +98,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Settings.Application.Window.ShowResult = ShowResults;
 
         Settings.Save();
-        _notificationService.Success("Saved", "Configuration saved.");
+        _userNotificationService.Success("Configuration saved.", "Saved");
 
         if (reboot)
         {
             const string msg = "Do you want to restart now to apply the new configuration?";
-            if (await WeakReferenceMessenger.Default.Send<Ask>(msg)) _appRestart.Restart();
+            if(await _userInteraction.AskUserYesNoAsync(msg)) _appRestart.Restart();
         }
     }
 

@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using Lanceur.Core.LuaScripting;
+using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui.Core.Messages;
@@ -20,16 +21,16 @@ public partial class CodeEditorView
     #region Fields
 
     private readonly ILogger<CodeEditorView> _logger;
-    private readonly INotificationService _notificationService;
+    private readonly IUserNotificationService _userNotificationService;
 
     #endregion Fields
 
     #region Constructors
 
-    public CodeEditorView(CodeEditorViewModel viewModel, ILogger<CodeEditorView> logger, INotificationService notificationService)
+    public CodeEditorView(CodeEditorViewModel viewModel, ILogger<CodeEditorView> logger, IUserNotificationService userNotificationService)
     {
         _logger = logger;
-        _notificationService = notificationService;
+        _userNotificationService = userNotificationService;
         DataContext = ViewModel = viewModel;
         InitializeComponent();
     }
@@ -121,7 +122,7 @@ public partial class CodeEditorView
                                 
                                 """;
 
-        _notificationService.Success("Build Successful", "Script executed successfully in dry run mode.");
+        _userNotificationService.Success("Script executed successfully in dry run mode.", "Build Successful");
     }
 
     private void ApplyScript()

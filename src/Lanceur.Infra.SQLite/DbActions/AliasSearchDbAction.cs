@@ -20,7 +20,7 @@ public class AliasSearchDbAction
 
     #region Constructors
 
-    public AliasSearchDbAction(IDbConnectionManager db, ILoggerFactory logFactory, IConversionService converter)
+    public AliasSearchDbAction(IDbConnectionManager db, ILoggerFactory logFactory, IMappingService converter)
     {
         _db = db;
         _logger = logFactory.GetLogger<AliasSearchDbAction>();

@@ -25,12 +25,12 @@ public class PluginManifestViewModel : ReactiveObject, IPluginManifest
 
     public PluginManifestViewModel(
         ISchedulerProvider schedulerProvider = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         IPluginUninstaller pluginUninstaller = null
     )
     {
         var l = Locator.Current;
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
         _pluginUninstaller = pluginUninstaller ?? l.GetService<IPluginUninstaller>();
         var schedulers = schedulerProvider ?? new RxAppSchedulerProvider();
 

@@ -27,13 +27,13 @@ public class TrendsViewModel : RoutableViewModel
     public TrendsViewModel(
         ISchedulerProvider schedulers = null,
         IDbRepository service = null,
-        IUserNotification notify = null
+        IUiNotification notify = null
     )
     {
         var l = Locator.Current;
         _schedulers = schedulers ?? l.GetService<ISchedulerProvider>();
         _service = service ?? l.GetService<IDbRepository>();
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
 
         Activate = ReactiveCommand.Create(OnActivate, outputScheduler: _schedulers.MainThreadScheduler);
         Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));

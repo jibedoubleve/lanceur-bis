@@ -16,4 +16,5 @@
     <conv:NumberToBooleanConverter x:Key="NumberToBooleanConverter" />
     <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
     <conv:IntToKeyEnumConverter x:Key="IntToKeyEnumConverter" />
+    <conv:IsDoubloonReportToVisibilityConverter x:Key="IsDoubloonReportToVisibilityConverter"/>
 </ResourceDictionary>

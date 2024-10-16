@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Lanceur.Utils;
 
-public class AutoMapperConverter : IConversionService
+public class AutoMapperConverter : IMappingService
 {
     #region Fields
 
@@ -30,7 +30,7 @@ public class AutoMapperConverter : IConversionService
 
     public IEnumerable<QueryResult> ToQueryResult(IEnumerable<string> source) => _mapper.Map<IEnumerable<string>, IEnumerable<DisplayQueryResult>>(source);
 
-    public IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<QueryResult> source) => _mapper.Map<IEnumerable<QueryResult>, IEnumerable<SelectableAliasQueryResult>>(source);
+    public IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<AliasQueryResult> source) => _mapper.Map<IEnumerable<AliasQueryResult>, IEnumerable<SelectableAliasQueryResult>>(source);
 
     #endregion Methods
 }

@@ -44,7 +44,7 @@ public class KeywordsViewModel : RoutableViewModel, IValidatableViewModel, IActi
     private readonly Scope<bool> _busyScope;
     private readonly ILogger<KeywordsViewModel> _logger;
     private readonly INotification _notification;
-    private readonly IUserNotification _notify;
+    private readonly IUiNotification _notify;
     private readonly IPackagedAppSearchService _packagedAppSearchService;
     private readonly ISchedulerProvider _schedulers;
     private readonly IThumbnailManager _thumbnailManager;
@@ -58,7 +58,7 @@ public class KeywordsViewModel : RoutableViewModel, IValidatableViewModel, IActi
         ILoggerFactory logFactory = null,
         IDbRepository searchService = null,
         ISchedulerProvider schedulers = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         IThumbnailManager thumbnailManager = null,
         INotification notification = null,
         IPackagedAppSearchService packagedAppSearchService = null
@@ -68,7 +68,7 @@ public class KeywordsViewModel : RoutableViewModel, IValidatableViewModel, IActi
         _schedulers = schedulers ?? Locator.Current.GetService<ISchedulerProvider>();
 
         var l = Locator.Current;
-        _notify = notify ?? l.GetService<IUserNotification>();
+        _notify = notify ?? l.GetService<IUiNotification>();
         _packagedAppSearchService = packagedAppSearchService ?? l.GetService<IPackagedAppSearchService>();
         _notification = notification ?? l.GetService<INotification>();
         _logger = logFactory.GetLogger<KeywordsViewModel>();
@@ -292,7 +292,7 @@ public class KeywordsViewModel : RoutableViewModel, IValidatableViewModel, IActi
         }
     }
 
-    private void SetupCommands(IScheduler uiThread, IUserNotification notify, CompositeDisposable d)
+    private void SetupCommands(IScheduler uiThread, IUiNotification notify, CompositeDisposable d)
     {
         Search = ReactiveCommand
                  .Create<SearchRequest, ObservableCollection<QueryResult>>(OnSearch, outputScheduler: uiThread)
