@@ -111,7 +111,7 @@ public class Bootstrapper
         l.RegisterConstant(new LoggingLevelSwitch(conditional));
 
         l.RegisterLazySingleton<IMapper>(() => new Mapper(GetAutoMapperCfg()));
-        l.RegisterLazySingleton<IUserNotification>(() => new UserNotification());
+        l.RegisterLazySingleton<IUiNotification>(() => new UiNotification());
         l.RegisterLazySingleton(() => new RoutingState());
         l.RegisterLazySingleton<IPluginStoreContext>(() => new PluginStoreContext());
         l.RegisterLazySingleton<IDelay>(() => new Delay());
@@ -143,19 +143,19 @@ public class Bootstrapper
                 new SQLiteRepository(
                     Get<IDbConnectionManager>(),
                     Get<ILoggerFactory>(),
-                    Get<IConversionService>()
+                    Get<IMappingService>()
                 )
         );
         l.Register<IDataDoctorRepository>(
             () => new SQLiteDataDoctorRepository(
                 Get<IDbConnectionManager>(),
                 Get<ILoggerFactory>(),
-                Get<IConversionService>()
+                Get<IMappingService>()
             )
         );
         l.Register<IWildcardManager>(() => new ReplacementComposite(Get<IClipboardService>()));
         l.Register<ICalculatorService>(() => new CodingSebCalculatorService());
-        l.Register<IConversionService>(() => new AutoMapperConverter(Get<IMapper>()));
+        l.Register<IMappingService>(() => new AutoMapperConverter(Get<IMapper>()));
         l.Register<IClipboardService>(() => new WindowsClipboardService());
         l.RegisterLazySingleton<IMacroManager>(() => new MacroManager(Assembly.GetExecutingAssembly(), null, null, null));
         l.Register<IPluginManager>(() => new PluginManager(Get<ILoggerFactory>()));

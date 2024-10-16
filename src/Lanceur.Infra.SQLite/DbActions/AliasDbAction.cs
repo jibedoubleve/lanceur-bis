@@ -16,7 +16,7 @@ public class AliasDbAction
     private readonly IDbConnectionManager _db;
     private readonly ILogger<AliasDbAction> _logger;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -26,20 +26,9 @@ public class AliasDbAction
         _logger = logFactory.GetLogger<AliasDbAction>();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
-
-    private static void UpdateName(AliasQueryResult alias, IDbTransaction tx)
-    {
-        //Remove all names
-        const string sql = @"delete from alias_name where id_alias = @id";
-        tx.Connection.Execute(sql, new { id = alias.Id });
-
-        //Recreate new names
-        const string sql2 = @"insert into alias_name (id_alias, name) values (@id, @name)";
-        foreach (var name in alias.Synonyms.SplitCsv()) tx.Connection.Execute(sql2, new { id = alias.Id, name });
-    }
 
     private void ClearAlias(params long[] ids)
     {
@@ -101,6 +90,17 @@ public class AliasDbAction
     }
 
     private void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx) => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
+
+    private static void UpdateName(AliasQueryResult alias, IDbTransaction tx)
+    {
+        //Remove all names
+        const string sql = @"delete from alias_name where id_alias = @id";
+        tx.Connection.Execute(sql, new { id = alias.Id });
+
+        //Recreate new names
+        const string sql2 = @"insert into alias_name (id_alias, name) values (@id, @name)";
+        foreach (var name in alias.Synonyms.SplitCsv()) tx.Connection.Execute(sql2, new { id = alias.Id, name });
+    }
 
     internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
     {
@@ -199,14 +199,47 @@ public class AliasDbAction
 
     public void CreateInvisible(ref QueryResult alias)
     {
-        var queryResult = new AliasQueryResult
-        {
-            Name = alias.Name,
-            FileName = alias.Name,
-            Synonyms = alias.Name,
-            IsHidden = true
-        };
+        var queryResult = new AliasQueryResult { Name = alias.Name, FileName = alias.Name, Synonyms = alias.Name, IsHidden = true };
         alias.Id = Create(ref queryResult);
+    }
+
+    public AliasQueryResult GetByIdAndName(long id, string name)
+    {
+        if (id <= 0) { throw new ArgumentException("The id of the alias should be greater than zero.");}
+        const string sql = $"""
+                            select
+                                n.Name                  as {nameof(AliasQueryResult.Name)},
+                                s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
+                                a.Id                    as {nameof(AliasQueryResult.Id)},
+                                a.arguments             as {nameof(AliasQueryResult.Parameters)},
+                                a.file_name             as {nameof(AliasQueryResult.FileName)},
+                                a.notes                 as {nameof(AliasQueryResult.Notes)},
+                                a.run_as                as {nameof(AliasQueryResult.RunAs)},
+                                a.start_mode            as {nameof(AliasQueryResult.StartMode)},
+                                a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
+                                a.icon                  as {nameof(AliasQueryResult.Icon)},
+                                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
+                                a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
+                                a.exec_count            as {nameof(AliasQueryResult.Count)},
+                                a.hidden                as {nameof(AliasQueryResult.IsHidden)},
+                                a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
+                            from
+                                alias a
+                                left join alias_name n on a.id = n.id_alias
+                                inner join data_alias_synonyms_v s on s.id_alias = a.id
+                            where
+                                n.Name = @name
+                                and a.Id = @id
+                            order by
+                                a.exec_count desc,
+                                n.name
+                            """;
+
+        return _db.WithinTransaction(
+            tx => tx.Connection!
+                    .Query<AliasQueryResult>(sql, new { id, name })
+                    .SingleOrDefault()
+        );
     }
 
     /// <summary>
@@ -221,33 +254,34 @@ public class AliasDbAction
     /// </remarks>
     public AliasQueryResult GetExact(string name, bool includeHidden = false)
     {
-        const string sql = @$"
-                select
-                    n.Name                  as {nameof(AliasQueryResult.Name)},
-                    s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
-                    a.Id                    as {nameof(AliasQueryResult.Id)},
-                    a.arguments             as {nameof(AliasQueryResult.Parameters)},
-                    a.file_name             as {nameof(AliasQueryResult.FileName)},
-                    a.notes                 as {nameof(AliasQueryResult.Notes)},
-                    a.run_as                as {nameof(AliasQueryResult.RunAs)},
-                    a.start_mode            as {nameof(AliasQueryResult.StartMode)},
-                    a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
-                    a.icon                  as {nameof(AliasQueryResult.Icon)},
-                    a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
-                    a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
-                    a.exec_count            as {nameof(AliasQueryResult.Count)},
-                    a.hidden                as {nameof(AliasQueryResult.IsHidden)},
-                    a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
-                from
-                    alias a
-                    left join alias_name n on a.id = n.id_alias
-                    inner join data_alias_synonyms_v s on s.id_alias = a.id
-                where
-                    n.Name = @name
-                    and hidden in @hidden
-                order by
-                    a.exec_count desc,
-                    n.name";
+        const string sql = $"""
+                            select
+                                n.Name                  as {nameof(AliasQueryResult.Name)},
+                                s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
+                                a.Id                    as {nameof(AliasQueryResult.Id)},
+                                a.arguments             as {nameof(AliasQueryResult.Parameters)},
+                                a.file_name             as {nameof(AliasQueryResult.FileName)},
+                                a.notes                 as {nameof(AliasQueryResult.Notes)},
+                                a.run_as                as {nameof(AliasQueryResult.RunAs)},
+                                a.start_mode            as {nameof(AliasQueryResult.StartMode)},
+                                a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
+                                a.icon                  as {nameof(AliasQueryResult.Icon)},
+                                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
+                                a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
+                                a.exec_count            as {nameof(AliasQueryResult.Count)},
+                                a.hidden                as {nameof(AliasQueryResult.IsHidden)},
+                                a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
+                            from
+                                alias a
+                                left join alias_name n on a.id = n.id_alias
+                                inner join data_alias_synonyms_v s on s.id_alias = a.id
+                            where
+                                n.Name = @name
+                                and hidden in @hidden
+                            order by
+                                a.exec_count desc,
+                                n.name
+                            """;
 
         var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
         var arguments = new { name, hidden };
@@ -316,28 +350,7 @@ public class AliasDbAction
         return result;
     }
 
-    public void Remove(AliasQueryResult alias)
-    {
-        if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");
-
-        ClearAliasUsage(alias.Id);
-        ClearAliasArgument(alias.Id);
-        ClearAliasName(alias.Id);
-        ClearAlias(alias.Id);
-    }
-
-    public void Remove(IEnumerable<SelectableAliasQueryResult> alias)
-    {
-        ArgumentNullException.ThrowIfNull(alias);
-        var ids = alias.Select(x => x.Id).ToArray();
-
-        ClearAliasUsage(ids);
-        ClearAliasArgument(ids);
-        ClearAliasName(ids);
-        ClearAlias(ids);
-    }
-
-    public bool SelectNames(AliasQueryResult alias)
+    public bool HasNames(AliasQueryResult alias)
     {
         const string sql = @"
             select count(*)
@@ -348,6 +361,27 @@ public class AliasDbAction
 
         var count = _db.WithinTransaction(tx => tx.Connection.ExecuteScalar<int>(sql, new { name = alias.Name }));
         return count > 0;
+    }
+
+    public void Remove(AliasQueryResult alias)
+    {
+        if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");
+
+        ClearAliasUsage(alias.Id);
+        ClearAliasArgument(alias.Id);
+        ClearAliasName(alias.Id);
+        ClearAlias(alias.Id);
+    }
+
+    public void RemoveMany(IEnumerable<AliasQueryResult> alias)
+    {
+        ArgumentNullException.ThrowIfNull(alias);
+        var ids = alias.Select(x => x.Id).ToArray();
+
+        ClearAliasUsage(ids);
+        ClearAliasArgument(ids);
+        ClearAliasName(ids);
+        ClearAlias(ids);
     }
 
     public ExistingNameResponse SelectNames(string[] names)
@@ -428,5 +462,5 @@ public class AliasDbAction
         return ids.ToArray();
     }
 
-    #endregion Methods
+    #endregion
 }

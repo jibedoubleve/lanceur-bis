@@ -21,11 +21,11 @@ public class MostUsedViewModel : RoutableViewModel
 
     #region Constructors
 
-    public MostUsedViewModel(IDbRepository service = null, IUserNotification notify = null)
+    public MostUsedViewModel(IDbRepository service = null, IUiNotification notify = null)
     {
         var l = Locator.Current;
         _service = service ?? l.GetService<IDbRepository>();
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
 
         Activate = ReactiveCommand.Create(OnActivate);
         Activate.ThrownExceptions.Subscribe(ex => notify.Error(ex.Message, ex));

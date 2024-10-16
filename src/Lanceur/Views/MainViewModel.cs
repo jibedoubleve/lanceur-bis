@@ -44,7 +44,7 @@ public partial class MainViewModel : ReactiveObject
         ISchedulerProvider schedulerProvider = null,
         ILoggerFactory loggerFactory = null,
         ISearchService searchService = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         IDbRepository dataService = null,
         IExecutionManager executor = null,
         ISettingsFacade appConfigService = null
@@ -53,7 +53,7 @@ public partial class MainViewModel : ReactiveObject
         schedulerProvider ??= new RxAppSchedulerProvider();
 
         var l = Locator.Current;
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
         _logger = loggerFactory.GetLogger<MainViewModel>();
         _searchService = searchService ?? l.GetService<ISearchService>();
         _dbRepository = dataService ?? l.GetService<IDbRepository>();

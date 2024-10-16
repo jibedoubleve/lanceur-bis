@@ -44,7 +44,7 @@ public class AppSettingsViewModel : RoutableViewModel
 
     public AppSettingsViewModel(
         ISchedulerProvider schedulers = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         ISettingsFacade settingsFacade = null,
         IDbRepository dataService = null,
         IDelay delay = null,
@@ -61,7 +61,7 @@ public class AppSettingsViewModel : RoutableViewModel
         _askFile = Interactions.SelectFile(schedulers.MainThreadScheduler);
         _logLevelSwitch = logLevelSwitch ?? l.GetService<LoggingLevelSwitch>();
         _service = dataService ?? l.GetService<IDbRepository>();
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
         _delay = delay ?? l.GetService<IDelay>();
         _restart = restart ?? l.GetService<IAppRestart>();
         _notification = notification ?? l.GetService<INotification>();

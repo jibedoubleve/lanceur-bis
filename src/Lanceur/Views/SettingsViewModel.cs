@@ -39,14 +39,14 @@ public class SettingsViewModel : ReactiveObject, IScreen
         MostUsedViewModel mostUsedViewModel = null,
         HistoryViewModel historyViewModel = null,
         PluginsViewModel pluginsViewModel = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         IDbRepository service = null
     )
     {
         var l = Locator.Current;
         Router = l.GetService<RoutingState>();
 
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
         _logger = logFactory.GetLogger<SettingsViewModel>();
         _keywordVm = keywordVm ?? l.GetService<KeywordsViewModel>();
         _settingsVm = settingsVm ?? l.GetService<AppSettingsViewModel>();

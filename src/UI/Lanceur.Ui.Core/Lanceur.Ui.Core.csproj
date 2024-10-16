@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="ViewModels\Pages\KeywordsViewModelHelpers.cs">
+      <Compile Update="ViewModels\Pages\KeywordsViewModelExtensions.cs">
         <DependentUpon>KeywordsViewModel.cs</DependentUpon>
       </Compile>
     </ItemGroup>

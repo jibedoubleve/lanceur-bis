@@ -1,10 +1,8 @@
 using System.Data;
 using System.Data.SQLite;
 using System.Reflection;
-using AutoMapper;
 using Everything.Wrapper;
 using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
 using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
@@ -30,8 +28,6 @@ using Lanceur.SharedKernel.Web;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
-using Lanceur.Ui.Core.ViewModels;
-using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -44,18 +40,6 @@ namespace Lanceur.Ui.Core.Extensions;
 public static class ServiceCollectionExtensions
 {
     #region Methods
-
-    public static IServiceCollection AddViewModels(this IServiceCollection serviceCollection) => serviceCollection.AddTransient<MainViewModel>()
-                                                                                                                  .AddTransient<SettingsViewModel>()
-                                                                                                                  .AddTransient<DoubloonsViewModel>()
-                                                                                                                  .AddTransient<EmptyKeywordsModel>()
-                                                                                                                  .AddTransient<HistoryViewModel>()
-                                                                                                                  .AddTransient<MostUsedViewModel>()
-                                                                                                                  .AddTransient<PluginsViewModel>()
-                                                                                                                  .AddTransient<TrendsViewModel>()
-                                                                                                                  .AddTransient<CodeEditorViewModel>()
-                                                                                                                  .AddTransient<ApplicationSettingsViewModel>()
-                                                                                                                  .AddSingleton<KeywordsViewModel>();
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
@@ -79,7 +63,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
                          .AddTransient<IConnectionString, ConnectionString>()
-                         .AddTransient<IConversionService, AutoMapperConverter>()
+                         .AddTransient<IMappingService, AutoMapperMappingService>()
                          .AddTransient<ISearchService, SearchService>()
                          .AddTransient<IStoreLoader, StoreLoader>()
                          .AddTransient<IMacroManager, MacroManager>(
@@ -124,18 +108,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddMapping(this IServiceCollection serviceCollection)
     {
-        var mapping = new MapperConfiguration(
-            cfg =>
-            {
-                cfg.CreateMap<QueryResult, SelectableAliasQueryResult>();
-                cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>();
-
-                cfg.CreateMap<string, DisplayQueryResult>()
-                   .ConstructUsing(x => new($"@{x}@", "This is a macro", "LinkVariant"));
-            }
-        );
-        var mapper = new Mapper(mapping);
-        serviceCollection.AddSingleton<IMapper>(mapper);
+        serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>();
         return serviceCollection;
     }
 
@@ -143,7 +116,7 @@ public static class ServiceCollectionExtensions
     {
         var conditional = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
         var levelSwitch = new LoggingLevelSwitch(conditional);
-        
+
         serviceCollection.AddSingleton(levelSwitch);
 
         Log.Logger = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch)

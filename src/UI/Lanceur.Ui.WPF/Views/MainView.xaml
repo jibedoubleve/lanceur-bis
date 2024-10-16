@@ -40,7 +40,6 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <!--<Grid Background="{DynamicResource ApplicationBackgroundBrush}" Opacity="0.01"/>-->
         <Grid Background="{DynamicResource ApplicationBackgroundBrush}" Opacity=".01" />
         <Grid>
             <Grid.RowDefinitions>
@@ -50,7 +49,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!--  THEME & QUERY BOXES  -->
+            <!--  QUERY BOXES  -->
             <StackPanel Opacity="1">
                 <Grid>
                     <!--  QUERY BOX  -->
@@ -93,7 +92,7 @@
 
             <!--  RESULT BOX  -->
             <ui:ListView
-                x:Name="ResultListView"
+                x:Name="Result"
                 Grid.Row="1"
                 MaxHeight="600"
                 Margin="15,5,15,0"
@@ -101,12 +100,9 @@
                 ItemsSource="{Binding Results}"
                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                 SelectedItem="{Binding SelectedResult}"
-                SelectionChanged="OnSelectorSelectionChanged">
+                SelectionChanged="OnResultSelectionChanged">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}" />
-                    </interactivity:EventTrigger>
-                    <interactivity:EventTrigger EventName="MouseLeftButtonUp">
                         <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>

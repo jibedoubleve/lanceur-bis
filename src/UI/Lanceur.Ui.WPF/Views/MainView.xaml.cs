@@ -120,10 +120,10 @@ public partial class MainView
         if (e.Key == Key.Escape) HideWindow();
     }
 
-    private void OnSelectorSelectionChanged(object _, SelectionChangedEventArgs e)
+    private void OnResultSelectionChanged(object _, SelectionChangedEventArgs e)
     {
-        var current = ResultListView.SelectedItem;
-        ResultListView.ScrollIntoView(current);
+        var current = Result.SelectedItem;
+        Result.ScrollIntoView(current);
     }
 
     private void OnSettingsClick(object sender, RoutedEventArgs e)

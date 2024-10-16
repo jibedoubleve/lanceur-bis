@@ -33,17 +33,9 @@
                     Icon="{ui:SymbolIcon Keyboard24}"
                     TargetPageType="{x:Type pages:KeywordsView}" />
                 <ui:NavigationViewItem
-                    Content="Plugins"
-                    Icon="{ui:SymbolIcon PlugConnected24}"
-                    TargetPageType="{x:Type pages:PluginsView}" />
-                <ui:NavigationViewItem
-                    Content="Doubloons"
-                    Icon="{ui:SymbolIcon ColumnDoubleCompare20}"
-                    TargetPageType="{x:Type pages:DoubloonsView}" />
-                <ui:NavigationViewItem
-                    Content="Empty Keywords"
-                    Icon="{ui:SymbolIcon PaintBrush24}"
-                    TargetPageType="{x:Type pages:EmptyKeywordsView}" />
+                    Content="Data Reconciliation" 
+                    Icon="{ui:SymbolIcon Database24}"
+                    TargetPageType="{x:Type pages:DataReconciliationView}"/>
                 <ui:NavigationViewItem
                     Content="History"
                     Icon="{ui:SymbolIcon History24}"

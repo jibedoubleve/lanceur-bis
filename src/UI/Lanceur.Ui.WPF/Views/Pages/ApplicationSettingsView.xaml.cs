@@ -1,5 +1,6 @@
 using System.IO;
 using System.Windows;
+using Lanceur.Core.Services;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Win32;
@@ -8,16 +9,16 @@ namespace Lanceur.Ui.WPF.Views.Pages;
 
 public partial class ApplicationSettingsView
 {
-    private readonly INotificationService _notification;
+    private readonly IUserNotificationService _userNotification;
 
     #region Constructors
 
     public ApplicationSettingsView(
         ApplicationSettingsViewModel viewModel,
-        INotificationService notification
+        IUserNotificationService userNotification
     )
     {
-        _notification = notification;
+        _userNotification = userNotification;
         DataContext = ViewModel = viewModel;
         InitializeComponent();
     }
@@ -41,7 +42,7 @@ public partial class ApplicationSettingsView
 
         if (!File.Exists(openFileDialog.FileName))
         {
-            _notification.Warn("File not found", "The specified file could not be found.");
+            _userNotification.Warn("The specified file could not be found.", "File not found");
             return;
         }
 

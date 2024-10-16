@@ -268,7 +268,7 @@ public class MacroShould : TestBase
 
         #region Methods
 
-        private static IConversionService GetConversionService()
+        private static IMappingService GetConversionService()
         {
             var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
             return new AutoMapperConverter(new Mapper(cfg));

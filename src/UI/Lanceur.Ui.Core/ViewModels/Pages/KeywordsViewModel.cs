@@ -5,13 +5,16 @@ using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Services;
 using Microsoft.Extensions.Logging;
+using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
+[Singleton]
 public partial class KeywordsViewModel : ObservableObject
 {
     #region Fields
@@ -20,8 +23,9 @@ public partial class KeywordsViewModel : ObservableObject
     private readonly IAliasManagementService _aliasManagementService;
     private IList<AliasQueryResult> _bufferedAliases = Array.Empty<AliasQueryResult>();
     private readonly ILogger<KeywordsViewModel> _logger;
-    private readonly INotificationService _notificationService;
+    private readonly IUserNotificationService _userNotificationService;
     private readonly IAliasValidationService _validationService;
+    private readonly IUserInteractionService _userInteraction;
     private AliasQueryResult? _selectedAlias;
     private readonly IThumbnailManager _thumbnailManager;
 
@@ -33,18 +37,21 @@ public partial class KeywordsViewModel : ObservableObject
         IAliasManagementService aliasManagementService,
         IThumbnailManager thumbnailManager,
         ILogger<KeywordsViewModel> logger,
-        INotificationService notificationService,
-        IAliasValidationService validationService
+        IUserNotificationService userNotificationService,
+        IAliasValidationService validationService,
+        IUserInteractionService userInteraction
     )
     {
         ArgumentNullException.ThrowIfNull(aliasManagementService);
-        ArgumentNullException.ThrowIfNull(notificationService);
+        ArgumentNullException.ThrowIfNull(userNotificationService);
         ArgumentNullException.ThrowIfNull(thumbnailManager);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(validationService);
+        ArgumentNullException.ThrowIfNull(userInteraction);
 
-        _notificationService = notificationService;
+        _userNotificationService = userNotificationService;
         _validationService = validationService;
+        _userInteraction = userInteraction;
         _aliasManagementService = aliasManagementService;
         _thumbnailManager = thumbnailManager;
         _logger = logger;
@@ -93,19 +100,18 @@ public partial class KeywordsViewModel : ObservableObject
         if (SelectedAlias.Id == 0)
         {
             Aliases.Remove(SelectedAlias);
-            _notificationService.Success("Cancel creation.", $"Abort creation of alias {aliasName}.");
+            _userNotificationService.Success($"Abort creation of alias {aliasName}.", "Cancel creation.");
             return;
         }
 
-        _logger.LogTrace("Deleting alias {AliasName}", aliasName);
-        var response = await WeakReferenceMessenger.Default.Send<Ask>(new("Do you want to delete '{0}'?".Format(SelectedAlias.Name)));
-
+        var response = await _userInteraction.AskUserYesNoAsync($"Do you want to delete '{SelectedAlias.Name}'?");
         if (!response) return;
 
+        _logger.LogTrace("Deleting alias {AliasName}", aliasName);
         await Task.Run(() => _aliasManagementService.Delete(SelectedAlias));
         var toDelete = Aliases.Where(x => x.Id == SelectedAlias.Id).ToArray();
         foreach (var item in toDelete) Aliases.Remove(item);
-        _notificationService.Success("Item deleted.", $"Alias {aliasName} deleted.");
+        _userNotificationService.Success($"Alias {aliasName} deleted.", "Item deleted.");
     }
 
     [RelayCommand]
@@ -133,7 +139,7 @@ public partial class KeywordsViewModel : ObservableObject
         var result = _validationService.IsValid(SelectedAlias);
         if (!result.IsSuccess)
         {
-            _notificationService.Warn("Validation failed", result.ErrorContent);
+            _userNotificationService.Warn(result.ErrorContent, "Validation failed");
             _logger.LogInformation("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
             return;
         }
@@ -141,7 +147,7 @@ public partial class KeywordsViewModel : ObservableObject
         _logger.LogTrace("Saving alias {AliasName}", SelectedAlias!.Name);
         var alias = SelectedAlias;
         await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));
-        _notificationService.Success("Item created.", $"Alias {alias.Name} created.");
+        _userNotificationService.Success($"Alias {alias.Name} created.", "Item created.");
         await OnLoadAliases();
     }
 

@@ -55,7 +55,7 @@ public class SearchShould : TestBase
 
     #region Methods
 
-    private static IConversionService GetConversionService()
+    private static IMappingService GetConversionService()
     {
         var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
         return new AutoMapperConverter(new Mapper(cfg));
@@ -107,7 +107,7 @@ public class SearchShould : TestBase
         using var conn = new DbSingleConnectionManager(db);
 
         var thumbnailManager = Substitute.For<IThumbnailManager>();
-        var converter = Substitute.For<IConversionService>();
+        var converter = Substitute.For<IMappingService>();
         var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
         var storeLoader = Substitute.For<IStoreLoader>();
         var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
@@ -132,7 +132,7 @@ public class SearchShould : TestBase
     public async Task ReturnResultWithExactMatchOnTop()
     {
         var dt = DateTime.Now;
-        var converter = Substitute.For<IConversionService>();
+        var converter = Substitute.For<IMappingService>();
         var sql = @$"
             insert into alias (id, file_name, arguments) values (1000, 'un', '@alias2@@alias3');
             insert into alias_name (id, id_alias, name) values (1001, 1000, 'un');
@@ -230,7 +230,7 @@ public class SearchShould : TestBase
 
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-        var converter = Substitute.For<IConversionService>();
+        var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
 
         var repository = new SQLiteRepository(connectionMgr, logger, converter);
@@ -260,7 +260,7 @@ public class SearchShould : TestBase
                                   .ToString();
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-        var converter = Substitute.For<IConversionService>();
+        var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
 
         var repository = new SQLiteRepository(connectionMgr, logger, converter);

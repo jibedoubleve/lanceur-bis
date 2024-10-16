@@ -30,7 +30,7 @@ internal class KeywordsViewModelBuilder
         _dbRepository ?? Substitute.For<IDbRepository>(),
         packagedAppSearchService: _packagedAppSearchService ?? Substitute.For<IPackagedAppSearchService>(),
         schedulers: _schedulerProvider ?? throw new ArgumentNullException($"No scheduler configured for the ViewModel to test."),
-        notify: Substitute.For<IUserNotification>(),
+        notify: Substitute.For<IUiNotification>(),
         thumbnailManager: Substitute.For<IThumbnailManager>(),
         notification: Substitute.For<INotification>()
     );

@@ -13,6 +13,8 @@
     Title="KeywordsView"
     d:DesignHeight="800"
     d:DesignWidth="800"
+    Background="{DynamicResource ApplicationBackgroundBrush}"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
     <interactivity:Interaction.Triggers>
@@ -61,23 +63,20 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal">
-                <ui:Button
-                    Margin="6"
+            <Menu>
+                <MenuItem
                     Command="{Binding CreateAliasCommand}"
-                    Content="New alias"
+                    Header="New alias"
                     Icon="{ui:SymbolIcon FormNew24}" />
-                <ui:Button
-                    Margin="6"
+                <MenuItem
                     Command="{Binding SaveCurrentAliasCommand}"
-                    Content="Save"
+                    Header="Save"
                     Icon="{ui:SymbolIcon Save24}" />
-                <ui:Button
-                    Margin="6"
+                <MenuItem
                     Command="{Binding DeleteCurrentAliasCommand}"
-                    Content="Delete"
+                    Header="Delete"
                     Icon="{ui:SymbolIcon Delete24}" />
-            </StackPanel>
+            </Menu>
             <ScrollViewer
                 Grid.Row="1"
                 VerticalScrollBarVisibility="Visible"

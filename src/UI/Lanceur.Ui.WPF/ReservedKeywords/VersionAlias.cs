@@ -12,11 +12,11 @@ namespace Lanceur.Ui.WPF.ReservedKeywords;
 [Description("Indicates the version of the application")]
 public class VersionAlias : SelfExecutableQueryResult
 {
-    private readonly IUiUserInteractionService _interaction;
+    private readonly IUserInteractionService _userInteraction;
 
     #region Constructors
 
-    public VersionAlias(IServiceProvider serviceProvider) => _interaction = serviceProvider.GetService<IUiUserInteractionService>()!;
+    public VersionAlias(IServiceProvider serviceProvider) => _userInteraction = serviceProvider.GetService<IUserInteractionService>()!;
 
     #endregion
 
@@ -35,7 +35,7 @@ public class VersionAlias : SelfExecutableQueryResult
         var semverSplit = semver?.Split(["+"], StringSplitOptions.RemoveEmptyEntries);
         semver = semverSplit?.Length > 0 ? semverSplit[0] : semver;
 
-        await _interaction.ShowAsync($"Lanceur {semver}", "Written by Jean-Baptiste Wautier");
+        await _userInteraction.ShowAsync($"Lanceur {semver}", "Written by Jean-Baptiste Wautier");
             
         return await NoResultAsync;
     }

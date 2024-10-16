@@ -32,14 +32,14 @@ public class DoubloonsViewModel : RoutableViewModel, IActivatableViewModel
 
     public DoubloonsViewModel(
         ISchedulerProvider schedulers = null,
-        IUserNotification notify = null,
+        IUiNotification notify = null,
         IDbRepository service = null,
         IThumbnailManager thumbnailManager = null,
         INotification notification = null
     )
     {
         var l = Locator.Current;
-        notify ??= l.GetService<IUserNotification>();
+        notify ??= l.GetService<IUiNotification>();
         schedulers ??= l.GetService<ISchedulerProvider>();
         _service = service ?? l.GetService<IDbRepository>();
         _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
@@ -113,7 +113,7 @@ public class DoubloonsViewModel : RoutableViewModel, IActivatableViewModel
         if (remove && count > 0)
         {
             foreach (var item in toDel) Doubloons.Remove(item);
-            _service.Remove(toDel);
+            _service.RemoveMany(toDel);
             _notification.Information($"Removed {toDel.Count} alias(es).");
         }
     }

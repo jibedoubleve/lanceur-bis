@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Services;
 
-public interface IConversionService
+public interface IMappingService
 {
     #region Methods
 
@@ -10,7 +10,7 @@ public interface IConversionService
 
     IEnumerable<QueryResult> ToQueryResult(IEnumerable<string> enumerable);
 
-    IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<QueryResult> source);
+    IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<AliasQueryResult> source);
 
     #endregion Methods
 }
