@@ -1,0 +1,50 @@
+<Page x:Class="Lanceur.Ui.WPF.Views.Pages.AnalyticsView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+      xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:p="clr-namespace:Lanceur.Ui.Core.ViewModels.Pages;assembly=Lanceur.Ui.Core"
+      Background="{DynamicResource ApplicationBackgroundBrush}"
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+      mc:Ignorable="d"
+      Title="HistoryView">
+    <interactivity:Interaction.Triggers>
+        <interactivity:EventTrigger EventName="Loaded">
+            <interactivity:InvokeCommandAction
+                Command="{Binding RefreshMonthlyHistoryCommand}" />
+        </interactivity:EventTrigger>
+    </interactivity:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="Monthly history" Command="{Binding RefreshMonthlyHistoryCommand}"
+                      Icon="{ui:SymbolIcon CalendarMonth24}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.MonthlyHistory}}" />
+            
+            <MenuItem Header="Daily history" Command="{Binding RefreshDailyHistoryCommand}"
+                      Icon="{ui:SymbolIcon CalendarDay24}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.DailyHistory}}" />
+            
+            <Separator Margin="5,3,5,3" />
+            
+            <MenuItem Header="Usage by day of week" Command="{Binding RefreshUsageByDayOfWeekCommand}"
+                      Icon="{ui:SymbolIcon ShiftsDay24}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.UsageByDayOfWeek}}" />
+
+            <MenuItem Header="Usage by hour" Command="{Binding RefreshUsageByHourOfDayCommand}"
+                      Icon="{ui:SymbolIcon Shifts24}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.UsageByHourOfDay}}" />
+        </Menu>
+        <sp:WpfPlot x:Name="HistoryPlot" Grid.Row="1" />
+    </Grid>
+</Page>

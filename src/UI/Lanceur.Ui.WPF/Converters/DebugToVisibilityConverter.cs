@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters
 {
-    internal class DebugToVisibility : IValueConverter
+    internal class DebugToVisibilityConverter : IValueConverter
     {
         #region Fields
 

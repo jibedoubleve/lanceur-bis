@@ -4,7 +4,7 @@ namespace Lanceur.Core.Repositories;
 
 public enum Per
 {
-    Hour,
+    HourOfDay,
     Day,
     DayOfWeek,
     Month

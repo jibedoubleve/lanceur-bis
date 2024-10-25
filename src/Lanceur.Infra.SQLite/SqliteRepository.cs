@@ -63,18 +63,18 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public IEnumerable<SelectableAliasQueryResult> GetDoubloons()
     {
         const string sql = $"""
-                           select
-                               id        as {nameof(SelectableAliasQueryResult.Id)},
-                               notes     as {nameof(SelectableAliasQueryResult.Description)},
-                               file_name as {nameof(SelectableAliasQueryResult.FileName)},
-                               arguments as {nameof(SelectableAliasQueryResult.Parameters)},
-                               name      as {nameof(SelectableAliasQueryResult.Name)},
-                               icon      as {nameof(SelectableAliasQueryResult.Icon)},
-                               thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
-                           from
-                               data_doubloons_v
-                           order by file_name
-                           """;
+                            select
+                                id        as {nameof(SelectableAliasQueryResult.Id)},
+                                notes     as {nameof(SelectableAliasQueryResult.Description)},
+                                file_name as {nameof(SelectableAliasQueryResult.FileName)},
+                                arguments as {nameof(SelectableAliasQueryResult.Parameters)},
+                                name      as {nameof(SelectableAliasQueryResult.Name)},
+                                icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                                thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
+                            from
+                                data_doubloons_v
+                            order by file_name
+                            """;
         var results = DB.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
         var r = _converter.ToSelectableQueryResult(results);
         return r;
@@ -104,8 +104,9 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     ///<inheritdoc/>
     public IEnumerable<SelectableAliasQueryResult> GetInvalidAliases()
     {
-        var result = GetAll().Where(a => MacroValidator.IsMacroFormat(a.FileName) && MacroValidator.IsValid(a.FileName))
-                             .ToArray();
+        var result = GetAll()
+                     .Where(a => MacroValidator.IsMacroFormat(a.FileName) && MacroValidator.IsValid(a.FileName))
+                     .ToArray();
         return _converter.ToSelectableQueryResult(result);
     }
 
@@ -132,7 +133,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         var action = new HistoryDbAction(DB);
         return per switch
         {
-            Per.Hour      => action.PerHour(),
+            Per.HourOfDay => action.PerHour(),
             Per.Day       => action.PerDay(),
             Per.DayOfWeek => action.PerDayOfWeek(),
             Per.Month     => action.PerMonth(),

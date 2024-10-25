@@ -37,13 +37,9 @@
                     Icon="{ui:SymbolIcon Database24}"
                     TargetPageType="{x:Type pages:DataReconciliationView}"/>
                 <ui:NavigationViewItem
-                    Content="History"
-                    Icon="{ui:SymbolIcon History24}"
-                    TargetPageType="{x:Type pages:HistoryView}" />
-                <ui:NavigationViewItem
-                    Content="Trends"
+                    Content="Analytics"
                     Icon="{ui:SymbolIcon ChartMultiple24}"
-                    TargetPageType="{x:Type pages:TrendsView}" />
+                    TargetPageType="{x:Type pages:AnalyticsView}" />
                 <ui:NavigationViewItem
                     Content="Most used"
                     Icon="{ui:SymbolIcon TextWordCount24}"

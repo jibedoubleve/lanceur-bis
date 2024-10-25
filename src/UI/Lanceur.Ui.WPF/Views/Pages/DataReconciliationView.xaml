@@ -110,6 +110,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    
                     <!--  ICON  -->
                     <DataGridTemplateColumn Width="60" Header="Icon">
                         <DataGridTemplateColumn.CellTemplate>

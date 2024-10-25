@@ -59,7 +59,7 @@ public class TrendsViewModel : RoutableViewModel
         var y2 = dow.Select(x => x.Y);
         OnRefreshChartDayOfWeek?.Invoke(x2, y2);
 
-        var hour = _service.GetUsage(Per.Hour);
+        var hour = _service.GetUsage(Per.HourOfDay);
         var x3 = hour.Select(x => x.X.ToString("HH:mm"));
         var y3 = hour.Select(x => x.Y);
         OnRefreshChartHour?.Invoke(x3, y3);

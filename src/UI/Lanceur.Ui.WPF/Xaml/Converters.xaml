@@ -8,7 +8,7 @@
     <conv:InvertNullToVisibilityConverter x:Key="InvertNullToVisibilityConverter" />
     <conv:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter" />
     <conv:KeyToDirectionConverter x:Key="KeyToDirectionConverter" />
-    <conv:DebugToVisibility x:Key="DebugToVisibility" />
+    <conv:DebugToVisibilityConverter x:Key="DebugToVisibilityConverter" />
     <conv:TextToTruncatedTextConverter x:Key="TextToTruncatedTextConverter" />
     <conv:InvertBooleanToVisibilityConverter x:Key="InvertBooleanToVisibilityConverter" />
     <conv:StringToRunAsConverter x:Key="StringToRunAsConverter" />
@@ -16,5 +16,6 @@
     <conv:NumberToBooleanConverter x:Key="NumberToBooleanConverter" />
     <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
     <conv:IntToKeyEnumConverter x:Key="IntToKeyEnumConverter" />
-    <conv:IsDoubloonReportToVisibilityConverter x:Key="IsDoubloonReportToVisibilityConverter"/>
+    <conv:IsDoubloonReportToVisibilityConverter x:Key="IsDoubloonReportToVisibilityConverter" />
+    <conv:InvertPlotTypeToBooleanConverter x:Key="InvertPlotTypeToBooleanConverter" />
 </ResourceDictionary>

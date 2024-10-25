@@ -41,6 +41,7 @@
         <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
         <PackageReference Include="NHotkey" Version="2.1.1" />
         <PackageReference Include="NHotkey.Wpf" Version="2.1.1" />
+        <PackageReference Include="ScottPlot.WPF" Version="5.0.40" />
         <PackageReference Include="WPF-UI" Version="3.0.5" />
         <PackageReference Include="WPF-UI.Tray" Version="3.0.5" />
     </ItemGroup>
