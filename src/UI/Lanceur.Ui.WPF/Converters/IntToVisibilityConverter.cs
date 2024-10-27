@@ -15,7 +15,7 @@ namespace Lanceur.Ui.WPF.Converters
                 return integer <= 0 ? Visibility.Collapsed : Visibility.Visible;
             }
 
-            return value;
+            return Binding.DoNothing;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();

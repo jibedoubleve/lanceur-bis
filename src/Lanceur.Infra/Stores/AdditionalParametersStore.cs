@@ -18,7 +18,7 @@ public class AdditionalParametersStore : IStoreService
     private readonly IDbRepository _aliasService;
     private readonly ILogger<AdditionalParametersStore> _logger;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -28,23 +28,14 @@ public class AdditionalParametersStore : IStoreService
         _logger = serviceProvider.GetService<ILogger<AdditionalParametersStore>>();
     }
 
-    [Obsolete("Use ctor with service provider instead")]
-    public AdditionalParametersStore(IDbRepository aliasService = null, ILoggerFactory loggerFactory = null)
-    {
-        _aliasService = aliasService ?? Locator.Current.GetService<IDbRepository>();
-
-        loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
-        _logger = loggerFactory.GetLogger<AdditionalParametersStore>();
-    }
-
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     /// <inheritdoc />
     public Orchestration Orchestration { get; } = Orchestration.Shared(".*:.*");
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -58,5 +49,5 @@ public class AdditionalParametersStore : IStoreService
         return _aliasService.SearchAliasWithAdditionalParameters(query.Name);
     }
 
-    #endregion Methods
+    #endregion
 }

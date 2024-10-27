@@ -66,15 +66,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IMappingService, AutoMapperMappingService>()
                          .AddTransient<ISearchService, SearchService>()
                          .AddTransient<IStoreLoader, StoreLoader>()
-                         .AddTransient<IMacroManager, MacroManager>(
-                             s =>
-                                 new(
-                                     Assembly.GetAssembly(typeof(MultiMacro)),
-                                     s.GetService<ILogger<MacroManager>>(),
-                                     s.GetService<IDbRepository>(),
-                                     s.GetService<IServiceProvider>()
-                                 )
-                         )
+                         .AddTransient<IMacroManager, MacroManager>()
                          .AddTransient<ILoggerFactory, LoggerFactory>()
                          .AddTransient<IThumbnailManager, ThumbnailManager>()
                          .AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>()

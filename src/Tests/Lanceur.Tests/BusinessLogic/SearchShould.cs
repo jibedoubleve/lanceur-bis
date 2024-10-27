@@ -16,11 +16,10 @@ using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
-using Lanceur.Utils;
+using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Splat;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -30,36 +29,28 @@ public class SearchShould : TestBase
 {
     #region Fields
 
-    private const string SqlCreateAlias = @"
-                insert into alias (id, file_name, arguments) values (1000, '@multi@', '@alias2@@alias3');
-                insert into alias_name (id, id_alias, name) values (1000, 1000, 'alias1');
-
-                insert into alias (id, file_name, arguments) values (2000, 'arg', 'c:\dummy\dummy.exe');
-                insert into alias_name (id, id_alias, name) values (2000, 2000, 'alias2');
-
-                insert into alias (id, file_name, arguments) values (3000, 'arg', 'c:\dummy\dummy.exe');
-                insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');";
-
     private readonly ILoggerFactory _testLoggerFactory;
 
-    #endregion Fields
+    private const string SqlCreateAlias = """
+                                          insert into alias (id, file_name, arguments) values (1000, '@multi@', '@alias2@@alias3');
+                                          insert into alias_name (id, id_alias, name) values (1000, 1000, 'alias1');
+
+                                          insert into alias (id, file_name, arguments) values (2000, 'arg', 'c:\dummy\dummy.exe');
+                                          insert into alias_name (id, id_alias, name) values (2000, 2000, 'alias2');
+
+                                          insert into alias (id, file_name, arguments) values (3000, 'arg', 'c:\dummy\dummy.exe');
+                                          insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');
+                                          """;
+
+    #endregion
 
     #region Constructors
 
-    public SearchShould(ITestOutputHelper output) : base(output)
-    {
-        _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
-    }
+    public SearchShould(ITestOutputHelper output) : base(output) => _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
-
-    private static IMappingService GetConversionService()
-    {
-        var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
-        return new AutoMapperConverter(new Mapper(cfg));
-    }
 
     [Fact]
     public void HaveStores()
@@ -80,7 +71,7 @@ public class SearchShould : TestBase
     public void NOT_HaveNullParameters()
     {
         // arrange
-        var converter = GetConversionService();
+        var converter = new AutoMapperMappingService();
         using var db = BuildFreshDb(SqlCreateAlias);
         using var conn = new DbSingleConnectionManager(db);
 
@@ -95,27 +86,63 @@ public class SearchShould : TestBase
     }
 
     [Fact]
+    public void NotSetUsageWhenCounterIsNegative()
+    {
+        /*
+         * Create a new alias with usage set to -1
+         * Execute it 4 times
+         * Check counter is still -1
+         */
+        OutputHelper.Arrange();
+        var sql = new SqlBuilder().AppendAlias(1)
+                                  .AppendSynonyms(1, "a")
+                                  .ToString();
+        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
+        var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
+        var converter = Substitute.For<IMappingService>();
+        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
+
+        var repository = new SQLiteRepository(connectionMgr, logger, converter);
+
+        OutputHelper.Act();
+
+        for (var i = 0; i < 5; i++) repository.SetUsage(alias);
+
+        OutputHelper.Assert();
+        const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
+
+        connectionMgr.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount))
+                     .Should()
+                     .Be(0);
+    }
+
+    [Fact]
     public async Task ReturnNoResultMessageWhenMisconfiguredMacro()
     {
         // ARRANGE
         const string sql = SqlCreateAlias +
-                           @"
-                insert into alias (id, file_name) values (4000, '@zzzz@');
-                insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');";
+                           """
+                           insert into alias (id, file_name) values (4000, '@zzzz@');
+                           insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');
+                           """;
 
         using var db = BuildFreshDb(sql);
         using var conn = new DbSingleConnectionManager(db);
 
-        var thumbnailManager = Substitute.For<IThumbnailManager>();
-        var converter = Substitute.For<IMappingService>();
-        var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
-        var storeLoader = Substitute.For<IStoreLoader>();
-        var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-        storeLoader.Load().Returns(new[] { new AliasStore(repository) });
+        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<IThumbnailManager>())
+                                                     .AddSingleton(Substitute.For<IMappingService>())
+                                                     .AddSingleton<SQLiteRepository>()
+                                                     .AddSingleton(Substitute.For<IStoreLoader>())
+                                                     .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
+                                                     .AddSingleton<SearchService>()
+                                                     .AddSingleton<ILogger<MacroManager>>(new TestOutputHelperDecoratorForMicrosoftLogging<MacroManager>(OutputHelper))
+                                                     .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .BuildServiceProvider();
 
-        var asm = Assembly.GetExecutingAssembly();
-        ILogger<MacroManager> logger = new TestOutputHelperDecoratorForMicrosoftLogging<MacroManager>(OutputHelper);
-        var service = new SearchService(storeLoader, new MacroManager(asm, logger, repository, new ServiceCollection().BuildServiceProvider()), thumbnailManager, orchestrator: orchestrator);
+        var storeLoader = serviceProvider.GetService<IStoreLoader>();
+        storeLoader.Load().Returns([new AliasStore(serviceProvider)]);
+
+        var service = serviceProvider.GetService<SearchService>();
 
         // ACT
         var result = (await service.SearchAsync(new("z"))).ToArray();
@@ -133,42 +160,49 @@ public class SearchShould : TestBase
     {
         var dt = DateTime.Now;
         var converter = Substitute.For<IMappingService>();
-        var sql = @$"
-            insert into alias (id, file_name, arguments) values (1000, 'un', '@alias2@@alias3');
-            insert into alias_name (id, id_alias, name) values (1001, 1000, 'un');
+        var sql = $"""
+                   insert into alias (id, file_name, arguments) values (1000, 'un', '@alias2@@alias3');
+                   insert into alias_name (id, id_alias, name) values (1001, 1000, 'un');
 
-            insert into alias (id, file_name, arguments) values (2000, 'deux', '@alias2@@alias3');
-            insert into alias_name (id, id_alias, name) values (1002, 2000, 'deux');
+                   insert into alias (id, file_name, arguments) values (2000, 'deux', '@alias2@@alias3');
+                   insert into alias_name (id, id_alias, name) values (1002, 2000, 'deux');
 
-            insert into alias (id, file_name, arguments) values (3000, 'trois', '@alias2@@alias3');
-            insert into alias_name (id, id_alias, name) values (1003, 3000, 'trois');
-            --
-            insert into alias (id, file_name, arguments) values (4000, 'u', '@alias2@@alias3');
-            insert into alias_name (id, id_alias, name) values (1004, 4000, 'u');
-            --
-            insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            ---
-            insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            ---
-            insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-            insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
-         ";
+                   insert into alias (id, file_name, arguments) values (3000, 'trois', '@alias2@@alias3');
+                   insert into alias_name (id, id_alias, name) values (1003, 3000, 'trois');
+                   --
+                   insert into alias (id, file_name, arguments) values (4000, 'u', '@alias2@@alias3');
+                   insert into alias_name (id, id_alias, name) values (1004, 4000, 'u');
+                   --
+                   insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   insert into alias_usage (id_alias, time_stamp) values (1000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   ---
+                   insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   insert into alias_usage (id_alias, time_stamp) values (2000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   ---
+                   insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   insert into alias_usage (id_alias, time_stamp) values (3000, '{dt.AddMinutes(1):yyyy-MM-dd HH:m:s}');
+                   """;
 
         // ARRANGE
         using var db = BuildFreshDb(sql);
         using var conn = new DbSingleConnectionManager(db);
 
+        var serviceProvider = new ServiceCollection().AddSingleton<SQLiteRepository>()
+                                                     .AddSingleton(conn)
+                                                     .AddSingleton(_testLoggerFactory)
+                                                     .AddSingleton(converter)
+                                                     .AddSingleton(Substitute.For<IStoreLoader>())
+                                                     .BuildServiceProvider();
         const string criterion = "u";
-        var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
-        var stores = Substitute.For<IStoreLoader>();
-        stores.Load().Returns(new[] { new AliasStore(repository) });
+        var stores = serviceProvider.GetService<IStoreLoader>();
+        stores.Load().Returns([new AliasStore(serviceProvider)]);
 
-        var results = repository.Search(criterion).ToList();
+        var results = serviceProvider.GetService<SQLiteRepository>()
+                                     .Search(criterion)
+                                     .ToList();
         var macroManager = Substitute.For<IMacroManager>();
         macroManager.Handle(Arg.Any<QueryResult[]>())
                     .Returns(results);
@@ -241,41 +275,10 @@ public class SearchShould : TestBase
         OutputHelper.Assert();
         const string sqlCount = "select count(*) from alias_argument";
 
-        connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
+        connectionMgr.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount))
                      .Should()
                      .Be(3);
     }
 
-    [Fact]
-    public void NotSetUsageWhenCounterIsNegative()
-    {
-        /*
-         * Create a new alias with usage set to -1
-         * Execute it 4 times
-         * Check counter is still -1
-         */
-        OutputHelper.Arrange();
-        var sql = new SqlBuilder().AppendAlias(1)
-                                  .AppendSynonyms(1, "a")
-                                  .ToString();
-        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
-        var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-        var converter = Substitute.For<IMappingService>();
-        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
-
-        var repository = new SQLiteRepository(connectionMgr, logger, converter);
-
-        OutputHelper.Act();
-
-        for (var i = 0; i < 5; i++) repository.SetUsage(alias);
-
-        OutputHelper.Assert();
-        const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
-
-        connectionMgr.WithinTransaction(x => x.Connection.ExecuteScalar<int>(sqlCount))
-                     .Should()
-                     .Be(0);
-    }
-
-    #endregion Methods
+    #endregion
 }

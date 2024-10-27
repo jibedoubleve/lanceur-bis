@@ -15,6 +15,7 @@ public class MacroManager : MacroManagerCache, IMacroManager
 
     #region Constructors
 
+    [Obsolete("Should be refactored and only user ServiceProvider")]
     public MacroManager(Assembly asm, ILogger<MacroManager> logger, IDbRepository dbRepository, IServiceProvider serviceProvider) : base(asm, logger, dbRepository, serviceProvider)
     {
         _logger = logger;

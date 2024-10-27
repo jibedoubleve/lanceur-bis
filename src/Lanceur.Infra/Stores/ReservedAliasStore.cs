@@ -17,16 +17,15 @@ namespace Lanceur.Infra.Stores;
 [Store]
 public class ReservedAliasStore : IStoreService
 {
-    private readonly IServiceProvider _serviceProvider;
-
     #region Fields
 
     private readonly Assembly _assembly;
     private readonly IDbRepository _dataService;
     private readonly ILogger<ReservedAliasStore> _logger;
     private IEnumerable<QueryResult> _reservedAliases;
+    private readonly IServiceProvider _serviceProvider;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -41,31 +40,18 @@ public class ReservedAliasStore : IStoreService
     {
         _serviceProvider = serviceProvider;
         _assembly = Assembly.GetEntryAssembly();
-        _dataService =serviceProvider.GetService<IDbRepository>();
+        _dataService = serviceProvider.GetService<IDbRepository>();
         _logger = serviceProvider.GetService<ILogger<ReservedAliasStore>>();
-
     }
 
-    /// <summary>
-    /// Generate a new instance
-    /// </summary>
-    /// <param name="assembly">The assembly where to search the reserved aliases. </param>
-    /// <param name="dataService">The service used to update usage of the alias</param>
-    /// <param name="loggerFactory">Logger factory used to create logger</param>
-    /// <remarks>
-    /// Each reserved alias should be decorated with <see cref="ReservedAliasAttribute"/>
-    /// </remarks>
-    [Obsolete("Use ctor with service provider instead")]
-    public ReservedAliasStore(Assembly assembly, IDbRepository dataService = null, ILoggerFactory loggerFactory = null)
-    {
-        _assembly = assembly;
-        _dataService = dataService ?? Locator.Current.GetService<IDbRepository>();
+    #endregion
 
-        loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
-        _logger = loggerFactory?.GetLogger<ReservedAliasStore>() ?? new NullLogger<ReservedAliasStore>();
-    }
+    #region Properties
 
-    #endregion Constructors
+    /// <inheritdoc />
+    public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
+
+    #endregion
 
     #region Methods
 
@@ -104,9 +90,6 @@ public class ReservedAliasStore : IStoreService
     }
 
     /// <inheritdoc />
-    public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
-
-    /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll()
     {
         if (_reservedAliases == null) LoadAliases();
@@ -117,8 +100,9 @@ public class ReservedAliasStore : IStoreService
     public IEnumerable<QueryResult> Search(Cmdline query)
     {
         using var _ = _logger.MeasureExecutionTime(this);
-        var result = GetAll().Where(k => k.Name.ToLower().StartsWith(query.Name))
-                             .ToList();
+        var result = GetAll()
+                     .Where(k => k.Name.ToLower().StartsWith(query.Name))
+                     .ToList();
 
         var orderedResult = _dataService
                             .RefreshUsage(result)
@@ -127,5 +111,5 @@ public class ReservedAliasStore : IStoreService
         return orderedResult;
     }
 
-    #endregion Methods
+    #endregion
 }

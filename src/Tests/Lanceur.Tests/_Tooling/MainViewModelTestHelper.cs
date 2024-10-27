@@ -1,6 +1,5 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Tests.Tooling.ReservedAliases;
-using Lanceur.Views;
 
 namespace Lanceur.Tests.Tooling;
 
@@ -15,10 +14,5 @@ public static class MainViewModelTestHelper
         return result;
     }
 
-    public static void SetResults(this MainViewModel vm, IEnumerable<QueryResult> results)
-    {
-        foreach (var item in results) vm.Results.Add(item);
-    }
-
-    #endregion Methods
+    #endregion
 }

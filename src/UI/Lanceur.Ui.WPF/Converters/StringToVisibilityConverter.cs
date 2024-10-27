@@ -9,7 +9,7 @@ public class StringToVisibilityConverter : IValueConverter
 {
     #region Methods
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not string str) return Visibility.Collapsed;
 

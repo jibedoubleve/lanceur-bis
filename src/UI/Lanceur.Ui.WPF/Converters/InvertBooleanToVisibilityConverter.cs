@@ -8,18 +8,18 @@ public class InvertBooleanToVisibilityConverter : IValueConverter
 {
     #region Methods
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is bool boolean) return boolean ? Visibility.Collapsed : Visibility.Visible;
 
-        return value;
+        return Binding.DoNothing;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is Visibility visibility) return visibility != Visibility.Visible;
 
-        return value;
+        return Binding.DoNothing;
     }
 
     #endregion

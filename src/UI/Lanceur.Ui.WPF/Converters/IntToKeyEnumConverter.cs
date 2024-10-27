@@ -8,16 +8,16 @@ public class IntToKeyEnumConverter : IValueConverter
 {
     #region Methods
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not int integer) return value;
+        if (value is not int integer) return Binding.DoNothing;
 
         return (Key)integer;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not Key key) return value;
+        if (value is not Key key) return Binding.DoNothing;
 
         return (int)key;
     }

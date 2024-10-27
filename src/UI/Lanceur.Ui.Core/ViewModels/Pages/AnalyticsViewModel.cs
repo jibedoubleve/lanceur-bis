@@ -30,10 +30,10 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #region Properties
 
-    public Action<IEnumerable<double>, IEnumerable<double>> OnRefreshDailyPlot { get; set; }
-    public Action<IEnumerable<double>, IEnumerable<double>> OnRefreshMonthlyPlot { get; set; }
-    public Action<IEnumerable<double>, IEnumerable<double>> OnRefreshUsageByDayOfWeekPlot { get; set; }
-    public Action<IEnumerable<double>, IEnumerable<double>> OnRefreshUsageByHourPlot { get; set; }
+    public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshDailyPlot { get; set; }
+    public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshMonthlyPlot { get; set; }
+    public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshUsageByDayOfWeekPlot { get; set; }
+    public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshUsageByHourPlot { get; set; }
 
     #endregion
 
@@ -68,14 +68,13 @@ public partial class AnalyticsViewModel : ObservableObject
     }
 
     private void Refresh(
-        Action<IEnumerable<double>, IEnumerable<double>> viewRefresher,
+        Action<IEnumerable<double>, IEnumerable<double>>? viewRefresher,
         IEnumerable<DataPoint<DateTime, double>> dataPoints,
         PlotType plotType,
         Func<DateTime, double>? convert = null,
         [CallerMemberName] string? caller = null
     )
     {
-        ArgumentNullException.ThrowIfNull(viewRefresher);
         convert ??= r => r.ToOADate();
 
         _logger.LogDebug("[ViewModel] Refreshing plot {Caller}", caller);
@@ -83,7 +82,7 @@ public partial class AnalyticsViewModel : ObservableObject
         var x = points.Select(p => convert(p.X)).ToArray();
         var y = points.Select(p => p.Y).ToArray();
         CurrentPlotType = plotType;
-        viewRefresher(x, y);
+        viewRefresher?.Invoke(x, y);
     }
 
     #endregion

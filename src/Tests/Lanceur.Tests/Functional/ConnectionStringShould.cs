@@ -1,6 +1,9 @@
 ﻿using FluentAssertions;
-using Lanceur.Utils.ConnectionStrings;
 using System.Text.RegularExpressions;
+using Lanceur.Core.Repositories.Config;
+using Lanceur.Ui.Core.Utils.ConnectionStrings;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;
@@ -28,10 +31,9 @@ public class ConnectionStringShould
     public void NotThrowErrorWhenFileDoesNotExist()
     {
         // Arrange
-        var file = Path.GetTempFileName();
-        File.Delete(file);
-
-        var cs = new ConnectionString(file);
+        var config = Substitute.For<ILocalConfigRepository>();
+        var logger = Substitute.For<ILogger<ConnectionString>>();
+        var cs = new ConnectionString(config, logger);
 
         // Act
         var action = () => cs.ToString();
@@ -44,17 +46,15 @@ public class ConnectionStringShould
     public void NotThrowErrorWhenFileExists()
     {
         // Arrange
-        var file = Path.GetTempFileName();
-        var cs = new ConnectionString(file);
+        var config = Substitute.For<ILocalConfigRepository>();
+        var logger = Substitute.For<ILogger<ConnectionString>>();
+        var cs = new ConnectionString(config, logger);
 
         // Act
         var action = () => cs.ToString();
 
         // Assert
         action.Should().NotThrow<InvalidDataException>();
-
-        // Tear down
-        File.Delete(file);
     }
 
     #endregion Methods

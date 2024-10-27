@@ -8,7 +8,7 @@ public class LuaCompletionData : ICompletionData
 {
     #region Constructors
 
-    public LuaCompletionData(string text, string description = null, double priority = 1)
+    public LuaCompletionData(string text, string? description = null, double priority = 1)
     {
         Text = text;
         Description = description;
@@ -22,8 +22,8 @@ public class LuaCompletionData : ICompletionData
     // Use this property if you want to show a fancy UIElement in the list.
     public object Content => Text;
 
-    public object Description { get; }
-    public System.Windows.Media.ImageSource Image => null;
+    public object? Description { get; }
+    public System.Windows.Media.ImageSource? Image => null;
     public double Priority { get; }
     public string Text { get; }
 

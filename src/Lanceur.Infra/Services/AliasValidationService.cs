@@ -12,7 +12,7 @@ internal static class AliasValidationRulesExtensions
 
     public static ValidationStatus ShouldNotBeNullOrEmpty(this string value, string error) => value.IsNullOrWhiteSpace() ? ValidationStatus.Invalid(error) : ValidationStatus.Valid();
 
-    public static ValidationStatus ValidateString(this object? str, Func<string, ValidationStatus> validate)
+    public static ValidationStatus ValidateString(this object str, Func<string, ValidationStatus> validate)
     {
         if (str is null) return ValidationStatus.Invalid("The value cannot be null. Please provide a valid input.");
         if (str is not string s) return ValidationStatus.Invalid("The input must be a valid string. Please enter text.");
@@ -39,7 +39,7 @@ public class AliasValidationService : IAliasValidationService
 
     #region Methods
 
-    public ValidationStatus AreNamesUnique(object? names, long idAlias)
+    public ValidationStatus AreNamesUnique(object names, long idAlias)
     {
         if (names is null) return ValidationStatus.Invalid("The value cannot be null. Please provide a valid input.");
         if (names is not string s) return ValidationStatus.Invalid("The input must be a valid string. Please enter text.");
@@ -57,8 +57,8 @@ public class AliasValidationService : IAliasValidationService
             : ValidationStatus.Valid();
     }
 
-    public ValidationStatus IsFileNameValid(object? fileName) => fileName.ValidateString(f => f.ShouldNotBeNullOrEmpty("Filename is required and cannot be empty."));
-    public ValidationStatus IsNameValid(object? name) => name.ValidateString(n => n.ShouldNotBeNullOrEmpty("An alias must contain at least one name, or multiple names separated by commas."));
+    public ValidationStatus IsFileNameValid(object fileName) => fileName.ValidateString(f => f.ShouldNotBeNullOrEmpty("Filename is required and cannot be empty."));
+    public ValidationStatus IsNameValid(object name) => name.ValidateString(n => n.ShouldNotBeNullOrEmpty("An alias must contain at least one name, or multiple names separated by commas."));
 
     public ValidationStatus IsValid(AliasQueryResult alias)
     {

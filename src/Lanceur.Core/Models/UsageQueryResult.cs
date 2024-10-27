@@ -12,10 +12,5 @@ public class UsageQueryResult : QueryResult
         _     => "red"
     };
 
-    [Obsolete("Should be soon removed.")]
-    public override string Icon => Count / 100 > 9
-        ? "Numeric9PlusBoxMultipleOutline"
-        : $"Numeric{Count / 100}BoxOutline";
-
     #endregion Properties
 }

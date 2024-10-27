@@ -5,7 +5,9 @@ namespace Lanceur.Ui.WPF.Converters;
 
 public class NumberToBooleanConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    #region Methods
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value switch
         {
@@ -14,9 +16,11 @@ public class NumberToBooleanConverter : IValueConverter
             decimal de => de > 0,
             double d   => d > 0,
             float f    => f > 0,
-            _          => value
+            _          => Binding.DoNothing
         };
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+
+    #endregion
 }

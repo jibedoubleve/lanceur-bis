@@ -18,7 +18,7 @@ public class AliasStore : IStoreService
     private readonly IDbRepository _dbRepository;
     private readonly ILogger<AliasStore> _logger;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -28,21 +28,16 @@ public class AliasStore : IStoreService
         _logger = serviceProvider.GetService<ILogger<AliasStore>>();
     }
 
-    [Obsolete("Use ctor with service provider instead")]
-    public AliasStore(IDbRepository dbRepository = null, ILoggerFactory loggerFactory = null)
-    {
-        _dbRepository = dbRepository ?? Locator.Current.GetService<IDbRepository>();
+    #endregion
 
-        loggerFactory ??= Locator.Current.GetService<ILoggerFactory>();
-        _logger = loggerFactory.GetLogger<AliasStore>();
-    }
-
-    #endregion Constructors
-
-    #region Methods
+    #region Properties
 
     /// <inheritdoc />
     public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
+
+    #endregion
+
+    #region Methods
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll() => _dbRepository.GetAll();
@@ -54,5 +49,5 @@ public class AliasStore : IStoreService
         return _dbRepository.Search(query.Name);
     }
 
-    #endregion Methods
+    #endregion
 }

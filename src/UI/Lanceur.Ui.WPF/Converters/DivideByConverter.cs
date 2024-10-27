@@ -26,7 +26,7 @@ public class DivideByConverter : IValueConverter
         return Math.Ceiling(number * 2) / 2;
     }
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (!int.TryParse($"{value}", out var integer)) return Binding.DoNothing;
 
@@ -37,7 +37,7 @@ public class DivideByConverter : IValueConverter
         return Divide(integer, divider);
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
 
     #endregion
 }

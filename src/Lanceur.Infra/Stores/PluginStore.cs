@@ -20,7 +20,6 @@ public class PluginStore : IStoreService, IPluginManifestRepository
 {
     #region Fields
 
-    private static IEnumerable<SelfExecutableQueryResult> _plugins;
     private readonly Version _appVersion;
     private readonly IPluginStoreContext _context;
     private readonly IDbRepository _dbRepository;
@@ -28,40 +27,30 @@ public class PluginStore : IStoreService, IPluginManifestRepository
     private readonly ILoggerFactory _loggerFactory;
     private readonly IPluginManager _pluginManager;
 
-    #endregion Fields
+    private static IEnumerable<SelfExecutableQueryResult> _plugins;
+
+    #endregion
 
     #region Constructors
 
     public PluginStore(IServiceProvider serviceProvider)
     {
         _logger = serviceProvider.GetService<ILogger<PluginStore>>();
-
+        _loggerFactory = serviceProvider.GetService<ILoggerFactory>();
         _dbRepository = serviceProvider.GetService<IDbRepository>();
         _pluginManager = serviceProvider.GetService<IPluginManager>();
         _context = serviceProvider.GetService<IPluginStoreContext>();
         _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
     }
 
-    [Obsolete("Use ctor with service provider instead")]
-    public PluginStore(
-        IPluginStoreContext context = null,
-        IPluginManager pluginManager = null,
-        IDbRepository dbRepository = null,
-        ILoggerFactory loggerFactory = null
-    )
-    {
-        var l = Locator.Current;
+    #endregion
 
-        _loggerFactory = loggerFactory ?? l.GetService<ILoggerFactory>();
-        _logger = LoggerFactoryMixin.GetLogger<PluginStore>(_loggerFactory);
+    #region Properties
 
-        _dbRepository = dbRepository ?? l.GetService<IDbRepository>();
-        _pluginManager = pluginManager ?? l.GetService<IPluginManager>();
-        _context = context ?? l.GetService<IPluginStoreContext>();
-        _appVersion = Assembly.GetExecutingAssembly().GetName().Version;
-    }
+    /// <inheritdoc />
+    public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -76,9 +65,6 @@ public class PluginStore : IStoreService, IPluginManifestRepository
                    .Select(x => new PluginExecutableQueryResult(x, _loggerFactory))
                    .ToList();
     }
-
-    /// <inheritdoc />
-    public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll()
@@ -116,5 +102,5 @@ public class PluginStore : IStoreService, IPluginManifestRepository
         return found;
     }
 
-    #endregion Methods
+    #endregion
 }

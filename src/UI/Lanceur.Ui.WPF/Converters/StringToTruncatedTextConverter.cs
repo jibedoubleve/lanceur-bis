@@ -7,15 +7,22 @@ namespace Lanceur.Ui.WPF.Converters;
 
 public class TextToTruncatedTextConverter : IValueConverter
 {
-    private const int Length = 70;
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (value is string text)
-        {
-            return text.Truncate(Length, "(...)");
-        }
+    #region Fields
 
-        return value;
+    private const int Length = 70;
+
+    #endregion
+
+    #region Methods
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is string text) return text.Truncate(Length, "(...)");
+
+        return Binding.DoNothing;
     }
+
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+
+    #endregion
 }

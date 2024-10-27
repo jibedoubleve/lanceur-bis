@@ -4,7 +4,7 @@ public record ValidationStatus
 {
     #region Constructors
 
-    private ValidationStatus(bool isSuccess, string? errorContent)
+    private ValidationStatus(bool isSuccess, string errorContent)
     {
         IsSuccess = isSuccess;
         ErrorContent = errorContent;

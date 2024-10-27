@@ -2,10 +2,12 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Infra.Stores;
-using Lanceur.Views;
 using NSubstitute;
 using System.Reflection;
+using System.Windows.Documents.DocumentStructures;
 using Lanceur.Tests.Tooling.ReservedAliases;
+using Lanceur.Ui.Core.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Lanceur.Tests.BusinessLogic;
@@ -14,12 +16,14 @@ public class InternalAliasStoreShould
 {
     #region Methods
 
-    private static ReservedAliasStore GetStore(IDbRepository dataService, Type type = null)
+    private static ReservedAliasStore GetStore(IDbRepository dbRepository, Type type = null)
     {
         type ??= typeof(NotExecutableTestAlias);
-        var asm = Assembly.GetAssembly(type);
-
-        var store = new ReservedAliasStore(asm, dataService);
+        var serviceProvider = new ServiceCollection().AddSingleton(Assembly.GetAssembly(type)!)
+                                                     .AddSingleton(dbRepository)
+                                                     .BuildServiceProvider();
+        
+        var store = new ReservedAliasStore(serviceProvider);
         return store;
     }
 

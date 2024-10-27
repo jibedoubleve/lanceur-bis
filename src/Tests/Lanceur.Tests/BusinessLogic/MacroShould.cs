@@ -9,15 +9,14 @@ using Lanceur.Infra.Managers;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Utils;
 using Lanceur.Tests.SQLite;
-using Lanceur.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System.Data.SQLite;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tooling.Macros;
+using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
@@ -65,25 +64,32 @@ public class MacroShould : TestBase
         }
     }
 
-    [Theory, InlineData("multi", true), InlineData("MULTI", true), InlineData("macro", false), InlineData("MACRO", false), InlineData("calendar", false), InlineData("CALENDAR", false)]
+    [Theory]
+    [InlineData("multi", true)]
+    [InlineData("MULTI", true)]
+    [InlineData("macro", false)]
+    [InlineData("MACRO", false)]
+    [InlineData("calendar", false)]
+    [InlineData("CALENDAR", false)]
     public void BeCompositeAsExpected(string macro, bool expected)
     {
-        var alias = new AliasQueryResult
-        {
-            FileName = $"@{macro}@"
-        };
+        var alias = new AliasQueryResult { FileName = $"@{macro}@" };
 
         alias.IsComposite().Should().Be(expected);
     }
 
-    [Theory, InlineData("init", "a@z@e@r@t@t"), InlineData("home", "azerty"), InlineData("some", "a z e r t y")]
+    [Theory]
+    [InlineData("init", "a@z@e@r@t@t")]
+    [InlineData("home", "azerty")]
+    [InlineData("some", "a z e r t y")]
     public async Task BeExecutable(string name, string parameters)
     {
-        var logger = Substitute.For<ILogger<MacroManager>>();
-        var repository = Substitute.For<IDbRepository>();
-
-        var asm = Assembly.GetExecutingAssembly();
-        var macroMgr = new MacroManager(asm, logger, repository, new ServiceCollection().BuildServiceProvider());
+        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<ILogger<MacroManager>>())
+                                                     .AddSingleton(Substitute.For<IDbRepository>())
+                                                     .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .AddSingleton<MacroManager>()
+                                                     .BuildServiceProvider();
+        var macroMgr = serviceProvider.GetService<MacroManager>();
         var macro = new MultiMacroTest(parameters);
         var handler = (SelfExecutableQueryResult)macroMgr.Handle(macro);
 
@@ -98,11 +104,13 @@ public class MacroShould : TestBase
     [Fact]
     public void BeExecutableQueryResult()
     {
-        var logger = Substitute.For<ILogger<MacroManager>>();
-        var repository = Substitute.For<IDbRepository>();
-
-        var asm = Assembly.GetExecutingAssembly();
-        var macroMgr = new MacroManager(asm, logger, repository, new ServiceCollection().BuildServiceProvider());
+        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<IDbRepository>())
+                                                     .AddSingleton(Substitute.For<ILogger<MacroManager>>())
+                                                     .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .AddSingleton<MacroManager>()
+                                                     .AddSingleton<MultiMacroTest>()
+                                                     .BuildServiceProvider();
+        var macroMgr = serviceProvider.GetService<MacroManager>();
         var macro = new MultiMacroTest();
         var result = macroMgr.Handle(macro);
 
@@ -147,15 +155,18 @@ public class MacroShould : TestBase
     [Fact]
     public void HaveDefaultMacro()
     {
-        var asm = Assembly.GetAssembly(typeof(MultiMacro));
-        var logger = Substitute.For<ILogger<MacroManager>>();
-        var repository = Substitute.For<IDbRepository>();
-        var manager = new MacroManager(asm, logger, repository, new ServiceCollection().BuildServiceProvider());
-
+        var serviceProvider = new ServiceCollection().AddSingleton(Assembly.GetAssembly(typeof(MultiMacro))!)
+                                                     .AddSingleton(Substitute.For<ILogger<MacroManager>>())
+                                                     .AddSingleton(Substitute.For<IDbRepository>())
+                                                     .AddSingleton<MacroManager>()
+                                                     .BuildServiceProvider();
+        var manager =serviceProvider.GetService<MacroManager>();
         manager.MacroCount.Should().BeGreaterThan(0);
     }
 
-    [Theory, InlineData(0, 1), InlineData(1, 2)]
+    [Theory]
+    [InlineData(0, 1)]
+    [InlineData(1, 2)]
     public void HaveDelayOnFirstElement(int index, int delay)
     {
         // Arrange
@@ -213,20 +224,17 @@ public class MacroShould : TestBase
     [Fact]
     public void NotHaveDoubloonsWhenMacroUsedMultipleTimes()
     {
-        var queryResults = new AliasQueryResult[]
-        {
-            new() { Name = "macro_1", FileName = "@multi@" },
-            new() { Name = "macro_2", FileName = "@multi@" },
-            new() { Name = "macro_3", FileName = "@multi@" }
-        };
+        QueryResult[] queryResults = new AliasQueryResult[] { new() { Name = "macro_1", FileName = "@multi@" }, new() { Name = "macro_2", FileName = "@multi@" }, new() { Name = "macro_3", FileName = "@multi@" } };
 
-        var logger = Substitute.For<ILogger<MacroManager>>();
-        var repository = Substitute.For<IDbRepository>();
-        var asm = Assembly.GetExecutingAssembly();
-        var manager = new MacroManager(asm, logger, repository, new ServiceCollection().BuildServiceProvider());
+        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<ILogger<MacroManager>>())
+                                                     .AddSingleton(Substitute.For<IDbRepository>())
+                                                     .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .AddSingleton<MacroManager>()
+                                                     .BuildServiceProvider();
 
-        var output = manager.Handle(queryResults)
-                            .ToArray();
+        var output =serviceProvider.GetService<MacroManager>()
+                                   .Handle(queryResults)
+                                   .ToArray();
 
         using (new AssertionScope())
         {
@@ -235,13 +243,13 @@ public class MacroShould : TestBase
         }
     }
 
-    [Theory, InlineData("un"), InlineData("deux"), InlineData("trois")]
+    [Theory]
+    [InlineData("un")]
+    [InlineData("deux")]
+    [InlineData("trois")]
     public void RecogniseMacro(string macro)
     {
-        var query = new AliasQueryResult()
-        {
-            FileName = $"@{macro}@"
-        };
+        var query = new AliasQueryResult() { FileName = $"@{macro}@" };
 
         query.IsMacro().Should().BeTrue();
     }
@@ -271,7 +279,7 @@ public class MacroShould : TestBase
         private static IMappingService GetConversionService()
         {
             var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
-            return new AutoMapperConverter(new Mapper(cfg));
+            return new AutoMapperMappingService();
         }
 
         public static IDbRepository GetDataService(IDbConnection db)

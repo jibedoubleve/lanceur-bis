@@ -15,32 +15,26 @@ public class CalculatorStore : IStoreService
 {
     #region Fields
 
-    private static readonly ICalculatorService Calculator = new CodingSebCalculatorService();
     private readonly ILogger<CalculatorStore> _logger;
 
-    #endregion Fields
+    private static readonly ICalculatorService Calculator = new CodingSebCalculatorService();
+
+    #endregion
 
     #region Constructors
 
+    public CalculatorStore(IServiceProvider serviceProvider) => _logger = serviceProvider.GetService<ILogger<CalculatorStore>>();
 
-    public CalculatorStore(IServiceProvider serviceProvider)
-    {
-        _logger = serviceProvider.GetService<ILogger<CalculatorStore>>();
-    }
+    #endregion
 
-    [Obsolete("Use ctor with service provider instead")]
-    public CalculatorStore(ILoggerFactory loggerFactory = null)
-    {
-        loggerFactory ??= Locator.GetLocator().GetService<ILoggerFactory>();
-        _logger = loggerFactory?.CreateLogger<CalculatorStore>() ?? new NullLogger<CalculatorStore>();
-    }
-
-    #endregion Constructors
-
-    #region Methods
+    #region Properties
 
     /// <inheritdoc />
     public Orchestration Orchestration => Orchestration.Shared(@"^\s{0,}[0-9(]");
+
+    #endregion
+
+    #region Methods
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll() => QueryResult.NoResult;
@@ -63,5 +57,5 @@ public class CalculatorStore : IStoreService
         return new DisplayQueryResult(result, query.ToString()) { Count = int.MaxValue, Icon = "calculator" }.ToEnumerable();
     }
 
-    #endregion Methods
+    #endregion
 }

@@ -8,11 +8,11 @@ public class InvertPlotTypeToBooleanConverter : IValueConverter
 {
     #region Methods
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is not PlotType plot || parameter is not PlotType expectedType
-        ? value
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is not PlotType plot || parameter is not PlotType expectedType
+        ? Binding.DoNothing
         : plot != expectedType;
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
 
     #endregion
 }

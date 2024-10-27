@@ -9,7 +9,7 @@ using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.Mocks;
 using Lanceur.Tests.Tooling.SQL;
-using Lanceur.Utils;
+using Lanceur.Ui.Core.Utils;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -49,7 +49,7 @@ public class ThumbnailManagerShould : TestBase
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
         var cfg = new MapperConfiguration(cfg => { cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
-        var conversionService = new AutoMapperConverter(new Mapper(cfg));
+        var conversionService = new AutoMapperMappingService();
         var dbRepository = new SQLiteRepository(connectionMgr, loggerFactory, conversionService);
         var thumbnailRefresher = new MockThumbnailRefresher();
 

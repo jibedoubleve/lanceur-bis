@@ -8,32 +8,32 @@ namespace Lanceur.Ui.WPF.Converters
     {
         #region Methods
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is RunAs startMode)
                 return startMode switch
                 {
-                    RunAs.Admin => "Admin",
+                    RunAs.Admin       => "Admin",
                     RunAs.CurrentUser => "CurrentUser",
-                    _ => "CurrentUser"
+                    _                 => "CurrentUser"
                 };
-            else
-                return value;
+
+            return Binding.DoNothing;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is string str)
                 return str switch
                 {
-                    "Admin" => RunAs.Admin,
+                    "Admin"       => RunAs.Admin,
                     "CurrentUser" => RunAs.CurrentUser,
-                    _ => RunAs.CurrentUser
+                    _             => RunAs.CurrentUser
                 };
-            else
-                return value;
+
+            return Binding.DoNothing;
         }
 
-        #endregion Methods
+        #endregion
     }
 }

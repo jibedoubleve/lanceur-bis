@@ -16,12 +16,13 @@ public class EverythingStore : IStoreService
 {
     #region Fields
 
-    private const string SearchAlias = ":";
     private readonly IEverythingApi _everythingApi;
     private readonly ILogger<EverythingStore> _logger;
     private readonly ISettingsFacade _settings;
 
-    #endregion Fields
+    private const string SearchAlias = ":";
+
+    #endregion
 
     #region Constructors
 
@@ -32,25 +33,14 @@ public class EverythingStore : IStoreService
         _settings = serviceProvider.GetService<ISettingsFacade>();
     }
 
-    [Obsolete("Use ctor with service provider instead")]
-    public EverythingStore(ILoggerFactory loggerFactory = null, IEverythingApi everythingApi = null, ISettingsFacade settings = null)
-    {
-        var l = Locator.Current;
-        _everythingApi = everythingApi ?? Locator.Current.GetService<IEverythingApi>();
-        _settings = settings ?? l.GetService<ISettingsFacade>();
-
-        var factory = loggerFactory ?? l.GetService<ILoggerFactory>();
-        _logger = factory.GetLogger<EverythingStore>();
-    }
-
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     /// <inheritdoc />
     public Orchestration Orchestration => Orchestration.Exclusive(@"^\s{0,}:.*");
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -94,5 +84,5 @@ public class EverythingStore : IStoreService
                              .ToList();
     }
 
-    #endregion Methods
+    #endregion
 }
