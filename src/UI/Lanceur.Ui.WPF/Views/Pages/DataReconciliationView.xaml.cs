@@ -1,4 +1,3 @@
-using System.Windows.Controls;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Messages;

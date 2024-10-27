@@ -6,7 +6,7 @@
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
     <conv:InvertNullToVisibilityConverter x:Key="InvertNullToVisibilityConverter" />
-    <conv:IntegerToVisibilityConverter x:Key="IntegerToVisibilityConverter" />
+    <conv:IntToVisibilityConverter x:Key="IntegerToVisibilityConverter" />
     <conv:KeyToDirectionConverter x:Key="KeyToDirectionConverter" />
     <conv:DebugToVisibilityConverter x:Key="DebugToVisibilityConverter" />
     <conv:TextToTruncatedTextConverter x:Key="TextToTruncatedTextConverter" />
@@ -18,4 +18,5 @@
     <conv:IntToKeyEnumConverter x:Key="IntToKeyEnumConverter" />
     <conv:IsDoubloonReportToVisibilityConverter x:Key="IsDoubloonReportToVisibilityConverter" />
     <conv:InvertPlotTypeToBooleanConverter x:Key="InvertPlotTypeToBooleanConverter" />
+    <conv:DivideByConverter x:Key="DivideByConverter" />
 </ResourceDictionary>

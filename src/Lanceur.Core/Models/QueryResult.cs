@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Lanceur.Core.Models;
@@ -45,7 +45,7 @@ public abstract class QueryResult : ObservableModel
     /// <remarks>
     /// The fallback behaviour is expected to be handled in the UI
     /// </remarks>
-    public virtual string Icon { get; set; } = "RocketLaunchOutline";
+    public virtual string Icon { get; set; } = "Rocket24";
 
     public long Id { get; set; }
 

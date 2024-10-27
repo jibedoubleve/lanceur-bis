@@ -1,8 +1,16 @@
-using System.Windows.Controls;
+using Lanceur.Ui.Core.ViewModels.Pages;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
-public partial class MostUsedView : Page
+public partial class MostUsedView
 {
-    public MostUsedView() { InitializeComponent(); }
+    #region Constructors
+
+    public MostUsedView(MostUsedViewModel viewModel)
+    {
+        DataContext = viewModel;
+        InitializeComponent();
+    }
+
+    #endregion
 }

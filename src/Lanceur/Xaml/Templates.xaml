@@ -195,7 +195,7 @@
             </Grid>
         </Border>
     </DataTemplate>
-    <DataTemplate x:Key="DisplayUsageAliasTemplate" DataType="{x:Type m:DisplayUsageQueryResult}">
+    <DataTemplate x:Key="DisplayUsageAliasTemplate" DataType="{x:Type m:UsageQueryResult}">
         <Border
             Margin="0,5,0,0"
             Padding="3"

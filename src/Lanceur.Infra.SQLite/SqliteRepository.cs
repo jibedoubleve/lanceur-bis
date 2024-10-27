@@ -118,13 +118,13 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     {
         const string sql = @$"
                 select
-	                keywords   as {nameof(DisplayUsageQueryResult.Name)},
-                    exec_count as {nameof(DisplayUsageQueryResult.Count)}
+	                keywords   as {nameof(UsageQueryResult.Name)},
+                    exec_count as {nameof(UsageQueryResult.Count)}
                 from
                     stat_execution_count_v
                 order
                     by exec_count desc";
-        return DB.WithinTransaction(tx => tx.Connection!.Query<DisplayUsageQueryResult>(sql));
+        return DB.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql));
     }
 
     ///<inheritdoc/>
