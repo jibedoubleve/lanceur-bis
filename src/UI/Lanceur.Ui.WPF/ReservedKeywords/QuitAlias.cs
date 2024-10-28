@@ -2,12 +2,15 @@
 using System.Windows;
 using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.Infra.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ILogger = Splat.ILogger;
 
 namespace Lanceur.Ui.WPF.ReservedKeywords;
 
-[ReservedAlias("quit"), Description("Quit lanceur")]
+[ReservedAlias("quit")]
+[Description("Quit lanceur")]
 public class QuitAlias : SelfExecutableQueryResult
 {
     #region Fields
@@ -21,8 +24,8 @@ public class QuitAlias : SelfExecutableQueryResult
     public QuitAlias(IServiceProvider serviceProvider)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
-
-        _logger = serviceProvider.GetService<ILogger<QuitAlias>>() ?? throw new ArgumentNullException(nameof(_logger));
+        var factory = serviceProvider.GetService<ILoggerFactory>() ?? throw new NullReferenceException("Log factory is not configured in the service provider.");
+        _logger = factory.GetLogger<QuitAlias>();
     }
 
     #endregion

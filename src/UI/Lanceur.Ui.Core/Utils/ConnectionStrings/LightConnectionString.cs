@@ -4,7 +4,7 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
 
-public class DebugConnectionString : BaseConnectionString, IConnectionString
+public class LightConnectionString : BaseConnectionString, IConnectionString
 {
     #region Fields
 
@@ -16,15 +16,13 @@ public class DebugConnectionString : BaseConnectionString, IConnectionString
 
     #region Constructors
 
-    private DebugConnectionString(string dbPath) => _dbPath = dbPath;
-
-    public DebugConnectionString() { }
+    private LightConnectionString(string dbPath) => _dbPath = dbPath;
 
     #endregion Constructors
 
     #region Methods
 
-    public static DebugConnectionString FromFile(string dbPath) => new(dbPath);
+    public static LightConnectionString FromFile(string dbPath) => new(dbPath);
 
     public override string ToString()
     {

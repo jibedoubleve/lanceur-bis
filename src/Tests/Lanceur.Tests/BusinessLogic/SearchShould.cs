@@ -1,12 +1,16 @@
-﻿using System.Reflection;
+﻿using System.Data;
+using System.Data.SQLite;
+using System.Reflection;
 using AutoMapper;
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Core.Utils;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
@@ -14,14 +18,17 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling;
+using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
+using ILogger = Castle.Core.Logging.ILogger;
 
 namespace Lanceur.Tests.BusinessLogic;
 
@@ -55,15 +62,18 @@ public class SearchShould : TestBase
     [Fact]
     public void HaveStores()
     {
-        var logger = Substitute.For<ILogger<StoreLoader>>();
-        var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
         var serviceProvider
-            = new ServiceCollection().AddTransient(_ => Substitute.For<ILoggerFactory>())
-                                     .AddTransient(_ => Substitute.For<ISearchServiceOrchestrator>())
+            = new ServiceCollection().AddMockSingleton<ILoggerFactory>()
+                                     .AddMockSingleton<ILogger<StoreLoader>>()
+                                     .AddSingleton<IStoreLoader, StoreLoader>()
+                                     .AddSingleton<IMacroManager, MacroManager>()
+                                     .AddSingleton<SearchService>()
+                                     .AddMockSingleton<ISearchServiceOrchestrator>()
+                                     .AddMockSingleton<IThumbnailManager>()
                                      .BuildServiceProvider();
 
-        var service = new SearchService(new StoreLoader(logger, orchestrator, serviceProvider));
 
+        var service = serviceProvider.GetService<SearchService>();
         service.Stores.Should().HaveCountGreaterThan(5);
     }
 
@@ -129,22 +139,29 @@ public class SearchShould : TestBase
         using var db = BuildFreshDb(sql);
         using var conn = new DbSingleConnectionManager(db);
 
-        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<IThumbnailManager>())
-                                                     .AddSingleton(Substitute.For<IMappingService>())
-                                                     .AddSingleton<SQLiteRepository>()
-                                                     .AddSingleton(Substitute.For<IStoreLoader>())
+        var serviceProvider = new ServiceCollection().AddMockSingleton<IThumbnailManager>()
+                                                     .AddLogger<StoreLoader>(OutputHelper)
+                                                     .AddLogger<MacroManager>(OutputHelper)
+                                                     .AddSingleton<ILoggerFactory, LoggerFactory>()
+                                                     .AddSingleton<IMacroManager, MacroManager>()
                                                      .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
+                                                     .AddSingleton<IMappingService, AutoMapperMappingService>()
+                                                     .AddSingleton<IDbRepository, SQLiteRepository>()
+                                                     .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
+                                                     .AddSingleton<IDbConnection, SQLiteConnection>()
                                                      .AddSingleton<SearchService>()
-                                                     .AddSingleton<ILogger<MacroManager>>(new TestOutputHelperDecoratorForMicrosoftLogging<MacroManager>(OutputHelper))
                                                      .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .AddMockSingleton<IStoreLoader>(
+                                                         (serviceProvider, storeLoader) =>
+                                                         {
+                                                             storeLoader.Load().Returns([new AliasStore(serviceProvider)]);
+                                                             return storeLoader;
+                                                         }
+                                                     )
                                                      .BuildServiceProvider();
 
-        var storeLoader = serviceProvider.GetService<IStoreLoader>();
-        storeLoader.Load().Returns([new AliasStore(serviceProvider)]);
-
-        var service = serviceProvider.GetService<SearchService>();
-
         // ACT
+        var service = serviceProvider.GetService<SearchService>();
         var result = (await service.SearchAsync(new("z"))).ToArray();
 
         // ASSERT
@@ -189,36 +206,47 @@ public class SearchShould : TestBase
         // ARRANGE
         using var db = BuildFreshDb(sql);
         using var conn = new DbSingleConnectionManager(db);
+        const string criterion = "u";
 
-        var serviceProvider = new ServiceCollection().AddSingleton<SQLiteRepository>()
-                                                     .AddSingleton(conn)
+        var serviceProvider = new ServiceCollection().AddMemoryDb(conn)
+                                                     .AddSingleton<IDbRepository, SQLiteRepository>()
                                                      .AddSingleton(_testLoggerFactory)
                                                      .AddSingleton(converter)
                                                      .AddSingleton(Substitute.For<IStoreLoader>())
+                                                     .AddSingleton<ISearchService, SearchService>()
+                                                     .AddMockSingleton<IThumbnailManager>()
+                                                     .AddMockSingleton<IStoreLoader>(
+                                                         (sp, _) =>
+                                                         {
+                                                             var stores = sp.GetService<IStoreLoader>();
+                                                             stores.Load().Returns([new AliasStore(sp)]);
+                                                             return stores;
+                                                         }
+                                                     )
+                                                     .AddMockSingleton<IMacroManager>(
+                                                         (sp, macroManager) =>
+                                                         {
+                                                             var results = sp.GetService<IDbRepository>()
+                                                                             .Search(criterion)
+                                                                             .ToList();
+                                                             macroManager.Handle(Arg.Any<QueryResult[]>())
+                                                                         .Returns(results);
+                                                             return macroManager;
+                                                         }
+                                                     )
+                                                     .AddMockSingleton<ISearchServiceOrchestrator>(
+                                                         (_, orchestrator) =>
+                                                         {
+                                                             orchestrator.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
+                                                                         .Returns(true);
+                                                             return orchestrator;
+                                                         }
+                                                     )
                                                      .BuildServiceProvider();
-        const string criterion = "u";
-        var stores = serviceProvider.GetService<IStoreLoader>();
-        stores.Load().Returns([new AliasStore(serviceProvider)]);
 
-        var results = serviceProvider.GetService<SQLiteRepository>()
-                                     .Search(criterion)
-                                     .ToList();
-        var macroManager = Substitute.For<IMacroManager>();
-        macroManager.Handle(Arg.Any<QueryResult[]>())
-                    .Returns(results);
-
-        var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-        orchestrator.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
-                    .Returns(true);
-
-        var searchService = new SearchService(
-            stores,
-            macroManager,
-            Substitute.For<IThumbnailManager>(),
-            orchestrator: orchestrator
-        );
 
         // ACT
+        var searchService = serviceProvider.GetService<ISearchService>();
         var result = (await searchService.SearchAsync(new(criterion))).ToArray();
 
         // ASSERT
@@ -233,16 +261,24 @@ public class SearchShould : TestBase
     [Fact]
     public async Task ReturnValues()
     {
-        var macroManager = Substitute.For<IMacroManager>();
-        var thumbnailManager = Substitute.For<IThumbnailManager>();
+        var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroManager>()
+                                                     .AddMockSingleton<IThumbnailManager>()
+                                                     .AddMockSingleton<IStoreLoader>()
+                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddMockSingleton<ISearchServiceOrchestrator>(
+                                                         (_, orchestrator) =>
+                                                         {
+                                                             orchestrator.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
+                                                                         .Returns(true);
+                                                             return orchestrator;
+                                                         }
+                                                     )
+                                                     .AddTransient<SearchService>()
+                                                     .BuildServiceProvider();
         var query = new Cmdline("code");
-        var orchestrator = Substitute.For<ISearchServiceOrchestrator>();
-        orchestrator.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
-                    .Returns(true);
-        var service = new SearchService(new DebugStoreLoader(), macroManager, thumbnailManager, orchestrator: orchestrator);
+        var service = serviceProvider.GetService<SearchService>();
 
-        var result = (await service.SearchAsync(query))
-            .ToArray();
+        var result = (await service.SearchAsync(query)).ToArray();
 
         using (new AssertionScope())
         {

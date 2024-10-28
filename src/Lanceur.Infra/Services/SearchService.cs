@@ -5,7 +5,6 @@ using Lanceur.Core.Stores;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
-using Splat;
 
 namespace Lanceur.Infra.Services;
 
@@ -24,19 +23,16 @@ public class SearchService : SearchServiceCache, ISearchService
     #region Constructors
 
     public SearchService(
-        IStoreLoader storeLoader = null,
-        IMacroManager macroManager = null,
-        IThumbnailManager thumbnailManager = null,
-        ILoggerFactory loggerFactory = null,
-        ISearchServiceOrchestrator orchestrator = null
+        IStoreLoader storeLoader,
+        IMacroManager macroManager,
+        IThumbnailManager thumbnailManager,
+        ILoggerFactory loggerFactory,
+        ISearchServiceOrchestrator orchestrator
     ) : base(storeLoader)
     {
-        var l = Locator.Current;
-        _macroManager = macroManager ?? l.GetService<IMacroManager>();
-        _thumbnailManager = thumbnailManager ?? l.GetService<IThumbnailManager>();
-        _orchestrator = orchestrator ?? l.GetService<ISearchServiceOrchestrator>();
-
-        loggerFactory ??= l.GetService<ILoggerFactory>();
+        _macroManager = macroManager;
+        _thumbnailManager = thumbnailManager;
+        _orchestrator = orchestrator;
         _logger = loggerFactory.GetLogger<SearchService>();
     }
 

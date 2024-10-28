@@ -9,16 +9,11 @@ namespace Lanceur.Tests.Tooling.Macros;
 [Macro("multi"), Description("Allow to start multiple alias at once")]
 public class MultiMacroTest : MacroQueryResult
 {
-    private readonly ServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
 
     #region Constructors
 
-    public MultiMacroTest(ServiceProvider serviceProvider) { _serviceProvider = serviceProvider; }
-    public MultiMacroTest(string parameters = null)
-    {
-        Name = Guid.NewGuid().ToString();
-        Parameters = parameters;
-    }
+    public MultiMacroTest(IServiceProvider serviceProvider) { _serviceProvider = serviceProvider; }
 
     #endregion Constructors
 

@@ -1,33 +1,23 @@
 ﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
 using Lanceur.SharedKernel.Mixins;
-using Microsoft.Extensions.Logging.Abstractions;
-using Splat;
 
 namespace Lanceur.Infra.Managers;
 
 public class MacroManager : MacroManagerCache, IMacroManager
 {
-    private readonly ILogger<IMacroManager> _logger;
-
     #region Constructors
 
-    [Obsolete("Should be refactored and only user ServiceProvider")]
-    public MacroManager(Assembly asm, ILogger<MacroManager> logger, IDbRepository dbRepository, IServiceProvider serviceProvider) : base(asm, logger, dbRepository, serviceProvider)
-    {
-        _logger = logger;
-    }
+    public MacroManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     public int MacroCount => MacroInstances?.Count ?? 0;
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -37,7 +27,7 @@ public class MacroManager : MacroManagerCache, IMacroManager
     /// <inheritdoc/>
     public IEnumerable<QueryResult> Handle(QueryResult[] collection)
     {
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = Logger.MeasureExecutionTime(this);
         var result = collection.Select(Handle)
                                .Where(item => item is not null)
                                .ToArray();
@@ -70,5 +60,5 @@ public class MacroManager : MacroManagerCache, IMacroManager
         return macro;
     }
 
-    #endregion Methods
+    #endregion
 }

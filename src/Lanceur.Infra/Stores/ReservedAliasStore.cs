@@ -20,7 +20,7 @@ public class ReservedAliasStore : IStoreService
     #region Fields
 
     private readonly Assembly _assembly;
-    private readonly IDbRepository _dataService;
+    private readonly IDbRepository _dbRepository;
     private readonly ILogger<ReservedAliasStore> _logger;
     private IEnumerable<QueryResult> _reservedAliases;
     private readonly IServiceProvider _serviceProvider;
@@ -39,8 +39,8 @@ public class ReservedAliasStore : IStoreService
     public ReservedAliasStore(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _assembly = Assembly.GetEntryAssembly();
-        _dataService = serviceProvider.GetService<IDbRepository>();
+        _assembly = serviceProvider.GetService<Assembly>();
+        _dbRepository = serviceProvider.GetService<IDbRepository>();
         _logger = serviceProvider.GetService<ILogger<ReservedAliasStore>>();
     }
 
@@ -66,12 +66,12 @@ public class ReservedAliasStore : IStoreService
         var foundItems = new List<QueryResult>();
         foreach (var type in found)
         {
-            var instance = Activator.CreateInstance(type, [_serviceProvider]);
+            var instance = Activator.CreateInstance(type, _serviceProvider);
 
             if (instance is not SelfExecutableQueryResult qr) continue;
 
             var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
-            var keyword = _dataService.GetKeyword(name);
+            var keyword = _dbRepository.GetKeyword(name);
 
             qr.Name = name;
             if (keyword is not null)
@@ -81,7 +81,7 @@ public class ReservedAliasStore : IStoreService
             }
 
             qr.Description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
-            qr.Icon = "ApplicationCogOutline";
+            qr.Icon = "Settings24";
 
             foundItems.Add(qr);
         }
@@ -93,7 +93,7 @@ public class ReservedAliasStore : IStoreService
     public IEnumerable<QueryResult> GetAll()
     {
         if (_reservedAliases == null) LoadAliases();
-        return _dataService.RefreshUsage(_reservedAliases);
+        return _dbRepository.RefreshUsage(_reservedAliases);
     }
 
     /// <inheritdoc />
@@ -104,7 +104,7 @@ public class ReservedAliasStore : IStoreService
                      .Where(k => k.Name.ToLower().StartsWith(query.Name))
                      .ToList();
 
-        var orderedResult = _dataService
+        var orderedResult = _dbRepository
                             .RefreshUsage(result)
                             .OrderByDescending(x => x.Count)
                             .ThenBy(x => x.Name);

@@ -11,11 +11,15 @@ namespace Lanceur.ReservedKeywords;
 [Description("Open the setup page")]
 public class SetupAlias : SelfExecutableQueryResult
 {
+    #region Fields
+
     private readonly IServiceProvider _serviceProvider;
+
+    #endregion
 
     #region Constructors
 
-    public SetupAlias(IServiceProvider serviceProvider) { _serviceProvider = serviceProvider; }
+    public SetupAlias(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
 
     #endregion
 

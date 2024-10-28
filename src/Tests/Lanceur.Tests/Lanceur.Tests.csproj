@@ -23,6 +23,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
+        <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.4.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
         <PackageReference Include="NSubstitute" Version="4.4.*" />
         <PackageReference Include="ReactiveUI.Testing" Version="18.4.*" />
@@ -41,8 +42,6 @@
         <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
         <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj" />
         <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="ViewModels\" />
+        <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj" />
     </ItemGroup>
 </Project>

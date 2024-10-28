@@ -15,9 +15,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.Macros;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog.Core;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -84,13 +86,14 @@ public class MacroShould : TestBase
     [InlineData("some", "a z e r t y")]
     public async Task BeExecutable(string name, string parameters)
     {
-        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<ILogger<MacroManager>>())
-                                                     .AddSingleton(Substitute.For<IDbRepository>())
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroManager>>()
+                                                     .AddMockSingleton<IDbRepository>()
+                                                     .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(Assembly.GetExecutingAssembly())
                                                      .AddSingleton<MacroManager>()
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroManager>();
-        var macro = new MultiMacroTest(parameters);
+        var macro = new MultiMacroTest(serviceProvider){Parameters = parameters};
         var handler = (SelfExecutableQueryResult)macroMgr.Handle(macro);
 
         var cmdline = new Cmdline(name, parameters);
@@ -104,14 +107,15 @@ public class MacroShould : TestBase
     [Fact]
     public void BeExecutableQueryResult()
     {
-        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<IDbRepository>())
-                                                     .AddSingleton(Substitute.For<ILogger<MacroManager>>())
+        var serviceProvider = new ServiceCollection().AddMockSingleton<IDbRepository>()
+                                                     .AddMockSingleton<ILogger<MacroManager>>()
+                                                     .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(Assembly.GetExecutingAssembly())
                                                      .AddSingleton<MacroManager>()
                                                      .AddSingleton<MultiMacroTest>()
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroManager>();
-        var macro = new MultiMacroTest();
+        var macro = new MultiMacroTest(serviceProvider);
         var result = macroMgr.Handle(macro);
 
         result.Should().BeAssignableTo<SelfExecutableQueryResult>();
@@ -156,11 +160,12 @@ public class MacroShould : TestBase
     public void HaveDefaultMacro()
     {
         var serviceProvider = new ServiceCollection().AddSingleton(Assembly.GetAssembly(typeof(MultiMacro))!)
-                                                     .AddSingleton(Substitute.For<ILogger<MacroManager>>())
-                                                     .AddSingleton(Substitute.For<IDbRepository>())
+                                                     .AddSingleton<ILoggerFactory, LoggerFactory>()
+                                                     .AddMockSingleton<ILogger<MacroManager>>()
+                                                     .AddMockSingleton<IDbRepository>()
                                                      .AddSingleton<MacroManager>()
                                                      .BuildServiceProvider();
-        var manager =serviceProvider.GetService<MacroManager>();
+        var manager = serviceProvider.GetService<MacroManager>();
         manager.MacroCount.Should().BeGreaterThan(0);
     }
 
@@ -226,15 +231,16 @@ public class MacroShould : TestBase
     {
         QueryResult[] queryResults = new AliasQueryResult[] { new() { Name = "macro_1", FileName = "@multi@" }, new() { Name = "macro_2", FileName = "@multi@" }, new() { Name = "macro_3", FileName = "@multi@" } };
 
-        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<ILogger<MacroManager>>())
-                                                     .AddSingleton(Substitute.For<IDbRepository>())
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroManager>>()
+                                                     .AddMockSingleton<IDbRepository>()
+                                                     .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(Assembly.GetExecutingAssembly())
                                                      .AddSingleton<MacroManager>()
                                                      .BuildServiceProvider();
 
-        var output =serviceProvider.GetService<MacroManager>()
-                                   .Handle(queryResults)
-                                   .ToArray();
+        var output = serviceProvider.GetService<MacroManager>()
+                                    .Handle(queryResults)
+                                    .ToArray();
 
         using (new AssertionScope())
         {

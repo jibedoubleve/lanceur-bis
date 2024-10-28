@@ -27,8 +27,8 @@ public partial class App
                                                   .ConfigureServices(
                                                       (_, services) =>
                                                       {
-                                                          services.Register("View", Assembly.Load("Lanceur.Ui.WPF"))
-                                                                  .Register("ViewModel", Assembly.Load("Lanceur.Ui.Core"))
+                                                          services.Register("View", "Lanceur.Ui.WPF")
+                                                                  .Register("ViewModel", "Lanceur.Ui.Core")
                                                                   .AddServices()
                                                                   .AddWpfServices()
                                                                   .AddMapping()
@@ -73,7 +73,7 @@ public partial class App
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application started");
 
-        /* Check whether database update is needed...
+        /* Checks whether database update is needed...
          */
         var cs = Ioc.Default.GetService<IConnectionString>()!;
         Ioc.Default.GetService<SQLiteUpdater>()!

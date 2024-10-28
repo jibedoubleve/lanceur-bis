@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -61,7 +60,7 @@ public partial class MainViewModel : ObservableObject
     private bool CanSearch() => _lastCriterion.Name != (Cmdline.BuildFromText(Query)?.Name ?? "");
 
     [RelayCommand]
-    private async Task Execute(bool runAsAdmin)
+    private async Task OnExecute(bool runAsAdmin)
     {
         if (SelectedResult is null) return;
 
@@ -89,7 +88,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Navigate(Direction direction)
+    private void OnNavigate(Direction direction)
     {
         if (SelectedResult == null)
         {
@@ -111,7 +110,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(CanSearch))]
-    private async Task Search()
+    private async Task OnSearch()
     {
         var criterion = Cmdline.BuildFromText(Query);
 

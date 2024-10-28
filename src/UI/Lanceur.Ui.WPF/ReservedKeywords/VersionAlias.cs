@@ -12,7 +12,11 @@ namespace Lanceur.Ui.WPF.ReservedKeywords;
 [Description("Indicates the version of the application")]
 public class VersionAlias : SelfExecutableQueryResult
 {
+    #region Fields
+
     private readonly IUserInteractionService _userInteraction;
+
+    #endregion
 
     #region Constructors
 
@@ -36,7 +40,7 @@ public class VersionAlias : SelfExecutableQueryResult
         semver = semverSplit?.Length > 0 ? semverSplit[0] : semver;
 
         await _userInteraction.ShowAsync($"Lanceur {semver}", "Written by Jean-Baptiste Wautier");
-            
+
         return await NoResultAsync;
     }
 

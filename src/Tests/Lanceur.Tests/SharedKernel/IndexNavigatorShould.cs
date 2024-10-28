@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Lanceur.SharedKernel.Mixins;
+using NSubstitute.Core;
 using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
@@ -28,7 +29,7 @@ public class IndexNavigatorShould
         var list = new List<string>();
         var action = () => list.GetNextItem(-1);
 
-        action.Should().Throw<IndexOutOfRangeException>();
+        action.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     [Fact]
@@ -37,11 +38,10 @@ public class IndexNavigatorShould
         var list = new List<string>();
         var action = () => list.GetPreviousItem(-1);
 
-        action.Should().Throw<IndexOutOfRangeException>();
+        action.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     [Theory]
-    [InlineData(-1, 0)]
     [InlineData(0, 1)]
     [InlineData(1, 2)]
     [InlineData(2, 3)]
@@ -125,7 +125,7 @@ public class IndexNavigatorShould
         var list = new List<int>();
 
         var subject = () => list[list.GetNextIndex(0)];
-        subject.Should().Throw<IndexOutOfRangeException>();
+        subject.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     [Theory]
@@ -157,7 +157,6 @@ public class IndexNavigatorShould
     [InlineData(2, 1)]
     [InlineData(1, 0)]
     [InlineData(0, 5)]
-    [InlineData(-1, 5)]
     public void GetPreviousIndex(int current, int previous)
     {
         var list = new List<int>()
@@ -205,17 +204,17 @@ public class IndexNavigatorShould
     }
 
     [Fact]
-    public void GetZeroIndexWhenCurrentIsMinusOneWhenNext()
+    public void GetZeroIndexWhenCurrentZeroWhenNext()
     {
         var list = new List<string> { "un" };
-        list.GetNextItem(-1).Should().Be("un");
+        list.GetNextItem(0).Should().Be("un");
     }
 
     [Fact]
-    public void GetZeroIndexWhenCurrentIsMinusOneWhenPrevious()
+    public void GetZeroIndexWhenCurrentZeroWhenPrevious()
     {
         var list = new List<string> { "un" };
-        list.GetPreviousItem(-1).Should().Be("un");
+        list.GetPreviousItem(0).Should().Be("un");
     }
 
     [Fact]
@@ -249,7 +248,7 @@ public class IndexNavigatorShould
     {
         var list = new List<string> { "un" };
         var subject = () => list.GetNextItem(index);
-        subject.Should().Throw<IndexOutOfRangeException>();
+        subject.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     #endregion Methods

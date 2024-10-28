@@ -25,7 +25,8 @@ public class AliasStore : IStoreService
     public AliasStore(IServiceProvider serviceProvider)
     {
         _dbRepository = serviceProvider.GetService<IDbRepository>();
-        _logger = serviceProvider.GetService<ILogger<AliasStore>>();
+        _logger = serviceProvider.GetService<ILoggerFactory>()
+                                 .GetLogger<AliasStore>();
     }
 
     #endregion

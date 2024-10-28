@@ -35,13 +35,6 @@ namespace Lanceur.Core.Managers
             return res1 || res2;
         }
 
-        public static Cmdline Build(string cmdline, ExecutableQueryResult query)
-        {
-            var cmd = BuildFromText(cmdline);
-            if (cmd.Parameters.IsNullOrWhiteSpace()) cmd = BuildFromText(query.ToQuery());
-            return cmd;
-        }
-
         public static Cmdline BuildFromText(string cmdline)
         {
             var name = string.Empty;

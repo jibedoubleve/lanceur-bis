@@ -24,8 +24,8 @@ public static class ServiceCollectionExtensions
 
         ConditionalExecution.Set(
             serviceCollection,
-            s => s.AddSingleton<IAppRestart, DummyAppRestart>(),
-            s => s.AddSingleton<IAppRestart, AppRestart>()
+            onPrd => onPrd.AddSingleton<IAppRestart, DummyAppRestart>(),
+            onDbg => onDbg.AddSingleton<IAppRestart, AppRestart>()
         );
 
         return serviceCollection;

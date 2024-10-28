@@ -5,6 +5,7 @@ using Lanceur.Infra.Logging;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Managers;
 
@@ -14,27 +15,24 @@ public abstract class MacroManagerCache
 
     private readonly Assembly _asm;
     private readonly IDbRepository _dbRepository;
-    private readonly IServiceProvider _serviceProvider;
     private Dictionary<string, ISelfExecutable> _macroInstances;
+    private readonly IServiceProvider _serviceProvider;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    internal MacroManagerCache(Assembly asm, ILogger logger, IDbRepository dbRepository, IServiceProvider serviceProvider)
+    internal MacroManagerCache(IServiceProvider serviceProvider)
     {
-        ArgumentNullException.ThrowIfNull(asm);
-        ArgumentNullException.ThrowIfNull(logger);
-        ArgumentNullException.ThrowIfNull(dbRepository);
         ArgumentNullException.ThrowIfNull(serviceProvider);
-        
-        _asm = asm;
-        Logger = logger;
-        _dbRepository = dbRepository;
+
+        _asm = serviceProvider.GetService<Assembly>();
+        Logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MacroManager>();
+        _dbRepository = serviceProvider.GetService<IDbRepository>();
         _serviceProvider = serviceProvider;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -49,7 +47,7 @@ public abstract class MacroManagerCache
         }
     }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -81,5 +79,5 @@ public abstract class MacroManagerCache
         _macroInstances = macroInstances;
     }
 
-    #endregion Methods
+    #endregion
 }
