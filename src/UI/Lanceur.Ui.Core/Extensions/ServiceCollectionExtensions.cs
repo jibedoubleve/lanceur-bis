@@ -45,6 +45,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>()
+                         .AddSingleton<ThumbnailLoader>()
                          .AddTransient<IDataStoreVersionManager, SQLiteVersionManager>()
                          .AddTransient<IDataStoreUpdateManager>(
                              sp =>  new SQLiteDatabaseUpdateManager(

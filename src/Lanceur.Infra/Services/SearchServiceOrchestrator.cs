@@ -3,7 +3,6 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Microsoft.Extensions.Logging;
-using Splat;
 
 namespace Lanceur.Infra.Services;
 
@@ -11,16 +10,20 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
 {
     #region Fields
 
-    private readonly Dictionary<string, IStoreService> _stores = new();
     private readonly ILogger<SearchServiceOrchestrator> _log;
 
-    #endregion Fields
+    private readonly Dictionary<string, IStoreService> _stores = new();
 
-    public SearchServiceOrchestrator(ILoggerFactory factory = null)
+    #endregion
+
+    #region Constructors
+
+    public SearchServiceOrchestrator(ILoggerFactory factory)
     {
-        factory ??= Locator.Current.GetService<ILoggerFactory>();
         _log = factory.GetLogger<SearchServiceOrchestrator>();
     }
+
+    #endregion
 
     #region Methods
 
@@ -32,5 +35,5 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
         return isAlive;
     }
 
-    #endregion Methods
+    #endregion
 }

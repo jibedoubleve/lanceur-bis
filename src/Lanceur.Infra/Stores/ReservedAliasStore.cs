@@ -3,14 +3,11 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Splat;
 using System.ComponentModel;
 using System.Reflection;
-using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Lanceur.Infra.Stores;
 

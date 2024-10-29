@@ -6,7 +6,6 @@ using System.SQLite.Updater;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Tests.Tooling.SQL;
-using Microsoft.Reactive.Testing;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.SQLite;

@@ -5,7 +5,6 @@ using Lanceur.Core.Models;
 using Lanceur.Infra.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ILogger = Splat.ILogger;
 
 namespace Lanceur.Ui.WPF.ReservedKeywords;
 

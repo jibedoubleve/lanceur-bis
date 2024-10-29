@@ -1,6 +1,5 @@
 ﻿using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Splat;
 
 namespace Lanceur.Infra.Services;
 
@@ -15,7 +14,7 @@ public abstract class SearchServiceCache
 
     #region Constructors
 
-    internal SearchServiceCache(IStoreLoader storeLoader) => _storeLoader = storeLoader ?? Locator.Current.GetService<IStoreLoader>();
+    internal SearchServiceCache(IStoreLoader storeLoader) => _storeLoader = storeLoader;
 
     #endregion Constructors
 

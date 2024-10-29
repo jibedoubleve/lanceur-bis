@@ -1,7 +1,6 @@
 ﻿using Lanceur.Core.Plugins;
 using Lanceur.Infra.Logging;
 using Microsoft.Extensions.Logging;
-using Splat;
 using System.Reflection;
 
 namespace Lanceur.Infra.Plugins;

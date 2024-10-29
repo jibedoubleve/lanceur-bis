@@ -1,43 +1,38 @@
-﻿using Lanceur.Infra.Logging;
-using Microsoft.Extensions.Logging;
-using Splat;
+﻿using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Windows.Media;
 
 namespace Lanceur.Infra.Win32.Thumbnails;
 
-internal static class ThumbnailLoader
+public class ThumbnailLoader
 {
     #region Fields
 
-    private const int ThumbnailSize = 64;
-    private static readonly Microsoft.Extensions.Logging.ILogger Logger;
+    private readonly ILogger _logger;
     private static readonly Dictionary<string, ImageSource> Cache = new();
 
     private static readonly string[] ImageExtensions = { ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff", ".ico" };
 
-    #endregion Fields
+    private const int ThumbnailSize = 64;
+
+    #endregion
 
     #region Constructors
 
-    static ThumbnailLoader()
-    {
-        var factory = Locator.Current.GetService<ILoggerFactory>();
-        Logger = factory.GetLogger(typeof(ThumbnailLoader));
-    }
+    public ThumbnailLoader(ILogger<ThumbnailLoader> logger) => _logger = logger;
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
-    private static ImageSource GetThumbnail(string path, ThumbnailOptions options) => WindowsThumbnailProvider.GetThumbnail(
+    private ImageSource GetThumbnail(string path, ThumbnailOptions options) => WindowsThumbnailProvider.GetThumbnail(
         path,
         ThumbnailSize,
         ThumbnailSize,
         options
     );
 
-    public static ImageSource? GetThumbnail(string path)
+    public ImageSource? GetThumbnail(string path)
     {
         ImageSource? image = null;
         try
@@ -77,11 +72,11 @@ internal static class ThumbnailLoader
                 Cache[path] = image;
             }
         }
-        catch (Exception ex) { Logger.LogWarning(ex, "Failed to extract thumbnail for {Path}", path); }
+        catch (Exception ex) { _logger.LogWarning(ex, "Failed to extract thumbnail for {Path}", path); }
 
         //Return the value event if null;
         return image;
     }
 
-    #endregion Methods
+    #endregion
 }

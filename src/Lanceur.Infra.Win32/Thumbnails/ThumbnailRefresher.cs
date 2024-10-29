@@ -16,6 +16,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
 
     private const string WebIcon = "Web";
     private readonly IFavIconManager _favIconManager;
+    private readonly ThumbnailLoader _thumbnailLoader;
     private readonly ILogger<ThumbnailRefresher> _logger;
     private readonly IPackagedAppSearchService _searchService;
 
@@ -23,10 +24,12 @@ public class ThumbnailRefresher : IThumbnailRefresher
 
     #region Constructors
 
-    public ThumbnailRefresher(ILoggerFactory loggerFactory, IPackagedAppSearchService searchService, IFavIconManager favIconManager)
+    public ThumbnailRefresher(ILoggerFactory loggerFactory, IPackagedAppSearchService searchService, IFavIconManager favIconManager, ThumbnailLoader thumbnailLoader)
     {
+        _thumbnailLoader =thumbnailLoader;
         _searchService = searchService;
         _favIconManager = favIconManager;
+        _thumbnailLoader = thumbnailLoader;
         _logger = loggerFactory.GetLogger<ThumbnailRefresher>();
     }
 
@@ -59,7 +62,7 @@ public class ThumbnailRefresher : IThumbnailRefresher
             return;
         }
 
-        var imageSource = ThumbnailLoader.GetThumbnail(alias.FileName);
+        var imageSource = _thumbnailLoader.GetThumbnail(alias.FileName);
         if (imageSource is not null)
         {
             var file = new FileInfo(alias.FileName);

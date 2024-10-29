@@ -3,15 +3,12 @@ using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Lanceur.Infra.Logging;
 using Lanceur.Infra.Plugins;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Splat;
 using System.Reflection;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.DependencyInjection;
-using ILogger = Splat.ILogger;
 
 namespace Lanceur.Infra.Stores;
 

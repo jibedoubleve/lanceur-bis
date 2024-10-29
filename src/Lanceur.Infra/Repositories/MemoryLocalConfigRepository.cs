@@ -2,7 +2,6 @@
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Services;
 using Microsoft.Extensions.Logging;
-using ILogger = Splat.ILogger;
 
 namespace Lanceur.Infra.Repositories;
 

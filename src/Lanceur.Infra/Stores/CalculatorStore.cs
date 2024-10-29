@@ -5,8 +5,6 @@ using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Splat;
 
 namespace Lanceur.Infra.Stores;
 

@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Data.Common;
-using Splat;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
@@ -16,7 +15,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
 
     #region Constructors
 
-    public DbMultiConnectionManager(IDbConnectionFactory connectionFactory) => _connectionFactory = connectionFactory ?? Locator.Current.GetService<IDbConnectionFactory>();
+    public DbMultiConnectionManager(IDbConnectionFactory connectionFactory) => _connectionFactory = connectionFactory ;
 
     #endregion Constructors
 

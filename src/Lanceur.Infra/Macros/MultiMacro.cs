@@ -5,11 +5,11 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.DependencyInjection;
-using Splat;
 
 namespace Lanceur.Infra.Macros;
 
-[Macro("multi"), Description("Allow to start multiple alias at once")]
+[Macro("multi")]
+[Description("Allow to start multiple alias at once")]
 public class MultiMacro : MacroQueryResult
 {
     #region Fields
@@ -33,11 +33,14 @@ public class MultiMacro : MacroQueryResult
         _delay = DefaultDelay;
     }
 
-    public MultiMacro(int? delay = null, IExecutionManager executionManager = null, ISearchService searchService = null)
+    public MultiMacro(IExecutionManager executionManager, ISearchService searchService, int? delay = null)
     {
+        ArgumentNullException.ThrowIfNull(executionManager);
+        ArgumentNullException.ThrowIfNull(searchService);   
+        
         _delay = delay ?? DefaultDelay;
-        _executionManager = executionManager ?? Locator.Current.GetService<IExecutionManager>();
-        _searchService = searchService ?? Locator.Current.GetService<ISearchService>();
+        _executionManager = executionManager;
+        _searchService = searchService;
     }
 
     #endregion

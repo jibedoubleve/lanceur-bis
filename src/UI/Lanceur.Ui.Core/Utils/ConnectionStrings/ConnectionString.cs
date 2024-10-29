@@ -2,7 +2,6 @@
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
-using Splat;
 
 namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
 

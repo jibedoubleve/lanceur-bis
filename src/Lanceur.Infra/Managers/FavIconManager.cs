@@ -5,7 +5,6 @@ using Lanceur.SharedKernel.Web;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using Lanceur.SharedKernel.Mixins;
-using Splat;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Lanceur.Infra.Managers;
