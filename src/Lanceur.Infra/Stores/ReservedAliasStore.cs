@@ -36,7 +36,7 @@ public class ReservedAliasStore : IStoreService
     public ReservedAliasStore(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _assembly = serviceProvider.GetService<Assembly>();
+        _assembly = serviceProvider.GetService<AssemblySource>().ReservedKeywordSource;
         _dbRepository = serviceProvider.GetService<IDbRepository>();
         _logger = serviceProvider.GetService<ILogger<ReservedAliasStore>>();
     }

@@ -42,7 +42,7 @@ public class StoreLoader : IStoreLoader
 
         using var _ = _logger.MeasureExecutionTime(this);
         var asm = Assembly.GetAssembly(typeof(SearchService));
-        var types = asm?.GetTypes() ?? Array.Empty<Type>();
+        var types = asm?.GetTypes() ?? [];
 
         var found = types.Where(t => t.GetCustomAttributes(typeof(StoreAttribute)).Any())
                          .ToList();

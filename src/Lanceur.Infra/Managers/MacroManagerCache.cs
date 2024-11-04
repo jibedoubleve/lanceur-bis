@@ -26,7 +26,7 @@ public abstract class MacroManagerCache
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
-        _asm = serviceProvider.GetService<Assembly>();
+        _asm = serviceProvider.GetService<AssemblySource>().MacroSource;
         Logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MacroManager>();
         _dbRepository = serviceProvider.GetService<IDbRepository>();
         _serviceProvider = serviceProvider;

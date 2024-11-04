@@ -62,6 +62,7 @@ public partial class AnalyticsView : IDisposable
 
         var barPlot = HistoryPlot.Plot.Add.Bars(positions, y);
         barPlot.ValueLabelStyle.ForeColor = CurrentTheme.LegendFontColor;
+        barPlot.Color = CurrentTheme.Palette.Colors[0];
         for (var i = 0; i < positions.Length; i++)
         {
             var b = barPlot.Bars.ElementAt(i);
@@ -85,16 +86,18 @@ public partial class AnalyticsView : IDisposable
 
         if (!x.Any() || !y.Any()) return;
 
+        // Styling
+        HistoryPlot.Plot.Axes.DateTimeTicksBottom();
+        SetTheme();
+
+        // Manage data
+
         HistoryPlot.Plot.Clear();
 
         var plot = HistoryPlot.Plot.Add.Scatter(x, y);
         plot.ConnectStyle = ConnectStyle.StepHorizontal;
 
         HistoryPlot.Plot.Axes.Title.Label.Text = plotTitle;
-
-        // Styling
-        HistoryPlot.Plot.Axes.DateTimeTicksBottom();
-        SetTheme();
 
         // Dates
         HistoryPlot.Plot.Axes.Bottom.Label.Text = "Date";

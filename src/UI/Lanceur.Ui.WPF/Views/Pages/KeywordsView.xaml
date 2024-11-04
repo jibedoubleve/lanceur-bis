@@ -11,8 +11,8 @@
     xmlns:v="clr-namespace:Lanceur.Ui.WPF.Validations"
     x:Name="Self"
     Title="KeywordsView"
-    d:DesignHeight="800"
-    d:DesignWidth="800"
+    d:DesignHeight="1200"
+    d:DesignWidth="1800"
     Background="{DynamicResource ApplicationBackgroundBrush}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
@@ -82,28 +82,33 @@
                 VerticalScrollBarVisibility="Visible"
                 Visibility="{Binding ElementName=AliasList, Path=SelectedItem, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
                 <StackPanel>
-                    <!--  NAMES  -->
-                    <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Tag24}">
-                        <ui:CardControl.Header>
-                            <ui:TextBlock FontTypography="Body" Text="Alias name" />
-                        </ui:CardControl.Header>
+                    <!--  ALIAS  -->
+                    <ui:CardExpander
+                        Margin="5,5,5,12"
+                        Icon="{ui:SymbolIcon Tag24}"
+                        IsExpanded="True">
+                        <ui:CardExpander.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <ui:TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    FontTypography="Body"
+                                    Text="Alias" />
+                            </Grid>
+                        </ui:CardExpander.Header>
                         <StackPanel>
-                            <ui:TextBox x:Name="TbName" PlaceholderText="Names are separated by commas...">
-                                <TextBox.Resources />
-                                <ui:TextBox.Text>
-                                    <Binding Path="SelectedAlias.Synonyms" UpdateSourceTrigger="PropertyChanged">
-                                        <Binding.ValidationRules>
-                                            <v:AliasNameRule ValidatesOnTargetUpdated="True" />
-                                        </Binding.ValidationRules>
-                                    </Binding>
-                                </ui:TextBox.Text>
-                            </ui:TextBox>
-                            <Label
-                                Content="{Binding ElementName=TbName, Path=(Validation.Errors)/ErrorContent}"
-                                FontSize="10"
-                                Foreground="Red" />
+                            <!--  NAME  -->
+                            <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasName}">Name</Label>
+                            <TextBox Text="{Binding SelectedAlias.Synonyms}" />
+                            <!--  NOTES  -->
+                            <Label Margin="6,20,6,3" Target="{Binding ElementName=TbNotes}">Comments</Label>
+                            <ui:TextBox x:Name="TbNotes" Text="{Binding SelectedAlias.Notes}" />
                         </StackPanel>
-                    </ui:CardControl>
+                    </ui:CardExpander>
                     <!--  PROCESS  -->
                     <ui:CardExpander
                         Margin="5,5,5,12"
@@ -174,9 +179,6 @@
                             <!--  WORKING DIRECTORY  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbWorkingDirectory}">Working directory</Label>
                             <ui:TextBox x:Name="TbWorkingDirectory" Text="{Binding SelectedAlias.WorkingDirectory}" />
-                            <!--  NOTES  -->
-                            <Label Margin="6,20,6,3" Target="{Binding ElementName=TbNotes}">Comments</Label>
-                            <ui:TextBox x:Name="TbNotes" Text="{Binding SelectedAlias.Notes}" />
                         </StackPanel>
                     </ui:CardExpander>
                     <!--  RUN AS  -->

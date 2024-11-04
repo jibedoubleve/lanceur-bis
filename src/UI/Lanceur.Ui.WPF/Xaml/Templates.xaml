@@ -22,15 +22,16 @@
                             VerticalAlignment="Center"
                             Source="{Binding Thumbnail}"
                             Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
-                        <ui:SymbolIcon
-                            Width="{StaticResource DefaultIconSize}"
-                            Height="{StaticResource DefaultIconSize}"
+                        <TextBlock
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Filled="False"
-                            FontSize="35"
-                            Symbol="{Binding Icon}"
-                            Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
+                            FontSize="35">
+                            <ui:SymbolIcon
+                                Filled="False"
+                                FontSize="{StaticResource DefaultIconSize}"
+                                Symbol="{Binding Icon}"
+                                Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
+                        </TextBlock>
                     </Grid>
                 </Border>
                 <StackPanel>

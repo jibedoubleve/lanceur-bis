@@ -57,7 +57,6 @@ public static class ServiceCollectionExtensions
                          )
                          .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()
-                         .AddTransient(_ => Assembly.GetExecutingAssembly()) //TODO THIS IS WRONG, remove this line and fix the issue...
                          .AddTransient<IMemoryStorageService, MemoryStorageService>()
                          .AddTransient<IDbRepository, SQLiteRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))

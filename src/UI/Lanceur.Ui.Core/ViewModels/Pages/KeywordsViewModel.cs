@@ -1,14 +1,10 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.DI;
-using Lanceur.SharedKernel.Mixins;
-using Lanceur.Ui.Core.Messages;
-using Lanceur.Ui.Core.Services;
 using Microsoft.Extensions.Logging;
 using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
 
@@ -84,7 +80,7 @@ public partial class KeywordsViewModel : ObservableObject
         if (Aliases.Any(x => x.Id == 0))
         {
             SelectedAlias = Aliases.Single(x => x.Id == 0);
-            _logger.LogTrace("Reselect alias to be created.");
+            _logger.LogTrace("Reselect alias to be created");
             return;
         }
 
