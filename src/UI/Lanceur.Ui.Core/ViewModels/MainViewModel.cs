@@ -19,6 +19,7 @@ public partial class MainViewModel : ObservableObject
     private readonly bool _doesReturnAllIfEmpty;
     private readonly IExecutionManager _executionManager;
     private readonly IUserInteractionService _userUserInteractionService;
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private Cmdline _lastCriterion = Cmdline.Empty;
     private readonly ILogger<MainViewModel> _logger;
@@ -62,21 +63,26 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task OnExecute(bool runAsAdmin)
     {
-        if (SelectedResult is null) return;
-
-        if(SelectedResult.IsExecutionConfirmationRequired)
+        await _semaphore.WaitAsync(); // I want to avoid other search or alias execution while this task executes
+        try
         {
-            var result = await _userUserInteractionService.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
-            if (!result) return;
-        } 
-        
-        _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
-        var response = await _executionManager.ExecuteAsync(
-            new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
-        );
+            if (SelectedResult is null) return;
 
-        WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
-        if (response.HasResult) Results = new(response.Results);
+            if (SelectedResult.IsExecutionConfirmationRequired)
+            {
+                var result = await _userUserInteractionService.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
+                if (!result) return;
+            }
+
+            _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
+            var response = await _executionManager.ExecuteAsync(
+                new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
+            );
+
+            WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
+            if (response.HasResult) Results = new(response.Results);
+        }
+        finally { _semaphore.Release(); }
     }
 
     private static string GetSuggestion(string query, QueryResult? selectedItem)
@@ -112,18 +118,25 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanSearch))]
     private async Task OnSearch()
     {
-        var criterion = Cmdline.BuildFromText(Query);
+        Suggestion = null;
+        await _semaphore.WaitAsync(); // I want to avoid other search or alias execution while this task executes
+        try
+        {
+            await Task.Delay(50);
+            var criterion = Cmdline.BuildFromText(Query);
 
-        if (criterion.IsNullOrEmpty()) Results.Clear();
+            if (criterion.IsNullOrEmpty()) Results.Clear();
 
-        var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
-        Results = new(results);
+            var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
+            Results = new(results);
 
-        SelectedResult = Results.FirstOrDefault()!;
-        Suggestion = GetSuggestion(criterion.Name, SelectedResult);
+            SelectedResult = Results.FirstOrDefault()!;
+            Suggestion = GetSuggestion(criterion.Name, SelectedResult);
 
-        _lastCriterion = criterion;
-        _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
+            _lastCriterion = criterion;
+            _logger.LogTrace("Found {Count} element(s) for query {Query} (Length: {QueryLength})", Results.Count, Query, Query?.Length ?? 0);
+        }
+        finally { _semaphore.Release(); }
     }
 
     [RelayCommand]
