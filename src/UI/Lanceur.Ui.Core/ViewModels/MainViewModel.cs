@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Humanizer;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -28,6 +29,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ISearchService _searchService;
     [ObservableProperty] private QueryResult? _selectedResult;
     [ObservableProperty] private string? _suggestion;
+    private readonly double _searchDelay;
 
     #endregion
 
@@ -51,14 +53,13 @@ public partial class MainViewModel : ObservableObject
         _executionManager = executionManager;
         _userUserInteractionService = userUserInteractionService;
         _doesReturnAllIfEmpty = settingsFacade.Application.Window.ShowResult;
+        _searchDelay = settingsFacade.Application.SearchDelay;
         _logger = logger;
     }
 
     #endregion
 
     #region Methods
-
-    private bool CanSearch() => _lastCriterion.Name != (Cmdline.BuildFromText(Query)?.Name ?? "");
 
     [RelayCommand]
     private async Task OnExecute(bool runAsAdmin)
@@ -115,18 +116,27 @@ public partial class MainViewModel : ObservableObject
         Suggestion = GetSuggestion(Query ?? "", SelectedResult);
     }
 
-    [RelayCommand(CanExecute = nameof(CanSearch))]
+    [RelayCommand]
     private async Task OnSearch()
     {
         Suggestion = null;
         await _semaphore.WaitAsync(); // I want to avoid other search or alias execution while this task executes
         try
         {
-            await Task.Delay(50);
+            await Task.Delay(_searchDelay.Milliseconds());
             var criterion = Cmdline.BuildFromText(Query);
 
+            _logger.LogTrace("Searching criterion: {Criterion}", criterion);
+            if (_lastCriterion.Name == Cmdline.BuildFromText(Query)?.Name)
+            {
+                // Since the main criterion hasn't changed, avoid triggering a new search.
+                // Instead, update the 'Query' property of each item in the 'Results'
+                // collection to reflect the new parameters.
+                foreach (var item in Results) item.Query = criterion;
+                return;
+            }
+            
             if (criterion.IsNullOrEmpty()) Results.Clear();
-
             var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
             Results = new(results);
 

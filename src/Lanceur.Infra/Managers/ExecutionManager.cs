@@ -1,4 +1,3 @@
-
 using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.BusinessLogic;
@@ -12,17 +11,18 @@ using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
+
 namespace Lanceur.Infra.Managers;
 
 public class ExecutionManager : IExecutionManager
 {
     #region Fields
-    
+
     private readonly IDbRepository _dataService;
     private readonly ILogger<ExecutionManager> _logger;
     private readonly IWildcardManager _wildcardManager;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -37,7 +37,7 @@ public class ExecutionManager : IExecutionManager
         _dataService = dataService;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -56,6 +56,12 @@ public class ExecutionManager : IExecutionManager
                 : ExecuteProcess(query);
         }
         catch (Exception ex) { throw new ApplicationException($"Cannot execute alias '{query?.Name ?? "NULL"}'. Check the path of the executable or the URL.", ex); }
+    }
+
+    private async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request, int delay)
+    {
+        await Task.Delay(delay);
+        return await ExecuteAsync(request);
     }
 
     private void ExecuteLuaScript(ref AliasQueryResult query)
@@ -169,12 +175,6 @@ public class ExecutionManager : IExecutionManager
         }
     }
 
-    private async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request, int delay)
-    {
-        await Task.Delay(delay);
-        return await ExecuteAsync(request);
-    }
-
     public ExecutionResponse ExecuteMultiple(IEnumerable<QueryResult> queryResults, int delay = 0)
     {
         var currentDelay = 0;
@@ -188,5 +188,5 @@ public class ExecutionManager : IExecutionManager
         return ExecutionResponse.NoResult;
     }
 
-    #endregion Methods
+    #endregion
 }
