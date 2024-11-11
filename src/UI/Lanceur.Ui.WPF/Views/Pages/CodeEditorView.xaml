@@ -12,6 +12,7 @@
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     Loaded="OnLoaded"
     PreviewKeyDown="OnPreviewKeyDown"
+    PreviewKeyUp="OnPreviewKeyUp"
     mc:Ignorable="d">
     <Grid Height="Auto" Margin="0,5,0,0">
         <Grid.RowDefinitions>

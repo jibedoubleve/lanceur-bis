@@ -9,8 +9,10 @@ public record Cmdline
 
     public Cmdline(string name, string parameters = "")
     {
-        if (name.Contains(' ')) throw new ArgumentException("The name of a cmdline cannot contain whitespaces.", nameof(name));
+        name ??= string.Empty;
         
+        if (name.Contains(' ')) throw new ArgumentException("The name of a cmdline cannot contain whitespaces.", nameof(name));
+
         Name = name ?? string.Empty;
         Parameters = parameters ?? string.Empty;
     }

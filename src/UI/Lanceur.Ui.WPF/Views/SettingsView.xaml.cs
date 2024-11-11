@@ -60,7 +60,7 @@ public partial class SettingsView
         return new SymbolIcon(icon);
     }
 
-    private void NavigateTo(NavigationMessage message) => PageNavigationView.Navigate(message.Value);
+    private void NavigateTo(NavigationMessage message) => PageNavigationView.Navigate(message.Value.ViewType, message.Value.DataContext);
 
     private void Notify(NotificationMessage message)
     {

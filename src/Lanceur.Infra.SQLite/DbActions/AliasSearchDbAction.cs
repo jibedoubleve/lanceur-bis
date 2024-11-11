@@ -57,8 +57,8 @@ public class AliasSearchDbAction
                        a.hidden                as {nameof(AliasQueryResult.IsHidden)}
                    from
                        alias a
-                       left join alias_name            an on a.id         = an.id_alias                    
-                       inner join data_alias_synonyms_v s on s.id_alias   = a.id
+                       left join alias_name            an on a.id       = an.id_alias                    
+                       inner join data_alias_synonyms_v s on s.id_alias = a.id
                    """;
         if (!name.IsNullOrEmpty())
             sql += """

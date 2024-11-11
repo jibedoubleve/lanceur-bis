@@ -126,7 +126,6 @@ public partial class MainViewModel : ObservableObject
             await Task.Delay(_searchDelay.Milliseconds());
             var criterion = Cmdline.BuildFromText(Query);
 
-            _logger.LogTrace("Searching criterion: {Criterion}", criterion);
             if (_lastCriterion.Name == Cmdline.BuildFromText(Query)?.Name)
             {
                 // Since the main criterion hasn't changed, avoid triggering a new search.
@@ -144,7 +143,7 @@ public partial class MainViewModel : ObservableObject
             Suggestion = GetSuggestion(criterion.Name, SelectedResult);
 
             _lastCriterion = criterion;
-            _logger.LogTrace("Found {Count} element(s) for query {Query} (Length: {QueryLength})", Results.Count, Query, Query?.Length ?? 0);
+            _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
         }
         finally { _semaphore.Release(); }
     }

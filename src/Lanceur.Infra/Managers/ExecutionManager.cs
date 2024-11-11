@@ -68,7 +68,13 @@ public class ExecutionManager : IExecutionManager
     {
         using var _ = _logger.BeginSingleScope("Query", query);
 
-        var result = LuaManager.ExecuteScript(new() { Code = query.LuaScript ?? string.Empty, Context = new() { FileName = query.FileName, Parameters = query.Parameters } });
+        var result = LuaManager.ExecuteScript(new()
+        {
+            Code = query.LuaScript ?? string.Empty, Context = new()
+            {
+                FileName = query.FileName, Parameters = query.Parameters
+            }
+        });
         using var __ = _logger.BeginSingleScope("ScriptResult", result);
         if (result.Exception is not null) _logger.LogWarning(result.Exception, "The Lua script is on error");
 

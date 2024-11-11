@@ -47,7 +47,8 @@ public partial class KeywordsView : IDisposable
 
         var viewModel = (CodeEditorViewModel)_codeEditorView.DataContext;
         viewModel.Alias = ViewModel.SelectedAlias!;
-        WeakReferenceMessenger.Default.Send<NavigationMessage>(new(typeof(CodeEditorView)));
+        var content = (ViewType: typeof(CodeEditorView), DataContext: viewModel);
+        WeakReferenceMessenger.Default.Send<NavigationMessage>(new(content));
     }
 
     public void Dispose() { WeakReferenceMessenger.Default.Unregister<KeywordsView>(this); }

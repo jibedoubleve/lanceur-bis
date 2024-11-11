@@ -23,7 +23,7 @@ public partial class CodeEditorView
     private readonly ILogger<CodeEditorView> _logger;
     private readonly IUserNotificationService _userNotificationService;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -35,32 +35,40 @@ public partial class CodeEditorView
         InitializeComponent();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     private CodeEditorViewModel ViewModel { get; set; }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
+
+    private void ApplyScript()
+    {
+        ViewModel.SetLuaScript(LuaEditor.Text);
+        GoBack();
+    }
+
+    private void GoBack() => WeakReferenceMessenger.Default.Send(new NavigationMessage((ViewType: typeof(KeywordsView), DataContext: null)!));
+
+    private void OnClickApply(object sender, RoutedEventArgs e) => ApplyScript();
 
     private void OnClickRollback(object sender, RoutedEventArgs e) => GoBack();
 
     private void OnClickRun(object sender, RoutedEventArgs e) => RunScript();
 
-    private void OnClickApply(object sender, RoutedEventArgs e) => ApplyScript();
-
     private void OnKeyUp(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.F5) { RunScript(); }
+        if (e.Key == Key.F5) RunScript();
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         ScriptOutput.Content
             = ScriptErrorOutput.Content
-            = string.Empty;
+                = string.Empty;
 
         SetupSyntaxColouration();
         var vm = (CodeEditorViewModel)DataContext;
@@ -71,12 +79,15 @@ public partial class CodeEditorView
 
         _logger.LogTrace("{View} has loaded lua script for {Alias}", GetType().Name, vm.Alias.Name);
     }
-    
-    private void GoBack() => WeakReferenceMessenger.Default.Send(new NavigationMessage(typeof(KeywordsView)));
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.F5) { e.Handled = true; }
+        if (e.Key == Key.F5) e.Handled = true;
+    }
+
+    private void OnPreviewKeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape) GoBack();
     }
 
     private void RunScript()
@@ -86,15 +97,7 @@ public partial class CodeEditorView
 
         var inputParameters = TbParameters.Text.IsNullOrWhiteSpace() ? ViewModel.Alias.Parameters : TbParameters.Text;
         var inputFileName = TbFileName.Text.IsNullOrWhiteSpace() ? ViewModel.Alias.FileName : TbFileName.Text;
-        var script = new Script
-        {
-            Code = LuaEditor.Text,
-            Context = new()
-            {
-                Parameters = inputParameters,
-                FileName = inputFileName
-            }
-        };
+        var script = new Script { Code = LuaEditor.Text, Context = new() { Parameters = inputParameters, FileName = inputFileName } };
         var result = LuaManager.ExecuteScript(script);
 
         if (result.Exception is not null)
@@ -117,18 +120,12 @@ public partial class CodeEditorView
                                 ---------------------------------------
                                 OUTPUT
                                 =====
-                                
+
                                 {result}
-                                
+
                                 """;
 
         _userNotificationService.Success("Script executed successfully in dry run mode.", "Build Successful");
-    }
-
-    private void ApplyScript()
-    {
-        ViewModel.SetLuaScript(LuaEditor.Text);
-        GoBack();
     }
 
     private void SetupSyntaxColouration()
@@ -140,6 +137,5 @@ public partial class CodeEditorView
         LuaEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
     }
 
-    #endregion Methods
-
+    #endregion
 }
