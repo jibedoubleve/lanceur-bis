@@ -4,6 +4,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Infra.Stores;
 using NSubstitute;
 using System.Reflection;
+using Lanceur.Core;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.ReservedAliases;
@@ -21,7 +22,7 @@ public class InternalAliasStoreShould
     private static ReservedAliasStore GetStore(IDbRepository dbRepository, Type type = null)
     {
         type ??= typeof(NotExecutableTestAlias);
-        var serviceProvider = new ServiceCollection().AddSingleton(Assembly.GetAssembly(type)!)
+        var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton(Substitute.For<IAppConfigRepository>())
                                                      .AddSingleton(dbRepository)

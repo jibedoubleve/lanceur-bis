@@ -5,6 +5,7 @@ using AutoMapper;
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -65,6 +66,7 @@ public class SearchShould : TestBase
         var serviceProvider
             = new ServiceCollection().AddMockSingleton<ILoggerFactory>()
                                      .AddMockSingleton<ILogger<StoreLoader>>()
+                                     .AddSingleton<AssemblySource>()
                                      .AddSingleton<IStoreLoader, StoreLoader>()
                                      .AddSingleton<IMacroManager, MacroManager>()
                                      .AddSingleton<SearchService>()
@@ -150,7 +152,7 @@ public class SearchShould : TestBase
                                                      .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
                                                      .AddSingleton<IDbConnection, SQLiteConnection>()
                                                      .AddSingleton<SearchService>()
-                                                     .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .AddSingleton<AssemblySource>()
                                                      .AddMockSingleton<IStoreLoader>(
                                                          (serviceProvider, storeLoader) =>
                                                          {

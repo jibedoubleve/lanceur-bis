@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Everything.Wrapper;
 using FluentAssertions;
+using Lanceur.Core;
 using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Infra.Stores;
@@ -145,7 +146,7 @@ public class SearchServicesShould
     public void ActivateReservedAliasStore(string query)
     {
         // ACT
-        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<Assembly>())
+        var serviceProvider = new ServiceCollection().AddSingleton<AssemblySource>()
                                                      .AddSingleton(DbRepository)
                                                      .AddSingleton(LoggerFactory)
                                                      .BuildServiceProvider();

@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Lanceur.Core;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tooling.Extensions;
@@ -89,11 +90,11 @@ public class MacroShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroManager>>()
                                                      .AddMockSingleton<IDbRepository>()
                                                      .AddMockSingleton<ILoggerFactory>()
-                                                     .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                      .AddSingleton<MacroManager>()
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroManager>();
-        var macro = new MultiMacroTest(serviceProvider){Parameters = parameters};
+        var macro = new MultiMacroTest(serviceProvider) { Parameters = parameters };
         var handler = (SelfExecutableQueryResult)macroMgr.Handle(macro);
 
         var cmdline = new Cmdline(name, parameters);
@@ -110,7 +111,7 @@ public class MacroShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<IDbRepository>()
                                                      .AddMockSingleton<ILogger<MacroManager>>()
                                                      .AddMockSingleton<ILoggerFactory>()
-                                                     .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                      .AddSingleton<MacroManager>()
                                                      .AddSingleton<MultiMacroTest>()
                                                      .BuildServiceProvider();
@@ -159,7 +160,7 @@ public class MacroShould : TestBase
     [Fact]
     public void HaveDefaultMacro()
     {
-        var serviceProvider = new ServiceCollection().AddSingleton(Assembly.GetAssembly(typeof(MultiMacro))!)
+        var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! })
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddMockSingleton<ILogger<MacroManager>>()
                                                      .AddMockSingleton<IDbRepository>()
@@ -234,7 +235,7 @@ public class MacroShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroManager>>()
                                                      .AddMockSingleton<IDbRepository>()
                                                      .AddMockSingleton<ILoggerFactory>()
-                                                     .AddSingleton(Assembly.GetExecutingAssembly())
+                                                     .AddSingleton(new AssemblySource{MacroSource = Assembly.GetExecutingAssembly()})
                                                      .AddSingleton<MacroManager>()
                                                      .BuildServiceProvider();
 

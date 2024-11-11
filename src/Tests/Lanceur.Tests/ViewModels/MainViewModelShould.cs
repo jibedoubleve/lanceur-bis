@@ -1,6 +1,7 @@
 using System.Reflection;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -42,7 +43,7 @@ public class MainViewModelShould : TestBase
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                                        .AddMemoryDb(db)
                                                        .AddApplicationSettings()
-                                                       .AddSingleton(Assembly.GetAssembly(typeof(MainView))!)
+                                                       .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                        .AddSingleton<IMappingService, AutoMapperMappingService>()
                                                        .AddSingleton<ISearchService, SearchService>()
                                                        .AddSingleton<IMacroManager, MacroManager>()
