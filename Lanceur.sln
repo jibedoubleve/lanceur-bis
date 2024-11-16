@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanceur.SharedKernel", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanceur.Core", "src\Lanceur.Core\Lanceur.Core.csproj", "{6FA1CD9C-234C-402A-B987-AF2ED89E5337}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanceur.Infra", "src\Lanceur.Infra\Lanceur.Infra.csproj", "{64C3C9B1-874E-4CF5-905B-DCBF063D8A0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanceur.Infra", "src\Infra\Lanceur.Infra\Lanceur.Infra.csproj", "{64C3C9B1-874E-4CF5-905B-DCBF063D8A0F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanceur.Infra.SQLite", "src\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj", "{6FC5DBA4-F987-419F-AD2B-438552A9DA78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanceur.Infra.SQLite", "src\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj", "{6FC5DBA4-F987-419F-AD2B-438552A9DA78}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Libraries", "_Libraries", "{42FC3E6A-9D1C-464D-A828-2D02E12F7192}"
 EndProject
@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Tests", "src\Tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IO.FileOps.Tests", "src\Tests\System.IO.FileOps.Tests\System.IO.FileOps.Tests.csproj", "{084BD3F9-987B-4E68-9CD8-F6FF94146072}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Infra.Win32", "src\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj", "{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Infra.Win32", "src\Infra\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj", "{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Everything.Wrapper", "src\Libraries\Everything.Wrapper\Everything.Wrapper.csproj", "{B4265078-7EE2-4DC2-9A4D-DD2FF995CA3C}"
 EndProject

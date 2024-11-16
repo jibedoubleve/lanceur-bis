@@ -14,9 +14,9 @@
         <PackageReference Include="NLua" Version="1.7.3" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Lanceur.Core\Lanceur.Core.csproj" />
-        <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
-        <ProjectReference Include="..\Libraries\Everything.Wrapper\Everything.Wrapper.csproj" />
-        <ProjectReference Include="..\Libraries\System.IO.FileOps\System.IO.FileOps.csproj" />
+        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
+        <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
+        <ProjectReference Include="..\..\Libraries\Everything.Wrapper\Everything.Wrapper.csproj" />
+        <ProjectReference Include="..\..\Libraries\System.IO.FileOps\System.IO.FileOps.csproj" />
     </ItemGroup>
 </Project>
