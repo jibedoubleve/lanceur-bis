@@ -3,8 +3,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Wpf.Ui;
-using Wpf.Ui.Controls;
-using Wpf.Ui.Extensions;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
@@ -13,7 +11,6 @@ public partial class KeywordsView : IDisposable
     #region Fields
 
     private readonly CodeEditorView _codeEditorView;
-    private readonly IContentDialogService _contentDialogService;
 
     #endregion
 
@@ -25,10 +22,9 @@ public partial class KeywordsView : IDisposable
         CodeEditorView codeEditorView
     )
     {
-        _contentDialogService = contentDialogService;
+        InitializeComponent();
         _codeEditorView = codeEditorView;
         DataContext = ViewModel = viewModel;
-        InitializeComponent();
     }
 
     #endregion

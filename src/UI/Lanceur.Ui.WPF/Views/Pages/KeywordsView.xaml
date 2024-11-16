@@ -102,7 +102,7 @@
                         </ui:CardExpander.Header>
                         <StackPanel>
                             <!--  NAME  -->
-                            <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasName}">Name</Label>
+                            <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasName}">Names</Label>
                             <TextBox Text="{Binding SelectedAlias.Synonyms}" />
                             <!--  NOTES  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbNotes}">Comments</Label>
@@ -149,7 +149,7 @@
                                     <ui:TextBox.Text>
                                         <Binding Path="SelectedAlias.FileName" UpdateSourceTrigger="PropertyChanged">
                                             <Binding.ValidationRules>
-                                                <v:AliasFileNameRule ValidatesOnTargetUpdated="True" />
+                                                <v:AliasFileNameRule />
                                             </Binding.ValidationRules>
                                         </Binding>
                                     </ui:TextBox.Text>

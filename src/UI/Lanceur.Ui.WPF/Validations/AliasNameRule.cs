@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Lanceur.Core.Services;
-using Lanceur.Core.Services.Validators;
 
 namespace Lanceur.Ui.WPF.Validations;
 
@@ -23,7 +22,7 @@ public class AliasNameRule : ValidationRule
     #region Methods
 
     public override ValidationResult Validate(object? value, CultureInfo cultureInfo) => _validationService.IsNameValid(value)
-                                                                                                          .ToValidationResult();
+                                                                                                           .ToValidationResult();
 
     #endregion
 }
