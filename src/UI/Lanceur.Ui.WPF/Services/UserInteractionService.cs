@@ -34,9 +34,11 @@ public class UserUserInteractionService : IUserInteractionService
     }
 
     ///<inheritdoc />
-    public async Task ShowAsync(string title, object content, string ok = "OK", string cancel = "Cancel")
+    public async Task ShowAsync(string title, object content, string ok = "Close", string? cancel = null)
     {
-        var messageBox = new MessageBox { Title = title, Content = content, PrimaryButtonText = ok, CloseButtonText = cancel };
+        MessageBox messageBox = cancel is null
+            ? new() { Title = title, Content = content }
+            : new() { Title = title, Content = content, PrimaryButtonText = ok };
         await messageBox.ShowDialogAsync();
     }
 

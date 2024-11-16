@@ -4,7 +4,18 @@ namespace Lanceur.Core.Services;
 public interface IUserInteractionService
 {
     Task<bool> AskAsync(string message, string title = "Question", string yes = "Yes", string no = "No");
-    Task ShowAsync(string title, object content, string ok = "OK", string cancel = "No");
+    
+    /// <summary>
+    /// Displays a MessageBox with the specified title and content.
+    /// Allows customization of the primary button text and an optional secondary button.
+    /// </summary>
+    /// <param name="title">The title to display in the MessageBox header.</param>
+    /// <param name="content">The content to display in the MessageBox body. Accepts strings or other objects.</param>
+    /// <param name="ok">The text for the primary button. Defaults to "OK".</param>
+    /// <param name="cancel">The text for the optional secondary button. Defaults to null (no secondary button displayed).</param>
+    /// <returns>A task that completes when the MessageBox is dismissed.</returns>
+
+    Task ShowAsync(string title, object content, string ok = "Close", string? cancel = null);
 
     /// <summary>
     /// Asynchronously displays a modal dialog that prompts the user with a Yes/No question.
