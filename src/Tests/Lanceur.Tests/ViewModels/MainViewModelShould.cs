@@ -50,6 +50,7 @@ public class MainViewModelShould : TestBase
                                                        .AddMockSingleton<IAppConfigRepository>()
                                                        .AddMockSingleton<IThumbnailManager>()
                                                        .AddMockSingleton<IUserInteractionService>()
+                                                       .AddMockSingleton<IUserNotificationService>()
                                                        .AddMockSingleton<IExecutionManager>(
                                                            (sp, i) =>
                                                            {

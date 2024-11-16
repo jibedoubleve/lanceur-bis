@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Lanceur.Core;
 using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;

@@ -20,6 +20,7 @@ public partial class MainViewModel : ObservableObject
     private readonly bool _doesReturnAllIfEmpty;
     private readonly IExecutionManager _executionManager;
     private readonly IUserInteractionService _userUserInteractionService;
+    private readonly IUserNotificationService _userNotificationService;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private Cmdline _lastCriterion = Cmdline.Empty;
@@ -41,7 +42,8 @@ public partial class MainViewModel : ObservableObject
         ISearchService searchService,
         ISettingsFacade settingsFacade,
         IExecutionManager executionManager,
-        IUserInteractionService userUserInteractionService
+        IUserInteractionService userUserInteractionService,
+        IUserNotificationService userNotificationService
     )
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -52,6 +54,7 @@ public partial class MainViewModel : ObservableObject
         _searchService = searchService;
         _executionManager = executionManager;
         _userUserInteractionService = userUserInteractionService;
+        _userNotificationService = userNotificationService;
         _doesReturnAllIfEmpty = settingsFacade.Application.Window.ShowResult;
         _searchDelay = settingsFacade.Application.SearchDelay;
         _logger = logger;
@@ -64,6 +67,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task OnExecute(bool runAsAdmin)
     {
+        _userNotificationService.BeginLoading();
         await _semaphore.WaitAsync(); // I want to avoid other search or alias execution while this task executes
         try
         {
@@ -83,7 +87,11 @@ public partial class MainViewModel : ObservableObject
             WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
             if (response.HasResult) Results = new(response.Results);
         }
-        finally { _semaphore.Release(); }
+        finally
+        {
+            _semaphore.Release(); 
+            _userNotificationService.EndLoading();
+        }
     }
 
     private static string GetSuggestion(string query, QueryResult? selectedItem)

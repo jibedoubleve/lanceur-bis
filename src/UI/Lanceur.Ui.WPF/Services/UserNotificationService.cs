@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Services;
 using Lanceur.Ui.Core.Messages;
@@ -10,7 +11,13 @@ public class UserNotificationService : IUserNotificationService
 
     private void Send(MessageLevel level, string title, string message) => WeakReferenceMessenger.Default.Send(new NotificationMessage((level, title, message)));
 
+    /// <inheritdoc />
+    public void BeginLoading() => Mouse.OverrideCursor = Cursors.Wait;
+    /// <inheritdoc />
+    public void EndLoading() => Mouse.OverrideCursor = null;
+    /// <inheritdoc />
     public void Success(string message, string title) => Send(MessageLevel.Success, title, message);
+    /// <inheritdoc />
     public void Warn(string message, string title) => Send(MessageLevel.Warning, title, message);
 
     #endregion
