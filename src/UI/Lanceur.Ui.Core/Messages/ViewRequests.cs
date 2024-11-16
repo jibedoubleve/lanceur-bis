@@ -34,4 +34,4 @@ public class NotificationMessage((MessageLevel Level, string Title, string Messa
 /*
  * NAVIGATION
  */
-public class NavigationMessage((Type ViewType, object? DataContext) value) : ValueChangedMessage<(Type ViewType, object DataContext)>(value);
+public class NavigationMessage((Type ViewType, object? DataContext) value) : ValueChangedMessage<(Type ViewType, object? DataContext)>(value);
