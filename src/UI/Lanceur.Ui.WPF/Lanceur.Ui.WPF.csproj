@@ -9,6 +9,7 @@
         <ApplicationIcon>Assets\appIcon.ico</ApplicationIcon>
         <Company>JB Wautier</Company>
         <Product>Lanceur</Product>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

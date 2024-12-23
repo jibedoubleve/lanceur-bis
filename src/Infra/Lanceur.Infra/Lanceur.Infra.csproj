@@ -4,6 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <PlatformTarget>AnyCPU</PlatformTarget>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="CodingSeb.ExpressionEvaluator" Version="1.4.*" />
