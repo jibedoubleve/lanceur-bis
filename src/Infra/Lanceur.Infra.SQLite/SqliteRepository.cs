@@ -175,7 +175,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     {
         if (alias is null) return;
 
-        const string sql = """
+        const string sqlArguments = """
                            select
                                id       as id,
                                name     as name,
@@ -183,9 +183,23 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                            from alias_argument
                            where id_alias = @idAlias
                            """;
-        var parameters =
-            DB.WithinTransaction(tx => tx.Connection!.Query<QueryResultAdditionalParameters>(sql, new { idAlias = alias.Id }));
+        const string sqlSynonyms = """
+                                   select name
+                                   from alias_name
+                                   where id_alias = @idAlias
+                                   """;
+        var (parameters, synonyms) =
+            DB.WithinTransaction(
+                tx =>
+                {
+                    var parameters = tx.Connection!.Query<QueryResultAdditionalParameters>(sqlArguments, new { idAlias = alias.Id });
+                    var synonyms = tx.Connection!.Query<string>(sqlSynonyms, new { idAlias = alias.Id });
+                    
+                    return (parameters, synonyms);
+                });
+        
         alias.AdditionalParameters = new(parameters);
+        alias.Synonyms = string.Join(", ", synonyms);
     }
 
     ///<inheritdoc/>
@@ -290,6 +304,21 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 
     ///<inheritdoc/>
     public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateThumbnails(aliases);
+
+    ///<inheritdoc/>
+    public IEnumerable<QueryResultAdditionalParameters> GetAdditionalParameter(IEnumerable<long> ids)
+    {
+        const string sql = """
+                           select 
+                           	id_alias as AliasId,
+                           	id       as Id,
+                           	name     as Name,
+                           	argument as Parameter
+                           from alias_argument	
+                           where id_alias in @ids
+                           """;
+        return DB.WithinTransaction(tx => tx!.Connection!.Query<QueryResultAdditionalParameters>(sql, new { ids }));
+    }
 
     #endregion
 }

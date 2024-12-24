@@ -48,6 +48,16 @@ public partial class DataReconciliationViewModel : ObservableObject
 
     private bool CanExecuteCommand() => Aliases.Any(e => e.IsSelected);
 
+    private bool CanMerge()
+    {
+        if (!CanExecuteCommand()) return false;
+
+        return GetSelectedAliases()
+               .Select(e => e.FileName)
+               .Distinct()
+               .Count() == 1;
+    }
+
     private SelectableAliasQueryResult[] GetSelectedAliases() => Aliases.Where(e => e.IsSelected).ToArray();
 
     [RelayCommand(CanExecute = nameof(CanExecuteCommand))]
@@ -63,26 +73,24 @@ public partial class DataReconciliationViewModel : ObservableObject
         _logger.LogInformation("Deleted {Items} aliases", toDelete.Length);
     }
 
-    [RelayCommand(CanExecute = nameof(CanExecuteCommand))]
+    [RelayCommand(CanExecute = nameof(CanMerge))]
     private async Task OnMerge(object content)
     {
         using var _ = _logger.BeginCorrelatedLogs();
 
-        var selectedAliases = (await Task.Run(GetSelectedAliases)).ToArray();
+        var selectedAliases = GetSelectedAliases().ToArray();
+        if (selectedAliases.Length == 0) return;
+        
+        var firstSelectedAlias = selectedAliases.FirstOrDefault();
+        var parameters = selectedAliases.Where(e => !e.Parameters.IsNullOrEmpty())
+                                        .Select(item => new KeyValueViewModel<string, string>(item.Name, item.Parameters))
+                                        .ToList();
+        
+        var alias = await Task.Run(() => _repository.GetByIdAndName(firstSelectedAlias!.Id, firstSelectedAlias.Name));
+        alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
+        alias.AdditionalParameters(_repository.GetAdditionalParameter(selectedAliases.Select(e => e.Id).ToArray()));
 
-        if (selectedAliases.Length <= 0) return;
-
-        var listToMerge = selectedAliases.Where(e => !e.Parameters.IsNullOrEmpty())
-                                         .Select(item => new KeyValueViewModel<string, string>(item.Name, item.Parameters))
-                                         .ToList();
-        if (listToMerge.Count < 1)
-        {
-            _logger.LogTrace("Cannot merge {Count} alias", listToMerge.Count);
-            return;
-        }
-
-        var alias = await Task.Run(() => _repository.GetByIdAndName(selectedAliases[0].Id, selectedAliases[0].Name));
-        var dataContext = new KeyValueListViewModel<string, string>(listToMerge, alias.Synonyms);
+        var dataContext = new KeyValueListViewModel<string, string>(parameters, alias.Synonyms);
 
         var response = await _userInteraction.AskUserYesNoAsync(content, "Update changes", "Cancel", "Merge aliases", dataContext);
         if (!response) return;

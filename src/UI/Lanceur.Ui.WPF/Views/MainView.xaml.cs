@@ -28,7 +28,7 @@ public partial class MainView
     private readonly IAppConfigRepository _appConfig;
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
-
+    private readonly FallbackShortcuts _fallbackShortcuts = new();
     #endregion
 
     #region Constructors
@@ -156,12 +156,20 @@ public partial class MainView
 
     private void SetGlobalShortcut(Key key, ModifierKeys modifier)
     {
+        _logger.LogInformation("Setup shortcut. (Key: {Key}, Modifier: {Modifier})", key, modifier);
         try { HotkeyManager.Current.AddOrReplace("OnShowWindow", key, modifier, OnShowWindow); }
         catch (HotkeyAlreadyRegisteredException ex)
         {
+            if (!_fallbackShortcuts.CanNext)
+            {
+                _logger.LogError("All the fallback shortcuts have been tried. Impossible to setup the shortcut.");
+                return;
+            }
+            
             //Default values
             _logger.LogWarning(ex, "Impossible to set shortcut. (Key: {Key}, Modifier: {Modifier})", key, modifier);
-            SetGlobalShortcut(Key.R, ModifierKeys.Shift | ModifierKeys.Windows);
+            var sc = _fallbackShortcuts.Next();
+            SetGlobalShortcut(sc.Key, sc.ModifierKeys);
         }
     }
 

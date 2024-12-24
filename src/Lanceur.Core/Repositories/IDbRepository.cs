@@ -184,6 +184,13 @@ public interface IDbRepository
     ///     will be ignored.
     /// </remarks>
     void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases);
+    
+    /// <summary>
+    /// Retrieves additional parameters for the specified alias IDs.
+    /// </summary>
+    /// <param name="ids">A collection of alias IDs to retrieve additional parameters for.</param>
+    /// <returns>A collection of QueryResultAdditionalParameters containing the additional parameters for each specified ID.</returns>
+    IEnumerable<QueryResultAdditionalParameters> GetAdditionalParameter(IEnumerable<long> ids);
 
     #endregion
 }
