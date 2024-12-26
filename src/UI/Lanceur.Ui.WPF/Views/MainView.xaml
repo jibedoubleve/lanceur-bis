@@ -1,4 +1,4 @@
-<Window
+<ui:FluentWindow
     x:Class="Lanceur.Ui.WPF.Views.MainView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,9 +10,9 @@
     x:Name="Self"
     Width="720"
     MinHeight="0"
+    WindowBackdropType="Acrylic"
+    ExtendsContentIntoTitleBar="true"
     AllowDrop="True"
-    AllowsTransparency="True"
-    Background="Transparent"
     BorderBrush="{DynamicResource AccentTextFillColorTertiaryBrush}"
     BorderThickness=".25"
     FocusManager.FocusedElement="{Binding ElementName=QueryTextBox}"
@@ -50,7 +50,7 @@
             </Grid.RowDefinitions>
 
             <!--  QUERY BOXES  -->
-            <StackPanel Opacity="1">
+            <StackPanel>
                 <Grid>
                     <!--  QUERY BOX  -->
                     <TextBox
@@ -84,6 +84,7 @@
                         </interactivity:Interaction.Triggers>
                     </TextBox>
                     <TextBox
+                        Background="Transparent"
                         Panel.ZIndex="0"
                         IsEnabled="False"
                         Text="{Binding Suggestion}" />
@@ -103,7 +104,8 @@
                 SelectionChanged="OnResultSelectionChanged">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}" CommandParameter="{StaticResource False}" />
+                        <interactivity:InvokeCommandAction Command="{Binding ExecuteCommand}"
+                                                           CommandParameter="{StaticResource False}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ui:ListView>
@@ -159,4 +161,4 @@
             </tray:NotifyIcon.Menu>
         </tray:NotifyIcon>
     </Grid>
-</Window>
+</ui:FluentWindow>
