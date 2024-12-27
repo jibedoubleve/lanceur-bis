@@ -7,31 +7,17 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
 {
     #region Fields
 
-    private static readonly object Locker = new();
     private readonly IDbConnectionFactory _connectionFactory;
-    private DbConnection _currentConnection;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    public DbMultiConnectionManager(IDbConnectionFactory connectionFactory) => _connectionFactory = connectionFactory ;
+    public DbMultiConnectionManager(IDbConnectionFactory connectionFactory) => _connectionFactory = connectionFactory;
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
-
-    private DbConnection GetConnection(bool renewConnection = true)
-    {
-        lock (Locker)
-        {
-            if (renewConnection && _currentConnection is not null) _currentConnection.Dispose();
-
-            if (renewConnection) _currentConnection = _connectionFactory.CreateConnection();
-
-            return _currentConnection;
-        }
-    }
 
     public void Dispose()
     {
@@ -51,7 +37,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
 
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)
     {
-        using var conn = GetConnection();
+        using var conn = _connectionFactory.CreateConnection();
         if (conn.State != ConnectionState.Open) conn.Open();
 
         using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
@@ -68,5 +54,5 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
         }
     }
 
-    #endregion Methods
+    #endregion
 }

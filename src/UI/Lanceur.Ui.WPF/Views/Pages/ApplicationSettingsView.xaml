@@ -19,6 +19,13 @@
                 <x:Type TypeName="Key" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+        <x:Array x:Key="WindowBackdropStyles" Type="{x:Type sys:String}">
+            <sys:String>Acrylic</sys:String>
+            <sys:String>Auto</sys:String>
+            <sys:String>Mica</sys:String>
+            <sys:String>None</sys:String>
+            <sys:String>Tabbed</sys:String>
+        </x:Array>
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -30,7 +37,8 @@
                 Margin="6"
                 Command="{Binding SaveSettingsCommand}"
                 Content="Save"
-                Icon="{ui:SymbolIcon Save24}" />
+                Icon="{ui:SymbolIcon Save24}" 
+                Appearance="Primary"/>
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
             <StackPanel>
@@ -46,6 +54,22 @@
                         <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}"
                                   SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
                     </StackPanel>
+                </ui:CardControl>
+
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Color24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Glass Effect" />
+                    </ui:CardControl.Header>
+                    <ComboBox SelectedItem="{Binding WindowBackdropStyle}"
+                              ItemsSource="{StaticResource WindowBackdropStyles}" />
+                
+                </ui:CardControl>
+                <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon Timer24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Search Trigger Delay (ms)" />
+                    </ui:CardControl.Header>
+                    <ui:CardControl.ToolTip>Time in milliseconds before search starts after typing stops.</ui:CardControl.ToolTip>
+                    <ui:NumberBox Value="{Binding SearchDelay, UpdateSourceTrigger=PropertyChanged}"/>
                 </ui:CardControl>
 
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ClipboardBulletListLtr20}">
@@ -75,7 +99,7 @@
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Enable trace until the next restart" />
                     </ui:CardControl.Header>
-                    <ui:ToggleSwitch OnContent="Trace enabled" 
+                    <ui:ToggleSwitch OnContent="Trace enabled"
                                      OffContent="Trace disabled"
                                      IsChecked="{Binding IsTraceEnabled}" />
                 </ui:CardControl>

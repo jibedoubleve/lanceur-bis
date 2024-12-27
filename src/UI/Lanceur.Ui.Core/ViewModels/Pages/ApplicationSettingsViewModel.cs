@@ -1,13 +1,10 @@
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Restart;
 using Lanceur.SharedKernel.Mixins;
-using Lanceur.Ui.Core.Messages;
-using Lanceur.Ui.Core.Services;
 using Serilog.Core;
 using Serilog.Events;
 using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
@@ -24,6 +21,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isShift;
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
+    [ObservableProperty] private string _windowBackdropStyle;
+    [ObservableProperty] private double _searchDelay;
 
     private readonly IUserNotificationService _userNotificationService;
     private readonly IAppRestart _appRestart;
@@ -66,6 +65,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Miscellaneous
         DbPath = _settings.Local.DbPath;
         ShowResults = _settings.Application.Window.ShowResult;
+        WindowBackdropStyle = _settings.Application.Window.BackdropStyle;
+        SearchDelay = _settings.Application.SearchDelay;
     }
 
     #endregion
@@ -94,9 +95,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         var reboot = hash != (hk.ModifierKey, hk.Key).GetHashCode();
         reboot &= Settings.Local.DbPath == DbPath;
 
-        Settings.Local.DbPath = DbPath;
-        Settings.Application.Window.ShowResult = ShowResults;
-
+        MapSettings();
         Settings.Save();
         _userNotificationService.Success("Configuration saved.", "Saved");
 
@@ -105,6 +104,14 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             const string msg = "Do you want to restart now to apply the new configuration?";
             if(await _userInteraction.AskUserYesNoAsync(msg)) _appRestart.Restart();
         }
+    }
+
+    private void MapSettings()
+    {
+        Settings.Local.DbPath = DbPath;
+        Settings.Application.Window.ShowResult = ShowResults;
+        Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
+        Settings.Application.SearchDelay = SearchDelay;
     }
 
     #endregion

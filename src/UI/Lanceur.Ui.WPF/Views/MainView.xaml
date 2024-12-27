@@ -10,7 +10,7 @@
     x:Name="Self"
     Width="720"
     MinHeight="0"
-    WindowBackdropType="Acrylic"
+    WindowBackdropType="{Binding WindowBackdropStyle}"
     ExtendsContentIntoTitleBar="true"
     AllowDrop="True"
     BorderBrush="{DynamicResource AccentTextFillColorTertiaryBrush}"
@@ -53,7 +53,7 @@
             <StackPanel>
                 <Grid>
                     <!--  QUERY BOX  -->
-                    <TextBox
+                    <TextBox                                                
                         x:Name="QueryTextBox"
                         Panel.ZIndex="2"
                         Background="Transparent"
@@ -82,8 +82,19 @@
                                     PassEventArgsToCommand="True" />
                             </interactivity:EventTrigger>
                         </interactivity:Interaction.Triggers>
+                        <TextBox.Template>
+                            <ControlTemplate TargetType="TextBox">
+                                <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{DynamicResource SeparatorBorderBrush}"
+                                        BorderThickness="1">
+                                    <ScrollViewer x:Name="PART_ContentHost"/>
+                                </Border>
+                            </ControlTemplate>
+                        </TextBox.Template>
                     </TextBox>
                     <TextBox
+                        BorderThickness="1"
+                        BorderBrush="Transparent"
                         Background="Transparent"
                         Panel.ZIndex="0"
                         IsEnabled="False"

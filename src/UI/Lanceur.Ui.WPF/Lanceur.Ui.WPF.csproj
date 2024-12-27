@@ -79,11 +79,4 @@
       <EmbeddedResource Include="SyntaxColouration\LUA-Mode.xml" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="Lanceur.Core">
-        <HintPath>bin\Debug\net6.0-windows10.0.19041.0\Lanceur.Core.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-
 </Project>

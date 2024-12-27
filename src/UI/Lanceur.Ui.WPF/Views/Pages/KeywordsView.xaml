@@ -65,13 +65,13 @@
             </Grid.RowDefinitions>
             <Menu>
                 <MenuItem
-                    Command="{Binding CreateAliasCommand}"
-                    Header="New alias"
-                    Icon="{ui:SymbolIcon FormNew24}" />
-                <MenuItem
                     Command="{Binding SaveCurrentAliasCommand}"
                     Header="Save"
                     Icon="{ui:SymbolIcon Save24}" />
+                <MenuItem
+                    Command="{Binding CreateAliasCommand}"
+                    Header="New alias"
+                    Icon="{ui:SymbolIcon FormNew24}" />
                 <MenuItem
                     Command="{Binding DeleteCurrentAliasCommand}"
                     Header="Delete"

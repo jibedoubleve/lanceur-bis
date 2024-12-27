@@ -36,8 +36,6 @@ public class ReservedAliasStore : IStoreService
     public ReservedAliasStore(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        var asm = serviceProvider.GetService<AssemblySource>();
-             
         _assembly = serviceProvider.GetService<AssemblySource>()?.ReservedKeywordSource ?? throw new NullReferenceException("The AssemblySource is not set in the DI container.");
         _dbRepository = serviceProvider.GetService<IDbRepository>();
         _logger = serviceProvider.GetService<ILogger<ReservedAliasStore>>();

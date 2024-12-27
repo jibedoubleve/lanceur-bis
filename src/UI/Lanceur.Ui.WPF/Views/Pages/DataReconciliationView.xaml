@@ -53,6 +53,11 @@
             </StackPanel>
         </ResourceDictionary>
     </Page.Resources>
+    <interactivity:Interaction.Triggers>
+        <interactivity:EventTrigger EventName="Loaded">
+            <interactivity:InvokeCommandAction Command="{Binding ShowDoubloonsCommand}" />
+        </interactivity:EventTrigger>
+    </interactivity:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

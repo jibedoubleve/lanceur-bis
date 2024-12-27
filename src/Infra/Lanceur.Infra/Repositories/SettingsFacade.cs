@@ -37,5 +37,11 @@ public class SettingsFacade : ISettingsFacade
         _appConfigRepository.Save();
     }
 
+    public void Reload()
+    {
+        _localConfigRepository.Load();
+        _appConfigRepository.Load();
+    }
+
     #endregion Methods
 }

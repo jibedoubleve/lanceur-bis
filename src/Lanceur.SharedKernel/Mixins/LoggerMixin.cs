@@ -24,6 +24,8 @@ public static class LoggerMixin
         [CallerMemberName] string callerMemberName = null
     )
     {
+        if (logger is null) throw new ArgumentNullException(nameof(logger));
+        
         return source is null
             ? Measurement.Empty
             : TimeMeter.Measure(

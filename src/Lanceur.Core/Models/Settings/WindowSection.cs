@@ -8,6 +8,7 @@ public class WindowSection
     public PositionSection Position { get; set; } = new();
     public bool ShowAtStartup { get; set; } = true;
     public bool ShowResult { get; set; }
+    public string BackdropStyle { get; set; } = "Mica";
 
     #endregion Properties
 }

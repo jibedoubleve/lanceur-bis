@@ -8,4 +8,6 @@ public class TestWatchdog : IWatchdog
 
     /// <inheritdoc />
     public async Task Pulse() => await _action?.Invoke()!;
+
+    public void ResetDelay(double searchDelay) { /* Do nothing */ }
 }

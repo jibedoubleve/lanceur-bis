@@ -60,6 +60,8 @@ public partial class MainView
     }
 
     #endregion
+    
+    private MainViewModel ViewModel => (MainViewModel)DataContext;
 
     #region Methods
 
@@ -195,6 +197,7 @@ public partial class MainView
 
     private void ShowWindow()
     {
+        ViewModel.RefreshSettings();
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();
 

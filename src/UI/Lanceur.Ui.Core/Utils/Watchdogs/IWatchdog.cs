@@ -10,4 +10,10 @@ public interface IWatchdog
     ///     Starts the watchdog timer. If already running, it stops and resets the timer.
     /// </summary>
     Task Pulse();
+    
+    /// <summary>
+    /// Replace the value of the interval of the watchdog with the specified value
+    /// </summary>
+    /// <param name="searchDelay">The new delay to apply in milliseconds</param>
+    void ResetDelay(double searchDelay);
 }

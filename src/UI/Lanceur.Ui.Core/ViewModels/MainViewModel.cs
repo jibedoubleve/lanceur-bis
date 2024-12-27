@@ -9,7 +9,6 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui.Core.Messages;
-using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +30,9 @@ public partial class MainViewModel : ObservableObject
     private readonly ISearchService _searchService;
     [ObservableProperty] private QueryResult? _selectedResult;
     [ObservableProperty] private string? _suggestion;
+    [ObservableProperty] private string _windowBackdropStyle;
     private readonly IWatchdog _watchdog;
+    private readonly ISettingsFacade _settingsFacade;
 
     #endregion
 
@@ -45,33 +46,48 @@ public partial class MainViewModel : ObservableObject
         IExecutionManager executionManager,
         IUserInteractionService userUserInteractionService,
         IUserNotificationService userNotificationService,
-        IWatchdogBuilder watchdogbuilder
+        IWatchdogBuilder watchdogBuilder
     )
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(searchService);
         ArgumentNullException.ThrowIfNull(settingsFacade);
         ArgumentNullException.ThrowIfNull(executionManager);
+        ArgumentNullException.ThrowIfNull(watchdogBuilder);
 
+        _logger = logger;
         _searchService = searchService;
         _executionManager = executionManager;
         _userUserInteractionService = userUserInteractionService;
         _userNotificationService = userNotificationService;
+
+        //Settings
+        _settingsFacade = settingsFacade;
         _doesReturnAllIfEmpty = settingsFacade.Application.Window.ShowResult;
-        _watchdog = watchdogbuilder.WithAction(SearchAsync)
+        _windowBackdropStyle = settingsFacade.Application.Window.BackdropStyle;
+
+        // Configuration
+        _watchdog = watchdogBuilder.WithAction(SearchAsync)
                                    .WithInterval(settingsFacade.Application.SearchDelay.Milliseconds())
                                    .Build();
-        _logger = logger;
     }
 
     #endregion
 
     #region Methods
 
+    private static string GetSuggestion(string query, QueryResult? selectedItem)
+    {
+        var name = selectedItem?.Name ?? string.Empty;
+        return !name.Contains(query) || name.Contains(' ')
+            ? string.Empty
+            : name;
+    }
+
     [RelayCommand]
     private async Task OnExecute(bool runAsAdmin)
     {
-        _userNotificationService.BeginLoading();
+        using var _  = _userNotificationService.TrackLoadingState();
         if (SelectedResult is null) return;
 
         if (SelectedResult.IsExecutionConfirmationRequired)
@@ -87,14 +103,6 @@ public partial class MainViewModel : ObservableObject
 
         WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
         if (response.HasResult) Results = new(response.Results);
-    }
-
-    private static string GetSuggestion(string query, QueryResult? selectedItem)
-    {
-        var name = selectedItem?.Name ?? string.Empty;
-        return !name.Contains(query) || name.Contains(' ')
-            ? string.Empty
-            : name;
     }
 
     [RelayCommand]
@@ -153,6 +161,13 @@ public partial class MainViewModel : ObservableObject
         var query = Cmdline.BuildFromText(Query);
         var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
         WeakReferenceMessenger.Default.Send<SetQueryMessage>(new(cmd));
+    }
+
+    public void RefreshSettings()
+    {
+        _settingsFacade.Reload();
+        WindowBackdropStyle = _settingsFacade.Application.Window.BackdropStyle;
+        _watchdog.ResetDelay(_settingsFacade.Application.SearchDelay);
     }
 
     #endregion

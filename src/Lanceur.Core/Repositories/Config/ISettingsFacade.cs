@@ -13,7 +13,15 @@ public interface ISettingsFacade
 
     #region Methods
 
+    /// <summary>
+    /// Save all the changes into the disk
+    /// </summary>
     void Save();
+
+    /// <summary>
+    /// Reload the settings from the disk
+    /// </summary>
+    void Reload();
 
     #endregion Methods
 }

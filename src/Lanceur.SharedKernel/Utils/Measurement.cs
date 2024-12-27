@@ -33,7 +33,7 @@ public sealed class Measurement : IDisposable
     private void Log(string message, bool stopTime)
     {
         if (stopTime) _stopwatch.Stop();
-        _log(_stopwatch.Elapsed, message);
+        _log?.Invoke(_stopwatch.Elapsed, message);
     }
 
     public void Dispose() => Log(string.Empty, true);

@@ -1,3 +1,4 @@
+using Humanizer;
 using System.Windows.Threading;
 
 namespace Lanceur.Ui.Core.Utils.Watchdogs;
@@ -27,4 +28,7 @@ public class Watchdog : IWatchdog
         _timer.Start();
         return Task.CompletedTask;
     }
+
+    /// <inheritdoc />
+    public void ResetDelay(double interval) => _timer.Interval = interval.Milliseconds();
 }

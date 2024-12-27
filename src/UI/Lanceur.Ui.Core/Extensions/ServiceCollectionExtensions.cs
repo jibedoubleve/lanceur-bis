@@ -1,6 +1,5 @@
 using System.Data;
 using System.Data.SQLite;
-using System.Reflection;
 using Everything.Wrapper;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Plugins;
@@ -10,7 +9,6 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
-using Lanceur.Infra.Macros;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Plugins;
 using Lanceur.Infra.Repositories;
@@ -41,6 +39,46 @@ namespace Lanceur.Ui.Core.Extensions;
 public static class ServiceCollectionExtensions
 {
     #region Methods
+
+    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddTransient<IAppConfigRepository, SQLiteAppConfigRepository>();
+        serviceCollection.AddTransient<ISettingsFacade, SettingsFacade>();
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddLoggers(this IServiceCollection serviceCollection)
+    {
+        var conditional = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
+        var levelSwitch = new LoggingLevelSwitch(conditional);
+
+        serviceCollection.AddSingleton(levelSwitch);
+
+        var loggerCfg = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch)
+                                                 .Enrich.FromLogContext()
+                                                 .Enrich.WithEnvironmentUserName()
+                                                 .WriteTo.File(
+                                                     new CompactJsonFormatter(),
+                                                     Paths.LogFile,
+                                                     rollingInterval: RollingInterval.Day
+                                                 )
+                                                 .WriteTo.Console();
+#if DEBUG
+        // For now, only seq is configured in my development machine and not anymore in AWS.
+        loggerCfg.WriteTo.Seq(Paths.TelemetryUrl);
+#endif
+        Log.Logger = loggerCfg.CreateLogger();
+        serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true))
+                         .BuildServiceProvider();
+        Log.Logger.Information("Logger configured");
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddMapping(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>();
+        return serviceCollection;
+    }
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
@@ -83,50 +121,13 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWildcardManager, ReplacementComposite>()
                          .AddTransient<IClipboardService, WindowsClipboardService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>();
-                         
+
         ConditionalExecution.Set(
             serviceCollection,
             s => s.AddSingleton<ILocalConfigRepository, MemoryLocalConfigRepository>(),
             s => s.AddSingleton<ILocalConfigRepository, JsonLocalConfigRepository>()
         );
 
-        return serviceCollection;
-    }
-
-    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddTransient<IAppConfigRepository, SQLiteAppConfigRepository>();
-        serviceCollection.AddTransient<ISettingsFacade, SettingsFacade>();
-        return serviceCollection;
-    }
-
-    public static IServiceCollection AddMapping(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>();
-        return serviceCollection;
-    }
-
-    public static IServiceCollection AddLoggers(this IServiceCollection serviceCollection)
-    {
-        var conditional = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
-        var levelSwitch = new LoggingLevelSwitch(conditional);
-
-        serviceCollection.AddSingleton(levelSwitch);
-
-        Log.Logger = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch)
-                                              .Enrich.FromLogContext()
-                                              .Enrich.WithEnvironmentUserName()
-                                              .WriteTo.File(
-                                                  new CompactJsonFormatter(),
-                                                  Paths.LogFile,
-                                                  rollingInterval: RollingInterval.Day
-                                              )
-                                              .WriteTo.Console()
-                                              .WriteTo.Seq(Paths.TelemetryUrl)
-                                              .CreateLogger();
-        serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true))
-                         .BuildServiceProvider();
-        Log.Logger.Information("Logger configured");
         return serviceCollection;
     }
 

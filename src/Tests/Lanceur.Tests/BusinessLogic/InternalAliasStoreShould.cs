@@ -22,10 +22,13 @@ public class InternalAliasStoreShould
     private static ReservedAliasStore GetStore(IDbRepository dbRepository, Type type = null)
     {
         type ??= typeof(NotExecutableTestAlias);
+        
+        var reservedAliasStoreLogger = Substitute.For<ILogger<ReservedAliasStore>>();
         var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
-                                                     .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton(Substitute.For<IAppConfigRepository>())
                                                      .AddSingleton(dbRepository)
+                                                     .AddSingleton<ILoggerFactory, LoggerFactory>()
+                                                     .AddSingleton(reservedAliasStoreLogger)
                                                      .BuildServiceProvider();
 
         var store = new ReservedAliasStore(serviceProvider);
