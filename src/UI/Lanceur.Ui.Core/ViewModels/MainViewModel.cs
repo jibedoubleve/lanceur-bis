@@ -9,6 +9,8 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
 using Lanceur.Ui.Core.Messages;
+using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.ViewModels;
@@ -21,7 +23,6 @@ public partial class MainViewModel : ObservableObject
     private readonly IExecutionManager _executionManager;
     private readonly IUserInteractionService _userUserInteractionService;
     private readonly IUserNotificationService _userNotificationService;
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
 
     private Cmdline _lastCriterion = Cmdline.Empty;
     private readonly ILogger<MainViewModel> _logger;
@@ -30,7 +31,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ISearchService _searchService;
     [ObservableProperty] private QueryResult? _selectedResult;
     [ObservableProperty] private string? _suggestion;
-    private readonly double _searchDelay;
+    private readonly IWatchdog _watchdog;
 
     #endregion
 
@@ -43,7 +44,8 @@ public partial class MainViewModel : ObservableObject
         ISettingsFacade settingsFacade,
         IExecutionManager executionManager,
         IUserInteractionService userUserInteractionService,
-        IUserNotificationService userNotificationService
+        IUserNotificationService userNotificationService,
+        IWatchdogBuilder watchdogbuilder
     )
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -56,7 +58,9 @@ public partial class MainViewModel : ObservableObject
         _userUserInteractionService = userUserInteractionService;
         _userNotificationService = userNotificationService;
         _doesReturnAllIfEmpty = settingsFacade.Application.Window.ShowResult;
-        _searchDelay = settingsFacade.Application.SearchDelay;
+        _watchdog = watchdogbuilder.WithAction(SearchAsync)
+                                   .WithInterval(settingsFacade.Application.SearchDelay.Milliseconds())
+                                   .Build();
         _logger = logger;
     }
 
@@ -68,30 +72,21 @@ public partial class MainViewModel : ObservableObject
     private async Task OnExecute(bool runAsAdmin)
     {
         _userNotificationService.BeginLoading();
-        await _semaphore.WaitAsync(); // I want to avoid other search or alias execution while this task executes
-        try
+        if (SelectedResult is null) return;
+
+        if (SelectedResult.IsExecutionConfirmationRequired)
         {
-            if (SelectedResult is null) return;
-
-            if (SelectedResult.IsExecutionConfirmationRequired)
-            {
-                var result = await _userUserInteractionService.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
-                if (!result) return;
-            }
-
-            _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
-            var response = await _executionManager.ExecuteAsync(
-                new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
-            );
-
-            WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
-            if (response.HasResult) Results = new(response.Results);
+            var result = await _userUserInteractionService.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
+            if (!result) return;
         }
-        finally
-        {
-            _semaphore.Release(); 
-            _userNotificationService.EndLoading();
-        }
+
+        _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
+        var response = await _executionManager.ExecuteAsync(
+            new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
+        );
+
+        WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
+        if (response.HasResult) Results = new(response.Results);
     }
 
     private static string GetSuggestion(string query, QueryResult? selectedItem)
@@ -124,36 +119,30 @@ public partial class MainViewModel : ObservableObject
         Suggestion = GetSuggestion(Query ?? "", SelectedResult);
     }
 
-    [RelayCommand]
-    private async Task OnSearch()
+    [RelayCommand] private async Task OnSearch() => await _watchdog.Pulse();
+
+    private async Task SearchAsync()
     {
-        Suggestion = null;
-        await _semaphore.WaitAsync(); // I want to avoid other search or alias execution while this task executes
-        try
+        var criterion = Cmdline.BuildFromText(Query);
+
+        if (_lastCriterion.Name == Cmdline.BuildFromText(Query)?.Name)
         {
-            await Task.Delay(_searchDelay.Milliseconds());
-            var criterion = Cmdline.BuildFromText(Query);
-
-            if (_lastCriterion.Name == Cmdline.BuildFromText(Query)?.Name)
-            {
-                // Since the main criterion hasn't changed, avoid triggering a new search.
-                // Instead, update the 'Query' property of each item in the 'Results'
-                // collection to reflect the new parameters.
-                foreach (var item in Results) item.Query = criterion;
-                return;
-            }
-            
-            if (criterion.IsNullOrEmpty()) Results.Clear();
-            var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
-            Results = new(results);
-
-            SelectedResult = Results.FirstOrDefault()!;
-            Suggestion = GetSuggestion(criterion.Name, SelectedResult);
-
-            _lastCriterion = criterion;
-            _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
+            // Since the main criterion hasn't changed, avoid triggering a new search.
+            // Instead, update the 'Query' property of each item in the 'Results'
+            // collection to reflect the new parameters.
+            foreach (var item in Results) item.Query = criterion;
+            return;
         }
-        finally { _semaphore.Release(); }
+
+        if (criterion.IsNullOrEmpty()) Results.Clear();
+        var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
+        Results = new(results);
+
+        SelectedResult = Results.FirstOrDefault()!;
+        Suggestion = GetSuggestion(criterion.Name, SelectedResult);
+
+        _lastCriterion = criterion;
+        _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
     }
 
     [RelayCommand]

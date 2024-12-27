@@ -16,6 +16,7 @@ using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -51,6 +52,7 @@ public class MainViewModelShould : TestBase
                                                        .AddMockSingleton<IThumbnailManager>()
                                                        .AddMockSingleton<IUserInteractionService>()
                                                        .AddMockSingleton<IUserNotificationService>()
+                                                       .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                                                        .AddMockSingleton<IExecutionManager>(
                                                            (sp, i) =>
                                                            {

@@ -28,6 +28,7 @@ using Lanceur.SharedKernel.Web;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
+using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -80,8 +81,9 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IEverythingApi, EverythingApi>()
                          .AddTransient<IExecutionManager, ExecutionManager>()
                          .AddTransient<IWildcardManager, ReplacementComposite>()
-                         .AddTransient<IClipboardService, WindowsClipboardService>();
-
+                         .AddTransient<IClipboardService, WindowsClipboardService>()
+                         .AddTransient<IWatchdogBuilder, WatchdogBuilder>();
+                         
         ConditionalExecution.Set(
             serviceCollection,
             s => s.AddSingleton<ILocalConfigRepository, MemoryLocalConfigRepository>(),
