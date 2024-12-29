@@ -77,7 +77,7 @@ public abstract class QueryResult : ObservableModel
     public string Thumbnail
     {
         get => _thumbnail;
-        set => Set(ref _thumbnail, value);
+        set => SetField(ref _thumbnail, value);
     }
 
     #endregion Properties

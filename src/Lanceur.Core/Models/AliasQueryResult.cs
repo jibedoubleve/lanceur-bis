@@ -10,7 +10,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 {
     #region Fields
 
-    private ObservableCollection<QueryResultAdditionalParameters> _additionalParameters = new();
+    private ObservableCollection<AdditionalParameter> _additionalParameters = new();
     private string _fileName;
 
     private string _synonyms;
@@ -27,10 +27,10 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     /// Additional parameters are a way to not duplicate alias to create other with the same
     /// configuration but with only one parameter that differs
     /// </summary>
-    public ObservableCollection<QueryResultAdditionalParameters> AdditionalParameters
+    public ObservableCollection<AdditionalParameter> AdditionalParameters
     {
         get => _additionalParameters;
-        set => Set(ref _additionalParameters, value);
+        set => SetField(ref _additionalParameters, value);
     }
 
     public int Delay { get; set; }
@@ -44,7 +44,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     public string FileName
     {
         get => _fileName;
-        set => Set(ref _fileName, value);
+        set => SetField(ref _fileName, value);
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
         get => _synonyms;
         set
         {
-            Set(ref _synonyms, value);
+            SetField(ref _synonyms, value);
             OnPropertyChanged(nameof(SynonymsToAdd));
         }
     }
@@ -129,7 +129,7 @@ public static class AliasQueryResultExtensions
     /// <param name="alias">The AliasQueryResult object to which the additional parameters will be added.</param>
     /// <param name="additionalParameters">A collection of QueryResultAdditionalParameters to add to the alias.</param>
 
-    public static void AdditionalParameters(this AliasQueryResult alias, IEnumerable<QueryResultAdditionalParameters> additionalParameters)
+    public static void AdditionalParameters(this AliasQueryResult alias, IEnumerable<AdditionalParameter> additionalParameters)
     {
         foreach (var additionalParameter in additionalParameters)
             alias.AdditionalParameters.Add(additionalParameter);

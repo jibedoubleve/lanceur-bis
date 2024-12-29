@@ -4,6 +4,8 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Win32.Restart;
 using Lanceur.SharedKernel.Utils;
+using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.ReservedKeywords;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +26,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IUserInteractionService, UserUserInteractionService>()
                          .AddSingleton<ISnackbarService, SnackbarService>()
                          .AddSingleton<IUserNotificationService, UserNotificationService>()
+                         .AddSingleton<IViewFactory, ViewFactory>()
                          .AddSingleton(new AssemblySource
                          {
                              ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)), 

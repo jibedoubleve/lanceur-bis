@@ -13,7 +13,7 @@ public class SelectableAliasQueryResult : AliasQueryResult
     public bool IsSelected
     {
         get => _isSelected;
-        set => Set(ref _isSelected, value);
+        set => SetField(ref _isSelected, value);
     }
 
     #endregion

@@ -1,0 +1,16 @@
+<UserControl x:Class="Lanceur.Ui.WPF.Views.Controls.MultipleAdditionalParameterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <TextBlock Margin="5,5,5,20">
+            <Run Text="To create multiple additional parameters, ensure that each parameter is added on a new line. " />
+            <LineBreak />
+            <Run Text="Separate the parameter name from its value using a comma." />
+        </TextBlock>
+        <TextBox Text="{Binding RawParameters}" Margin="5" MinLines="15" AcceptsReturn="True" />
+    </StackPanel>
+</UserControl>

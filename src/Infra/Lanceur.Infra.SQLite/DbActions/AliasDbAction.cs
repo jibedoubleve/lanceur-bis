@@ -74,7 +74,7 @@ public class AliasDbAction
         _logger.LogInformation("Removed {Count} row(s) from alias_usage. Id: {IdAliases}", cnt, idd);
     }
 
-    private void CreateAdditionalParameters(long idAlias, IEnumerable<QueryResultAdditionalParameters> parameters, IDbTransaction tx)
+    private void CreateAdditionalParameters(long idAlias, IEnumerable<AdditionalParameter> parameters, IDbTransaction tx)
     {
         using var _ = _logger.BeginSingleScope("Parameters", parameters);
         const string sql1 = "delete from alias_argument where id_alias = @idAlias";

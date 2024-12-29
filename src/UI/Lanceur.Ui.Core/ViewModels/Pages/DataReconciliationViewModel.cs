@@ -55,7 +55,8 @@ public partial class DataReconciliationViewModel : ObservableObject
         return GetSelectedAliases()
                .Select(e => e.FileName)
                .Distinct()
-               .Count() == 1;
+               .Count() ==
+               1;
     }
 
     private SelectableAliasQueryResult[] GetSelectedAliases() => Aliases.Where(e => e.IsSelected).ToArray();
@@ -80,24 +81,24 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         var selectedAliases = GetSelectedAliases().ToArray();
         if (selectedAliases.Length == 0) return;
-        
+
         var firstSelectedAlias = selectedAliases.FirstOrDefault();
         var parameters = selectedAliases.Where(e => !e.Parameters.IsNullOrEmpty())
-                                        .Select(item => new KeyValueViewModel<string, string>(item.Name, item.Parameters))
+                                        .Select(item => new AdditionalParameter { Name = item.Name, Parameter = item.Parameters })
                                         .ToList();
-        
+
         var alias = await Task.Run(() => _repository.GetByIdAndName(firstSelectedAlias!.Id, firstSelectedAlias.Name));
         alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
         alias.AdditionalParameters(_repository.GetAdditionalParameter(selectedAliases.Select(e => e.Id).ToArray()));
 
-        var dataContext = new KeyValueListViewModel<string, string>(parameters, alias.Synonyms);
+        var dataContext = new DoubloonViewModel(parameters, alias.Synonyms);
 
         var response = await _userInteraction.AskUserYesNoAsync(content, "Update changes", "Cancel", "Merge aliases", dataContext);
         if (!response) return;
 
         // Merge all the alias into this one (That's add additional parameters) 
         alias.Synonyms = dataContext.Synonyms;
-        foreach (var item in dataContext.List) alias.AdditionalParameters.Add(new() { Name = item.Key, Parameter = item.Value });
+        foreach (var item in dataContext.List) alias.AdditionalParameters.Add(new() { Name = item.Name, Parameter = item.Parameter });
 
         await Task.Run(() => _repository.SaveOrUpdate(ref alias));
 

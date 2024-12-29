@@ -1,19 +1,20 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Lanceur.Core.Models;
 
 namespace Lanceur.Ui.Core.ViewModels.Controls;
 
-public partial class KeyValueListViewModel<TKey, TValue> : ObservableObject
+public partial class DoubloonViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private List<KeyValueViewModel<TKey, TValue>> _list;
+    [ObservableProperty] private List<AdditionalParameter> _list;
     [ObservableProperty] private string _synonyms;
 
     #endregion
 
     #region Constructors
 
-    public KeyValueListViewModel(List<KeyValueViewModel<TKey, TValue>> list, string synonyms)
+    public DoubloonViewModel(List<AdditionalParameter> list, string synonyms)
     {
         _list = list;
         _synonyms = synonyms;

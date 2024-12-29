@@ -190,7 +190,7 @@ public interface IDbRepository
     /// </summary>
     /// <param name="ids">A collection of alias IDs to retrieve additional parameters for.</param>
     /// <returns>A collection of QueryResultAdditionalParameters containing the additional parameters for each specified ID.</returns>
-    IEnumerable<QueryResultAdditionalParameters> GetAdditionalParameter(IEnumerable<long> ids);
+    IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids);
 
     #endregion
 }

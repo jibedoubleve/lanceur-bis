@@ -17,6 +17,8 @@
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
+    <Page.Resources>
+    </Page.Resources>
     <interactivity:Interaction.Triggers>
         <interactivity:EventTrigger EventName="Loaded">
             <interactivity:InvokeCommandAction Command="{Binding LoadAliasesCommand}" />
@@ -40,7 +42,8 @@
                 IconPlacement="Right">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="TextChanged">
-                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=TbSearch, Path=Text}" />
+                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}"
+                                                           CommandParameter="{Binding ElementName=TbSearch, Path=Text}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ui:TextBox>
@@ -187,7 +190,8 @@
                             <ui:TextBlock FontTypography="Body" Text="Run as" />
                         </ui:CardControl.Header>
                         <StackPanel>
-                            <ComboBox SelectedIndex="1" SelectedItem="{Binding SelectedAlias.RunAs, Converter={StaticResource StringToRunAsConverter}}">
+                            <ComboBox SelectedIndex="1"
+                                      SelectedItem="{Binding SelectedAlias.RunAs, Converter={StaticResource StringToRunAsConverter}}">
                                 <ComboBox.Items>
                                     <sys:String>Admin</sys:String>
                                     <sys:String>CurrentUser</sys:String>
@@ -244,6 +248,7 @@
                         Icon="{ui:SymbolIcon AppsList24}"
                         IsExpanded="{Binding SelectedAlias.AdditionalParameters.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource NumberToBooleanConverter}}">
                         <ui:CardExpander.Header>
+
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -261,23 +266,67 @@
                             </Grid>
                         </ui:CardExpander.Header>
                         <StackPanel>
+                            <Menu>
+                                <MenuItem
+                                    Command="{Binding AddParameterCommand}"
+                                    Header="Add parameter"
+                                    Icon="{ui:SymbolIcon AddCircle24}" />
+                                <MenuItem
+                                    Command="{Binding AddMultiParametersCommand}"
+                                    Header="Add multiple parameters"
+                                    Icon="{ui:SymbolIcon TextBulletListAdd24}" />
+                            </Menu>
                             <ui:DataGrid
                                 AreRowDetailsFrozen="True"
                                 AutoGenerateColumns="False"
-                                CanUserAddRows="True"
-                                CanUserDeleteRows="True"
+                                CanUserAddRows="False"
+                                CanUserDeleteRows="False"
                                 CanUserResizeColumns="True"
                                 ItemsSource="{Binding SelectedAlias.AdditionalParameters}"
                                 SelectionMode="Single">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn
-                                        Width="250"
-                                        Binding="{Binding Name}"
-                                        Header="Name" />
-                                    <DataGridTextColumn
-                                        Width="*"
-                                        Binding="{Binding Parameter}"
-                                        Header="Parameter" />
+                                    <DataGridTemplateColumn Width="Auto" Header="Name">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}" Margin="10,0,10,0"
+                                                           VerticalAlignment="Center" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Width="*" Header="Parameter">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Parameter}" Margin="10,0,10,0"
+                                                           VerticalAlignment="Center" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Width="100" Header="Actions">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button
+                                                        Command="{Binding ElementName=Self, Path=DataContext.DeleteParameterCommand}"
+                                                        HorizontalAlignment="Center" ToolTip="Delete this parameter"
+                                                        Margin="5" CommandParameter="{Binding .}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ui:SymbolIcon Symbol="Delete24" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                    <Button
+                                                        Command="{Binding ElementName=Self, Path=DataContext.EditParameterCommand}"
+                                                        HorizontalAlignment="Center" ToolTip="Edit this parameter"
+                                                        Margin="5" CommandParameter="{Binding .}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ui:SymbolIcon Symbol="Edit24" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </ui:DataGrid>
                         </StackPanel>

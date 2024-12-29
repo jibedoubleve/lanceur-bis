@@ -192,7 +192,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
             DB.WithinTransaction(
                 tx =>
                 {
-                    var parameters = tx.Connection!.Query<QueryResultAdditionalParameters>(sqlArguments, new { idAlias = alias.Id });
+                    var parameters = tx.Connection!.Query<AdditionalParameter>(sqlArguments, new { idAlias = alias.Id });
                     var synonyms = tx.Connection!.Query<string>(sqlSynonyms, new { idAlias = alias.Id });
                     
                     return (parameters, synonyms);
@@ -306,7 +306,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateThumbnails(aliases);
 
     ///<inheritdoc/>
-    public IEnumerable<QueryResultAdditionalParameters> GetAdditionalParameter(IEnumerable<long> ids)
+    public IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids)
     {
         const string sql = """
                            select 
@@ -317,7 +317,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                            from alias_argument	
                            where id_alias in @ids
                            """;
-        return DB.WithinTransaction(tx => tx!.Connection!.Query<QueryResultAdditionalParameters>(sql, new { ids }));
+        return DB.WithinTransaction(tx => tx!.Connection!.Query<AdditionalParameter>(sql, new { ids }));
     }
 
     #endregion

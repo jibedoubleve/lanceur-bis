@@ -22,7 +22,7 @@ public class UserUserInteractionService : IUserInteractionService
     ///<inheritdoc />
     public async Task<bool> AskUserYesNoAsync(object content, string yesTextMessage = "yes", string noTextMessage = "no", string title = "Question", object? dataContext = null)
     {
-        if (content is FrameworkElement d) d.DataContext = dataContext;
+        if (content is FrameworkElement d && dataContext is not null) d.DataContext = dataContext;
         return await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
             new(
                 content,

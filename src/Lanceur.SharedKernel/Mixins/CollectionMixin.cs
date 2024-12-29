@@ -7,12 +7,37 @@ public static class CollectionMixin
     #region Methods
 
     /// <summary>
-    /// Move the specified item to the specified index
+    ///     Adds the elements of the specified collection to the end of the list.
+    /// </summary>
+    /// <typeparam name="T">
+    ///     The type of elements in the list and collection.
+    /// </typeparam>
+    /// <param name="list">
+    ///     The list to which elements will be added.
+    /// </param>
+    /// <param name="items">
+    ///     The collection of items to add to the list.
+    /// </param>
+    /// <returns>
+    ///     The updated list containing the original elements along with the added items.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown if either <paramref name="list" /> or <paramref name="items" /> is null.
+    /// </exception>
+    public static IList<T> AddRange<T>(this IList<T> list, IEnumerable<T> items)
+    {
+        foreach (var item in items) list.Add(item);
+
+        return list;
+    }
+
+    /// <summary>
+    ///     Move the specified item to the specified index
     /// </summary>
     /// <param name="list">List of items where items will be moved</param>
     /// <param name="item">Item to move</param>
     /// <remarks>
-    /// https://stackoverflow.com/questions/450233/generic-list-moving-an-item-within-the-list
+    ///     https://stackoverflow.com/questions/450233/generic-list-moving-an-item-within-the-list
     /// </remarks>
     public static void Move<T>(this IList<T> list, T item, int newIndex)
     {
@@ -36,5 +61,5 @@ public static class CollectionMixin
 
     public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> enumerable) => new(enumerable);
 
-    #endregion Methods
+    #endregion
 }
