@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Extensions;
@@ -33,6 +34,7 @@ public partial class App
                                                                   .AddWpfServices()
                                                                   .AddMapping()
                                                                   .AddConfiguration()
+                                                                  .AddDatabaseServices()
                                                                   .AddLoggers();
                                                       }
                                                   )

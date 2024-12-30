@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Data.Common;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
@@ -24,6 +23,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
         // TODO release managed resources here
     }
 
+    /// <inheritdoc />
     public void WithinTransaction(Action<IDbTransaction> action)
     {
         WithinTransaction(
@@ -35,6 +35,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
         );
     }
 
+    /// <inheritdoc />
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)
     {
         using var conn = _connectionFactory.CreateConnection();
@@ -52,6 +53,36 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
             tx.Rollback();
             throw;
         }
+    }
+
+    /// <inheritdoc />
+    public TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext, TContext> action, TContext context)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        if (conn.State != ConnectionState.Open) conn.Open();
+
+        using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
+        try
+        {
+            var result = action(tx, context);
+            tx.Commit();
+            return result;
+        }
+        catch
+        {
+            tx.Rollback();
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
+    {
+        
+        using var conn = _connectionFactory.CreateConnection();
+        if (conn.State != ConnectionState.Open) conn.Open();
+
+        return action(conn);
     }
 
     #endregion

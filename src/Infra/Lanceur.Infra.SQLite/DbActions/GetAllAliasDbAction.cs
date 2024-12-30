@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -10,17 +11,17 @@ internal class GetAllAliasDbAction
 
     private readonly IDbConnectionManager _db;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     internal GetAllAliasDbAction(IDbConnectionManager db) => _db = db;
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
-    internal IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters()
+    internal IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(IDbTransaction tx)
     {
         const string sql = $"""
                             select
@@ -48,10 +49,9 @@ internal class GetAllAliasDbAction
                                 a.exec_count desc,
                                 an.name
                             """;
-                            
-                                    var result = _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql));
-                                    return result ?? AliasQueryResult.NoResult;
-                                }
-                            
-                                #endregion Methods
-                            }
+
+        return tx.Connection!.Query<AliasQueryResult>(sql);
+    }
+
+    #endregion
+}

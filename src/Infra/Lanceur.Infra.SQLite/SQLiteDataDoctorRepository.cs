@@ -1,9 +1,8 @@
+using System.Data;
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
-using Lanceur.Infra.SQLite.DbActions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite;
@@ -12,41 +11,42 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
 {
     #region Fields
 
-    private readonly AliasSearchDbAction _dbAction;
+    private readonly IDbActionFactory _dbActionFactory;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    public SQLiteDataDoctorRepository(IDbConnectionManager manager, ILoggerFactory loggerFactory, IMappingService converter) : base(manager) => _dbAction = new(DB, loggerFactory, converter);
+    public SQLiteDataDoctorRepository(IDbConnectionManager manager, ILoggerFactory loggerFactory, IDbActionFactory dbActionFactory) : base(manager) => _dbActionFactory = dbActionFactory;
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
-    private void Update(IEnumerable<AliasQueryResult> aliases)
+    private static void Update(IEnumerable<AliasQueryResult> aliases, IDbTransaction tx)
     {
-        const string sql = @"
-                update alias
-                set
-                    icon = @icon
-                where
-                    id = @id";
-        DB.WithinTransaction(
-            tx =>
+        const string sql = """
+                           update alias
+                           set
+                               icon = @icon
+                           where
+                               id = @id
+                           """;
+        foreach (var alias in aliases) tx.Connection!.Execute(sql, new { id = alias.Id, icon = alias.Icon });
+    }
+
+    public Task FixIconsForHyperlinksAsync() => DB.WithinTransaction(
+        tx =>
+        {
             {
-                foreach (var alias in aliases) tx.Connection.Execute(sql, new { id = alias.Id, icon = alias.Icon });
+                var aliases = _dbActionFactory.AliasSearchDbAction()
+                                              .Search(tx)
+                                              .ToArray();
+                Update(aliases, tx);
+                return Task.CompletedTask;
             }
-        );
-    }
+        }
+    );
 
-    public Task FixIconsForHyperlinksAsync()
-    {
-        var aliases = _dbAction.Search()
-                               .ToArray();
-        Update(aliases);
-        return Task.CompletedTask;
-    }
-
-    #endregion Methods
+    #endregion
 }

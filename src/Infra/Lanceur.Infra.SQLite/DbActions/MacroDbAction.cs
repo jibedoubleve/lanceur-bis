@@ -1,54 +1,55 @@
-﻿using Lanceur.Core.Models;
+﻿using System.Data;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
-using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-internal class MacroDbAction
+public class MacroDbAction
 {
     #region Fields
 
     private readonly IMappingService _converter;
-    private readonly IDbConnectionManager _db;
+    private readonly IDbActionFactory _dbActionFactory;
     private readonly ILogger _logger;
     private readonly ILoggerFactory _loggerFactory;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    internal MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IMappingService converter)
+    internal MacroDbAction(ILoggerFactory loggerFactory, IMappingService converter, IDbActionFactory dbActionFactory)
     {
-        _db = db;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<MacroDbAction>();
         _converter = converter;
+        _dbActionFactory = dbActionFactory;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
     /// <summary>
-    /// If the specified <see cref="AliasQueryResult"/> is composite
-    /// this method will hydrate and create a <see cref="CompositeAliasQueryResult"/>;
-    /// otherwise it'll return <paramref name="item"/>
+    ///     If the specified <see cref="AliasQueryResult" /> is composite
+    ///     this method will hydrate and create a <see cref="CompositeAliasQueryResult" />;
+    ///     otherwise it'll return <paramref name="item" />
     /// </summary>
-    /// <param name="item">The <see cref="QueryResult"/> to hydrate</param>
-    /// <returns>The hydrated <see cref="QueryResult"/> or <paramref name="item"/></returns>
-    private AliasQueryResult Hydrate(AliasQueryResult item)
+    /// <param name="tx">The transaction to use for this query</param>
+    /// <param name="item">The <see cref="QueryResult" /> to hydrate</param>
+    /// <returns>The hydrated <see cref="QueryResult" /> or <paramref name="item" /></returns>
+    private AliasQueryResult Hydrate(IDbTransaction tx, AliasQueryResult item)
     {
         _logger.BeginSingleScope("AliasToHydrate", item);
         if (!item.IsComposite()) return item;
 
-        var action = new AliasDbAction(_db, _loggerFactory);
+        var action = _dbActionFactory.AliasDbAction();
         var subAliases = new List<AliasQueryResult>();
 
-        var names = item?.Parameters?.Split("@") ?? Array.Empty<string>();
-        var aliases = action.GetExact(names).ToArray();
+        var names = item?.Parameters?.Split("@") ?? [];
+        var aliases = action.GetExact(names, tx).ToArray();
 
         var delay = 0;
         foreach (var name in names)
@@ -73,20 +74,21 @@ internal class MacroDbAction
     }
 
     /// <summary>
-    /// Go through the collection and upgrade items to composite when they are
-    /// composite macro.
+    ///     Go through the collection and upgrade items to composite when they are
+    ///     composite macro.
     /// </summary>
+    /// <param name="tx">The transaction to use for this query</param>
     /// <param name="collection">The collection to upgrade</param>
     /// <returns>
-    /// The collection with all element that are upgradable
-    /// to composite, upgraded
+    ///     The collection with all element that are upgradable
+    ///     to composite, upgraded
     /// </returns>
-    internal IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)
+    internal IEnumerable<AliasQueryResult> UpgradeToComposite(IDbTransaction tx, IEnumerable<AliasQueryResult> collection)
     {
         using var _ = _logger.MeasureExecutionTime(this);
         var list = new List<AliasQueryResult>(collection);
         var composites = list.Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
-                             .Select(Hydrate)
+                             .Select(x => Hydrate(tx, x))
                              .ToArray();
 
         list.RemoveAll(x => composites.Select(c => c.Id).Contains(x.Id));
@@ -95,5 +97,5 @@ internal class MacroDbAction
         return list.ToArray();
     }
 
-    #endregion Methods
+    #endregion
 }

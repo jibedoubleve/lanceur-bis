@@ -2,83 +2,79 @@ using System.Data;
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Infra.Logging;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Sqlite.Entities;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
-using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-internal class AliasDbAction
+//TODO: reorder the IDbTransaction it should be the first argument of any method
+public class AliasDbAction
 {
     #region Fields
 
-    private readonly IDbConnectionManager _db;
     private readonly ILogger<AliasDbAction> _logger;
 
     #endregion
 
     #region Constructors
 
-    internal AliasDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
-    {
-        _db = db;
-        _logger = logFactory.GetLogger<AliasDbAction>();
-    }
+    internal AliasDbAction(ILoggerFactory logFactory)  => _logger = logFactory.GetLogger<AliasDbAction>();
 
     #endregion
 
     #region Methods
 
-    private void ClearAlias(params long[] ids)
+    private void ClearAlias(IDbTransaction tx, params long[] ids)
     {
         const string sql = """
                            delete from alias
                            where id = @id
                            """;
 
-        var cnt = _db.ExecuteMany(sql, ids);
+        var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
         _logger.LogInformation("Removed {Count} row(s) from alias. Id: {Idd}", cnt, idd);
     }
 
-    private void ClearAliasArgument(params long[] ids)
+    private void ClearAliasArgument(IDbTransaction tx, params long[] ids)
     {
         const string sql = """
                            delete from alias_argument
                            where id_alias = @id
                            """;
 
-        var cnt = _db.ExecuteMany(sql, ids);
+        var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
         _logger.LogInformation("Removed {Count} row(s) from alias_argument. Id: {IdAliases}", cnt, idd);
     }
 
-    private void ClearAliasName(params long[] ids)
+    private void ClearAliasName(IDbTransaction tx, params long[] ids)
     {
         const string sql = """
                            delete from alias_name
                            where id_alias = @id
                            """;
 
-        var cnt = _db.ExecuteMany(sql, ids);
+        var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
         _logger.LogInformation("Removed {RemovedCount} row(s) from alias_name. Id: {IdAliases}", cnt, idd);
     }
 
-    private void ClearAliasUsage(params long[] ids)
+    private void ClearAliasUsage(IDbTransaction tx, params long[] ids)
     {
         const string sql = """
                            delete from alias_usage
                            where id_alias = @id;
                            """;
 
-        var cnt = _db.ExecuteMany(sql, ids);
+        var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
         _logger.LogInformation("Removed {Count} row(s) from alias_usage. Id: {IdAliases}", cnt, idd);
     }
 
-    private void CreateAdditionalParameters(long idAlias, IEnumerable<AdditionalParameter> parameters, IDbTransaction tx)
+    private void CreateAdditionalParameters(IDbTransaction tx, long idAlias, IEnumerable<AdditionalParameter> parameters)
     {
         using var _ = _logger.BeginSingleScope("Parameters", parameters);
         const string sql1 = "delete from alias_argument where id_alias = @idAlias";
@@ -93,9 +89,9 @@ internal class AliasDbAction
         if (deletedRowsCount > 0 && addedRowsCount == 0) _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);
     }
 
-    private void CreateAdditionalParameters(AliasQueryResult alias, IDbTransaction tx) => CreateAdditionalParameters(alias.Id, alias.AdditionalParameters, tx);
+    private void CreateAdditionalParameters(IDbTransaction tx, AliasQueryResult alias) => CreateAdditionalParameters(tx, alias.Id, alias.AdditionalParameters);
 
-    private static void UpdateName(AliasQueryResult alias, IDbTransaction tx)
+    private static void UpdateName(IDbTransaction tx, AliasQueryResult alias)
     {
         //Remove all names
         const string sql = @"delete from alias_name where id_alias = @id";
@@ -106,32 +102,7 @@ internal class AliasDbAction
         foreach (var name in alias.Synonyms.SplitCsv()) tx.Connection.Execute(sql2, new { id = alias.Id, name });
     }
 
-    internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
-    {
-        const string sql = $"""
-
-                            select
-                            	id_alias as {nameof(KeywordUsage.Id)},
-                            	count
-                            from
-                            	stat_usage_per_app_v
-                            where id_alias in @ids;
-                            """;
-
-        var dbResultAr = results as QueryResult[] ?? results.ToArray();
-        var dbResults = _db.WithinTransaction(
-            tx => tx.Connection!.Query<KeywordUsage>(sql, new { ids = dbResultAr.Select(x => x.Id).ToArray() })
-                    .ToArray()
-        );
-
-        foreach (var result in dbResultAr)
-            result.Count = dbResults.Where(item => item.Id == result.Id)
-                                    .Select(item => item.Count)
-                                    .SingleOrDefault();
-        return dbResultAr;
-    }
-
-    internal long Create(ref AliasQueryResult alias)
+    internal long Create(IDbTransaction tx, ref AliasQueryResult alias)
     {
         const string sqlAlias = """
 
@@ -182,20 +153,14 @@ internal class AliasDbAction
         var additionalParameters = alias.AdditionalParameters;
 
         using var _ = _logger.BeginSingleScope("SqlCreateAlias", sqlAlias);
-        var id = _db.WithinTransaction(
-            tx =>
-            {
-                var id = tx.Connection!.ExecuteScalar<long>(sqlAlias, param);
+        var id = tx.Connection!.ExecuteScalar<long>(sqlAlias, param);
 
-                // Create synonyms
-                const string sqlSynonyms = @"insert into alias_name (id_alias, name) values (@id, @name)";
-                foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
+        // Create synonyms
+        const string sqlSynonyms = @"insert into alias_name (id_alias, name) values (@id, @name)";
+        foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
 
-                //Create additional arguments
-                CreateAdditionalParameters(id, additionalParameters, tx);
-                return id;
-            }
-        );
+        //Create additional arguments
+        CreateAdditionalParameters(tx, id, additionalParameters);
 
         alias.Id = id;
 
@@ -205,15 +170,16 @@ internal class AliasDbAction
         return id;
     }
 
-    internal void CreateInvisible(ref QueryResult alias)
+    internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
     {
         var queryResult = new AliasQueryResult { Name = alias.Name, FileName = alias.Name, Synonyms = alias.Name, IsHidden = true };
-        alias.Id = Create(ref queryResult);
+        alias.Id = Create(tx, ref queryResult);
     }
 
-    internal AliasQueryResult GetByIdAndName(long id, string name)
+    internal AliasQueryResult GetByIdAndName(long id, string name, IDbTransaction tx)
     {
-        if (id <= 0) { throw new ArgumentException("The id of the alias should be greater than zero.");}
+        if (id <= 0) throw new ArgumentException("The id of the alias should be greater than zero.");
+
         const string sql = $"""
                             select
                                 n.Name                  as {nameof(AliasQueryResult.Name)},
@@ -243,24 +209,23 @@ internal class AliasDbAction
                                 n.name
                             """;
 
-        return _db.WithinTransaction(
-            tx => tx.Connection!
-                    .Query<AliasQueryResult>(sql, new { id, name })
-                    .SingleOrDefault()
-        );
+        return tx.Connection!
+                 .Query<AliasQueryResult>(sql, new { id, name })
+                 .SingleOrDefault();
     }
 
     /// <summary>
-    /// Get the first alias with the exact name.
+    ///     Get the first alias with the exact name.
     /// </summary>
     /// <param name="name">The alias' exact name to find.</param>
+    /// <param name="tx">Transaction to use for the query</param>
     /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
     /// <remarks>
-    /// For optimisation reason, there's no check of doubloons. Bear UI validates and
-    /// forbid to insert two aliases with same name.
+    ///     For optimisation reason, there's no check of doubloons. Bear UI validates and
+    ///     forbid to insert two aliases with same name.
     /// </remarks>
-    internal AliasQueryResult GetExact(string name, bool includeHidden = false)
+    internal AliasQueryResult GetExact(string name, IDbTransaction tx, bool includeHidden = false)
     {
         const string sql = $"""
                             select
@@ -294,18 +259,19 @@ internal class AliasDbAction
         var hidden = includeHidden ? [0, 1] : 0.ToEnumerable();
         var arguments = new { name, hidden };
 
-        return _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql, arguments).FirstOrDefault());
+        return tx.Connection!.Query<AliasQueryResult>(sql, arguments).FirstOrDefault();
     }
 
     /// <summary>
-    /// Get all the alias that has an exact name in the specified list of names.
-    /// . In case of multiple aliases with same name, the one with greater counter
-    /// is selected.
+    ///     Get all the alias that has an exact name in the specified list of names.
+    ///     . In case of multiple aliases with same name, the one with greater counter
+    ///     is selected.
     /// </summary>
     /// <param name="names">The list of names to find.</param>
+    /// <param name="tx">The transaction to use for the query</param>
     /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
-    internal IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, bool includeHidden = false)
+    internal IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, IDbTransaction tx, bool includeHidden = false)
     {
         const string sql = $"""
                             select
@@ -334,10 +300,10 @@ internal class AliasDbAction
         var hidden = includeHidden ? [0, 1] : 0.ToEnumerable();
         var arguments = new { names, hidden };
 
-        return _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql, arguments).ToArray());
+        return tx.Connection!.Query<AliasQueryResult>(sql, arguments).ToArray();
     }
 
-    internal KeywordUsage GetHiddenKeyword(string name)
+    internal KeywordUsage GetHiddenKeyword(string name, IDbTransaction tx)
     {
         const string sql = """
                            select
@@ -355,12 +321,12 @@ internal class AliasDbAction
                            	hidden = 1
                                and n.name = @name;
                            """;
-        var result = _db.WithinTransaction(tx => tx.Connection!.Query<KeywordUsage>(sql, new { name }).FirstOrDefault());
+        var result = tx.Connection!.Query<KeywordUsage>(sql, new { name }).FirstOrDefault();
 
         return result;
     }
 
-    internal bool HasNames(AliasQueryResult alias)
+    internal bool HasNames(AliasQueryResult alias, IDbTransaction tx)
     {
         const string sql = """
                            select count(*)
@@ -370,32 +336,55 @@ internal class AliasDbAction
                            where lower(name) = @name
                            """;
 
-        var count = _db.WithinTransaction(tx => tx.Connection!.ExecuteScalar<int>(sql, new { name = alias.Name }));
+        var count = tx.Connection!.ExecuteScalar<int>(sql, new { name = alias.Name });
         return count > 0;
     }
 
-    internal void Remove(AliasQueryResult alias)
+    internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results, IDbTransaction tx)
+    {
+        const string sql = $"""
+
+                            select
+                            	id_alias as {nameof(KeywordUsage.Id)},
+                            	count
+                            from
+                            	stat_usage_per_app_v
+                            where id_alias in @ids;
+                            """;
+
+        var dbResultAr = results as QueryResult[] ?? results.ToArray();
+        var dbResults = tx.Connection!.Query<KeywordUsage>(sql, new { ids = dbResultAr.Select(x => x.Id).ToArray() })
+                          .ToArray();
+
+        foreach (var result in dbResultAr)
+            result.Count = dbResults.Where(item => item.Id == result.Id)
+                                    .Select(item => item.Count)
+                                    .SingleOrDefault();
+        return dbResultAr;
+    }
+
+    internal void Remove(AliasQueryResult alias, IDbTransaction tx)
     {
         if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");
 
-        ClearAliasUsage(alias.Id);
-        ClearAliasArgument(alias.Id);
-        ClearAliasName(alias.Id);
-        ClearAlias(alias.Id);
+        ClearAliasUsage(tx, alias.Id);
+        ClearAliasArgument(tx, alias.Id);
+        ClearAliasName(tx, alias.Id);
+        ClearAlias(tx, alias.Id);
     }
 
-    internal void RemoveMany(IEnumerable<AliasQueryResult> alias)
+    internal void RemoveMany(IEnumerable<AliasQueryResult> alias, IDbTransaction tx)
     {
         ArgumentNullException.ThrowIfNull(alias);
         var ids = alias.Select(x => x.Id).ToArray();
 
-        ClearAliasUsage(ids);
-        ClearAliasArgument(ids);
-        ClearAliasName(ids);
-        ClearAlias(ids);
+        ClearAliasUsage(tx, ids);
+        ClearAliasArgument(tx, ids);
+        ClearAliasName(tx, ids);
+        ClearAlias(tx, ids);
     }
 
-    internal ExistingNameResponse SelectNames(string[] names)
+    internal ExistingNameResponse SelectNames(string[] names, IDbTransaction tx)
     {
         const string sql = """
                            select an.name
@@ -405,73 +394,65 @@ internal class AliasDbAction
                            where an.name in @names
                            """;
 
-        var result = _db.WithinTransaction(
-            tx => tx.Connection!.Query<string>(sql, new { names }).ToArray()
-        );
+        var result = tx.Connection!.Query<string>(sql, new { names }).ToArray();
 
         return new(result);
     }
 
-    internal long Update(AliasQueryResult alias) => _db.WithinTransaction(
-        tx =>
-        {
-            const string updateAliasSql = """
-                                          update alias
-                                          set
-                                              arguments             = @parameters,
-                                              file_name             = @fileName,
-                                              notes                 = @notes,
-                                              run_as                = @runAs,
-                                              start_mode            = @startMode,
-                                              working_dir           = @WorkingDirectory,
-                                              icon                  = @Icon,
-                                              thumbnail             = @thumbnail,
-                                              lua_script            = @luaScript,
-                                              exec_count            = @count,
-                                              confirmation_required = @isExecutionConfirmationRequired
-                                          where id = @id;
-                                          """;
+    internal long Update(AliasQueryResult alias, IDbTransaction tx)
+    {
+        const string updateAliasSql = """
+                                      update alias
+                                      set
+                                          arguments             = @parameters,
+                                          file_name             = @fileName,
+                                          notes                 = @notes,
+                                          run_as                = @runAs,
+                                          start_mode            = @startMode,
+                                          working_dir           = @WorkingDirectory,
+                                          icon                  = @Icon,
+                                          thumbnail             = @thumbnail,
+                                          lua_script            = @luaScript,
+                                          exec_count            = @count,
+                                          confirmation_required = @isExecutionConfirmationRequired
+                                      where id = @id;
+                                      """;
 
-            using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
-            tx.Connection!.Execute(
-                updateAliasSql,
-                new
-                {
-                    alias.Parameters,
-                    alias.FileName,
-                    alias.Notes,
-                    alias.RunAs,
-                    alias.StartMode,
-                    alias.WorkingDirectory,
-                    alias.Icon,
-                    alias.Thumbnail,
-                    alias.LuaScript,
-                    alias.Count,
-                    id = alias.Id,
-                    alias.IsExecutionConfirmationRequired
-                }
-            );
-            CreateAdditionalParameters(alias, tx);
-            UpdateName(alias, tx);
-            alias.SynonymsWhenLoaded = alias.Synonyms;
-            return alias.Id;
-        }
-    );
+        using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
+        tx.Connection!.Execute(
+            updateAliasSql,
+            new
+            {
+                alias.Parameters,
+                alias.FileName,
+                alias.Notes,
+                alias.RunAs,
+                alias.StartMode,
+                alias.WorkingDirectory,
+                alias.Icon,
+                alias.Thumbnail,
+                alias.LuaScript,
+                alias.Count,
+                id = alias.Id,
+                alias.IsExecutionConfirmationRequired
+            }
+        );
+        CreateAdditionalParameters(tx, alias);
+        UpdateName(tx, alias);
+        alias.SynonymsWhenLoaded = alias.Synonyms;
+        return alias.Id;
+    }
 
-    internal IEnumerable<long> UpdateThumbnails(IEnumerable<AliasQueryResult> aliases)
+    internal IEnumerable<long> UpdateThumbnails(IEnumerable<AliasQueryResult> aliases, IDbTransaction tx)
     {
         const string sql = "update alias set thumbnail = @thumbnail where id = @id";
         var ids = new List<long>();
-        _db.WithinTransaction(
-            tx =>
-            {
-                foreach (var alias in aliases)
-                {
-                    tx.Connection!.Execute(sql, new { alias.Thumbnail, alias.Id });
-                    ids.Add(alias.Id);
-                }
-            }
-        );
+        foreach (var alias in aliases)
+        {
+            tx.Connection!.Execute(sql, new { alias.Thumbnail, alias.Id });
+            ids.Add(alias.Id);
+        }
+
         return ids.ToArray();
     }
 

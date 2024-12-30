@@ -1,42 +1,39 @@
+using System.Data;
 using Dapper;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
-using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-internal class AliasSearchDbAction
+public class AliasSearchDbAction
 {
     #region Fields
 
-    private readonly IDbConnectionManager _db;
+    private readonly IDbActionFactory _dbActionFactory;
     private readonly ILogger<AliasSearchDbAction> _logger;
-    private readonly MacroDbAction _macroManager;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    internal AliasSearchDbAction(IDbConnectionManager db, ILoggerFactory logFactory, IMappingService converter)
+    internal AliasSearchDbAction(ILoggerFactory logFactory, IDbActionFactory dbActionFactory)
     {
-        _db = db;
+        _dbActionFactory = dbActionFactory;
         _logger = logFactory.GetLogger<AliasSearchDbAction>();
-        _macroManager = new(db, logFactory, converter);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
-    internal IEnumerable<AliasQueryResult> Search(string name = null, bool isReturnAllIfEmpty = false)
+    internal IEnumerable<AliasQueryResult> Search(IDbTransaction tx, string name = null, bool isReturnAllIfEmpty = false)
     {
         using var _ = _logger.MeasureExecutionTime(this);
-        
+
         if (name.IsNullOrEmpty() && !isReturnAllIfEmpty) return Array.Empty<AliasQueryResult>();
-        
+
         var sql = $"""
                    select
                        an.Name                 as {nameof(AliasQueryResult.Name)},
@@ -62,62 +59,64 @@ internal class AliasSearchDbAction
                    """;
         if (!name.IsNullOrEmpty())
             sql += """
-                   
+
                    where
                        an.Name like @name
                        and a.hidden = 0
                    """;
         sql += """
-               
+
                order by
                  a.exec_count desc,
                  an.name
                """;
 
         name = $"{name ?? string.Empty}%";
-        var results = _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql, new { name }));
+        var results = tx.Connection!.Query<AliasQueryResult>(sql, new { name });
 
-        results = _macroManager.UpgradeToComposite(results);
+        results = _dbActionFactory.MacroDbAction().UpgradeToComposite(tx, results);
         return results ?? AliasQueryResult.NoResult;
     }
 
-    internal IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string name)
+    internal IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(IDbTransaction tx, string name)
     {
-        const string sql = @$"
-                select
-                    an.Name || ':' || aa.name         as {nameof(AliasQueryResult.Name)},
-                    a.Id                              as {nameof(AliasQueryResult.Id)},
-                    COALESCE(a.arguments, '') || ' ' || aa.argument as {nameof(AliasQueryResult.Parameters)},
-                    a.file_name                       as {nameof(AliasQueryResult.FileName)},
-                    a.notes                           as {nameof(AliasQueryResult.Notes)},
-                    a.run_as                          as {nameof(AliasQueryResult.RunAs)},
-                    a.start_mode                      as {nameof(AliasQueryResult.StartMode)},
-                    a.working_dir                     as {nameof(AliasQueryResult.WorkingDirectory)},
-                    a.icon                            as {nameof(AliasQueryResult.Icon)},
-                    a.thumbnail                       as {nameof(AliasQueryResult.Thumbnail)},
-                    a.lua_script                      as {nameof(AliasQueryResult.LuaScript)},
-                    a.exec_count                      as {nameof(AliasQueryResult.Count)},
-                    s.synonyms                        as {nameof(AliasQueryResult.Synonyms)},
-                    s.Synonyms                        as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
-                    a.exec_count                      as {nameof(AliasQueryResult.Count)}
-                from
-                    alias a
-                    left join alias_name            an on a.id         = an.id_alias
-                    inner join alias_argument       aa on a.id         = aa.id_alias                    
-                    inner join data_alias_synonyms_v s on s.id_alias   = a.id
-                where
-                    an.Name || ':' || aa.name  like @name
-                    and a.hidden = 0
-                order by
-                    a.exec_count desc,
-                    an.name";
+        const string sql = $"""
+                            select
+                                an.Name || ':' || aa.name         as {nameof(AliasQueryResult.Name)},
+                                a.Id                              as {nameof(AliasQueryResult.Id)},
+                                COALESCE(a.arguments, '') || ' ' || aa.argument as {nameof(AliasQueryResult.Parameters)},
+                                a.file_name                       as {nameof(AliasQueryResult.FileName)},
+                                a.notes                           as {nameof(AliasQueryResult.Notes)},
+                                a.run_as                          as {nameof(AliasQueryResult.RunAs)},
+                                a.start_mode                      as {nameof(AliasQueryResult.StartMode)},
+                                a.working_dir                     as {nameof(AliasQueryResult.WorkingDirectory)},
+                                a.icon                            as {nameof(AliasQueryResult.Icon)},
+                                a.thumbnail                       as {nameof(AliasQueryResult.Thumbnail)},
+                                a.lua_script                      as {nameof(AliasQueryResult.LuaScript)},
+                                a.exec_count                      as {nameof(AliasQueryResult.Count)},
+                                s.synonyms                        as {nameof(AliasQueryResult.Synonyms)},
+                                s.Synonyms                        as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
+                                a.exec_count                      as {nameof(AliasQueryResult.Count)}
+                            from
+                                alias a
+                                left join alias_name            an on a.id         = an.id_alias
+                                inner join alias_argument       aa on a.id         = aa.id_alias                    
+                                inner join data_alias_synonyms_v s on s.id_alias   = a.id
+                            where
+                                an.Name || ':' || aa.name  like @name
+                                and a.hidden = 0
+                            order by
+                                a.exec_count desc,
+                                an.name
+                            """;
 
         name = $"{name ?? string.Empty}%";
-        var results = _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql, new { name }));
+        var results = tx.Connection!.Query<AliasQueryResult>(sql, new { name });
 
-        results = _macroManager.UpgradeToComposite(results);
+        results = _dbActionFactory.MacroDbAction()
+                                  .UpgradeToComposite(tx, results);
         return results ?? AliasQueryResult.NoResult;
     }
 
-    #endregion Methods
+    #endregion
 }

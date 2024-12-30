@@ -1,71 +1,36 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Infra.Logging;
-using Lanceur.Infra.SQLite.DataAccess;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-internal class SetUsageDbAction
+public class SetUsageDbAction
 {
     #region Fields
 
-    private readonly AliasDbAction _aliasDbAction;
-    private readonly IDbConnectionManager _db;
+    private readonly IDbActionFactory _dbActionFactory;
+    private readonly ILoggerFactory _logFactory;
+
     private readonly ILogger<SetUsageDbAction> _logger;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    internal SetUsageDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
+    internal SetUsageDbAction(ILoggerFactory logFactory, IDbActionFactory dbActionFactory)
     {
-        _db = db;
+        _logFactory = logFactory;
+        _dbActionFactory = dbActionFactory;
         _logger = logFactory.GetLogger<SetUsageDbAction>();
-
-        _aliasDbAction = new(db, logFactory);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
-    internal void SetUsage(ref QueryResult alias)
-    {
-        ArgumentNullException.ThrowIfNull(alias);
-
-        // When counter is set to -1, it means
-        //   * usage should neither be maintained nor saved in history 
-        //   * counter shouldn't be visible to the user
-        if (alias.Count < 0) return;
-
-        if (alias.Id  == 0)
-        {
-            if (_aliasDbAction.GetExact(alias?.Name) is { } a)
-                alias!.Id = a.Id;
-            else
-                _aliasDbAction.CreateInvisible(ref alias);
-        }
-
-        AddHistory(ref alias);
-        IncrementCounter(alias);
-    }
-
-    private void IncrementCounter(QueryResult alias)
-    {
-        alias.Count++;
-        const string sql = """
-                           update alias 
-                           set 
-                               exec_count = @counter 
-                           where 
-                               id = @id
-                           """;
-        var param = new { id = alias.Id, counter = alias.Count };
-        _db.WithinTransaction(tx => tx.Connection!.Execute(sql, param));
-    }
-
-    private void AddHistory(ref QueryResult alias)
+    private void AddHistory(IDbTransaction tx,ref QueryResult alias)
     {
         const string sql = """
 
@@ -80,8 +45,44 @@ internal class SetUsageDbAction
                            """;
 
         var param = new { idAlias = alias.Id, now = DateTime.Now };
-        _db.WithinTransaction(tx => tx.Connection!.Execute(sql, param));
+        tx.Connection!.Execute(sql, param);
     }
 
-    #endregion Methods
+    private void IncrementCounter(IDbTransaction tx, QueryResult alias)
+    {
+        alias.Count++;
+        const string sql = """
+                           update alias 
+                           set 
+                               exec_count = @counter 
+                           where 
+                               id = @id
+                           """;
+        var param = new { id = alias.Id, counter = alias.Count };
+        tx.Connection!.Execute(sql, param);
+    }
+
+    internal void SetUsage(IDbTransaction tx, ref QueryResult alias)
+    {
+        ArgumentNullException.ThrowIfNull(alias);
+
+        // When counter is set to -1, it means
+        //   * usage should neither be maintained nor saved in history 
+        //   * counter shouldn't be visible to the user
+        if (alias.Count < 0) return;
+
+        var aliasDbAction = _dbActionFactory.AliasDbAction();
+        if (alias.Id  == 0)
+        {
+            if (aliasDbAction.GetExact(alias?.Name, tx) is { } a)
+                alias!.Id = a.Id;
+            else
+                aliasDbAction.CreateInvisible(tx, ref alias);
+        }
+
+        AddHistory(tx, ref alias);
+        IncrementCounter(tx, alias);
+    }
+
+    #endregion
 }

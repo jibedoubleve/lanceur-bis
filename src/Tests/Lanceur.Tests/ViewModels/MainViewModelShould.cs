@@ -11,6 +11,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
+using Lanceur.Infra.SQLite;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling.Extensions;
@@ -48,6 +49,7 @@ public class MainViewModelShould : TestBase
                                                        .AddSingleton<IMappingService, AutoMapperMappingService>()
                                                        .AddSingleton<ISearchService, SearchService>()
                                                        .AddSingleton<IMacroManager, MacroManager>()
+                                                       .AddSingleton<IDbActionFactory, DbActionFactory>()
                                                        .AddMockSingleton<IAppConfigRepository>()
                                                        .AddMockSingleton<IThumbnailManager>()
                                                        .AddMockSingleton<IUserInteractionService>()

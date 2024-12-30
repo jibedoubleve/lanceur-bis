@@ -28,7 +28,7 @@ internal class HistoryDbAction
                            	exec_count as Y
                            from stat_usage_per_day_v;
                            """;
-        return _db.WithinTransaction(tx => tx.Connection!.Query<DataPoint<DateTime, double>>(sql));
+        return _db.WithConnection(conn => conn.Query<DataPoint<DateTime, double>>(sql));
     }
 
     internal IEnumerable<DataPoint<DateTime, double>> PerDayOfWeek()
@@ -39,7 +39,7 @@ internal class HistoryDbAction
                            	exec_count                                     as Y
                            from stat_usage_per_day_of_week_v;
                            """;
-        return _db.WithinTransaction(tx => tx.Connection!.Query<DataPoint<DateTime, double>>(sql));
+        return _db.WithConnection(conn => conn.Query<DataPoint<DateTime, double>>(sql));
     }
 
     internal IEnumerable<DataPoint<DateTime, double>> PerHour()
@@ -50,7 +50,7 @@ internal class HistoryDbAction
                            	exec_count  as Y
                            from stat_usage_per_hour_in_day_v;
                            """;
-        return _db.WithinTransaction(tx => tx.Connection!.Query<DataPoint<DateTime, double>>(sql));
+        return _db.WithConnection(conn => conn.Query<DataPoint<DateTime, double>>(sql));
     }
 
     internal IEnumerable<DataPoint<DateTime, double>> PerMonth()
@@ -61,7 +61,7 @@ internal class HistoryDbAction
                            	exec_count as Y
                            from stat_usage_per_month_v;
                            """;
-        return _db.WithinTransaction(tx => tx.Connection!.Query<DataPoint<DateTime, double>>(sql));
+        return _db.WithConnection(conn => conn.Query<DataPoint<DateTime, double>>(sql));
     }
 
     #endregion

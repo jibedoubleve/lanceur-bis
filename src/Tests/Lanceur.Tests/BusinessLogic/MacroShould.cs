@@ -293,7 +293,7 @@ public class MacroShould : TestBase
         {
             var log = Substitute.For<ILoggerFactory>();
             var conv = GetConversionService();
-            var service = new SQLiteRepository(new DbSingleConnectionManager(db), log, conv);
+            var service = new SQLiteRepository(new DbSingleConnectionManager(db), log, conv, new DbActionFactory(new AutoMapperMappingService(), log));
             return service;
         }
 

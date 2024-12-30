@@ -1,7 +1,5 @@
 ﻿using System.Data;
 using System.Data.SQLite;
-using System.Reflection;
-using AutoMapper;
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -11,25 +9,22 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Lanceur.Core.Utils;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.SQLite;
-using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;
-using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
-using ILogger = Castle.Core.Logging.ILogger;
 
 namespace Lanceur.Tests.BusinessLogic;
 
@@ -87,7 +82,7 @@ public class SearchShould : TestBase
         using var db = BuildFreshDb(SqlCreateAlias);
         using var conn = new DbSingleConnectionManager(db);
 
-        var repository = new SQLiteRepository(conn, _testLoggerFactory, converter);
+        var repository = new SQLiteRepository(conn, _testLoggerFactory, converter, new DbActionFactory(new AutoMapperMappingService(), _testLoggerFactory));
 
         // act
         var results = repository.GetAll();
@@ -114,7 +109,7 @@ public class SearchShould : TestBase
         var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
 
-        var repository = new SQLiteRepository(connectionMgr, logger, converter);
+        var repository = new SQLiteRepository(connectionMgr, logger, converter, new DbActionFactory(new AutoMapperMappingService(), logger));
 
         OutputHelper.Act();
 
@@ -153,6 +148,7 @@ public class SearchShould : TestBase
                                                      .AddSingleton<IDbConnection, SQLiteConnection>()
                                                      .AddSingleton<SearchService>()
                                                      .AddSingleton<AssemblySource>()
+                                                     .AddSingleton<IDbActionFactory, DbActionFactory>()
                                                      .AddMockSingleton<IStoreLoader>(
                                                          (serviceProvider, storeLoader) =>
                                                          {
@@ -216,6 +212,7 @@ public class SearchShould : TestBase
                                                      .AddSingleton(converter)
                                                      .AddSingleton(Substitute.For<IStoreLoader>())
                                                      .AddSingleton<ISearchService, SearchService>()
+                                                     .AddSingleton<IDbActionFactory, DbActionFactory>()
                                                      .AddMockSingleton<IThumbnailManager>()
                                                      .AddMockSingleton<IStoreLoader>(
                                                          (sp, _) =>
@@ -300,12 +297,12 @@ public class SearchShould : TestBase
                                   .AppendArgument(1)
                                   .ToString();
 
-        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
+        var connectionManager = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
 
-        var repository = new SQLiteRepository(connectionMgr, logger, converter);
+        var repository = new SQLiteRepository(connectionManager, logger, converter, new DbActionFactory(new AutoMapperMappingService(), logger));
 
         OutputHelper.Act();
         repository.SetUsage(alias);
@@ -313,9 +310,9 @@ public class SearchShould : TestBase
         OutputHelper.Assert();
         const string sqlCount = "select count(*) from alias_argument";
 
-        connectionMgr.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount))
-                     .Should()
-                     .Be(3);
+        connectionManager.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount))
+                         .Should()
+                         .Be(3);
     }
 
     #endregion

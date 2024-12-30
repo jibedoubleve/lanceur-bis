@@ -1,7 +1,5 @@
-using AutoMapper;
 using Dapper;
 using FluentAssertions;
-using Lanceur.Core.Models;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Win32.Thumbnails;
@@ -21,7 +19,7 @@ public class ThumbnailManagerShould : TestBase
 
     public ThumbnailManagerShould(ITestOutputHelper output) : base(output) { }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -48,9 +46,8 @@ public class ThumbnailManagerShould : TestBase
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
-        var cfg = new MapperConfiguration(cfg => { cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
         var conversionService = new AutoMapperMappingService();
-        var dbRepository = new SQLiteRepository(connectionMgr, loggerFactory, conversionService);
+        var dbRepository = new SQLiteRepository(connectionMgr, loggerFactory, conversionService, new DbActionFactory(new AutoMapperMappingService(), loggerFactory));
         var thumbnailRefresher = new MockThumbnailRefresher();
 
         var thumbnailManager = new ThumbnailManager(loggerFactory, dbRepository, thumbnailRefresher);
@@ -65,5 +62,5 @@ public class ThumbnailManagerShould : TestBase
                      .Be(6);
     }
 
-    #endregion Methods
+    #endregion
 }

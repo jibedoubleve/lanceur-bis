@@ -1,15 +1,15 @@
 using System.Reflection;
 using Dapper;
+using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
+using Lanceur.Infra.Macros;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
-using Lanceur.Core.BusinessLogic;
-using Lanceur.Infra.Macros;
-using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite;
 
@@ -17,12 +17,10 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 {
     #region Fields
 
-    private readonly AliasDbAction _aliasDbAction;
-    private readonly AliasSearchDbAction _aliasSearchDbAction;
     private readonly IMappingService _converter;
+    private readonly IDbActionFactory _dbActionFactory;
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly ILogger<SQLiteRepository> _logger;
-    private readonly SetUsageDbAction _setUsageDbAction;
     private static readonly MacroValidator MacroValidator = new(Assembly.GetAssembly(typeof(GuidMacro)));
 
     #endregion
@@ -32,7 +30,8 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     public SQLiteRepository(
         IDbConnectionManager manager,
         ILoggerFactory logFactory,
-        IMappingService converter
+        IMappingService converter,
+        IDbActionFactory dbActionFactory
     ) : base(manager)
     {
         ArgumentNullException.ThrowIfNull(logFactory);
@@ -40,10 +39,8 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
 
         _logger = logFactory.GetLogger<SQLiteRepository>();
         _converter = converter;
-        _aliasDbAction = new(manager, logFactory);
         _getAllAliasDbAction = new(manager);
-        _setUsageDbAction = new(DB, logFactory);
-        _aliasSearchDbAction = new(DB, logFactory, converter);
+        _dbActionFactory = dbActionFactory;
     }
 
     #endregion
@@ -51,15 +48,30 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     #region Methods
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> GetAll() => _aliasSearchDbAction.Search(isReturnAllIfEmpty: true);
+    public IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids)
+    {
+        const string sql = """
+                           select 
+                           	id_alias as AliasId,
+                           	id       as Id,
+                           	name     as Name,
+                           	argument as Parameter
+                           from alias_argument	
+                           where id_alias in @ids
+                           """;
+        return DB.WithinTransaction(tx => tx!.Connection!.Query<AdditionalParameter>(sql, new { ids }));
+    }
 
-    ///<inheritdoc/>
-    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters();
+    /// <inheritdoc />
+    public IEnumerable<AliasQueryResult> GetAll() => DB.WithinTransaction(tx => _dbActionFactory.AliasSearchDbAction().Search(tx, isReturnAllIfEmpty: true));
 
-    ///<inheritdoc/>
-    public AliasQueryResult GetByIdAndName(long id, string name) => _aliasDbAction.GetByIdAndName(id, name);
+    /// <inheritdoc />
+    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() => DB.WithinTransaction(tx => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters(tx));
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
+    public AliasQueryResult GetByIdAndName(long id, string name) => DB.WithinTransaction(tx => _dbActionFactory.AliasDbAction().GetByIdAndName(id, name, tx));
+
+    /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetDoubloons()
     {
         const string sql = $"""
@@ -81,14 +93,14 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
     }
 
     /// <summary>
-    /// Get the a first alias with the exact name. In case of multiple aliases
-    /// with same name, the one with greater counter is selected.
+    ///     Get the a first alias with the exact name. In case of multiple aliases
+    ///     with same name, the one with greater counter is selected.
     /// </summary>
     /// <param name="name">The alias' exact name to find.</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
-    public AliasQueryResult GetExact(string name) => _aliasDbAction.GetExact(name);
+    public AliasQueryResult GetExact(string name) => DB.WithinTransaction(tx => _dbActionFactory.AliasDbAction().GetExact(name, tx));
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)
     {
         const string  sql = """
@@ -101,7 +113,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         return DB.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetInvalidAliases()
     {
         var result = GetAll()
@@ -110,24 +122,25 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         return _converter.ToSelectableQueryResult(result);
     }
 
-    ///<inheritdoc/>
-    public KeywordUsage GetKeyword(string name) => _aliasDbAction.GetHiddenKeyword(name);
+    /// <inheritdoc />
+    public KeywordUsage GetKeyword(string name) => DB.WithinTransaction(tx => _dbActionFactory.AliasDbAction().GetHiddenKeyword(name, tx));
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public IEnumerable<QueryResult> GetMostUsedAliases()
     {
-        const string sql = @$"
-                select
-	                keywords   as {nameof(UsageQueryResult.Name)},
-                    exec_count as {nameof(UsageQueryResult.Count)}
-                from
-                    stat_execution_count_v
-                order
-                    by exec_count desc";
+        const string sql = $"""
+                            select
+                            	keywords   as {nameof(UsageQueryResult.Name)},
+                                exec_count as {nameof(UsageQueryResult.Count)}
+                            from
+                                stat_execution_count_v
+                            order
+                                by exec_count desc
+                            """;
         return DB.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql));
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per)
     {
         var action = new HistoryDbAction(DB);
@@ -141,7 +154,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         };
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public void Hydrate(QueryResult queryResult)
     {
         const string sql =
@@ -170,19 +183,19 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         queryResult.Count = first.Count;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void HydrateAlias(AliasQueryResult alias)
     {
         if (alias is null) return;
 
         const string sqlArguments = """
-                           select
-                               id       as id,
-                               name     as name,
-                               argument as parameter
-                           from alias_argument
-                           where id_alias = @idAlias
-                           """;
+                                    select
+                                        id       as id,
+                                        name     as name,
+                                        argument as parameter
+                                    from alias_argument
+                                    where id_alias = @idAlias
+                                    """;
         const string sqlSynonyms = """
                                    select name
                                    from alias_name
@@ -194,15 +207,16 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
                 {
                     var parameters = tx.Connection!.Query<AdditionalParameter>(sqlArguments, new { idAlias = alias.Id });
                     var synonyms = tx.Connection!.Query<string>(sqlSynonyms, new { idAlias = alias.Id });
-                    
+
                     return (parameters, synonyms);
-                });
-        
+                }
+            );
+
         alias.AdditionalParameters = new(parameters);
         alias.Synonyms = string.Join(", ", synonyms);
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc />
     public void HydrateMacro(QueryResult alias)
     {
         const string sql = $"""
@@ -233,92 +247,90 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         );
     }
 
-    ///<inheritdoc/>
-    public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => _aliasDbAction.RefreshUsage(result);
+    /// <inheritdoc />
+    public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => DB.WithinTransaction(tx => _dbActionFactory.AliasDbAction().RefreshUsage(result, tx));
 
-    ///<inheritdoc/>
-    public void Remove(AliasQueryResult alias) => _aliasDbAction.Remove(alias);
+    /// <inheritdoc />
+    public void Remove(AliasQueryResult alias) => DB.WithinTransaction(tx => _dbActionFactory.AliasDbAction().Remove(alias, tx));
 
-    ///<inheritdoc/>
-    public void RemoveMany(IEnumerable<AliasQueryResult> aliases)
-    {
-        var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
-        _logger.LogInformation("Removing {Length} alias(es)", list.Length);
-        _aliasDbAction.RemoveMany(list);
-    }
+    /// <inheritdoc />
+    public void RemoveMany(IEnumerable<AliasQueryResult> aliases) => DB.WithinTransaction(
+        tx =>
+        {
+            var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
+            _logger.LogInformation("Removing {Length} alias(es)", list.Length);
+            _dbActionFactory.AliasDbAction().RemoveMany(list, tx);
+        }
+    );
 
     /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias)
     {
-        ArgumentNullException.ThrowIfNull(alias);
-        ArgumentNullException.ThrowIfNull(alias.Synonyms);
-        ArgumentNullException.ThrowIfNull(alias.Id);
+        _ = DB.WithinTransaction(
+            (tx, current) =>
+            {
+                ArgumentNullException.ThrowIfNull(current);
+                ArgumentNullException.ThrowIfNull(current.Synonyms);
+                ArgumentNullException.ThrowIfNull(current.Id);
 
-        alias.SanitizeSynonyms();
+                current.SanitizeSynonyms();
+                var action = _dbActionFactory.AliasDbAction();
 
-        using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
+                using var _ = _logger.BeginSingleScope("UpdatedAlias", current);
 
-        switch (alias.Id)
-        {
-            case 0 when !_aliasDbAction.HasNames(alias):
-                _aliasDbAction.Create(ref alias);
-                _logger.LogInformation("Created new alias {AliasName}", alias.Name);
-                break;
+                switch (current.Id)
+                {
+                    case 0 when !action.HasNames(current, tx):
+                        action.Create(tx, ref current);
+                        _logger.LogInformation("Created new alias {AliasName}", current.Name);
+                        break;
 
-            case > 0:
-                _logger.LogInformation("Updating alias {AliasName}", alias.Name);
-                _aliasDbAction.Update(alias);
-                break;
-        }
+                    case > 0:
+                        _logger.LogInformation("Updating alias {AliasName}", current.Name);
+                        action.Update(current, tx);
+                        break;
+                }
 
-        // Reset state after save
-        alias.SynonymsWhenLoaded = alias.Synonyms;
+                // Reset state after save
+                current.SynonymsWhenLoaded = current.Synonyms;
+
+                return current;
+            },
+            alias
+        );
     }
 
-    ///<inheritdoc/>
-    public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false) => _aliasSearchDbAction.Search(name, isReturnAllIfEmpty);
+    /// <inheritdoc />
+    public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false) => DB.WithinTransaction(tx => _dbActionFactory.AliasSearchDbAction().Search(tx, name, isReturnAllIfEmpty));
 
-    ///<inheritdoc/>
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => _aliasSearchDbAction.SearchAliasWithAdditionalParameters(criteria);
+    /// <inheritdoc />
+    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => DB.WithinTransaction(tx => _dbActionFactory.AliasSearchDbAction().SearchAliasWithAdditionalParameters(tx, criteria));
 
-    ///<inheritdoc/>
-    public ExistingNameResponse SelectNames(string[] names) => _aliasDbAction.SelectNames(names);
+    /// <inheritdoc />
+    public ExistingNameResponse SelectNames(string[] names) => DB.WithinTransaction(tx => _dbActionFactory.AliasDbAction().SelectNames(names, tx));
 
-    ///<inheritdoc/>
-    public void SetUsage(QueryResult alias)
-    {
-        if (alias is null)
+    /// <inheritdoc />
+    public void SetUsage(QueryResult alias) => DB.WithinTransaction(
+        tx =>
         {
-            _logger.LogInformation("Impossible to set usage: alias is null");
-            return;
+            if (alias is null)
+            {
+                _logger.LogInformation("Impossible to set usage: alias is null");
+                return;
+            }
+
+            if (alias.Name.IsNullOrEmpty())
+            {
+                _logger.LogInformation("Impossible to set usage: alias name is empty. Alias: {@Alias}", alias);
+                return;
+            }
+
+            _dbActionFactory.SetUsageDbAction().SetUsage(tx, ref alias);
         }
+    );
 
-        if (alias.Name.IsNullOrEmpty())
-        {
-            _logger.LogInformation("Impossible to set usage: alias name is empty. Alias: {@Alias}", alias);
-            return;
-        }
-
-        _setUsageDbAction.SetUsage(ref alias);
-    }
-
-    ///<inheritdoc/>
-    public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => _aliasDbAction.UpdateThumbnails(aliases);
-
-    ///<inheritdoc/>
-    public IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids)
-    {
-        const string sql = """
-                           select 
-                           	id_alias as AliasId,
-                           	id       as Id,
-                           	name     as Name,
-                           	argument as Parameter
-                           from alias_argument	
-                           where id_alias in @ids
-                           """;
-        return DB.WithinTransaction(tx => tx!.Connection!.Query<AdditionalParameter>(sql, new { ids }));
-    }
+    /// <inheritdoc />
+    public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => DB.WithinTransaction(tx => _dbActionFactory.AliasDbAction().UpdateThumbnails(aliases, tx));
 
     #endregion
 }
