@@ -49,7 +49,7 @@ public class GetAllAliasDbAction
                                 an.name
                             """;
                             
-                                    var result = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql));
+                                    var result = _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql));
                                     return result ?? AliasQueryResult.NoResult;
                                 }
                             

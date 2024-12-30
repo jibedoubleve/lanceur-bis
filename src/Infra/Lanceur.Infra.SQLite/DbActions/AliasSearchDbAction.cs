@@ -75,7 +75,7 @@ public class AliasSearchDbAction
                """;
 
         name = $"{name ?? string.Empty}%";
-        var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name }));
+        var results = _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql, new { name }));
 
         results = _macroManager.UpgradeToComposite(results);
         return results ?? AliasQueryResult.NoResult;
@@ -113,7 +113,7 @@ public class AliasSearchDbAction
                     an.name";
 
         name = $"{name ?? string.Empty}%";
-        var results = _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, new { name }));
+        var results = _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql, new { name }));
 
         results = _macroManager.UpgradeToComposite(results);
         return results ?? AliasQueryResult.NoResult;

@@ -9,7 +9,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class AliasDbAction
+internal class AliasDbAction
 {
     #region Fields
 
@@ -20,7 +20,7 @@ public class AliasDbAction
 
     #region Constructors
 
-    public AliasDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
+    internal AliasDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
     {
         _db = db;
         _logger = logFactory.GetLogger<AliasDbAction>();
@@ -32,9 +32,10 @@ public class AliasDbAction
 
     private void ClearAlias(params long[] ids)
     {
-        const string sql = @"
-                    delete from alias
-                    where id = @id";
+        const string sql = """
+                           delete from alias
+                           where id = @id
+                           """;
 
         var cnt = _db.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
@@ -43,9 +44,10 @@ public class AliasDbAction
 
     private void ClearAliasArgument(params long[] ids)
     {
-        const string sql = @"
-                delete from alias_argument
-                where id_alias = @id";
+        const string sql = """
+                           delete from alias_argument
+                           where id_alias = @id
+                           """;
 
         var cnt = _db.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
@@ -54,9 +56,10 @@ public class AliasDbAction
 
     private void ClearAliasName(params long[] ids)
     {
-        const string sql = @"
-                delete from alias_name
-                where id_alias = @id";
+        const string sql = """
+                           delete from alias_name
+                           where id_alias = @id
+                           """;
 
         var cnt = _db.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
@@ -65,9 +68,10 @@ public class AliasDbAction
 
     private void ClearAliasUsage(params long[] ids)
     {
-        const string sql = @"
-                delete from alias_usage
-                where id_alias = @id;";
+        const string sql = """
+                           delete from alias_usage
+                           where id_alias = @id;
+                           """;
 
         var cnt = _db.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
@@ -81,7 +85,7 @@ public class AliasDbAction
         const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
 
         // Remove existing additional alias parameters
-        var deletedRowsCount = tx.Connection.Execute(sql1, new { idAlias });
+        var deletedRowsCount = tx.Connection!.Execute(sql1, new { idAlias });
 
         // Create alias additional parameters
         var addedRowsCount = tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
@@ -95,7 +99,7 @@ public class AliasDbAction
     {
         //Remove all names
         const string sql = @"delete from alias_name where id_alias = @id";
-        tx.Connection.Execute(sql, new { id = alias.Id });
+        tx.Connection!.Execute(sql, new { id = alias.Id });
 
         //Recreate new names
         const string sql2 = @"insert into alias_name (id_alias, name) values (@id, @name)";
@@ -104,17 +108,19 @@ public class AliasDbAction
 
     internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results)
     {
-        var sql = @$"
-                select
-	                id_alias as {nameof(KeywordUsage.Id)},
-	                count
-                from
-	                stat_usage_per_app_v
-                where id_alias in @ids;";
+        const string sql = $"""
+
+                            select
+                            	id_alias as {nameof(KeywordUsage.Id)},
+                            	count
+                            from
+                            	stat_usage_per_app_v
+                            where id_alias in @ids;
+                            """;
 
         var dbResultAr = results as QueryResult[] ?? results.ToArray();
         var dbResults = _db.WithinTransaction(
-            tx => tx.Connection.Query<KeywordUsage>(sql, new { ids = dbResultAr.Select(x => x.Id).ToArray() })
+            tx => tx.Connection!.Query<KeywordUsage>(sql, new { ids = dbResultAr.Select(x => x.Id).ToArray() })
                     .ToArray()
         );
 
@@ -125,35 +131,37 @@ public class AliasDbAction
         return dbResultAr;
     }
 
-    public long Create(ref AliasQueryResult alias)
+    internal long Create(ref AliasQueryResult alias)
     {
-        const string sqlAlias = @"
-                insert into alias (
-                    arguments,
-                    file_name,
-                    notes,
-                    run_as,
-                    start_mode,
-                    working_dir,
-                    icon,
-                    thumbnail,
-                    lua_script,
-                    hidden,
-                    confirmation_required
-                ) values (
-                    @arguments,
-                    @fileName,
-                    @notes,
-                    @runAs,
-                    @startMode,
-                    @workingDirectory,
-                    @icon,
-                    @thumbnail,
-                    @luaScript,
-                    @isHidden,
-                    @isExecutionConfirmationRequired
-                );
-                select last_insert_rowid() from alias limit 1;";
+        const string sqlAlias = """
+
+                                insert into alias (
+                                    arguments,
+                                    file_name,
+                                    notes,
+                                    run_as,
+                                    start_mode,
+                                    working_dir,
+                                    icon,
+                                    thumbnail,
+                                    lua_script,
+                                    hidden,
+                                    confirmation_required
+                                ) values (
+                                    @arguments,
+                                    @fileName,
+                                    @notes,
+                                    @runAs,
+                                    @startMode,
+                                    @workingDirectory,
+                                    @icon,
+                                    @thumbnail,
+                                    @luaScript,
+                                    @isHidden,
+                                    @isExecutionConfirmationRequired
+                                );
+                                select last_insert_rowid() from alias limit 1;
+                                """;
 
         var param = new
         {
@@ -177,7 +185,7 @@ public class AliasDbAction
         var id = _db.WithinTransaction(
             tx =>
             {
-                var id = tx.Connection.ExecuteScalar<long>(sqlAlias, param);
+                var id = tx.Connection!.ExecuteScalar<long>(sqlAlias, param);
 
                 // Create synonyms
                 const string sqlSynonyms = @"insert into alias_name (id_alias, name) values (@id, @name)";
@@ -197,13 +205,13 @@ public class AliasDbAction
         return id;
     }
 
-    public void CreateInvisible(ref QueryResult alias)
+    internal void CreateInvisible(ref QueryResult alias)
     {
         var queryResult = new AliasQueryResult { Name = alias.Name, FileName = alias.Name, Synonyms = alias.Name, IsHidden = true };
         alias.Id = Create(ref queryResult);
     }
 
-    public AliasQueryResult GetByIdAndName(long id, string name)
+    internal AliasQueryResult GetByIdAndName(long id, string name)
     {
         if (id <= 0) { throw new ArgumentException("The id of the alias should be greater than zero.");}
         const string sql = $"""
@@ -243,7 +251,7 @@ public class AliasDbAction
     }
 
     /// <summary>
-    /// Get the a first alias with the exact name.
+    /// Get the first alias with the exact name.
     /// </summary>
     /// <param name="name">The alias' exact name to find.</param>
     /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
@@ -252,7 +260,7 @@ public class AliasDbAction
     /// For optimisation reason, there's no check of doubloons. Bear UI validates and
     /// forbid to insert two aliases with same name.
     /// </remarks>
-    public AliasQueryResult GetExact(string name, bool includeHidden = false)
+    internal AliasQueryResult GetExact(string name, bool includeHidden = false)
     {
         const string sql = $"""
                             select
@@ -283,10 +291,10 @@ public class AliasDbAction
                                 n.name
                             """;
 
-        var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
+        var hidden = includeHidden ? [0, 1] : 0.ToEnumerable();
         var arguments = new { name, hidden };
 
-        return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).FirstOrDefault());
+        return _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql, arguments).FirstOrDefault());
     }
 
     /// <summary>
@@ -297,73 +305,76 @@ public class AliasDbAction
     /// <param name="names">The list of names to find.</param>
     /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
-    public IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, bool includeHidden = false)
+    internal IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, bool includeHidden = false)
     {
-        const string sql = @$"
-            select
-                n.Name                  as {nameof(AliasQueryResult.Name)},
-                a.Id                    as {nameof(AliasQueryResult.Id)},
-                a.arguments             as {nameof(AliasQueryResult.Parameters)},
-                a.file_name             as {nameof(AliasQueryResult.FileName)},
-                a.notes                 as {nameof(AliasQueryResult.Notes)},
-                a.run_as                as {nameof(AliasQueryResult.RunAs)},
-                a.start_mode            as {nameof(AliasQueryResult.StartMode)},
-                a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
-                a.icon                  as {nameof(AliasQueryResult.Icon)},
-                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
-                a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
-                a.hidden                as {nameof(AliasQueryResult.IsHidden)},
-                a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
-            from
-                alias a
-                left join alias_name n on a.id = n.id_alias
-            where
-                n.Name in @names
-                and hidden in @hidden
-            order by n.name";
+        const string sql = $"""
+                            select
+                                n.Name                  as {nameof(AliasQueryResult.Name)},
+                                a.Id                    as {nameof(AliasQueryResult.Id)},
+                                a.arguments             as {nameof(AliasQueryResult.Parameters)},
+                                a.file_name             as {nameof(AliasQueryResult.FileName)},
+                                a.notes                 as {nameof(AliasQueryResult.Notes)},
+                                a.run_as                as {nameof(AliasQueryResult.RunAs)},
+                                a.start_mode            as {nameof(AliasQueryResult.StartMode)},
+                                a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
+                                a.icon                  as {nameof(AliasQueryResult.Icon)},
+                                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
+                                a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
+                                a.hidden                as {nameof(AliasQueryResult.IsHidden)},
+                                a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
+                            from
+                                alias a
+                                left join alias_name n on a.id = n.id_alias
+                            where
+                                n.Name in @names
+                                and hidden in @hidden
+                            order by n.name
+                            """;
 
-        var hidden = includeHidden ? new[] { 0, 1 } : 0.ToEnumerable();
+        var hidden = includeHidden ? [0, 1] : 0.ToEnumerable();
         var arguments = new { names, hidden };
 
-        return _db.WithinTransaction(tx => tx.Connection.Query<AliasQueryResult>(sql, arguments).ToArray());
+        return _db.WithinTransaction(tx => tx.Connection!.Query<AliasQueryResult>(sql, arguments).ToArray());
     }
 
-    public KeywordUsage GetHiddenKeyword(string name)
+    internal KeywordUsage GetHiddenKeyword(string name)
     {
-        const string sql = @"
-                select
-	                a.id,
-                    n.name,
-                    (
-    	                select count(id)
-     	                from alias_usage
-      	                where id = a.id
-                    ) as count
-                from
-	                alias a
-                    inner join alias_name n on a.id = n.id_alias
-                where
-	                hidden = 1
-                    and n.name = @name;";
-        var result = _db.WithinTransaction(tx => tx.Connection.Query<KeywordUsage>(sql, new { name }).FirstOrDefault());
+        const string sql = """
+                           select
+                           	a.id,
+                               n.name,
+                               (
+                               	select count(id)
+                                	from alias_usage
+                                 	where id = a.id
+                               ) as count
+                           from
+                           	alias a
+                               inner join alias_name n on a.id = n.id_alias
+                           where
+                           	hidden = 1
+                               and n.name = @name;
+                           """;
+        var result = _db.WithinTransaction(tx => tx.Connection!.Query<KeywordUsage>(sql, new { name }).FirstOrDefault());
 
         return result;
     }
 
-    public bool HasNames(AliasQueryResult alias)
+    internal bool HasNames(AliasQueryResult alias)
     {
-        const string sql = @"
-            select count(*)
-            from
-	            alias_name an
-                inner join alias a on an.id_alias = a.id
-            where lower(name) = @name";
+        const string sql = """
+                           select count(*)
+                           from
+                           	alias_name an
+                               inner join alias a on an.id_alias = a.id
+                           where lower(name) = @name
+                           """;
 
-        var count = _db.WithinTransaction(tx => tx.Connection.ExecuteScalar<int>(sql, new { name = alias.Name }));
+        var count = _db.WithinTransaction(tx => tx.Connection!.ExecuteScalar<int>(sql, new { name = alias.Name }));
         return count > 0;
     }
 
-    public void Remove(AliasQueryResult alias)
+    internal void Remove(AliasQueryResult alias)
     {
         if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");
 
@@ -373,7 +384,7 @@ public class AliasDbAction
         ClearAlias(alias.Id);
     }
 
-    public void RemoveMany(IEnumerable<AliasQueryResult> alias)
+    internal void RemoveMany(IEnumerable<AliasQueryResult> alias)
     {
         ArgumentNullException.ThrowIfNull(alias);
         var ids = alias.Select(x => x.Id).ToArray();
@@ -384,43 +395,45 @@ public class AliasDbAction
         ClearAlias(ids);
     }
 
-    public ExistingNameResponse SelectNames(string[] names)
+    internal ExistingNameResponse SelectNames(string[] names)
     {
-        const string sql = @"
-                select an.name
-                from
-                	alias_name an
-                	inner join alias a on a.id = an.id_alias
-                where an.name in @names";
+        const string sql = """
+                           select an.name
+                           from
+                               alias_name an
+                               inner join alias a on a.id = an.id_alias
+                           where an.name in @names
+                           """;
 
         var result = _db.WithinTransaction(
-            tx => tx.Connection.Query<string>(sql, new { names }).ToArray()
+            tx => tx.Connection!.Query<string>(sql, new { names }).ToArray()
         );
 
         return new(result);
     }
 
-    public long Update(AliasQueryResult alias) => _db.WithinTransaction(
+    internal long Update(AliasQueryResult alias) => _db.WithinTransaction(
         tx =>
         {
-            const string updateAliasSql = @"
-                update alias
-                set
-                    arguments             = @parameters,
-                    file_name             = @fileName,
-                    notes                 = @notes,
-                    run_as                = @runAs,
-                    start_mode            = @startMode,
-                    working_dir           = @WorkingDirectory,
-                    icon                  = @Icon,
-                    thumbnail             = @thumbnail,
-                    lua_script            = @luaScript,
-                    exec_count            = @count,
-                    confirmation_required = @isExecutionConfirmationRequired
-                where id = @id;";
+            const string updateAliasSql = """
+                                          update alias
+                                          set
+                                              arguments             = @parameters,
+                                              file_name             = @fileName,
+                                              notes                 = @notes,
+                                              run_as                = @runAs,
+                                              start_mode            = @startMode,
+                                              working_dir           = @WorkingDirectory,
+                                              icon                  = @Icon,
+                                              thumbnail             = @thumbnail,
+                                              lua_script            = @luaScript,
+                                              exec_count            = @count,
+                                              confirmation_required = @isExecutionConfirmationRequired
+                                          where id = @id;
+                                          """;
 
             using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
-            tx.Connection.Execute(
+            tx.Connection!.Execute(
                 updateAliasSql,
                 new
                 {
@@ -445,7 +458,7 @@ public class AliasDbAction
         }
     );
 
-    public IEnumerable<long> UpdateThumbnails(IEnumerable<AliasQueryResult> aliases)
+    internal IEnumerable<long> UpdateThumbnails(IEnumerable<AliasQueryResult> aliases)
     {
         const string sql = "update alias set thumbnail = @thumbnail where id = @id";
         var ids = new List<long>();
@@ -454,7 +467,7 @@ public class AliasDbAction
             {
                 foreach (var alias in aliases)
                 {
-                    tx.Connection.Execute(sql, new { alias.Thumbnail, alias.Id });
+                    tx.Connection!.Execute(sql, new { alias.Thumbnail, alias.Id });
                     ids.Add(alias.Id);
                 }
             }

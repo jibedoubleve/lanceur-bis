@@ -54,30 +54,33 @@ public class SetUsageDbAction
     private void IncrementCounter(QueryResult alias)
     {
         alias.Count++;
-        const string sql = @"
-                update alias 
-                set 
-                    exec_count = @counter 
-                where 
-                    id = @id";
+        const string sql = """
+                           update alias 
+                           set 
+                               exec_count = @counter 
+                           where 
+                               id = @id
+                           """;
         var param = new { id = alias.Id, counter = alias.Count };
-        _db.WithinTransaction(tx => tx.Connection.Execute(sql, param));
+        _db.WithinTransaction(tx => tx.Connection!.Execute(sql, param));
     }
 
     private void AddHistory(ref QueryResult alias)
     {
-        const string sql = @"
-                    insert into alias_usage (
-                        id_alias,
-                        time_stamp
+        const string sql = """
 
-                    ) values (
-                        @idAlias,
-                        @now
-                    )";
+                           insert into alias_usage (
+                               id_alias,
+                               time_stamp
+
+                           ) values (
+                               @idAlias,
+                               @now
+                           )
+                           """;
 
         var param = new { idAlias = alias.Id, now = DateTime.Now };
-        _db.WithinTransaction(tx => tx.Connection.Execute(sql, param));
+        _db.WithinTransaction(tx => tx.Connection!.Execute(sql, param));
     }
 
     #endregion Methods
