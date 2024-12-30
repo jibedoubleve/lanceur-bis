@@ -69,17 +69,20 @@ public partial class App
     {
         Ioc.Default.ConfigureServices(Host.Services);
         Host.Start();
-        Host.Services
-            .GetRequiredService<MainView>()
-            .Show();
-        Host.Services.GetRequiredService<ILogger<App>>()!
-            .LogInformation("Application started");
 
         /* Checks whether database update is needed...
          */
         var cs = Ioc.Default.GetService<IConnectionString>()!;
         Ioc.Default.GetService<SQLiteUpdater>()!
                    .Update(cs.ToString());
+        
+        /* Now the database is up to date, let's start the application
+         */
+        Host.Services
+            .GetRequiredService<MainView>()
+            .Show();
+        Host.Services.GetRequiredService<ILogger<App>>()!
+            .LogInformation("Application started");
 
     }
 

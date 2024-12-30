@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Ui.WPF.Views;
+using Lanceur.Ui.Core.Messages;
+using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.Views.Pages;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Ui.WPF.ReservedKeywords;
 
@@ -13,13 +14,13 @@ public class AddAlias : SelfExecutableQueryResult
 {
     #region Fields
 
-    private readonly IServiceProvider _serviceProvider;
+    private readonly PageNavigator _navigator;
 
     #endregion
 
     #region Constructors
 
-    public AddAlias(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+    public AddAlias(IServiceProvider serviceProvider) => _navigator = new(serviceProvider);
 
     #endregion
 
@@ -33,12 +34,11 @@ public class AddAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        var view = _serviceProvider.GetService<SettingsView>()!;
-        view.Show();
-        view.Navigate<KeywordsView>();
-
+        _navigator.Navigate<KeywordsView>();
+        WeakReferenceMessenger.Default.Send(new AddAliasMessage(cmdline));
         return NoResultAsync;
     }
 
     #endregion
 }
+

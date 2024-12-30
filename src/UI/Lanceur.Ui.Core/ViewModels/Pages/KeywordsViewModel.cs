@@ -1,12 +1,14 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Mixins;
+using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Microsoft.Extensions.Logging;
@@ -52,6 +54,8 @@ public partial class KeywordsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(userInteraction);
         ArgumentNullException.ThrowIfNull(viewFactory);
 
+        WeakReferenceMessenger.Default.Register<AddAliasMessage>(this, (r, m) => ((KeywordsViewModel)r).CreateAlias(m));
+
         _userNotificationService = userNotificationService;
         _validationService = validationService;
         _userInteraction = userInteraction;
@@ -80,6 +84,13 @@ public partial class KeywordsViewModel : ObservableObject
 
     #region Methods
 
+    private void CreateAlias(AddAliasMessage message)
+    {
+        _logger.LogTrace("Creating new alias with name '{Name}'", message.Cmdline?.Parameters);
+        var names = message.Cmdline?.Parameters;
+        Aliases.Insert(0, new()  { Name = names, Synonyms = names });
+        SelectedAlias = Aliases[0];
+    }
     private bool CanExecuteCurrentAlias() => SelectedAlias != null;
 
     [RelayCommand]
@@ -92,16 +103,17 @@ public partial class KeywordsViewModel : ObservableObject
         if (!result) return;
 
         var parser = new TextToParameterParser();
-        var parseResult= parser.Parse(viewModel.RawParameters);
+        var parseResult = parser.Parse(viewModel.RawParameters);
 
         if (!parseResult.Success)
         {
             _userNotificationService.Warn("The parsing operation failed because the entered text is invalid and cannot be converted into parameters.");
             return;
         }
-        
+
         _selectedAlias?.AdditionalParameters.AddRange(parseResult.Parameters);
     }
+
     [RelayCommand]
     private async Task OnAddParameter()
     {
@@ -190,9 +202,16 @@ public partial class KeywordsViewModel : ObservableObject
     {
         _bufferedAliases = await Task.Run(() => _aliasManagementService.GetAll()!.ToList());
 
-        SelectedAlias = _bufferedAliases.ReselectAlias(SelectedAlias);
+        if (Aliases.Count == 0)
+        {
+            SelectedAlias = _bufferedAliases.ReselectAlias(SelectedAlias);
+            Aliases = new(_bufferedAliases);
+        }
+        else
+        {
+            Aliases.AddRange(_bufferedAliases);
+        }
 
-        Aliases = new(_bufferedAliases);
         _thumbnailManager.RefreshThumbnails(_bufferedAliases);
         _logger.LogTrace("Loaded {Count} alias(es)", _bufferedAliases.Count);
     }

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Ui.Core.Messages;
@@ -79,7 +80,12 @@ public partial class SettingsView
         Hide();
     }
 
-    public void Navigate<T>() where T : Page => PageNavigationView.Navigate(typeof(T));
+    private void OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape) Close();
+    }
+
+    public void Navigate<T>(object? dataContext = null) where T : Page => PageNavigationView.Navigate(typeof(T), dataContext);
 
     #endregion
 }

@@ -18,6 +18,8 @@ public static class KeywordsViewModelExtensions
     /// </returns>
     public static AliasQueryResult? ReselectAlias(this IList<AliasQueryResult> aliases, AliasQueryResult? selectedAlias)
     {
+        if (aliases.Count == 0) return null;
+        
         var id = selectedAlias?.Id ?? 0;
         var name = selectedAlias?.Synonyms.SplitCsv().FirstOrDefault();
         return id == 0

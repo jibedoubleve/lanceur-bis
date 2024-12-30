@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Ui.WPF.Views;
+using Lanceur.Ui.WPF.Helpers;
+using Lanceur.Ui.WPF.ReservedKeywords;
 using Lanceur.Ui.WPF.Views.Pages;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.ReservedKeywords;
 
@@ -13,13 +13,16 @@ public class SetupAlias : SelfExecutableQueryResult
 {
     #region Fields
 
-    private readonly IServiceProvider _serviceProvider;
+    private readonly PageNavigator _navigator;
 
     #endregion
 
     #region Constructors
 
-    public SetupAlias(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+    public SetupAlias(IServiceProvider serviceProvider)
+    {
+        _navigator = new(serviceProvider);
+    }
 
     #endregion
 
@@ -33,9 +36,7 @@ public class SetupAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        var view = _serviceProvider.GetService<SettingsView>()!;
-        view.Show();
-        view.Navigate<KeywordsView>();
+        _navigator.Navigate<KeywordsView>();
         return NoResultAsync;
     }
 

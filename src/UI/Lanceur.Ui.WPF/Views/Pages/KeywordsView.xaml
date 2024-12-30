@@ -106,10 +106,11 @@
                         <StackPanel>
                             <!--  NAME  -->
                             <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasName}">Names</Label>
-                            <TextBox Text="{Binding SelectedAlias.Synonyms}" />
+                            <TextBox Text="{Binding SelectedAlias.Synonyms, UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Lower"/>
                             <!--  NOTES  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbNotes}">Comments</Label>
-                            <ui:TextBox x:Name="TbNotes" Text="{Binding SelectedAlias.Notes}" />
+                            <ui:TextBox x:Name="TbNotes"
+                                        Text="{Binding SelectedAlias.Notes, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </ui:CardExpander>
                     <!--  PROCESS  -->
@@ -178,10 +179,11 @@
                             <ui:TextBox
                                 x:Name="TbParameters"
                                 PlaceholderText="Parameters for the process..."
-                                Text="{Binding SelectedAlias.Parameters}" />
+                                Text="{Binding SelectedAlias.Parameters, UpdateSourceTrigger=PropertyChanged}" />
                             <!--  WORKING DIRECTORY  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbWorkingDirectory}">Working directory</Label>
-                            <ui:TextBox x:Name="TbWorkingDirectory" Text="{Binding SelectedAlias.WorkingDirectory}" />
+                            <ui:TextBox x:Name="TbWorkingDirectory"
+                                        Text="{Binding SelectedAlias.WorkingDirectory, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </ui:CardExpander>
                     <!--  RUN AS  -->

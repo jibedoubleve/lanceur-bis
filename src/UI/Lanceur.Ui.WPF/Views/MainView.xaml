@@ -53,7 +53,8 @@
             <StackPanel>
                 <Grid>
                     <!--  QUERY BOX  -->
-                    <TextBox                                                
+                    <TextBox
+                        CharacterCasing="Lower"
                         x:Name="QueryTextBox"
                         Panel.ZIndex="2"
                         Background="Transparent"
@@ -87,7 +88,7 @@
                                 <Border Background="{TemplateBinding Background}"
                                         BorderBrush="{DynamicResource SeparatorBorderBrush}"
                                         BorderThickness="1">
-                                    <ScrollViewer x:Name="PART_ContentHost"/>
+                                    <ScrollViewer x:Name="PART_ContentHost" />
                                 </Border>
                             </ControlTemplate>
                         </TextBox.Template>
