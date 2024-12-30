@@ -2,7 +2,9 @@ using Lanceur.Core.Charts;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Logging;
 using ScottPlot;
+using ScottPlot.Palettes;
 using Wpf.Ui.Appearance;
+using Color = System.Windows.Media.Color;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
@@ -42,7 +44,7 @@ public partial class AnalyticsView : IDisposable
 
     #region Methods
 
-    private void OnThemeChanged(ApplicationTheme _, System.Windows.Media.Color __) => SetTheme();
+    private void OnThemeChanged(ApplicationTheme _, Color __) => SetTheme();
 
     private void RefreshBar(IEnumerable<double> xPoint, IEnumerable<double> yPoint, Func<double, string> convertBarName, string plotTitle, string bottomAxesTitle)
     {
@@ -159,17 +161,17 @@ public partial class AnalyticsView : IDisposable
 
         #region Properties
 
-        public Color Axes => _isDark ? Color.FromHex("#d7d7d7") : Color.FromHex("#616161");
+        public ScottPlot.Color Axes => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#616161");
         public static ThemeColor Dark => new(true);
-        public Color DataBackground => _isDark ? Color.FromHex("#1f1f1f") : Color.FromHex("#010101000");
-        public Color FigureBackground => _isDark ? Color.FromHex("#181818") : Color.FromHex("#FFFFFF");
-        public Color LegendBackgroundColor => _isDark ? Color.FromHex("#404040") : Color.FromHex("#FFFFFF");
-        public Color LegendFontColor => _isDark ? Color.FromHex("#d7d7d7") : Color.FromHex("#ff0000");
-        public Color LegendOutlineColor => _isDark ? Color.FromHex("#d7d7d7") : Color.FromHex("#000000");
+        public ScottPlot.Color DataBackground => _isDark ? ScottPlot.Color.FromHex("#1f1f1f") : ScottPlot.Color.FromHex("#010101000");
+        public ScottPlot.Color FigureBackground => _isDark ? ScottPlot.Color.FromHex("#181818") : ScottPlot.Color.FromHex("#FFFFFF");
+        public ScottPlot.Color LegendBackgroundColor => _isDark ? ScottPlot.Color.FromHex("#404040") : ScottPlot.Color.FromHex("#FFFFFF");
+        public ScottPlot.Color LegendFontColor => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#ff0000");
+        public ScottPlot.Color LegendOutlineColor => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#000000");
         public static ThemeColor Light => new(false);
-        public Color MajorLineColor => _isDark ? Color.FromHex("#404040") : Color.FromHex("#d7d7d7");
+        public ScottPlot.Color MajorLineColor => _isDark ? ScottPlot.Color.FromHex("#404040") : ScottPlot.Color.FromHex("#d7d7d7");
 
-        public IPalette Palette =>  _isDark ? new ScottPlot.Palettes.Penumbra() : new ScottPlot.Palettes.Nord();
+        public IPalette Palette =>  _isDark ? new Penumbra() : new Nord();
 
         #endregion
     }

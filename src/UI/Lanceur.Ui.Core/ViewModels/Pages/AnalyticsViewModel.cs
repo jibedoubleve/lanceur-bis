@@ -13,7 +13,7 @@ public partial class AnalyticsViewModel : ObservableObject
 
     [ObservableProperty] private PlotType _currentPlotType;
     private readonly IDbRepository _dbRepository;
-
+    [ObservableProperty] private bool _isMonthlyVisible;
     private readonly ILogger<AnalyticsViewModel> _logger;
 
     #endregion
@@ -50,7 +50,13 @@ public partial class AnalyticsViewModel : ObservableObject
     private async Task OnRefreshMonthlyHistory()
     {
         var points = await Task.Run(() => _dbRepository.GetUsage(Per.Month));
-        Refresh(OnRefreshMonthlyPlot, points, PlotType.MonthlyHistory);
+        points = points.ToList();
+        
+        IsMonthlyVisible = points.Any();
+        if (IsMonthlyVisible)
+            Refresh(OnRefreshMonthlyPlot, points, PlotType.MonthlyHistory);
+        else // To be here means there's nothing to show, fallback is daily history...
+            await OnRefreshDailyHistory();
     }
 
     [RelayCommand]
