@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class SetUsageDbAction
+internal class SetUsageDbAction
 {
     #region Fields
 
@@ -18,7 +18,7 @@ public class SetUsageDbAction
 
     #region Constructors
 
-    public SetUsageDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
+    internal SetUsageDbAction(IDbConnectionManager db, ILoggerFactory logFactory)
     {
         _db = db;
         _logger = logFactory.GetLogger<SetUsageDbAction>();
@@ -30,7 +30,7 @@ public class SetUsageDbAction
 
     #region Methods
 
-    public void SetUsage(ref QueryResult alias)
+    internal void SetUsage(ref QueryResult alias)
     {
         ArgumentNullException.ThrowIfNull(alias);
 

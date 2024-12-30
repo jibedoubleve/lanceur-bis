@@ -4,7 +4,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class HistoryDbAction
+internal class HistoryDbAction
 {
     #region Fields
 
@@ -14,13 +14,13 @@ public class HistoryDbAction
 
     #region Constructors
 
-    public HistoryDbAction(IDbConnectionManager manager) => _db = manager;
+    internal HistoryDbAction(IDbConnectionManager manager) => _db = manager;
 
     #endregion
 
     #region Methods
 
-    public IEnumerable<DataPoint<DateTime, double>> PerDay()
+    internal IEnumerable<DataPoint<DateTime, double>> PerDay()
     {
         const string sql = """
                            select
@@ -31,7 +31,7 @@ public class HistoryDbAction
         return _db.WithinTransaction(tx => tx.Connection!.Query<DataPoint<DateTime, double>>(sql));
     }
 
-    public IEnumerable<DataPoint<DateTime, double>> PerDayOfWeek()
+    internal IEnumerable<DataPoint<DateTime, double>> PerDayOfWeek()
     {
         const string sql = """
                            select
@@ -42,7 +42,7 @@ public class HistoryDbAction
         return _db.WithinTransaction(tx => tx.Connection!.Query<DataPoint<DateTime, double>>(sql));
     }
 
-    public IEnumerable<DataPoint<DateTime, double>> PerHour()
+    internal IEnumerable<DataPoint<DateTime, double>> PerHour()
     {
         const string sql = """
                            select
@@ -53,7 +53,7 @@ public class HistoryDbAction
         return _db.WithinTransaction(tx => tx.Connection!.Query<DataPoint<DateTime, double>>(sql));
     }
 
-    public IEnumerable<DataPoint<DateTime, double>> PerMonth()
+    internal IEnumerable<DataPoint<DateTime, double>> PerMonth()
     {
         const string sql = """
                            select

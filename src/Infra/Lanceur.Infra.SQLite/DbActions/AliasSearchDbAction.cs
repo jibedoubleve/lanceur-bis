@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class AliasSearchDbAction
+internal class AliasSearchDbAction
 {
     #region Fields
 
@@ -20,7 +20,7 @@ public class AliasSearchDbAction
 
     #region Constructors
 
-    public AliasSearchDbAction(IDbConnectionManager db, ILoggerFactory logFactory, IMappingService converter)
+    internal AliasSearchDbAction(IDbConnectionManager db, ILoggerFactory logFactory, IMappingService converter)
     {
         _db = db;
         _logger = logFactory.GetLogger<AliasSearchDbAction>();
@@ -31,7 +31,7 @@ public class AliasSearchDbAction
 
     #region Methods
 
-    public IEnumerable<AliasQueryResult> Search(string name = null, bool isReturnAllIfEmpty = false)
+    internal IEnumerable<AliasQueryResult> Search(string name = null, bool isReturnAllIfEmpty = false)
     {
         using var _ = _logger.MeasureExecutionTime(this);
         
@@ -81,7 +81,7 @@ public class AliasSearchDbAction
         return results ?? AliasQueryResult.NoResult;
     }
 
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string name)
+    internal IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string name)
     {
         const string sql = @$"
                 select

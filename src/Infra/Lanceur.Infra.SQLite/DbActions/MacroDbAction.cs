@@ -20,7 +20,7 @@ internal class MacroDbAction
 
     #region Constructors
 
-    public MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IMappingService converter)
+    internal MacroDbAction(IDbConnectionManager db, ILoggerFactory loggerFactory, IMappingService converter)
     {
         _db = db;
         _loggerFactory = loggerFactory;
@@ -81,7 +81,7 @@ internal class MacroDbAction
     /// The collection with all element that are upgradable
     /// to composite, upgraded
     /// </returns>
-    public IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)
+    internal IEnumerable<AliasQueryResult> UpgradeToComposite(IEnumerable<AliasQueryResult> collection)
     {
         using var _ = _logger.MeasureExecutionTime(this);
         var list = new List<AliasQueryResult>(collection);

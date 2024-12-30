@@ -4,7 +4,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class GetAllAliasDbAction
+internal class GetAllAliasDbAction
 {
     #region Fields
 
@@ -14,13 +14,13 @@ public class GetAllAliasDbAction
 
     #region Constructors
 
-    public GetAllAliasDbAction(IDbConnectionManager db) => _db = db;
+    internal GetAllAliasDbAction(IDbConnectionManager db) => _db = db;
 
     #endregion Constructors
 
     #region Methods
 
-    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters()
+    internal IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters()
     {
         const string sql = $"""
                             select
