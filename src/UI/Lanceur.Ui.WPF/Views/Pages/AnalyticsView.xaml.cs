@@ -1,3 +1,4 @@
+using System.Windows;
 using Lanceur.Core.Charts;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Logging;
@@ -43,6 +44,12 @@ public partial class AnalyticsView : IDisposable
     #endregion
 
     #region Methods
+
+    /// <remarks>
+    ///     Click on the menu should reset the year
+    /// </remarks>
+    /// >
+    private void OnClickMenu(object sender, RoutedEventArgs e) { CbYears.SelectedIndex = 0; }
 
     private void OnThemeChanged(ApplicationTheme _, Color __) => SetTheme();
 
