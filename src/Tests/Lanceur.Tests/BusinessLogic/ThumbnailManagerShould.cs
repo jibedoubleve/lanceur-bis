@@ -2,6 +2,7 @@ using Dapper;
 using FluentAssertions;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling.Logging;

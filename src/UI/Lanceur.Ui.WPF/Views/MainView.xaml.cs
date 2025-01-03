@@ -25,9 +25,10 @@ public partial class MainView
     #region Fields
 
     private readonly IAppConfigRepository _appConfig;
+    private readonly FallbackShortcuts _fallbackShortcuts = new();
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly FallbackShortcuts _fallbackShortcuts = new();
+
     #endregion
 
     #region Constructors
@@ -51,8 +52,10 @@ public partial class MainView
             this,
             (_, m) =>
             {
-                if (m.Value) ShowWindow();
-                else HideWindow();
+                if (m.Value)
+                    ShowWindow();
+                else
+                    HideWindow();
             }
         );
         messenger.Register<ChangeCoordinateMessage>(this, (_, m) => SetWindowPosition(m.Value));
@@ -60,8 +63,12 @@ public partial class MainView
     }
 
     #endregion
-    
+
+    #region Properties
+
     private MainViewModel ViewModel => (MainViewModel)DataContext;
+
+    #endregion
 
     #region Methods
 
@@ -76,7 +83,7 @@ public partial class MainView
     private void OnClickLightTheme(object sender, RoutedEventArgs e) => ApplicationThemeManager.Apply(ApplicationTheme.Light);
 
     private void OnLoaded(object _, RoutedEventArgs e)
-    {        
+    {
         SystemThemeWatcher.Watch(this);
 
         var hk = _appConfig!.Current.HotKey;
@@ -106,7 +113,7 @@ public partial class MainView
 
     private void OnMouseUp(object _, MouseButtonEventArgs e)
     {
-        var coordinate = _appConfig!.Current.Window.Position;
+        var coordinate = _appConfig.Current.Window.Position;
 
         if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) return;
 
@@ -133,9 +140,7 @@ public partial class MainView
 
         switch (menuItem.Tag)
         {
-            case "showquery":
-                ShowWindow();
-                break;
+            case "showquery": ShowWindow(); break;
 
             case "settings":
                 var view = _serviceProvider.GetService<SettingsView>()!;
@@ -143,9 +148,7 @@ public partial class MainView
                 view.Navigate<KeywordsView>();
                 break;
 
-            case "quit":
-                Application.Current.Shutdown();
-                break;
+            case "quit": Application.Current.Shutdown(); break;
         }
     }
 
@@ -166,7 +169,7 @@ public partial class MainView
                 _logger.LogError("All the fallback shortcuts have been tried. Impossible to setup the shortcut.");
                 return;
             }
-            
+
             //Default values
             _logger.LogWarning(ex, "Impossible to set shortcut. (Key: {Key}, Modifier: {Modifier})", key, modifier);
             var sc = _fallbackShortcuts.Next();
@@ -189,7 +192,7 @@ public partial class MainView
         else
             this.SetPosition(coordinate);
 
-        if (!this.IsOutOfScreen()) return;
+        if (this.IsInScreen()) return;
 
         _logger.LogWarning("Window is out of screen {Coordinate}. Set it to default position at centre of the screen", this.ToCoordinate());
         this.SetDefaultPosition();
@@ -197,6 +200,8 @@ public partial class MainView
 
     private void ShowWindow()
     {
+        _logger.LogTrace("Current window is at {Coordinate}", this.ToCoordinate());
+        
         ViewModel.RefreshSettings();
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();

@@ -14,6 +14,7 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Extensions;
+using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling.Extensions;

@@ -5,6 +5,7 @@ using Lanceur.Infra.Constants;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.SQLite;
 using Newtonsoft.Json;
 using Xunit;

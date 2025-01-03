@@ -15,6 +15,7 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.PackagedApp;

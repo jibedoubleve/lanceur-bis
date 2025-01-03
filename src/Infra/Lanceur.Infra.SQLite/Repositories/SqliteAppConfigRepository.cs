@@ -5,8 +5,9 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Mixins;
 using Newtonsoft.Json;
 
-namespace Lanceur.Infra.SQLite;
+namespace Lanceur.Infra.SQLite.Repositories;
 
+/// <inheritdoc cref="IAppConfigRepository"/>
 public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigRepository
 {
     #region Fields
@@ -45,14 +46,15 @@ public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigReposit
 
     public void Load()
     {
-        const string sql = @"
-                select
-                    s_value as Value
-                from settings
-                where s_key = 'json';";
-        var s = DB.WithinTransaction(
+        const string sql = """
+                           select
+                               s_value as Value
+                           from settings
+                           where s_key = 'json';
+                           """;
+        var s = Db.WithinTransaction(
             tx =>
-                tx.Connection.Query<string>(sql)
+                tx.Connection!.Query<string>(sql)
                   .FirstOrDefault()
         );
 
@@ -63,19 +65,19 @@ public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigReposit
 
     public void Save()
     {
-        DB.WithinTransaction(
+        Db.WithinTransaction(
             tx =>
             {
-                var sqlExists = "select count(*) from settings where s_key = 'json'";
-                var exists = tx.Connection.ExecuteScalar<long>(sqlExists) > 0;
+                const string sqlExists = "select count(*) from settings where s_key = 'json'";
+                var exists = tx.Connection!.ExecuteScalar<long>(sqlExists) > 0;
 
                 if (!exists)
                 {
-                    var sqlInsert = "insert into settings(s_key) values ('json')";
+                    const string sqlInsert = "insert into settings(s_key) values ('json')";
                     tx.Connection.Execute(sqlInsert);
                 }
 
-                var sql = "update settings set s_value = @value where s_key = 'json'";
+                const string sql = "update settings set s_value = @value where s_key = 'json'";
                 var json = JsonConvert.SerializeObject(Current);
                 tx.Connection.Execute(sql, new { value = json });
             }

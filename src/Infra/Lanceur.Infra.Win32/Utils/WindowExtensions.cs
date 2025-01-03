@@ -9,7 +9,7 @@ public static class WindowExtensions
 
     public const double DefaultTopOffset = 200;
 
-    #endregion Fields
+    #endregion
 
     #region Methods
 
@@ -26,11 +26,20 @@ public static class WindowExtensions
         return new(x, y);
     }
 
-    public static Coordinate SetDefaultPosition(this Window win)
+
+    public static bool IsInScreen(this Window window)
     {
-        var coordinate = win.GetCenterCoordinate(DefaultTopOffset);
-        win.SetPosition(coordinate);
-        return coordinate;
+        // Obtain the dimensions and position of the window
+        var winRect = new Rect(window.Left, window.Top, window.ActualWidth, window.ActualHeight);
+
+        // Check if the window is completely or partially off the screen
+        return SystemParameters.WorkArea.Contains(winRect);
+    }
+
+    public static void SetDefaultPosition(this Window window)
+    {
+        var coordinate = window.GetCenterCoordinate();
+        window.SetPosition(coordinate);
     }
 
     public static void SetPosition(this Window win, Coordinate coordinate)
@@ -39,24 +48,5 @@ public static class WindowExtensions
         win.Top = coordinate.Y;
     }
 
-
-    public static bool IsOutOfScreen(this Window win)
-    {
-        // Obtain the dimensions of the primary screen
-        var workArea = SystemParameters.WorkArea;
-
-        // Obtain the dimensions and position of the window
-        var winLeft = win.Left;
-        var winTop = win.Top;
-        var winWidth = winLeft + win.Width;
-        var winHeight = winTop + win.Height;
-
-        // Check if the window is completely or partially off the screen
-        return winLeft < workArea.Left ||
-               winTop < workArea.Top ||
-               winWidth > workArea.Right ||
-               winHeight > workArea.Bottom;
-    }
-
-    #endregion Methods
+    #endregion
 }

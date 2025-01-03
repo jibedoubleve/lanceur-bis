@@ -1,6 +1,6 @@
 ﻿using Lanceur.Infra.SQLite.DataAccess;
 
-namespace Lanceur.Infra.SQLite;
+namespace Lanceur.Infra.SQLite.Repositories;
 
 public abstract class SQLiteRepositoryBase
 {
@@ -9,14 +9,14 @@ public abstract class SQLiteRepositoryBase
     protected SQLiteRepositoryBase(IDbConnectionManager manager)
     {
         ArgumentNullException.ThrowIfNull(manager);
-        DB = manager;
+        Db = manager;
     }
 
     #endregion Constructors
 
     #region Properties
 
-    protected IDbConnectionManager DB { get; }
+    protected IDbConnectionManager Db { get; }
 
     #endregion Properties
 }

@@ -5,7 +5,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.SQLite;
+namespace Lanceur.Infra.SQLite.Repositories;
 
 public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepository
 {
@@ -35,7 +35,7 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
         foreach (var alias in aliases) tx.Connection!.Execute(sql, new { id = alias.Id, icon = alias.Icon });
     }
 
-    public Task FixIconsForHyperlinksAsync() => DB.WithinTransaction(
+    public Task FixIconsForHyperlinksAsync() => Db.WithinTransaction(
         tx =>
         {
             {

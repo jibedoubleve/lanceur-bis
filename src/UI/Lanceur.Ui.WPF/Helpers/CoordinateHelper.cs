@@ -28,8 +28,8 @@ public static class CoordinateHelper
                position.Left == window.Left;
     }
 
-    public static Coordinate ToCoordinate(this PositionSection position) => new(position.Top, position.Left);
-    public static Coordinate ToCoordinate(this Window window) => new(window.Top, window.Left);
+    public static Coordinate ToCoordinate(this PositionSection position) => new(position.Left, position.Top);
+    public static Coordinate ToCoordinate(this Window window) => new(window.Left, window.Top);
 
     #endregion
 }

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Lanceur.Core.Managers;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite;
@@ -17,7 +18,7 @@ public class SQLiteVersionManager : SQLiteRepositoryBase, IDataStoreVersionManag
 
     public Version GetCurrentDbVersion()
     {
-        var version = DB.WithinTransaction(tx => tx.Connection.Query<string>(SQL.GetDbVersion).FirstOrDefault());
+        var version = Db.WithinTransaction(tx => tx.Connection.Query<string>(SQL.GetDbVersion).FirstOrDefault());
 
         return version.IsNullOrEmpty()
             ? new()
@@ -26,7 +27,7 @@ public class SQLiteVersionManager : SQLiteRepositoryBase, IDataStoreVersionManag
 
     public bool IsUpToDate(Version goalVersion)
     {
-        var version = DB.WithinTransaction(tx => tx.Connection.Query<string>(SQL.GetDbVersion).FirstOrDefault());
+        var version = Db.WithinTransaction(tx => tx.Connection.Query<string>(SQL.GetDbVersion).FirstOrDefault());
 
         var currentVersion = version.IsNullOrEmpty()
             ? new()
@@ -39,7 +40,7 @@ public class SQLiteVersionManager : SQLiteRepositoryBase, IDataStoreVersionManag
 
     public void SetCurrentDbVersion(Version version)
     {
-        DB.WithinTransaction(
+        Db.WithinTransaction(
             tx =>
             {
                 var exists = tx.Connection.ExecuteScalar<int>(SQL.DbVersionCount) >= 1;
