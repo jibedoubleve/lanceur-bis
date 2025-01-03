@@ -12,6 +12,7 @@ using Lanceur.Core.Stores;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling.Extensions;
@@ -19,7 +20,7 @@ using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
-using Lanceur.Ui.WPF.Views;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -55,6 +56,7 @@ public class MainViewModelShould : TestBase
                                                        .AddMockSingleton<IUserInteractionService>()
                                                        .AddMockSingleton<IUserNotificationService>()
                                                        .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
+                                                       .AddSingleton<IMemoryCache, MemoryCache>()
                                                        .AddMockSingleton<IExecutionManager>(
                                                            (sp, i) =>
                                                            {

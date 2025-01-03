@@ -6,7 +6,7 @@ using System.SQLite.Updater;
 
 namespace Lanceur.Infra.SQLite;
 
-public class SQLiteDatabaseUpdateManager : IDataStoreUpdateManager
+internal class SQLiteDatabaseUpdateManager 
 {
     #region Fields
 

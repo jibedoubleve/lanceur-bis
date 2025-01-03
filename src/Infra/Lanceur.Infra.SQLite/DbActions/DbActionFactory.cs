@@ -1,8 +1,7 @@
 using Lanceur.Core.Services;
-using Lanceur.Infra.SQLite.DbActions;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.SQLite;
+namespace Lanceur.Infra.SQLite.DbActions;
 
 internal class DbActionFactory : IDbActionFactory
 {

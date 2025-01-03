@@ -1,3 +1,4 @@
+using Lanceur.Infra.SQLite.DbActions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.SQLite.Extensions;

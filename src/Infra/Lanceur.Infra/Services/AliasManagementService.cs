@@ -21,8 +21,8 @@ public class AliasManagementService : IAliasManagementService
     #region Methods
 
     public IEnumerable<AliasQueryResult> GetAll() => _repository.GetAll()
-                                                           .Where(x => x.IsHidden == false)
-                                                           .OrderBy(x => x.Name);
+                                                                .Where(x => x.IsHidden == false)
+                                                                .OrderBy(x => x.Name);
 
     public AliasQueryResult Hydrate(AliasQueryResult queryResult)
     {

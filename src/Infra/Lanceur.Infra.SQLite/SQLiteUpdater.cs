@@ -1,50 +1,69 @@
-﻿using Lanceur.Core.Managers;
+﻿using System.Data;
+using System.Reflection;
+using Lanceur.Core.Managers;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite;
 
+/// <summary>
+///     This class is responsible for ensuring that the SQLite database is updated to the latest version.
+/// </summary>
 public class SQLiteUpdater
 {
     #region Fields
 
     private readonly ILogger<SQLiteUpdater> _logger;
-    private readonly IDataStoreUpdateManager _updater;
+    private readonly SQLiteDatabaseUpdateManager _updater;
     private readonly IDataStoreVersionManager _versionManager;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public SQLiteUpdater(
         IDataStoreVersionManager versionManager,
-        ILoggerFactory logService,
-        IDataStoreUpdateManager updater
+        ILoggerFactory logFactory,
+        IDbConnection dbConnection,
+        Assembly assembly,
+        string pattern
     )
     {
         _versionManager = versionManager;
-        _logger = logService.GetLogger<SQLiteUpdater>();
-        _updater = updater;
+        _logger = logFactory.GetLogger<SQLiteUpdater>();
+        _updater = new(versionManager, dbConnection, assembly, pattern);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
     private static void CreateDirectory(string dbPath)
     {
         var dir = Path.GetDirectoryName(dbPath);
+        if (dir is null)
+            throw new DirectoryNotFoundException(
+                $"Failed to create the directory because the provided path is invalid or null. Path: [{dbPath}]"
+            );
+
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
     }
 
-    public void Update(string cString)
+
+    /// <summary>
+    ///     Checks whether the database specified by the connection string needs an update.
+    ///     If an update is required, applies the necessary Data Definition Language (DDL) scripts
+    ///     to bring the database to the latest version.
+    /// </summary>
+    /// <param name="connectionString">The connection string pointing to the SQLite database.</param>
+    public void Update(string connectionString)
     {
-        var dbPath = cString.ExtractPathFromSQLiteCString();
+        var dbPath = connectionString.ExtractPathFromSQLiteCString();
         if (!File.Exists(dbPath))
         {
             CreateDirectory(dbPath);
-            _logger.LogWarning("Creating a new database in {DbPath}", dbPath);
+            _logger.LogInformation("Creating a new database in {DbPath}", dbPath);
             _updater.UpdateFromScratch();
             _updater.SetLatestVersion();
         }
@@ -63,5 +82,5 @@ public class SQLiteUpdater
         }
     }
 
-    #endregion Methods
+    #endregion
 }

@@ -13,7 +13,7 @@ using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
-using Lanceur.Infra.SQLite.Extensions;
+using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.SQLite;
@@ -21,6 +21,7 @@ using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -208,6 +209,7 @@ public class SearchShould : TestBase
         const string criterion = "u";
 
         var serviceProvider = new ServiceCollection().AddMemoryDb(conn)
+                                                     .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                                      .AddSingleton<IDbRepository, SQLiteRepository>()
                                                      .AddSingleton(_testLoggerFactory)
                                                      .AddSingleton(converter)
@@ -215,6 +217,7 @@ public class SearchShould : TestBase
                                                      .AddSingleton<ISearchService, SearchService>()
                                                      .AddSingleton<IDbActionFactory, DbActionFactory>()
                                                      .AddMockSingleton<IThumbnailManager>()
+                                                     .AddSingleton<IMemoryCache, MemoryCache>()
                                                      .AddMockSingleton<IStoreLoader>(
                                                          (sp, _) =>
                                                          {
@@ -243,7 +246,6 @@ public class SearchShould : TestBase
                                                          }
                                                      )
                                                      .BuildServiceProvider();
-
 
         // ACT
         var searchService = serviceProvider.GetService<ISearchService>();

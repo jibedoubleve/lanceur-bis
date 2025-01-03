@@ -84,17 +84,17 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddSingleton<IServiceProvider>(x => x)
-                         .AddSingleton<SQLiteUpdater>()
-                         .AddSingleton<ThumbnailLoader>()
-                         .AddTransient<IDataStoreVersionManager, SQLiteVersionManager>()
-                         .AddTransient<IDataStoreUpdateManager>(
-                             sp =>  new SQLiteDatabaseUpdateManager(
-                                 sp.GetService<IDataStoreVersionManager>(),
-                                 sp.GetService<IDbConnection>(),
-                                 ScriptRepository.Asm,
-                                 ScriptRepository.DbScriptEmbededResourcePattern
+                         .AddSingleton<SQLiteUpdater>(
+                             sp => new(
+                                     sp.GetService<IDataStoreVersionManager>(),
+                                     sp.GetService<ILoggerFactory>(),
+                                     sp.GetService<IDbConnection>(),
+                                     ScriptRepository.Asm,
+                                     ScriptRepository.DbScriptEmbededResourcePattern
                              )
                          )
+                         .AddSingleton<ThumbnailLoader>()
+                         .AddTransient<IDataStoreVersionManager, SQLiteVersionManager>()
                          .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()
                          .AddTransient<IMemoryStorageService, MemoryStorageService>()
