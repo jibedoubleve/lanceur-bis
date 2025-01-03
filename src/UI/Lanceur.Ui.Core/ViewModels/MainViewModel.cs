@@ -113,13 +113,14 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
+        const int navOffset = 8;
         var currentIndex = Results.IndexOf(SelectedResult);
         var index = direction switch
         {
             Direction.Up       => Results.GetPreviousIndex(currentIndex),
             Direction.Down     => Results.GetNextIndex(currentIndex),
-            Direction.PageUp   => Results.GetPreviousPage(currentIndex, 9),
-            Direction.PageDown => Results.GetNextPage(currentIndex, 9),
+            Direction.PageUp   => Results.GetPreviousPage(currentIndex, navOffset),
+            Direction.PageDown => Results.GetNextPage(currentIndex, navOffset),
             _                  => currentIndex
         };
         SelectedResult = Results.ElementAt(index);
