@@ -2,6 +2,7 @@
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
@@ -14,34 +15,36 @@ public class ThumbnailManager : IThumbnailManager
 
     private readonly IDbRepository _dbRepository;
     private readonly ILogger<ThumbnailManager> _logger;
-    private readonly IThumbnailRefresher _thumbnailRefresher;
+    private readonly ThumbnailRefresher _thumbnailRefresher;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public ThumbnailManager(
         ILoggerFactory loggerFactory,
         IDbRepository dbRepository,
-        IThumbnailRefresher thumbnailRefresher
+        IPackagedAppSearchService packagedAppSearchService,
+        IFavIconManager favIconManager
     )
     {
         _dbRepository = dbRepository;
-        _thumbnailRefresher = thumbnailRefresher;
+        _thumbnailRefresher = new(loggerFactory, packagedAppSearchService, favIconManager);
         _logger = loggerFactory.GetLogger<ThumbnailManager>();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
     /// <summary>
-    /// Starts a thread to refresh the thumbnails asynchronously. This method returns immediately after starting the thread.
-    /// Each time a thumbnail is found, the corresponding alias is updated. Because the alias is reactive, the UI will
-    /// automatically reflect these updates.
+    ///     Starts a thread to refresh the thumbnails asynchronously. This method returns immediately after starting the
+    ///     thread.
+    ///     Each time a thumbnail is found, the corresponding alias is updated. Because the alias is reactive, the UI will
+    ///     automatically reflect these updates.
     /// </summary>
     /// <remarks>
-    /// All aliases are updated in a single operation to avoid concurrency issues.
+    ///     All aliases are updated in a single operation to avoid concurrency issues.
     /// </remarks>
     /// <param name="results">The list of queries for which thumbnails need to be updated.</param>
     public void RefreshThumbnails(IEnumerable<QueryResult> results)
@@ -52,7 +55,7 @@ public class ThumbnailManager : IThumbnailManager
         using var m = _logger.MeasureExecutionTime(this);
         try
         {
-            var tasks = queries.Select(q => _thumbnailRefresher.RefreshCurrentThumbnailAsync(q));
+            var tasks = queries.Select(_thumbnailRefresher.UpdateThumbnailAsync);
             _ =  Task.WhenAll(tasks); // Fire & forget thumbnail refresh
 
             var aliases = queries.Where(x => x.IsDirty)
@@ -64,5 +67,5 @@ public class ThumbnailManager : IThumbnailManager
         catch (Exception ex) { _logger.LogWarning(ex, "An error occured during the refresh of the icons"); }
     }
 
-    #endregion Methods
+    #endregion
 }

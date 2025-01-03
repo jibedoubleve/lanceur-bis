@@ -2,7 +2,7 @@ using System.Reflection;
 using Lanceur.Core;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
-using Lanceur.Infra.Win32.Restart;
+using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.Helpers;
@@ -37,8 +37,8 @@ public static class ServiceCollectionExtensions
 
         ConditionalExecution.Set(
             serviceCollection,
-            onPrd => onPrd.AddSingleton<IAppRestart, DummyAppRestart>(),
-            onDbg => onDbg.AddSingleton<IAppRestart, AppRestart>()
+            onPrd => onPrd.AddSingleton<IAppRestartService, AppRestartDummyService>(),
+            onDbg => onDbg.AddSingleton<IAppRestartService, AppRestartService>()
         );
 
         return serviceCollection;

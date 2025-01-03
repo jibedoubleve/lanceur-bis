@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Win32.Restart;
+using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.Mixins;
 using Serilog.Core;
 using Serilog.Events;
@@ -25,7 +25,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private double _searchDelay;
 
     private readonly IUserNotificationService _userNotificationService;
-    private readonly IAppRestart _appRestart;
+    private readonly IAppRestartService _appRestartService;
     [ObservableProperty] private ISettingsFacade _settings;
     private readonly IUserInteractionService _userInteraction;
     [ObservableProperty] private bool _showResults;
@@ -37,17 +37,17 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     public ApplicationSettingsViewModel(
         IUserNotificationService userNotificationService,
-        IAppRestart appRestart,
+        IAppRestartService appRestartService,
         ISettingsFacade settings,
         LoggingLevelSwitch loggingLevelSwitch,
         IUserInteractionService userInteraction
     )
     {
         ArgumentNullException.ThrowIfNull(settings);
-        ArgumentNullException.ThrowIfNull(appRestart);
+        ArgumentNullException.ThrowIfNull(appRestartService);
 
         _userNotificationService = userNotificationService;
-        _appRestart = appRestart;
+        _appRestartService = appRestartService;
         _settings = settings;
         _userInteraction = userInteraction;
 
@@ -102,7 +102,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (reboot)
         {
             const string msg = "Do you want to restart now to apply the new configuration?";
-            if(await _userInteraction.AskUserYesNoAsync(msg)) _appRestart.Restart();
+            if(await _userInteraction.AskUserYesNoAsync(msg)) _appRestartService.Restart();
         }
     }
 

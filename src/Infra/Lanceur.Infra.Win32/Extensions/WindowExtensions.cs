@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Infra.Win32.Utils;
+namespace Lanceur.Infra.Win32.Extensions;
 
 public static class WindowExtensions
 {

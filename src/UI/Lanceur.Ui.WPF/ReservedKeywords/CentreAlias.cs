@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Win32.Utils;
+using Lanceur.Infra.Win32.Extensions;
 using Lanceur.Ui.Core.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

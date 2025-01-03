@@ -4,7 +4,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Win32.Utils;
+using Lanceur.Infra.Win32.Extensions;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Helpers;

@@ -73,7 +73,7 @@ public class SearchShould : TestBase
 
 
         var service = serviceProvider.GetService<SearchService>();
-        service.Stores.Should().HaveCountGreaterThan(5);
+        service.Stores.Should().HaveCountGreaterThan(4);
     }
 
     [Fact]

@@ -16,7 +16,6 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
-using Lanceur.Infra.Win32.PackagedApp;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Scripts;
@@ -84,14 +83,13 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(
                              sp => new(
-                                     sp.GetService<IDataStoreVersionManager>(),
-                                     sp.GetService<ILoggerFactory>(),
-                                     sp.GetService<IDbConnection>(),
-                                     ScriptRepository.Asm,
-                                     ScriptRepository.DbScriptEmbededResourcePattern
+                                 sp.GetService<IDataStoreVersionManager>(),
+                                 sp.GetService<ILoggerFactory>(),
+                                 sp.GetService<IDbConnection>(),
+                                 ScriptRepository.Asm,
+                                 ScriptRepository.DbScriptEmbededResourcePattern
                              )
                          )
-                         .AddSingleton<ThumbnailLoader>()
                          .AddTransient<IDataStoreVersionManager, SQLiteVersionManager>()
                          .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()
@@ -109,7 +107,6 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IThumbnailManager, ThumbnailManager>()
                          .AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                          .AddTransient<IThumbnailManager, ThumbnailManager>()
-                         .AddTransient<IThumbnailRefresher, ThumbnailRefresher>()
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IFavIconManager, FavIconManager>()
                          .AddTransient<IFavIconDownloader, FavIconDownloader>()

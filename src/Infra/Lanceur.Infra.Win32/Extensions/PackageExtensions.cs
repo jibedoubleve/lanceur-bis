@@ -3,7 +3,7 @@ using Windows.ApplicationModel;
 
 namespace Lanceur.Infra.Win32.PackagedApp;
 
-public static class PackageMixin
+public static class PackageExtensions
 {
     #region Fields
 

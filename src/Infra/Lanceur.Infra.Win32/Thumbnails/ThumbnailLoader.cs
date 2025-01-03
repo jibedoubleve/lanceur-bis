@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using System.IO;
+﻿using System.IO;
 using System.Windows.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails;
 
-public class ThumbnailLoader
+internal class ThumbnailLoader
 {
     #region Fields
 

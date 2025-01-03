@@ -1,7 +1,7 @@
 using System.Security.Principal;
 using Windows.Management.Deployment;
 
-namespace Lanceur.Infra.Win32.PackagedApp;
+namespace Lanceur.Infra.Win32.Services;
 
 public class AbstractPackagedAppSearchService
 {

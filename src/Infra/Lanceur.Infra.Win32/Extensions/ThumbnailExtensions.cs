@@ -5,7 +5,7 @@ using System.Windows.Media.Imaging;
 
 namespace Lanceur.Infra.Win32.Images;
 
-public static class ThumbnailMixin
+public static class ThumbnailExtensions
 {
     #region Fields
 

@@ -9,5 +9,5 @@ public class WindowsClipboardService : IClipboardService
 
     public string GetText() => Clipboard.GetText();
 
-    #endregion Methods
+    #endregion
 }

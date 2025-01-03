@@ -1,3 +1,4 @@
+using System.IO;
 using Lanceur.Core.Decorators;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -6,38 +7,49 @@ using Lanceur.Infra.Logging;
 using Lanceur.Infra.Win32.Images;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
-using System.IO;
 
 namespace Lanceur.Infra.Win32.Thumbnails;
 
-public class ThumbnailRefresher : IThumbnailRefresher
+/// <summary>
+/// Provides functionality to refresh the thumbnail based on the provided query.
+/// This class handles executable files, Windows Store applications, and URLs by attempting
+/// to retrieve their respective favicons when necessary.
+/// </summary>
+public class ThumbnailRefresher
 {
     #region Fields
 
-    private const string WebIcon = "Web";
     private readonly IFavIconManager _favIconManager;
-    private readonly ThumbnailLoader _thumbnailLoader;
     private readonly ILogger<ThumbnailRefresher> _logger;
     private readonly IPackagedAppSearchService _searchService;
+    private readonly ThumbnailLoader _thumbnailLoader;
 
-    #endregion Fields
+    private const string WebIcon = "Web";
+
+    #endregion
 
     #region Constructors
 
-    public ThumbnailRefresher(ILoggerFactory loggerFactory, IPackagedAppSearchService searchService, IFavIconManager favIconManager, ThumbnailLoader thumbnailLoader)
+    public ThumbnailRefresher(ILoggerFactory loggerFactory, IPackagedAppSearchService searchService, IFavIconManager favIconManager)
     {
-        _thumbnailLoader =thumbnailLoader;
+        _thumbnailLoader = new  (loggerFactory.CreateLogger<ThumbnailLoader>());
         _searchService = searchService;
         _favIconManager = favIconManager;
-        _thumbnailLoader = thumbnailLoader;
         _logger = loggerFactory.GetLogger<ThumbnailRefresher>();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
-    public async Task RefreshCurrentThumbnailAsync(EntityDecorator<QueryResult> query)
+    /// <summary>
+    /// Updates the thumbnail for the provided query. This method handles different types of sources:
+    /// executables, Windows Store applications, and URLs. It attempts to retrieve and assign the appropriate
+    /// thumbnail or favicon based on the query information.
+    /// </summary>
+    /// <param name="query">An object containing the necessary information to retrieve and update the thumbnail.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public async Task UpdateThumbnailAsync(EntityDecorator<QueryResult> query)
     {
         if (query.Entity?.IsThumbnailDisabled ?? true) return;
         if (query.Entity is not AliasQueryResult alias) return;
@@ -93,5 +105,5 @@ public class ThumbnailRefresher : IThumbnailRefresher
         _logger.LogTrace("Retrieved favicon for alias {Name}. Favicon {FileName}", alias.Name, alias.FileName);
     }
 
-    #endregion Methods
+    #endregion
 }

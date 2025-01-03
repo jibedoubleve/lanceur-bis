@@ -17,7 +17,7 @@ public enum ThumbnailOptions
     InCacheOnly = 0x10
 }
 
-public class WindowsThumbnailProvider
+internal class WindowsThumbnailProvider
 {
     // Based on https://stackoverflow.com/questions/21751747/extract-thumbnail-for-any-file-in-windows
 

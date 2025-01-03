@@ -1,15 +1,24 @@
-﻿using Lanceur.Core.Services;
-using System.IO;
+﻿using System.IO;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
+using Lanceur.Infra.Win32.PackagedApp;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.Win32.PackagedApp;
+namespace Lanceur.Infra.Win32.Services;
 
 public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPackagedAppSearchService
 {
+    #region Fields
+
     private readonly ILogger<PackagedAppSearchService> _logger;
 
+    #endregion
+
+    #region Constructors
+
     public PackagedAppSearchService(ILoggerFactory factory) => _logger = factory.GetLogger<PackagedAppSearchService>();
+
+    #endregion
 
     #region Methods
 
@@ -50,5 +59,5 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
         );
     }
 
-    #endregion Methods
+    #endregion
 }

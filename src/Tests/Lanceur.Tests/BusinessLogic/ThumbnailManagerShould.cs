@@ -1,15 +1,16 @@
 using Dapper;
 using FluentAssertions;
-using Lanceur.Infra.SQLite;
+using Lanceur.Core.Managers;
+using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling.Logging;
-using Lanceur.Tests.Tooling.Mocks;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;
+using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -50,16 +51,18 @@ public class ThumbnailManagerShould : TestBase
 
         var conversionService = new AutoMapperMappingService();
         var dbRepository = new SQLiteRepository(connectionMgr, loggerFactory, conversionService, new DbActionFactory(new AutoMapperMappingService(), loggerFactory));
-        var thumbnailRefresher = new MockThumbnailRefresher();
 
-        var thumbnailManager = new ThumbnailManager(loggerFactory, dbRepository, thumbnailRefresher);
+        var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();
+        var favIconManager = Substitute.For<IFavIconManager>();
+        var thumbnailManager = new ThumbnailManager(loggerFactory, dbRepository, packagedAppSearchService, favIconManager);
+        
         var aliases = dbRepository.Search("a");
 
         // ACT
         thumbnailManager.RefreshThumbnails(aliases);
 
         // ASSERT
-        connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))
+        connectionMgr.WithinTransaction(tx => (long)tx.Connection!.ExecuteScalar("select count(*) from alias_argument")!)
                      .Should()
                      .Be(6);
     }
