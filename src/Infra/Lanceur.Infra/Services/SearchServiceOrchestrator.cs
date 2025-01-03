@@ -30,7 +30,7 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
     /// <inheritdoc />
     public bool IsAlive(IStoreService storeService, Cmdline query)
     {
-        var regex = new Regex(storeService.Orchestration.AlivePattern);
+        var regex = new Regex(storeService.StoreOrchestration.AlivePattern);
         var isAlive = regex.IsMatch(query.Name);
         return isAlive;
     }

@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Models;
+﻿using Lanceur.Core.Managers;
+using Lanceur.Core.Models;
 
 namespace Lanceur.Core.Services;
 
@@ -9,7 +10,7 @@ public interface IStoreService
     /// <summary>
     /// Configuration of the orchestration.
     /// </summary>
-    Orchestration Orchestration { get; }
+    StoreOrchestration StoreOrchestration { get; }
 
     /// <summary>
     /// Get all the results of this search service.

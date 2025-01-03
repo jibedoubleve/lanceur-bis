@@ -1,3 +1,4 @@
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -31,7 +32,7 @@ public class AdditionalParametersStore : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public Orchestration Orchestration { get; } = Orchestration.Shared(".*:.*");
+    public StoreOrchestration StoreOrchestration { get; } = StoreOrchestration.Shared(".*:.*");
 
     #endregion
 

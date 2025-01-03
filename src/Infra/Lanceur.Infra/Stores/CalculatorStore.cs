@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Models;
+﻿using Lanceur.Core.Managers;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
@@ -28,7 +29,7 @@ public class CalculatorStore : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public Orchestration Orchestration => Orchestration.Shared(@"^\s{0,}[0-9(]");
+    public StoreOrchestration StoreOrchestration => StoreOrchestration.Shared(@"^\s{0,}[0-9(]");
 
     #endregion
 

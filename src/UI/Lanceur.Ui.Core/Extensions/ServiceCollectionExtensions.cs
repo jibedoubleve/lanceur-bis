@@ -1,7 +1,6 @@
 using System.Data;
 using System.Data.SQLite;
 using Everything.Wrapper;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -83,14 +82,14 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(
                              sp => new(
-                                 sp.GetService<IDataStoreVersionManager>(),
+                                 sp.GetService<IDataStoreVersionService>(),
                                  sp.GetService<ILoggerFactory>(),
                                  sp.GetService<IDbConnection>(),
                                  ScriptRepository.Asm,
                                  ScriptRepository.DbScriptEmbededResourcePattern
                              )
                          )
-                         .AddTransient<IDataStoreVersionManager, SQLiteVersionManager>()
+                         .AddTransient<IDataStoreVersionService, SQLiteVersionService>()
                          .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()
                          .AddTransient<IMemoryStorageService, MemoryStorageService>()
@@ -102,17 +101,17 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IMappingService, AutoMapperMappingService>()
                          .AddTransient<ISearchService, SearchService>()
                          .AddTransient<IStoreLoader, StoreLoader>()
-                         .AddTransient<IMacroManager, MacroManager>()
+                         .AddTransient<IMacroService, MacroService>()
                          .AddTransient<ILoggerFactory, LoggerFactory>()
-                         .AddTransient<IThumbnailManager, ThumbnailManager>()
+                         .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                         .AddTransient<IThumbnailManager, ThumbnailManager>()
+                         .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
-                         .AddTransient<IFavIconManager, FavIconManager>()
+                         .AddTransient<IFavIconService, FavIconService>()
                          .AddTransient<IFavIconDownloader, FavIconDownloader>()
                          .AddTransient<IEverythingApi, EverythingApi>()
-                         .AddTransient<IExecutionManager, ExecutionManager>()
-                         .AddTransient<IWildcardManager, ReplacementComposite>()
+                         .AddTransient<IExecutionService, ExecutionService>()
+                         .AddTransient<IWildcardService, ReplacementComposite>()
                          .AddTransient<IClipboardService, WindowsClipboardService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>();
 

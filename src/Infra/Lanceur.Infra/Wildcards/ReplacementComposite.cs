@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Wildcards;
 
-public class ReplacementComposite : IReplacement, IWildcardManager
+public class ReplacementComposite : IReplacement, IWildcardService
 {
     #region Fields
 
@@ -28,7 +27,7 @@ public class ReplacementComposite : IReplacement, IWildcardManager
 
     #region Methods
 
-    /// <inheritdoc cref="IWildcardManager"/>
+    /// <inheritdoc cref="IWildcardService"/>
     public string Replace(string text, string withThis)
     {
         foreach (var replacement in _replacements) text = replacement.Replace(text, withThis);

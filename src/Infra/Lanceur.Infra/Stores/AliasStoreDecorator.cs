@@ -1,3 +1,4 @@
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 
@@ -25,7 +26,7 @@ public class AliasStoreDecorator : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public Orchestration Orchestration => _aliasStore.Orchestration;
+    public StoreOrchestration StoreOrchestration => _aliasStore.StoreOrchestration;
 
     #endregion
 

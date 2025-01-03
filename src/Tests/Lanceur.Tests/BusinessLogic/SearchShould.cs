@@ -4,7 +4,6 @@ using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -65,10 +64,10 @@ public class SearchShould : TestBase
                                      .AddMockSingleton<ILogger<StoreLoader>>()
                                      .AddSingleton<AssemblySource>()
                                      .AddSingleton<IStoreLoader, StoreLoader>()
-                                     .AddSingleton<IMacroManager, MacroManager>()
+                                     .AddSingleton<IMacroService, MacroService>()
                                      .AddSingleton<SearchService>()
                                      .AddMockSingleton<ISearchServiceOrchestrator>()
-                                     .AddMockSingleton<IThumbnailManager>()
+                                     .AddMockSingleton<IThumbnailService>()
                                      .BuildServiceProvider();
 
 
@@ -138,11 +137,11 @@ public class SearchShould : TestBase
         using var db = BuildFreshDb(sql);
         using var conn = new DbSingleConnectionManager(db);
 
-        var serviceProvider = new ServiceCollection().AddMockSingleton<IThumbnailManager>()
+        var serviceProvider = new ServiceCollection().AddMockSingleton<IThumbnailService>()
                                                      .AddLogger<StoreLoader>(OutputHelper)
-                                                     .AddLogger<MacroManager>(OutputHelper)
+                                                     .AddLogger<MacroService>(OutputHelper)
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
-                                                     .AddSingleton<IMacroManager, MacroManager>()
+                                                     .AddSingleton<IMacroService, MacroService>()
                                                      .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
                                                      .AddSingleton<IMappingService, AutoMapperMappingService>()
                                                      .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
@@ -216,7 +215,7 @@ public class SearchShould : TestBase
                                                      .AddSingleton(Substitute.For<IStoreLoader>())
                                                      .AddSingleton<ISearchService, SearchService>()
                                                      .AddSingleton<IDbActionFactory, DbActionFactory>()
-                                                     .AddMockSingleton<IThumbnailManager>()
+                                                     .AddMockSingleton<IThumbnailService>()
                                                      .AddSingleton<IMemoryCache, MemoryCache>()
                                                      .AddMockSingleton<IStoreLoader>(
                                                          (sp, _) =>
@@ -226,7 +225,7 @@ public class SearchShould : TestBase
                                                              return stores;
                                                          }
                                                      )
-                                                     .AddMockSingleton<IMacroManager>(
+                                                     .AddMockSingleton<IMacroService>(
                                                          (sp, macroManager) =>
                                                          {
                                                              var results = sp.GetService<IAliasRepository>()
@@ -263,8 +262,8 @@ public class SearchShould : TestBase
     [Fact]
     public async Task ReturnValues()
     {
-        var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroManager>()
-                                                     .AddMockSingleton<IThumbnailManager>()
+        var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroService>()
+                                                     .AddMockSingleton<IThumbnailService>()
                                                      .AddMockSingleton<IStoreLoader>()
                                                      .AddMockSingleton<ILoggerFactory>()
                                                      .AddMockSingleton<ISearchServiceOrchestrator>(

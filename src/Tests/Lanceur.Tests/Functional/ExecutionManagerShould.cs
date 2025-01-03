@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Managers;
+using Lanceur.Infra.Services;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -20,13 +20,13 @@ public class ExecutionManagerShould
     public async Task ExecuteMultiMacro(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
-        var executionManager = new ExecutionManager(
+        var executionManager = new ExecutionService(
             Substitute.For<ILoggerFactory>(),
-            Substitute.For<IWildcardManager>(),
+            Substitute.For<IWildcardService>(),
             Substitute.For<IAliasRepository>()
         );
 
-        var macro =new MultiMacro(Substitute.For<IExecutionManager>(),Substitute.For<ISearchService>(), 0);
+        var macro =new MultiMacro(Substitute.For<IExecutionService>(),Substitute.For<ISearchService>(), 0);
         await macro.ExecuteAsync(cmdline);
 
         var request = new ExecutionRequest

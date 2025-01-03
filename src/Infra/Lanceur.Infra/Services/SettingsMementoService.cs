@@ -3,7 +3,7 @@ using Lanceur.Core.Repositories.Config;
 
 namespace Lanceur.Infra.Managers;
 
-public class SettingsMementoManager
+public class SettingsMementoService
 {
     #region Fields
 
@@ -13,7 +13,7 @@ public class SettingsMementoManager
 
     #region Constructors
 
-    private SettingsMementoManager(int initialHash) => _stateHash = initialHash;
+    private SettingsMementoService(int initialHash) => _stateHash = initialHash;
 
     #endregion Constructors
 
@@ -21,7 +21,7 @@ public class SettingsMementoManager
 
     private static int GetStateHash(DatabaseConfiguration appCfg, IApplicationSettings dbCfg) => (appCfg.HotKey, dbCfg.DbPath).GetHashCode();
 
-    public static SettingsMementoManager GetInitialState(ISettingsFacade settings) => new(GetStateHash(settings.Application, settings.Local));
+    public static SettingsMementoService GetInitialState(ISettingsFacade settings) => new(GetStateHash(settings.Application, settings.Local));
 
     public bool HasStateChanged(ISettingsFacade settings) => GetStateHash(settings.Application, settings.Local) != _stateHash;
 

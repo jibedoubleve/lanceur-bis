@@ -5,6 +5,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using System.ComponentModel;
 using System.Reflection;
+using Lanceur.Core.Managers;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -46,7 +47,7 @@ public class ReservedAliasStore : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
+    public StoreOrchestration StoreOrchestration => StoreOrchestration.SharedAlwaysActive();
 
     #endregion
 

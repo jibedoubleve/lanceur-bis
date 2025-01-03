@@ -1,10 +1,10 @@
-namespace Lanceur.Core.Services;
+namespace Lanceur.Core.Managers;
 
-public class Orchestration
+public class StoreOrchestration
 {
     #region Constructors
 
-    private Orchestration(string alivePattern, bool idleOthers)
+    private StoreOrchestration(string alivePattern, bool idleOthers)
     {
         AlivePattern = alivePattern;
         IdleOthers = idleOthers;
@@ -41,7 +41,7 @@ public class Orchestration
     /// </summary>
     /// <param name="alivePattern">The regex to apply to determine whether the service should be executed.</param>
     /// <returns>An Orchestrator</returns>
-    public static Orchestration Exclusive(string alivePattern) => new(alivePattern, true);
+    public static StoreOrchestration Exclusive(string alivePattern) => new(alivePattern, true);
 
     /// <summary>
     /// Create an orchestrator that allows the store to run with all the
@@ -49,7 +49,7 @@ public class Orchestration
     /// </summary>
     /// <param name="alivePattern">The regex to apply to determine whether the service should be executed.</param>
     /// <returns>An Orchestrator</returns>
-    public static Orchestration Shared(string alivePattern) => new(alivePattern, false);
+    public static StoreOrchestration Shared(string alivePattern) => new(alivePattern, false);
 
     /// <summary>
     /// Create an orchestrator that allows the store to run with all the
@@ -57,7 +57,7 @@ public class Orchestration
     /// store will never be idle
     /// </summary>
     /// <returns>An Orchestrator</returns>
-    public static Orchestration SharedAlwaysActive() => new(string.Empty, false);
+    public static StoreOrchestration SharedAlwaysActive() => new(string.Empty, false);
 
     #endregion Methods
 }

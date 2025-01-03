@@ -41,7 +41,7 @@ public class SearchServicesShould
         var store = new AdditionalParametersStore(serviceProvider);
 
         // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
+        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeTrue();
     }
 
@@ -61,7 +61,7 @@ public class SearchServicesShould
         var store = new AliasStore(serviceProvider);
 
         // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
+        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeTrue();
     }
 
@@ -81,7 +81,7 @@ public class SearchServicesShould
         var store = new CalculatorStore(serviceProvider);
 
         // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
+        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeTrue();
     }
 
@@ -102,7 +102,7 @@ public class SearchServicesShould
         var store = new EverythingStore(serviceProvider);
 
         // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
+        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeTrue();
     }
 
@@ -123,7 +123,7 @@ public class SearchServicesShould
         var store = new ReservedAliasStore(serviceProvider);
 
         // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
+        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeTrue();
     }
 
@@ -150,7 +150,7 @@ public class SearchServicesShould
         var store = new AdditionalParametersStore(serviceProvider);
 
         // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
+        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeFalse();
     }
 
@@ -169,7 +169,7 @@ public class SearchServicesShould
         var store = new CalculatorStore(serviceProvider);
 
         // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
+        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeFalse();
     }
 
@@ -189,7 +189,7 @@ public class SearchServicesShould
         var store = new EverythingStore(serviceProvider);
 
         // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
+        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeFalse();
     }
 

@@ -6,34 +6,35 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.Managers;
+namespace Lanceur.Infra.Services;
 
-public class ExecutionManager : IExecutionManager
+public class ExecutionService : IExecutionService
 {
     #region Fields
 
     private readonly IAliasRepository _dataService;
-    private readonly ILogger<ExecutionManager> _logger;
-    private readonly IWildcardManager _wildcardManager;
+    private readonly ILogger<ExecutionService> _logger;
+    private readonly IWildcardService _wildcardService;
 
     #endregion
 
     #region Constructors
 
-    public ExecutionManager(
+    public ExecutionService(
         ILoggerFactory logFactory,
-        IWildcardManager wildcardManager,
+        IWildcardService wildcardService,
         IAliasRepository dataService
     )
     {
-        _logger = logFactory.GetLogger<ExecutionManager>();
-        _wildcardManager = wildcardManager;
+        _logger = logFactory.GetLogger<ExecutionService>();
+        _wildcardService = wildcardService;
         _dataService = dataService;
     }
 
@@ -90,13 +91,13 @@ public class ExecutionManager : IExecutionManager
 
         using var _ = _logger.MeasureExecutionTime(this);
 
-        query.Parameters = _wildcardManager.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
+        query.Parameters = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
         ExecuteLuaScript(ref query);
 
         _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
         var psi = new ProcessStartInfo
         {
-            FileName = _wildcardManager.Replace(query.FileName, query.Parameters),
+            FileName = _wildcardService.Replace(query.FileName, query.Parameters),
             Verb = "open",
             Arguments = query.Parameters,
             UseShellExecute = true, // https://stackoverflow.com/a/5255335/389529

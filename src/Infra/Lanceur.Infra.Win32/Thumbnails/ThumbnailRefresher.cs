@@ -1,6 +1,5 @@
 using System.IO;
 using Lanceur.Core.Decorators;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
@@ -19,7 +18,7 @@ public class ThumbnailRefresher
 {
     #region Fields
 
-    private readonly IFavIconManager _favIconManager;
+    private readonly IFavIconService _favIconService;
     private readonly ILogger<ThumbnailRefresher> _logger;
     private readonly IPackagedAppSearchService _searchService;
     private readonly ThumbnailLoader _thumbnailLoader;
@@ -30,11 +29,11 @@ public class ThumbnailRefresher
 
     #region Constructors
 
-    public ThumbnailRefresher(ILoggerFactory loggerFactory, IPackagedAppSearchService searchService, IFavIconManager favIconManager)
+    public ThumbnailRefresher(ILoggerFactory loggerFactory, IPackagedAppSearchService searchService, IFavIconService favIconService)
     {
         _thumbnailLoader = new  (loggerFactory.CreateLogger<ThumbnailLoader>());
         _searchService = searchService;
-        _favIconManager = favIconManager;
+        _favIconService = favIconService;
         _logger = loggerFactory.GetLogger<ThumbnailRefresher>();
     }
 
@@ -101,7 +100,7 @@ public class ThumbnailRefresher
         alias.Icon = WebIcon;
         alias.Thumbnail = null;
 
-        _ = _favIconManager.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
+        _ = _favIconService.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
         _logger.LogTrace("Retrieved favicon for alias {Name}. Favicon {FileName}", alias.Name, alias.FileName);
     }
 

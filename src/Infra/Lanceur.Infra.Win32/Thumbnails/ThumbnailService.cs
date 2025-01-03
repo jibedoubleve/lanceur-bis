@@ -1,5 +1,4 @@
 ﻿using Lanceur.Core.Decorators;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -9,28 +8,28 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails;
 
-public class ThumbnailManager : IThumbnailManager
+public class ThumbnailService : IThumbnailService
 {
     #region Fields
 
     private readonly IAliasRepository _aliasRepository;
-    private readonly ILogger<ThumbnailManager> _logger;
+    private readonly ILogger<ThumbnailService> _logger;
     private readonly ThumbnailRefresher _thumbnailRefresher;
 
     #endregion
 
     #region Constructors
 
-    public ThumbnailManager(
+    public ThumbnailService(
         ILoggerFactory loggerFactory,
         IAliasRepository aliasRepository,
         IPackagedAppSearchService packagedAppSearchService,
-        IFavIconManager favIconManager
+        IFavIconService favIconService
     )
     {
         _aliasRepository = aliasRepository;
-        _thumbnailRefresher = new(loggerFactory, packagedAppSearchService, favIconManager);
-        _logger = loggerFactory.GetLogger<ThumbnailManager>();
+        _thumbnailRefresher = new(loggerFactory, packagedAppSearchService, favIconService);
+        _logger = loggerFactory.GetLogger<ThumbnailService>();
     }
 
     #endregion

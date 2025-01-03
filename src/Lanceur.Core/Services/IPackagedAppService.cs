@@ -1,8 +1,8 @@
 ﻿using Lanceur.Core.Responses;
 
-namespace Lanceur.Core.Managers;
+namespace Lanceur.Core.Services;
 
-public interface IPackagedAppManager
+public interface IPackagedAppService
 {
     #region Methods
 

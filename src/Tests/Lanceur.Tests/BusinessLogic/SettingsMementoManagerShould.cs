@@ -90,7 +90,7 @@ public class SettingsMementoManagerShould
         var settingsFacade = new SettingsFacadeService(databaseConfigRepository, appConfigRepository);
 
         // ACT
-        var memento = SettingsMementoManager.GetInitialState(settingsFacade);
+        var memento = SettingsMementoService.GetInitialState(settingsFacade);
 
         // ASSERT
         memento.HasStateChanged(settingsFacade)
@@ -124,7 +124,7 @@ public class SettingsMementoManagerShould
         var settingsFacade = new SettingsFacadeService(databaseConfigRepository, appConfigRepository);
 
         // ACT
-        var memento = SettingsMementoManager.GetInitialState(settingsFacade);
+        var memento = SettingsMementoService.GetInitialState(settingsFacade);
 
         // ASSERT
         memento.HasStateChanged(settingsFacade).Should().BeFalse();

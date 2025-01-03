@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;
 using Lanceur.Tests.Tooling.Macros;
 using NSubstitute;

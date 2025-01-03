@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.BusinessLogic;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.DI;
@@ -26,7 +25,7 @@ public partial class KeywordsViewModel : ObservableObject
     private IList<AliasQueryResult> _bufferedAliases = Array.Empty<AliasQueryResult>();
     private readonly ILogger<KeywordsViewModel> _logger;
     private AliasQueryResult? _selectedAlias;
-    private readonly IThumbnailManager _thumbnailManager;
+    private readonly IThumbnailService _thumbnailService;
     private readonly IUserInteractionService _userInteraction;
     private readonly IUserNotificationService _userNotificationService;
     private readonly IAliasValidationService _validationService;
@@ -38,7 +37,7 @@ public partial class KeywordsViewModel : ObservableObject
 
     public KeywordsViewModel(
         IAliasManagementService aliasManagementService,
-        IThumbnailManager thumbnailManager,
+        IThumbnailService thumbnailService,
         ILogger<KeywordsViewModel> logger,
         IUserNotificationService userNotificationService,
         IAliasValidationService validationService,
@@ -48,7 +47,7 @@ public partial class KeywordsViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(aliasManagementService);
         ArgumentNullException.ThrowIfNull(userNotificationService);
-        ArgumentNullException.ThrowIfNull(thumbnailManager);
+        ArgumentNullException.ThrowIfNull(thumbnailService);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(validationService);
         ArgumentNullException.ThrowIfNull(userInteraction);
@@ -61,7 +60,7 @@ public partial class KeywordsViewModel : ObservableObject
         _userInteraction = userInteraction;
         _viewFactory = viewFactory;
         _aliasManagementService = aliasManagementService;
-        _thumbnailManager = thumbnailManager;
+        _thumbnailService = thumbnailService;
         _logger = logger;
     }
 
@@ -212,7 +211,7 @@ public partial class KeywordsViewModel : ObservableObject
             Aliases.AddRange(_bufferedAliases);
         }
 
-        _thumbnailManager.RefreshThumbnails(_bufferedAliases);
+        _thumbnailService.RefreshThumbnails(_bufferedAliases);
         _logger.LogTrace("Loaded {Count} alias(es)", _bufferedAliases.Count);
     }
 

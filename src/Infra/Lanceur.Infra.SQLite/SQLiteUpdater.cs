@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using System.Reflection;
-using Lanceur.Core.Managers;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
@@ -16,23 +16,23 @@ public class SQLiteUpdater
 
     private readonly ILogger<SQLiteUpdater> _logger;
     private readonly SQLiteDatabaseUpdateManager _updater;
-    private readonly IDataStoreVersionManager _versionManager;
+    private readonly IDataStoreVersionService _versionService;
 
     #endregion
 
     #region Constructors
 
     public SQLiteUpdater(
-        IDataStoreVersionManager versionManager,
+        IDataStoreVersionService versionService,
         ILoggerFactory logFactory,
         IDbConnection dbConnection,
         Assembly assembly,
         string pattern
     )
     {
-        _versionManager = versionManager;
+        _versionService = versionService;
         _logger = logFactory.GetLogger<SQLiteUpdater>();
-        _updater = new(versionManager, dbConnection, assembly, pattern);
+        _updater = new(versionService, dbConnection, assembly, pattern);
     }
 
     #endregion
@@ -70,9 +70,9 @@ public class SQLiteUpdater
         else
         {
             var latestVer = _updater.GetLatestVersion();
-            var currentVer = _versionManager.GetCurrentDbVersion();
+            var currentVer = _versionService.GetCurrentDbVersion();
 
-            if (_versionManager.IsUpToDate(latestVer) == false)
+            if (_versionService.IsUpToDate(latestVer) == false)
             {
                 _logger.LogWarning("Database V.{CurrentVer} is out of date. Updating to V.{LatestVer}", currentVer, latestVer);
                 _updater.UpdateFrom(currentVer);

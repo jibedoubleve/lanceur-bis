@@ -1,16 +1,16 @@
 ﻿using Dapper;
-using Lanceur.Core.Managers;
+using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.SQLite;
 
-public class SQLiteVersionManager : SQLiteRepositoryBase, IDataStoreVersionManager
+public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionService
 {
     #region Constructors
 
-    public SQLiteVersionManager(IDbConnectionManager manager) : base(manager) { }
+    public SQLiteVersionService(IDbConnectionManager manager) : base(manager) { }
 
     #endregion Constructors
 

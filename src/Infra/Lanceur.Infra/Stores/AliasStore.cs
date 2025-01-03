@@ -1,4 +1,5 @@
 ﻿using Humanizer;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -39,7 +40,7 @@ public class AliasStore : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public Orchestration Orchestration => Orchestration.SharedAlwaysActive();
+    public StoreOrchestration StoreOrchestration => StoreOrchestration.SharedAlwaysActive();
 
     #endregion
 

@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -19,7 +18,7 @@ public partial class MainViewModel : ObservableObject
     #region Fields
 
     private readonly bool _doesReturnAllIfEmpty;
-    private readonly IExecutionManager _executionManager;
+    private readonly IExecutionService _executionService;
     private readonly IUserInteractionService _userUserInteractionService;
     private readonly IUserNotificationService _userNotificationService;
 
@@ -43,7 +42,7 @@ public partial class MainViewModel : ObservableObject
         ILogger<MainViewModel> logger,
         ISearchService searchService,
         ISettingsFacade settingsFacade,
-        IExecutionManager executionManager,
+        IExecutionService executionService,
         IUserInteractionService userUserInteractionService,
         IUserNotificationService userNotificationService,
         IWatchdogBuilder watchdogBuilder
@@ -52,12 +51,12 @@ public partial class MainViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(searchService);
         ArgumentNullException.ThrowIfNull(settingsFacade);
-        ArgumentNullException.ThrowIfNull(executionManager);
+        ArgumentNullException.ThrowIfNull(executionService);
         ArgumentNullException.ThrowIfNull(watchdogBuilder);
 
         _logger = logger;
         _searchService = searchService;
-        _executionManager = executionManager;
+        _executionService = executionService;
         _userUserInteractionService = userUserInteractionService;
         _userNotificationService = userNotificationService;
 
@@ -97,7 +96,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
-        var response = await _executionManager.ExecuteAsync(
+        var response = await _executionService.ExecuteAsync(
             new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
         );
 

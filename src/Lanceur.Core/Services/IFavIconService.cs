@@ -1,6 +1,6 @@
-﻿namespace Lanceur.Core.Managers;
+﻿namespace Lanceur.Core.Services;
 
-public interface IFavIconManager
+public interface IFavIconService
 {
     #region Methods
 

@@ -1,8 +1,8 @@
 ﻿using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Managers;
+namespace Lanceur.Core.Services;
 
-public interface IMacroManager
+public interface IMacroService
 {
     #region Methods
 

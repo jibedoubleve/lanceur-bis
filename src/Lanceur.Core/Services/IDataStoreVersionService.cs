@@ -1,6 +1,6 @@
-﻿namespace Lanceur.Core.Managers;
+﻿namespace Lanceur.Core.Services;
 
-public interface IDataStoreVersionManager
+public interface IDataStoreVersionService
 {
     #region Methods
 

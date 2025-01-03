@@ -2,7 +2,6 @@ using System.Reflection;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
@@ -49,15 +48,15 @@ public class MainViewModelShould : TestBase
                                                        .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                        .AddSingleton<IMappingService, AutoMapperMappingService>()
                                                        .AddSingleton<ISearchService, SearchService>()
-                                                       .AddSingleton<IMacroManager, MacroManager>()
+                                                       .AddSingleton<IMacroService, MacroService>()
                                                        .AddSingleton<IDbActionFactory, DbActionFactory>()
                                                        .AddMockSingleton<IDatabaseConfigurationService>()
-                                                       .AddMockSingleton<IThumbnailManager>()
+                                                       .AddMockSingleton<IThumbnailService>()
                                                        .AddMockSingleton<IUserInteractionService>()
                                                        .AddMockSingleton<IUserNotificationService>()
                                                        .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                                                        .AddSingleton<IMemoryCache, MemoryCache>()
-                                                       .AddMockSingleton<IExecutionManager>(
+                                                       .AddMockSingleton<IExecutionService>(
                                                            (sp, i) =>
                                                            {
                                                                i.ExecuteAsync(Arg.Any<ExecutionRequest>())
@@ -88,7 +87,7 @@ public class MainViewModelShould : TestBase
     [Fact]
     public async Task BeAbleToExecuteAliases()
     {
-        IExecutionManager sut = null;
+        IExecutionService sut = null;
         var visitors = new ServiceVisitors
         {
             VisitExecutionManager = (_, i) =>
@@ -176,7 +175,7 @@ public class MainViewModelShould : TestBase
     {
         #region Properties
 
-        public Func<IServiceProvider, IExecutionManager, IExecutionManager> VisitExecutionManager { get; set; }
+        public Func<IServiceProvider, IExecutionService, IExecutionService> VisitExecutionManager { get; set; }
 
         #endregion
     }

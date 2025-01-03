@@ -1,5 +1,4 @@
-﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Logging;
@@ -14,8 +13,8 @@ public class SearchService : SearchServiceCache, ISearchService
 
     #region Fields
 
-    private readonly IMacroManager _macroManager;
-    private readonly IThumbnailManager _thumbnailManager;
+    private readonly IMacroService _macroService;
+    private readonly IThumbnailService _thumbnailService;
     private readonly ILogger<SearchService> _logger;
 
     #endregion Fields
@@ -24,14 +23,14 @@ public class SearchService : SearchServiceCache, ISearchService
 
     public SearchService(
         IStoreLoader storeLoader,
-        IMacroManager macroManager,
-        IThumbnailManager thumbnailManager,
+        IMacroService macroService,
+        IThumbnailService thumbnailService,
         ILoggerFactory loggerFactory,
         ISearchServiceOrchestrator orchestrator
     ) : base(storeLoader)
     {
-        _macroManager = macroManager;
-        _thumbnailManager = thumbnailManager;
+        _macroService = macroService;
+        _thumbnailService = thumbnailService;
         _orchestrator = orchestrator;
         _logger = loggerFactory.GetLogger<SearchService>();
     }
@@ -44,11 +43,11 @@ public class SearchService : SearchServiceCache, ISearchService
     {
         // Upgrade alias to executable macro and return the result
         var results = input?.Any() ?? false
-            ? _macroManager.Handle(input).ToList()
+            ? _macroService.Handle(input).ToList()
             : new();
 
         // Refresh the thumbnails
-        _thumbnailManager.RefreshThumbnails(results);
+        _thumbnailService.RefreshThumbnails(results);
 
         // Order the list and return the result
         var orderedResults = results.OrderByDescending(e => e.Count)
@@ -86,9 +85,9 @@ public class SearchService : SearchServiceCache, ISearchService
 
         // I've got a services that stunt all the others, then
         // I execute the search for this one only
-        if (aliveStores.Any(x => x.Orchestration.IdleOthers))
+        if (aliveStores.Any(x => x.StoreOrchestration.IdleOthers))
         {
-            var store = aliveStores.First(x => x.Orchestration.IdleOthers);
+            var store = aliveStores.First(x => x.StoreOrchestration.IdleOthers);
             tasks.Add(Task.Run(() => store.Search(query)));
         }
         // No store that stunt all the other stores, execute aggregated search

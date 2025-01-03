@@ -1,3 +1,4 @@
+using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;
 using Lanceur.SharedKernel.Mixins;
 

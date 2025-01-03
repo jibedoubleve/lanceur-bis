@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Managers;
 
-public abstract class MacroCachedManager
+public abstract class MacroCachedService
 {
     #region Fields
 
@@ -22,12 +22,12 @@ public abstract class MacroCachedManager
 
     #region Constructors
 
-    internal MacroCachedManager(IServiceProvider serviceProvider)
+    internal MacroCachedService(IServiceProvider serviceProvider)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
         _asm = serviceProvider.GetService<AssemblySource>().MacroSource;
-        Logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MacroManager>();
+        Logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MacroService>();
         _aliasRepository = serviceProvider.GetService<IAliasRepository>();
         _serviceProvider = serviceProvider;
     }

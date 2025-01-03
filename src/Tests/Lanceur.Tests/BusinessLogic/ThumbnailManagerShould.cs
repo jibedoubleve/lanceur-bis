@@ -1,6 +1,5 @@
 using Dapper;
 using FluentAssertions;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
@@ -53,8 +52,8 @@ public class ThumbnailManagerShould : TestBase
         var dbRepository = new SQLiteAliasRepository(connectionMgr, loggerFactory, conversionService, new DbActionFactory(new AutoMapperMappingService(), loggerFactory));
 
         var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();
-        var favIconManager = Substitute.For<IFavIconManager>();
-        var thumbnailManager = new ThumbnailManager(loggerFactory, dbRepository, packagedAppSearchService, favIconManager);
+        var favIconManager = Substitute.For<IFavIconService>();
+        var thumbnailManager = new ThumbnailService(loggerFactory, dbRepository, packagedAppSearchService, favIconManager);
         
         var aliases = dbRepository.Search("a");
 

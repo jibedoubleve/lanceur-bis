@@ -1,4 +1,5 @@
 using Everything.Wrapper;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -35,7 +36,7 @@ public class EverythingStore : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public Orchestration Orchestration => Orchestration.Exclusive(@"^\s{0,}:.*");
+    public StoreOrchestration StoreOrchestration => StoreOrchestration.Exclusive(@"^\s{0,}:.*");
 
     #endregion
 

@@ -36,7 +36,7 @@ public class UpdateServiceShould : TestBase
         CreateTable(db.GetConnection());
         CreateVersion(db.GetConnection(), "1.0");
 
-        var service = new SQLiteVersionManager(db);
+        var service = new SQLiteVersionService(db);
         service.IsUpToDate(goal)
                .Should()
                .BeFalse();
@@ -49,7 +49,7 @@ public class UpdateServiceShould : TestBase
         CreateTable(db.GetConnection());
         CreateVersion(db.GetConnection(), "1.0");
 
-        var service = new SQLiteVersionManager(db);
+        var service = new SQLiteVersionService(db);
         var action = () => service.IsUpToDate(version);
         action.Should().Throw<ArgumentException>();
     }
@@ -61,7 +61,7 @@ public class UpdateServiceShould : TestBase
         CreateTable(db.GetConnection());
         CreateVersion(db.GetConnection(), actual);
 
-        var service = new SQLiteVersionManager(db);
+        var service = new SQLiteVersionService(db);
         service.IsUpToDate(expected).Should().BeTrue();
     }
 
@@ -73,7 +73,7 @@ public class UpdateServiceShould : TestBase
         CreateVersion(db.GetConnection(), actual);
 
         var goalVersion = new Version(goal);
-        var service = new SQLiteVersionManager(db);
+        var service = new SQLiteVersionService(db);
         service.IsUpToDate(goalVersion).Should().BeTrue();
     }
 
@@ -84,7 +84,7 @@ public class UpdateServiceShould : TestBase
         CreateTable(db.GetConnection());
         CreateVersion(db.GetConnection(), version);
 
-        var service = new SQLiteVersionManager(db);
+        var service = new SQLiteVersionService(db);
         var expected = new Version(version);
 
         service.GetCurrentDbVersion().Should().Be(expected);
@@ -98,7 +98,7 @@ public class UpdateServiceShould : TestBase
         using var db = new DbSingleConnectionManager(BuildConnection());
         CreateTable(db.GetConnection());
 
-        var service = new SQLiteVersionManager(db);
+        var service = new SQLiteVersionService(db);
         service.SetCurrentDbVersion(version);
         service.GetCurrentDbVersion().Should().Be(version);
     }
@@ -110,7 +110,7 @@ public class UpdateServiceShould : TestBase
         CreateTable(db.GetConnection());
         CreateVersion(db.GetConnection(), "1.0");
 
-        var service = new SQLiteVersionManager(db);
+        var service = new SQLiteVersionService(db);
         service.IsUpToDate(goal)
                .Should()
                .BeTrue();

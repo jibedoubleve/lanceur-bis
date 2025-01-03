@@ -89,13 +89,13 @@ public class MacroShould : TestBase
     [InlineData("some", "a z e r t y")]
     public async Task BeExecutable(string name, string parameters)
     {
-        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroManager>>()
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                                     .AddSingleton<MacroManager>()
+                                                     .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();
-        var macroMgr = serviceProvider.GetService<MacroManager>();
+        var macroMgr = serviceProvider.GetService<MacroService>();
         var macro = new MultiMacroTest(serviceProvider) { Parameters = parameters };
         var handler = (SelfExecutableQueryResult)macroMgr.Handle(macro);
 
@@ -111,13 +111,13 @@ public class MacroShould : TestBase
     public void BeExecutableQueryResult()
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<IAliasRepository>()
-                                                     .AddMockSingleton<ILogger<MacroManager>>()
+                                                     .AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                                     .AddSingleton<MacroManager>()
+                                                     .AddSingleton<MacroService>()
                                                      .AddSingleton<MultiMacroTest>()
                                                      .BuildServiceProvider();
-        var macroMgr = serviceProvider.GetService<MacroManager>();
+        var macroMgr = serviceProvider.GetService<MacroService>();
         var macro = new MultiMacroTest(serviceProvider);
         var result = macroMgr.Handle(macro);
 
@@ -164,11 +164,11 @@ public class MacroShould : TestBase
     {
         var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! })
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
-                                                     .AddMockSingleton<ILogger<MacroManager>>()
+                                                     .AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddSingleton<MacroManager>()
+                                                     .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();
-        var manager = serviceProvider.GetService<MacroManager>();
+        var manager = serviceProvider.GetService<MacroService>();
         manager.MacroCount.Should().BeGreaterThan(0);
     }
 
@@ -234,14 +234,14 @@ public class MacroShould : TestBase
     {
         QueryResult[] queryResults = new AliasQueryResult[] { new() { Name = "macro_1", FileName = "@multi@" }, new() { Name = "macro_2", FileName = "@multi@" }, new() { Name = "macro_3", FileName = "@multi@" } };
 
-        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroManager>>()
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(new AssemblySource{MacroSource = Assembly.GetExecutingAssembly()})
-                                                     .AddSingleton<MacroManager>()
+                                                     .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();
 
-        var output = serviceProvider.GetService<MacroManager>()
+        var output = serviceProvider.GetService<MacroService>()
                                     .Handle(queryResults)
                                     .ToArray();
 

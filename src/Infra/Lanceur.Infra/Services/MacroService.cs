@@ -1,15 +1,15 @@
-﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
+using Lanceur.Core.Services;
 using Microsoft.Extensions.Logging;
 using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Managers;
 
-public class MacroManager : MacroCachedManager, IMacroManager
+public class MacroService : MacroCachedService, IMacroService
 {
     #region Constructors
 
-    public MacroManager(IServiceProvider serviceProvider) : base(serviceProvider) { }
+    public MacroService(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
     #endregion
 

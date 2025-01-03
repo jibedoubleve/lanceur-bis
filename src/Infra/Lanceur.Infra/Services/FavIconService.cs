@@ -1,5 +1,4 @@
-﻿using Lanceur.Core.Managers;
-using Lanceur.Core.Services;
+﻿using Lanceur.Core.Services;
 using Lanceur.Infra.Constants;
 using Lanceur.SharedKernel.Web;
 using Microsoft.Extensions.Logging;
@@ -9,7 +8,7 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Lanceur.Infra.Managers;
 
-public class FavIconManager : IFavIconManager
+public class FavIconService : IFavIconService
 {
     #region Fields
 
@@ -30,7 +29,7 @@ public class FavIconManager : IFavIconManager
     /// <param name="imageRepository">
     /// This is used for unit tests. Keep default value unless you're testing
     /// </param>
-    public FavIconManager(
+    public FavIconService(
         IPackagedAppSearchService searchService,
         IFavIconDownloader favIconDownloader,
         ILoggerFactory loggerFactory,

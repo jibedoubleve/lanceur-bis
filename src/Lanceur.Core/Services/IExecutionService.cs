@@ -2,9 +2,9 @@
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
 
-namespace Lanceur.Core.Managers;
+namespace Lanceur.Core.Services;
 
-public interface IExecutionManager
+public interface IExecutionService
 {
     #region Methods
 

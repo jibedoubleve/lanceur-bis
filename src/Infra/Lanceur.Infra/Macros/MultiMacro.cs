@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Lanceur.Core;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Utils;
@@ -15,7 +14,7 @@ public class MultiMacro : MacroQueryResult
     #region Fields
 
     private readonly int _delay;
-    private readonly IExecutionManager _executionManager;
+    private readonly IExecutionService _executionService;
     private readonly ISearchService _searchService;
     private readonly IServiceProvider _serviceProvider;
 
@@ -28,18 +27,18 @@ public class MultiMacro : MacroQueryResult
     public MultiMacro(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _executionManager = serviceProvider.GetService<IExecutionManager>();
+        _executionService = serviceProvider.GetService<IExecutionService>();
         _searchService = serviceProvider.GetService<ISearchService>();
         _delay = DefaultDelay;
     }
 
-    public MultiMacro(IExecutionManager executionManager, ISearchService searchService, int? delay = null)
+    public MultiMacro(IExecutionService executionService, ISearchService searchService, int? delay = null)
     {
-        ArgumentNullException.ThrowIfNull(executionManager);
+        ArgumentNullException.ThrowIfNull(executionService);
         ArgumentNullException.ThrowIfNull(searchService);   
         
         _delay = delay ?? DefaultDelay;
-        _executionManager = executionManager;
+        _executionService = executionService;
         _searchService = searchService;
     }
 
@@ -67,7 +66,7 @@ public class MultiMacro : MacroQueryResult
             aliases.Add(toAdd);
         }
 
-        _ = _executionManager.ExecuteMultiple(aliases, _delay);
+        _ = _executionService.ExecuteMultiple(aliases, _delay);
 
         return await NoResultAsync;
     }
