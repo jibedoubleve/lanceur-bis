@@ -6,8 +6,6 @@ public class ExecutionResponse
 {
     #region Properties
 
-    public static ExecutionResponse EmptyResult => new() { HasResult = true, Results = new List<QueryResult>() };
-
     public static ExecutionResponse NoResult => new() { HasResult = false, Results = new List<QueryResult>() };
 
     public bool HasResult { get; set; }

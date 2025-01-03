@@ -21,7 +21,7 @@ public class FavIconManagerShould
         var repository = Path.GetTempPath();
 
         // ACT
-        var manager = new FavIconManager(searchService, favIconDownloader, logger, repository);
+        var manager = new FavIconService(searchService, favIconDownloader, logger, repository);
         await manager.RetrieveFaviconAsync(url);
 
         // ASSERT

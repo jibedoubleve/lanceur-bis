@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
+using Lanceur.Core.BusinessLogic;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Infra.Managers;
 using Xunit;
 
 namespace Lanceur.Tests.Models;
@@ -20,6 +21,33 @@ public class CmdlineShould
 
     [Fact]
     public void HaveEmptyParametersWhenCtorNull() { new Cmdline(null, null).Parameters.Should().BeEmpty(); }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    [InlineData("un deux trois")]
+    [InlineData("un")]
+    public void BeEquals(string cmd)
+    {
+        var left = Cmdline.BuildFromText(cmd);
+        var right = Cmdline.BuildFromText(cmd);
+        
+        (left == right).Should().BeTrue();
+    } 
+    
+    [Theory]
+    [InlineData("", "a")]
+    [InlineData("un", "deux trois")]
+    [InlineData("un", null)]
+    [InlineData("un deux trois", "un deux")]
+    [InlineData("deux trois", "deux quatre")]
+    public void NotBeEquals(string cmd1, string cmd2)
+    {
+        var left = Cmdline.BuildFromText(cmd1);
+        var right =Cmdline.BuildFromText(cmd2);
+        
+        (left != right).Should().BeTrue();
+    }
 
     [Theory,
      InlineData("$AAAA aa"),
@@ -50,10 +78,9 @@ public class CmdlineShould
      InlineData(".AAAA aa")]
     public void HandleSpecialCmdCharacter(string cmdline)
     {
-        var builder = new CmdlineManager();
-        builder.BuildFromText(cmdline)
-               .Name.Should()
-               .Be(cmdline[0].ToString());
+        CmdlineManager.BuildFromText(cmdline)
+                      .Name.Should()
+                      .Be(cmdline[0].ToString());
     }
 
     #endregion Methods

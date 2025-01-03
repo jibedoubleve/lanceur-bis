@@ -1,6 +1,10 @@
 ﻿using FluentAssertions;
-using Lanceur.Utils.ConnectionStrings;
 using System.Text.RegularExpressions;
+using Lanceur.Core.Repositories.Config;
+using Lanceur.Ui.Core.Utils.ConnectionStrings;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
+using NSubstitute.Routing.Handlers;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;
@@ -15,7 +19,7 @@ public class ConnectionStringShould
         // ARRANGE
         var file = Path.GetTempFileName();
         var pattern = "Data Source=(.*);Version=3";
-        var cs = DebugConnectionString.FromFile(file);
+        var cs = LightConnectionString.FromFile(file);
 
         // ACT
         var dbPAth = new Regex(pattern).Match(cs.ToString()).Groups[1].Value;
@@ -28,10 +32,10 @@ public class ConnectionStringShould
     public void NotThrowErrorWhenFileDoesNotExist()
     {
         // Arrange
-        var file = Path.GetTempFileName();
-        File.Delete(file);
-
-        var cs = new ConnectionString(file);
+        var config = Substitute.For<IApplicationConfigurationService>();
+        config.Current.DbPath.Returns("lkj");
+        var logger = Substitute.For<ILogger<ConnectionString>>();
+        var cs = new ConnectionString(config, logger);
 
         // Act
         var action = () => cs.ToString();
@@ -40,12 +44,22 @@ public class ConnectionStringShould
         action.Should().NotThrow();
     }
 
+    private string CreateTemporaryFile()
+    {
+        var tempFilePath = Path.GetTempFileName();
+        File.WriteAllText(tempFilePath, "");
+        return tempFilePath;
+    }
+
     [Fact]
     public void NotThrowErrorWhenFileExists()
     {
         // Arrange
-        var file = Path.GetTempFileName();
-        var cs = new ConnectionString(file);
+        var file = CreateTemporaryFile();
+        var config = Substitute.For<IApplicationConfigurationService>();
+        config.Current.DbPath.Returns(file);
+        var logger = Substitute.For<ILogger<ConnectionString>>();
+        var cs = new ConnectionString(config, logger);
 
         // Act
         var action = () => cs.ToString();
@@ -53,7 +67,7 @@ public class ConnectionStringShould
         // Assert
         action.Should().NotThrow<InvalidDataException>();
 
-        // Tear down
+        //Teardown
         File.Delete(file);
     }
 

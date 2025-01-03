@@ -1,0 +1,340 @@
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.KeywordsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Lanceur.Ui.WPF.Views.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:v="clr-namespace:Lanceur.Ui.WPF.Validations"
+    x:Name="Self"
+    Title="KeywordsView"
+    d:DesignHeight="1200"
+    d:DesignWidth="1800"
+    Background="{DynamicResource ApplicationBackgroundBrush}"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d">
+    <Page.Resources>
+    </Page.Resources>
+    <interactivity:Interaction.Triggers>
+        <interactivity:EventTrigger EventName="Loaded">
+            <interactivity:InvokeCommandAction Command="{Binding LoadAliasesCommand}" />
+        </interactivity:EventTrigger>
+    </interactivity:Interaction.Triggers>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ui:TextBox
+                x:Name="TbSearch"
+                Margin="5"
+                Icon="{ui:SymbolIcon Search24}"
+                IconPlacement="Right">
+                <interactivity:Interaction.Triggers>
+                    <interactivity:EventTrigger EventName="TextChanged">
+                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}"
+                                                           CommandParameter="{Binding ElementName=TbSearch, Path=Text}" />
+                    </interactivity:EventTrigger>
+                </interactivity:Interaction.Triggers>
+            </ui:TextBox>
+            <ui:ListView
+                x:Name="AliasList"
+                Grid.Row="1"
+                ItemTemplate="{StaticResource AliasSettingsTemplate}"
+                ItemsSource="{Binding Aliases}"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                SelectedItem="{Binding SelectedAlias}">
+                <interactivity:Interaction.Triggers>
+                    <interactivity:EventTrigger EventName="SelectionChanged">
+                        <interactivity:InvokeCommandAction Command="{Binding LoadCurrentAliasCommand}" />
+                    </interactivity:EventTrigger>
+                </interactivity:Interaction.Triggers>
+            </ui:ListView>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Menu>
+                <MenuItem
+                    Command="{Binding SaveCurrentAliasCommand}"
+                    Header="Save"
+                    Icon="{ui:SymbolIcon Save24}" />
+                <MenuItem
+                    Command="{Binding CreateAliasCommand}"
+                    Header="New alias"
+                    Icon="{ui:SymbolIcon FormNew24}" />
+                <MenuItem
+                    Command="{Binding DeleteCurrentAliasCommand}"
+                    Header="Delete"
+                    Icon="{ui:SymbolIcon Delete24}" />
+            </Menu>
+            <ScrollViewer
+                Grid.Row="1"
+                VerticalScrollBarVisibility="Visible"
+                Visibility="{Binding ElementName=AliasList, Path=SelectedItem, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
+                <StackPanel>
+                    <!--  ALIAS  -->
+                    <ui:CardExpander
+                        Margin="5,5,5,12"
+                        Icon="{ui:SymbolIcon Tag24}"
+                        IsExpanded="True">
+                        <ui:CardExpander.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <ui:TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    FontTypography="Body"
+                                    Text="Alias" />
+                            </Grid>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <!--  NAME  -->
+                            <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasName}">Names</Label>
+                            <TextBox Text="{Binding SelectedAlias.Synonyms, UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Lower"/>
+                            <!--  NOTES  -->
+                            <Label Margin="6,20,6,3" Target="{Binding ElementName=TbNotes}">Comments</Label>
+                            <ui:TextBox x:Name="TbNotes"
+                                        Text="{Binding SelectedAlias.Notes, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </ui:CardExpander>
+                    <!--  PROCESS  -->
+                    <ui:CardExpander
+                        Margin="5,5,5,12"
+                        Icon="{ui:SymbolIcon ArrowForwardDownLightning24}"
+                        IsExpanded="True">
+                        <ui:CardExpander.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <ui:TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    FontTypography="Body"
+                                    Text="Process" />
+                            </Grid>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <!--  FILE NAME  -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Label Margin="6,0,6,3" Target="{Binding ElementName=TbFilename}">File name</Label>
+                                <ui:TextBox
+                                    x:Name="TbFilename"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    PlaceholderText="Use the crosshair to determine the process path...">
+                                    <ui:TextBox.Text>
+                                        <Binding Path="SelectedAlias.FileName" UpdateSourceTrigger="PropertyChanged">
+                                            <Binding.ValidationRules>
+                                                <v:AliasFileNameRule />
+                                            </Binding.ValidationRules>
+                                        </Binding>
+                                    </ui:TextBox.Text>
+                                </ui:TextBox>
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Content="{Binding ElementName=TbFilename, Path=(Validation.Errors)/ErrorContent}"
+                                    FontSize="10"
+                                    Foreground="Red" />
+                                <controls:ProcessFinderButton
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    DockPanel.Dock="Right"
+                                    ProcessName="{Binding ElementName=TbFilename, Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}" />
+                            </Grid>
+                            <!--  PARAMETERS  -->
+                            <Label Margin="6,20,6,3" Target="{Binding ElementName=TbParameters}">Parameters</Label>
+                            <ui:TextBox
+                                x:Name="TbParameters"
+                                PlaceholderText="Parameters for the process..."
+                                Text="{Binding SelectedAlias.Parameters, UpdateSourceTrigger=PropertyChanged}" />
+                            <!--  WORKING DIRECTORY  -->
+                            <Label Margin="6,20,6,3" Target="{Binding ElementName=TbWorkingDirectory}">Working directory</Label>
+                            <ui:TextBox x:Name="TbWorkingDirectory"
+                                        Text="{Binding SelectedAlias.WorkingDirectory, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </ui:CardExpander>
+                    <!--  RUN AS  -->
+                    <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ShieldCheckmark24}">
+                        <ui:CardControl.Header>
+                            <ui:TextBlock FontTypography="Body" Text="Run as" />
+                        </ui:CardControl.Header>
+                        <StackPanel>
+                            <ComboBox SelectedIndex="1"
+                                      SelectedItem="{Binding SelectedAlias.RunAs, Converter={StaticResource StringToRunAsConverter}}">
+                                <ComboBox.Items>
+                                    <sys:String>Admin</sys:String>
+                                    <sys:String>CurrentUser</sys:String>
+                                </ComboBox.Items>
+                            </ComboBox>
+                        </StackPanel>
+                    </ui:CardControl>
+                    <!--  START MODE  -->
+                    <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Window24}">
+                        <ui:CardControl.Header>
+                            <ui:TextBlock FontTypography="Body" Text="Start mode" />
+                        </ui:CardControl.Header>
+                        <StackPanel>
+                            <ComboBox
+                                x:Name="StartModes"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                SelectedIndex="0"
+                                SelectedItem="{Binding SelectedAlias.StartMode, Converter={StaticResource StringToStartModeConverter}}">
+                                <ComboBox.Items>
+                                    <sys:String>Default</sys:String>
+                                    <sys:String>Maximized</sys:String>
+                                    <sys:String>Minimized</sys:String>
+                                </ComboBox.Items>
+                            </ComboBox>
+                        </StackPanel>
+                    </ui:CardControl>
+                    <!--  CONFIRM ACTION  -->
+                    <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ChatBubblesQuestion24}">
+                        <ui:CardControl.Header>
+                            <ui:TextBlock FontTypography="Body" Text="Confirm before exiting" />
+                        </ui:CardControl.Header>
+                        <StackPanel>
+                            <ui:ToggleSwitch
+                                IsChecked="{Binding SelectedAlias.IsExecutionConfirmationRequired}"
+                                OffContent="Execute without confirmation"
+                                OnContent="Ask confirmation before executing" />
+                        </StackPanel>
+                    </ui:CardControl>
+                    <!--  LUA SCRIPT  -->
+                    <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Script16}">
+                        <ui:CardControl.Header>
+                            <ui:TextBlock FontTypography="Body" Text="Lua scipt" />
+                        </ui:CardControl.Header>
+                        <StackPanel>
+                            <ui:Button Click="OnClickCodeEditor">
+                                Open editor
+                            </ui:Button>
+                        </StackPanel>
+                    </ui:CardControl>
+                    <!--  ADDITIONNAL ARGUMENTS  -->
+                    <ui:CardExpander
+                        Margin="5,5,5,12"
+                        Icon="{ui:SymbolIcon AppsList24}"
+                        IsExpanded="{Binding SelectedAlias.AdditionalParameters.Count, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource NumberToBooleanConverter}}">
+                        <ui:CardExpander.Header>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    FontTypography="Body"
+                                    Text="Additionnal parameters" />
+                            </Grid>
+                        </ui:CardExpander.Header>
+                        <StackPanel>
+                            <Menu>
+                                <MenuItem
+                                    Command="{Binding AddParameterCommand}"
+                                    Header="Add parameter"
+                                    Icon="{ui:SymbolIcon AddCircle24}" />
+                                <MenuItem
+                                    Command="{Binding AddMultiParametersCommand}"
+                                    Header="Add multiple parameters"
+                                    Icon="{ui:SymbolIcon TextBulletListAdd24}" />
+                            </Menu>
+                            <ui:DataGrid
+                                AreRowDetailsFrozen="True"
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                CanUserDeleteRows="False"
+                                CanUserResizeColumns="True"
+                                ItemsSource="{Binding SelectedAlias.AdditionalParameters}"
+                                SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Width="Auto" Header="Name">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}" Margin="10,0,10,0"
+                                                           VerticalAlignment="Center" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Width="*" Header="Parameter">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Parameter}" Margin="10,0,10,0"
+                                                           VerticalAlignment="Center" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Width="100" Header="Actions">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button
+                                                        Command="{Binding ElementName=Self, Path=DataContext.DeleteParameterCommand}"
+                                                        HorizontalAlignment="Center" ToolTip="Delete this parameter"
+                                                        Margin="5" CommandParameter="{Binding .}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ui:SymbolIcon Symbol="Delete24" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                    <Button
+                                                        Command="{Binding ElementName=Self, Path=DataContext.EditParameterCommand}"
+                                                        HorizontalAlignment="Center" ToolTip="Edit this parameter"
+                                                        Margin="5" CommandParameter="{Binding .}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ui:SymbolIcon Symbol="Edit24" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </ui:DataGrid>
+                        </StackPanel>
+                    </ui:CardExpander>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>

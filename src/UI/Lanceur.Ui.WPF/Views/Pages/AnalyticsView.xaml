@@ -1,0 +1,68 @@
+<Page x:Class="Lanceur.Ui.WPF.Views.Pages.AnalyticsView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+      xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:p="clr-namespace:Lanceur.Ui.Core.ViewModels.Pages;assembly=Lanceur.Ui.Core"
+      Background="{DynamicResource ApplicationBackgroundBrush}"
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+      mc:Ignorable="d"
+      Title="HistoryView">
+    <interactivity:Interaction.Triggers>
+        <interactivity:EventTrigger EventName="Loaded">
+            <interactivity:InvokeCommandAction
+                Command="{Binding RefreshMonthlyHistoryCommand}" />
+        </interactivity:EventTrigger>
+    </interactivity:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="Monthly history" Command="{Binding RefreshMonthlyHistoryCommand}"
+                      Visibility="{Binding IsMonthlyVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Icon="{ui:SymbolIcon CalendarMonth24}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.MonthlyHistory}}" Click="OnClickMenu"/>
+
+            <MenuItem Header="Daily history" Command="{Binding RefreshDailyHistoryCommand}"
+                      Icon="{ui:SymbolIcon CalendarDay24}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.DailyHistory}}"  Click="OnClickMenu"/>
+
+            <Separator Margin="5,3,5,3" />
+
+            <MenuItem Header="Usage by day of week" Command="{Binding RefreshUsageByDayOfWeekCommand}"
+                      Icon="{ui:SymbolIcon ShiftsDay24}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.UsageByDayOfWeek}}"  Click="OnClickMenu"/>
+
+            <MenuItem Header="Usage by hour" Command="{Binding RefreshUsageByHourOfDayCommand}"
+                      Icon="{ui:SymbolIcon Shifts24}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.UsageByHourOfDay}}"  Click="OnClickMenu"/>
+        </Menu>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <StackPanel Margin="5" Orientation="Horizontal" Visibility="{Binding IsYearVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Label Content="Year to display" VerticalAlignment="Center" Margin="5,5,15,5" />
+                <ComboBox ItemsSource="{Binding Years}" Margin="0,5,5,5" SelectedIndex="0" x:Name="CbYears">
+                    <interactivity:Interaction.Triggers>
+                        <interactivity:EventTrigger EventName="SelectionChanged">
+                            <interactivity:InvokeCommandAction Command="{Binding SelectYearCommand}"
+                                                               CommandParameter="{Binding ElementName=CbYears, Path=SelectedItem}" />
+                        </interactivity:EventTrigger>
+                    </interactivity:Interaction.Triggers>
+                </ComboBox>
+            </StackPanel>
+            <sp:WpfPlot x:Name="HistoryPlot" Grid.Row="1" />
+        </Grid>
+    </Grid>
+</Page>

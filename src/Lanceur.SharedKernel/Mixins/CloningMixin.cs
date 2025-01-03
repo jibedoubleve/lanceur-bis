@@ -7,11 +7,11 @@ public static class CloningMixin
     #region Methods
 
     /// <summary>
-    /// Clone object by serialising/deserialising it
+    /// Creates a deep copy of the specified object by serializing and deserializing it.
     /// </summary>
-    /// <param name="obj">The object to clone</param>
-    /// <typeparam name="T">The type of the object to clone</typeparam>
-    /// <returns>A new instance of the object with the same state</returns>
+    /// <param name="obj">The object to be cloned.</param>
+    /// <typeparam name="T">The type of the object to be cloned.</typeparam>
+    /// <returns>A new instance of <typeparamref name="T"/> with the same state as the original object.</returns>
     public static T CloneObject<T>(this T obj)
         where T : new()
     {

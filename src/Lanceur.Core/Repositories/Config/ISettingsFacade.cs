@@ -6,14 +6,22 @@ public interface ISettingsFacade
 {
     #region Properties
 
-    AppConfig Application { get; }
-    ILocalConfig Local { get; }
+    DatabaseConfiguration Application { get; }
+    IApplicationSettings Local { get; }
 
     #endregion Properties
 
     #region Methods
 
+    /// <summary>
+    /// Save all the changes into the disk
+    /// </summary>
     void Save();
+
+    /// <summary>
+    /// Reload the settings from the disk
+    /// </summary>
+    void Reload();
 
     #endregion Methods
 }

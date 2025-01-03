@@ -4,8 +4,6 @@ public class HotKeySection
 {
     #region Constructors
 
-    private HotKeySection() { }
-
     public HotKeySection(int modifier, int key)
     {
         Key = key;
@@ -16,6 +14,10 @@ public class HotKeySection
 
     #region Properties
 
+    /// <summary>
+    /// Gets the default hotkey configuration (ALTGR + Space).
+    /// The values 3 and 18 represent the key codes for the ALTGR and Space keys, respectively.
+    /// </summary>
     public static HotKeySection Default => new(3, 18);
 
     /// <remarks>

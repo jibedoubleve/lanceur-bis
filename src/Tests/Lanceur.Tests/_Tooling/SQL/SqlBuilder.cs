@@ -3,13 +3,13 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Tests.Tooling.SQL;
 
-internal class SqlBuilder
+public class SqlBuilder
 {
     #region Fields
 
     private readonly StringBuilder _sql = new();
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -18,17 +18,27 @@ internal class SqlBuilder
         if (initialSql is not null) _sql.Append(initialSql);
     }
 
-    #endregion Constructors
+    #endregion
+
+    #region Properties
+
+    public static SqlBuilder Empty => new();
+
+    #endregion
 
     #region Methods
 
-    public SqlBuilder AppendAlias(long idAlias, string fileName = null, string arguments = null)
+    public SqlBuilder AppendAlias(long idAlias, string fileName = null, string arguments = null, string[] synonyms = null)
     {
         fileName ??= Guid.NewGuid().ToString();
         arguments ??= Guid.NewGuid().ToString();
 
         _sql.Append($"insert into alias (id, file_name, arguments) values ({idAlias}, '{fileName}', '{arguments}');");
         _sql.AppendNewLine();
+
+        if (synonyms is null) return this;
+
+        AppendSynonyms(idAlias, synonyms);
         return this;
     }
 
@@ -57,5 +67,5 @@ internal class SqlBuilder
 
     public override string ToString() => _sql.ToString();
 
-    #endregion Methods
+    #endregion
 }

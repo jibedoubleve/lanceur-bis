@@ -3,6 +3,7 @@
         <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
     <ItemGroup>
         <Compile Remove="UI\**" />
@@ -23,9 +24,9 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="FluentAssertions" Version="6.12.0" />
+        <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.4.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
         <PackageReference Include="NSubstitute" Version="4.4.*" />
-        <PackageReference Include="ReactiveUI.Testing" Version="18.4.*" />
         <PackageReference Include="xunit" Version="2.9.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -34,12 +35,13 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
-        <ProjectReference Include="..\..\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
-        <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj" />
-        <ProjectReference Include="..\..\Lanceur\Lanceur.csproj" />
-        <ProjectReference Include="..\..\Lanceur.Infra\Lanceur.Infra.csproj" />
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj" />
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj" />
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj" />
         <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
-        <ProjectReference Include="..\..\Lanceur\Lanceur.csproj" />
         <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj" />
+        <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj" />
+        <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj" />
     </ItemGroup>
 </Project>

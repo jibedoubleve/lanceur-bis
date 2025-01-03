@@ -1,225 +1,182 @@
-﻿using FluentAssertions;
+using System.Reflection;
+using FluentAssertions;
 using FluentAssertions.Execution;
-using Lanceur.Core.Managers;
+using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
-using Lanceur.Core.Services;
-using Lanceur.Infra.Managers;
-using Lanceur.Macros.Development;
-using Lanceur.Views.Mixins;
-using Microsoft.Extensions.Logging;
-using Microsoft.Reactive.Testing;
-using NSubstitute;
-using ReactiveUI.Testing;
-using Splat;
-using System.Reactive.Concurrency;
-using FluentAssertions.Extensions;
 using Lanceur.Core.Responses;
+using Lanceur.Core.Services;
+using Lanceur.Core.Stores;
+using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
+using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.DbActions;
+using Lanceur.Infra.Stores;
 using Lanceur.Tests.SQLite;
-using Lanceur.Tests.Tooling;
-using Lanceur.Tests.Tooling.Builders;
-using Lanceur.Tests.Tooling.ReservedAliases;
+using Lanceur.Tests.Tooling.Extensions;
+using Lanceur.Tests.Tooling.SQL;
+using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.Core.Utils.Watchdogs;
+using Lanceur.Ui.Core.ViewModels;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public partial class MainViewModelShould : TestBase
+public class MainViewModelShould : TestBase
 {
     #region Constructors
 
-    public MainViewModelShould(ITestOutputHelper output) : base(output) { }
+    public MainViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
-    [Theory, InlineData("=8*5", "40")]
-    public void HaveResultWhenQueryIsArithmetic(string expression, string result)
+    private async Task TestViewModel(Func<MainViewModel, Task> scope, SqlBuilder sqlBuilder = null, ServiceVisitors configurator = null)
     {
-        new TestScheduler().With(
-            scheduler =>
+        using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty);
+        var serviceCollection = new ServiceCollection().AddView<MainViewModel>()
+                                                       .AddLogging(builder => builder.AddXUnit(OutputHelper))
+                                                       .AddMemoryDb(db)
+                                                       .AddApplicationSettings()
+                                                       .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
+                                                       .AddSingleton<IMappingService, AutoMapperMappingService>()
+                                                       .AddSingleton<ISearchService, SearchService>()
+                                                       .AddSingleton<IMacroService, MacroService>()
+                                                       .AddSingleton<IDbActionFactory, DbActionFactory>()
+                                                       .AddMockSingleton<IDatabaseConfigurationService>()
+                                                       .AddMockSingleton<IThumbnailService>()
+                                                       .AddMockSingleton<IUserInteractionService>()
+                                                       .AddMockSingleton<IUserNotificationService>()
+                                                       .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
+                                                       .AddSingleton<IMemoryCache, MemoryCache>()
+                                                       .AddMockSingleton<IExecutionService>(
+                                                           (sp, i) =>
+                                                           {
+                                                               i.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                                                                .Returns(ExecutionResponse.NoResult);
+                                                               return configurator?.VisitExecutionManager?.Invoke(sp, i) ?? i;
+                                                           }
+                                                       )
+                                                       .AddMockSingleton<ISearchServiceOrchestrator>(
+                                                           (_, i) =>
+                                                           {
+                                                               i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
+                                                                .Returns(true);
+                                                               return i;
+                                                           }
+                                                       )
+                                                       .AddMockSingleton<IStoreLoader>(
+                                                           (sp, i) =>
+                                                           {
+                                                               i.Load().Returns([new AliasStore(sp), new ReservedAliasStore(sp), new CalculatorStore(sp)]);
+                                                               return i;
+                                                           }
+                                                       );
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        var viewModel = serviceProvider.GetService<MainViewModel>();
+        await scope(viewModel);
+    }
+
+    [Fact]
+    public async Task BeAbleToExecuteAliases()
+    {
+        IExecutionService sut = null;
+        var visitors = new ServiceVisitors
+        {
+            VisitExecutionManager = (_, i) =>
+            {
+                sut = i;
+                return i;
+            }
+        };
+        await TestViewModel(
+            async viewModel =>
             {
                 // ARRANGE
-                Substitute.For<ILoggerFactory>();
-
-                var executor = Substitute.For<IExecutionManager>();
-                executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                        .Returns(new ExecutionResponse { Results = new List<QueryResult>() { new NotExecutableTestAlias() } });
-
-                var vm = new MainViewModelBuilder()
-                         .With(OutputHelper)
-                         .With(scheduler)
-                         .With(executor)
-                         .Build();
-
-                vm.Query.Value = expression;
+                var alias = Substitute.For<ExecutableQueryResult>();
+                viewModel.Results.Add(alias);
 
                 // ACT
-                var request = new AliasExecutionRequest { Query = expression };
-                vm.ExecuteAlias.Execute(request).Subscribe();
+                viewModel.SelectedResult = alias;
+                await viewModel.ExecuteCommand.ExecuteAsync(false); //RunAsAdmin: false
 
-                scheduler.Start();
-                vm.CurrentAlias?.Name?.Should().Be(result);
+                // ASSERT done in ServiceCollectionConfigurator
+                using var _ = new AssertionScope();
+                sut.Should().NotBeNull();
+                await sut.Received().ExecuteAsync(Arg.Any<ExecutionRequest>());
+            },
+            SqlBuilder.Empty,
+            visitors
+        );
+    }
+
+    [Theory]
+    [InlineData("2+5", "7")]
+    [InlineData("2 + 5", "7")]
+    [InlineData("2 * 5", "10")]
+    public async Task BeAbleToExecuteCalculation(string operation, string result)
+    {
+        await TestViewModel(
+            async viewModel =>
+            {
+                // ARRANGE
+                var alias = Substitute.For<ExecutableQueryResult>();
+                viewModel.Results.Add(alias);
+
+                // ACT
+                viewModel.Query = operation;
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                // ASSERT done in ServiceCollectionConfigurator
+                using var _ = new AssertionScope();
+                viewModel.Results.Should().HaveCountGreaterThan(0);
+                viewModel.Results.ElementAt(0).Name.Should().Be(result);
             }
         );
     }
 
     [Fact]
-    public void NotifyWhenCriterionChanges()
+    public async Task BeAbleToSearchAliases()
     {
-        //https://stackoverflow.com/questions/49338867/unit-testing-viewmodel-property-bound-to-reactivecommand-isexecuting
-        new TestScheduler().With(
-            scheduler =>
+        // ARRANGE
+        var sqlBuilder = new SqlBuilder().AppendAlias(1, synonyms: ["alias1", "alias_1"])
+                                         .AppendAlias(2, synonyms: ["alias2", "alias_2"])
+                                         .AppendAlias(3, synonyms: ["alias3", "alias_3"]);
+
+
+        await TestViewModel(
+            async viewModel =>
             {
-                var searchService = Substitute.For<IAsyncSearchService>();
-                var vm = new MainViewModelBuilder()
-                         .With(OutputHelper)
-                         .With(scheduler)
-                         .With(searchService)
-                         .Build();
-
-                scheduler.Schedule(() => vm.Query.Value = "a");
-                scheduler.Schedule(101.Milliseconds(), () => vm.Query.Value += "b");
-                scheduler.Schedule(301.Milliseconds(), () => vm.Query.Value += "c");
-                scheduler.Schedule(501.Milliseconds(), () => vm.Query.Value += "d");
-
-                scheduler.AdvanceTo(1_000.Milliseconds().Ticks);
-
-                searchService.ReceivedWithAnyArgs(4)
-                             .SearchAsync(default);
-            }
-        );
-    }
-
-    [Fact]
-    public void SelectFirstAsCurrentResultsAfterSearch()
-    {
-        new TestScheduler().With(
-            scheduler =>
-            {
-                // ARRANGE
-                var searchService = Substitute.For<IAsyncSearchService>();
-                searchService.SearchAsync(Arg.Any<Cmdline>()).Returns(new List<QueryResult> { new NotExecutableTestAlias(), new NotExecutableTestAlias() });
-                var vm = new MainViewModelBuilder()
-                         .With(OutputHelper)
-                         .With(scheduler)
-                         .With(searchService)
-                         .Build();
-
                 // ACT
-                vm.SearchAlias.Execute("__").Subscribe();
-
-                scheduler.Start();
+                viewModel.Query = "alias";
+                await viewModel.SearchCommand.ExecuteAsync(null);
 
                 // ASSERT
-                vm.CurrentAlias.Should().NotBeNull();
-            }
+                viewModel.Results.Count.Should().Be(6);
+            },
+            sqlBuilder
         );
     }
 
-    [Fact]
-    public void SelectFirstAsResultsAfterExecutionWithResults()
+    #endregion
+
+    /// <summary>
+    /// Manages a collection of visitor functions that allow users to configure 
+    /// custom behaviour for the <c>serviceProvider</c> with specific types.
+    /// </summary>
+    private class ServiceVisitors
     {
-        var aliasName = "alias1";
-        new TestScheduler().With(
-            scheduler =>
-            {
-                // ARRANGE
-                var executor = Substitute.For<IExecutionManager>();
-                executor.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                        .Returns(new ExecutionResponse { Results = new List<QueryResult>() { ExecutableWithResultsTestAlias.FromName(aliasName) } });
+        #region Properties
 
-                var vm = new MainViewModelBuilder()
-                         .With(OutputHelper)
-                         .With(scheduler)
-                         .With(executor)
-                         .Build();
+        public Func<IServiceProvider, IExecutionService, IExecutionService> VisitExecutionManager { get; set; }
 
-                // ACT
-                vm.CurrentAlias = ExecutableWithResultsTestAlias.FromName("some random name");
-
-                var request = vm.BuildExecutionRequest(aliasName);
-                vm.ExecuteAlias.Execute(request).Subscribe();
-                scheduler.Start();
-
-                vm.CurrentAlias.Should().NotBeNull();
-                vm.CurrentAlias.Name.Should().Be(aliasName);
-            }
-        );
+        #endregion
     }
-
-    [Fact]
-    public void ShowAutoCompleteWhenCallingDebugMacro()
-    {
-        Locator.CurrentMutable.Register<ICmdlineManager>(() => new CmdlineManager());
-        new TestScheduler().With(
-            scheduler =>
-            {
-                // ARRANGE
-                var searchService = Substitute.For<IAsyncSearchService>();
-                searchService.SearchAsync(Arg.Any<Cmdline>())
-                             .Returns(
-                                 new List<QueryResult> { new DebugMacro { Name = "debug" } }
-                             );
-
-                var vm = new MainViewModelBuilder()
-                         .With(OutputHelper)
-                         .With(scheduler)
-                         .With(searchService)
-                         .With(new DebugMacroExecutor())
-                         .Build();
-
-                // ACT
-                vm.Query.Value = "random_query";
-                scheduler.Start();
-
-                var request = vm.BuildExecutionRequest("random_query");
-                vm.ExecuteAlias.Execute(request).Subscribe(); // Execute first result
-                scheduler.Start();
-
-                // ASSERT
-                using (new AssertionScope())
-                {
-                    vm.CurrentAlias.Should().NotBeNull();
-                    vm.CurrentAlias?.Name.Should().Be("debug all"); // I know the first result in debug is 'debug all'
-                }
-            }
-        );
-    }
-
-    [Theory, InlineData(true, 5), InlineData(false, 0)]
-    public void ShowResultWhenConfigured(bool showResult, int expectedCount)
-    {
-        new TestScheduler().With(
-            scheduler =>
-            {
-                // ARRANGE
-                var settings = Substitute.For<ISettingsFacade>();
-                settings.Application.Returns(new AppConfig { Window = new() { ShowResult = showResult } });
-
-                var searchService = Substitute.For<IAsyncSearchService>();
-                searchService.GetAllAsync().Returns(new AliasQueryResult[] { new(), new(), new(), new(), new() });
-
-                var vm = new MainViewModelBuilder()
-                         .With(OutputHelper)
-                         .With(scheduler)
-                         .With(settings)
-                         .With(searchService)
-                         .Build();
-
-                // ACT
-                vm.Activate.Execute().Subscribe();
-
-                // ASSERT
-                scheduler.Start();
-                vm.Results.Should().HaveCount(expectedCount);
-            }
-        );
-    }
-
-    #endregion Methods
 }

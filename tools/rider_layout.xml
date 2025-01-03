@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns">
+    <TypePattern DisplayName="Default Pattern">
+        <Region Name="Fields">
+            <Entry DisplayName="Fields">
+                <Entry.Match>
+                    <Or>
+                        <Kind Is="Field" />
+                        <Kind Is="Constant" />
+                    </Or>
+                </Entry.Match>
+                <Entry.SortBy>
+                    <Access/>
+                    <Name/>
+                </Entry.SortBy>
+            </Entry>
+        </Region>
+
+        <Region Name="Constructors">
+            <Entry DisplayName="Constructors">
+                <Entry.Match>
+                    <Kind Is="Constructor" />
+                </Entry.Match>
+                <Entry.SortBy>
+                    <Static />
+                    <Access/>
+                </Entry.SortBy>
+            </Entry>
+        </Region>
+
+        <Region Name="Properties">
+            <Entry DisplayName="Properties">
+                <Entry.Match>
+                    <Kind Is="Property" />
+                </Entry.Match>
+                <Entry.SortBy>
+                    <Access Order="private internal protected protectedinternal public "/>
+                    <Name/>
+                </Entry.SortBy>
+            </Entry>
+        </Region>
+
+        <Region Name="Methods">
+            <Entry DisplayName="Methods" Priority="100">
+                <Entry.Match>
+                    <Kind Is="Method" />
+                </Entry.Match>
+                <Entry.SortBy>
+                    <Access Order="private internal protected protectedinternal public "/>
+                    <Name/>
+                </Entry.SortBy>
+            </Entry>
+        </Region>
+
+    </TypePattern>
+</Patterns>

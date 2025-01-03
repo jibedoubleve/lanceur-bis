@@ -7,10 +7,10 @@ namespace Lanceur.SharedKernel.Web;
 ///<inheritdoc />
 public class FavIconDownloader : IFavIconDownloader
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<FavIconDownloader> _logger;
     private readonly HashSet<string> _failedPaths = new();
 
-    public FavIconDownloader(ILogger logger) => _logger = logger;
+    public FavIconDownloader(ILogger<FavIconDownloader> logger) => _logger = logger;
 
     #region Methods
 

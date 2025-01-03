@@ -12,7 +12,7 @@
 #define MyAppName "Lanceur 2"
 #define MyAppPublisher "JB Wautier"
 #define MyAppURL "https://github.com/jibedoubleve/lanceur-bis"
-#define MyAppExeName "Lanceur.exe"
+#define MyAppExeName "Lanceur.Ui.WPF.exe"
 
 [Setup]
 PrivilegesRequired=admin

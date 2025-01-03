@@ -1,0 +1,109 @@
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.ApplicationSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="ApplicationSettings"
+    d:Height="600"
+    d:Width="800"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <ObjectDataProvider
+            x:Key="KeySource"
+            MethodName="GetValues"
+            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="Key" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <x:Array x:Key="WindowBackdropStyles" Type="{x:Type sys:String}">
+            <sys:String>Acrylic</sys:String>
+            <sys:String>Auto</sys:String>
+            <sys:String>Mica</sys:String>
+            <sys:String>None</sys:String>
+            <sys:String>Tabbed</sys:String>
+        </x:Array>
+    </Page.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <ui:Button
+                Margin="6"
+                Command="{Binding SaveSettingsCommand}"
+                Content="Save"
+                Icon="{ui:SymbolIcon Save24}" 
+                Appearance="Primary"/>
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
+            <StackPanel>
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Keyboard24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Hot key" />
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Margin="0,0,5,0" Content="Ctrl" IsChecked="{Binding IsCtrl}" />
+                        <CheckBox Margin="0,0,5,0" Content="Alt" IsChecked="{Binding IsAlt}" />
+                        <CheckBox Margin="0,0,5,0" Content="Win" IsChecked="{Binding IsWin}" />
+                        <CheckBox Margin="0,0,5,0" Content="Shift" IsChecked="{Binding IsShift}" />
+                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}"
+                                  SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
+                    </StackPanel>
+                </ui:CardControl>
+
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Color24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Glass Effect" />
+                    </ui:CardControl.Header>
+                    <ComboBox SelectedItem="{Binding WindowBackdropStyle}"
+                              ItemsSource="{StaticResource WindowBackdropStyles}" />
+                
+                </ui:CardControl>
+                <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon Timer24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Search Trigger Delay (ms)" />
+                    </ui:CardControl.Header>
+                    <ui:CardControl.ToolTip>Time in milliseconds before search starts after typing stops.</ui:CardControl.ToolTip>
+                    <ui:NumberBox Value="{Binding SearchDelay, UpdateSourceTrigger=PropertyChanged}"/>
+                </ui:CardControl>
+
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ClipboardBulletListLtr20}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="When search box becomes visible..." />
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ToggleSwitch OffContent="show no result" OnContent="Show all results"
+                                         IsChecked="{Binding ShowResult}" />
+                    </StackPanel>
+                </ui:CardControl>
+
+                <ui:CardControl
+                    Margin="5,0,5,12"
+                    Icon="{ui:SymbolIcon Database24}"
+                    ToolTip="This change will take effect until you restart the application or adjust it again here.">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Database" />
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:TextBox MinWidth="500" Margin="5" Text="{Binding DbPath}" />
+                        <ui:Button Margin="5,0,0,0" Content="Select database" Click="OnClickDbPath" />
+                    </StackPanel>
+                </ui:CardControl>
+
+                <ui:CardControl Margin="5,0,5,12" Icon="{ui:SymbolIcon NoteBookError24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Enable trace until the next restart" />
+                    </ui:CardControl.Header>
+                    <ui:ToggleSwitch OnContent="Trace enabled"
+                                     OffContent="Trace disabled"
+                                     IsChecked="{Binding IsTraceEnabled}" />
+                </ui:CardControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

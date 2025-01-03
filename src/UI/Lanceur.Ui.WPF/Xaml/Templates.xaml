@@ -1,0 +1,108 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:vm="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core">
+    <!--  TEMPLATES  -->
+    <DataTemplate x:Key="QueryResultTemplate" DataType="{x:Type vm:QueryResult}">
+        <Border HorizontalAlignment="Stretch" Background="Transparent">
+            <DockPanel>
+                <Border
+                    Width="{StaticResource DefaultIconContainerSize}"
+                    Height="{StaticResource DefaultIconContainerSize}"
+                    Margin="10,0,5,0"
+                    Background="{ui:ThemeResource AccentTextFillColorTertiaryBrush}"
+                    CornerRadius="8"
+                    Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <Image
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Source="{Binding Thumbnail}"
+                            Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="35">
+                            <ui:SymbolIcon
+                                Filled="False"
+                                FontSize="{StaticResource DefaultIconSize}"
+                                Symbol="{Binding Icon}"
+                                Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
+                        </TextBlock>
+                    </Grid>
+                </Border>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:TextBlock
+                            Margin="12,0,0,0"
+                            FontTypography="Subtitle"
+                            Foreground="{DynamicResource TextFillColorPrimarydBrush}"
+                            Opacity="{StaticResource PrimaryTextOpacity}"
+                            Text="{Binding Name}" />
+                    </StackPanel>
+                    <DockPanel Margin="12,0,15,0" Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ui:TextBlock
+                            FontTypography="Body"
+                            Foreground="{DynamicResource TextFillColorTerciarydBrush}"
+                            Opacity="{StaticResource SecondaryTextOpacity}"
+                            Text="{Binding Description, Converter={StaticResource TextToTruncatedTextConverter}}" />
+                        <ui:TextBlock
+                            HorizontalAlignment="Right"
+                            FontTypography="Caption"
+                            Foreground="{DynamicResource TextFillColorTerciarydBrush}"
+                            Opacity="{StaticResource SecondaryTextOpacity}"
+                            Text="{Binding Count, StringFormat=Count: {0}}" />
+                    </DockPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate x:Key="AliasSettingsTemplate" DataType="{x:Type vm:QueryResult}">
+        <Border HorizontalAlignment="Stretch" Background="Transparent">
+            <DockPanel>
+                <Border
+                    Width="{StaticResource SmallIconContainerSize}"
+                    Height="{StaticResource SmallIconContainerSize}"
+                    Margin="10,0,5,0"
+                    Background="{ui:ThemeResource AccentTextFillColorTertiaryBrush}"
+                    CornerRadius="8"
+                    Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid>
+                        <Image
+                            Width="{StaticResource SmallIconSize}"
+                            Height="{StaticResource SmallIconSize}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Source="{Binding Thumbnail}"
+                            Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
+                        <ui:SymbolIcon
+                            Width="{StaticResource SmallIconSize}"
+                            Height="{StaticResource SmallIconSize}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Filled="False"
+                            FontSize="35"
+                            Symbol="{Binding Icon}"
+                            Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
+                    </Grid>
+                </Border>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:TextBlock
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center"
+                            FontTypography="BodyStrong"
+                            Foreground="{DynamicResource TextFillColorPrimarydBrush}"
+                            Opacity="{StaticResource PrimaryTextOpacity}"
+                            Text="{Binding Name}" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </DataTemplate>
+
+</ResourceDictionary>

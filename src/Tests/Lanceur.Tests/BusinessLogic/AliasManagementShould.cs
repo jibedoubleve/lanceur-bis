@@ -5,11 +5,13 @@ using FluentAssertions.Execution;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite;
+using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
+using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.SQLite;
+using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Lanceur.Infra.SQLite.DataAccess;
 using Xunit;
 using Xunit.Abstractions;
 using static Lanceur.SharedKernel.Constants;
@@ -22,7 +24,7 @@ public class AliasManagementShould : TestBase
 
     public AliasManagementShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -44,18 +46,17 @@ public class AliasManagementShould : TestBase
 
     private static AliasDbAction BuildAliasDbAction(IDbConnection connection)
     {
-        var scope = new DbSingleConnectionManager(connection);
         var log = Substitute.For<ILoggerFactory>();
-        var action = new AliasDbAction(scope, log);
+        var action = new AliasDbAction(log);
         return action;
     }
 
-    private static SQLiteRepository BuildDataService(IDbConnection connection)
+    private static SQLiteAliasRepository BuildDataService(IDbConnection connection)
     {
         var scope = new DbSingleConnectionManager(connection);
         var log = Substitute.For<ILoggerFactory>();
-        var conv = Substitute.For<IConversionService>();
-        var service = new SQLiteRepository(scope, log, conv);
+        var conv = Substitute.For<IMappingService>();
+        var service = new SQLiteAliasRepository(scope, log, conv, new DbActionFactory(new AutoMapperMappingService(), log));
         return service;
     }
 
@@ -63,14 +64,15 @@ public class AliasManagementShould : TestBase
     public void CreateAlias()
     {
         // ARRANGE
-        const string sql = @"
-                insert into alias(id) values (1001);
-                insert into alias(id) values (1002);
-                insert into alias(id) values (1003);
+        const string sql = """
+                           insert into alias(id) values (1001);
+                           insert into alias(id) values (1002);
+                           insert into alias(id) values (1003);
 
-                insert into alias_name(id, name, id_alias) values (1000, 'noname', 1001);
-                insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
-                insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);";
+                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 1001);
+                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
+                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);
+                           """;
 
         var connection = BuildFreshDb(sql);
         var action = BuildAliasDbAction(connection);
@@ -78,11 +80,17 @@ public class AliasManagementShould : TestBase
         var alias1 = BuildAlias();
         var alias2 = BuildAlias();
         var alias3 = BuildAlias();
+        var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        action.Create(ref alias1);
-        action.Create(ref alias2);
-        action.Create(ref alias3);
+        c.WithinTransaction(
+            tx =>
+            {
+                action.Create(tx, ref alias1);
+                action.Create(tx, ref alias2);
+                action.Create(tx, ref alias3);
+            }
+        );
 
         //ASSERT
         using (new AssertionScope())
@@ -107,13 +115,17 @@ public class AliasManagementShould : TestBase
 
         var connection = BuildFreshDb();
         var action = BuildAliasDbAction(connection);
-
+        var c = new DbSingleConnectionManager(connection);
         QueryResult alias1 = new AliasQueryResult { Name = aliasName };
 
         // ACT
-        action.CreateInvisible(ref alias1);
-
-        var sut = action.GetExact(aliasName, true);
+        var sut = c.WithinTransaction(
+            tx =>
+            {
+                action.CreateInvisible(tx, ref alias1);
+                return action.GetExact(aliasName, tx, true);
+            }
+        );
 
         //ASSERT
         sut.Should().NotBeNull();
@@ -124,14 +136,15 @@ public class AliasManagementShould : TestBase
     public void CreateAliasUsingService()
     {
         // ARRANGE
-        var sql = @"
-                insert into alias(id) values (1001);
-                insert into alias(id) values (1002);
-                insert into alias(id) values (1003);
+        const string sql = """
+                           insert into alias(id) values (1001);
+                           insert into alias(id) values (1002);
+                           insert into alias(id) values (1003);
 
-                insert into alias_name(id, name, id_alias) values (1000, 'noname', 1001);
-                insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
-                insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);";
+                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 1001);
+                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
+                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);
+                           """;
 
         var connection = BuildFreshDb(sql);
         var service = BuildDataService(connection);
@@ -152,8 +165,8 @@ public class AliasManagementShould : TestBase
         //ASSERT
         using (new AssertionScope())
         {
-            var sql2 = "select count(*) from alias;";
-            var sql3 = "select count(*) from alias_name;";
+            const string sql2 = "select count(*) from alias;";
+            const string sql3 = "select count(*) from alias_name;";
 
             alias1.Name.Should().Be(name1);
             alias2.Name.Should().Be(name2);
@@ -203,17 +216,19 @@ public class AliasManagementShould : TestBase
     public void FindExact()
     {
         // ARRANGE
-        const string sql = @"
-                insert into alias(id) values (100);
-                insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
-                insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
-                insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
+        const string sql = """
+                           insert into alias(id) values (100);
+                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);
+                           """;
 
         var connection = BuildFreshDb(sql);
         var action = BuildAliasDbAction(connection);
+        var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        var found = action.GetExact("noname");
+        var found = c.WithinTransaction(tx => action.GetExact("noname", tx));
 
         // ASSERT
         using (new AssertionScope())
@@ -227,17 +242,19 @@ public class AliasManagementShould : TestBase
     public void FindNoExact()
     {
         // ARRANGE
-        var sql = @"
-                insert into alias(id) values (100);
-                insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
-                insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
-                insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);";
+        const string sql = """
+                           insert into alias(id) values (100);
+                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);
+                           """;
 
         var connection = BuildFreshDb(sql);
         var action = BuildAliasDbAction(connection);
+        var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        var found = action.GetExact("nothing");
+        var found = c.WithinTransaction(tx => action.GetExact("nothing", tx));
 
         // ASSERT
         using (new AssertionScope()) { found.Should().BeNull(); }
@@ -249,16 +266,22 @@ public class AliasManagementShould : TestBase
         // ARRANGE
         var connection = BuildFreshDb();
         var action = BuildAliasDbAction(connection);
+        var c = new DbSingleConnectionManager(connection);
 
         var alias = BuildAlias();
 
         // ACT
-        action.Create(ref alias);
-        action.Remove(alias);
+        c.WithinTransaction(
+            tx =>
+            {
+                action.Create(tx, ref alias);
+                action.Remove(alias, tx);
+            }
+        );
 
         //ASSERT
-        var sql2 = "select count(*) from alias";
-        var sql3 = "select count(*) from alias_name";
+        const string sql2 = "select count(*) from alias";
+        const string sql3 = "select count(*) from alias_name";
 
         connection.ExecuteScalar<int>(sql2).Should().Be(0);
         connection.ExecuteScalar<int>(sql3).Should().Be(0);
@@ -282,8 +305,8 @@ public class AliasManagementShould : TestBase
         service.Remove(alias1);
 
         //ASSERT
-        var sql2 = "select count(*) from alias";
-        var sql3 = "select count(*) from alias_name";
+        const string sql2 = "select count(*) from alias";
+        const string sql3 = "select count(*) from alias_name";
 
         alias1.Id.Should().BeGreaterThan(0);
         connection.ExecuteScalar<int>(sql2).Should().Be(2);
@@ -294,29 +317,31 @@ public class AliasManagementShould : TestBase
     public void RemoveAliasWithDbActionSql()
     {
         // ARRANGE
-        var sql = @"
-                insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
-                insert into alias_name(name, id_alias) values ('noname', 256);
+        const string sql = """
+                           insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 256);
 
-                insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
-                insert into alias_name(name, id_alias) values ('noname', 257);
+                           insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 257);
 
-                insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
-                insert into alias_name(name, id_alias) values ('noname', 258);";
+                           insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 258);
+                           """;
         var connection = BuildFreshDb(sql);
+        var c = new DbSingleConnectionManager(connection);
 
         var action = BuildAliasDbAction(connection);
 
         // ACT
-        action.Remove(new AliasQueryResult() { Id = 256 });
+        c.WithinTransaction(tx => action.Remove(new()  { Id = 256 }, tx));
 
         using (new AssertionScope())
         {
             // ASSERT
-            var sql2 = "select count(*) from alias where id = 256";
+            const string sql2 = "select count(*) from alias where id = 256";
             connection.ExecuteScalar<int>(sql2).Should().Be(0);
 
-            var sql3 = "select count(*) from alias_name where id_alias = 256";
+            const string sql3 = "select count(*) from alias_name where id_alias = 256";
             connection.ExecuteScalar<int>(sql3).Should().Be(0);
         }
     }
@@ -325,29 +350,30 @@ public class AliasManagementShould : TestBase
     public void RemoveAliasWithServiceSql()
     {
         // ARRANGE
-        var sql = @"
-                insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
-                insert into alias_name(name, id_alias) values ('noname', 256);
+        const string sql = """
+                           insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 256);
 
-                insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
-                insert into alias_name(name, id_alias) values ('noname', 257);
+                           insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 257);
 
-                insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
-                insert into alias_name(name, id_alias) values ('noname', 258);";
+                           insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 258);
+                           """;
         var connection = BuildFreshDb(sql);
 
         var service = BuildDataService(connection);
 
         // ACT
-        service.Remove(new AliasQueryResult() { Id = 256 });
+        service.Remove(new() { Id = 256 });
 
         // ASSERT
-        var sql2 = "select count(*) from alias where id = 256";
+        const string sql2 = "select count(*) from alias where id = 256";
         connection.ExecuteScalar<int>(sql2).Should().Be(0);
 
-        var sql3 = "select count(*) from alias_name where id_alias = 256";
+        const string sql3 = "select count(*) from alias_name where id_alias = 256";
         connection.ExecuteScalar<int>(sql3).Should().Be(0);
     }
 
-    #endregion Methods
+    #endregion
 }

@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Data.SQLite;
 using System.Reflection;
 
 namespace System.SQLite.Updater;

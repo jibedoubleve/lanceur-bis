@@ -1,0 +1,196 @@
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.DataReconciliationView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="Self"
+    Title="DataReconciliationView"
+    d:DesignHeight="800"
+    d:DesignWidth="800"
+    Background="{DynamicResource ApplicationBackgroundBrush}"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <ResourceDictionary>
+            <StackPanel
+                x:Key="MergeDialog"
+                Height="Auto"
+                VerticalAlignment="Center">
+
+                <ui:TextBlock Margin="5,5,5,15" FontTypography="BodyStrong">
+                    <Run Text="You can adjust the settings as necessary." />
+                    <LineBreak />
+                    <Run Text="Once you have made your modifications, click on 'Update changes' to apply the changes" />
+                </ui:TextBlock>
+
+                <Label Margin="0,10,0,0" Content="Alias names" />
+                <TextBox Text="{Binding Synonyms, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Label Margin="0,10,0,0" Content="Parameters"
+                       Visibility="{Binding List, Converter={StaticResource EnumerableToVisibilityConverter}}" />
+                <DataGrid
+                    Visibility="{Binding List, Converter={StaticResource EnumerableToVisibilityConverter}}"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    CanUserReorderColumns="False"
+                    CanUserResizeColumns="True"
+                    ItemsSource="{Binding List}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding Key}"
+                            Header="Key" />
+                        <DataGridTextColumn
+                            Width="3*"
+                            Binding="{Binding Value}"
+                            Header="Value" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ResourceDictionary>
+    </Page.Resources>
+    <interactivity:Interaction.Triggers>
+        <interactivity:EventTrigger EventName="Loaded">
+            <interactivity:InvokeCommandAction Command="{Binding ShowDoubloonsCommand}" />
+        </interactivity:EventTrigger>
+    </interactivity:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="Show data" Icon="{ui:SymbolIcon Database24}">
+                <MenuItem
+                    Command="{Binding ShowDoubloonsCommand}"
+                    Header="Doubloons"
+                    Icon="{ui:SymbolIcon ColumnDoubleCompare20}" />
+                <MenuItem
+                    Command="{Binding ShowEmptyKeywordsCommand}"
+                    Header="Empty keywords"
+                    Icon="{ui:SymbolIcon WeatherDustStorm24}" />
+            </MenuItem>
+            <MenuItem
+                Command="{Binding DeleteCommand}"
+                Header="Delete selected"
+                Icon="{ui:SymbolIcon Delete24}" />
+            <MenuItem
+                Command="{Binding MergeCommand}"
+                CommandParameter="{StaticResource MergeDialog}"
+                Header="Merge selected"
+                Icon="{ui:SymbolIcon Merge24}"
+                Visibility="{Binding ReportType, Converter={StaticResource IsDoubloonReportToVisibilityConverter}}" />
+        </Menu>
+        <StackPanel Grid.Row="1">
+            <ui:TextBlock
+                Margin="15,5,5,15"
+                FontTypography="Title"
+                Text="{Binding Title}" />
+            <ui:DataGrid
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                CanUserDeleteRows="False"
+                CanUserReorderColumns="False"
+                GridLinesVisibility="Vertical"
+                HeadersVisibility="Column"
+                ItemsSource="{Binding Aliases}">
+                <DataGrid.Columns>
+                    <!--  CHECKBOX  -->
+                    <DataGridTemplateColumn Width="35">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    <interactivity:Interaction.Triggers>
+                                        <interactivity:EventTrigger EventName="Checked">
+                                            <interactivity:InvokeCommandAction
+                                                Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
+                                        </interactivity:EventTrigger>
+                                        <interactivity:EventTrigger EventName="Unchecked">
+                                            <interactivity:InvokeCommandAction
+                                                Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
+                                        </interactivity:EventTrigger>
+                                    </interactivity:Interaction.Triggers>
+                                </CheckBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  ICON  -->
+                    <DataGridTemplateColumn Width="60" Header="Icon">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border
+                                    Width="{StaticResource SmallIconContainerSize}"
+                                    Height="{StaticResource SmallIconContainerSize}"
+                                    Background="{ui:ThemeResource AccentTextFillColorTertiaryBrush}"
+                                    CornerRadius="8">
+                                    <Grid>
+                                        <Image
+                                            Width="{StaticResource SmallIconSize}"
+                                            Height="{StaticResource SmallIconSize}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Source="{Binding Thumbnail}"
+                                            Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
+                                        <ui:SymbolIcon
+                                            Width="{StaticResource SmallIconSize}"
+                                            Height="{StaticResource SmallIconSize}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Filled="False"
+                                            Symbol="{Binding Icon}"
+                                            Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  NAME  -->
+                    <DataGridTemplateColumn Header="Alias">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock
+                                    Margin="5,5,50,5"
+                                    VerticalAlignment="Center"
+                                    FontTypography="BodyStrong"
+                                    Text="{Binding Name}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  FILENAME  -->
+                    <DataGridTemplateColumn Header="File name">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock
+                                    Margin="5,5,50,5"
+                                    VerticalAlignment="Center"
+                                    FontTypography="BodyStrong"
+                                    Text="{Binding FileName}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  PARAMETERS  -->
+                    <DataGridTemplateColumn Header="Parameters">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock
+                                    Margin="5,5,50,5"
+                                    VerticalAlignment="Center"
+                                    FontTypography="BodyStrong"
+                                    Text="{Binding Parameters}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </ui:DataGrid>
+        </StackPanel>
+    </Grid>
+</Page>

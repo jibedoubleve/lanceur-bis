@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Lanceur.Core.Models;
@@ -45,7 +45,7 @@ public abstract class QueryResult : ObservableModel
     /// <remarks>
     /// The fallback behaviour is expected to be handled in the UI
     /// </remarks>
-    public virtual string Icon { get; set; } = "RocketLaunchOutline";
+    public virtual string Icon { get; set; } = "Rocket24";
 
     public long Id { get; set; }
 
@@ -72,13 +72,12 @@ public abstract class QueryResult : ObservableModel
     public Cmdline Query { get; set; } = Cmdline.Empty;
 
     /// <summary>
-    /// Contains a thumbnail that can be displayed on the UI. Put <c>null</c> if you want
-    /// to let <see cref="Icon"/> handle this.
+    /// Represents a thumbnail to display in the UI. Set to <c>null</c> to display the <see cref="Icon"/> instead.
     /// </summary>
     public string Thumbnail
     {
         get => _thumbnail;
-        set => Set(ref _thumbnail, value);
+        set => SetField(ref _thumbnail, value);
     }
 
     #endregion Properties

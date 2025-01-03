@@ -1,15 +1,15 @@
-using AutoMapper;
 using Dapper;
 using FluentAssertions;
-using Lanceur.Core.Models;
-using Lanceur.Infra.SQLite;
+using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Infra.SQLite.DbActions;
+using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Tests.SQLite;
 using Lanceur.Tests.Tooling.Logging;
-using Lanceur.Tests.Tooling.Mocks;
 using Lanceur.Tests.Tooling.SQL;
-using Lanceur.Utils;
+using Lanceur.Ui.Core.Utils;
+using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -21,7 +21,7 @@ public class ThumbnailManagerShould : TestBase
 
     public ThumbnailManagerShould(ITestOutputHelper output) : base(output) { }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -48,22 +48,23 @@ public class ThumbnailManagerShould : TestBase
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
-        var cfg = new MapperConfiguration(cfg => { cfg.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
-        var conversionService = new AutoMapperConverter(new Mapper(cfg));
-        var dbRepository = new SQLiteRepository(connectionMgr, loggerFactory, conversionService);
-        var thumbnailRefresher = new MockThumbnailRefresher();
+        var conversionService = new AutoMapperMappingService();
+        var dbRepository = new SQLiteAliasRepository(connectionMgr, loggerFactory, conversionService, new DbActionFactory(new AutoMapperMappingService(), loggerFactory));
 
-        var thumbnailManager = new ThumbnailManager(loggerFactory, dbRepository, thumbnailRefresher);
+        var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();
+        var favIconManager = Substitute.For<IFavIconService>();
+        var thumbnailManager = new ThumbnailService(loggerFactory, dbRepository, packagedAppSearchService, favIconManager);
+        
         var aliases = dbRepository.Search("a");
 
         // ACT
         thumbnailManager.RefreshThumbnails(aliases);
 
         // ASSERT
-        connectionMgr.WithinTransaction(tx => (long)tx.Connection.ExecuteScalar("select count(*) from alias_argument"))
+        connectionMgr.WithinTransaction(tx => (long)tx.Connection!.ExecuteScalar("select count(*) from alias_argument")!)
                      .Should()
                      .Be(6);
     }
 
-    #endregion Methods
+    #endregion
 }
