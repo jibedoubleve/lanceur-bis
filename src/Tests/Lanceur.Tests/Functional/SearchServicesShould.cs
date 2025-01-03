@@ -1,13 +1,10 @@
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Everything.Wrapper;
 using FluentAssertions;
 using Lanceur.Core;
-using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Infra.Stores;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -22,7 +19,7 @@ public class SearchServicesShould
 
     private ILoggerFactory LoggerFactory => Substitute.For<ILoggerFactory>();
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -42,6 +39,26 @@ public class SearchServicesShould
                                                      .AddSingleton(DbRepository)
                                                      .BuildServiceProvider();
         var store = new AdditionalParametersStore(serviceProvider);
+
+        // ASSERT
+        var regex = new Regex(store.Orchestration.AlivePattern);
+        regex.IsMatch(query).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(":1254")]
+    [InlineData(">undeux")]
+    [InlineData("sqlite")]
+    [InlineData("123")]
+    [InlineData("----")]
+    public void ActivateAliasStore(string query)
+    {
+        // ACT
+        var serviceProvider = new ServiceCollection().AddSingleton(DbRepository)
+                                                     .AddSingleton(LoggerFactory)
+                                                     .BuildServiceProvider();
+        var store = new AliasStore(serviceProvider);
 
         // ASSERT
         var regex = new Regex(store.Orchestration.AlivePattern);
@@ -90,6 +107,27 @@ public class SearchServicesShould
     }
 
     [Theory]
+    [InlineData("")]
+    [InlineData(":1254")]
+    [InlineData(">undeux")]
+    [InlineData("sqlite")]
+    [InlineData("123")]
+    [InlineData("----")]
+    public void ActivateReservedAliasStore(string query)
+    {
+        // ACT
+        var serviceProvider = new ServiceCollection().AddSingleton<AssemblySource>()
+                                                     .AddSingleton(DbRepository)
+                                                     .AddSingleton(LoggerFactory)
+                                                     .BuildServiceProvider();
+        var store = new ReservedAliasStore(serviceProvider);
+
+        // ASSERT
+        var regex = new Regex(store.Orchestration.AlivePattern);
+        regex.IsMatch(query).Should().BeTrue();
+    }
+
+    [Theory]
     [InlineData("sqlite")]
     [InlineData("")]
     [InlineData("null")]
@@ -116,68 +154,6 @@ public class SearchServicesShould
         regex.IsMatch(query).Should().BeFalse();
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData(":1254")]
-    [InlineData(">undeux")]
-    [InlineData("sqlite")]
-    [InlineData("123")]
-    [InlineData("----")]
-    public void ActivateAliasStore(string query)
-    {
-        // ACT
-        var serviceProvider = new ServiceCollection().AddSingleton(DbRepository)
-                                                     .AddSingleton(LoggerFactory)
-                                                     .BuildServiceProvider();
-        var store = new AliasStore(serviceProvider);
-
-        // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeTrue();
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData(":1254")]
-    [InlineData(">undeux")]
-    [InlineData("sqlite")]
-    [InlineData("123")]
-    [InlineData("----")]
-    public void ActivateReservedAliasStore(string query)
-    {
-        // ACT
-        var serviceProvider = new ServiceCollection().AddSingleton<AssemblySource>()
-                                                     .AddSingleton(DbRepository)
-                                                     .AddSingleton(LoggerFactory)
-                                                     .BuildServiceProvider();
-        var store = new ReservedAliasStore(serviceProvider);
-
-        // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeTrue();
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData(":1254")]
-    [InlineData(">undeux")]
-    [InlineData("sqlite")]
-    [InlineData("123")]
-    [InlineData("----")]
-    public void ActivatePluginStore(string query)
-    {
-        // ACT
-        var serviceProvider = new ServiceCollection().AddSingleton(DbRepository)
-                                                     .AddSingleton(LoggerFactory)
-                                                     .AddSingleton(Substitute.For<IPluginStoreContext>())
-                                                     .AddSingleton(Substitute.For<IPluginManager>())
-                                                     .BuildServiceProvider();
-        var store = new PluginStore(serviceProvider);
-
-        // ASSERT
-        var regex = new Regex(store.Orchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeTrue();
-    }
 
     [Theory]
     [InlineData("e6+5")]
@@ -217,5 +193,5 @@ public class SearchServicesShould
         regex.IsMatch(query).Should().BeFalse();
     }
 
-    #endregion Methods
+    #endregion
 }

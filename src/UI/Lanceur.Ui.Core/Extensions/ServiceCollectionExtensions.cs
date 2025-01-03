@@ -2,7 +2,6 @@ using System.Data;
 using System.Data.SQLite;
 using Everything.Wrapper;
 using Lanceur.Core.Managers;
-using Lanceur.Core.Plugins;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -10,7 +9,6 @@ using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
 using Lanceur.Infra.Managers;
-using Lanceur.Infra.Plugins;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
@@ -115,8 +113,6 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IFavIconManager, FavIconManager>()
                          .AddTransient<IFavIconDownloader, FavIconDownloader>()
-                         .AddTransient<IPluginManager, PluginManager>()
-                         .AddTransient<IPluginStoreContext, PluginStoreContext>()
                          .AddTransient<IEverythingApi, EverythingApi>()
                          .AddTransient<IExecutionManager, ExecutionManager>()
                          .AddTransient<IWildcardManager, ReplacementComposite>()
