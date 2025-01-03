@@ -26,7 +26,7 @@ public partial class AnalyticsView : IDisposable
         _logger = logger;
 
         viewModel.OnRefreshDailyPlot = (x, y) => RefreshScatter(x, y, "Daily history");
-        viewModel.OnRefreshMonthlyPlot = (x, y) => RefreshScatter(x, y, "Monthly history");
+        viewModel.OnRefreshMonthlyPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToMonthYear, "Monthly history", "Month Year", new() { Rotation = -45, PositionMultipier =  2 });
         viewModel.OnRefreshUsageByHourPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToTimeString, "Usage by hour of day", "Hours of day");
         viewModel.OnRefreshUsageByDayOfWeekPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToDayOfWeek, "Usage by day of week", "Day of week");
 
@@ -53,8 +53,9 @@ public partial class AnalyticsView : IDisposable
 
     private void OnThemeChanged(ApplicationTheme _, Color __) => SetTheme();
 
-    private void RefreshBar(IEnumerable<double> xPoint, IEnumerable<double> yPoint, Func<double, string> convertBarName, string plotTitle, string bottomAxesTitle)
+    private void RefreshBar(IEnumerable<double> xPoint, IEnumerable<double> yPoint, Func<double, string> convertBarName, string plotTitle, string bottomAxesTitle, Options? options = null)
     {
+        options ??= new();
         var x = xPoint.ToArray();
         var y = yPoint.ToArray();
 
@@ -66,16 +67,20 @@ public partial class AnalyticsView : IDisposable
         HistoryPlot.Plot.Clear();
 
         var positions = Enumerable.Range(0, y.Length)
-                                  .Select(e => (double)e)
+                                  .Select(e => (double)e * options.PositionMultipier) // Artificially add space between axis
                                   .ToArray();
+
 
         var barPlot = HistoryPlot.Plot.Add.Bars(positions, y);
         barPlot.ValueLabelStyle.ForeColor = CurrentTheme.LegendFontColor;
+
+        barPlot.ValueLabelStyle.Rotation = options.Rotation;
+        barPlot.ValueLabelStyle.FontSize = 10;
         barPlot.Color = CurrentTheme.Palette.Colors[0];
         for (var i = 0; i < positions.Length; i++)
         {
             var b = barPlot.Bars.ElementAt(i);
-            b.Label = convertBarName(i);
+            b.Label = convertBarName(x[i]);
         }
 
         SetTheme();
@@ -100,12 +105,11 @@ public partial class AnalyticsView : IDisposable
         SetTheme();
 
         // Manage data
-
         HistoryPlot.Plot.Clear();
 
         var plot = HistoryPlot.Plot.Add.Scatter(x, y);
+        plot.MarkerSize = 0;
         plot.ConnectStyle = ConnectStyle.StepHorizontal;
-
         HistoryPlot.Plot.Axes.Title.Label.Text = plotTitle;
 
         // Dates
@@ -151,6 +155,16 @@ public partial class AnalyticsView : IDisposable
     }
 
     #endregion
+
+    private record Options
+    {
+        #region Properties
+
+        public int PositionMultipier { get; init; } = 1;
+        public int Rotation { get; init; }
+
+        #endregion
+    }
 
     private class ThemeColor
     {
