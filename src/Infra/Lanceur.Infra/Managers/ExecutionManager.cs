@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Lanceur.Core;
 using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;
@@ -177,7 +174,7 @@ public class ExecutionManager : IExecutionManager
                 _logger.LogInformation("Executing self executable {Name}", name);
                 exec.IsElevated = request.ExecuteWithPrivilege;
                 return ExecutionResponse.FromResults(
-                    await exec.ExecuteAsync(Lanceur.Core.Managers.CmdlineManager.BuildFromText(request.Query))
+                    await exec.ExecuteAsync(CmdlineManager.BuildFromText(request.Query))
                 );
 
             default: throw new NotSupportedException($"Cannot execute query result '{request.QueryResult?.Name ?? "<EMPTY>"}'");

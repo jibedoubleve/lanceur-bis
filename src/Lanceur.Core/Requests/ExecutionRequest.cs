@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Requests;
 
-public class ExecutionRequest
+public record ExecutionRequest
 {
     #region Properties
 

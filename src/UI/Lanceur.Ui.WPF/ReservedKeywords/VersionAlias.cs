@@ -15,12 +15,17 @@ public class VersionAlias : SelfExecutableQueryResult
     #region Fields
 
     private readonly IUserInteractionService _userInteraction;
+    private readonly IUserNotificationService _userNotification;
 
     #endregion
 
     #region Constructors
 
-    public VersionAlias(IServiceProvider serviceProvider) => _userInteraction = serviceProvider.GetService<IUserInteractionService>()!;
+    public VersionAlias(IServiceProvider serviceProvider)
+    {
+        _userInteraction = serviceProvider.GetService<IUserInteractionService>()!;
+        _userNotification = serviceProvider.GetService<IUserNotificationService>()!;
+    }
 
     #endregion
 
@@ -34,6 +39,7 @@ public class VersionAlias : SelfExecutableQueryResult
 
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
+        _userNotification.DisableLoadingState();
         var asm = Assembly.GetExecutingAssembly();
         var semver = FileVersionInfo.GetVersionInfo(asm.Location).ProductVersion;
         var semverSplit = semver?.Split(["+"], StringSplitOptions.RemoveEmptyEntries);
