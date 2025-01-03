@@ -65,20 +65,22 @@ public class EverythingStore : IStoreService
     {
         if (query.Name != SearchAlias) return Array.Empty<QueryResult>();
 
-        return _everythingApi.Search(query.Parameters)
-                             .Select(
-                                 item => new AliasQueryResult
-                                 {
-                                     Name = item.Name,
-                                     FileName = item.Path,
-                                     Icon = GetIcon(item.ResultType),
-                                     Thumbnail = null,
-                                     IsThumbnailDisabled = true,
-                                     Count = -1
-                                 }
-                             )
-                             .Cast<QueryResult>()
-                             .ToList();
+        var result =  _everythingApi.Search(query.Parameters)
+                                    .Select(
+                                        item => new AliasQueryResult
+                                        {
+                                            Name = item.Name,
+                                            FileName = item.Path,
+                                            Icon = GetIcon(item.ResultType),
+                                            Thumbnail = null,
+                                            IsThumbnailDisabled = true,
+                                            Count = -1
+                                        }
+                                    )
+                                    .Cast<QueryResult>()
+                                    .ToList();
+        _logger.LogTrace("Found {Count} results for request {Request}", result.Count, query);
+        return result;
     }
 
     #endregion

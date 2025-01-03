@@ -8,6 +8,7 @@ using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.ReservedKeywords;
 using Lanceur.Ui.WPF.Services;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui;
 using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
@@ -27,6 +28,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<ISnackbarService, SnackbarService>()
                          .AddSingleton<IUserNotificationService, UserNotificationService>()
                          .AddSingleton<IViewFactory, ViewFactory>()
+                         .AddSingleton<IMemoryCache, MemoryCache>()
                          .AddSingleton(new AssemblySource
                          {
                              ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)), 

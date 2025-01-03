@@ -20,4 +20,5 @@
     <conv:InvertPlotTypeToBooleanConverter x:Key="InvertPlotTypeToBooleanConverter" />
     <conv:DivideByConverter x:Key="DivideByConverter" />
     <conv:EnumerableToVisibilityConverter x:Key="EnumerableToVisibilityConverter" />
+    <conv:CmdLineArgumentsToVisibility x:Key="CmdLineArgumentsToVisibility" />
 </ResourceDictionary>

@@ -99,6 +99,7 @@
                         Background="Transparent"
                         Panel.ZIndex="0"
                         IsEnabled="False"
+                        Visibility="{Binding Query,Converter={StaticResource CmdLineArgumentsToVisibility}}"
                         Text="{Binding Suggestion}" />
                 </Grid>
             </StackPanel>

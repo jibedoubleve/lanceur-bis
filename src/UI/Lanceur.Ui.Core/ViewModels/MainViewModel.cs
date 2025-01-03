@@ -133,15 +133,6 @@ public partial class MainViewModel : ObservableObject
     {
         var criterion = Cmdline.BuildFromText(Query);
 
-        if (_lastCriterion.Name == Cmdline.BuildFromText(Query)?.Name)
-        {
-            // Since the main criterion hasn't changed, avoid triggering a new search.
-            // Instead, update the 'Query' property of each item in the 'Results'
-            // collection to reflect the new parameters.
-            foreach (var item in Results) item.Query = criterion;
-            return;
-        }
-
         if (criterion.IsNullOrEmpty()) Results.Clear();
         var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
         Results = new(results);
