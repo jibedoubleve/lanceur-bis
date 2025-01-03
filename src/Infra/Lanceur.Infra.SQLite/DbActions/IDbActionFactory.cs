@@ -1,7 +1,4 @@
-using System.Data;
-using Lanceur.Infra.SQLite.DbActions;
-
-namespace Lanceur.Infra.SQLite;
+namespace Lanceur.Infra.SQLite.DbActions;
 
 public interface IDbActionFactory
 {

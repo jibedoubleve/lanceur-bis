@@ -8,5 +8,5 @@ public interface IDbConnectionFactory
 
     DbConnection CreateConnection();
 
-    #endregion Methods
+    #endregion
 }

@@ -24,6 +24,15 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     }
 
     /// <inheritdoc />
+    public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        if (conn.State != ConnectionState.Open) conn.Open();
+
+        return action(conn);
+    }
+
+    /// <inheritdoc />
     public void WithinTransaction(Action<IDbTransaction> action)
     {
         WithinTransaction(
@@ -73,16 +82,6 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
             tx.Rollback();
             throw;
         }
-    }
-
-    /// <inheritdoc />
-    public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
-    {
-        
-        using var conn = _connectionFactory.CreateConnection();
-        if (conn.State != ConnectionState.Open) conn.Open();
-
-        return action(conn);
     }
 
     #endregion

@@ -35,6 +35,13 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     public void Dispose() => Connection.Dispose();
 
     /// <inheritdoc />
+    public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
+    {
+        if (Connection.State != ConnectionState.Open) Connection.Open();
+        return action(Connection);
+    }
+
+    /// <inheritdoc />
     public void WithinTransaction(Action<IDbTransaction> action)
     {
         WithinTransaction(
@@ -80,13 +87,6 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
             tx.Rollback();
             throw;
         }
-    }
-
-    /// <inheritdoc />
-    public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
-    {
-        if (Connection.State != ConnectionState.Open) Connection.Open();
-        return action(Connection);
     }
 
     #endregion

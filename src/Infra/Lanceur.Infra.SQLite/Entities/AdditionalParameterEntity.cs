@@ -1,6 +1,6 @@
 namespace Lanceur.Infra.SQLite.Entities;
 
-public class AdditionalParameter
+public class AdditionalParameterEntity
 {
     #region Properties
 

@@ -11,13 +11,13 @@ public abstract class LoggerDbProfiler : IDbProfiler
 
     protected const string Template = "[{Status}] SQL query: {SqlQuery} - {SqlParameters}";
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     protected LoggerDbProfiler(bool doFullLogging) => DoFullLogging = doFullLogging;
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -25,7 +25,7 @@ public abstract class LoggerDbProfiler : IDbProfiler
 
     public virtual bool IsActive => true;
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -49,5 +49,5 @@ public abstract class LoggerDbProfiler : IDbProfiler
 
     public virtual void ReaderFinish(IDataReader reader) { }
 
-    #endregion Methods
+    #endregion
 }

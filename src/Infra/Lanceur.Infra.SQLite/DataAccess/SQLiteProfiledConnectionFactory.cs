@@ -6,8 +6,7 @@ using StackExchange.Profiling.Data;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
-public class SQLiteProfiledConnectionFactory
-    : IDbConnectionFactory
+public class SQLiteProfiledConnectionFactory : IDbConnectionFactory
 {
     #region Fields
 
@@ -17,7 +16,7 @@ public class SQLiteProfiledConnectionFactory
     #endregion
 
     #region Constructors
-    
+
     public SQLiteProfiledConnectionFactory(IConnectionString connectionString, ILogger<SQLiteProfiledConnectionFactory> loggerFactory, bool isFullProvider = false)
     {
         _connectionString = connectionString.ToString();
