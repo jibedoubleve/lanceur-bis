@@ -130,7 +130,7 @@ public interface IAliasRepository
     /// <summary>
     /// Removes the specified list of aliases from the repository
     /// </summary>
-    /// <param name="doubloons">The list of aliases to remove from the repository</param>
+    /// <param name="aliases">The list of aliases to remove from the repository</param>
     void RemoveMany(IEnumerable<AliasQueryResult> aliases);
 
     /// <summary>

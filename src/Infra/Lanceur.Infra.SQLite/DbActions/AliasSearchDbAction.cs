@@ -62,10 +62,10 @@ public class AliasSearchDbAction
 
                    where
                        an.Name like @name
-                       and a.hidden = 0
                    """;
         sql += """
-
+               
+               and a.hidden = 0
                order by
                  a.exec_count desc,
                  an.name

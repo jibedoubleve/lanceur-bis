@@ -5,20 +5,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Repositories;
 
-public class MemoryLocalConfigRepository : ILocalConfigRepository
+public class MemoryApplicationConfigurationService : IApplicationConfigurationService
 {
 
     #region Fields
 
-    private static readonly LocalConfig Settings;
-    private readonly ILogger<MemoryLocalConfigRepository> _logger;
+    private static readonly ApplicationSettings Settings;
+    private readonly ILogger<MemoryApplicationConfigurationService> _logger;
 
     #endregion Fields
 
     #region Constructors
 
-    public MemoryLocalConfigRepository(ILogger<MemoryLocalConfigRepository> logger) { _logger = logger; }
-    static MemoryLocalConfigRepository()
+    public MemoryApplicationConfigurationService(ILogger<MemoryApplicationConfigurationService> logger) { _logger = logger; }
+    static MemoryApplicationConfigurationService()
     {
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         var path = Path.Combine(desktop, "debug.sqlite");
@@ -30,7 +30,7 @@ public class MemoryLocalConfigRepository : ILocalConfigRepository
 
     #region Properties
 
-    public ILocalConfig Current => Settings;
+    public IApplicationSettings Current => Settings;
 
     #endregion Properties
 

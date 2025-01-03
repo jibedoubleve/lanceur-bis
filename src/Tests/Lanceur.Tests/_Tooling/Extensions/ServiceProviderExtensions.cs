@@ -25,7 +25,7 @@ public static class ServiceProviderExtensions
     public static IServiceCollection AddApplicationSettings(this IServiceCollection serviceCollection)
     {
         var settings = Substitute.For<ISettingsFacade>();
-        settings.Application.Returns(new AppConfig());
+        settings.Application.Returns(new DatabaseConfiguration());
 
         serviceCollection.AddSingleton(settings);
 

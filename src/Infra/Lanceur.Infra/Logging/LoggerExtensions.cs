@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Logging;
 
-public static class LoggerMixin
+public static class LoggerExtensions
 {
     #region Methods
 

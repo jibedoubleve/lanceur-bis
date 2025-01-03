@@ -5,7 +5,7 @@ using Lanceur.SharedKernel.Mixins;
 
 namespace Lanceur.Infra.Managers;
 
-public class MacroManager : MacroManagerCache, IMacroManager
+public class MacroManager : MacroCachedManager, IMacroManager
 {
     #region Constructors
 

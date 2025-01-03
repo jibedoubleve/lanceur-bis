@@ -7,7 +7,7 @@ public class LimitedStringLengthFormatter : IStringFormatter
 {
     #region Fields
 
-    public const int MaxLength = 90;
+    private const int MaxLength = 90;
 
     #endregion Fields
 

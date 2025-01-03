@@ -40,8 +40,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<IAppConfigRepository, SQLiteAppConfigRepository>();
-        serviceCollection.AddTransient<ISettingsFacade, SettingsFacade>();
+        serviceCollection.AddTransient<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>();
+        serviceCollection.AddTransient<ISettingsFacade, SettingsFacadeService>();
         return serviceCollection;
     }
 
@@ -118,8 +118,8 @@ public static class ServiceCollectionExtensions
 
         ConditionalExecution.Set(
             serviceCollection,
-            s => s.AddSingleton<ILocalConfigRepository, MemoryLocalConfigRepository>(),
-            s => s.AddSingleton<ILocalConfigRepository, JsonLocalConfigRepository>()
+            s => s.AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>(),
+            s => s.AddSingleton<IApplicationConfigurationService, JsonApplicationConfigurationService>()
         );
 
         return serviceCollection;

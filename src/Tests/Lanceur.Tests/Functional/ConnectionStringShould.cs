@@ -32,7 +32,7 @@ public class ConnectionStringShould
     public void NotThrowErrorWhenFileDoesNotExist()
     {
         // Arrange
-        var config = Substitute.For<ILocalConfigRepository>();
+        var config = Substitute.For<IApplicationConfigurationService>();
         config.Current.DbPath.Returns("lkj");
         var logger = Substitute.For<ILogger<ConnectionString>>();
         var cs = new ConnectionString(config, logger);
@@ -56,7 +56,7 @@ public class ConnectionStringShould
     {
         // Arrange
         var file = CreateTemporaryFile();
-        var config = Substitute.For<ILocalConfigRepository>();
+        var config = Substitute.For<IApplicationConfigurationService>();
         config.Current.DbPath.Returns(file);
         var logger = Substitute.For<ILogger<ConnectionString>>();
         var cs = new ConnectionString(config, logger);

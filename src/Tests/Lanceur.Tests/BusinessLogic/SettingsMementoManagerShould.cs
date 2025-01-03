@@ -65,29 +65,29 @@ public class SettingsMementoManagerShould
         var dbPath = Guid.NewGuid().ToString();
 
         // Initial state
-        var initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
+        var initialAppConfig = JsonConvert.DeserializeObject<DatabaseConfiguration>(_jsonAppConfig);
         _output.WriteJson("Initial AppConfig", initialAppConfig);
 
         // Second state
         var replacement = @$"""{property}"": {newValue}";
         var newJson = regex.Replace(_jsonAppConfig, replacement);
-        var secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(newJson);
+        var secondAppConfig = JsonConvert.DeserializeObject<DatabaseConfiguration>(newJson);
         _output.WriteJson("Second AppConfig", secondAppConfig);
         _output.WriteLine($"Replacement: '{replacement}', Pattern: '{pattern}'");
 
         secondDbPath = secondDbPath.IsNullOrWhiteSpace() ? dbPath : secondDbPath;
 
         // Setup SettingsFacade
-        var databaseConfig = Substitute.For<ILocalConfig>();
+        var databaseConfig = Substitute.For<IApplicationSettings>();
         databaseConfig.DbPath.Returns(dbPath, secondDbPath);
 
-        var databaseConfigRepository = Substitute.For<ILocalConfigRepository>();
+        var databaseConfigRepository = Substitute.For<IApplicationConfigurationService>();
         databaseConfigRepository.Current.Returns(databaseConfig);
 
-        var appConfigRepository = Substitute.For<IAppConfigRepository>();
+        var appConfigRepository = Substitute.For<IDatabaseConfigurationService>();
         appConfigRepository.Current.Returns(initialAppConfig, secondAppConfig);
 
-        var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
+        var settingsFacade = new SettingsFacadeService(databaseConfigRepository, appConfigRepository);
 
         // ACT
         var memento = SettingsMementoManager.GetInitialState(settingsFacade);
@@ -104,24 +104,24 @@ public class SettingsMementoManagerShould
         // ARRANGE
         // First state
         var dbPath = Guid.NewGuid().ToString();
-        var initialAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
+        var initialAppConfig = JsonConvert.DeserializeObject<DatabaseConfiguration>(_jsonAppConfig);
         var initialDbPath = dbPath;
 
         // Second state
-        var secondAppConfig = JsonConvert.DeserializeObject<AppConfig>(_jsonAppConfig);
+        var secondAppConfig = JsonConvert.DeserializeObject<DatabaseConfiguration>(_jsonAppConfig);
         var secondDbPath = dbPath;
 
         // Setup SettingsFacade
-        var databaseConfig = Substitute.For<ILocalConfig>();
+        var databaseConfig = Substitute.For<IApplicationSettings>();
         databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
 
-        var databaseConfigRepository = Substitute.For<ILocalConfigRepository>();
+        var databaseConfigRepository = Substitute.For<IApplicationConfigurationService>();
         databaseConfigRepository.Current.Returns(databaseConfig);
 
-        var appConfigRepository = Substitute.For<IAppConfigRepository>();
+        var appConfigRepository = Substitute.For<IDatabaseConfigurationService>();
         appConfigRepository.Current.Returns(initialAppConfig, secondAppConfig);
 
-        var settingsFacade = new SettingsFacade(databaseConfigRepository, appConfigRepository);
+        var settingsFacade = new SettingsFacadeService(databaseConfigRepository, appConfigRepository);
 
         // ACT
         var memento = SettingsMementoManager.GetInitialState(settingsFacade);

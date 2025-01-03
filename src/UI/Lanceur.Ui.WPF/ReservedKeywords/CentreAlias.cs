@@ -17,7 +17,7 @@ namespace Lanceur.Ui.WPF.ReservedKeywords;
 public class CentreAlias : SelfExecutableQueryResult
 {
     private readonly ILogger<CentreAlias>? _logger;
-    private readonly IAppConfigRepository? _appConfig;
+    private readonly IDatabaseConfigurationService? _appConfig;
 
     #region Constructors
 
@@ -27,7 +27,7 @@ public class CentreAlias : SelfExecutableQueryResult
 
         var factory = serviceProvider.GetService<ILoggerFactory>() ?? throw new NullReferenceException("Logger factory is ont configured in the service provider");
         _logger = factory.CreateLogger<CentreAlias>();
-        _appConfig = serviceProvider.GetService<IAppConfigRepository>() ?? throw new NullReferenceException(nameof(_appConfig));
+        _appConfig = serviceProvider.GetService<IDatabaseConfigurationService>() ?? throw new NullReferenceException(nameof(_appConfig));
     }
 
     #endregion

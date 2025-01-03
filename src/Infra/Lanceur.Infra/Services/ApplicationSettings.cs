@@ -3,7 +3,7 @@ using Lanceur.Infra.Constants;
 
 namespace Lanceur.Infra.Services;
 
-public class LocalConfig : ILocalConfig
+public class ApplicationSettings : IApplicationSettings
 {
     #region Properties
 

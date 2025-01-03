@@ -7,24 +7,24 @@ using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite.Repositories;
 
-/// <inheritdoc cref="IAppConfigRepository"/>
-public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigRepository
+/// <inheritdoc cref="IDatabaseConfigurationService"/>
+public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabaseConfigurationService
 {
     #region Fields
 
-    private AppConfig _current;
+    private DatabaseConfiguration _current;
 
     #endregion Fields
 
     #region Constructors
 
-    public SQLiteAppConfigRepository(IDbConnectionManager manager) : base(manager) { }
+    public SQLiteDatabaseConfigurationService(IDbConnectionManager manager) : base(manager) { }
 
     #endregion Constructors
 
     #region Properties
 
-    public AppConfig Current
+    public DatabaseConfiguration Current
     {
         get
         {
@@ -37,7 +37,7 @@ public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigReposit
 
     #region Methods
 
-    public void Edit(Action<AppConfig> edit)
+    public void Edit(Action<DatabaseConfiguration> edit)
     {
         var stg = Current;
         edit(stg);
@@ -60,7 +60,7 @@ public class SQLiteAppConfigRepository : SQLiteRepositoryBase, IAppConfigReposit
 
         _current = s.IsNullOrEmpty()
             ? new()
-            : JsonConvert.DeserializeObject<AppConfig>(s);
+            : JsonConvert.DeserializeObject<DatabaseConfiguration>(s);
     }
 
     public void Save()

@@ -24,7 +24,7 @@ public partial class MainView
 {
     #region Fields
 
-    private readonly IAppConfigRepository _appConfig;
+    private readonly IDatabaseConfigurationService _databaseConfig;
     private readonly FallbackShortcuts _fallbackShortcuts = new();
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
@@ -33,13 +33,13 @@ public partial class MainView
 
     #region Constructors
 
-    public MainView(MainViewModel viewModel, IAppConfigRepository appConfigRepository, ILogger<MainView> logger, IServiceProvider serviceProvider)
+    public MainView(MainViewModel viewModel, IDatabaseConfigurationService databaseConfigurationService, ILogger<MainView> logger, IServiceProvider serviceProvider)
     {
-        ArgumentNullException.ThrowIfNull(appConfigRepository);
+        ArgumentNullException.ThrowIfNull(databaseConfigurationService);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewModel);
 
-        _appConfig = appConfigRepository;
+        _databaseConfig = databaseConfigurationService;
         _logger = logger;
         _serviceProvider = serviceProvider;
 
@@ -86,7 +86,7 @@ public partial class MainView
     {
         SystemThemeWatcher.Watch(this);
 
-        var hk = _appConfig!.Current.HotKey;
+        var hk = _databaseConfig!.Current.HotKey;
         SetGlobalShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);
 
         SetWindowPosition();
@@ -113,14 +113,14 @@ public partial class MainView
 
     private void OnMouseUp(object _, MouseButtonEventArgs e)
     {
-        var coordinate = _appConfig.Current.Window.Position;
+        var coordinate = _databaseConfig.Current.Window.Position;
 
         if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) return;
 
         _logger.LogInformation("Save new coordinate ({Top},{Left})", Top, Left);
         coordinate.Top = Top;
         coordinate.Left = Left;
-        _appConfig.Save();
+        _databaseConfig.Save();
     }
 
     private void OnPreviewKeyDown(object _, KeyEventArgs e)
@@ -185,7 +185,7 @@ public partial class MainView
 
     private void SetWindowPosition(Coordinate? coordinate = null)
     {
-        coordinate ??= _appConfig!.Current.Window.Position.ToCoordinate();
+        coordinate ??= _databaseConfig!.Current.Window.Position.ToCoordinate();
 
         if (coordinate.IsEmpty)
             this.SetDefaultPosition();

@@ -25,7 +25,7 @@ public class InternalAliasStoreShould
         
         var reservedAliasStoreLogger = Substitute.For<ILogger<ReservedAliasStore>>();
         var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
-                                                     .AddSingleton(Substitute.For<IAppConfigRepository>())
+                                                     .AddSingleton(Substitute.For<IDatabaseConfigurationService>())
                                                      .AddSingleton(aliasRepository)
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton(reservedAliasStoreLogger)

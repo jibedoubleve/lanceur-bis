@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Logging;
 
 //TODO: analyse, it should probably be removed.
-public static class LoggerFactoryMixin
+public static class LoggerFactoryExtensions
 {
     #region Methods
 

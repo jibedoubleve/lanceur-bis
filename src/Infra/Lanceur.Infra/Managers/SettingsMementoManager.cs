@@ -19,7 +19,7 @@ public class SettingsMementoManager
 
     #region Methods
 
-    private static int GetStateHash(AppConfig appCfg, ILocalConfig dbCfg) => (appCfg.HotKey, dbCfg.DbPath).GetHashCode();
+    private static int GetStateHash(DatabaseConfiguration appCfg, IApplicationSettings dbCfg) => (appCfg.HotKey, dbCfg.DbPath).GetHashCode();
 
     public static SettingsMementoManager GetInitialState(ISettingsFacade settings) => new(GetStateHash(settings.Application, settings.Local));
 

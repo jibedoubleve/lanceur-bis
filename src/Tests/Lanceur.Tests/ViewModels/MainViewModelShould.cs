@@ -51,7 +51,7 @@ public class MainViewModelShould : TestBase
                                                        .AddSingleton<ISearchService, SearchService>()
                                                        .AddSingleton<IMacroManager, MacroManager>()
                                                        .AddSingleton<IDbActionFactory, DbActionFactory>()
-                                                       .AddMockSingleton<IAppConfigRepository>()
+                                                       .AddMockSingleton<IDatabaseConfigurationService>()
                                                        .AddMockSingleton<IThumbnailManager>()
                                                        .AddMockSingleton<IUserInteractionService>()
                                                        .AddMockSingleton<IUserNotificationService>()

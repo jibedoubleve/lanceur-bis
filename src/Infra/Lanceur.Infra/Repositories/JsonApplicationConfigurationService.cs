@@ -7,19 +7,19 @@ using Newtonsoft.Json;
 
 namespace Lanceur.Infra.Repositories;
 
-public class JsonLocalConfigRepository : ILocalConfigRepository
+public class JsonApplicationConfigurationService : IApplicationConfigurationService
 {
     #region Fields
 
     private static readonly object Locker = new();
     private readonly string _filePath;
-    private ILocalConfig _current;
+    private IApplicationSettings _current;
 
     #endregion Fields
 
     #region Constructors
 
-    public JsonLocalConfigRepository(string path = null)
+    public JsonApplicationConfigurationService(string path = null)
     {
         path ??= Paths.Settings;
         _filePath = Environment.ExpandEnvironmentVariables(path);
@@ -29,7 +29,7 @@ public class JsonLocalConfigRepository : ILocalConfigRepository
 
     #region Properties
 
-    public ILocalConfig Current
+    public IApplicationSettings Current
     {
         get
         {
@@ -58,14 +58,14 @@ public class JsonLocalConfigRepository : ILocalConfigRepository
     {
         lock (Locker)
         {
-            LocalConfig jsonSettings = null;
+            ApplicationSettings jsonSettings = null;
             if (File.Exists(_filePath))
             {
                 var output = File.ReadAllText(_filePath);
-                jsonSettings = JsonConvert.DeserializeObject<LocalConfig>(output);
+                jsonSettings = JsonConvert.DeserializeObject<ApplicationSettings>(output);
             }
 
-            _current = jsonSettings ?? new LocalConfig();
+            _current = jsonSettings ?? new ApplicationSettings();
         }
     }
 

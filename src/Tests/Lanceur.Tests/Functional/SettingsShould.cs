@@ -23,11 +23,11 @@ public class SettingsShould : TestBase
 
     #region Methods
 
-    private void WithConfiguration(Action<IAppConfigRepository> assert)
+    private void WithConfiguration(Action<IDatabaseConfigurationService> assert)
     {
         using var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteAppConfigRepository(scope);
+        var settingRepository = new SQLiteDatabaseConfigurationService(scope);
 
         assert(settingRepository);
     }
@@ -36,7 +36,7 @@ public class SettingsShould : TestBase
     public void CreateFileWhenNotExists()
     {
         var file = Path.GetTempFileName();
-        var stg = new JsonLocalConfigRepository(file);
+        var stg = new JsonApplicationConfigurationService(file);
         File.Delete(file);
 
         var value = stg.Current.DbPath;
@@ -48,7 +48,7 @@ public class SettingsShould : TestBase
     public void GetAndSetData()
     {
         var file = Path.GetTempFileName();
-        var stg = new JsonLocalConfigRepository(file);
+        var stg = new JsonApplicationConfigurationService(file);
         var expected = "undeuxtrois";
 
         stg.Current.DbPath = expected;
@@ -90,7 +90,7 @@ public class SettingsShould : TestBase
     {
         var c = BuildFreshDb();
         var scope = new DbSingleConnectionManager(c);
-        var settings = new SQLiteAppConfigRepository(scope);
+        var settings = new SQLiteDatabaseConfigurationService(scope);
 
         settings.Current.Window.ShowAtStartup.Should().BeTrue();
     }
@@ -100,7 +100,7 @@ public class SettingsShould : TestBase
     {
         var c = BuildFreshDb();
         var scope = new DbSingleConnectionManager(c);
-        var settings = new SQLiteAppConfigRepository(scope);
+        var settings = new SQLiteDatabaseConfigurationService(scope);
 
         settings.Current.Window.ShowResult.Should().BeFalse();
     }
@@ -125,7 +125,7 @@ public class SettingsShould : TestBase
     public void SaveJsonData()
     {
         var file = Path.GetTempFileName();
-        var stg = new JsonLocalConfigRepository(file) { Current = { DbPath = "un_deux_trois" } };
+        var stg = new JsonApplicationConfigurationService(file) { Current = { DbPath = "un_deux_trois" } };
 
         stg.Save();
 
