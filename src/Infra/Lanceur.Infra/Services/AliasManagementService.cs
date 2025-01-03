@@ -8,13 +8,13 @@ public class AliasManagementService : IAliasManagementService
 {
     #region Fields
 
-    private readonly IDbRepository _repository;
+    private readonly IAliasRepository _repository;
 
     #endregion
 
     #region Constructors
 
-    public AliasManagementService(IDbRepository repository) => _repository = repository;
+    public AliasManagementService(IAliasRepository repository) => _repository = repository;
 
     #endregion
 

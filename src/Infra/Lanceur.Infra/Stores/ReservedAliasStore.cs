@@ -17,7 +17,7 @@ public class ReservedAliasStore : IStoreService
     #region Fields
 
     private readonly Assembly _assembly;
-    private readonly IDbRepository _dbRepository;
+    private readonly IAliasRepository _aliasRepository;
     private readonly ILogger<ReservedAliasStore> _logger;
     private IEnumerable<QueryResult> _reservedAliases;
     private readonly IServiceProvider _serviceProvider;
@@ -37,7 +37,7 @@ public class ReservedAliasStore : IStoreService
     {
         _serviceProvider = serviceProvider;
         _assembly = serviceProvider.GetService<AssemblySource>()?.ReservedKeywordSource ?? throw new NullReferenceException("The AssemblySource is not set in the DI container.");
-        _dbRepository = serviceProvider.GetService<IDbRepository>();
+        _aliasRepository = serviceProvider.GetService<IAliasRepository>();
         _logger = serviceProvider.GetService<ILogger<ReservedAliasStore>>();
     }
 
@@ -68,7 +68,7 @@ public class ReservedAliasStore : IStoreService
             if (instance is not SelfExecutableQueryResult qr) continue;
 
             var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
-            var keyword = _dbRepository.GetKeyword(name);
+            var keyword = _aliasRepository.GetKeyword(name);
 
             qr.Name = name;
             if (keyword is not null)
@@ -90,7 +90,7 @@ public class ReservedAliasStore : IStoreService
     public IEnumerable<QueryResult> GetAll()
     {
         if (_reservedAliases == null) LoadAliases();
-        return _dbRepository.RefreshUsage(_reservedAliases);
+        return _aliasRepository.RefreshUsage(_reservedAliases);
     }
 
     /// <inheritdoc />
@@ -101,7 +101,7 @@ public class ReservedAliasStore : IStoreService
                      .Where(k => k.Name.ToLower().StartsWith(query.Name))
                      .ToList();
 
-        var orderedResult = _dbRepository
+        var orderedResult = _aliasRepository
                             .RefreshUsage(result)
                             .OrderByDescending(x => x.Count)
                             .ThenBy(x => x.Name);

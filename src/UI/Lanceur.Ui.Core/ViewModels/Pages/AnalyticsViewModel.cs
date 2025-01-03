@@ -15,7 +15,7 @@ public partial class AnalyticsViewModel : ObservableObject
     private IEnumerable<DataPoint<DateTime, double>> _cachedDataPoints = [];
 
     [ObservableProperty] private PlotType _currentPlotType;
-    private readonly IDbRepository _dbRepository;
+    private readonly IAliasRepository _aliasRepository;
     [ObservableProperty] private bool _isMonthlyVisible;
     [ObservableProperty] private bool _isYearVisible;
     private readonly ILogger<AnalyticsViewModel> _logger;
@@ -25,10 +25,10 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #region Constructors
 
-    public AnalyticsViewModel(ILogger<AnalyticsViewModel> logger, IDbRepository dbRepository)
+    public AnalyticsViewModel(ILogger<AnalyticsViewModel> logger, IAliasRepository aliasRepository)
     {
         _logger = logger;
-        _dbRepository = dbRepository;
+        _aliasRepository = aliasRepository;
     }
 
     #endregion
@@ -61,7 +61,7 @@ public partial class AnalyticsViewModel : ObservableObject
     private async Task OnRefreshDailyHistory()
     {
         IsYearVisible = true;
-        var points = await Task.Run(() => _dbRepository.GetUsage(Per.Day));
+        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Day));
         points = points.ToList();
         Cache(points);
         RedrawPlot(OnRefreshDailyPlot, points, PlotType.DailyHistory);
@@ -71,7 +71,7 @@ public partial class AnalyticsViewModel : ObservableObject
     private async Task OnRefreshMonthlyHistory()
     {
         IsYearVisible = true;
-        var points = await Task.Run(() => _dbRepository.GetUsage(Per.Month));
+        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Month));
         points = points.ToList();
         Cache(points);
 
@@ -86,7 +86,7 @@ public partial class AnalyticsViewModel : ObservableObject
     private async Task OnRefreshUsageByDayOfWeek()
     {
         IsYearVisible = false;
-        var points = await Task.Run(() => _dbRepository.GetUsage(Per.DayOfWeek));
+        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.DayOfWeek));
         points = points.ToList();
         Cache(points);
         RedrawPlot(OnRefreshUsageByDayOfWeekPlot, points, PlotType.UsageByDayOfWeek, e => (double)e.DayOfWeek);
@@ -96,7 +96,7 @@ public partial class AnalyticsViewModel : ObservableObject
     private async Task OnRefreshUsageByHourOfDay()
     {
         IsYearVisible = false;
-        var points = await Task.Run(() => _dbRepository.GetUsage(Per.HourOfDay));
+        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.HourOfDay));
         points = points.ToList();
         Cache(points);
         RedrawPlot(OnRefreshUsageByHourPlot, points, PlotType.UsageByHourOfDay, e => e.TimeOfDay.TotalHours);

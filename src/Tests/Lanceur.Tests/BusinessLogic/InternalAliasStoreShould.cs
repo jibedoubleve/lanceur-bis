@@ -19,14 +19,14 @@ public class InternalAliasStoreShould
 {
     #region Methods
 
-    private static ReservedAliasStore GetStore(IDbRepository dbRepository, Type type = null)
+    private static ReservedAliasStore GetStore(IAliasRepository aliasRepository, Type type = null)
     {
         type ??= typeof(NotExecutableTestAlias);
         
         var reservedAliasStoreLogger = Substitute.For<ILogger<ReservedAliasStore>>();
         var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
                                                      .AddSingleton(Substitute.For<IAppConfigRepository>())
-                                                     .AddSingleton(dbRepository)
+                                                     .AddSingleton(aliasRepository)
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton(reservedAliasStoreLogger)
                                                      .BuildServiceProvider();
@@ -42,7 +42,7 @@ public class InternalAliasStoreShould
     [InlineData("version")]
     public void ReturnSpecifiedReservedAliasFromLanceur(string criterion)
     {
-        var repository = Substitute.For<IDbRepository>();
+        var repository = Substitute.For<IAliasRepository>();
         repository.RefreshUsage(Arg.Any<IEnumerable<QueryResult>>())
                   .ReturnsForAnyArgs(x => x.Args()[0] as IEnumerable<QueryResult>);
 
@@ -57,7 +57,7 @@ public class InternalAliasStoreShould
     [Fact]
     public void ReturnSpecifiedReservedKeyword()
     {
-        var serviceProvider  = new ServiceCollection().AddMockSingleton<IDbRepository>(
+        var serviceProvider  = new ServiceCollection().AddMockSingleton<IAliasRepository>(
                                                           (sp, repository) =>
                                                           {
                                                               repository.RefreshUsage(Arg.Any<IEnumerable<QueryResult>>())
@@ -67,7 +67,7 @@ public class InternalAliasStoreShould
                                                       )
                                                       .BuildServiceProvider();
 
-        var store = GetStore(serviceProvider.GetService<IDbRepository>());
+        var store = GetStore(serviceProvider.GetService<IAliasRepository>());
         var query = new Cmdline("anothertest");
 
         store.Search(query)

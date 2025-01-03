@@ -37,7 +37,7 @@ public static class ServiceProviderExtensions
     public static IServiceCollection AddMemoryDb(this IServiceCollection serviceCollection, IDbConnectionManager connectionManager)
     {
         serviceCollection.AddMockSingleton<IConnectionString>()
-                         .AddSingleton<IDbRepository, SQLiteRepository>()
+                         .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))
                          .AddSingleton(connectionManager);
         return serviceCollection;

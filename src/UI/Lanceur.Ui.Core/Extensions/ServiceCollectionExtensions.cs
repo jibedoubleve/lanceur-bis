@@ -94,7 +94,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()
                          .AddTransient<IMemoryStorageService, MemoryStorageService>()
-                         .AddTransient<IDbRepository, SQLiteRepository>()
+                         .AddTransient<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()

@@ -13,21 +13,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.Repositories;
 
-public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
+public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 {
     #region Fields
 
     private readonly IMappingService _converter;
     private readonly IDbActionFactory _dbActionFactory;
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
-    private readonly ILogger<SQLiteRepository> _logger;
+    private readonly ILogger<SQLiteAliasRepository> _logger;
     private static readonly MacroValidator MacroValidator = new(Assembly.GetAssembly(typeof(GuidMacro)));
 
     #endregion
 
     #region Constructors
 
-    public SQLiteRepository(
+    public SQLiteAliasRepository(
         IDbConnectionManager manager,
         ILoggerFactory logFactory,
         IMappingService converter,
@@ -37,7 +37,7 @@ public class SQLiteRepository : SQLiteRepositoryBase, IDbRepository
         ArgumentNullException.ThrowIfNull(logFactory);
         ArgumentNullException.ThrowIfNull(converter);
 
-        _logger = logFactory.GetLogger<SQLiteRepository>();
+        _logger = logFactory.GetLogger<SQLiteAliasRepository>();
         _converter = converter;
         _getAllAliasDbAction = new(manager);
         _dbActionFactory = dbActionFactory;

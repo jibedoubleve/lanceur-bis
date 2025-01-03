@@ -10,7 +10,7 @@ public enum Per
     Month
 }
 
-public interface IDbRepository
+public interface IAliasRepository
 {
     #region Methods
 

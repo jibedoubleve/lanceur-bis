@@ -84,7 +84,7 @@ public class SearchShould : TestBase
         using var db = BuildFreshDb(SqlCreateAlias);
         using var conn = new DbSingleConnectionManager(db);
 
-        var repository = new SQLiteRepository(conn, _testLoggerFactory, converter, new DbActionFactory(new AutoMapperMappingService(), _testLoggerFactory));
+        var repository = new SQLiteAliasRepository(conn, _testLoggerFactory, converter, new DbActionFactory(new AutoMapperMappingService(), _testLoggerFactory));
 
         // act
         var results = repository.GetAll();
@@ -111,7 +111,7 @@ public class SearchShould : TestBase
         var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
 
-        var repository = new SQLiteRepository(connectionMgr, logger, converter, new DbActionFactory(new AutoMapperMappingService(), logger));
+        var repository = new SQLiteAliasRepository(connectionMgr, logger, converter, new DbActionFactory(new AutoMapperMappingService(), logger));
 
         OutputHelper.Act();
 
@@ -145,7 +145,7 @@ public class SearchShould : TestBase
                                                      .AddSingleton<IMacroManager, MacroManager>()
                                                      .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
                                                      .AddSingleton<IMappingService, AutoMapperMappingService>()
-                                                     .AddSingleton<IDbRepository, SQLiteRepository>()
+                                                     .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
                                                      .AddSingleton<IDbConnection, SQLiteConnection>()
                                                      .AddSingleton<SearchService>()
@@ -210,7 +210,7 @@ public class SearchShould : TestBase
 
         var serviceProvider = new ServiceCollection().AddMemoryDb(conn)
                                                      .AddLogging(builder => builder.AddXUnit(OutputHelper))
-                                                     .AddSingleton<IDbRepository, SQLiteRepository>()
+                                                     .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton(_testLoggerFactory)
                                                      .AddSingleton(converter)
                                                      .AddSingleton(Substitute.For<IStoreLoader>())
@@ -229,7 +229,7 @@ public class SearchShould : TestBase
                                                      .AddMockSingleton<IMacroManager>(
                                                          (sp, macroManager) =>
                                                          {
-                                                             var results = sp.GetService<IDbRepository>()
+                                                             var results = sp.GetService<IAliasRepository>()
                                                                              .Search(criterion)
                                                                              .ToList();
                                                              macroManager.Handle(Arg.Any<QueryResult[]>())
@@ -305,7 +305,7 @@ public class SearchShould : TestBase
         var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
 
-        var repository = new SQLiteRepository(connectionManager, logger, converter, new DbActionFactory(new AutoMapperMappingService(), logger));
+        var repository = new SQLiteAliasRepository(connectionManager, logger, converter, new DbActionFactory(new AutoMapperMappingService(), logger));
 
         OutputHelper.Act();
         repository.SetUsage(alias);

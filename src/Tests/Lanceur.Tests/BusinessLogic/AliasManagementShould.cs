@@ -51,12 +51,12 @@ public class AliasManagementShould : TestBase
         return action;
     }
 
-    private static SQLiteRepository BuildDataService(IDbConnection connection)
+    private static SQLiteAliasRepository BuildDataService(IDbConnection connection)
     {
         var scope = new DbSingleConnectionManager(connection);
         var log = Substitute.For<ILoggerFactory>();
         var conv = Substitute.For<IMappingService>();
-        var service = new SQLiteRepository(scope, log, conv, new DbActionFactory(new AutoMapperMappingService(), log));
+        var service = new SQLiteAliasRepository(scope, log, conv, new DbActionFactory(new AutoMapperMappingService(), log));
         return service;
     }
 

@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Lanceur.Infra.Utils;
 
-public static class LoggerMixins
+public static class LoggerExtensions
 {
     #region Methods
 

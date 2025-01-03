@@ -90,7 +90,7 @@ public class MacroShould : TestBase
     public async Task BeExecutable(string name, string parameters)
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroManager>>()
-                                                     .AddMockSingleton<IDbRepository>()
+                                                     .AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                      .AddSingleton<MacroManager>()
@@ -110,7 +110,7 @@ public class MacroShould : TestBase
     [Fact]
     public void BeExecutableQueryResult()
     {
-        var serviceProvider = new ServiceCollection().AddMockSingleton<IDbRepository>()
+        var serviceProvider = new ServiceCollection().AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILogger<MacroManager>>()
                                                      .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
@@ -165,7 +165,7 @@ public class MacroShould : TestBase
         var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! })
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddMockSingleton<ILogger<MacroManager>>()
-                                                     .AddMockSingleton<IDbRepository>()
+                                                     .AddMockSingleton<IAliasRepository>()
                                                      .AddSingleton<MacroManager>()
                                                      .BuildServiceProvider();
         var manager = serviceProvider.GetService<MacroManager>();
@@ -235,7 +235,7 @@ public class MacroShould : TestBase
         QueryResult[] queryResults = new AliasQueryResult[] { new() { Name = "macro_1", FileName = "@multi@" }, new() { Name = "macro_2", FileName = "@multi@" }, new() { Name = "macro_3", FileName = "@multi@" } };
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroManager>>()
-                                                     .AddMockSingleton<IDbRepository>()
+                                                     .AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILoggerFactory>()
                                                      .AddSingleton(new AssemblySource{MacroSource = Assembly.GetExecutingAssembly()})
                                                      .AddSingleton<MacroManager>()
@@ -291,11 +291,11 @@ public class MacroShould : TestBase
             return new AutoMapperMappingService();
         }
 
-        public static IDbRepository GetDataService(IDbConnection db)
+        public static IAliasRepository GetDataService(IDbConnection db)
         {
             var log = Substitute.For<ILoggerFactory>();
             var conv = GetConversionService();
-            var service = new SQLiteRepository(new DbSingleConnectionManager(db), log, conv, new DbActionFactory(new AutoMapperMappingService(), log));
+            var service = new SQLiteAliasRepository(new DbSingleConnectionManager(db), log, conv, new DbActionFactory(new AutoMapperMappingService(), log));
             return service;
         }
 

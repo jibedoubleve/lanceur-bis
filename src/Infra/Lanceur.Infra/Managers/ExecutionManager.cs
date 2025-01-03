@@ -18,7 +18,7 @@ public class ExecutionManager : IExecutionManager
 {
     #region Fields
 
-    private readonly IDbRepository _dataService;
+    private readonly IAliasRepository _dataService;
     private readonly ILogger<ExecutionManager> _logger;
     private readonly IWildcardManager _wildcardManager;
 
@@ -29,7 +29,7 @@ public class ExecutionManager : IExecutionManager
     public ExecutionManager(
         ILoggerFactory logFactory,
         IWildcardManager wildcardManager,
-        IDbRepository dataService
+        IAliasRepository dataService
     )
     {
         _logger = logFactory.GetLogger<ExecutionManager>();

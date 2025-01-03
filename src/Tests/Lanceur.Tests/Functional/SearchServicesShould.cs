@@ -15,7 +15,7 @@ public class SearchServicesShould
 {
     #region Properties
 
-    private IDbRepository DbRepository => Substitute.For<IDbRepository>();
+    private IAliasRepository AliasRepository => Substitute.For<IAliasRepository>();
 
     private ILoggerFactory LoggerFactory => Substitute.For<ILoggerFactory>();
 
@@ -36,7 +36,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
-                                                     .AddSingleton(DbRepository)
+                                                     .AddSingleton(AliasRepository)
                                                      .BuildServiceProvider();
         var store = new AdditionalParametersStore(serviceProvider);
 
@@ -55,7 +55,7 @@ public class SearchServicesShould
     public void ActivateAliasStore(string query)
     {
         // ACT
-        var serviceProvider = new ServiceCollection().AddSingleton(DbRepository)
+        var serviceProvider = new ServiceCollection().AddSingleton(AliasRepository)
                                                      .AddSingleton(LoggerFactory)
                                                      .BuildServiceProvider();
         var store = new AliasStore(serviceProvider);
@@ -117,7 +117,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton<AssemblySource>()
-                                                     .AddSingleton(DbRepository)
+                                                     .AddSingleton(AliasRepository)
                                                      .AddSingleton(LoggerFactory)
                                                      .BuildServiceProvider();
         var store = new ReservedAliasStore(serviceProvider);
@@ -145,7 +145,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
-                                                     .AddSingleton(DbRepository)
+                                                     .AddSingleton(AliasRepository)
                                                      .BuildServiceProvider();
         var store = new AdditionalParametersStore(serviceProvider);
 
@@ -183,7 +183,7 @@ public class SearchServicesShould
     public void DeactivateEverythingStore(string query)
     {
         // ACT
-        var serviceProvider = new ServiceCollection().AddSingleton(DbRepository)
+        var serviceProvider = new ServiceCollection().AddSingleton(AliasRepository)
                                                      .AddSingleton(Substitute.For<IEverythingApi>())
                                                      .BuildServiceProvider();
         var store = new EverythingStore(serviceProvider);

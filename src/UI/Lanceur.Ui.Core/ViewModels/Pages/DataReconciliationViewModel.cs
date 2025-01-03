@@ -20,7 +20,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<SelectableAliasQueryResult> _aliases = new();
     private readonly ILogger<DataReconciliationViewModel> _logger;
     [ObservableProperty] private ReportType _reportType = ReportType.None;
-    private readonly IDbRepository _repository;
+    private readonly IAliasRepository _repository;
     [ObservableProperty] private string _title = string.Empty;
     private readonly IUserInteractionService _userInteraction;
     private readonly IUserNotificationService _userNotification;
@@ -30,7 +30,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     #region Constructors
 
     public DataReconciliationViewModel(
-        IDbRepository repository,
+        IAliasRepository repository,
         ILogger<DataReconciliationViewModel> logger,
         IUserInteractionService userInteraction,
         IUserNotificationService userNotification

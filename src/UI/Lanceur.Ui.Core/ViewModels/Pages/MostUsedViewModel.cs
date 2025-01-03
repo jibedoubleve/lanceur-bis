@@ -12,14 +12,14 @@ public partial class MostUsedViewModel : ObservableObject
     #region Fields
 
     [ObservableProperty] private ObservableCollection<QueryResult> _aliases = new();
-    private readonly IDbRepository _repository;
+    private readonly IAliasRepository _repository;
     private readonly ILogger<MostUsedViewModel> _logger;
 
     #endregion
 
     #region Constructors
 
-    public MostUsedViewModel(ILogger<MostUsedViewModel> logger, IDbRepository repository)
+    public MostUsedViewModel(ILogger<MostUsedViewModel> logger, IAliasRepository repository)
     {
         _repository = repository;
         _logger = logger;

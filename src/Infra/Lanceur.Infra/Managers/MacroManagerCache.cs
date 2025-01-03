@@ -14,7 +14,7 @@ public abstract class MacroManagerCache
     #region Fields
 
     private readonly Assembly _asm;
-    private readonly IDbRepository _dbRepository;
+    private readonly IAliasRepository _aliasRepository;
     private Dictionary<string, ISelfExecutable> _macroInstances;
     private readonly IServiceProvider _serviceProvider;
 
@@ -28,7 +28,7 @@ public abstract class MacroManagerCache
 
         _asm = serviceProvider.GetService<AssemblySource>().MacroSource;
         Logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MacroManager>();
-        _dbRepository = serviceProvider.GetService<IDbRepository>();
+        _aliasRepository = serviceProvider.GetService<IAliasRepository>();
         _serviceProvider = serviceProvider;
     }
 
@@ -70,7 +70,7 @@ public abstract class MacroManagerCache
             var description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
             alias.Description = description;
 
-            _dbRepository.HydrateMacro(alias);
+            _aliasRepository.HydrateMacro(alias);
 
             macroInstances.Add(name, alias);
             Logger.LogDebug("Found macro {Name}", name);

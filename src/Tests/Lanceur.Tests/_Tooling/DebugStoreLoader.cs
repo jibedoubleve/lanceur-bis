@@ -15,7 +15,7 @@ internal class DebugStoreLoader : IStoreLoader
     public IEnumerable<IStoreService> Load()
     {
         var serviceProvider = new ServiceCollection().AddSingleton(Assembly.GetExecutingAssembly())
-                                                     .AddSingleton(Substitute.For<IDbRepository>())
+                                                     .AddSingleton(Substitute.For<IAliasRepository>())
                                                      .BuildServiceProvider();
         return new List<IStoreService> { new ReservedAliasStore(serviceProvider) };
     }

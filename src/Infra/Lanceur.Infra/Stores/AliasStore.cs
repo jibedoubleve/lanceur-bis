@@ -19,7 +19,7 @@ public class AliasStore : IStoreService
 
     private readonly IMemoryCache _cache;
 
-    private readonly IDbRepository _dbRepository;
+    private readonly IAliasRepository _aliasRepository;
     private readonly ILogger<AliasStore> _logger;
 
     #endregion
@@ -28,7 +28,7 @@ public class AliasStore : IStoreService
 
     public AliasStore(IServiceProvider serviceProvider)
     {
-        _dbRepository = serviceProvider.GetService<IDbRepository>();
+        _aliasRepository = serviceProvider.GetService<IAliasRepository>();
         _logger = serviceProvider.GetService<ILoggerFactory>()
                                  .GetLogger<AliasStore>();
         _cache = serviceProvider.GetService<IMemoryCache>();
@@ -46,7 +46,7 @@ public class AliasStore : IStoreService
     #region Methods
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll() => _dbRepository.GetAll();
+    public IEnumerable<QueryResult> GetAll() => _aliasRepository.GetAll();
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query)
@@ -60,7 +60,7 @@ public class AliasStore : IStoreService
         }
 
         _logger.LogTrace("The query {Query} is NOT in the cache.", query.Name);
-        var entry = _dbRepository.Search(query.Name).ToArray();
+        var entry = _aliasRepository.Search(query.Name).ToArray();
         _cache.Set(query.GetCacheKey(), entry, 15.Seconds());
         return entry;
     }

@@ -13,7 +13,7 @@ public class AdditionalParametersStore : IStoreService
 {
     #region Fields
 
-    private readonly IDbRepository _aliasService;
+    private readonly IAliasRepository _aliasService;
     private readonly ILogger<AdditionalParametersStore> _logger;
 
     #endregion
@@ -22,7 +22,7 @@ public class AdditionalParametersStore : IStoreService
 
     public AdditionalParametersStore(IServiceProvider serviceProvider)
     {
-        _aliasService = serviceProvider.GetService<IDbRepository>();
+        _aliasService = serviceProvider.GetService<IAliasRepository>();
         _logger = serviceProvider.GetService<ILogger<AdditionalParametersStore>>();
     }
 

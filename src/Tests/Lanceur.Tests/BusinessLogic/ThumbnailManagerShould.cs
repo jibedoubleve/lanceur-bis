@@ -50,7 +50,7 @@ public class ThumbnailManagerShould : TestBase
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
         var conversionService = new AutoMapperMappingService();
-        var dbRepository = new SQLiteRepository(connectionMgr, loggerFactory, conversionService, new DbActionFactory(new AutoMapperMappingService(), loggerFactory));
+        var dbRepository = new SQLiteAliasRepository(connectionMgr, loggerFactory, conversionService, new DbActionFactory(new AutoMapperMappingService(), loggerFactory));
 
         var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();
         var favIconManager = Substitute.For<IFavIconManager>();

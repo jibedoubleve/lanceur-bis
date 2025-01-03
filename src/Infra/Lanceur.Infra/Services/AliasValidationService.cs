@@ -27,13 +27,13 @@ public class AliasValidationService : IAliasValidationService
 {
     #region Fields
 
-    private readonly IDbRepository _repository;
+    private readonly IAliasRepository _repository;
 
     #endregion
 
     #region Constructors
 
-    public AliasValidationService(IDbRepository repository) => _repository = repository;
+    public AliasValidationService(IAliasRepository repository) => _repository = repository;
 
     #endregion
 

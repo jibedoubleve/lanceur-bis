@@ -23,7 +23,7 @@ public class ExecutionManagerShould
         var executionManager = new ExecutionManager(
             Substitute.For<ILoggerFactory>(),
             Substitute.For<IWildcardManager>(),
-            Substitute.For<IDbRepository>()
+            Substitute.For<IAliasRepository>()
         );
 
         var macro =new MultiMacro(Substitute.For<IExecutionManager>(),Substitute.For<ISearchService>(), 0);

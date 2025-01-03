@@ -13,7 +13,7 @@ public class ThumbnailManager : IThumbnailManager
 {
     #region Fields
 
-    private readonly IDbRepository _dbRepository;
+    private readonly IAliasRepository _aliasRepository;
     private readonly ILogger<ThumbnailManager> _logger;
     private readonly ThumbnailRefresher _thumbnailRefresher;
 
@@ -23,12 +23,12 @@ public class ThumbnailManager : IThumbnailManager
 
     public ThumbnailManager(
         ILoggerFactory loggerFactory,
-        IDbRepository dbRepository,
+        IAliasRepository aliasRepository,
         IPackagedAppSearchService packagedAppSearchService,
         IFavIconManager favIconManager
     )
     {
-        _dbRepository = dbRepository;
+        _aliasRepository = aliasRepository;
         _thumbnailRefresher = new(loggerFactory, packagedAppSearchService, favIconManager);
         _logger = loggerFactory.GetLogger<ThumbnailManager>();
     }
@@ -62,7 +62,7 @@ public class ThumbnailManager : IThumbnailManager
                                  .Select(x => x.Entity)
                                  .OfType<AliasQueryResult>()
                                  .ToArray();
-            if (aliases.Any()) _dbRepository.UpdateThumbnails(aliases);
+            if (aliases.Any()) _aliasRepository.UpdateThumbnails(aliases);
         }
         catch (Exception ex) { _logger.LogWarning(ex, "An error occured during the refresh of the icons"); }
     }
