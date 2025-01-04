@@ -9,15 +9,14 @@ namespace Lanceur.Infra.Services;
 
 public class SearchService : SearchServiceCache, ISearchService
 {
-    private readonly ISearchServiceOrchestrator _orchestrator;
-
     #region Fields
 
-    private readonly IMacroService _macroService;
-    private readonly IThumbnailService _thumbnailService;
     private readonly ILogger<SearchService> _logger;
+    private readonly IMacroService _macroService;
+    private readonly ISearchServiceOrchestrator _orchestrator;
+    private readonly IThumbnailService _thumbnailService;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -35,7 +34,7 @@ public class SearchService : SearchServiceCache, ISearchService
         _logger = loggerFactory.GetLogger<SearchService>();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -121,5 +120,5 @@ public class SearchService : SearchServiceCache, ISearchService
             : orderedResults;
     }
 
-    #endregion Methods
+    #endregion
 }
