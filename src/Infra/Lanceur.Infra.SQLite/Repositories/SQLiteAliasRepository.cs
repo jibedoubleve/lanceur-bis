@@ -69,30 +69,30 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public IEnumerable<SelectableAliasQueryResult> GetAliasesWithoutNotes()
     {
         const string sql = $"""
-                             select
-                                 a.id         as {nameof(SelectableAliasQueryResult.Id)},
-                                 a.notes      as {nameof(SelectableAliasQueryResult.Description)},
-                                 a.file_name  as {nameof(SelectableAliasQueryResult.FileName)},
-                                 a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
-                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
-                                 sub.synonyms as {nameof(SelectableAliasQueryResult.Synonyms)},
-                                 a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
-                                 a.thumbnail  as {nameof(SelectableAliasQueryResult.Thumbnail)}
-                             from 
-                                 alias a
-                                 inner join alias_name an on a.id = an.id_alias
-                                 inner join (
-                                     select 
-                                         id_alias,
-                                         group_concat(name) as synonyms
-                                     from alias_name
-                                     group by id_alias
-                             ) as sub on sub.id_alias = a.id
-                             where
-                                 a.notes is null
-                                 and a.hidden = 0
-                             order by an.name
-                             """;
+                            select
+                                a.id         as {nameof(SelectableAliasQueryResult.Id)},
+                                a.notes      as {nameof(SelectableAliasQueryResult.Description)},
+                                a.file_name  as {nameof(SelectableAliasQueryResult.FileName)},
+                                a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
+                                an.name      as {nameof(SelectableAliasQueryResult.Name)},
+                                sub.synonyms as {nameof(SelectableAliasQueryResult.Synonyms)},
+                                a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.thumbnail  as {nameof(SelectableAliasQueryResult.Thumbnail)}
+                            from 
+                                alias a
+                                inner join alias_name an on a.id = an.id_alias
+                                inner join (
+                                    select 
+                                        id_alias,
+                                        group_concat(name) as synonyms
+                                    from alias_name
+                                    group by id_alias
+                            ) as sub on sub.id_alias = a.id
+                            where
+                                a.notes is null
+                                and a.hidden = 0
+                            order by an.name
+                            """;
         var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
 
 
@@ -132,12 +132,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         return r;
     }
 
-    /// <summary>
-    ///     Get the a first alias with the exact name. In case of multiple aliases
-    ///     with same name, the one with greater counter is selected.
-    /// </summary>
-    /// <param name="name">The alias' exact name to find.</param>
-    /// <returns>The exact match or <c>null</c> if not found.</returns>
+    /// <inheritdoc />
     public AliasQueryResult GetExact(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().GetExact(name, tx));
 
     /// <inheritdoc />
@@ -154,12 +149,32 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<SelectableAliasQueryResult> GetInvalidAliases()
+    public IEnumerable<SelectableAliasQueryResult> GetBrokenAliases()
     {
-        var result = GetAll()
-                     .Where(a => MacroValidator.IsMacroFormat(a.FileName) && MacroValidator.IsValid(a.FileName))
-                     .ToArray();
-        return _converter.ToSelectableQueryResult(result);
+        const string sql = $"""
+                            select 
+                                a.id        as {nameof(SelectableAliasQueryResult.Id)},
+                                a.notes     as {nameof(SelectableAliasQueryResult.Description)},
+                                a.file_name as {nameof(SelectableAliasQueryResult.FileName)},
+                                a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
+                                an.name      as {nameof(SelectableAliasQueryResult.Name)},
+                                a.icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
+                            from 
+                                alias a
+                                inner join alias_name an on a.id = an.id_alias
+                            where 	
+                            	file_name like 'c:\%'
+                            	or file_name like 'd:\%'
+                            	or file_name like 'e:\%'
+                            	or file_name like 'f:\%'
+                            	or file_name like 'g:\%'
+                            	or file_name like 'h:\%'
+                            	or file_name like 'i:\%'
+                            """;
+        var aliases = Db.WithinTransaction(tx => tx!.Connection!.Query<SelectableAliasQueryResult>(sql));
+        return aliases.Where(e => !File.Exists(e.FileName))
+                      .ToArray();
     }
 
     /// <inheritdoc />

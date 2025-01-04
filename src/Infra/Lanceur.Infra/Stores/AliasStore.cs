@@ -18,9 +18,9 @@ public class AliasStore : IStoreService
 {
     #region Fields
 
-    private readonly IMemoryCache _cache;
-
     private readonly IAliasRepository _aliasRepository;
+
+    private readonly IMemoryCache _cache;
     private readonly ILogger<AliasStore> _logger;
 
     #endregion
@@ -54,7 +54,7 @@ public class AliasStore : IStoreService
     {
         using var _ = _logger.MeasureExecutionTime(this);
 
-        if(_cache.TryGetValue(query.GetCacheKey(), out IEnumerable<QueryResult> cacheEntry))
+        if (_cache.TryGetValue(query.GetCacheKey(), out IEnumerable<QueryResult> cacheEntry))
         {
             _logger.LogTrace("The query {Query} is in the cache.", query.Name);
             return cacheEntry;
