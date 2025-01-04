@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Lanceur.Infra.Win32.PackagedApp;
+using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;
@@ -22,6 +24,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
 
     #region Methods
 
+    /// <inheritdoc />
     public async Task<IEnumerable<Core.Models.PackagedApp>> GetByInstalledDirectory(string fileName)
     {
         fileName = fileName.Replace("package:", "");
@@ -57,6 +60,26 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
                                    .ToArray();
             }
         );
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> TryResolveDetails(AliasQueryResult queryResult)
+    {
+        ArgumentNullException.ThrowIfNull(queryResult);
+        var results = await GetByInstalledDirectory(queryResult.FileName);
+        results  = results.ToArray();
+
+        if (!results.Any()) return false;
+
+        var result = results.First();
+        if (queryResult.Notes.IsNullOrEmpty())
+        {
+            queryResult.Description = result.Description.IsNullOrEmpty() 
+                ? result.DisplayName 
+                : result.Description; 
+        }
+        queryResult.FileName = result.FileName;
+        return true;
     }
 
     #endregion

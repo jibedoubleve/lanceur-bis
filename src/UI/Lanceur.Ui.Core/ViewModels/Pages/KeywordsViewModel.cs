@@ -30,6 +30,7 @@ public partial class KeywordsViewModel : ObservableObject
     private readonly IUserNotificationService _userNotificationService;
     private readonly IAliasValidationService _validationService;
     private readonly IViewFactory _viewFactory;
+    private readonly IPackagedAppSearchService _packagedAppSearchService;
 
     #endregion
 
@@ -42,7 +43,8 @@ public partial class KeywordsViewModel : ObservableObject
         IUserNotificationService userNotificationService,
         IAliasValidationService validationService,
         IUserInteractionService userInteraction,
-        IViewFactory viewFactory
+        IViewFactory viewFactory,
+        IPackagedAppSearchService packagedAppSearchService
     )
     {
         ArgumentNullException.ThrowIfNull(aliasManagementService);
@@ -52,6 +54,7 @@ public partial class KeywordsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(validationService);
         ArgumentNullException.ThrowIfNull(userInteraction);
         ArgumentNullException.ThrowIfNull(viewFactory);
+        ArgumentNullException.ThrowIfNull(packagedAppSearchService);
 
         WeakReferenceMessenger.Default.Register<AddAliasMessage>(this, (r, m) => ((KeywordsViewModel)r).CreateAlias(m));
 
@@ -59,6 +62,7 @@ public partial class KeywordsViewModel : ObservableObject
         _validationService = validationService;
         _userInteraction = userInteraction;
         _viewFactory = viewFactory;
+        _packagedAppSearchService = packagedAppSearchService;
         _aliasManagementService = aliasManagementService;
         _thumbnailService = thumbnailService;
         _logger = logger;
@@ -230,10 +234,14 @@ public partial class KeywordsViewModel : ObservableObject
         {
             _userNotificationService.Warn(result.ErrorContent, "Validation failed");
             _logger.LogInformation("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
+            _userNotificationService.Warn($"Alias validation failed:\n{result.ErrorContent}");
             return;
         }
 
         _logger.LogTrace("Saving alias {AliasName}", SelectedAlias!.Name);
+        
+        await _packagedAppSearchService.TryResolveDetails(SelectedAlias);
+
         var alias = SelectedAlias;
         await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));
         _userNotificationService.Success($"Alias {alias.Name} created.", "Item created.");
