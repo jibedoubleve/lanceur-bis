@@ -135,12 +135,12 @@ public partial class KeywordsViewModel : ObservableObject
     {
         if (Aliases.Any(x => x.Id == 0))
         {
+            // An alias for creation already exists in the list,
+            // select it again to continue creation.
             SelectedAlias = Aliases.Single(x => x.Id == 0);
-            _logger.LogTrace("Reselect alias to be created");
             return;
         }
 
-        _logger.LogTrace("Creating new alias");
         Aliases.Insert(0, AliasQueryResult.EmptyForCreation);
         SelectedAlias = Aliases[0];
     }
@@ -203,11 +203,12 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnLoadAliases()
     {
-        _bufferedAliases = await Task.Run(() => _aliasManagementService.GetAll()!.ToList());
+        var result = await Task.Run(() => _aliasManagementService.GetAll());
+        _bufferedAliases = result.ToList();
 
         if (Aliases.Count == 0)
         {
-            SelectedAlias = _bufferedAliases.ReselectAlias(SelectedAlias);
+            SelectedAlias = _bufferedAliases.Reselect(SelectedAlias);
             Aliases = new(_bufferedAliases);
         }
         else

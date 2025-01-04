@@ -12,4 +12,9 @@
     <ItemGroup>
         <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Models\AliasQueryResultExtensions.cs">
+        <DependentUpon>AliasQueryResult.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>
