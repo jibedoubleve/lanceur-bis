@@ -83,16 +83,19 @@ public interface IAliasRepository
     /// <param name="idAlias">Id of the alias to validate</param>
     /// <returns>An IEnumerable containing the aliases that exist in both the provided list and the database.</returns>
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
-
+    
     /// <summary>
     ///     Retrieves a collection of aliases that are incorrectly configured,
-    ///     indicating they are invalid.
+    ///     indicating they are invalid. A broken alias is an alias that has a filename
+    ///     that leads to a non-existing file.
     /// </summary>
     /// <returns>
     ///     An enumerable collection of <see cref="SelectableAliasQueryResult" />
     ///     representing the aliases that have been poorly configured and are therefore invalid.
+    ///     These invalid aliases are considered "broken" because their associated filenames
+    ///     point to non-existing files.
     /// </returns>
-    IEnumerable<SelectableAliasQueryResult> GetInvalidAliases();
+    IEnumerable<SelectableAliasQueryResult> GetBrokenAliases();
 
 
     /// <summary>

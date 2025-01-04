@@ -175,7 +175,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         using var loading = _userNotification.TrackLoadingState();
         Title = "Misconfigured Aliases";
         ReportType = ReportType.InvalidAliases;
-        var aliases = await Task.Run(() => _repository.GetInvalidAliases());
+        var aliases = await Task.Run(() => _repository.GetBrokenAliases());
         Aliases = new(aliases);
         OnSelectionChanged();
     }
