@@ -1,34 +1,22 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Ui.Core.ViewModels.Controls
+namespace Lanceur.Ui.Core.ViewModels.Controls;
+
+public partial class QueryResultAdditionalParametersViewModel : ObservableObject
 {
-    public partial class QueryResultAdditionalParametersViewModel : ObservableObject
-    {
-        private readonly AdditionalParameter _model;
+    #region Fields
 
-        public string Name
-        {
-            get => _model.Name;
-            set
-            {
-                _model.Name = value;
-                OnPropertyChanged(nameof(Name));
-            }
-        }
-        public string Parameter
-        {
-            get => _model.Parameter;
-            set
-            {
-                _model.Parameter = value;
-                OnPropertyChanged(nameof(Parameter));
-            }
-        }
+    private readonly AdditionalParameter _model;
 
-        public QueryResultAdditionalParametersViewModel(AdditionalParameter model)
-        {
-            this._model = model;
-        }
-    }
+    [ObservableProperty] private string _name;
+    [ObservableProperty] private string _parameter;
+
+    #endregion
+
+    #region Constructors
+
+    public QueryResultAdditionalParametersViewModel(AdditionalParameter model) => _model = model;
+
+    #endregion
 }
