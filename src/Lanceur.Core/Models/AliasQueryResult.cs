@@ -38,7 +38,12 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     public override string Description
     {
         get => Notes.IsNullOrWhiteSpace() ? FileName : Notes;
-        set => Notes = value;
+        set 
+        {
+            Notes = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Notes));
+        }
     }
 
     public string FileName
