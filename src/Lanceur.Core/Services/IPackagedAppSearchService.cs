@@ -36,7 +36,7 @@ public interface IPackagedAppSearchService
     /// <exception cref="ArgumentNullException">
     /// Thrown if <paramref name="queryResult"/> is null.
     /// </exception>
-    Task<bool> TryResolveDetails(AliasQueryResult queryResult);
+    Task<bool> TryResolveDetailsAsync(AliasQueryResult queryResult);
 
     #endregion Methods
 }

@@ -84,5 +84,24 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
         }
     }
 
+    /// <inheritdoc />
+    public void WithinTransaction<TContext>(Action<IDbTransaction, TContext> action, TContext context)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        if (conn.State != ConnectionState.Open) conn.Open();
+
+        using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
+        try
+        {
+            action(tx, context);
+            tx.Commit();
+        }
+        catch
+        {
+            tx.Rollback();
+            throw;
+        }
+    }
+
     #endregion
 }

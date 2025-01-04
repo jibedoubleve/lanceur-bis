@@ -105,7 +105,6 @@ public class AliasDbAction
     internal long Create(IDbTransaction tx, ref AliasQueryResult alias)
     {
         const string sqlAlias = """
-
                                 insert into alias (
                                     arguments,
                                     file_name,

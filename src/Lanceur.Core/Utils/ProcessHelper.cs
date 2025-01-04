@@ -38,8 +38,14 @@ public class ProcessHelper
 
             var ps = Process.GetProcessById((int)processId);
             var fileName = ps.MainModule.FileName;
+            var fileDescription = ps.MainModule.FileVersionInfo.FileDescription;
 
-            return new() { HWnd = $"ThreadId: {threadId} - ProcessId: {processId} - hWnd: {hWnd}", FileName = fileName };
+            return new()
+            {
+                HWnd = $"ThreadId: {threadId} - ProcessId: {processId} - hWnd: {hWnd}",
+                FileName = fileName,
+                FileDescription = fileDescription
+            };
         }
         catch (Win32Exception ex)
         {
@@ -58,11 +64,19 @@ public class ProcessHelper
     [StructLayout(LayoutKind.Sequential)]
     private struct Win32Point
     {
-        public static Win32Point NewPoint(int x, int y) => new() { X = x, Y = y };
+        #region Fields
 
         public int X;
         public int Y;
-    };
+
+        #endregion
+
+        #region Methods
+
+        public static Win32Point NewPoint(int x, int y) => new() { X = x, Y = y };
+
+        #endregion
+    }
 
     #endregion Structs
 }

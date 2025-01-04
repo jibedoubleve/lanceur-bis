@@ -1,3 +1,5 @@
+using System.ComponentModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Messages;
@@ -23,9 +25,15 @@ public partial class DataReconciliationView
     {
         _contentDialogService = contentDialogService;
         DataContext = viewModel;
-        WeakReferenceMessenger.Default.Register<DataReconciliationView, QuestionRequestMessage>(this, (_, m) => m.Reply(HandleMessageBoxAsync(m)));
+        viewModel.PropertyChanged += OnViewModelOnPropertyChanged;
         InitializeComponent();
     }
+
+    #endregion
+
+    #region Properties
+
+    private DataReconciliationViewModel ViewModel => (DataReconciliationViewModel)DataContext;
 
     #endregion
 
@@ -39,10 +47,29 @@ public partial class DataReconciliationView
                 Title = request.Title,
                 Content = request.Content,
                 PrimaryButtonText = request.YesText,
-                CloseButtonText = request.NoText,                
+                CloseButtonText = request.NoText
             }
         );
         return result == ContentDialogResult.Primary;
+    }
+
+    private void OnViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(ViewModel.ReportType)) return;
+
+        switch (ViewModel)
+        {
+            case { ReportType: ReportType.UnannotatedAliases }:
+                ColumnParameters.Visibility = Visibility.Collapsed;
+                ColumnFileName.Visibility = Visibility.Collapsed;
+                ColumnProposedDescription.Visibility = Visibility.Visible;
+                break;
+            default:
+                ColumnParameters.Visibility = Visibility.Visible;
+                ColumnFileName.Visibility = Visibility.Visible;
+                ColumnProposedDescription.Visibility = Visibility.Collapsed;
+                break;
+        }
     }
 
     #endregion

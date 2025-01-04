@@ -9,8 +9,8 @@ public partial class QueryResultAdditionalParametersViewModel : ObservableObject
 
     private readonly AdditionalParameter _model;
 
-    [ObservableProperty] private string _name;
-    [ObservableProperty] private string _parameter;
+    [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] private string _parameter = string.Empty;
 
     #endregion
 

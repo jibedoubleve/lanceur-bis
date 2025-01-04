@@ -88,6 +88,23 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
             throw;
         }
     }
+    
+    /// <inheritdoc />
+    public void WithinTransaction<TContext>(Action<IDbTransaction, TContext> action, TContext context)
+    {
+        if (Connection.State != ConnectionState.Open) Connection.Open();
+        using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
+        try
+        {
+            action(tx, context);
+            tx.Commit();
+        }
+        catch
+        {
+            tx.Rollback();
+            throw;
+        }
+    }
 
     #endregion
 }

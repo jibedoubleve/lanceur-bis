@@ -241,7 +241,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         _logger.LogTrace("Saving alias {AliasName}", SelectedAlias!.Name);
         
-        await _packagedAppSearchService.TryResolveDetails(SelectedAlias);
+        await _packagedAppSearchService.TryResolveDetailsAsync(SelectedAlias);
 
         var alias = SelectedAlias;
         await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));

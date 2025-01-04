@@ -11,7 +11,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
-public enum ReportType { None, DoubloonAliases, InvalidAliases }
+public enum ReportType
+{
+    None,
+    DoubloonAliases,
+    InvalidAliases,
+    UnannotatedAliases
+}
 
 public partial class DataReconciliationViewModel : ObservableObject
 {
@@ -19,6 +25,7 @@ public partial class DataReconciliationViewModel : ObservableObject
 
     [ObservableProperty] private ObservableCollection<SelectableAliasQueryResult> _aliases = new();
     private readonly ILogger<DataReconciliationViewModel> _logger;
+    private readonly IReconciliationService _reconciliationService;
     [ObservableProperty] private ReportType _reportType = ReportType.None;
     private readonly IAliasRepository _repository;
     [ObservableProperty] private string _title = string.Empty;
@@ -33,24 +40,24 @@ public partial class DataReconciliationViewModel : ObservableObject
         IAliasRepository repository,
         ILogger<DataReconciliationViewModel> logger,
         IUserInteractionService userInteraction,
-        IUserNotificationService userNotification
+        IUserNotificationService userNotification,
+        IReconciliationService reconciliationService
     )
     {
         _repository = repository;
         _logger = logger;
         _userInteraction = userInteraction;
         _userNotification = userNotification;
+        _reconciliationService = reconciliationService;
     }
 
     #endregion
 
     #region Methods
 
-    private bool CanExecuteCommand() => Aliases.Any(e => e.IsSelected);
-
     private bool CanMerge()
     {
-        if (!CanExecuteCommand()) return false;
+        if (!HasSelection()) return false;
 
         return GetSelectedAliases()
                .Select(e => e.FileName)
@@ -61,7 +68,9 @@ public partial class DataReconciliationViewModel : ObservableObject
 
     private SelectableAliasQueryResult[] GetSelectedAliases() => Aliases.Where(e => e.IsSelected).ToArray();
 
-    [RelayCommand(CanExecute = nameof(CanExecuteCommand))]
+    private bool HasSelection() => Aliases.Any(e => e.IsSelected);
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
     private async Task OnDelete()
     {
         var toDelete = GetSelectedAliases();
@@ -72,6 +81,15 @@ public partial class DataReconciliationViewModel : ObservableObject
         Aliases.RemoveMultiple(toDelete);
         _userNotification.Success($"Deleted {toDelete.Length} aliases.");
         _logger.LogInformation("Deleted {Items} aliases", toDelete.Length);
+    }
+
+    [RelayCommand]
+    private void OnMarkSameIdAsSelected(AliasQueryResult alias)
+    {
+        if (alias == null) throw new ArgumentNullException(nameof(alias), "No alias was selected, did you forget to setup CommandParameter?");
+
+        var selected = Aliases.Where(e => e.Id == alias.Id);
+        foreach (var item in selected) item.IsSelected = true;
     }
 
     [RelayCommand(CanExecute = nameof(CanMerge))]
@@ -93,7 +111,13 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         var dataContext = new DoubloonViewModel(parameters, alias.Synonyms);
 
-        var response = await _userInteraction.AskUserYesNoAsync(content, "Update changes", "Cancel", "Merge aliases", dataContext);
+        var response = await _userInteraction.AskUserYesNoAsync(
+            content,
+            "Update changes",
+            "Cancel",
+            "Merge aliases",
+            dataContext
+        );
         if (!response) return;
 
         // Merge all the alias into this one (That's add additional parameters) 
@@ -116,26 +140,58 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         DeleteCommand.NotifyCanExecuteChanged();
         MergeCommand?.NotifyCanExecuteChanged();
+        UpdateDescriptionCommand.NotifyCanExecuteChanged();
+    }
+
+    [RelayCommand]
+    private async Task OnShowAliasesWithoutNotes()
+    {
+        using var loading = _userNotification.TrackLoadingState();
+        Title = "Show aliases without comments";
+        ReportType = ReportType.UnannotatedAliases;
+
+        var aliases = await Task.Run(() => _repository.GetAliasesWithoutNotes());
+        Aliases = new(aliases);
+
+        _ = _reconciliationService.ProposeDescriptionAsync(Aliases); // Fire & forget
+
+        OnSelectionChanged();
     }
 
     [RelayCommand]
     private async Task OnShowDoubloons()
     {
+        using var loading = _userNotification.TrackLoadingState();
         Title = "Doubloon Aliases";
         ReportType = ReportType.DoubloonAliases;
-        var doubloons = await Task.Run(() => _repository.GetDoubloons());
-        Aliases = new(doubloons);
+        var aliases = await Task.Run(() => _repository.GetDoubloons());
+        Aliases = new(aliases);
         OnSelectionChanged();
     }
 
     [RelayCommand]
     private async Task OnShowEmptyKeywords()
     {
+        using var loading = _userNotification.TrackLoadingState();
         Title = "Misconfigured Aliases";
         ReportType = ReportType.InvalidAliases;
-        var doubloons = await Task.Run(() => _repository.GetInvalidAliases());
-        Aliases = new(doubloons);
+        var aliases = await Task.Run(() => _repository.GetInvalidAliases());
+        Aliases = new(aliases);
         OnSelectionChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private async Task OnUpdateDescription()
+    {
+        var selectedAliases = GetSelectedAliases();
+
+        var response = await _userInteraction.AskUserYesNoAsync($"Do you want to update the description the {selectedAliases.Length} selected aliases?");
+        if (!response) return;
+
+        _repository.Update(selectedAliases);
+        _userNotification.Success($"Updated {selectedAliases.Length} selected aliases");
+        _logger.LogInformation("Updated {Items} aliases", selectedAliases.Length);
+        await OnShowAliasesWithoutNotes();
     }
 
     #endregion
