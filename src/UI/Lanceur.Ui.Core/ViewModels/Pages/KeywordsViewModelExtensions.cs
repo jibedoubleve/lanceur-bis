@@ -16,7 +16,7 @@ public static class KeywordsViewModelExtensions
     /// If <paramref name="selectedAlias"/> is null or has an invalid ID, returns the first alias from the list.
     /// Otherwise, returns the alias from the list that matches both the ID and name of the selected alias.
     /// </returns>
-    public static AliasQueryResult? ReselectAlias(this IList<AliasQueryResult> aliases, AliasQueryResult? selectedAlias)
+    public static AliasQueryResult? Reselect(this IList<AliasQueryResult> aliases, AliasQueryResult? selectedAlias)
     {
         if (aliases.Count == 0) return null;
         
