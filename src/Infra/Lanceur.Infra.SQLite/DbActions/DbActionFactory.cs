@@ -24,6 +24,7 @@ internal class DbActionFactory : IDbActionFactory
 
     #region Methods
 
+    public AliasSaveDbAction AliasSaveDbAction() => new(this, _loggerFactory);
     public AliasDbAction AliasDbAction() => new(_loggerFactory);
     public AliasSearchDbAction AliasSearchDbAction() => new(_loggerFactory, this);
     public MacroDbAction MacroDbAction() => new(_loggerFactory, _converter, this);

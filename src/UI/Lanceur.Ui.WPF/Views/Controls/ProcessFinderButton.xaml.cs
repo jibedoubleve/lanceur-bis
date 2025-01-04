@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -11,15 +10,18 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Ui.WPF.Views.Controls;
 
 /// <summary>
-/// Interaction logic for ProcessFinderButton.xaml
+///     Interaction logic for ProcessFinderButton.xaml
 /// </summary>
 public partial class ProcessFinderButton
 {
     #region Fields
-    private readonly ILogger<ProcessFinderButton> _logger = Ioc.Default.GetService<ILogger<ProcessFinderButton>>()!;
-    private static readonly Point CursorHotSpot = new(16, 20);
 
-    private readonly Cursor _crosshairsCursor;
+    public static readonly DependencyProperty FileDescriptionProperty = DependencyProperty.Register(
+        nameof(FileDescription),
+        typeof(string),
+        typeof(ProcessFinderButton),
+        null
+    );
 
     public static readonly DependencyProperty ProcessNameProperty = DependencyProperty.Register(
         nameof(ProcessName),
@@ -28,7 +30,11 @@ public partial class ProcessFinderButton
         null
     );
 
-    #endregion Fields
+    private readonly Cursor _crosshairsCursor;
+    private readonly ILogger<ProcessFinderButton> _logger = Ioc.Default.GetService<ILogger<ProcessFinderButton>>()!;
+    private static readonly Point CursorHotSpot = new(16, 20);
+
+    #endregion
 
     #region Constructors
 
@@ -38,9 +44,15 @@ public partial class ProcessFinderButton
         _crosshairsCursor = ConvertToCursor(WindowInfoControl, CursorHotSpot);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
+
+    public string FileDescription
+    {
+        get => (string)GetValue(FileDescriptionProperty);
+        set => SetValue(FileDescriptionProperty, value);
+    }
 
     public string ProcessName
     {
@@ -50,7 +62,7 @@ public partial class ProcessFinderButton
 
     public WindowInfoControl WindowInfoControl { get; } = new();
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -68,7 +80,13 @@ public partial class ProcessFinderButton
         control.Arrange(rect);
         control.UpdateLayout();
 
-        var rtb = new RenderTargetBitmap((int)control.DesiredSize.Width, (int)control.DesiredSize.Height, 96, 96, PixelFormats.Pbgra32);
+        var rtb = new RenderTargetBitmap(
+            (int)control.DesiredSize.Width,
+            (int)control.DesiredSize.Height,
+            96,
+            96,
+            PixelFormats.Pbgra32
+        );
         rtb.Render(control);
 
         var png = new PngBitmapEncoder();
@@ -128,6 +146,7 @@ public partial class ProcessFinderButton
 
             var ps = ProcessHelper.GetExecutablePath();
             ProcessName = ps.FileName;
+            FileDescription = ps.FileDescription;
 
             ReleaseMouseCapture();
             Cursor = null;
@@ -144,5 +163,5 @@ public partial class ProcessFinderButton
         base.OnPreviewMouseLeftButtonDown(e);
     }
 
-    #endregion Methods
+    #endregion
 }

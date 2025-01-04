@@ -75,6 +75,24 @@ public interface IDbConnectionManager : IDisposable
     ///     If the function fails, the transaction is rolled back.
     /// </remarks>
     TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext, TContext> action, TContext context);
+    
+    /// <summary>
+    ///     Executes a function within a database transaction and passes a context object.
+    /// </summary>
+    /// <typeparam name="TContext">The type of the context object.</typeparam>
+    /// <param name="action">
+    ///     The function to be executed. It accepts an <see cref="IDbTransaction" /> and a context object of type
+    ///     <typeparamref name="TContext" />,
+    ///     and returns the modified context object.
+    /// </param>
+    /// <param name="context">
+    ///     The context object to be passed to the function.
+    /// </param>
+    /// <remarks>
+    ///     The function provided will be executed within the context of a transaction.
+    ///     If the function fails, the transaction is rolled back.
+    /// </remarks>
+    void WithinTransaction<TContext>(Action<IDbTransaction, TContext> action, TContext context);
 
     #endregion
 }

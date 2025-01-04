@@ -113,6 +113,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IExecutionService, ExecutionService>()
                          .AddTransient<IWildcardService, ReplacementComposite>()
                          .AddTransient<IClipboardService, WindowsClipboardService>()
+                         .AddTransient<IReconciliationService, ReconciliationService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>();
 
         ConditionalExecution.Set(

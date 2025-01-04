@@ -15,6 +15,26 @@ public interface IAliasRepository
     #region Methods
 
     /// <summary>
+    ///     Retrieves additional parameters for the specified alias IDs.
+    /// </summary>
+    /// <param name="ids">A collection of alias IDs to retrieve additional parameters for.</param>
+    /// <returns>A collection of QueryResultAdditionalParameters containing the additional parameters for each specified ID.</returns>
+    IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids);
+
+    /// <summary>
+    ///     Retrieves all aliases in the system that don't have associated notes or comments.
+    /// </summary>
+    /// <returns>
+    ///     A collection of selectable aliases without notes, where each item contains
+    ///     the alias details and selection state.
+    /// </returns>
+    /// <remarks>
+    ///     This method filters out any aliases that have notes attached to them,
+    ///     making it useful for identifying aliases that may need additional documentation.
+    /// </remarks>
+    IEnumerable<SelectableAliasQueryResult> GetAliasesWithoutNotes();
+
+    /// <summary>
     ///     Get all the aliases
     /// </summary>
     /// <returns>All the aliases.</returns>
@@ -27,17 +47,19 @@ public interface IAliasRepository
     IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters();
 
     /// <summary>
-    /// Retrieves an <see cref="AliasQueryResult"/> object based on its unique identifier.
-    /// The <paramref name="name"/> is used to filter the results, ensuring that only one result is returned for the given <paramref name="id"/>.
+    ///     Retrieves an <see cref="AliasQueryResult" /> object based on its unique identifier.
+    ///     The <paramref name="name" /> is used to filter the results, ensuring that only one result is returned for the given
+    ///     <paramref name="id" />.
     /// </summary>
-    /// <param name="id">The unique identifier of the <see cref="AliasQueryResult"/>. It must be greater than zero.</param>
-    /// <param name="name">The name used to filter the results corresponding to the specified <paramref name="id"/>.</param>
+    /// <param name="id">The unique identifier of the <see cref="AliasQueryResult" />. It must be greater than zero.</param>
+    /// <param name="name">The name used to filter the results corresponding to the specified <paramref name="id" />.</param>
     /// <returns>
-    /// An <see cref="AliasQueryResult"/> object that matches the specified <paramref name="id"/> and <paramref name="name"/>.
-    /// Returns null if no matching object is found.
+    ///     An <see cref="AliasQueryResult" /> object that matches the specified <paramref name="id" /> and
+    ///     <paramref name="name" />.
+    ///     Returns null if no matching object is found.
     /// </returns>
     /// <exception cref="ArgumentException">
-    /// Thrown when the <paramref name="id"/> is less than or equal to zero.
+    ///     Thrown when the <paramref name="id" /> is less than or equal to zero.
     /// </exception>
     AliasQueryResult GetByIdAndName(long id, string name);
 
@@ -63,11 +85,13 @@ public interface IAliasRepository
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
 
     /// <summary>
-    /// Retrieves a collection of aliases that are incorrectly configured,
-    /// indicating they are invalid.
+    ///     Retrieves a collection of aliases that are incorrectly configured,
+    ///     indicating they are invalid.
     /// </summary>
-    /// <returns>An enumerable collection of <see cref="SelectableAliasQueryResult"/> 
-    /// representing the aliases that have been poorly configured and are therefore invalid.</returns>
+    /// <returns>
+    ///     An enumerable collection of <see cref="SelectableAliasQueryResult" />
+    ///     representing the aliases that have been poorly configured and are therefore invalid.
+    /// </returns>
     IEnumerable<SelectableAliasQueryResult> GetInvalidAliases();
 
 
@@ -122,13 +146,13 @@ public interface IAliasRepository
     IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result);
 
     /// <summary>
-    /// Removed an alias from the repository
+    ///     Removed an alias from the repository
     /// </summary>
     /// <param name="alias">The alias to remove from the repository</param>
     void Remove(AliasQueryResult alias);
 
     /// <summary>
-    /// Removes the specified list of aliases from the repository
+    ///     Removes the specified list of aliases from the repository
     /// </summary>
     /// <param name="aliases">The list of aliases to remove from the repository</param>
     void RemoveMany(IEnumerable<AliasQueryResult> aliases);
@@ -139,6 +163,7 @@ public interface IAliasRepository
     /// <param name="alias">The alias to create or update.</param>
     /// <returns>The ID of the created or updated alias.</returns>
     void SaveOrUpdate(ref AliasQueryResult alias);
+
 
     /// <summary>
     ///     Searches for all aliases that match the specified criteria.
@@ -164,13 +189,22 @@ public interface IAliasRepository
     /// <param name="names">The names to find in the database</param>
     /// <returns></returns>
     public ExistingNameResponse SelectNames(string[] names);
-    
+
     /// <summary>
-    /// Increments the execution counter for a given alias. 
-    /// This method is the recommended way to track usage of an executable alias.
+    ///     Increments the execution counter for a given alias.
+    ///     This method is the recommended way to track usage of an executable alias.
     /// </summary>
     /// <param name="alias">The alias whose execution is being tracked.</param>
     void SetUsage(QueryResult alias);
+
+    /// <summary>
+    ///     Updates the database with the changes specified in the provided alias records.
+    /// </summary>
+    /// <param name="aliases">
+    ///     A collection of AliasQueryResult objects containing the alias changes to apply.
+    ///     Each item in the collection represents a single alias and its updated values.
+    /// </param>
+    void Update(IEnumerable<AliasQueryResult> aliases);
 
     /// <summary>
     ///     Updates thumbnail of many aliases at once.
@@ -184,13 +218,6 @@ public interface IAliasRepository
     ///     will be ignored.
     /// </remarks>
     void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases);
-    
-    /// <summary>
-    /// Retrieves additional parameters for the specified alias IDs.
-    /// </summary>
-    /// <param name="ids">A collection of alias IDs to retrieve additional parameters for.</param>
-    /// <returns>A collection of QueryResultAdditionalParameters containing the additional parameters for each specified ID.</returns>
-    IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids);
 
     #endregion
 }

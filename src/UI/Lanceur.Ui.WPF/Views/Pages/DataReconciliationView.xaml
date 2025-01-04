@@ -66,6 +66,10 @@
         <Menu>
             <MenuItem Header="Show data" Icon="{ui:SymbolIcon Database24}">
                 <MenuItem
+                    Command="{Binding ShowAliasesWithoutNotesCommand}"
+                    Header="Aliases without comments"
+                    Icon="{ui:SymbolIcon ProhibitedNote20}" />
+                <MenuItem
                     Command="{Binding ShowDoubloonsCommand}"
                     Header="Doubloons"
                     Icon="{ui:SymbolIcon ColumnDoubleCompare20}" />
@@ -75,15 +79,21 @@
                     Icon="{ui:SymbolIcon WeatherDustStorm24}" />
             </MenuItem>
             <MenuItem
+                Command="{Binding UpdateDescriptionCommand}"
+                Header="Update selected"
+                Icon="{ui:SymbolIcon SaveMultiple24}"
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=UnannotatedAliases}" />
+            <MenuItem
                 Command="{Binding DeleteCommand}"
                 Header="Delete selected"
-                Icon="{ui:SymbolIcon Delete24}" />
+                Icon="{ui:SymbolIcon Delete24}"
+                Visibility="{Binding ReportType, Converter={StaticResource InvertReportTypeToVisibilityConverter}, ConverterParameter=UnannotatedAliases}" />
             <MenuItem
                 Command="{Binding MergeCommand}"
                 CommandParameter="{StaticResource MergeDialog}"
                 Header="Merge selected"
                 Icon="{ui:SymbolIcon Merge24}"
-                Visibility="{Binding ReportType, Converter={StaticResource IsDoubloonReportToVisibilityConverter}}" />
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=DoubloonAliases}" />
         </Menu>
         <StackPanel Grid.Row="1">
             <ui:TextBlock
@@ -97,6 +107,7 @@
                 CanUserReorderColumns="False"
                 GridLinesVisibility="Vertical"
                 HeadersVisibility="Column"
+                EnableColumnVirtualization="True"
                 ItemsSource="{Binding Aliases}">
                 <DataGrid.Columns>
                     <!--  CHECKBOX  -->
@@ -109,6 +120,9 @@
                                         <interactivity:EventTrigger EventName="Checked">
                                             <interactivity:InvokeCommandAction
                                                 Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
+                                            <interactivity:InvokeCommandAction
+                                                Command="{Binding ElementName=Self, Path=DataContext.MarkSameIdAsSelectedCommand}"
+                                                CommandParameter="{Binding .}" />
                                         </interactivity:EventTrigger>
                                         <interactivity:EventTrigger EventName="Unchecked">
                                             <interactivity:InvokeCommandAction
@@ -165,7 +179,8 @@
                     </DataGridTemplateColumn>
 
                     <!--  FILENAME  -->
-                    <DataGridTemplateColumn Header="File name">
+                    <DataGridTemplateColumn Header="File name"
+                                            x:Name="ColumnFileName">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock
@@ -178,7 +193,8 @@
                     </DataGridTemplateColumn>
 
                     <!--  PARAMETERS  -->
-                    <DataGridTemplateColumn Header="Parameters">
+                    <DataGridTemplateColumn Header="Parameters"
+                                            x:Name="ColumnParameters">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock
@@ -186,6 +202,20 @@
                                     VerticalAlignment="Center"
                                     FontTypography="BodyStrong"
                                     Text="{Binding Parameters}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- DESCRIPTION -->
+                    <DataGridTemplateColumn Header="Proposed Description"
+                                            x:Name="ColumnProposedDescription">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock
+                                    Margin="5,5,50,5"
+                                    VerticalAlignment="Center"
+                                    FontTypography="BodyStrong"
+                                    Text="{Binding Description}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

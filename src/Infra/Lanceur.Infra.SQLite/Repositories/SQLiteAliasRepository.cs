@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Dapper;
 using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Models;
@@ -22,6 +23,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly ILogger<SQLiteAliasRepository> _logger;
     private static readonly MacroValidator MacroValidator = new(Assembly.GetAssembly(typeof(GuidMacro)));
+
+    private static readonly Regex RegexSelectUrl = new(@"(www?|http?|https?|ftp):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(\.[a-zA-Z]{2,})?$");
 
     #endregion
 
@@ -60,6 +63,43 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                            where id_alias in @ids
                            """;
         return Db.WithinTransaction(tx => tx!.Connection!.Query<AdditionalParameter>(sql, new { ids }));
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<SelectableAliasQueryResult> GetAliasesWithoutNotes()
+    {
+        const string sql = $"""
+                             select
+                                 a.id         as {nameof(SelectableAliasQueryResult.Id)},
+                                 a.notes      as {nameof(SelectableAliasQueryResult.Description)},
+                                 a.file_name  as {nameof(SelectableAliasQueryResult.FileName)},
+                                 a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
+                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
+                                 sub.synonyms as {nameof(SelectableAliasQueryResult.Synonyms)},
+                                 a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                 a.thumbnail  as {nameof(SelectableAliasQueryResult.Thumbnail)}
+                             from 
+                                 alias a
+                                 inner join alias_name an on a.id = an.id_alias
+                                 inner join (
+                                     select 
+                                         id_alias,
+                                         group_concat(name) as synonyms
+                                     from alias_name
+                                     group by id_alias
+                             ) as sub on sub.id_alias = a.id
+                             where
+                                 a.notes is null
+                                 and a.hidden = 0
+                             order by an.name
+                             """;
+        var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+
+
+        results = results.Where(e => !RegexSelectUrl.IsMatch(e.FileName)) // Excluding all aliases that serve as shortcuts for URLs
+                         .Where(e => !e.FileName.StartsWith("package:"))  // Excluding all packaged applications
+                         .ToArray();
+        return _converter.ToSelectableQueryResult(results);
     }
 
     /// <inheritdoc />
@@ -266,38 +306,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias)
     {
-        _ = Db.WithinTransaction(
-            (tx, current) =>
-            {
-                ArgumentNullException.ThrowIfNull(current);
-                ArgumentNullException.ThrowIfNull(current.Synonyms);
-                ArgumentNullException.ThrowIfNull(current.Id);
-
-                current.SanitizeSynonyms();
-                var action = _dbActionFactory.AliasDbAction();
-
-                using var _ = _logger.BeginSingleScope("UpdatedAlias", current);
-
-                switch (current.Id)
-                {
-                    case 0 when !action.HasNames(current, tx):
-                        action.Create(tx, ref current);
-                        _logger.LogInformation("Created new alias {AliasName}", current.Name);
-                        break;
-
-                    case > 0:
-                        _logger.LogInformation("Updating alias {AliasName}", current.Name);
-                        action.Update(current, tx);
-                        break;
-                }
-
-                // Reset state after save
-                current.SynonymsWhenLoaded = current.Synonyms;
-
-                return current;
-            },
-            alias
-        );
+        var dbAction = _dbActionFactory.AliasSaveDbAction();
+        Db.WithinTransaction((tx, current) => dbAction.SaveOrUpdate(tx, ref current), alias);
     }
 
     /// <inheritdoc />
@@ -328,6 +338,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             _dbActionFactory.SetUsageDbAction().SetUsage(tx, ref alias);
         }
     );
+
+    /// <inheritdoc />
+    public void Update(IEnumerable<AliasQueryResult> aliases)
+    {
+        var dbAction = _dbActionFactory.AliasSaveDbAction();
+        Db.WithinTransaction(dbAction.Update, aliases);
+    }
 
     /// <inheritdoc />
     public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().UpdateThumbnails(aliases, tx));

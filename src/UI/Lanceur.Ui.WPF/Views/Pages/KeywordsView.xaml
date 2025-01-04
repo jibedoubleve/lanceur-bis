@@ -172,7 +172,8 @@
                                     VerticalAlignment="Center"
                                     VerticalContentAlignment="Center"
                                     DockPanel.Dock="Right"
-                                    ProcessName="{Binding ElementName=TbFilename, Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}" />
+                                    ProcessName="{Binding ElementName=TbFilename, Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}" 
+                                    FileDescription="{Binding ElementName=TbNotes, Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"/>
                             </Grid>
                             <!--  PARAMETERS  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbParameters}">Parameters</Label>

@@ -63,7 +63,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryResolveDetails(AliasQueryResult queryResult)
+    public async Task<bool> TryResolveDetailsAsync(AliasQueryResult queryResult)
     {
         ArgumentNullException.ThrowIfNull(queryResult);
         var results = await GetByInstalledDirectory(queryResult.FileName);
@@ -73,11 +73,9 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
 
         var result = results.First();
         if (queryResult.Notes.IsNullOrEmpty())
-        {
-            queryResult.Description = result.Description.IsNullOrEmpty() 
-                ? result.DisplayName 
-                : result.Description; 
-        }
+            queryResult.Description = result.Description.IsNullOrEmpty()
+                ? result.DisplayName
+                : result.Description;
         queryResult.FileName = result.FileName;
         return true;
     }
