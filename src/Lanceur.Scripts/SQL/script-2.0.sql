@@ -67,7 +67,20 @@ create table alias (
 );
 
 insert into alias
-select *
+select
+    id,
+    arguments,
+    file_name,
+    notes,
+    run_as,
+    start_mode,
+    working_dir,
+    icon,
+    hidden,
+    null as deleted_at,
+    lua_script,
+    thumbnail,
+    confirmation_required
 from temp_alias;
 
 --------------------------------------------------------

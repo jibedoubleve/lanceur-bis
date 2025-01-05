@@ -15,8 +15,9 @@ public enum ReportType
 {
     None,
     DoubloonAliases,
-    InvalidAliases,
-    UnannotatedAliases
+    BrokenAliases,
+    UnannotatedAliases,
+    RestoreAlias
 }
 
 public partial class DataReconciliationViewModel : ObservableObject
@@ -77,7 +78,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         var response = await _userInteraction.AskUserYesNoAsync($"Do you want to delete the {toDelete.Length} selected aliases?");
         if (!response) return;
 
-        await Task.Run(() => _repository.RemoveMany(toDelete));
+        await Task.Run(() => _repository.Remove(toDelete));
         Aliases.RemoveMultiple(toDelete);
         _userNotification.Success($"Deleted {toDelete.Length} aliases.");
         _logger.LogInformation("Deleted {Items} aliases", toDelete.Length);
@@ -127,7 +128,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         await Task.Run(() => _repository.SaveOrUpdate(ref alias));
 
         // Removing merged aliases
-        _repository.RemoveMany(selectedAliases.Where(e => e.Id != alias.Id).Select(a => a));
+        _repository.Remove(selectedAliases.Where(e => e.Id != alias.Id).Select(a => a));
 
         //Reload when finished
         await OnShowDoubloons();
@@ -135,50 +136,42 @@ public partial class DataReconciliationViewModel : ObservableObject
         _userNotification.Success($"Aliases merged into alias '{alias.Name}'.");
     }
 
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private async Task OnRestore()
+    {
+        var selectedAliases = GetSelectedAliases();
+
+        var response = await _userInteraction.AskUserYesNoAsync($"Do you want to restore {selectedAliases.Length} selected aliases?");
+        if (!response) return;
+
+        _repository.Restore(selectedAliases);
+        _userNotification.Success($"Restored {selectedAliases.Length} selected aliases");
+        _logger.LogInformation("Restored {Items} aliases", selectedAliases.Length);
+        await OnShowRestoreAlias();
+    }
+
     [RelayCommand]
     private void OnSelectionChanged()
     {
         DeleteCommand.NotifyCanExecuteChanged();
-        MergeCommand?.NotifyCanExecuteChanged();
+        MergeCommand.NotifyCanExecuteChanged();
+        RestoreCommand.NotifyCanExecuteChanged();
         UpdateDescriptionCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand]
-    private async Task OnShowAliasesWithoutNotes()
-    {
-        using var loading = _userNotification.TrackLoadingState();
-        Title = "Show aliases without comments";
-        ReportType = ReportType.UnannotatedAliases;
+    private async Task OnShowAliasesWithoutNotes() => await ShowAsync(
+        "Show aliases without comments",
+        ReportType.UnannotatedAliases,
+        _repository.GetAliasesWithoutNotes,
+        true
+    );
 
-        var aliases = await Task.Run(() => _repository.GetAliasesWithoutNotes());
-        Aliases = new(aliases);
+    [RelayCommand] private async Task OnShowDoubloons() => await ShowAsync("Doubloon Aliases", ReportType.DoubloonAliases, _repository.GetDoubloons);
 
-        _ = _reconciliationService.ProposeDescriptionAsync(Aliases); // Fire & forget
+    [RelayCommand] private async Task OnShowBrokenAliases() => await ShowAsync("Broken Aliases", ReportType.BrokenAliases, _repository.GetBrokenAliases);
 
-        OnSelectionChanged();
-    }
-
-    [RelayCommand]
-    private async Task OnShowDoubloons()
-    {
-        using var loading = _userNotification.TrackLoadingState();
-        Title = "Doubloon Aliases";
-        ReportType = ReportType.DoubloonAliases;
-        var aliases = await Task.Run(() => _repository.GetDoubloons());
-        Aliases = new(aliases);
-        OnSelectionChanged();
-    }
-
-    [RelayCommand]
-    private async Task OnShowEmptyKeywords()
-    {
-        using var loading = _userNotification.TrackLoadingState();
-        Title = "Broken Aliases";
-        ReportType = ReportType.InvalidAliases;
-        var aliases = await Task.Run(() => _repository.GetBrokenAliases());
-        Aliases = new(aliases);
-        OnSelectionChanged();
-    }
+    [RelayCommand] private async Task OnShowRestoreAlias() => await ShowAsync("Show deleted aliases", ReportType.RestoreAlias, _repository.GetDeletedAlias);
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private async Task OnUpdateDescription()
@@ -192,6 +185,19 @@ public partial class DataReconciliationViewModel : ObservableObject
         _userNotification.Success($"Updated {selectedAliases.Length} selected aliases");
         _logger.LogInformation("Updated {Items} aliases", selectedAliases.Length);
         await OnShowAliasesWithoutNotes();
+    }
+
+    private async Task ShowAsync(string title, ReportType reportType, Func<IEnumerable<SelectableAliasQueryResult>> refreshAliases, bool isDescriptionUpdated = false)
+    {
+        using var loading = _userNotification.TrackLoadingState();
+        Title = title;
+        ReportType = reportType;
+
+        var aliases = await Task.Run(refreshAliases);
+        Aliases = new(aliases);
+
+        if (isDescriptionUpdated) _ = _reconciliationService.ProposeDescriptionAsync(Aliases); // Fire & forget
+        OnSelectionChanged();
     }
 
     #endregion

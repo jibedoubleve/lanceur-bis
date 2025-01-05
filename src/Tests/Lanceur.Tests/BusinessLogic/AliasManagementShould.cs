@@ -117,15 +117,10 @@ public class AliasManagementShould : TestBase
         var action = BuildAliasDbAction(connection);
         var c = new DbSingleConnectionManager(connection);
         QueryResult alias1 = new AliasQueryResult { Name = aliasName };
+        c.WithinTransaction(tx => action.CreateInvisible(tx, ref alias1));
 
         // ACT
-        var sut = c.WithinTransaction(
-            tx =>
-            {
-                action.CreateInvisible(tx, ref alias1);
-                return action.GetExact(aliasName, tx, true);
-            }
-        );
+        var sut = c.WithinTransaction(tx => action.GetExact(aliasName, tx, true));
 
         //ASSERT
         sut.Should().NotBeNull();
@@ -201,15 +196,59 @@ public class AliasManagementShould : TestBase
     [Fact]
     public void CreateAliasWithPrivilegeUsingService()
     {
+        // ARRANGE
         var connection = BuildFreshDb();
         var service = BuildDataService(connection);
 
-        var alias = BuildAlias("admin", RunAs.Admin);
+        const string name = "admin";
+        var alias = BuildAlias(name, RunAs.Admin);
         service.SaveOrUpdate(ref alias);
 
+        const string sql = """
+                           select 
+                               a.id, 
+                               an.name, 
+                               a.run_as as RunAs
+                           from 
+                           	alias a
+                           	inner join alias_name an on an.id_alias = a.id
+                           where a.id = @id
+                           """;
+        var sut = connection.Query<AliasQueryResult>(sql, new { id = alias.Id })
+                            .Single();
+        // ASSERT
+        using (new AssertionScope())
+        {
+            sut.Should().NotBeNull();
+            sut.Id.Should().NotBe(0);
+            sut.Name.Should().Be(name);
+            sut.RunAs.Should().Be(RunAs.Admin);
+        }
+    }
+    
+    [Fact]
+    public void RetrieveAliasWithPrivilegeUsingService()
+    {
+        // ARRANGE
+        var connection = BuildFreshDb();
+        var service = BuildDataService(connection);
+
+        const string sql = """
+                           insert into alias (id, run_as) values (1, 0);
+                           insert into alias_name(id, name, id_alias) values (1, 'admin', 1);
+                           """;
+        connection.Execute(sql);
+
+        // ACT
         var sut = service.Search("admin").ToArray();
-        sut.Should().HaveCount(1);
-        sut.ElementAt(0).RunAs.Should().Be(RunAs.Admin);
+        
+        // ASSERT
+        using (new AssertionScope())
+        {
+            sut.Should().NotBeEmpty();
+            sut.Should().HaveCount(1);
+            sut.ElementAt(0).RunAs.Should().Be(RunAs.Admin);
+        }
     }
 
     [Fact]
@@ -305,12 +344,13 @@ public class AliasManagementShould : TestBase
         service.Remove(alias1);
 
         //ASSERT
-        const string sql2 = "select count(*) from alias";
+        const string sql2 = "select count(*) from alias where deleted_at is null";
         const string sql3 = "select count(*) from alias_name";
 
         alias1.Id.Should().BeGreaterThan(0);
         connection.ExecuteScalar<int>(sql2).Should().Be(2);
-        connection.ExecuteScalar<int>(sql3).Should().Be(2);
+        connection.ExecuteScalar<int>(sql3).Should().Be(3); // Logical deletion don't remove data: the names of the
+                                                            // deleted alias should remains in the database
     }
 
     [Fact]
@@ -365,14 +405,16 @@ public class AliasManagementShould : TestBase
         var service = BuildDataService(connection);
 
         // ACT
-        service.Remove(new() { Id = 256 });
+        service.Remove((AliasQueryResult)new() { Id = 256 });
 
         // ASSERT
-        const string sql2 = "select count(*) from alias where id = 256";
+        const string sql2 = "select count(*) from alias where id = 256 and deleted_at is null";
         connection.ExecuteScalar<int>(sql2).Should().Be(0);
 
         const string sql3 = "select count(*) from alias_name where id_alias = 256";
-        connection.ExecuteScalar<int>(sql3).Should().Be(0);
+        // The logical deletion don't remove data, the names should therefore
+        // remain in the database
+        connection.ExecuteScalar<int>(sql3).Should().Be(1);
     }
 
     #endregion

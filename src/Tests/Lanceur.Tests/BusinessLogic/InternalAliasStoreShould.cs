@@ -43,9 +43,6 @@ public class InternalAliasStoreShould
     public void ReturnSpecifiedReservedAliasFromLanceur(string criterion)
     {
         var repository = Substitute.For<IAliasRepository>();
-        repository.RefreshUsage(Arg.Any<IEnumerable<QueryResult>>())
-                  .ReturnsForAnyArgs(x => x.Args()[0] as IEnumerable<QueryResult>);
-
         var store = GetStore(repository, typeof(MainView));
         var query = new Cmdline(criterion);
 
@@ -57,14 +54,7 @@ public class InternalAliasStoreShould
     [Fact]
     public void ReturnSpecifiedReservedKeyword()
     {
-        var serviceProvider  = new ServiceCollection().AddMockSingleton<IAliasRepository>(
-                                                          (sp, repository) =>
-                                                          {
-                                                              repository.RefreshUsage(Arg.Any<IEnumerable<QueryResult>>())
-                                                                        .Returns((List<QueryResult>) [new ExecutableTestAlias(sp)]);
-                                                              return repository;
-                                                          }
-                                                      )
+        var serviceProvider  = new ServiceCollection().AddMockSingleton<IAliasRepository>((_, repository) => repository)
                                                       .BuildServiceProvider();
 
         var store = GetStore(serviceProvider.GetService<IAliasRepository>());

@@ -87,7 +87,8 @@ public class MacroDbAction
     {
         using var _ = _logger.MeasureExecutionTime(this);
         var list = new List<AliasQueryResult>(collection);
-        var composites = list.Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
+        var composites = list.Where(item => false == item.FileName.IsNullOrEmpty())
+                             .Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
                              .Select(x => Hydrate(tx, x))
                              .ToArray();
 

@@ -69,15 +69,9 @@ public class ReservedAliasStore : IStoreService
             if (instance is not SelfExecutableQueryResult qr) continue;
 
             var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
-            var keyword = _aliasRepository.GetKeyword(name);
+            _aliasRepository.SetHiddenAliasUsage(qr);
 
             qr.Name = name;
-            if (keyword is not null)
-            {
-                qr.Id = keyword.Id;
-                qr.Count = keyword.Count;
-            }
-
             qr.Description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)?.Description;
             qr.Icon = "Settings24";
 
@@ -91,7 +85,7 @@ public class ReservedAliasStore : IStoreService
     public IEnumerable<QueryResult> GetAll()
     {
         if (_reservedAliases == null) LoadAliases();
-        return _aliasRepository.RefreshUsage(_reservedAliases);
+        return _reservedAliases;
     }
 
     /// <inheritdoc />
@@ -102,10 +96,8 @@ public class ReservedAliasStore : IStoreService
                      .Where(k => k.Name.ToLower().StartsWith(query.Name))
                      .ToList();
 
-        var orderedResult = _aliasRepository
-                            .RefreshUsage(result)
-                            .OrderByDescending(x => x.Count)
-                            .ThenBy(x => x.Name);
+        var orderedResult = result.OrderByDescending(x => x.Count)
+                                  .ThenBy(x => x.Name);
         return orderedResult;
     }
 

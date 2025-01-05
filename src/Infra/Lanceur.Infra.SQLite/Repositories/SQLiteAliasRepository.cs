@@ -117,20 +117,23 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.notes     as {nameof(SelectableAliasQueryResult.Description)},
                                 a.file_name as {nameof(SelectableAliasQueryResult.FileName)},
                                 a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
-                                an.name      as {nameof(SelectableAliasQueryResult.Name)},
+                                an.name     as {nameof(SelectableAliasQueryResult.Name)},
                                 a.icon      as {nameof(SelectableAliasQueryResult.Icon)},
                                 a.thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
-                            where 	
-                            	file_name like 'c:\%'
-                            	or file_name like 'd:\%'
-                            	or file_name like 'e:\%'
-                            	or file_name like 'f:\%'
-                            	or file_name like 'g:\%'
-                            	or file_name like 'h:\%'
-                            	or file_name like 'i:\%'
+                            where
+                                deleted_at is null
+                            	and (
+                                    file_name like 'c:\%'
+                            	    or file_name like 'd:\%'
+                            	    or file_name like 'e:\%'
+                            	    or file_name like 'f:\%'
+                            	    or file_name like 'g:\%'
+                            	    or file_name like 'h:\%'
+                            	    or file_name like 'i:\%'
+                            	)
                             """;
         var aliases = Db.WithinTransaction(tx => tx!.Connection!.Query<SelectableAliasQueryResult>(sql));
         return aliases.Where(e => !File.Exists(e.FileName))
@@ -178,7 +181,17 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public KeywordUsage GetKeyword(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetHiddenKeyword(name, tx));
+    public void SetHiddenAliasUsage(QueryResult alias)
+    {
+        ArgumentNullException.ThrowIfNull(alias);
+
+        var usage = Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetHiddenAlias(alias.Name, tx));
+        if (usage is null) return;
+
+        alias.Id = usage.Id;
+        new QueryResultCounterIncrement(alias).SetCount(usage);
+        
+    }
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetMostUsedAliases()
@@ -215,7 +228,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         const string sql =
             """
             select
-            a.id        as id,
+                a.id       as id,
                count(a.id) as count
             from
             	alias a
@@ -235,7 +248,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
         var first = result.First();
         queryResult.Id = first.Id;
-        queryResult.Count = first.Count;
+        new QueryResultCounterIncrement(queryResult).SetCount(first.Count);
     }
 
     /// <inheritdoc />
@@ -297,24 +310,21 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
                 var item = enumerable.ElementAt(0);
                 alias.Id = item.Id;
-                alias.Count = (int)item.Count;
+                new QueryResultCounterIncrement(alias).SetCount(item.Count);
             }
         );
     }
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.RefreshUsage(result, tx));
+    public void Remove(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.LogicalRemove(alias, tx));
 
     /// <inheritdoc />
-    public void Remove(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.Remove(alias, tx));
-
-    /// <inheritdoc />
-    public void RemoveMany(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
+    public void Remove(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
         tx =>
         {
             var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
             _logger.LogInformation("Removing {Length} alias(es)", list.Length);
-            _dbActionFactory.AliasManagement.RemoveMany(list, tx);
+            _dbActionFactory.AliasManagement.LogicalRemove(list, tx);
         }
     );
 
@@ -355,6 +365,41 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
     /// <inheritdoc />
     public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.UpdateThumbnails(aliases, tx));
+
+    /// <inheritdoc />
+    public IEnumerable<SelectableAliasQueryResult> GetDeletedAlias()
+    {
+        const string sql = $"""
+                            select 
+                                a.id        as {nameof(SelectableAliasQueryResult.Id)},
+                                a.notes     as {nameof(SelectableAliasQueryResult.Description)},
+                                a.file_name as {nameof(SelectableAliasQueryResult.FileName)},
+                                a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
+                                an.name     as {nameof(SelectableAliasQueryResult.Name)},
+                                a.icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
+                            from 
+                                alias a
+                                inner join alias_name an on a.id = an.id_alias
+                            where
+                                deleted_at is not null;
+                            """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+    }
+
+    /// <inheritdoc />
+    public void Restore(IEnumerable<SelectableAliasQueryResult> aliases)
+    {
+        const string sql = """
+                           update alias
+                           set
+                               deleted_at = null,
+                               hidden     = 0 
+                           where id in @selectedAliases;
+                           """;
+        var selectedAliases = aliases.Select(e => e.Id).ToArray();
+        Db.WithinTransaction(tx => tx.Connection!.Query(sql, new { selectedAliases  }));
+    }
 
     #endregion
 }

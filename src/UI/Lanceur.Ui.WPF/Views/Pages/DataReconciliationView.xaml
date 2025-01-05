@@ -66,6 +66,10 @@
         <Menu>
             <MenuItem Header="Show data" Icon="{ui:SymbolIcon Database24}">
                 <MenuItem
+                    Command="{Binding ShowRestoreAliasCommand}"
+                    Header="Deleted aliases"
+                    Icon="{ui:SymbolIcon Delete24}" />
+                <MenuItem
                     Command="{Binding ShowAliasesWithoutNotesCommand}"
                     Header="Aliases without comments"
                     Icon="{ui:SymbolIcon ProhibitedNote20}" />
@@ -74,7 +78,7 @@
                     Header="Doubloons"
                     Icon="{ui:SymbolIcon ColumnDoubleCompare20}" />
                 <MenuItem
-                    Command="{Binding ShowEmptyKeywordsCommand}"
+                    Command="{Binding ShowBrokenAliasesCommand}"
                     Header="Broken aliases"
                     Icon="{ui:SymbolIcon WeatherDustStorm24}" />
             </MenuItem>
@@ -82,18 +86,23 @@
                 Command="{Binding UpdateDescriptionCommand}"
                 Header="Update selected"
                 Icon="{ui:SymbolIcon SaveMultiple24}"
-                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=UnannotatedAliases}" />
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=UpdateDescription}" />
             <MenuItem
                 Command="{Binding DeleteCommand}"
                 Header="Delete selected"
                 Icon="{ui:SymbolIcon Delete24}"
-                Visibility="{Binding ReportType, Converter={StaticResource InvertReportTypeToVisibilityConverter}, ConverterParameter=UnannotatedAliases}" />
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=Delete}" />
             <MenuItem
                 Command="{Binding MergeCommand}"
                 CommandParameter="{StaticResource MergeDialog}"
                 Header="Merge selected"
                 Icon="{ui:SymbolIcon Merge24}"
-                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=DoubloonAliases}" />
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=Merge}" />
+            <MenuItem
+                Command="{Binding RestoreCommand}"
+                Header="Restore selected aliases"
+                Icon="{ui:SymbolIcon DeleteDismiss24}"
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=Restore}" />
         </Menu>
         <StackPanel Grid.Row="1">
             <ui:TextBlock

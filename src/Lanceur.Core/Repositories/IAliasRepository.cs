@@ -47,6 +47,19 @@ public interface IAliasRepository
     IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters();
 
     /// <summary>
+    ///     Retrieves a collection of aliases that are incorrectly configured,
+    ///     indicating they are invalid. A broken alias is an alias that has a filename
+    ///     that leads to a non-existing file.
+    /// </summary>
+    /// <returns>
+    ///     An enumerable collection of <see cref="SelectableAliasQueryResult" />
+    ///     representing the aliases that have been poorly configured and are therefore invalid.
+    ///     These invalid aliases are considered "broken" because their associated filenames
+    ///     point to non-existing files.
+    /// </returns>
+    IEnumerable<SelectableAliasQueryResult> GetBrokenAliases();
+
+    /// <summary>
     ///     Retrieves an <see cref="AliasQueryResult" /> object based on its unique identifier.
     ///     The <paramref name="name" /> is used to filter the results, ensuring that only one result is returned for the given
     ///     <paramref name="id" />.
@@ -62,6 +75,16 @@ public interface IAliasRepository
     ///     Thrown when the <paramref name="id" /> is less than or equal to zero.
     /// </exception>
     AliasQueryResult GetByIdAndName(long id, string name);
+
+    /// <summary>
+    ///     Retrieves a collection of aliases that have been logically deleted.
+    ///     Logical deletion means the aliases are marked as deleted in the system
+    ///     but are not permanently removed from the database.
+    /// </summary>
+    /// <returns>
+    ///     An <see cref="IEnumerable{SelectableAliasQueryResult}" /> representing the logically deleted aliases.
+    /// </returns>
+    IEnumerable<SelectableAliasQueryResult> GetDeletedAlias();
 
     /// <summary>
     ///     Get the list of all the doubloons in the database
@@ -83,27 +106,6 @@ public interface IAliasRepository
     /// <param name="idAlias">Id of the alias to validate</param>
     /// <returns>An IEnumerable containing the aliases that exist in both the provided list and the database.</returns>
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
-    
-    /// <summary>
-    ///     Retrieves a collection of aliases that are incorrectly configured,
-    ///     indicating they are invalid. A broken alias is an alias that has a filename
-    ///     that leads to a non-existing file.
-    /// </summary>
-    /// <returns>
-    ///     An enumerable collection of <see cref="SelectableAliasQueryResult" />
-    ///     representing the aliases that have been poorly configured and are therefore invalid.
-    ///     These invalid aliases are considered "broken" because their associated filenames
-    ///     point to non-existing files.
-    /// </returns>
-    IEnumerable<SelectableAliasQueryResult> GetBrokenAliases();
-
-
-    /// <summary>
-    ///     Search into the hidden aliases the one with the specified name and returns its ID
-    /// </summary>
-    /// <param name="name">The name of the hidden alias</param>
-    /// <returns>The ID of this alias or '0' if not found</returns>
-    KeywordUsage GetKeyword(string name);
 
     /// <summary>
     ///     Get list of all the aliases with count greater than 0
@@ -142,27 +144,31 @@ public interface IAliasRepository
     void HydrateMacro(QueryResult alias);
 
     /// <summary>
-    ///     Update the usage of the specified <see cref="QueryResult" />
-    /// </summary>
-    /// <param name="result">The collection of <see cref="QueryResult" />to refresh</param>
-    /// <returns></returns>
-    IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result);
-
-    /// <summary>
-    ///     Marks the specified alias as removed from the repository. 
-    ///     This is a logical removal; the alias remains in the database 
+    ///     Marks the specified alias as removed from the repository.
+    ///     This is a logical removal; the alias remains in the database
     ///     but is flagged as deleted and excluded from subsequent queries.
     /// </summary>
     /// <param name="alias">The alias to mark as removed from the repository.</param>
     void Remove(AliasQueryResult alias);
 
     /// <summary>
-    ///     Marks the specified list of aliases as removed from the repository. 
-    ///     This is a logical removal; the aliases remain in the database 
+    ///     Marks the specified list of aliases as removed from the repository.
+    ///     This is a logical removal; the aliases remain in the database
     ///     but are flagged as deleted and excluded from subsequent queries.
     /// </summary>
     /// <param name="aliases">The list of aliases to mark as removed from the repository.</param>
-    void RemoveMany(IEnumerable<AliasQueryResult> aliases);
+    void Remove(IEnumerable<AliasQueryResult> aliases);
+
+
+    /// <summary>
+    ///     Restores the specified aliases by reversing their logical deletion status.
+    ///     Aliases that are not marked as logically deleted will remain unchanged.
+    /// </summary>
+    /// <param name="aliases">
+    ///     An array of <see cref="SelectableAliasQueryResult" /> objects representing the aliases to restore.
+    ///     Only aliases marked as logically deleted will be affected.
+    /// </param>
+    void Restore(IEnumerable<SelectableAliasQueryResult> aliases);
 
 
     /// <summary>
@@ -197,6 +203,17 @@ public interface IAliasRepository
     /// <param name="names">The names to find in the database</param>
     /// <returns></returns>
     public ExistingNameResponse SelectNames(string[] names);
+
+
+    /// <summary>
+    ///     Searches for a hidden alias with the specified name. and, if exists, set the usage into the specified QueryResult's
+    ///     count property
+    /// </summary>
+    /// <param name="alias">The hidden alias to search for.</param>
+    /// <returns>
+    ///     The usage of the alias if found; otherwise, an empty <see cref="AliasUsage" /> object with its Id set to '0'.
+    /// </returns>
+    void SetHiddenAliasUsage(QueryResult alias);
 
     /// <summary>
     ///     Increments the execution counter for a given alias.
