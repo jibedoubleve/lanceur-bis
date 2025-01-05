@@ -75,7 +75,7 @@ public class AliasSearchDbAction
         name = $"{name ?? string.Empty}%";
         var results = tx.Connection!.Query<AliasQueryResult>(sql, new { name });
 
-        results = _dbActionFactory.MacroDbAction().UpgradeToComposite(tx, results);
+        results = _dbActionFactory.MacroManagement.UpgradeToComposite(tx, results);
         return results ?? AliasQueryResult.NoResult;
     }
 
@@ -114,7 +114,7 @@ public class AliasSearchDbAction
         name = $"{name ?? string.Empty}%";
         var results = tx.Connection!.Query<AliasQueryResult>(sql, new { name });
 
-        results = _dbActionFactory.MacroDbAction()
+        results = _dbActionFactory.MacroManagement
                                   .UpgradeToComposite(tx, results);
         return results ?? AliasQueryResult.NoResult;
     }

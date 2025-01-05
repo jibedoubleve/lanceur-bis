@@ -45,7 +45,7 @@ public class MacroDbAction
         _logger.BeginSingleScope("AliasToHydrate", item);
         if (!item.IsComposite()) return item;
 
-        var action = _dbActionFactory.AliasDbAction();
+        var action = _dbActionFactory.AliasManagement;
         var subAliases = new List<AliasQueryResult>();
 
         var names = item?.Parameters?.Split("@") ?? [];

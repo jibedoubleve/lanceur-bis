@@ -103,50 +103,10 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> GetAll() => Db.WithinTransaction(tx => _dbActionFactory.AliasSearchDbAction().Search(tx, isReturnAllIfEmpty: true));
+    public IEnumerable<AliasQueryResult> GetAll() => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, isReturnAllIfEmpty: true));
 
     /// <inheritdoc />
     public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() => Db.WithinTransaction(tx => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters(tx));
-
-    /// <inheritdoc />
-    public AliasQueryResult GetByIdAndName(long id, string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().GetByIdAndName(id, name, tx));
-
-    /// <inheritdoc />
-    public IEnumerable<SelectableAliasQueryResult> GetDoubloons()
-    {
-        const string sql = $"""
-                            select
-                                id        as {nameof(SelectableAliasQueryResult.Id)},
-                                notes     as {nameof(SelectableAliasQueryResult.Description)},
-                                file_name as {nameof(SelectableAliasQueryResult.FileName)},
-                                arguments as {nameof(SelectableAliasQueryResult.Parameters)},
-                                name      as {nameof(SelectableAliasQueryResult.Name)},
-                                icon      as {nameof(SelectableAliasQueryResult.Icon)},
-                                thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
-                            from
-                                data_doubloons_v
-                            order by file_name
-                            """;
-        var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
-        var r = _converter.ToSelectableQueryResult(results);
-        return r;
-    }
-
-    /// <inheritdoc />
-    public AliasQueryResult GetExact(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().GetExact(name, tx));
-
-    /// <inheritdoc />
-    public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)
-    {
-        const string  sql = """
-                            select name
-                            from alias_name
-                            where 
-                                name in @names
-                                and id_alias != @idAlias
-                            """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
-    }
 
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetBrokenAliases()
@@ -178,7 +138,47 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public KeywordUsage GetKeyword(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().GetHiddenKeyword(name, tx));
+    public AliasQueryResult GetByIdAndName(long id, string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetByIdAndName(id, name, tx));
+
+    /// <inheritdoc />
+    public IEnumerable<SelectableAliasQueryResult> GetDoubloons()
+    {
+        const string sql = $"""
+                            select
+                                id        as {nameof(SelectableAliasQueryResult.Id)},
+                                notes     as {nameof(SelectableAliasQueryResult.Description)},
+                                file_name as {nameof(SelectableAliasQueryResult.FileName)},
+                                arguments as {nameof(SelectableAliasQueryResult.Parameters)},
+                                name      as {nameof(SelectableAliasQueryResult.Name)},
+                                icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                                thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
+                            from
+                                data_doubloons_v
+                            order by file_name
+                            """;
+        var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+        var r = _converter.ToSelectableQueryResult(results);
+        return r;
+    }
+
+    /// <inheritdoc />
+    public AliasQueryResult GetExact(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetExact(name, tx));
+
+    /// <inheritdoc />
+    public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)
+    {
+        const string  sql = """
+                            select name
+                            from alias_name
+                            where 
+                                name in @names
+                                and id_alias != @idAlias
+                            """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
+    }
+
+    /// <inheritdoc />
+    public KeywordUsage GetKeyword(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetHiddenKeyword(name, tx));
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetMostUsedAliases()
@@ -303,10 +303,10 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().RefreshUsage(result, tx));
+    public IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.RefreshUsage(result, tx));
 
     /// <inheritdoc />
-    public void Remove(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().Remove(alias, tx));
+    public void Remove(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.Remove(alias, tx));
 
     /// <inheritdoc />
     public void RemoveMany(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
@@ -314,25 +314,21 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         {
             var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
             _logger.LogInformation("Removing {Length} alias(es)", list.Length);
-            _dbActionFactory.AliasDbAction().RemoveMany(list, tx);
+            _dbActionFactory.AliasManagement.RemoveMany(list, tx);
         }
     );
 
     /// <inheritdoc />
-    public void SaveOrUpdate(ref AliasQueryResult alias)
-    {
-        var dbAction = _dbActionFactory.AliasSaveDbAction();
-        Db.WithinTransaction((tx, current) => dbAction.SaveOrUpdate(tx, ref current), alias);
-    }
+    public void SaveOrUpdate(ref AliasQueryResult alias) => Db.WithinTransaction((tx, current) =>  _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref current), alias);
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false) => Db.WithinTransaction(tx => _dbActionFactory.AliasSearchDbAction().Search(tx, name, isReturnAllIfEmpty));
+    public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false) => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, name, isReturnAllIfEmpty));
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => Db.WithinTransaction(tx => _dbActionFactory.AliasSearchDbAction().SearchAliasWithAdditionalParameters(tx, criteria));
+    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.SearchAliasWithAdditionalParameters(tx, criteria));
 
     /// <inheritdoc />
-    public ExistingNameResponse SelectNames(string[] names) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().SelectNames(names, tx));
+    public ExistingNameResponse SelectNames(string[] names) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.SelectNames(names, tx));
 
     /// <inheritdoc />
     public void SetUsage(QueryResult alias) => Db.WithinTransaction(
@@ -350,19 +346,15 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                 return;
             }
 
-            _dbActionFactory.SetUsageDbAction().SetUsage(tx, ref alias);
+            _dbActionFactory.UsageManagement.SetUsage(tx, ref alias);
         }
     );
 
     /// <inheritdoc />
-    public void Update(IEnumerable<AliasQueryResult> aliases)
-    {
-        var dbAction = _dbActionFactory.AliasSaveDbAction();
-        Db.WithinTransaction(dbAction.Update, aliases);
-    }
+    public void Update(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(_dbActionFactory.SaveManagement.Update, aliases);
 
     /// <inheritdoc />
-    public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx => _dbActionFactory.AliasDbAction().UpdateThumbnails(aliases, tx));
+    public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.UpdateThumbnails(aliases, tx));
 
     #endregion
 }

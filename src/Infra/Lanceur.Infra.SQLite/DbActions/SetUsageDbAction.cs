@@ -71,7 +71,7 @@ public class SetUsageDbAction
         //   * counter shouldn't be visible to the user
         if (alias.Count < 0) return;
 
-        var aliasDbAction = _dbActionFactory.AliasDbAction();
+        var aliasDbAction = _dbActionFactory.AliasManagement;
         if (alias.Id  == 0)
         {
             if (aliasDbAction.GetExact(alias?.Name, tx) is { } a)

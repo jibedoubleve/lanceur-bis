@@ -2,13 +2,13 @@ namespace Lanceur.Infra.SQLite.DbActions;
 
 public interface IDbActionFactory
 {
-    #region Methods
+    #region Properties
 
-    AliasDbAction AliasDbAction();
-    AliasSaveDbAction AliasSaveDbAction();
-    AliasSearchDbAction AliasSearchDbAction();
-    MacroDbAction MacroDbAction();
-    SetUsageDbAction SetUsageDbAction();
+    AliasDbAction AliasManagement { get; }
+    MacroDbAction MacroManagement { get; }
+    AliasSaveDbAction SaveManagement { get; }
+    AliasSearchDbAction SearchManagement { get; }
+    SetUsageDbAction UsageManagement { get; }
 
     #endregion
 }
