@@ -2,11 +2,8 @@ using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.SharedKernel.DI;
-using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Wpf.Ui;
-using Wpf.Ui.Controls;
-using Wpf.Ui.Extensions;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
@@ -39,20 +36,6 @@ public partial class DataReconciliationView
 
     #region Methods
 
-    private async Task<bool> HandleMessageBoxAsync(QuestionRequestMessage request)
-    {
-        var result = await _contentDialogService.ShowSimpleDialogAsync(
-            new()
-            {
-                Title = request.Title,
-                Content = request.Content,
-                PrimaryButtonText = request.YesText,
-                CloseButtonText = request.NoText
-            }
-        );
-        return result == ContentDialogResult.Primary;
-    }
-
     private void OnViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(ViewModel.ReportType)) return;
@@ -60,6 +43,7 @@ public partial class DataReconciliationView
         switch (ViewModel)
         {
             case { ReportType: ReportType.UnannotatedAliases }:
+            case {ReportType: ReportType.RestoreAlias}:
                 ColumnParameters.Visibility = Visibility.Collapsed;
                 ColumnFileName.Visibility = Visibility.Collapsed;
                 ColumnProposedDescription.Visibility = Visibility.Visible;

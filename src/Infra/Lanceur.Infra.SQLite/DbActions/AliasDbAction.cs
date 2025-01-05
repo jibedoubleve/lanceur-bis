@@ -193,18 +193,19 @@ public class AliasDbAction
                                 a.icon                  as {nameof(AliasQueryResult.Icon)},
                                 a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
                                 a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
-                                a.exec_count            as {nameof(AliasQueryResult.Count)},
+                                e.exec_count            as {nameof(AliasQueryResult.Count)},
                                 a.hidden                as {nameof(AliasQueryResult.IsHidden)},
                                 a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
                             from
                                 alias a
                                 left join alias_name n on a.id = n.id_alias
                                 inner join data_alias_synonyms_v s on s.id_alias = a.id
+                                inner join stat_execution_count_v e on a.id       = e.id_keyword
                             where
                                 n.Name = @name
                                 and a.Id = @id
                             order by
-                                a.exec_count desc,
+                                e.exec_count desc,
                                 n.name
                             """;
 
@@ -240,18 +241,19 @@ public class AliasDbAction
                                 a.icon                  as {nameof(AliasQueryResult.Icon)},
                                 a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
                                 a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
-                                a.exec_count            as {nameof(AliasQueryResult.Count)},
+                                e.exec_count            as {nameof(AliasQueryResult.Count)},
                                 a.hidden                as {nameof(AliasQueryResult.IsHidden)},
                                 a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
                             from
                                 alias a
                                 left join alias_name n on a.id = n.id_alias
                                 inner join data_alias_synonyms_v s on s.id_alias = a.id
+                                left join stat_execution_count_v e on a.id      = e.id_keyword
                             where
                                 n.Name = @name
                                 and hidden in @hidden
                             order by
-                                a.exec_count desc,
+                                e.exec_count desc,
                                 n.name
                             """;
 
@@ -302,25 +304,25 @@ public class AliasDbAction
         return tx.Connection!.Query<AliasQueryResult>(sql, arguments).ToArray();
     }
 
-    internal KeywordUsage GetHiddenKeyword(string name, IDbTransaction tx)
+    internal AliasUsage GetHiddenAlias(string name, IDbTransaction tx)
     {
         const string sql = """
                            select
-                           	a.id,
+                               a.id,
                                n.name,
                                (
-                               	select count(id)
-                                	from alias_usage
-                                 	where id = a.id
+                                   select count(id)
+                                   from alias_usage
+                                   where id = a.id
                                ) as count
                            from
-                           	alias a
+                               alias a
                                inner join alias_name n on a.id = n.id_alias
                            where
-                           	hidden = 1
+                               hidden = 1
                                and n.name = @name;
                            """;
-        var result = tx.Connection!.Query<KeywordUsage>(sql, new { name }).FirstOrDefault();
+        var result = tx.Connection!.Query<AliasUsage>(sql, new { name }).FirstOrDefault();
 
         return result;
     }
@@ -339,29 +341,22 @@ public class AliasDbAction
         return count > 0;
     }
 
-    internal IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> results, IDbTransaction tx)
+    internal void LogicalRemove(AliasQueryResult alias, IDbTransaction tx)
     {
-        const string sql = $"""
-
-                            select
-                            	id_alias as {nameof(KeywordUsage.Id)},
-                            	count
-                            from
-                            	stat_usage_per_app_v
-                            where id_alias in @ids;
-                            """;
-
-        var dbResultAr = results as QueryResult[] ?? results.ToArray();
-        var dbResults = tx.Connection!.Query<KeywordUsage>(sql, new { ids = dbResultAr.Select(x => x.Id).ToArray() })
-                          .ToArray();
-
-        foreach (var result in dbResultAr)
-            result.Count = dbResults.Where(item => item.Id == result.Id)
-                                    .Select(item => item.Count)
-                                    .SingleOrDefault();
-        return dbResultAr;
+        const string sql = """
+                           update alias 
+                           set 
+                               deleted_at = @deleted_at,
+                               hidden     = 1
+                           where id = @id;
+                           """;
+        tx.Connection!.Execute(sql, new { deleted_at = DateTime.Now, id = alias.Id });
     }
 
+    internal void LogicalRemove(IEnumerable<AliasQueryResult> aliases, IDbTransaction tx)
+    {
+        foreach (var alias in aliases) LogicalRemove(alias, tx);
+    }
     internal void Remove(AliasQueryResult alias, IDbTransaction tx)
     {
         if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");
@@ -412,7 +407,6 @@ public class AliasDbAction
                                           icon                  = @Icon,
                                           thumbnail             = @thumbnail,
                                           lua_script            = @luaScript,
-                                          exec_count            = @count,
                                           confirmation_required = @isExecutionConfirmationRequired
                                       where id = @id;
                                       """;

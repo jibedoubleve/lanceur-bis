@@ -10,7 +10,6 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
-using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
@@ -83,7 +82,12 @@ public class SearchShould : TestBase
         using var db = BuildFreshDb(SqlCreateAlias);
         using var conn = new DbSingleConnectionManager(db);
 
-        var repository = new SQLiteAliasRepository(conn, _testLoggerFactory, converter, new DbActionFactory(new AutoMapperMappingService(), _testLoggerFactory));
+        var repository = new SQLiteAliasRepository(
+            conn,
+            _testLoggerFactory,
+            converter,
+            new DbActionFactory(new AutoMapperMappingService(), _testLoggerFactory)
+        );
 
         // act
         var results = repository.GetAll();
@@ -108,9 +112,15 @@ public class SearchShould : TestBase
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         var converter = Substitute.For<IMappingService>();
-        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
+        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
+        new QueryResultCounterIncrement(alias).SetCount(-1);
 
-        var repository = new SQLiteAliasRepository(connectionMgr, logger, converter, new DbActionFactory(new AutoMapperMappingService(), logger));
+        var repository = new SQLiteAliasRepository(
+            connectionMgr,
+            logger,
+            converter,
+            new DbActionFactory(new AutoMapperMappingService(), logger)
+        );
 
         OutputHelper.Act();
 
@@ -304,7 +314,12 @@ public class SearchShould : TestBase
         var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
 
-        var repository = new SQLiteAliasRepository(connectionManager, logger, converter, new DbActionFactory(new AutoMapperMappingService(), logger));
+        var repository = new SQLiteAliasRepository(
+            connectionManager,
+            logger,
+            converter,
+            new DbActionFactory(new AutoMapperMappingService(), logger)
+        );
 
         OutputHelper.Act();
         repository.SetUsage(alias);

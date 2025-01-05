@@ -51,9 +51,11 @@ public class CalculatorStore : IStoreService
          *       that there's no result to display. */
         if (!float.TryParse(result, out _)) return QueryResult.NoResult;
 
-        if (isError) return QueryResult.NoResult;
-
-        return new DisplayQueryResult(result, query.ToString()) { Count = int.MaxValue, Icon = "calculator" }.ToEnumerable();
+        var returnResult = new DisplayQueryResult(result, query.ToString()) { Icon = "calculator" };
+        new QueryResultCounterIncrement(returnResult).SetCount(int.MaxValue);
+        return isError 
+            ? QueryResult.NoResult 
+            : returnResult.ToEnumerable();
     }
 
     #endregion

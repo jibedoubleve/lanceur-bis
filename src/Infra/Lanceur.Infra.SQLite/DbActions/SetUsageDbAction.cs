@@ -48,20 +48,6 @@ public class SetUsageDbAction
         tx.Connection!.Execute(sql, param);
     }
 
-    private void IncrementCounter(IDbTransaction tx, QueryResult alias)
-    {
-        alias.Count++;
-        const string sql = """
-                           update alias 
-                           set 
-                               exec_count = @counter 
-                           where 
-                               id = @id
-                           """;
-        var param = new { id = alias.Id, counter = alias.Count };
-        tx.Connection!.Execute(sql, param);
-    }
-
     internal void SetUsage(IDbTransaction tx, ref QueryResult alias)
     {
         ArgumentNullException.ThrowIfNull(alias);
@@ -81,7 +67,6 @@ public class SetUsageDbAction
         }
 
         AddHistory(tx, ref alias);
-        IncrementCounter(tx, alias);
     }
 
     #endregion

@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Models;
 
-public class KeywordUsage
+public class AliasUsage
 {
     #region Properties
 
