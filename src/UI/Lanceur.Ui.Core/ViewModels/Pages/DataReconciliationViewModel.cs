@@ -173,7 +173,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     private async Task OnShowEmptyKeywords()
     {
         using var loading = _userNotification.TrackLoadingState();
-        Title = "Misconfigured Aliases";
+        Title = "Broken Aliases";
         ReportType = ReportType.InvalidAliases;
         var aliases = await Task.Run(() => _repository.GetBrokenAliases());
         Aliases = new(aliases);

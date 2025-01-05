@@ -75,7 +75,7 @@
                     Icon="{ui:SymbolIcon ColumnDoubleCompare20}" />
                 <MenuItem
                     Command="{Binding ShowEmptyKeywordsCommand}"
-                    Header="Empty keywords"
+                    Header="Broken aliases"
                     Icon="{ui:SymbolIcon WeatherDustStorm24}" />
             </MenuItem>
             <MenuItem
