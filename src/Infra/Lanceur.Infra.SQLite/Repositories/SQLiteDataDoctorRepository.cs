@@ -39,7 +39,7 @@ public class SQLiteDataDoctorRepository : SQLiteRepositoryBase, IDataDoctorRepos
         tx =>
         {
             {
-                var aliases = _dbActionFactory.AliasSearchDbAction()
+                var aliases = _dbActionFactory.SearchManagement
                                               .Search(tx)
                                               .ToArray();
                 _logger.LogTrace("Updating icons for {Count} alias(es)", aliases.Length);

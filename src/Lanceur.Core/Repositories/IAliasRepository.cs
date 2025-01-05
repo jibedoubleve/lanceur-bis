@@ -149,16 +149,21 @@ public interface IAliasRepository
     IEnumerable<QueryResult> RefreshUsage(IEnumerable<QueryResult> result);
 
     /// <summary>
-    ///     Removed an alias from the repository
+    ///     Marks the specified alias as removed from the repository. 
+    ///     This is a logical removal; the alias remains in the database 
+    ///     but is flagged as deleted and excluded from subsequent queries.
     /// </summary>
-    /// <param name="alias">The alias to remove from the repository</param>
+    /// <param name="alias">The alias to mark as removed from the repository.</param>
     void Remove(AliasQueryResult alias);
 
     /// <summary>
-    ///     Removes the specified list of aliases from the repository
+    ///     Marks the specified list of aliases as removed from the repository. 
+    ///     This is a logical removal; the aliases remain in the database 
+    ///     but are flagged as deleted and excluded from subsequent queries.
     /// </summary>
-    /// <param name="aliases">The list of aliases to remove from the repository</param>
+    /// <param name="aliases">The list of aliases to mark as removed from the repository.</param>
     void RemoveMany(IEnumerable<AliasQueryResult> aliases);
+
 
     /// <summary>
     ///     Creates a new alias if the ID is '0'; otherwise, updates the existing alias.

@@ -22,13 +22,13 @@ internal class DbActionFactory : IDbActionFactory
 
     #endregion
 
-    #region Methods
+    #region Properties
 
-    public AliasSaveDbAction AliasSaveDbAction() => new(this, _loggerFactory);
-    public AliasDbAction AliasDbAction() => new(_loggerFactory);
-    public AliasSearchDbAction AliasSearchDbAction() => new(_loggerFactory, this);
-    public MacroDbAction MacroDbAction() => new(_loggerFactory, _converter, this);
-    public SetUsageDbAction SetUsageDbAction() => new(_loggerFactory, this);
+    public AliasDbAction AliasManagement => new(_loggerFactory);
+    public AliasSaveDbAction SaveManagement => new(this, _loggerFactory);
+    public AliasSearchDbAction SearchManagement => new(_loggerFactory, this);
+    public MacroDbAction MacroManagement => new(_loggerFactory, _converter, this);
+    public SetUsageDbAction UsageManagement => new(_loggerFactory, this);
 
     #endregion
 }
