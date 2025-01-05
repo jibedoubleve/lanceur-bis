@@ -47,15 +47,16 @@ public class AliasSearchDbAction
                        a.icon                  as {nameof(AliasQueryResult.Icon)},
                        a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
                        a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
-                       a.exec_count            as {nameof(AliasQueryResult.Count)},
+                       e.exec_count            as {nameof(AliasQueryResult.Count)},
                        s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
-                       s.Synonyms              as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
+                       s.synonyms              as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
                        a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)},
                        a.hidden                as {nameof(AliasQueryResult.IsHidden)}
                    from
                        alias a
-                       left join alias_name            an on a.id       = an.id_alias                    
-                       inner join data_alias_synonyms_v s on s.id_alias = a.id
+                       left join alias_name             an on a.id       = an.id_alias                    
+                       inner join data_alias_synonyms_v  s on s.id_alias = a.id
+                       inner join stat_execution_count_v e on a.id       = e.id_keyword
                    """;
         if (!name.IsNullOrEmpty())
             sql += """
