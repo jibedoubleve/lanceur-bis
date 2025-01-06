@@ -60,7 +60,7 @@ public class SetUsageDbAction
         var aliasDbAction = _dbActionFactory.AliasManagement;
         if (alias.Id  == 0)
         {
-            if (aliasDbAction.GetExact(alias?.Name, tx) is { } a)
+            if (aliasDbAction.GetExact(alias?.Name, tx, includeHidden: true) is { } a)
                 alias!.Id = a.Id;
             else
                 aliasDbAction.CreateInvisible(tx, ref alias);

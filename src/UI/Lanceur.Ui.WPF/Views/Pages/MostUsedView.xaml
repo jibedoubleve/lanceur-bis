@@ -116,7 +116,7 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 FontTypography="Body">
-                                <Run FontWeight="Bold" Text="{Binding Count}" />
+                                <Run FontWeight="Bold" Text="{Binding Count, Mode=OneWay}" />
                                 <Run Text="executions." />
                             </ui:TextBlock>
 
