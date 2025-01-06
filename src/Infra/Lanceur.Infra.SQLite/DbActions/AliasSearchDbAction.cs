@@ -47,7 +47,7 @@ public class AliasSearchDbAction
                        a.icon                  as {nameof(AliasQueryResult.Icon)},
                        a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
                        a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
-                       e.exec_count            as {nameof(AliasQueryResult.Count)},
+                       a.exec_count            as {nameof(AliasQueryResult.Count)},
                        s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
                        s.synonyms              as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
                        a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)},
@@ -56,7 +56,6 @@ public class AliasSearchDbAction
                        alias a
                        left join alias_name             an on a.id       = an.id_alias                    
                        left join data_alias_synonyms_v  s on s.id_alias = a.id
-                       left join stat_execution_count_v e on a.id       = e.id_keyword
                    """;
         if (!name.IsNullOrEmpty())
             sql += """
@@ -68,7 +67,7 @@ public class AliasSearchDbAction
                
                and a.hidden = 0
                order by
-                 e.exec_count desc,
+                 a.exec_count desc,
                  an.name
                """;
 
@@ -94,21 +93,20 @@ public class AliasSearchDbAction
                                 a.icon                            as {nameof(AliasQueryResult.Icon)},
                                 a.thumbnail                       as {nameof(AliasQueryResult.Thumbnail)},
                                 a.lua_script                      as {nameof(AliasQueryResult.LuaScript)},
-                                e.exec_count                      as {nameof(AliasQueryResult.Count)},
+                                a.exec_count                      as {nameof(AliasQueryResult.Count)},
                                 s.synonyms                        as {nameof(AliasQueryResult.Synonyms)},
                                 s.Synonyms                        as {nameof(AliasQueryResult.SynonymsWhenLoaded)},
-                                e.exec_count                      as {nameof(AliasQueryResult.Count)}
+                                a.exec_count                      as {nameof(AliasQueryResult.Count)}
                             from
                                 alias a
                                 left join alias_name            an on a.id       = an.id_alias
                                 inner join alias_argument       aa on a.id       = aa.id_alias                    
                                 inner join data_alias_synonyms_v s on s.id_alias = a.id
-                                inner join stat_execution_count_v e on a.id      = e.id_keyword
                             where
                                 an.Name || ':' || aa.name  like @name
                                 and a.hidden = 0
                             order by
-                                e.exec_count desc,
+                                a.exec_count desc,
                                 an.name
                             """;
 

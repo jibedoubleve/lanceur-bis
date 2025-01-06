@@ -28,7 +28,7 @@ internal class DbActionFactory : IDbActionFactory
     public AliasSaveDbAction SaveManagement => new(this, _loggerFactory);
     public AliasSearchDbAction SearchManagement => new(_loggerFactory, this);
     public MacroDbAction MacroManagement => new(_loggerFactory, _converter, this);
-    public SetUsageDbAction UsageManagement => new(_loggerFactory, this);
+    public SetUsageDbAction UsageManagement => new(this);
 
     #endregion
 }
