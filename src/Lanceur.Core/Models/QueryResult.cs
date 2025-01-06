@@ -16,6 +16,8 @@ public abstract class QueryResult : ObservableModel
 {
     #region Fields
 
+    private int _count  ;
+
     private string _thumbnail;
 
     #endregion
@@ -31,7 +33,11 @@ public abstract class QueryResult : ObservableModel
     ///     If the value is negative, it indicates that the counter is not used
     ///     (In this case the UI should not display this information).
     /// </remarks>
-    public int Count { get; internal set; }
+    public int Count
+    {
+        get => _count;
+        set => SetField(ref _count, value);
+    }
 
     public virtual string Description { get; set; }
 
@@ -85,45 +91,6 @@ public abstract class QueryResult : ObservableModel
     #region Methods
 
     public virtual string ToQuery() => $"{Name}";
-
-    #endregion
-}
-
-public class QueryResultCounterIncrement
-{
-    #region Fields
-
-    private readonly QueryResult _queryResult;
-
-    #endregion
-
-    #region Constructors
-
-    public QueryResultCounterIncrement(QueryResult queryResult)
-    {
-        _queryResult = queryResult;
-        ArgumentNullException.ThrowIfNull(queryResult);
-    }
-
-    #endregion
-
-    #region Methods
-
-    /// <summary>
-    /// Updates the count of the associated <see cref="QueryResult"/> with the count value from the specified <see cref="AliasUsage"/>.
-    /// </summary>
-    /// <param name="value">
-    /// An <see cref="AliasUsage"/> object whose count value is used to update the count of the associated <see cref="QueryResult"/>.
-    /// </param>
-    public void SetCount(AliasUsage value) => _queryResult.Count = value.Count;
-    
-    /// <summary>
-    /// Updates the count of the associated <see cref="QueryResult"/> with the specified integer value.
-    /// </summary>
-    /// <param name="value">
-    /// An integer value used to update the count of the associated <see cref="QueryResult"/>.
-    /// </param>
-    public void SetCount(int value) => _queryResult.Count = value;
 
     #endregion
 }

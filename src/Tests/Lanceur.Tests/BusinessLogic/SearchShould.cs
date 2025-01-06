@@ -112,8 +112,7 @@ public class SearchShould : TestBase
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         var converter = Substitute.For<IMappingService>();
-        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
-        new QueryResultCounterIncrement(alias).SetCount(-1);
+        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
 
         var repository = new SQLiteAliasRepository(
             connectionMgr,

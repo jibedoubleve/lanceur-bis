@@ -68,18 +68,14 @@ public class EverythingStore : IStoreService
 
         var result =  _everythingApi.Search(query.Parameters)
                                     .Select(
-                                        item =>
+                                        item => new AliasQueryResult
                                         {
-                                            var qr = new AliasQueryResult
-                                            {
-                                                Name = item.Name,
-                                                FileName = item.Path,
-                                                Icon = GetIcon(item.ResultType),
-                                                Thumbnail = null,
-                                                IsThumbnailDisabled = true
-                                            };
-                                            new QueryResultCounterIncrement(qr).SetCount(-1);
-                                            return qr;
+                                            Name = item.Name,
+                                            FileName = item.Path,
+                                            Icon = GetIcon(item.ResultType),
+                                            Thumbnail = null,
+                                            IsThumbnailDisabled = true,
+                                            Count = -1
                                         }
                                     )
                                     .Cast<QueryResult>()

@@ -1,13 +1,7 @@
 /*
- * Removed the execution count from the table alias. 
- * The inner join with the count history is not too slow, 
- * and the stored values were not related to the calculated values. 
- * This mismatch caused invalid values to appear on the screen.
- *****
  * Add a new column to the 'alias' table to support logical deletion 
  * functionality.
  */
-
 
 --------------------------------------------------------
 -- create and fill temp table
@@ -26,6 +20,7 @@ create table temp_alias (
     hidden      integer not null default 0 check (hidden in (0,1)),
     lua_script  text,
     thumbnail   text,
+    exec_count number,
     confirmation_required integer default 0
 );
 
@@ -42,6 +37,7 @@ select
     hidden,
     lua_script,
     thumbnail,
+    exec_count,
     confirmation_required
 from alias;
 
@@ -51,18 +47,19 @@ from alias;
 drop table if exists alias;
 
 create table alias (
-    id                    integer primary key,
-    arguments             text,
-    file_name             text,
-    notes                 text,
-    run_as                text,
-    start_mode            text,
-    working_dir           text,
-    icon                  text,
-    hidden                integer not null default 0 check (hidden in (0,1)),
-    deleted_at            datetime default null,
-    lua_script            text,
-    thumbnail             text,
+    id          integer primary key,
+    arguments   text,
+    file_name   text,
+    notes       text,
+    run_as      text,
+    start_mode  text,
+    working_dir text,
+    icon        text,
+    hidden      integer not null default 0 check (hidden in (0,1)),
+    deleted_at  datetime default null,
+    lua_script  text,
+    thumbnail   text,
+    exec_count  number,
     confirmation_required integer default 0
 );
 
@@ -80,6 +77,7 @@ select
     null as deleted_at,
     lua_script,
     thumbnail,
+    exec_count,
     confirmation_required
 from temp_alias;
 
