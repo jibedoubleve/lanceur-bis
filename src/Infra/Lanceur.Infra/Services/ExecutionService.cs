@@ -19,7 +19,7 @@ public class ExecutionService : IExecutionService
 {
     #region Fields
 
-    private readonly IAliasRepository _dataService;
+    private readonly IAliasRepository _aliasRepository;
     private readonly ILogger<ExecutionService> _logger;
     private readonly IWildcardService _wildcardService;
 
@@ -30,12 +30,12 @@ public class ExecutionService : IExecutionService
     public ExecutionService(
         ILoggerFactory logFactory,
         IWildcardService wildcardService,
-        IAliasRepository dataService
+        IAliasRepository aliasRepository
     )
     {
         _logger = logFactory.GetLogger<ExecutionService>();
         _wildcardService = wildcardService;
-        _dataService = dataService;
+        _aliasRepository = aliasRepository;
     }
 
     #endregion
@@ -146,6 +146,7 @@ public class ExecutionService : IExecutionService
         return QueryResult.NoResult;
     }
 
+    /// <inheritdoc />
     public async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request)
     {
         if (request is null)
@@ -162,7 +163,7 @@ public class ExecutionService : IExecutionService
             return ExecutionResponse.NoResult;
         }
 
-        _dataService.SetUsage(request.QueryResult);
+        _aliasRepository.SetUsage(request.QueryResult);
         switch (request.QueryResult)
         {
             case AliasQueryResult alias:

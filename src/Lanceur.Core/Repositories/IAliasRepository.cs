@@ -216,10 +216,14 @@ public interface IAliasRepository
     void SetHiddenAliasUsage(QueryResult alias);
 
     /// <summary>
-    ///     Increments the execution counter for a given alias.
-    ///     This method is the recommended way to track usage of an executable alias.
+    /// Adds an entry to the usage table with the alias and the current date and time, 
+    /// and updates the counter of the specified QueryResult.
     /// </summary>
-    /// <param name="alias">The alias whose execution is being tracked.</param>
+    /// <remarks>
+    /// This method has a side effect: it modifies the counter of the provided alias.  
+    /// If the counter is negative, no usage is recorded or saved in the history, and the counter remains hidden from the user.
+    /// </remarks>
+    /// <param name="alias">The QueryResult object representing the alias to be updated. Must not be null.</param>
     void SetUsage(QueryResult alias);
 
     /// <summary>
