@@ -1,9 +1,0 @@
-{
-  "name": "Debug plugin",
-  "author": "JB Wautier",
-  "dll": "/debug/Lanceur.Plugin.Debug.dll",
-  "appMinVersion": "2.3.0",
-  "version": "1.0.0",
-  "description": "This plugin is a small tool for development.",
-  "help": "Type 'debug' to execute the plugin"
-}
