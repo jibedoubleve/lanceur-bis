@@ -8,14 +8,23 @@ namespace Lanceur.Infra.SQLite.DbActions;
 
 public class AliasSaveDbAction
 {
+    #region Fields
+
     private readonly IDbActionFactory _dbActionFactory;
     private readonly ILogger<AliasSaveDbAction> _logger;
+
+    #endregion
+
+    #region Constructors
 
     public AliasSaveDbAction(IDbActionFactory dbActionFactory, ILoggerFactory factory)
     {
         _dbActionFactory = dbActionFactory;
         _logger = factory.GetLogger<AliasSaveDbAction>();
     }
+
+    #endregion
+
     #region Methods
 
     public void SaveOrUpdate(IDbTransaction tx, ref AliasQueryResult alias)
@@ -31,14 +40,14 @@ public class AliasSaveDbAction
 
         switch (alias.Id)
         {
-            case 0 when !action.HasNames(alias, tx):
+            case 0 when !action.HasNames(tx, alias):
                 action.Create(tx, ref alias);
                 _logger.LogInformation("Created new alias {AliasName}", alias.Name);
                 break;
 
             case > 0:
                 _logger.LogInformation("Updating alias {AliasName}", alias.Name);
-                action.Update(alias, tx);
+                action.Update(tx, alias);
                 break;
         }
 

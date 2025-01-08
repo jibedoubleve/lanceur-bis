@@ -120,7 +120,7 @@ public class AliasManagementShould : TestBase
         c.WithinTransaction(tx => action.CreateInvisible(tx, ref alias1));
 
         // ACT
-        var sut = c.WithinTransaction(tx => action.GetExact(aliasName, tx, true));
+        var sut = c.WithinTransaction(tx => action.GetExact(tx, aliasName, true));
 
         //ASSERT
         sut.Should().NotBeNull();
@@ -267,7 +267,7 @@ public class AliasManagementShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        var found = c.WithinTransaction(tx => action.GetExact("noname", tx));
+        var found = c.WithinTransaction(tx => action.GetExact(tx, "noname"));
 
         // ASSERT
         using (new AssertionScope())
@@ -293,7 +293,7 @@ public class AliasManagementShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        var found = c.WithinTransaction(tx => action.GetExact("nothing", tx));
+        var found = c.WithinTransaction(tx => action.GetExact(tx, "nothing"));
 
         // ASSERT
         using (new AssertionScope()) { found.Should().BeNull(); }
@@ -314,7 +314,7 @@ public class AliasManagementShould : TestBase
             tx =>
             {
                 action.Create(tx, ref alias);
-                action.Remove(alias, tx);
+                action.Remove(tx, alias);
             }
         );
 
@@ -373,7 +373,7 @@ public class AliasManagementShould : TestBase
         var action = BuildAliasDbAction(connection);
 
         // ACT
-        c.WithinTransaction(tx => action.Remove(new()  { Id = 256 }, tx));
+        c.WithinTransaction(tx => action.Remove(tx, new()  { Id = 256 }));
 
         using (new AssertionScope())
         {
