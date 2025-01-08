@@ -52,11 +52,21 @@
             <!--  QUERY BOXES  -->
             <StackPanel>
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
                     <!--  QUERY BOX  -->
                     <TextBox
                         CharacterCasing="Lower"
                         x:Name="QueryTextBox"
                         Panel.ZIndex="2"
+                        BorderThickness="0"
                         Background="Transparent"
                         KeyDown="OnPreviewKeyDown"
                         Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}">
@@ -83,24 +93,19 @@
                                     PassEventArgsToCommand="True" />
                             </interactivity:EventTrigger>
                         </interactivity:Interaction.Triggers>
-                        <TextBox.Template>
-                            <ControlTemplate TargetType="TextBox">
-                                <Border Background="{TemplateBinding Background}"
-                                        BorderBrush="{DynamicResource SeparatorBorderBrush}"
-                                        BorderThickness="1">
-                                    <ScrollViewer x:Name="PART_ContentHost" />
-                                </Border>
-                            </ControlTemplate>
-                        </TextBox.Template>
                     </TextBox>
                     <TextBox
-                        BorderThickness="1"
-                        BorderBrush="Transparent"
+                        BorderThickness="0"
                         Background="Transparent"
                         Panel.ZIndex="0"
                         IsEnabled="False"
                         Visibility="{Binding Query,Converter={StaticResource CmdLineArgumentsToVisibility}}"
                         Text="{Binding Suggestion}" />
+                    <ui:SymbolIcon Symbol="Search24" Grid.Row="0" Grid.Column="1" Margin="5,0,15,0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" FontSize="37" />
+                    <Separator Grid.Row="2" Grid.Column="0" Margin="5,0,5,6" Grid.ColumnSpan="2"
+                               Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}" />
                 </Grid>
             </StackPanel>
 
