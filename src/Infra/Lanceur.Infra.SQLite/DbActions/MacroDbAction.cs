@@ -49,7 +49,7 @@ public class MacroDbAction
         var subAliases = new List<AliasQueryResult>();
 
         var names = item?.Parameters?.Split("@") ?? [];
-        var aliases = action.GetExact(names, tx).ToArray();
+        var aliases = action.GetExact(tx, names).ToArray();
 
         var delay = 0;
         foreach (var name in names)

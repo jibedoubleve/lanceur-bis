@@ -141,7 +141,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public AliasQueryResult GetByIdAndName(long id, string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetByIdAndName(id, name, tx));
+    public AliasQueryResult GetByIdAndName(long id, string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetByIdAndName(tx, id, name));
 
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetDeletedAlias()
@@ -186,7 +186,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public AliasQueryResult GetExact(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetExact(name, tx));
+    public AliasQueryResult GetExact(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetExact(tx, name));
 
     /// <inheritdoc />
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)
@@ -322,7 +322,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public void Remove(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.LogicalRemove(alias, tx));
+    public void Remove(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.LogicalRemove(tx, alias));
 
     /// <inheritdoc />
     public void Remove(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
@@ -330,7 +330,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         {
             var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
             _logger.LogInformation("Removing {Length} alias(es)", list.Length);
-            _dbActionFactory.AliasManagement.LogicalRemove(list, tx);
+            _dbActionFactory.AliasManagement.LogicalRemove(tx, list);
         }
     );
 
@@ -358,14 +358,14 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.SearchAliasWithAdditionalParameters(tx, criteria));
 
     /// <inheritdoc />
-    public ExistingNameResponse SelectNames(string[] names) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.SelectNames(names, tx));
+    public ExistingNameResponse SelectNames(string[] names) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.SelectNames(tx, names));
 
     /// <inheritdoc />
     public void SetHiddenAliasUsage(QueryResult alias)
     {
         ArgumentNullException.ThrowIfNull(alias);
 
-        var usage = Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetHiddenAlias(alias.Name, tx));
+        var usage = Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetHiddenAlias(tx, alias.Name));
         if (usage is null) return;
 
         alias.Id = usage.Id;
@@ -396,7 +396,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public void Update(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(_dbActionFactory.SaveManagement.Update, aliases);
 
     /// <inheritdoc />
-    public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.UpdateThumbnails(aliases, tx));
+    public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.UpdateThumbnails(tx, aliases));
 
     #endregion
 }

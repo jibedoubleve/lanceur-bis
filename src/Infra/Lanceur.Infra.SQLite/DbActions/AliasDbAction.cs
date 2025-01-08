@@ -158,7 +158,6 @@ public class AliasDbAction
         const string sqlSynonyms = @"insert into alias_name (id_alias, name) values (@id, @name)";
         foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
 
-        //Create additional arguments
         CreateAdditionalParameters(tx, id, additionalParameters);
 
         alias.Id = id;
@@ -175,7 +174,7 @@ public class AliasDbAction
         alias.Id = Create(tx, ref queryResult);
     }
 
-    internal AliasQueryResult GetByIdAndName(long id, string name, IDbTransaction tx)
+    internal AliasQueryResult GetByIdAndName(IDbTransaction tx, long id, string name)
     {
         if (id <= 0) throw new ArgumentException("The id of the alias should be greater than zero.");
 
@@ -216,15 +215,15 @@ public class AliasDbAction
     /// <summary>
     ///     Get the first alias with the exact name.
     /// </summary>
-    /// <param name="name">The alias' exact name to find.</param>
     /// <param name="tx">Transaction to use for the query</param>
+    /// <param name="name">The alias' exact name to find.</param>
     /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
     /// <remarks>
     ///     For optimisation reason, there's no check of doubloons. Bear UI validates and
     ///     forbid to insert two aliases with same name.
     /// </remarks>
-    internal AliasQueryResult GetExact(string name, IDbTransaction tx, bool includeHidden = false)
+    internal AliasQueryResult GetExact(IDbTransaction tx, string name, bool includeHidden = false)
     {
         const string sql = $"""
                             select
@@ -266,11 +265,11 @@ public class AliasDbAction
     ///     . In case of multiple aliases with same name, the one with greater counter
     ///     is selected.
     /// </summary>
-    /// <param name="names">The list of names to find.</param>
     /// <param name="tx">The transaction to use for the query</param>
+    /// <param name="names">The list of names to find.</param>
     /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
-    internal IEnumerable<AliasQueryResult> GetExact(IEnumerable<string> names, IDbTransaction tx, bool includeHidden = false)
+    internal IEnumerable<AliasQueryResult> GetExact(IDbTransaction tx, IEnumerable<string> names, bool includeHidden = false)
     {
         const string sql = $"""
                             select
@@ -302,7 +301,7 @@ public class AliasDbAction
         return tx.Connection!.Query<AliasQueryResult>(sql, arguments).ToArray();
     }
 
-    internal AliasUsage GetHiddenAlias(string name, IDbTransaction tx)
+    internal AliasUsage GetHiddenAlias(IDbTransaction tx, string name)
     {
         const string sql = """
                            select
@@ -325,7 +324,7 @@ public class AliasDbAction
         return result;
     }
 
-    internal bool HasNames(AliasQueryResult alias, IDbTransaction tx)
+    internal bool HasNames(IDbTransaction tx, AliasQueryResult alias)
     {
         const string sql = """
                            select count(*)
@@ -339,7 +338,7 @@ public class AliasDbAction
         return count > 0;
     }
 
-    internal void LogicalRemove(AliasQueryResult alias, IDbTransaction tx)
+    internal void LogicalRemove(IDbTransaction tx, AliasQueryResult alias)
     {
         const string sql = """
                            update alias 
@@ -351,11 +350,12 @@ public class AliasDbAction
         tx.Connection!.Execute(sql, new { deleted_at = DateTime.Now, id = alias.Id });
     }
 
-    internal void LogicalRemove(IEnumerable<AliasQueryResult> aliases, IDbTransaction tx)
+    internal void LogicalRemove(IDbTransaction tx, IEnumerable<AliasQueryResult> aliases)
     {
-        foreach (var alias in aliases) LogicalRemove(alias, tx);
+        foreach (var alias in aliases) LogicalRemove(tx, alias);
     }
-    internal void Remove(AliasQueryResult alias, IDbTransaction tx)
+    
+    internal void Remove(IDbTransaction tx, AliasQueryResult alias)
     {
         if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");
 
@@ -365,18 +365,7 @@ public class AliasDbAction
         ClearAlias(tx, alias.Id);
     }
 
-    internal void RemoveMany(IEnumerable<AliasQueryResult> alias, IDbTransaction tx)
-    {
-        ArgumentNullException.ThrowIfNull(alias);
-        var ids = alias.Select(x => x.Id).ToArray();
-
-        ClearAliasUsage(tx, ids);
-        ClearAliasArgument(tx, ids);
-        ClearAliasName(tx, ids);
-        ClearAlias(tx, ids);
-    }
-
-    internal ExistingNameResponse SelectNames(string[] names, IDbTransaction tx)
+    internal ExistingNameResponse SelectNames(IDbTransaction tx, string[] names)
     {
         const string sql = """
                            select an.name
@@ -391,7 +380,7 @@ public class AliasDbAction
         return new(result);
     }
 
-    internal long Update(AliasQueryResult alias, IDbTransaction tx)
+    internal long Update(IDbTransaction tx, AliasQueryResult alias)
     {
         const string updateAliasSql = """
                                       update alias
@@ -434,7 +423,7 @@ public class AliasDbAction
         return alias.Id;
     }
 
-    internal IEnumerable<long> UpdateThumbnails(IEnumerable<AliasQueryResult> aliases, IDbTransaction tx)
+    internal IEnumerable<long> UpdateThumbnails(IDbTransaction tx, IEnumerable<AliasQueryResult> aliases)
     {
         const string sql = "update alias set thumbnail = @thumbnail where id = @id";
         var ids = new List<long>();
