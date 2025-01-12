@@ -136,8 +136,7 @@ public class AliasManagementShould : TestBase
                            insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);
                            """;
 
-        EnableSqlProfiling();
-        var connectionString = ConnectionStringFactory.InDesktop;
+        var connectionString = ConnectionStringFactory.InMemory;
         var connection = BuildFreshDb(sql, connectionString.ToString());
         var action = BuildAliasDbAction();
 
