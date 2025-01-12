@@ -88,7 +88,7 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
             throw;
         }
     }
-    
+
     /// <inheritdoc />
     public void WithinTransaction<TContext>(Action<IDbTransaction, TContext> action, TContext context)
     {

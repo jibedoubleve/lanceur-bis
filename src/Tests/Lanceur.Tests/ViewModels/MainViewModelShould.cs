@@ -43,7 +43,7 @@ public class MainViewModelShould : TestBase
         using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty);
         var serviceCollection = new ServiceCollection().AddView<MainViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
-                                                       .AddMemoryDb(db)
+                                                       .AddDatabase(db)
                                                        .AddApplicationSettings()
                                                        .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                        .AddSingleton<IMappingService, AutoMapperMappingService>()

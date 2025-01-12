@@ -170,7 +170,13 @@ public class AliasDbAction
 
     internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
     {
-        var queryResult = new AliasQueryResult { Name = alias.Name, FileName = alias.Name, Synonyms = alias.Name, IsHidden = true };
+        var queryResult = new AliasQueryResult
+        {
+            Name = alias.Name,
+            FileName = alias.Name,
+            Synonyms = alias.Name,
+            IsHidden = true
+        };
         alias.Id = Create(tx, ref queryResult);
     }
 
@@ -354,7 +360,7 @@ public class AliasDbAction
     {
         foreach (var alias in aliases) LogicalRemove(tx, alias);
     }
-    
+
     internal void Remove(IDbTransaction tx, AliasQueryResult alias)
     {
         if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");

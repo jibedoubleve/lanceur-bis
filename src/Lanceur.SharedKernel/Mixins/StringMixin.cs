@@ -27,14 +27,6 @@ public static class StringMixin
 
     public static string CastToString(this object @this, string @default = default) => @this is not null ? $"{@this}" : @default;
 
-    public static string ExtractPathFromSQLiteCString(this string value)
-    {
-        var regex = new Regex("Data Source=(.*);Version=3;");
-        return regex.IsMatch(value)
-            ? regex.Match(value).Groups[1].Captures[0].Value
-            : string.Empty;
-    }
-
     public static string Format(this string format, params object[] args) => string.Format(format, args);
 
     public static bool IsDirectory(this string value) => Directory.Exists(value);
