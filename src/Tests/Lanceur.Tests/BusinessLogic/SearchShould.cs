@@ -216,7 +216,7 @@ public class SearchShould : TestBase
         using var conn = new DbSingleConnectionManager(db);
         const string criterion = "u";
 
-        var serviceProvider = new ServiceCollection().AddMemoryDb(conn)
+        var serviceProvider = new ServiceCollection().AddDatabase(conn)
                                                      .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                                      .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton(_testLoggerFactory)

@@ -34,7 +34,7 @@ public static class ServiceProviderExtensions
 
     public static IServiceCollection AddLogger<T>(this IServiceCollection serviceCollection, ITestOutputHelper outputHelper) => serviceCollection.AddSingleton<ILogger<T>>(new TestOutputHelperDecoratorForMicrosoftLogging<T>(outputHelper));
 
-    public static IServiceCollection AddMemoryDb(this IServiceCollection serviceCollection, IDbConnectionManager connectionManager)
+    public static IServiceCollection AddDatabase(this IServiceCollection serviceCollection, IDbConnectionManager connectionManager)
     {
         serviceCollection.AddMockSingleton<IConnectionString>()
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
