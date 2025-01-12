@@ -4,7 +4,7 @@ using System.Data.SQLite;
 using StackExchange.Profiling.Data;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.SQLite;
+namespace Lanceur.Tests.Tooling;
 
 public class DbProfiler : IDbProfiler
 {

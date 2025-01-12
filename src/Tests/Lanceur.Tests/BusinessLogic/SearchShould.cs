@@ -14,7 +14,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
-using Lanceur.Tests.SQLite;
+using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
