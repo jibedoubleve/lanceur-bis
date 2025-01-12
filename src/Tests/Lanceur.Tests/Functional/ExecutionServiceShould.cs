@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class ExecutionManagerShould
+public class ExecutionServiceShould
 {
     #region Methods
 

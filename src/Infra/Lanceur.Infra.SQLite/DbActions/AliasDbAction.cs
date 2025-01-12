@@ -290,6 +290,7 @@ public class AliasDbAction
     {
         const string sqlAlias = """
                                 insert into alias (
+                                    id ,
                                     arguments,
                                     file_name,
                                     notes,
@@ -302,6 +303,7 @@ public class AliasDbAction
                                     hidden,
                                     confirmation_required
                                 ) values (
+                                    @id,
                                     @arguments,
                                     @fileName,
                                     @notes,
@@ -314,7 +316,8 @@ public class AliasDbAction
                                     @isHidden,
                                     @isExecutionConfirmationRequired
                                 )
-                                on conflict(id) do update set
+                                on conflict(id) do update 
+                                set
                                     arguments   = @arguments,
                                     file_name   = @fileName,
                                     notes       = @notes,
@@ -326,13 +329,14 @@ public class AliasDbAction
                                     lua_script  = @luaScript,
                                     hidden      = @isHidden,
                                     confirmation_required = @isExecutionConfirmationRequired
-                                where id = excluded.id;
-                                select last_insert_rowid() from alias limit 1;
+                                where id = excluded.id
+                                returning id;
                                 """;
 
         var param = new
         {
             Arguments = alias.Parameters,
+            Id = alias.Id == 0 ? null : (int?)alias.Id,
             alias.FileName,
             alias.Notes,
             alias.RunAs,
@@ -347,7 +351,10 @@ public class AliasDbAction
 
         var id = tx.Connection!.ExecuteScalar<long>(sqlAlias, param);
 
-        // Synonyms
+        // Remove 
+        const string sqlDelete = "delete from alias_name where id_alias = @id;";
+        tx.Connection.Execute(sqlDelete, new { id });
+        // Add the updated synonyms 
         var csv = alias.Synonyms.SplitCsv();
         const string sqlSynonyms = "insert into alias_name (id_alias, name) values (@id, @name)";
         foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });

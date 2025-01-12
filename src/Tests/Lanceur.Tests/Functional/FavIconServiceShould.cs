@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class FavIconManagerShould
+public class FavIconServiceShould
 {
     [Theory, InlineData("http://www.google.com", "http://www.google.com"), InlineData("http://www.google.com:4001", "http://www.google.com:4001"), InlineData("http://www.google.com:80", "http://www.google.com:80"), InlineData("https://www.google.com", "https://www.google.com"), InlineData("https://www.google.com:4001", "https://www.google.com:4001"), InlineData("https://www.google.com:80", "https://www.google.com:80"), InlineData("https://www.google.com/some/index.html", "https://www.google.com"), InlineData("https://www.google.com:4001/some/index.html", "https://www.google.com:4001"), InlineData("https://www.google.com:80/some/index.html", "https://www.google.com:80")]
     public async Task RetrieveExpectedUrl(string url, string asExpected)

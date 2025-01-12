@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public partial class CmdlineManagerShould
+public class CmdlineManagerShould
 {
     #region Methods
 

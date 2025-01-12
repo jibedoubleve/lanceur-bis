@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿
+using System.Data;
+using Bogus;
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -7,6 +9,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
+using Lanceur.SharedKernel.Mixins;
 using Lanceur.Tests.Tooling;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.Logging;
@@ -29,25 +32,32 @@ public class AliasManagementShould : TestBase
 
     private static AliasQueryResult BuildAlias(string name = null, RunAs runAs = RunAs.CurrentUser)
     {
-        name ??= Guid.NewGuid().ToString();
+        var faker = new Faker();
+        name ??= faker.Lorem.Word();
         return new()
         {
-            Name = name,
+            Name = name, 
             Synonyms = name,
             Parameters = string.Empty,
-            FileName = @"C:\Users\jibedoubleve\AppData\Local\Programs\beekeeper-studio\Beekeeper Studioeuh.exe",
+            FileName = faker.System.FileName(),
             RunAs = runAs,
             StartMode = StartMode.Default,
-            WorkingDirectory = string.Empty,
-            Icon = null
+            WorkingDirectory = faker.System.DirectoryPath(),
+            Icon = faker.Image.PlaceholderUrl(150, 150)
         };
     }
 
-    private static AliasDbAction BuildAliasDbAction(IDbConnection connection)
+    private static AliasDbAction BuildAliasDbAction()
     {
         var log = Substitute.For<ILoggerFactory>();
         var action = new AliasDbAction(log);
         return action;
+    }
+
+    private AliasSearchDbAction BuildAliasSearchDbAction()
+    {
+        var log = Substitute.For<ILoggerFactory>();
+        return new(log, new DbActionFactory(new AutoMapperMappingService(), log));
     }
 
     private static SQLiteAliasRepository BuildDataService(IDbConnection connection)
@@ -55,15 +65,68 @@ public class AliasManagementShould : TestBase
         var scope = new DbSingleConnectionManager(connection);
         var log = Substitute.For<ILoggerFactory>();
         var conv = Substitute.For<IMappingService>();
-        var service = new SQLiteAliasRepository(scope, log, conv, new DbActionFactory(new AutoMapperMappingService(), log));
+        var service = new SQLiteAliasRepository(
+            scope,
+            log,
+            conv,
+            new DbActionFactory(new AutoMapperMappingService(), log)
+        );
         return service;
+    }
+
+    [Fact]
+    public void AddNewNames()
+    {
+        // ARRANGE
+        const string sql = """
+                           insert into alias(id) values (1001);
+                           insert into alias(id) values (1002);
+                           insert into alias(id) values (1003);
+
+                           insert into alias_name(id, name, id_alias) values (100, 'noname_1', 1001);
+                           insert into alias_name(id, name, id_alias) values (101, 'noname_2', 1001);
+                           insert into alias_name(id, name, id_alias) values (102, 'noname_3', 1001);
+                           insert into alias_name(id, name, id_alias) values (200, 'some_name_1', 1002);
+                           insert into alias_name(id, name, id_alias) values (300, 'some_name_2', 1003);
+                           """;
+        
+        var connectionString = ConnectionStringFactory.InMemory;
+        var connection = BuildFreshDb(sql, connectionString.ToString());
+        var c = new DbSingleConnectionManager(connection);
+        var aliasAction = BuildAliasDbAction();
+        var aliasSearch = BuildAliasSearchDbAction();
+
+        AliasQueryResult alias;
+        // ACT
+        
+        // Find the alias
+        alias = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
+        using (new AssertionScope())
+        {
+            alias.Id.Should().Be(1001, "this is the id of the alias to find");
+            alias.Should().NotBeNull("the search matches one alias");
+        }
+        
+        // Add new names to the alias and save it
+        alias.Synonyms += ", noname_4, noname_5";
+        var id = alias.Id;
+        var outputId = c.WithinTransaction(tx => aliasAction.SaveOrUpdate(tx, ref alias));
+        outputId.Should().Be(id, "the alias has only be updated");
+        
+        // Retrieve back the alias and check the names
+        var found = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
+        using (new AssertionScope())
+        {
+            found.Should().NotBeNull();
+            found.Synonyms.SplitCsv().Should().HaveCount(5);
+        }
     }
 
     [Fact]
     public void CreateAlias()
     {
         // ARRANGE
-        const string sql = """
+        const string sql = $"""
                            insert into alias(id) values (1001);
                            insert into alias(id) values (1002);
                            insert into alias(id) values (1003);
@@ -73,8 +136,10 @@ public class AliasManagementShould : TestBase
                            insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);
                            """;
 
-        var connection = BuildFreshDb(sql);
-        var action = BuildAliasDbAction(connection);
+        EnableSqlProfiling();
+        var connectionString = ConnectionStringFactory.InDesktop;
+        var connection = BuildFreshDb(sql, connectionString.ToString());
+        var action = BuildAliasDbAction();
 
         var alias1 = BuildAlias();
         var alias2 = BuildAlias();
@@ -113,7 +178,7 @@ public class AliasManagementShould : TestBase
         var aliasName = Guid.NewGuid().ToString();
 
         var connection = BuildFreshDb();
-        var action = BuildAliasDbAction(connection);
+        var action = BuildAliasDbAction();
         var c = new DbSingleConnectionManager(connection);
         QueryResult alias1 = new AliasQueryResult { Name = aliasName };
         c.WithinTransaction(tx => action.CreateInvisible(tx, ref alias1));
@@ -224,31 +289,6 @@ public class AliasManagementShould : TestBase
             sut.RunAs.Should().Be(RunAs.Admin);
         }
     }
-    
-    [Fact]
-    public void RetrieveAliasWithPrivilegeUsingService()
-    {
-        // ARRANGE
-        var connection = BuildFreshDb();
-        var service = BuildDataService(connection);
-
-        const string sql = """
-                           insert into alias (id, run_as) values (1, 0);
-                           insert into alias_name(id, name, id_alias) values (1, 'admin', 1);
-                           """;
-        connection.Execute(sql);
-
-        // ACT
-        var sut = service.Search("admin").ToArray();
-        
-        // ASSERT
-        using (new AssertionScope())
-        {
-            sut.Should().NotBeEmpty();
-            sut.Should().HaveCount(1);
-            sut.ElementAt(0).RunAs.Should().Be(RunAs.Admin);
-        }
-    }
 
     [Fact]
     public void FindExact()
@@ -262,7 +302,7 @@ public class AliasManagementShould : TestBase
                            """;
 
         var connection = BuildFreshDb(sql);
-        var action = BuildAliasDbAction(connection);
+        var action = BuildAliasDbAction();
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
@@ -288,7 +328,7 @@ public class AliasManagementShould : TestBase
                            """;
 
         var connection = BuildFreshDb(sql);
-        var action = BuildAliasDbAction(connection);
+        var action = BuildAliasDbAction();
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
@@ -303,7 +343,7 @@ public class AliasManagementShould : TestBase
     {
         // ARRANGE
         var connection = BuildFreshDb();
-        var action = BuildAliasDbAction(connection);
+        var action = BuildAliasDbAction();
         var c = new DbSingleConnectionManager(connection);
 
         var alias = BuildAlias();
@@ -349,7 +389,7 @@ public class AliasManagementShould : TestBase
         alias1.Id.Should().BeGreaterThan(0);
         connection.ExecuteScalar<int>(sql2).Should().Be(2);
         connection.ExecuteScalar<int>(sql3).Should().Be(3); // Logical deletion don't remove data: the names of the
-                                                            // deleted alias should remains in the database
+        // deleted alias should remains in the database
     }
 
     [Fact]
@@ -369,7 +409,7 @@ public class AliasManagementShould : TestBase
         var connection = BuildFreshDb(sql);
         var c = new DbSingleConnectionManager(connection);
 
-        var action = BuildAliasDbAction(connection);
+        var action = BuildAliasDbAction();
 
         // ACT
         c.WithinTransaction(tx => action.Remove(tx, new()  { Id = 256 }));
@@ -414,6 +454,31 @@ public class AliasManagementShould : TestBase
         // The logical deletion don't remove data, the names should therefore
         // remain in the database
         connection.ExecuteScalar<int>(sql3).Should().Be(1);
+    }
+
+    [Fact]
+    public void RetrieveAliasWithPrivilegeUsingService()
+    {
+        // ARRANGE
+        var connection = BuildFreshDb();
+        var service = BuildDataService(connection);
+
+        const string sql = """
+                           insert into alias (id, run_as) values (1, 0);
+                           insert into alias_name(id, name, id_alias) values (1, 'admin', 1);
+                           """;
+        connection.Execute(sql);
+
+        // ACT
+        var sut = service.Search("admin").ToArray();
+
+        // ASSERT
+        using (new AssertionScope())
+        {
+            sut.Should().NotBeEmpty();
+            sut.Should().HaveCount(1);
+            sut.ElementAt(0).RunAs.Should().Be(RunAs.Admin);
+        }
     }
 
     #endregion
