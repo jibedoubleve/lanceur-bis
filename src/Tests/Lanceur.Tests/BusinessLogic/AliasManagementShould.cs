@@ -86,9 +86,9 @@ public class AliasManagementShould : TestBase
         c.WithinTransaction(
             tx =>
             {
-                action.Create(tx, ref alias1);
-                action.Create(tx, ref alias2);
-                action.Create(tx, ref alias3);
+                action.SaveOrUpdate(tx, ref alias1);
+                action.SaveOrUpdate(tx, ref alias2);
+                action.SaveOrUpdate(tx, ref alias3);
             }
         );
 
@@ -313,7 +313,7 @@ public class AliasManagementShould : TestBase
         c.WithinTransaction(
             tx =>
             {
-                action.Create(tx, ref alias);
+                action.SaveOrUpdate(tx, ref alias);
                 action.Remove(tx, alias);
             }
         );

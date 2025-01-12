@@ -30,11 +30,11 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.UseCases;
 
-public class CreateAndUpdateAliasUseCase : TestBase
+public class AliasUseCases : TestBase
 {
     #region Constructors
 
-    public CreateAndUpdateAliasUseCase(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public AliasUseCases(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -99,7 +99,7 @@ public class CreateAndUpdateAliasUseCase : TestBase
     }
 
     [Fact]
-    public async Task CreateAndUpdateALias()
+    public async Task CreateAndUpdateAlias()
     {
         /*
          * Arrange

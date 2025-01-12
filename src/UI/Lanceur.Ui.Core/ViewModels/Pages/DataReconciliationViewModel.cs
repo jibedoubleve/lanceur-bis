@@ -181,7 +181,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         var response = await _userInteraction.AskUserYesNoAsync($"Do you want to update the description the {selectedAliases.Length} selected aliases?");
         if (!response) return;
 
-        _repository.Update(selectedAliases);
+        _repository.SaveOrUpdate(selectedAliases);
         _userNotification.Success($"Updated {selectedAliases.Length} selected aliases");
         _logger.LogInformation("Updated {Items} aliases", selectedAliases.Length);
         await OnShowAliasesWithoutNotes();
