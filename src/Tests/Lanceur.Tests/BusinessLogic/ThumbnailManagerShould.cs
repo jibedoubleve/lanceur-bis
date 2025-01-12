@@ -5,7 +5,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Win32.Thumbnails;
-using Lanceur.Tests.SQLite;
+using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;

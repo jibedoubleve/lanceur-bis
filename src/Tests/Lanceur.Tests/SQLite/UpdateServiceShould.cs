@@ -3,6 +3,7 @@ using Dapper;
 using FluentAssertions;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Tests.Tooling;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -10,7 +10,7 @@ using Lanceur.Tests.Tooling.SQL;
 using StackExchange.Profiling.Data;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.SQLite;
+namespace Lanceur.Tests.Tooling;
 
 public class TestBase
 

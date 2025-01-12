@@ -2,6 +2,7 @@
 using FluentAssertions;
 using System.Reflection;
 using System.SQLite.Updater;
+using Lanceur.Tests.Tooling;
 using Xunit;
 using Xunit.Abstractions;
 

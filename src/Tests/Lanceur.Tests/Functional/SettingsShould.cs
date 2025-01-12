@@ -1,12 +1,10 @@
 ﻿using FluentAssertions;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Constants;
 using Lanceur.Infra.Repositories;
-using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Tests.SQLite;
+using Lanceur.Tests.Tooling;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;

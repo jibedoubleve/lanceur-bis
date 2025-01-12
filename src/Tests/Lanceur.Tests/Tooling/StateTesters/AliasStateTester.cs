@@ -4,7 +4,7 @@ using Lanceur.Core.Models;
 using Lanceur.SharedKernel;
 using Xunit;
 
-namespace Lanceur.Tests._Tooling.StateTesters;
+namespace Lanceur.Tests.Tooling.StateTesters;
 
 public class AliasStateTester
 {
