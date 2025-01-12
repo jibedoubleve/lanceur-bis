@@ -178,6 +178,16 @@ public interface IAliasRepository
     /// <returns>The ID of the created or updated alias.</returns>
     void SaveOrUpdate(ref AliasQueryResult alias);
 
+    /// <summary>
+    ///     Updates the database by applying the specified alias changes.
+    ///     If an alias does not exist, it is created; otherwise, it is updated with the new values.
+    /// </summary>
+    /// <param name="aliases">
+    ///     A collection of <see cref="AliasQueryResult" /> objects representing the aliases to be saved or updated.
+    ///     Each object in the collection contains the details of a single alias, including its updated values.
+    /// </param>
+    void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases);
+
 
     /// <summary>
     ///     Searches for all aliases that match the specified criteria.
@@ -216,24 +226,16 @@ public interface IAliasRepository
     void SetHiddenAliasUsage(QueryResult alias);
 
     /// <summary>
-    /// Adds an entry to the usage table with the alias and the current date and time, 
-    /// and updates the counter of the specified QueryResult.
+    ///     Adds an entry to the usage table with the alias and the current date and time,
+    ///     and updates the counter of the specified QueryResult.
     /// </summary>
     /// <remarks>
-    /// This method has a side effect: it modifies the counter of the provided alias.  
-    /// If the counter is negative, no usage is recorded or saved in the history, and the counter remains hidden from the user.
+    ///     This method has a side effect: it modifies the counter of the provided alias.
+    ///     If the counter is negative, no usage is recorded or saved in the history, and the counter remains hidden from the
+    ///     user.
     /// </remarks>
     /// <param name="alias">The QueryResult object representing the alias to be updated. Must not be null.</param>
     void SetUsage(QueryResult alias);
-
-    /// <summary>
-    ///     Updates the database with the changes specified in the provided alias records.
-    /// </summary>
-    /// <param name="aliases">
-    ///     A collection of AliasQueryResult objects containing the alias changes to apply.
-    ///     Each item in the collection represents a single alias and its updated values.
-    /// </param>
-    void Update(IEnumerable<AliasQueryResult> aliases);
 
     /// <summary>
     ///     Updates thumbnail of many aliases at once.

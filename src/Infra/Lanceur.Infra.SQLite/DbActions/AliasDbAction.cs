@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-//TODO: reorder the IDbTransaction it should be the first argument of any method
 public class AliasDbAction
 {
     #region Fields
@@ -89,85 +88,6 @@ public class AliasDbAction
         if (deletedRowsCount > 0 && addedRowsCount == 0) _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);
     }
 
-    private void CreateAdditionalParameters(IDbTransaction tx, AliasQueryResult alias) => CreateAdditionalParameters(tx, alias.Id, alias.AdditionalParameters);
-
-    private static void UpdateName(IDbTransaction tx, AliasQueryResult alias)
-    {
-        //Remove all names
-        const string sql = @"delete from alias_name where id_alias = @id";
-        tx.Connection!.Execute(sql, new { id = alias.Id });
-
-        //Recreate new names
-        const string sql2 = @"insert into alias_name (id_alias, name) values (@id, @name)";
-        foreach (var name in alias.Synonyms.SplitCsv()) tx.Connection.Execute(sql2, new { id = alias.Id, name });
-    }
-
-    internal long Create(IDbTransaction tx, ref AliasQueryResult alias)
-    {
-        const string sqlAlias = """
-                                insert into alias (
-                                    arguments,
-                                    file_name,
-                                    notes,
-                                    run_as,
-                                    start_mode,
-                                    working_dir,
-                                    icon,
-                                    thumbnail,
-                                    lua_script,
-                                    hidden,
-                                    confirmation_required
-                                ) values (
-                                    @arguments,
-                                    @fileName,
-                                    @notes,
-                                    @runAs,
-                                    @startMode,
-                                    @workingDirectory,
-                                    @icon,
-                                    @thumbnail,
-                                    @luaScript,
-                                    @isHidden,
-                                    @isExecutionConfirmationRequired
-                                );
-                                select last_insert_rowid() from alias limit 1;
-                                """;
-
-        var param = new
-        {
-            Arguments = alias.Parameters,
-            alias.FileName,
-            alias.Notes,
-            alias.RunAs,
-            alias.StartMode,
-            alias.WorkingDirectory,
-            alias.Icon,
-            alias.Thumbnail,
-            alias.LuaScript,
-            alias.IsHidden,
-            alias.IsExecutionConfirmationRequired
-        };
-
-        var csv = alias.Synonyms.SplitCsv();
-        var additionalParameters = alias.AdditionalParameters;
-
-        using var _ = _logger.BeginSingleScope("SqlCreateAlias", sqlAlias);
-        var id = tx.Connection!.ExecuteScalar<long>(sqlAlias, param);
-
-        // Create synonyms
-        const string sqlSynonyms = @"insert into alias_name (id_alias, name) values (@id, @name)";
-        foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
-
-        CreateAdditionalParameters(tx, id, additionalParameters);
-
-        alias.Id = id;
-
-        // Return either the id of the created Alias or
-        // return the id of the just updated alias (which
-        // should be the same as the one specified as arg)
-        return id;
-    }
-
     internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
     {
         var queryResult = new AliasQueryResult
@@ -177,7 +97,7 @@ public class AliasDbAction
             Synonyms = alias.Name,
             IsHidden = true
         };
-        alias.Id = Create(tx, ref queryResult);
+        alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
 
     internal AliasQueryResult GetByIdAndName(IDbTransaction tx, long id, string name)
@@ -330,20 +250,6 @@ public class AliasDbAction
         return result;
     }
 
-    internal bool HasNames(IDbTransaction tx, AliasQueryResult alias)
-    {
-        const string sql = """
-                           select count(*)
-                           from
-                           	alias_name an
-                               inner join alias a on an.id_alias = a.id
-                           where lower(name) = @name
-                           """;
-
-        var count = tx.Connection!.ExecuteScalar<int>(sql, new { name = alias.Name });
-        return count > 0;
-    }
-
     internal void LogicalRemove(IDbTransaction tx, AliasQueryResult alias)
     {
         const string sql = """
@@ -361,6 +267,15 @@ public class AliasDbAction
         foreach (var alias in aliases) LogicalRemove(tx, alias);
     }
 
+    /// <summary>
+    ///     Permanently deletes the specified alias and all associated information from the database.
+    ///     This operation is irreversible and cannot be undone.
+    /// </summary>
+    /// <param name="tx">The database transaction used to execute the deletion operation.</param>
+    /// <param name="alias">The alias to be removed, encapsulated in an <see cref="AliasQueryResult" /> object.</param>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when the <paramref name="tx" /> or <paramref name="alias" /> parameter is <c>null</c>.
+    /// </exception>
     internal void Remove(IDbTransaction tx, AliasQueryResult alias)
     {
         if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");
@@ -369,6 +284,84 @@ public class AliasDbAction
         ClearAliasArgument(tx, alias.Id);
         ClearAliasName(tx, alias.Id);
         ClearAlias(tx, alias.Id);
+    }
+
+    internal long SaveOrUpdate(IDbTransaction tx, ref AliasQueryResult alias)
+    {
+        const string sqlAlias = """
+                                insert into alias (
+                                    arguments,
+                                    file_name,
+                                    notes,
+                                    run_as,
+                                    start_mode,
+                                    working_dir,
+                                    icon,
+                                    thumbnail,
+                                    lua_script,
+                                    hidden,
+                                    confirmation_required
+                                ) values (
+                                    @arguments,
+                                    @fileName,
+                                    @notes,
+                                    @runAs,
+                                    @startMode,
+                                    @workingDirectory,
+                                    @icon,
+                                    @thumbnail,
+                                    @luaScript,
+                                    @isHidden,
+                                    @isExecutionConfirmationRequired
+                                )
+                                on conflict(id) do update set
+                                    arguments   = @arguments,
+                                    file_name   = @fileName,
+                                    notes       = @notes,
+                                    run_as      = @runAs,
+                                    start_mode  = @startMode,
+                                    working_dir = @workingDirectory,
+                                    icon        = @icon,
+                                    thumbnail   = @thumbnail,
+                                    lua_script  = @luaScript,
+                                    hidden      = @isHidden,
+                                    confirmation_required = @isExecutionConfirmationRequired
+                                where id = excluded.id;
+                                select last_insert_rowid() from alias limit 1;
+                                """;
+
+        var param = new
+        {
+            Arguments = alias.Parameters,
+            alias.FileName,
+            alias.Notes,
+            alias.RunAs,
+            alias.StartMode,
+            alias.WorkingDirectory,
+            alias.Icon,
+            alias.Thumbnail,
+            alias.LuaScript,
+            alias.IsHidden,
+            alias.IsExecutionConfirmationRequired
+        };
+
+        var id = tx.Connection!.ExecuteScalar<long>(sqlAlias, param);
+
+        // Synonyms
+        var csv = alias.Synonyms.SplitCsv();
+        const string sqlSynonyms = "insert into alias_name (id_alias, name) values (@id, @name)";
+        foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
+
+        // Additionall parameters
+        var additionalParameters = alias.AdditionalParameters;
+        CreateAdditionalParameters(tx, id, additionalParameters);
+
+        alias.Id = id;
+
+        // Return either the id of the created Alias or
+        // return the id of the just updated alias (which
+        // should be the same as the one specified as arg)
+        return id;
     }
 
     internal ExistingNameResponse SelectNames(IDbTransaction tx, string[] names)
@@ -384,49 +377,6 @@ public class AliasDbAction
         var result = tx.Connection!.Query<string>(sql, new { names }).ToArray();
 
         return new(result);
-    }
-
-    internal long Update(IDbTransaction tx, AliasQueryResult alias)
-    {
-        const string updateAliasSql = """
-                                      update alias
-                                      set
-                                          arguments             = @parameters,
-                                          file_name             = @fileName,
-                                          notes                 = @notes,
-                                          run_as                = @runAs,
-                                          start_mode            = @startMode,
-                                          working_dir           = @WorkingDirectory,
-                                          icon                  = @Icon,
-                                          thumbnail             = @thumbnail,
-                                          lua_script            = @luaScript,
-                                          confirmation_required = @isExecutionConfirmationRequired
-                                      where id = @id;
-                                      """;
-
-        using var _ = _logger.BeginSingleScope("Sql", updateAliasSql);
-        tx.Connection!.Execute(
-            updateAliasSql,
-            new
-            {
-                alias.Parameters,
-                alias.FileName,
-                alias.Notes,
-                alias.RunAs,
-                alias.StartMode,
-                alias.WorkingDirectory,
-                alias.Icon,
-                alias.Thumbnail,
-                alias.LuaScript,
-                alias.Count,
-                id = alias.Id,
-                alias.IsExecutionConfirmationRequired
-            }
-        );
-        CreateAdditionalParameters(tx, alias);
-        UpdateName(tx, alias);
-        alias.SynonymsWhenLoaded = alias.Synonyms;
-        return alias.Id;
     }
 
     internal IEnumerable<long> UpdateThumbnails(IDbTransaction tx, IEnumerable<AliasQueryResult> aliases)

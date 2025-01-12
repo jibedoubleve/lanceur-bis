@@ -352,6 +352,9 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public void SaveOrUpdate(ref AliasQueryResult alias) => Db.WithinTransaction((tx, current) =>  _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref current), alias);
 
     /// <inheritdoc />
+    public void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(_dbActionFactory.SaveManagement.SaveOrUpdate, aliases);
+
+    /// <inheritdoc />
     public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false) => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, name, isReturnAllIfEmpty));
 
     /// <inheritdoc />
@@ -391,9 +394,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             _dbActionFactory.UsageManagement.SetUsage(tx, ref alias);
         }
     );
-
-    /// <inheritdoc />
-    public void Update(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(_dbActionFactory.SaveManagement.Update, aliases);
 
     /// <inheritdoc />
     public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.UpdateThumbnails(tx, aliases));
