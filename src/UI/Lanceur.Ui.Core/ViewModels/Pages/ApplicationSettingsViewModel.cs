@@ -23,6 +23,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private int _key;
     [ObservableProperty] private string _windowBackdropStyle;
     [ObservableProperty] private double _searchDelay;
+    [ObservableProperty] private bool _showAtStartup;
+    [ObservableProperty] private bool _showLastQuery;
 
     private readonly IUserNotificationService _userNotificationService;
     private readonly IAppRestartService _appRestartService;
@@ -64,9 +66,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         DbPath = _settings.Local.DbPath;
-        ShowResults = _settings.Application.Window.ShowResult;
         WindowBackdropStyle = _settings.Application.Window.BackdropStyle;
         SearchDelay = _settings.Application.SearchDelay;
+        ShowResults = _settings.Application.ShowResult;
+        ShowAtStartup = _settings.Application.ShowAtStartup;
+        ShowLastQuery = _settings.Application.ShowLastQuery;
+        
     }
 
     #endregion
@@ -109,9 +114,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     private void MapSettings()
     {
         Settings.Local.DbPath = DbPath;
-        Settings.Application.Window.ShowResult = ShowResults;
         Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
         Settings.Application.SearchDelay = SearchDelay;
+        Settings.Application.ShowResult = ShowResults;
+        Settings.Application.ShowAtStartup = ShowAtStartup;
+        Settings.Application.ShowLastQuery = ShowLastQuery;
     }
 
     #endregion
