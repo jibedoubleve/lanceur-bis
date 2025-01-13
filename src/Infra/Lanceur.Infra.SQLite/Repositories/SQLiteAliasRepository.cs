@@ -217,6 +217,23 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
+    public IEnumerable<QueryResult> GetMostUsedAliases(int year)
+    {
+        ArgumentNullException.ThrowIfNull(year);
+        const string sql = $"""
+                            select
+                            	keywords   as {nameof(UsageQueryResult.Name)},
+                                exec_count as {nameof(UsageQueryResult.Count)}
+                            from
+                                stat_execution_count_by_year_v
+                            where year = @year
+                            order
+                                by exec_count desc
+                            """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql, new { year = year.ToString() }));
+    }
+
+    /// <inheritdoc />
     public IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per)
     {
         var action = new HistoryDbAction(Db);
@@ -228,6 +245,14 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             Per.Month     => action.PerMonth(),
             _             => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
         };
+    }
+
+
+    /// <inheritdoc />
+    public IEnumerable<int> GetYearsWithUsage()
+    {
+        const string sql = "select distinct strftime('%Y', time_stamp) from alias_usage";
+        return Db.WithinTransaction(tx => tx.Connection!.Query<int>(sql));
     }
 
     /// <inheritdoc />
