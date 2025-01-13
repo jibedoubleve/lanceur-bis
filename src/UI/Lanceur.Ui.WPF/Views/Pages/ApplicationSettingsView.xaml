@@ -81,6 +81,26 @@
                                          IsChecked="{Binding ShowResult}" />
                     </StackPanel>
                 </ui:CardControl>
+                
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Search24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Should the last query be shown when the search opens?" />
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ToggleSwitch OffContent="No" OnContent="Yes"
+                                         IsChecked="{Binding ShowLastQuery}" />
+                    </StackPanel>
+                    </ui:CardControl>
+                    
+                    <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Glasses24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Show search after Windows loads and Lanceur starts?" />
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ToggleSwitch OffContent="No" OnContent="Yes"
+                                         IsChecked="{Binding ShowAtStartup}" />
+                    </StackPanel>
+                </ui:CardControl>
 
                 <ui:CardControl
                     Margin="5,0,5,12"

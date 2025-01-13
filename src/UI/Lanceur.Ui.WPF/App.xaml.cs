@@ -80,7 +80,7 @@ public partial class App
          */
         Host.Services
             .GetRequiredService<MainView>()
-            .Show();
+            .ShowOnStartup();
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application started");
 

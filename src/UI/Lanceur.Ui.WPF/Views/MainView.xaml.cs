@@ -74,7 +74,8 @@ public partial class MainView
 
     private void HideWindow()
     {
-        QueryTextBox.SelectAll();
+        if (ViewModel.ShowLastQuery) QueryTextBox.SelectAll();
+        else QueryTextBox.Clear();
         Hide();
     }
 
@@ -161,7 +162,15 @@ public partial class MainView
     private void SetGlobalShortcut(Key key, ModifierKeys modifier)
     {
         _logger.LogInformation("Setup shortcut. (Key: {Key}, Modifier: {Modifier})", key, modifier);
-        try { HotkeyManager.Current.AddOrReplace("OnShowWindow", key, modifier, OnShowWindow); }
+        try
+        {
+            HotkeyManager.Current.AddOrReplace(
+                "OnShowWindow",
+                key,
+                modifier,
+                OnShowWindow
+            );
+        }
         catch (HotkeyAlreadyRegisteredException ex)
         {
             if (!_fallbackShortcuts.CanNext)
@@ -171,7 +180,12 @@ public partial class MainView
             }
 
             //Default values
-            _logger.LogWarning(ex, "Impossible to set shortcut. (Key: {Key}, Modifier: {Modifier})", key, modifier);
+            _logger.LogWarning(
+                ex,
+                "Impossible to set shortcut. (Key: {Key}, Modifier: {Modifier})",
+                key,
+                modifier
+            );
             var sc = _fallbackShortcuts.Next();
             SetGlobalShortcut(sc.Key, sc.ModifierKeys);
         }
@@ -201,7 +215,7 @@ public partial class MainView
     private void ShowWindow()
     {
         _logger.LogTrace("Current window is at {Coordinate}", this.ToCoordinate());
-        
+
         ViewModel.RefreshSettings();
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();
@@ -213,6 +227,17 @@ public partial class MainView
         Topmost = true;
         Topmost = false;
         Focus();
+    }
+
+    /// <summary>
+    ///     Call this method to display the window the first time. It checks the settings and hides the window
+    ///     immediately after showing it if the <c>ShowAtStartup</c> setting is set to <c>True</c>.
+    ///     If <c>ShowAtStartup</c> is <c>False</c>, the window remains visible.
+    /// </summary>
+    public void ShowOnStartup()
+    {
+        Show();
+        if (false == ViewModel.ShowAtStartup) Hide();
     }
 
     #endregion

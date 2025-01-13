@@ -19,19 +19,17 @@ public partial class MainViewModel : ObservableObject
 
     private readonly bool _doesReturnAllIfEmpty;
     private readonly IExecutionService _executionService;
-    private readonly IUserInteractionService _userUserInteractionService;
-    private readonly IUserNotificationService _userNotificationService;
-
-    private Cmdline _lastCriterion = Cmdline.Empty;
     private readonly ILogger<MainViewModel> _logger;
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
     private readonly ISearchService _searchService;
     [ObservableProperty] private QueryResult? _selectedResult;
-    [ObservableProperty] private string? _suggestion;
-    [ObservableProperty] private string _windowBackdropStyle;
-    private readonly IWatchdog _watchdog;
     private readonly ISettingsFacade _settingsFacade;
+    [ObservableProperty] private string? _suggestion;
+    private readonly IUserNotificationService _userNotificationService;
+    private readonly IUserInteractionService _userUserInteractionService;
+    private readonly IWatchdog _watchdog;
+    [ObservableProperty] private string _windowBackdropStyle;
 
     #endregion
 
@@ -62,14 +60,23 @@ public partial class MainViewModel : ObservableObject
 
         //Settings
         _settingsFacade = settingsFacade;
-        _doesReturnAllIfEmpty = settingsFacade.Application.Window.ShowResult;
+        _doesReturnAllIfEmpty = settingsFacade.Application.ShowResult;
         _windowBackdropStyle = settingsFacade.Application.Window.BackdropStyle;
+        ShowAtStartup = settingsFacade.Application.ShowAtStartup;
+        ShowLastQuery = settingsFacade.Application.ShowLastQuery;
 
         // Configuration
         _watchdog = watchdogBuilder.WithAction(SearchAsync)
                                    .WithInterval(settingsFacade.Application.SearchDelay.Milliseconds())
                                    .Build();
     }
+
+    #endregion
+
+    #region Properties
+
+    public bool ShowAtStartup { get;  }
+    public bool ShowLastQuery { get; }
 
     #endregion
 
@@ -140,7 +147,6 @@ public partial class MainViewModel : ObservableObject
         SelectedResult = Results.FirstOrDefault()!;
         Suggestion = GetSuggestion(criterion.Name, SelectedResult);
 
-        _lastCriterion = criterion;
         _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
     }
 
