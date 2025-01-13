@@ -25,15 +25,11 @@
         <EmbeddedResource Include="SQL\script-0.7.sql" />
         <EmbeddedResource Include="SQL\script-0.8.sql" />
         <EmbeddedResource Include="SQL\script-0.9.sql" />
-        <None Remove="SQL\script-0.15.sql" />
-        <None Remove="SQL\script-1.1.0.sql" />
         <EmbeddedResource Include="SQL\script-0.15.sql" />
-        <None Remove="SQL\script-1.0.0.sql" />
         <EmbeddedResource Include="SQL\script-1.0.0.sql" />
         <EmbeddedResource Include="SQL\script-1.1.0.sql" />
-        <None Remove="SQL\script-1.1.1.sql" />
         <EmbeddedResource Include="SQL\script-1.1.1.sql" />
-        <None Remove="SQL\script-2.0.sql" />
         <EmbeddedResource Include="SQL\script-2.0.sql" />
+        <EmbeddedResource Include="SQL\script-2.1.sql" />
     </ItemGroup>
 </Project>
