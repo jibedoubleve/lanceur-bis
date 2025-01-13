@@ -114,11 +114,31 @@ public interface IAliasRepository
     IEnumerable<QueryResult> GetMostUsedAliases();
 
     /// <summary>
+    ///     Retrieves a list of aliases with a count greater than 0 for the specified year.
+    /// </summary>
+    /// <param name="year">The year for which aliases are being retrieved.</param>
+    /// <returns>
+    ///     A collection of <see cref="QueryResult" /> objects, where each item contains the alias name and its associated
+    ///     count.
+    /// </returns>
+    IEnumerable<QueryResult> GetMostUsedAliases(int year);
+
+
+    /// <summary>
     ///     Returns usage trends. The result is meant to be dislayed as a chart
     /// </summary>
     /// <param name="per">The level of the trend. Can be hour, day, day of week or month</param>
     /// <returns>Points of the chart</returns>
     IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per);
+
+    /// <summary>
+    ///     Retrieves all unique years where usage data is recorded.
+    /// </summary>
+    /// <returns>
+    ///     An IEnumerable of integers representing the years with recorded usage.
+    ///     The years are expected to be unique and may or may not be sorted, depending on the implementation.
+    /// </returns>
+    IEnumerable<int> GetYearsWithUsage();
 
     /// <summary>
     ///     Update the id and the counter of <paramref name="queryResult" />

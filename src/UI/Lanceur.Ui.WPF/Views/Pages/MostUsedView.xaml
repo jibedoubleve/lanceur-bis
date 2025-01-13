@@ -29,10 +29,23 @@
     </interactivity:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="Display usage for year:" Margin="5,5,5,2" />
+            <ComboBox ItemsSource="{Binding Years}" Margin="5,0,5,5" x:Name="CbYear" SelectedIndex="0">
+                <interactivity:Interaction.Triggers>
+                    <interactivity:EventTrigger EventName="SelectionChanged">
+                        <interactivity:InvokeCommandAction
+                            Command="{Binding RefreshAliasesCommand}"
+                            CommandParameter="{Binding ElementName=CbYear, Path=SelectedItem}" />
+                    </interactivity:EventTrigger>
+                </interactivity:Interaction.Triggers>
+            </ComboBox>
+        </StackPanel>
         <ui:DataGrid
+            Grid.Row="1"
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             CanUserDeleteRows="False"
