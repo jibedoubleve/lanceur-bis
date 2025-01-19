@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Ui.Core", "src\UI\L
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra", "Infra", "{350959D7-AF81-4739-8F5E-ED16E635CB46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Bookmarks", "src\Libraries\System.Web.Bookmarks\System.Web.Bookmarks.csproj", "{D8A94002-28BC-4E7A-9DBE-2690E5E63272}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{607D7DC7-A50A-4607-9041-67A79A34344A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{607D7DC7-A50A-4607-9041-67A79A34344A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{607D7DC7-A50A-4607-9041-67A79A34344A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8A94002-28BC-4E7A-9DBE-2690E5E63272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8A94002-28BC-4E7A-9DBE-2690E5E63272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8A94002-28BC-4E7A-9DBE-2690E5E63272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8A94002-28BC-4E7A-9DBE-2690E5E63272}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +102,7 @@ Global
 		{12D6AA4E-A168-4F07-B9F9-FF286BD4F4AB} = {350959D7-AF81-4739-8F5E-ED16E635CB46}
 		{6FC5DBA4-F987-419F-AD2B-438552A9DA78} = {350959D7-AF81-4739-8F5E-ED16E635CB46}
 		{64C3C9B1-874E-4CF5-905B-DCBF063D8A0F} = {350959D7-AF81-4739-8F5E-ED16E635CB46}
+		{D8A94002-28BC-4E7A-9DBE-2690E5E63272} = {42FC3E6A-9D1C-464D-A828-2D02E12F7192}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F1CB5DA-802E-408C-B009-A94BE0FE61F3}

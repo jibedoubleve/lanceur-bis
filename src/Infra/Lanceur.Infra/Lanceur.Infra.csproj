@@ -19,5 +19,6 @@
         <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
         <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
         <ProjectReference Include="..\..\Libraries\Everything.Wrapper\Everything.Wrapper.csproj" />
+        <ProjectReference Include="..\..\Libraries\System.Web.Bookmarks\System.Web.Bookmarks.csproj" />
     </ItemGroup>
 </Project>
