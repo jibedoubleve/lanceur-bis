@@ -3,6 +3,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
@@ -16,6 +17,7 @@ using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
 using Microsoft.Extensions.Caching.Memory;
@@ -43,7 +45,9 @@ public class MainViewModelShould : TestBase
         var serviceCollection = new ServiceCollection().AddView<MainViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                                        .AddDatabase(db)
-                                                       .AddApplicationSettings()
+                                                       .AddApplicationSettings(
+                                                           stg => configurator?.VisitSettings?.Invoke(stg)
+                                                       )
                                                        .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                        .AddSingleton<IMappingService, AutoMapperMappingService>()
                                                        .AddSingleton<ISearchService, SearchService>()
@@ -164,17 +168,45 @@ public class MainViewModelShould : TestBase
         );
     }
 
+    [Theory]
+    [InlineData(true, 1)]
+    [InlineData(false, 0)]
+    public async Task ShowAllResultsOrNotDependingOnConfiguration(bool showAllResults, int count)
+    {
+        var builder = new SqlBuilder().AppendAlias(1, synonyms: ["alias1", "alias_1"])
+                                      .AppendAlias(2, synonyms: ["alias2", "alias_2"])
+                                      .AppendAlias(3, synonyms: ["alias3", "alias_3"]);
+                
+        var visitors = new ServiceVisitors
+        {
+            VisitSettings = settings =>
+            {
+                var application = new DatabaseConfiguration { ShowResult = showAllResults, };
+                settings.Application.Returns(application);
+            }
+        };
+        await TestViewModel(
+            async viewModel =>
+            {
+                await viewModel.DisplayResultsIfAllowed();
+                viewModel.Results.Should().HaveCountGreaterOrEqualTo(count);
+            },
+            builder,
+            visitors
+        );
+    }
     #endregion
 
     /// <summary>
-    /// Manages a collection of visitor functions that allow users to configure 
-    /// custom behaviour for the <c>serviceProvider</c> with specific types.
+    ///     Manages a collection of visitor functions that allow users to configure
+    ///     custom behaviour for the <c>serviceProvider</c> with specific types.
     /// </summary>
     private class ServiceVisitors
     {
         #region Properties
 
         public Func<IServiceProvider, IExecutionService, IExecutionService> VisitExecutionManager { get; set; }
+        public Action<ISettingsFacade> VisitSettings { get; set; }
 
         #endregion
     }
