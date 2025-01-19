@@ -160,11 +160,13 @@ public partial class MainViewModel : ObservableObject
         WeakReferenceMessenger.Default.Send<SetQueryMessage>(new(cmd));
     }
 
-    public void DisplayResultsIfAllowed()
+    public async Task DisplayResultsIfAllowed()
     {
         if (_settingsFacade.Application.ShowResult)
-            _ = Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true))
-                    .ContinueWith(r => Results = new(r.Result), TaskScheduler.FromCurrentSynchronizationContext());
+        {
+            var results = await Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true));
+            Results = new(results);
+        }
 
         _logger.LogTrace("When showing search, display all results: {ShowAtStartup}", _settingsFacade.Application.ShowAtStartup);
     }
