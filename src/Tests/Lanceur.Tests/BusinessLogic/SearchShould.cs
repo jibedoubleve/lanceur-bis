@@ -67,6 +67,7 @@ public class SearchShould : TestBase
                                      .AddSingleton<SearchService>()
                                      .AddMockSingleton<ISearchServiceOrchestrator>()
                                      .AddMockSingleton<IThumbnailService>()
+                                     .AddMemoryCache()
                                      .BuildServiceProvider();
 
 
@@ -225,7 +226,6 @@ public class SearchShould : TestBase
                                                      .AddSingleton<ISearchService, SearchService>()
                                                      .AddSingleton<IDbActionFactory, DbActionFactory>()
                                                      .AddMockSingleton<IThumbnailService>()
-                                                     .AddSingleton<IMemoryCache, MemoryCache>()
                                                      .AddMockSingleton<IStoreLoader>(
                                                          (sp, _) =>
                                                          {
