@@ -217,6 +217,7 @@ public partial class MainView
         _logger.LogTrace("Current window is at {Coordinate}", this.ToCoordinate());
 
         ViewModel.RefreshSettings();
+        ViewModel.DisplayResultsIfAllowed();
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();
 

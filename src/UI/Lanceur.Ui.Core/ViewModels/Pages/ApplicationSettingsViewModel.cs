@@ -30,7 +30,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     private readonly IAppRestartService _appRestartService;
     [ObservableProperty] private ISettingsFacade _settings;
     private readonly IUserInteractionService _userInteraction;
-    [ObservableProperty] private bool _showResults;
+    [ObservableProperty] private bool _showResult;
     [ObservableProperty] private  bool _isTraceEnabled;
 
     #endregion
@@ -68,7 +68,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         DbPath = _settings.Local.DbPath;
         WindowBackdropStyle = _settings.Application.Window.BackdropStyle;
         SearchDelay = _settings.Application.SearchDelay;
-        ShowResults = _settings.Application.ShowResult;
+        ShowResult = _settings.Application.ShowResult;
         ShowAtStartup = _settings.Application.ShowAtStartup;
         ShowLastQuery = _settings.Application.ShowLastQuery;
         
@@ -116,7 +116,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Settings.Local.DbPath = DbPath;
         Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
         Settings.Application.SearchDelay = SearchDelay;
-        Settings.Application.ShowResult = ShowResults;
+        Settings.Application.ShowResult = ShowResult;
         Settings.Application.ShowAtStartup = ShowAtStartup;
         Settings.Application.ShowLastQuery = ShowLastQuery;
     }
