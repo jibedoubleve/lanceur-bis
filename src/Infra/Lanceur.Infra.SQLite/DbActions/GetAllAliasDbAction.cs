@@ -46,7 +46,7 @@ internal class GetAllAliasDbAction
                                 inner join data_alias_synonyms_v s on s.id_alias = a.id
                             where a.hidden = 0
                             order by
-                                e.exec_count desc,
+                                a.exec_count desc,
                                 an.name
                             """;
 

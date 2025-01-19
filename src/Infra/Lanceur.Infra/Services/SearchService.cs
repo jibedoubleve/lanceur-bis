@@ -74,7 +74,7 @@ public class SearchService : SearchServiceCache, ISearchService
     {
         using var measurement = _logger.MeasureExecutionTime(this);
 
-        if (doesReturnAllIfEmpty && query is null) return await GetAllAsync();
+        if (doesReturnAllIfEmpty && (query is null || query.IsEmpty)) return await GetAllAsync();
         if (query is null || query.IsEmpty) return new List<QueryResult>();
 
         //Get the alive stores

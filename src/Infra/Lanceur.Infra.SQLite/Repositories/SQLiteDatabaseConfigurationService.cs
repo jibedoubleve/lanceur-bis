@@ -68,18 +68,15 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
         Db.WithinTransaction(
             tx =>
             {
-                const string sqlExists = "select count(*) from settings where s_key = 'json'";
-                var exists = tx.Connection!.ExecuteScalar<long>(sqlExists) > 0;
-
-                if (!exists)
-                {
-                    const string sqlInsert = "insert into settings(s_key) values ('json')";
-                    tx.Connection.Execute(sqlInsert);
-                }
-
-                const string sql = "update settings set s_value = @value where s_key = 'json'";
+                const string sql = """
+                                   insert into settings(s_key, s_value) values ('json', @json)
+                                   on conflict (s_key) do update 
+                                   set 
+                                   	s_value = @json
+                                   where s_key = 'json'
+                                   """;
                 var json = JsonConvert.SerializeObject(Current);
-                tx.Connection.Execute(sql, new { value = json });
+                tx.Connection!.Execute(sql, new { json });
             }
         );
     }
