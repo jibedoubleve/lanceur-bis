@@ -13,7 +13,7 @@
 
 #tool nuget:?package=vswhere&version=3.0.1
 #tool nuget:?package=GitVersion.CommandLine&version=5.12.0
-#tool nuget:?package=GitReleaseManager&version=0.17.0
+#tool nuget:?package=GitReleaseManager&version=0.18.0
 
 ///////////////////////////////////////////////////////////////////////////////
 /// USINGS & NAMESPACES
