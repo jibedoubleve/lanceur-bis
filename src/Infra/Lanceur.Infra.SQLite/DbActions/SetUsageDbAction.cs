@@ -86,8 +86,8 @@ public class SetUsageDbAction
         var aliasDbAction = _dbActionFactory.AliasManagement;
         if (alias.Id  == 0)
         {
-            if (aliasDbAction.GetExact(tx, alias?.Name, true) is { } a)
-                alias!.Id = a.Id;
+            if (alias is AliasQueryResult aqr &&  aliasDbAction.TryFind(tx, ref aqr))
+                alias!.Id = aqr.Id;
             else
                 aliasDbAction.CreateInvisible(tx, ref alias);
         }

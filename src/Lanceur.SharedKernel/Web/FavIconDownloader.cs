@@ -42,11 +42,14 @@ public class FavIconDownloader : IFavIconDownloader
 
             foreach (var uri in uris)
             {
-                _logger.LogTrace("Checking favicon url {Url}", uri);
                 if (!await CheckExistsAsync(uri)) continue;
 
                 var bytes = await httpClient.GetByteArrayAsync(uri);
-                if (bytes.Length == 0) continue;
+                if (bytes.Length == 0)
+                {
+                    _logger.LogTrace("No favicon found for {uri}", uri);
+                    continue;
+                }
 
                 await File.WriteAllBytesAsync(outputPath, bytes);
                 return true;

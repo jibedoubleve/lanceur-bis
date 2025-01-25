@@ -1,10 +1,12 @@
 using System.Web.Bookmarks;
+using Humanizer;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Microsoft.Extensions.Caching.Memory;
+using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Stores;
@@ -14,8 +16,12 @@ public class BookmarksStore : IStoreService
 {
     #region Fields
 
-    private readonly IBookmarkRepository _bookmarkRepository;
+    private readonly IAliasRepository _aliasRepository;
+
+    private readonly IBookmarkRepositoryFactory _bookmarkRepositoryFactory;
     private readonly ISettingsFacade _settings;
+
+    private const int Length = 66;
 
     #endregion
 
@@ -24,8 +30,8 @@ public class BookmarksStore : IStoreService
     public BookmarksStore(IServiceProvider serviceProvider)
     {
         _settings = serviceProvider.GetService<ISettingsFacade>();
-        var memoryCache = serviceProvider.GetService<IMemoryCache>();
-        _bookmarkRepository = new ChromeBookmarksRepository(memoryCache);
+        _bookmarkRepositoryFactory = serviceProvider.GetService<IBookmarkRepositoryFactory>();
+        _aliasRepository = serviceProvider.GetService<IAliasRepository>();
     }
 
     #endregion
@@ -38,18 +44,34 @@ public class BookmarksStore : IStoreService
 
     #region Methods
 
-    public IEnumerable<QueryResult> GetAll() => _bookmarkRepository.GetBookmarks()
-                                                                   .Select(
-                                                                       e => new AliasQueryResult { Name = e.Name, FileName = e.Url }
-                                                                   );
 
+    /// <inheritdoc />
+    public IEnumerable<QueryResult> GetAll()
+    {
+        var bookmarks = _bookmarkRepositoryFactory.CreateBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
+                                                  .GetBookmarks()
+                                                  .Select(
+                                                      e => new AliasQueryResult { Name = e.Name.Truncate(Length, "(...)"), FileName = e.Url, Count = -1}
+                                                  )
+                                                  .ToList();
+        return bookmarks;
+    }
+
+    /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query)
     {
-        var r  = _bookmarkRepository.GetBookmarks(query.Parameters)
-                                    .Select(
-                                        e => new AliasQueryResult { Name = e.Name, FileName = e.Url }
-                                    );
-        return r;
+        if (query.Parameters.IsNullOrWhiteSpace())
+        {
+            return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
+        }
+        
+        var bookmarks  = _bookmarkRepositoryFactory.CreateBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
+                                                   .GetBookmarks(query.Parameters)
+                                                   .Select(
+                                                       e => new AliasQueryResult { Name = e.Name.Truncate(Length, "(...)"), FileName = e.Url, Count = -1}
+                                                   )
+                                                   .ToList();
+        return bookmarks;
     }
 
     #endregion

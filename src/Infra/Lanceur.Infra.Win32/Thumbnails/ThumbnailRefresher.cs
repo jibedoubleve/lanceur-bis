@@ -69,7 +69,6 @@ public class ThumbnailRefresher
             }
 
             alias.Thumbnail.CopyToImageRepository(alias.FileName);
-            _logger.LogTrace("Retrieved thumbnail for packaged application {Name}. Thumbnail: {Thumbnail}", alias.Name, alias.Thumbnail);
             return;
         }
 
@@ -80,7 +79,6 @@ public class ThumbnailRefresher
             imageSource.CopyToImageRepository(file.Name);
             alias.Thumbnail = file.Name.GetThumbnailPath();
             query.Soil();
-            _logger.LogTrace("Retrieved thumbnail for win32 application {Name}. Thumbnail: {Thumbnail}", alias.Name, alias.Thumbnail);
             return;
         }
 
@@ -101,7 +99,6 @@ public class ThumbnailRefresher
         alias.Thumbnail = null;
 
         _ = _favIconService.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
-        _logger.LogTrace("Retrieved favicon for alias {Name}. Favicon {FileName}", alias.Name, alias.FileName);
     }
 
     #endregion

@@ -1,12 +1,9 @@
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Dapper;
-using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
-using Lanceur.Infra.Macros;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.SharedKernel.Mixins;
@@ -22,7 +19,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     private readonly IDbActionFactory _dbActionFactory;
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly ILogger<SQLiteAliasRepository> _logger;
-    private static readonly MacroValidator MacroValidator = new(Assembly.GetAssembly(typeof(GuidMacro)));
 
     private static readonly Regex RegexSelectUrl = new(@"(www?|http?|https?|ftp):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(\.[a-zA-Z]{2,})?$");
 
@@ -142,6 +138,27 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
     /// <inheritdoc />
     public AliasQueryResult GetByIdAndName(long id, string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetByIdAndName(tx, id, name));
+
+    /// <inheritdoc />
+    public Dictionary<string, int> GetHiddenCounters() => Db.WithinTransaction(
+        tx =>
+        {
+            const string sql = """
+                               select 
+                               	file_name             as FileName,
+                               	ifnull(exec_count, 0) as Counter
+                               from alias
+                               where 
+                               	hidden is true	
+                               	and deleted_at is null
+                               order by id desc
+                               """;
+            var dictionary = tx.Connection!.Query<dynamic>(sql)
+                               .Select(e => new { Key = e.FileName, Value = e.Counter })
+                               .ToDictionary(e => (string)e.Key, e => (int)e.Value);
+            return dictionary;
+        }
+    );
 
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetDeletedAlias()

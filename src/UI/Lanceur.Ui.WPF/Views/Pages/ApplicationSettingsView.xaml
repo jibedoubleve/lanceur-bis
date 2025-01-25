@@ -26,6 +26,11 @@
             <sys:String>None</sys:String>
             <sys:String>Tabbed</sys:String>
         </x:Array>
+        <x:Array x:Key="Browsers" Type="{x:Type sys:String}">
+            <sys:String>Chrome</sys:String>
+            <sys:String>Firefox</sys:String>
+            <sys:String>Zen</sys:String>
+        </x:Array>
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -37,8 +42,8 @@
                 Margin="6"
                 Command="{Binding SaveSettingsCommand}"
                 Content="Save"
-                Icon="{ui:SymbolIcon Save24}" 
-                Appearance="Primary"/>
+                Icon="{ui:SymbolIcon Save24}"
+                Appearance="Primary" />
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
             <StackPanel>
@@ -62,14 +67,14 @@
                     </ui:CardControl.Header>
                     <ComboBox SelectedItem="{Binding WindowBackdropStyle}"
                               ItemsSource="{StaticResource WindowBackdropStyles}" />
-                
+
                 </ui:CardControl>
                 <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon Timer24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Search Trigger Delay (ms)" />
                     </ui:CardControl.Header>
                     <ui:CardControl.ToolTip>Time in milliseconds before search starts after typing stops.</ui:CardControl.ToolTip>
-                    <ui:NumberBox Value="{Binding SearchDelay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ui:NumberBox Value="{Binding SearchDelay, UpdateSourceTrigger=PropertyChanged}" />
                 </ui:CardControl>
 
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ClipboardBulletListLtr20}">
@@ -81,24 +86,37 @@
                                          IsChecked="{Binding ShowResult}" />
                     </StackPanel>
                 </ui:CardControl>
-                
+
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Search24}">
                     <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body" Text="Should the last query be shown when the search opens?" />
+                        <ui:TextBlock FontTypography="Body"
+                                      Text="Should the last query be shown when the search opens?" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:ToggleSwitch OffContent="No" OnContent="Yes"
                                          IsChecked="{Binding ShowLastQuery}" />
                     </StackPanel>
-                    </ui:CardControl>
-                    
-                    <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Glasses24}">
+                </ui:CardControl>
+
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Glasses24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Show search after Windows loads and Lanceur starts?" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:ToggleSwitch OffContent="No" OnContent="Yes"
                                          IsChecked="{Binding ShowAtStartup}" />
+                    </StackPanel>
+                </ui:CardControl>
+
+                <ui:CardControl Margin="5,0,5,12"
+                                Icon="{ui:SymbolIcon BookmarkSearch24}"
+                                ToolTip="Select the main browser to use for searching your bookmarks.">
+
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Source of the bookmarks" />
+                    </ui:CardControl.Header>
+                    <StackPanel>
+                        <ComboBox ItemsSource="{StaticResource Browsers}" SelectedItem="{Binding BookmarkSourceBrowser}"/>
                     </StackPanel>
                 </ui:CardControl>
 

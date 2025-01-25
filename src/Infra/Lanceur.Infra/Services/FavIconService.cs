@@ -59,7 +59,6 @@ public class FavIconService : IFavIconService
         if (File.Exists(output)) return;
 
         var uriAuthority = uri.GetAuthority();
-        _logger.LogInformation("Getting favicon for {Uri}", uriAuthority);
 
         if (!await _favIconDownloader.CheckExistsAsync(uriAuthority)) return;
 

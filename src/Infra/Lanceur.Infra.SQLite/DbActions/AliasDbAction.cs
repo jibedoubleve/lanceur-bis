@@ -90,13 +90,9 @@ public class AliasDbAction
 
     internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
     {
-        var queryResult = new AliasQueryResult
-        {
-            Name = alias.Name,
-            FileName = alias.Name,
-            Synonyms = alias.Name,
-            IsHidden = true
-        };
+        if (alias is not AliasQueryResult queryResult) return;
+
+        queryResult.IsHidden = true;
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
 
@@ -149,6 +145,7 @@ public class AliasDbAction
     ///     For optimisation reason, there's no check of doubloons. Bear UI validates and
     ///     forbid to insert two aliases with same name.
     /// </remarks>
+    [Obsolete("This method is no longer used and should be replaced with 'TryFind' for better functionality.")]
     internal AliasQueryResult GetExact(IDbTransaction tx, string name, bool includeHidden = false)
     {
         const string sql = $"""
@@ -289,8 +286,24 @@ public class AliasDbAction
     internal long SaveOrUpdate(IDbTransaction tx, ref AliasQueryResult alias)
     {
         const string sqlAlias = """
+                                update alias
+                                set
+                                    arguments   = @arguments,
+                                    file_name   = @fileName,
+                                    notes       = @notes,
+                                    run_as      = @runAs,
+                                    start_mode  = @startMode,
+                                    working_dir = @workingDirectory,
+                                    icon        = @icon,
+                                    thumbnail   = @thumbnail,
+                                    lua_script  = '@luaScript',
+                                    hidden      = @isHidden,
+                                    confirmation_required = @isExecutionConfirmationRequired
+                                where id = @id
+                                returning id;
+
                                 insert into alias (
-                                    id ,
+                                    id,
                                     arguments,
                                     file_name,
                                     notes,
@@ -299,7 +312,7 @@ public class AliasDbAction
                                     working_dir,
                                     icon,
                                     thumbnail,
-                                    lua_script,
+                                    'lua_script',
                                     hidden,
                                     confirmation_required
                                 ) values (
@@ -316,37 +329,24 @@ public class AliasDbAction
                                     @isHidden,
                                     @isExecutionConfirmationRequired
                                 )
-                                on conflict(id) do update 
-                                set
-                                    arguments   = @arguments,
-                                    file_name   = @fileName,
-                                    notes       = @notes,
-                                    run_as      = @runAs,
-                                    start_mode  = @startMode,
-                                    working_dir = @workingDirectory,
-                                    icon        = @icon,
-                                    thumbnail   = @thumbnail,
-                                    lua_script  = @luaScript,
-                                    hidden      = @isHidden,
-                                    confirmation_required = @isExecutionConfirmationRequired
-                                where id = excluded.id
+                                on conflict (id) do nothing
                                 returning id;
                                 """;
 
         var param = new
         {
-            Arguments = alias.Parameters,
-            Id = alias.Id == 0 ? null : (int?)alias.Id,
-            alias.FileName,
-            alias.Notes,
-            alias.RunAs,
-            alias.StartMode,
-            alias.WorkingDirectory,
-            alias.Icon,
-            alias.Thumbnail,
-            alias.LuaScript,
-            alias.IsHidden,
-            alias.IsExecutionConfirmationRequired
+            arguments = alias.Parameters,
+            id = alias.Id == 0 ? null : (int?)alias.Id,
+            fileName = alias.FileName ?? "",
+            notes = alias.Notes ?? "",
+            runAs = alias.RunAs,
+            startMode = alias.StartMode,
+            workingDirectory = alias.WorkingDirectory ?? "",
+            icon = alias.Icon ?? "",
+            thumbnail = alias.Thumbnail ?? "",
+            luaScript = alias.LuaScript ?? "",
+            isHidden = alias.IsHidden,
+            isExecutionConfirmationRequired = alias.IsExecutionConfirmationRequired
         };
 
         var id = tx.Connection!.ExecuteScalar<long>(sqlAlias, param);
@@ -354,12 +354,13 @@ public class AliasDbAction
         // Remove 
         const string sqlDelete = "delete from alias_name where id_alias = @id;";
         tx.Connection.Execute(sqlDelete, new { id });
+
         // Add the updated synonyms 
         var csv = alias.Synonyms.SplitCsv();
         const string sqlSynonyms = "insert into alias_name (id_alias, name) values (@id, @name)";
         foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
 
-        // Additionall parameters
+        // Additional parameters
         var additionalParameters = alias.AdditionalParameters;
         CreateAdditionalParameters(tx, id, additionalParameters);
 
@@ -386,12 +387,49 @@ public class AliasDbAction
         return new(result);
     }
 
+
+    /// <summary>
+    ///     Attempts to find the specified alias in the database. If found, updates the alias's ID and returns <c>true</c>.
+    ///     If not found, returns <c>false</c> and leaves the alias unchanged.
+    ///     The method performs a database query to find aliases matching the following criteria:
+    ///     - Same <c>file_name</c>
+    ///     - Alias is marked as hidden (<c>hidden = true</c>)
+    ///     If multiple aliases are found, the method will return <c>false</c>.
+    /// </summary>
+    /// <param name="tx">The database transaction to be used for querying.</param>
+    /// <param name="alias">The alias to search for. If found, its ID will be updated.</param>
+    /// <returns><c>true</c> if the alias was found and its ID was updated; otherwise, <c>false</c>.</returns>
+    internal bool TryFind(IDbTransaction tx, ref AliasQueryResult alias)
+    {
+        const string sql = """
+                           select
+                               Id 
+                           from
+                               alias 
+                           where
+                               file_name = @fileName
+                               and hidden = true
+                           order by
+                               exec_count desc
+                           """;
+        var foundAlias = tx.Connection!.Query<AliasQueryResult>(
+                               sql,
+                               new { fileName = alias.FileName }
+                           )
+                           .SingleOrDefault();
+
+        if (foundAlias is not null) alias.Id = foundAlias.Id;
+        return foundAlias is not null;
+    }
+
     internal IEnumerable<long> UpdateThumbnails(IDbTransaction tx, IEnumerable<AliasQueryResult> aliases)
     {
         const string sql = "update alias set thumbnail = @thumbnail where id = @id";
         var ids = new List<long>();
         foreach (var alias in aliases)
         {
+            if (alias.Id == 0) continue;
+
             tx.Connection!.Execute(sql, new { alias.Thumbnail, alias.Id });
             ids.Add(alias.Id);
         }

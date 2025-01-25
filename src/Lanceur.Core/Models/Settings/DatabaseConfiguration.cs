@@ -40,6 +40,8 @@ public class DatabaseConfiguration
     /// </summary>
     public bool ShowResult { get; set; }
 
+    public StoreSection Stores { get; set; } = StoreSection.Default;
+
     /// <summary>
     ///     Gets or sets the configuration settings related to the application's window.
     /// </summary>

@@ -77,6 +77,16 @@ public interface IAliasRepository
     AliasQueryResult GetByIdAndName(long id, string name);
 
     /// <summary>
+    ///     Retrieves the counters for items that are not aliases. Specifically, this includes aliases that are hidden but not
+    ///     deleted.
+    /// </summary>
+    /// <returns>
+    ///     A dictionary where the key is the file name of each special alias (hidden, non-deleted), and the value is its
+    ///     associated counter.
+    /// </returns>
+    Dictionary<string, int> GetHiddenCounters();
+
+    /// <summary>
     ///     Retrieves a collection of aliases that have been logically deleted.
     ///     Logical deletion means the aliases are marked as deleted in the system
     ///     but are not permanently removed from the database.
