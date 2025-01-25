@@ -1,5 +1,7 @@
 using System.Data;
 using System.Data.SQLite;
+using System.Web.Bookmarks;
+using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
@@ -39,7 +41,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>();
+        serviceCollection.AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>();
         serviceCollection.AddTransient<ISettingsFacade, SettingsFacadeService>();
         return serviceCollection;
     }
@@ -114,7 +116,8 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWildcardService, ReplacementComposite>()
                          .AddTransient<IClipboardService, WindowsClipboardService>()
                          .AddTransient<IReconciliationService, ReconciliationService>()
-                         .AddTransient<IWatchdogBuilder, WatchdogBuilder>();
+                         .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
+                         .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>();
 
         ConditionalExecution.Set(
             serviceCollection,

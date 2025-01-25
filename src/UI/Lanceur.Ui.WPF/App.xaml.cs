@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
@@ -13,6 +12,7 @@ using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Lanceur.Ui.WPF;
 
@@ -57,6 +57,7 @@ public partial class App
 
         logger.LogCritical(e.Exception, "Fatal error: {Message}", e.Exception.Message);
         notify.Error(e.Exception.Message);
+        Log.CloseAndFlush();
     }
 
     protected override void OnExit(ExitEventArgs e)

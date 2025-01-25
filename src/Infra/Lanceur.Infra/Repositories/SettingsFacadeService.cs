@@ -35,6 +35,8 @@ public class SettingsFacadeService : ISettingsFacade
     {
         _applicationConfigurationService.Save();
         _databaseConfigurationService.Save();
+        
+        Reload();
     }
 
     public void Reload()

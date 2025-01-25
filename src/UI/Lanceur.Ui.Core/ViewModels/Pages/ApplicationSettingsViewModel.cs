@@ -15,23 +15,25 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 {
     #region Fields
 
+    private readonly IAppRestartService _appRestartService;
+
+    [ObservableProperty] private string _bookmarkSourceBrowser;
     [ObservableProperty] private string _dbPath;
     [ObservableProperty] private bool _isAlt;
     [ObservableProperty] private bool _isCtrl;
     [ObservableProperty] private bool _isShift;
+    [ObservableProperty] private  bool _isTraceEnabled;
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
-    [ObservableProperty] private string _windowBackdropStyle;
     [ObservableProperty] private double _searchDelay;
+    [ObservableProperty] private ISettingsFacade _settings;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
+    [ObservableProperty] private bool _showResult;
+    private readonly IUserInteractionService _userInteraction;
 
     private readonly IUserNotificationService _userNotificationService;
-    private readonly IAppRestartService _appRestartService;
-    [ObservableProperty] private ISettingsFacade _settings;
-    private readonly IUserInteractionService _userInteraction;
-    [ObservableProperty] private bool _showResult;
-    [ObservableProperty] private  bool _isTraceEnabled;
+    [ObservableProperty] private string _windowBackdropStyle;
 
     #endregion
 
@@ -71,7 +73,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ShowResult = _settings.Application.ShowResult;
         ShowAtStartup = _settings.Application.ShowAtStartup;
         ShowLastQuery = _settings.Application.ShowLastQuery;
-        
+        BookmarkSourceBrowser = _settings.Application.Stores.BookmarkSourceBrowser;
+            
     }
 
     #endregion
@@ -86,6 +89,17 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (IsWin) result += (int)ModifierKeys.Windows;
         if (IsShift) result += (int)ModifierKeys.Shift;
         return result;
+    }
+
+    private void MapSettings()
+    {
+        Settings.Local.DbPath = DbPath;
+        Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
+        Settings.Application.SearchDelay = SearchDelay;
+        Settings.Application.ShowResult = ShowResult;
+        Settings.Application.ShowAtStartup = ShowAtStartup;
+        Settings.Application.ShowLastQuery = ShowLastQuery;
+        Settings.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
     }
 
     [RelayCommand]
@@ -107,18 +121,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (reboot)
         {
             const string msg = "Do you want to restart now to apply the new configuration?";
-            if(await _userInteraction.AskUserYesNoAsync(msg)) _appRestartService.Restart();
+            if (await _userInteraction.AskUserYesNoAsync(msg)) _appRestartService.Restart();
         }
-    }
-
-    private void MapSettings()
-    {
-        Settings.Local.DbPath = DbPath;
-        Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
-        Settings.Application.SearchDelay = SearchDelay;
-        Settings.Application.ShowResult = ShowResult;
-        Settings.Application.ShowAtStartup = ShowAtStartup;
-        Settings.Application.ShowLastQuery = ShowLastQuery;
     }
 
     #endregion

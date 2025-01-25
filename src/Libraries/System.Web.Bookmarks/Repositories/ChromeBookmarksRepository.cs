@@ -1,7 +1,9 @@
 using System.Text.Json.Nodes;
+using System.Web.Bookmarks.Domain;
+using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace System.Web.Bookmarks;
+namespace System.Web.Bookmarks.Repositories;
 
 public class ChromeBookmarksRepository : IBookmarkRepository
 {
@@ -10,7 +12,7 @@ public class ChromeBookmarksRepository : IBookmarkRepository
     private readonly IMemoryCache _memoryCache;
     private const string CacheKey = $"ChromeBookmarks_{nameof(ChromeBookmarksRepository)}";
 
-    private static readonly string Path = Environment.ExpandEnvironmentVariables(@"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Bookmarks");
+    private static readonly string Path = @"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Bookmarks".ExpandPath();
 
     #endregion
 
@@ -21,6 +23,13 @@ public class ChromeBookmarksRepository : IBookmarkRepository
         ArgumentNullException.ThrowIfNull(memoryCache);
         _memoryCache = memoryCache;
     }
+
+    #endregion
+
+    #region Properties
+
+    ///<inheritdoc />
+    public string ConfiguredBrowser => "Chrome";
 
     #endregion
 
@@ -48,7 +57,7 @@ public class ChromeBookmarksRepository : IBookmarkRepository
             var url = jsonObject["url"]?.ToString();
             var order = jsonObject["date_last_used"]?.ToString() ?? "0";
 
-            if (name is not null && url is not null) results.Add(new(name, url, order));
+            if (name is not null && url is not null) results.Add(new() { Name = name, Url = url, SortKey = order });
         }
     }
 
@@ -64,17 +73,16 @@ public class ChromeBookmarksRepository : IBookmarkRepository
 
                 var startNode = node?["roots"]?["bookmark_bar"];
                 if (startNode is not null) FetchAll(startNode, results);
-                return results.OrderByDescending(e => e.Order);
+                return results.OrderByDescending(e => e.SortKey);
             }
         )!;
     }
 
     public IEnumerable<Bookmark> GetBookmarks() => FetchAll();
 
-    public IEnumerable<Bookmark> GetBookmarks(string filter) => FetchAll()
-        .Where(
-            e => e.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-        );
+    public IEnumerable<Bookmark> GetBookmarks(string filter) => FetchAll().Where(e => e.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase));
+
+    public bool IsBookmarkSourceAvailable() => File.Exists(Path);
 
     #endregion
 }

@@ -54,6 +54,7 @@
                             FontTypography="Caption"
                             Foreground="{DynamicResource TextFillColorTerciarydBrush}"
                             Opacity="{StaticResource SecondaryTextOpacity}"
+                            Visibility="{Binding Count, Converter={StaticResource CounterToVisibilityConverter}}"
                             Text="{Binding Count, StringFormat=Count: {0}}" />
                     </DockPanel>
                 </StackPanel>

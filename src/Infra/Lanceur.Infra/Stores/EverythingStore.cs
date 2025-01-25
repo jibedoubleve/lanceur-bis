@@ -4,6 +4,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.SharedKernel.Mixins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -64,7 +65,11 @@ public class EverythingStore : IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query)
     {
-        if (query.Name != SearchAlias) return Array.Empty<QueryResult>();
+        
+        if (query.Parameters.IsNullOrWhiteSpace())
+        {
+            return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
+        }
 
         var result =  _everythingApi.Search(query.Parameters)
                                     .Select(
