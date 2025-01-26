@@ -1,5 +1,5 @@
-# When a pull request is merged (therefor a push), 
-# execute tests and release the packages in GitHub
+# When a pull request is merged (and thus a push occurs),
+# execute tests and release the packages on GitHub.
 name: Release
 on:
   push:
@@ -14,11 +14,33 @@ jobs:
       - name: Get the sources
         uses: actions/checkout@v1
 
-      - name: Install .NET SDK
+    ###################################################
+    ### Manually install frameworks 6, 8, and 9 to match
+    ### the default frameworks.
+    ### Additionally, install .NET 7 as required by 
+    ### GitReleaseManager.
+    ###################################################
+      - name: Install .NET 6 SDK
         uses: actions/setup-dotnet@v1
         with:
+          dotnet-version: '6.0.x'
+
+      - name: Install .NET 7 SDK
+        uses: actions/setup-dotnet@v1
+        with:          
           dotnet-version: '7.0.x'
-        
+
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v1
+        with:          
+          dotnet-version: '8.0.x'
+      
+      - name: Install .NET 9 SDK
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '9.0.x'          
+    ###################################################
+                  
       - name: Restore dotnet tools
         run: dotnet tool restore
         
