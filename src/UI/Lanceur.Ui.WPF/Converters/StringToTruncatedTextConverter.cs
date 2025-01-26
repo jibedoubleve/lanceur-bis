@@ -17,7 +17,12 @@ public class TextToTruncatedTextConverter : IValueConverter
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is string text) return text.Truncate(Length, "(...)");
+        var length = Length;
+        if (parameter is string integer && int.TryParse(integer, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
+        {
+            length = result;
+        }
+        if (value is string text) return text.Truncate(length, "(...)");
 
         return Binding.DoNothing;
     }
