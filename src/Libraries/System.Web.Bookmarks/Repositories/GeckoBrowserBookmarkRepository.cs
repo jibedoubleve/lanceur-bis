@@ -1,4 +1,5 @@
 using System.Data.SQLite;
+using System.Web.Bookmarks.Configuration;
 using System.Web.Bookmarks.Domain;
 using Dapper;
 using Lanceur.SharedKernel.Mixins;
@@ -7,14 +8,13 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Repositories;
 
-public abstract class SqlBookmarkRepository : IBookmarkRepository
+public class GeckoBrowserBookmarkRepository : IBookmarkRepository
 {
     #region Fields
 
     private  readonly string _bookmarksPath;
-
     private readonly string _cacheKey;
-    private readonly ILogger<SqlBookmarkRepository> _logger;
+    private readonly ILogger<GeckoBrowserBookmarkRepository> _logger;
 
     private readonly IMemoryCache _memoryCache;
 
@@ -22,21 +22,20 @@ public abstract class SqlBookmarkRepository : IBookmarkRepository
 
     #region Constructors
 
-    protected SqlBookmarkRepository(IMemoryCache memoryCache, ILoggerFactory loggerFactory, (string Database, string IniFilename) configuration, string cacheKeyPrefix)
+    public GeckoBrowserBookmarkRepository(IMemoryCache memoryCache, ILoggerFactory loggerFactory, IGeckoBrowserConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(memoryCache);
         ArgumentNullException.ThrowIfNull(configuration);
-        ArgumentNullException.ThrowIfNull(cacheKeyPrefix);
         ArgumentNullException.ThrowIfNull(loggerFactory);
 
 
-        _logger = loggerFactory.CreateLogger<SqlBookmarkRepository>();
+        _logger = loggerFactory.CreateLogger<GeckoBrowserBookmarkRepository>();
         var query = new IniFileLoader(loggerFactory).LoadQuery(configuration.IniFilename.ExpandPath());
         var path = query.GetDefaultProfile();
 
         _bookmarksPath = configuration.Database.Format(path).ExpandPath();
-        ConfiguredBrowser = cacheKeyPrefix;
-        _cacheKey = $"{cacheKeyPrefix}_{nameof(ChromeBookmarksRepository)}";
+        ConfiguredBrowser = configuration.CacheKey;
+        _cacheKey = $"{configuration.CacheKey}_{nameof(ChromeBookmarksRepository)}";
         _memoryCache = memoryCache;
     }
 
@@ -53,6 +52,8 @@ public abstract class SqlBookmarkRepository : IBookmarkRepository
 
     private IEnumerable<Bookmark> FetchAll()
     {
+        if (_bookmarksPath.IsNullOrWhiteSpace()) return [];
+        
         const string sql = """
                            select 
                            	b.title as name,

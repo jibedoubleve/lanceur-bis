@@ -30,6 +30,8 @@ public class IniFileLoader
 
     private IEnumerable<IniNode> Load(string filename)
     {
+        if(!File.Exists(filename))return [];
+        
         List<IniNode> nodes = new();
         var isSection = new Regex(IsSectionPattern);
         var currentSection = string.Empty;

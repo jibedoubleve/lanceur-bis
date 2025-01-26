@@ -64,14 +64,13 @@ public interface IAliasRepository
     /// </summary>
     /// <param name="id">The unique identifier of the <see cref="AliasQueryResult" />. It must be greater than zero.</param>
     /// <returns>
-    ///     An <see cref="AliasQueryResult" /> object that matches the specified <paramref name="id" /> and
-    ///     <paramref name="name" />.
+    ///     An <see cref="AliasQueryResult" /> object that matches the specified <paramref name="id" /> 
     ///     Returns null if no matching object is found.
     /// </returns>
     /// <exception cref="ArgumentException">
     ///     Thrown when the <paramref name="id" /> is less than or equal to zero.
     /// </exception>
-    AliasQueryResult GetByIdAndName(long id);
+    AliasQueryResult GetById(long id);
 
     /// <summary>
     ///     Retrieves the counters for items that are not aliases. Specifically, this includes aliases that are hidden but not

@@ -106,7 +106,7 @@ public partial class DataReconciliationViewModel : ObservableObject
                                         .Select(item => new AdditionalParameter { Name = item.Name, Parameter = item.Parameters })
                                         .ToList();
 
-        var alias = await Task.Run(() => _repository.GetByIdAndName(firstSelectedAlias!.Id));
+        var alias = await Task.Run(() => _repository.GetById(firstSelectedAlias!.Id));
         alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
         alias.AdditionalParameters(_repository.GetAdditionalParameter(selectedAliases.Select(e => e.Id).ToArray()));
 

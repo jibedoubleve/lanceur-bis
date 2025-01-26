@@ -137,7 +137,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public AliasQueryResult GetByIdAndName(long id) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
+    public AliasQueryResult GetById(long id) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
 
     /// <inheritdoc />
     public Dictionary<string, int> GetHiddenCounters() => Db.WithinTransaction(

@@ -17,4 +17,9 @@
       <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Repositories\ChromeBookmarkRepositorySource.cs" />
+      <Compile Remove="Domain\IBookmarkRepositorySource.cs" />
+    </ItemGroup>
+
 </Project>
