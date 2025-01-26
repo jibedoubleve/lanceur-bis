@@ -1,9 +1,10 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Ui.WPF.Views.Controls;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Ui.WPF.ReservedKeywords;
@@ -41,11 +42,13 @@ public class VersionAlias : SelfExecutableQueryResult
     {
         _userNotification.DisableLoadingState();
         var asm = Assembly.GetExecutingAssembly();
-        var semver = FileVersionInfo.GetVersionInfo(asm.Location).ProductVersion;
-        var semverSplit = semver?.Split(["+"], StringSplitOptions.RemoveEmptyEntries);
-        semver = semverSplit?.Length > 0 ? semverSplit[0] : semver;
+        var fullVer = FileVersionInfo.GetVersionInfo(asm.Location).ProductVersion;
+        var semverSplit = fullVer?.Split(["+"], StringSplitOptions.RemoveEmptyEntries);
+        
+        var ver = semverSplit?.Length > 0 ? semverSplit[0] : fullVer;
+        var commit = semverSplit?.Length > 0 ? semverSplit[1] : string.Empty;
 
-        await _userInteraction.ShowAsync($"Lanceur {semver}", "Written by Jean-Baptiste Wautier");
+        await _userInteraction.ShowAsync("Lanceur - Version", new VersionView(ver!, commit!));
 
         return await NoResultAsync;
     }
