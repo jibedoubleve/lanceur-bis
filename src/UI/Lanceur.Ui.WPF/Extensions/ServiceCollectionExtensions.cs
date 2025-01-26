@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<ISnackbarService, SnackbarService>()
                          .AddSingleton<IUserNotificationService, UserNotificationService>()
                          .AddSingleton<IViewFactory, ViewFactory>()
+                         .AddSingleton<IUserInteractionHub, UserInteractionHub>()
                          .AddSingleton(new AssemblySource
                          {
                              ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)), 

@@ -19,6 +19,7 @@ public partial class MainViewModel : ObservableObject
 
     private readonly bool _doesReturnAllIfEmpty;
     private readonly IExecutionService _executionService;
+    private readonly IUserInteractionHub _interactionHub;
     private readonly ILogger<MainViewModel> _logger;
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
@@ -26,8 +27,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private QueryResult? _selectedResult;
     private readonly ISettingsFacade _settingsFacade;
     [ObservableProperty] private string? _suggestion;
-    private readonly IUserNotificationService _userNotificationService;
-    private readonly IUserInteractionService _userUserInteractionService;
     private readonly IWatchdog _watchdog;
     [ObservableProperty] private string _windowBackdropStyle;
 
@@ -41,8 +40,7 @@ public partial class MainViewModel : ObservableObject
         ISearchService searchService,
         ISettingsFacade settingsFacade,
         IExecutionService executionService,
-        IUserInteractionService userUserInteractionService,
-        IUserNotificationService userNotificationService,
+        IUserInteractionHub interactionHub,
         IWatchdogBuilder watchdogBuilder
     )
     {
@@ -51,12 +49,12 @@ public partial class MainViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(settingsFacade);
         ArgumentNullException.ThrowIfNull(executionService);
         ArgumentNullException.ThrowIfNull(watchdogBuilder);
+        ArgumentNullException.ThrowIfNull(interactionHub);
 
         _logger = logger;
         _searchService = searchService;
         _executionService = executionService;
-        _userUserInteractionService = userUserInteractionService;
-        _userNotificationService = userNotificationService;
+        _interactionHub = interactionHub;
 
         //Settings
         _settingsFacade = settingsFacade;
@@ -93,22 +91,30 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task OnExecute(bool runAsAdmin)
     {
-        using var _  = _userNotificationService.TrackLoadingState();
-        if (SelectedResult is null) return;
-
-        if (SelectedResult.IsExecutionConfirmationRequired)
+        try
         {
-            var result = await _userUserInteractionService.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
-            if (!result) return;
+            using var _  = _interactionHub.Notifications.TrackLoadingState();
+            if (SelectedResult is null) return;
+
+            if (SelectedResult.IsExecutionConfirmationRequired)
+            {
+                var result = await _interactionHub.Interactions.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
+                if (!result) return;
+            }
+
+            _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
+            var response = await _executionService.ExecuteAsync(
+                new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
+            );
+
+            WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
+            if (response.HasResult) Results = new(response.Results);
         }
-
-        _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
-        var response = await _executionService.ExecuteAsync(
-            new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
-        );
-
-        WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
-        if (response.HasResult) Results = new(response.Results);
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occured while performing alias execution");
+            _interactionHub.GlobalNotifications.Error($"An error occured while performing alias execution.{Environment.NewLine}Alias name '{SelectedResult?.Name ?? "<NULL>"}'");
+        }
     }
 
     [RelayCommand]
@@ -136,22 +142,11 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand] private async Task OnSearch() => await _watchdog.Pulse();
 
-    private async Task SearchAsync()
-    {
-        var criterion = Cmdline.BuildFromText(Query);
-
-        if (criterion.IsNullOrEmpty()) Results.Clear();
-        var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
-        Results = new(results);
-
-        SelectedResult = Results.FirstOrDefault()!;
-        Suggestion = GetSuggestion(criterion.Name, SelectedResult);
-
-        _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
-    }
-
+    /// <summary>
+    /// Handles the "Tab" key press event, typically used to expand an unfinished query.
+    /// </summary>
     [RelayCommand]
-    private void SetQuery()
+    private void OnCompleteQuery()
     {
         if (SelectedResult is null) return;
 
@@ -160,15 +155,49 @@ public partial class MainViewModel : ObservableObject
         WeakReferenceMessenger.Default.Send<SetQueryMessage>(new(cmd));
     }
 
+    private async Task SearchAsync()
+    {
+        try
+        {
+            var criterion = Cmdline.BuildFromText(Query);
+
+            if (criterion.IsNullOrEmpty()) Results.Clear();
+            var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
+            Results = new(results);
+
+            SelectedResult = Results.FirstOrDefault()!;
+            Suggestion = GetSuggestion(criterion.Name, SelectedResult);
+
+            _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occured while performing search");
+            _interactionHub.GlobalNotifications.Error("An error occured while performing search.");
+        }
+    }
+
+    /// <summary>
+    /// Displays search results based on application settings. If allowed, the method will query 
+    /// the database for results when the search box is shown. It checks if all aliases should be 
+    /// displayed immediately or if results should wait until the user starts typing a query.
+    /// </summary>
     public async Task DisplayResultsIfAllowed()
     {
-        if (_settingsFacade.Application.ShowResult)
+        try
         {
-            var results = await Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true));
-            Results = new(results);
+            if (_settingsFacade.Application.ShowResult)
+            {
+                var results = await Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true));
+                Results = new(results);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occured while performing search.");
+            _interactionHub.GlobalNotifications.Error("An error occured while performing search.");
         }
 
-        _logger.LogTrace("When showing search, display all results: {ShowAtStartup}", _settingsFacade.Application.ShowAtStartup);
     }
 
     public void RefreshSettings()

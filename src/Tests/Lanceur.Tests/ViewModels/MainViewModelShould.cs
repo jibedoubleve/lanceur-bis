@@ -57,6 +57,7 @@ public class MainViewModelShould : TestBase
                                                        .AddMockSingleton<IThumbnailService>()
                                                        .AddMockSingleton<IUserInteractionService>()
                                                        .AddMockSingleton<IUserNotificationService>()
+                                                       .AddMockSingleton<IUserInteractionHub>()
                                                        .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                                                        .AddSingleton<IMemoryCache, MemoryCache>()
                                                        .AddMockSingleton<IExecutionService>(

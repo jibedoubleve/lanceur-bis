@@ -80,7 +80,7 @@
                                 Command="{Binding ExecuteCommand}"
                                 CommandParameter="{StaticResource True}"
                                 Modifiers="Control" />
-                            <KeyBinding Key="Tab" Command="{Binding SetQueryCommand}" />
+                            <KeyBinding Key="Tab" Command="{Binding CompleteQueryCommand}" />
                         </TextBox.InputBindings>
                         <interactivity:Interaction.Triggers>
                             <interactivity:EventTrigger EventName="TextChanged">
