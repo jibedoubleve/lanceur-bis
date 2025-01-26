@@ -137,7 +137,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public AliasQueryResult GetByIdAndName(long id, string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetByIdAndName(tx, id, name));
+    public AliasQueryResult GetByIdAndName(long id) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
 
     /// <inheritdoc />
     public Dictionary<string, int> GetHiddenCounters() => Db.WithinTransaction(
@@ -201,9 +201,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         var r = _converter.ToSelectableQueryResult(results);
         return r;
     }
-
-    /// <inheritdoc />
-    public AliasQueryResult GetExact(string name) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetExact(tx, name));
 
     /// <inheritdoc />
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)

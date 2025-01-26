@@ -76,6 +76,7 @@ public class AliasDbAction
     private void CreateAdditionalParameters(IDbTransaction tx, long idAlias, IEnumerable<AdditionalParameter> parameters)
     {
         using var _ = _logger.BeginSingleScope("Parameters", parameters);
+        parameters = parameters.ToList();
         const string sql1 = "delete from alias_argument where id_alias = @idAlias";
         const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
 
@@ -83,7 +84,11 @@ public class AliasDbAction
         var deletedRowsCount = tx.Connection!.Execute(sql1, new { idAlias });
 
         // Create alias additional parameters
-        var addedRowsCount = tx.Connection.Execute(sql2, parameters.ToEntity(idAlias));
+        var entities = parameters.ToEntity(idAlias).ToList();
+        var addedRowsCount = entities.Sum(
+            entity =>
+                tx.Connection.Execute(sql2, new { idAlias = entity.Id, parameter = entity.Parameter, name = entity.Name })
+        );
 
         if (deletedRowsCount > 0 && addedRowsCount == 0) _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);
     }
@@ -96,7 +101,7 @@ public class AliasDbAction
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
 
-    internal AliasQueryResult GetByIdAndName(IDbTransaction tx, long id, string name)
+    internal AliasQueryResult GetById(IDbTransaction tx, long id)
     {
         if (id <= 0) throw new ArgumentException("The id of the alias should be greater than zero.");
 
@@ -120,67 +125,20 @@ public class AliasDbAction
                             from
                                 alias a
                                 left join alias_name n on a.id = n.id_alias
-                                inner join data_alias_synonyms_v s on s.id_alias = a.id
+                                left join data_alias_synonyms_v s on s.id_alias = a.id
                             where
-                                n.Name = @name
-                                and a.Id = @id
+                                a.Id = @id
                             order by
                                 a.exec_count desc,
                                 n.name
+                            limit 1;
                             """;
 
-        return tx.Connection!
-                 .Query<AliasQueryResult>(sql, new { id, name })
-                 .SingleOrDefault();
-    }
+        var result = tx.Connection!
+                       .Query<AliasQueryResult>(sql, new { id })
+                       .SingleOrDefault();
 
-    /// <summary>
-    ///     Get the first alias with the exact name.
-    /// </summary>
-    /// <param name="tx">Transaction to use for the query</param>
-    /// <param name="name">The alias' exact name to find.</param>
-    /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
-    /// <returns>The exact match or <c>null</c> if not found.</returns>
-    /// <remarks>
-    ///     For optimisation reason, there's no check of doubloons. Bear UI validates and
-    ///     forbid to insert two aliases with same name.
-    /// </remarks>
-    [Obsolete("This method is no longer used and should be replaced with 'TryFind' for better functionality.")]
-    internal AliasQueryResult GetExact(IDbTransaction tx, string name, bool includeHidden = false)
-    {
-        const string sql = $"""
-                            select
-                                n.Name                  as {nameof(AliasQueryResult.Name)},
-                                s.synonyms              as {nameof(AliasQueryResult.Synonyms)},
-                                a.Id                    as {nameof(AliasQueryResult.Id)},
-                                a.arguments             as {nameof(AliasQueryResult.Parameters)},
-                                a.file_name             as {nameof(AliasQueryResult.FileName)},
-                                a.notes                 as {nameof(AliasQueryResult.Notes)},
-                                a.run_as                as {nameof(AliasQueryResult.RunAs)},
-                                a.start_mode            as {nameof(AliasQueryResult.StartMode)},
-                                a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
-                                a.icon                  as {nameof(AliasQueryResult.Icon)},
-                                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
-                                a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
-                                a.exec_count            as {nameof(AliasQueryResult.Count)},
-                                a.hidden                as {nameof(AliasQueryResult.IsHidden)},
-                                a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
-                            from
-                                alias a
-                                left join alias_name n on a.id = n.id_alias
-                                inner join data_alias_synonyms_v s on s.id_alias = a.id
-                            where
-                                n.Name = @name
-                                and hidden in @hidden
-                            order by
-                                a.exec_count desc,
-                                n.name
-                            """;
-
-        var hidden = includeHidden ? [0, 1] : 0.ToEnumerable();
-        var arguments = new { name, hidden };
-
-        return tx.Connection!.Query<AliasQueryResult>(sql, arguments).FirstOrDefault();
+        return result;
     }
 
     /// <summary>
@@ -296,11 +254,10 @@ public class AliasDbAction
                                     working_dir = @workingDirectory,
                                     icon        = @icon,
                                     thumbnail   = @thumbnail,
-                                    lua_script  = '@luaScript',
+                                    lua_script  = @luaScript,
                                     hidden      = @isHidden,
                                     confirmation_required = @isExecutionConfirmationRequired
-                                where id = @id
-                                returning id;
+                                where id = @id;
 
                                 insert into alias (
                                     id,
@@ -312,7 +269,7 @@ public class AliasDbAction
                                     working_dir,
                                     icon,
                                     thumbnail,
-                                    'lua_script',
+                                    lua_script,
                                     hidden,
                                     confirmation_required
                                 ) values (
@@ -351,6 +308,11 @@ public class AliasDbAction
 
         var id = tx.Connection!.ExecuteScalar<long>(sqlAlias, param);
 
+        // If the 'id' is 0 (indicating that an UPDATE was performed instead of an INSERT),
+        // reassign the 'id'. This ensures the correct ID is used for subsequent operations.
+        id = id == 0 ? alias.Id : id;
+        alias.Id = id;
+
         // Remove 
         const string sqlDelete = "delete from alias_name where id_alias = @id;";
         tx.Connection.Execute(sqlDelete, new { id });
@@ -364,12 +326,10 @@ public class AliasDbAction
         var additionalParameters = alias.AdditionalParameters;
         CreateAdditionalParameters(tx, id, additionalParameters);
 
-        alias.Id = id;
-
         // Return either the id of the created Alias or
         // return the id of the just updated alias (which
         // should be the same as the one specified as arg)
-        return id;
+        return alias.Id;
     }
 
     internal ExistingNameResponse SelectNames(IDbTransaction tx, string[] names)

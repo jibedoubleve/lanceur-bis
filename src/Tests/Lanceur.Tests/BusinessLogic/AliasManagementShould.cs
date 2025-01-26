@@ -1,5 +1,4 @@
-﻿
-using System.Data;
+﻿using System.Data;
 using Bogus;
 using Dapper;
 using FluentAssertions;
@@ -36,7 +35,7 @@ public class AliasManagementShould : TestBase
         name ??= faker.Lorem.Word();
         return new()
         {
-            Name = name, 
+            Name = name,
             Synonyms = name,
             Parameters = string.Empty,
             FileName = faker.System.FileName(),
@@ -89,7 +88,7 @@ public class AliasManagementShould : TestBase
                            insert into alias_name(id, name, id_alias) values (200, 'some_name_1', 1002);
                            insert into alias_name(id, name, id_alias) values (300, 'some_name_2', 1003);
                            """;
-        
+
         var connectionString = ConnectionStringFactory.InMemory;
         var connection = BuildFreshDb(sql, connectionString.ToString());
         var c = new DbSingleConnectionManager(connection);
@@ -98,7 +97,7 @@ public class AliasManagementShould : TestBase
 
         AliasQueryResult alias;
         // ACT
-        
+
         // Find the alias
         alias = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
         using (new AssertionScope())
@@ -106,13 +105,13 @@ public class AliasManagementShould : TestBase
             alias.Id.Should().Be(1001, "this is the id of the alias to find");
             alias.Should().NotBeNull("the search matches one alias");
         }
-        
+
         // Add new names to the alias and save it
         alias.Synonyms += ", noname_4, noname_5";
         var id = alias.Id;
         var outputId = c.WithinTransaction(tx => aliasAction.SaveOrUpdate(tx, ref alias));
         outputId.Should().Be(id, "the alias has only be updated");
-        
+
         // Retrieve back the alias and check the names
         var found = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
         using (new AssertionScope())
@@ -126,7 +125,7 @@ public class AliasManagementShould : TestBase
     public void CreateAlias()
     {
         // ARRANGE
-        const string sql = $"""
+        const string sql = """
                            insert into alias(id) values (1001);
                            insert into alias(id) values (1002);
                            insert into alias(id) values (1003);
@@ -175,15 +174,15 @@ public class AliasManagementShould : TestBase
     {
         // ARRANGE
         var aliasName = Guid.NewGuid().ToString();
-
-        var connection = BuildFreshDb();
+        var cs = ConnectionStringFactory.InMemory.ToString();
+        var connection = BuildFreshDb(connectionString: cs);
         var action = BuildAliasDbAction();
-        var c = new DbSingleConnectionManager(connection);
+        var db = new DbSingleConnectionManager(connection);
         QueryResult alias1 = new AliasQueryResult { Name = aliasName };
-        c.WithinTransaction(tx => action.CreateInvisible(tx, ref alias1));
+        db.WithinTransaction(tx => action.CreateInvisible(tx, ref alias1));
 
         // ACT
-        var sut = c.WithinTransaction(tx => action.GetExact(tx, aliasName, true));
+        var sut = db.WithinTransaction(tx => action.GetById(tx, alias1.Id));
 
         //ASSERT
         sut.Should().NotBeNull();
@@ -249,7 +248,7 @@ public class AliasManagementShould : TestBase
         // ACT
         service.SaveOrUpdate(ref alias1);
 
-        var sut = service.GetExact(aliasName);
+        var sut = service.GetByIdAndName(alias1.Id);
 
         //ASSERT
         sut.Should().NotBeNull();
@@ -290,7 +289,7 @@ public class AliasManagementShould : TestBase
     }
 
     [Fact]
-    public void FindExact()
+    public void BeAbleToFindById()
     {
         // ARRANGE
         const string sql = """
@@ -305,7 +304,7 @@ public class AliasManagementShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        var found = c.WithinTransaction(tx => action.GetExact(tx, "noname"));
+        var found = c.WithinTransaction(tx => action.GetById(tx, 100));
 
         // ASSERT
         using (new AssertionScope())
@@ -316,7 +315,7 @@ public class AliasManagementShould : TestBase
     }
 
     [Fact]
-    public void FindNoExact()
+    public void BeAbleToNotFindById()
     {
         // ARRANGE
         const string sql = """
@@ -331,7 +330,7 @@ public class AliasManagementShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        var found = c.WithinTransaction(tx => action.GetExact(tx, "nothing"));
+        var found = c.WithinTransaction(tx => action.GetById(tx, 1000));
 
         // ASSERT
         using (new AssertionScope()) { found.Should().BeNull(); }
