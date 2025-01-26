@@ -61,11 +61,8 @@ public interface IAliasRepository
 
     /// <summary>
     ///     Retrieves an <see cref="AliasQueryResult" /> object based on its unique identifier.
-    ///     The <paramref name="name" /> is used to filter the results, ensuring that only one result is returned for the given
-    ///     <paramref name="id" />.
     /// </summary>
     /// <param name="id">The unique identifier of the <see cref="AliasQueryResult" />. It must be greater than zero.</param>
-    /// <param name="name">The name used to filter the results corresponding to the specified <paramref name="id" />.</param>
     /// <returns>
     ///     An <see cref="AliasQueryResult" /> object that matches the specified <paramref name="id" /> and
     ///     <paramref name="name" />.
@@ -74,7 +71,7 @@ public interface IAliasRepository
     /// <exception cref="ArgumentException">
     ///     Thrown when the <paramref name="id" /> is less than or equal to zero.
     /// </exception>
-    AliasQueryResult GetByIdAndName(long id, string name);
+    AliasQueryResult GetByIdAndName(long id);
 
     /// <summary>
     ///     Retrieves the counters for items that are not aliases. Specifically, this includes aliases that are hidden but not
@@ -101,13 +98,6 @@ public interface IAliasRepository
     /// </summary>
     /// <returns>The list of doubloons</returns>
     IEnumerable<SelectableAliasQueryResult> GetDoubloons();
-
-    /// <summary>
-    ///     Get the alias with the exact name.
-    /// </summary>
-    /// <param name="name">The name of the alias to find</param>
-    /// <returns>The alias to find or null if do not exist</returns>
-    AliasQueryResult GetExact(string name);
 
     /// <summary>
     ///     Checks which aliases from the provided list exist in the database.
