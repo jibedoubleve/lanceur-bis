@@ -248,7 +248,7 @@ public class AliasManagementShould : TestBase
         // ACT
         service.SaveOrUpdate(ref alias1);
 
-        var sut = service.GetByIdAndName(alias1.Id);
+        var sut = service.GetById(alias1.Id);
 
         //ASSERT
         sut.Should().NotBeNull();

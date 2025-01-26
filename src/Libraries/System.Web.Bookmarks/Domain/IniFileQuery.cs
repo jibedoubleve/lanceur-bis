@@ -33,6 +33,8 @@ public class IniFileQuery
     /// </returns>
     public string GetDefaultProfile()
     {
+        if (!_nodes.Any()) return string.Empty;
+        
         var section = _nodes.Where(n => n.Section.StartsWith("Install"))
                             .Select(s => s.Section)
                             .FirstOrDefault();

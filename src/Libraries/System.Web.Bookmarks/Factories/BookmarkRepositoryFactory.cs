@@ -1,3 +1,4 @@
+using System.Web.Bookmarks.Configuration;
 using System.Web.Bookmarks.Domain;
 using System.Web.Bookmarks.Repositories;
 using Microsoft.Extensions.Caching.Memory;
@@ -27,21 +28,14 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
 
     #region Methods
 
-    private IBookmarkRepository CreateBookmarkRepository(IBookmarkRepository repository)
-    {
-        if (!repository.IsBookmarkSourceAvailable()) throw new NotSupportedException($"Bookmark source is not available for {repository.ConfiguredBrowser}");
-
-        return repository;
-    }
-
     ///<inheritdoc />
     public IBookmarkRepository CreateBookmarkRepository(Browser browser)
     {
         return browser switch
         {
-            Browser.Chrome  => CreateBookmarkRepository(new ChromeBookmarksRepository(_memoryCache)),
-            Browser.Firefox => CreateBookmarkRepository(new FireFoxBookmarkRepository(_memoryCache, _loggerFactory)),
-            Browser.Zen     => CreateBookmarkRepository(new ZenSqlBookmarkRepository(_memoryCache, _loggerFactory)),
+            Browser.Chrome  => new ChromeBookmarksRepository(_memoryCache),
+            Browser.Firefox => new GeckoBrowserBookmarkRepository(_memoryCache, _loggerFactory, BrowserConfiguration.Firefox),
+            Browser.Zen     => new GeckoBrowserBookmarkRepository(_memoryCache, _loggerFactory, BrowserConfiguration.Zen),
             _               => throw new ArgumentOutOfRangeException(nameof(browser), browser, null)
         };
     }

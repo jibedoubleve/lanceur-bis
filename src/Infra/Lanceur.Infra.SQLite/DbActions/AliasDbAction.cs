@@ -75,8 +75,8 @@ public class AliasDbAction
 
     private void CreateAdditionalParameters(IDbTransaction tx, long idAlias, IEnumerable<AdditionalParameter> parameters)
     {
-        using var _ = _logger.BeginSingleScope("Parameters", parameters);
         parameters = parameters.ToList();
+        using var _ = _logger.BeginSingleScope("Parameters", parameters);
         const string sql1 = "delete from alias_argument where id_alias = @idAlias";
         const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
 
