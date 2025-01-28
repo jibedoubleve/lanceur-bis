@@ -260,6 +260,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             Per.Day       => action.PerDay(),
             Per.DayOfWeek => action.PerDayOfWeek(),
             Per.Month     => action.PerMonth(),
+            Per.Year      => action.PerYear(),
             _             => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
         };
     }

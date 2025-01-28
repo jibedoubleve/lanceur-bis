@@ -38,6 +38,7 @@ public partial class AnalyticsViewModel : ObservableObject
     private PlotContext? LastPlotContext { get; set; }
 
     public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshDailyPlot { get; set; }
+    public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshYearlyPlot { get; set; }
     public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshMonthlyPlot { get; set; }
     public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshUsageByDayOfWeekPlot { get; set; }
     public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshUsageByHourPlot { get; set; }
@@ -78,6 +79,21 @@ public partial class AnalyticsViewModel : ObservableObject
         IsMonthlyVisible = points.Any();
         if (IsMonthlyVisible)
             RedrawPlot(OnRefreshMonthlyPlot, points, PlotType.MonthlyHistory);
+        else // To be here means there's nothing to show, fallback is daily history...
+            await OnRefreshDailyHistory();
+    }
+    
+    [RelayCommand]
+    private async Task OnRefreshYearlyHistory()
+    {
+        IsYearVisible = false;
+        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Year));
+        points = points.ToList();
+        Cache(points);
+
+        IsMonthlyVisible = points.Any();
+        if (IsMonthlyVisible)
+            RedrawPlot(OnRefreshYearlyPlot, points, PlotType.YearlyHistory);
         else // To be here means there's nothing to show, fallback is daily history...
             await OnRefreshDailyHistory();
     }

@@ -1,6 +1,6 @@
 /*
  * Helper view to list all the hours in the day.
- * This view is used amongnst other in 
+ * This view is used among other in 
  * 'stat_usage_per_hour_in_day_v'
  */
 drop view if exists helper_hour_in_day;
