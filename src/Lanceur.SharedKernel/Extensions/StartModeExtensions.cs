@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using static Lanceur.SharedKernel.Constants;
 
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
-public static class StartModeMixin
+public static class StartModeExtensions
 {
     #region Methods
 

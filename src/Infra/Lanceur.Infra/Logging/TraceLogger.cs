@@ -1,4 +1,4 @@
-﻿using Lanceur.SharedKernel.Mixins;
+﻿using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 

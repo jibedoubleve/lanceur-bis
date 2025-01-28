@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
-public static class CollectionMixin
+public static class CollectionExtensions
 {
     #region Methods
 

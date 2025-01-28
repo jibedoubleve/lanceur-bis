@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.LuaScripting;
 using NLua;
 using System.Text;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.LuaScripting;
 

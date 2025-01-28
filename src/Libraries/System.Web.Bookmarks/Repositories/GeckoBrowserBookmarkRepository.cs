@@ -2,7 +2,7 @@ using System.Data.SQLite;
 using System.Web.Bookmarks.Configuration;
 using System.Web.Bookmarks.Domain;
 using Dapper;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 

@@ -1,6 +1,6 @@
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
-public static class ListMixin
+public static class ListExtensions
 {
     /// <summary>
     /// Removes multiple specified items from the provided list.

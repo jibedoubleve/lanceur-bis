@@ -2,7 +2,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Lanceur.Ui.WPF.Services;
@@ -49,7 +49,7 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
 
         static Icon()
         {
-            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+            var path = Assembly.GetExecutingAssembly().Location.GetDirectoryName()!;
             Info = Path.Combine(path, @"Assets\IconInfo.png");
             Warn = Path.Combine(path, @"Assets\IconWarn.png");
             Error = Path.Combine(path, @"Assets\IconError.png");

@@ -1,6 +1,6 @@
-namespace Lanceur.SharedKernel.Mixins
+namespace Lanceur.SharedKernel.Extensions
 {
-    public static class LogicalArithmeticMixins
+    public static class LogicalArithmeticExtensions
     {
         #region Methods
 

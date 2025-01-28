@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Utils;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
@@ -28,7 +28,7 @@ public class ConnectionString : BaseConnectionString, IConnectionString
 
         _logger = logger;
         var s = applicationConfiguration!.Current;
-        _dbPath = Environment.ExpandEnvironmentVariables(s.DbPath);
+        _dbPath = s.DbPath.ExpandPath();
     }
 
     #endregion Constructors
@@ -38,7 +38,7 @@ public class ConnectionString : BaseConnectionString, IConnectionString
     public override string ToString()
     {
         if (!File.Exists(_dbPath)) _logger.LogWarning("The path {DbPath} doesn't exist. A new database should be created!", _dbPath);
-        var path = Environment.ExpandEnvironmentVariables(_dbPath);
+        var path = _dbPath.ExpandPath();
         return CSTRING_PATTERN.Format(path);
     }
 

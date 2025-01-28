@@ -6,7 +6,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.Repositories;

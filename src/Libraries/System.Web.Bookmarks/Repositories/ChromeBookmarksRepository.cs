@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 using System.Web.Bookmarks.Domain;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace System.Web.Bookmarks.Repositories;

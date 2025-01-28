@@ -1,4 +1,4 @@
-﻿using Lanceur.SharedKernel.Mixins;
+﻿using Lanceur.SharedKernel.Extensions;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Tooling.Logging;

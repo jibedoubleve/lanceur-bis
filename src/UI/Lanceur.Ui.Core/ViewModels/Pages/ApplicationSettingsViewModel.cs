@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Services;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Serilog.Core;
 using Serilog.Events;
 using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;

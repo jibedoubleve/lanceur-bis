@@ -1,8 +1,8 @@
 using System.Text.Json;
 
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
-public static class CloningMixin
+public static class CloningExtensions
 {
     #region Methods
 

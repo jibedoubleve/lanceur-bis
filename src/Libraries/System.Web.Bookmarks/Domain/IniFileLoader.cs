@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Domain;

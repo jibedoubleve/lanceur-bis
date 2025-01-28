@@ -4,7 +4,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Lanceur.Infra.Win32.Images;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails;

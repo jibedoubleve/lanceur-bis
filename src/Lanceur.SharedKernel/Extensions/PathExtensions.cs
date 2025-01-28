@@ -1,6 +1,6 @@
-﻿namespace Lanceur.SharedKernel.Mixins;
+﻿namespace Lanceur.SharedKernel.Extensions;
 
-public static class PathMixin
+public static class PathExtensions
 {
     #region Methods
 
@@ -8,5 +8,5 @@ public static class PathMixin
 
     public static string GetDirectoryName(this string path) => Path.GetDirectoryName(path);
 
-    #endregion Methods
+    #endregion
 }

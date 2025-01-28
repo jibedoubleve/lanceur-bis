@@ -1,4 +1,4 @@
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.Constants;
 

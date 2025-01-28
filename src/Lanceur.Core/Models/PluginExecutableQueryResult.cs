@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Plugins;
 using Lanceur.Core.Plugins.Models;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Core.Models;

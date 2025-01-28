@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
 
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
-public static class SQLiteStringMixin
+public static class SQLiteStringExtensions
 {
     #region Methods
 

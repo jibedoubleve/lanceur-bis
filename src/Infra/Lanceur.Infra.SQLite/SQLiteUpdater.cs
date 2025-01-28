@@ -2,7 +2,7 @@
 using System.Reflection;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite;
@@ -41,7 +41,7 @@ public class SQLiteUpdater
 
     private static void CreateDirectory(string dbPath)
     {
-        var dir = Path.GetDirectoryName(dbPath);
+        var dir = dbPath.GetDirectoryName();
         if (dir is null)
             throw new DirectoryNotFoundException(
                 $"Failed to create the directory because the provided path is invalid or null. Path: [{dbPath}]"

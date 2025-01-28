@@ -1,6 +1,6 @@
-﻿namespace Lanceur.SharedKernel.Mixins;
+﻿namespace Lanceur.SharedKernel.Extensions;
 
-public static class IndexNavigatorMixin
+public static class IndexNavigatorExtensions
 {
     #region Methods
 

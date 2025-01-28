@@ -6,7 +6,7 @@ using Lanceur.Core.Stores;
 using System.ComponentModel;
 using System.Reflection;
 using Lanceur.Core.Managers;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

@@ -2,7 +2,7 @@
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using System.Reflection;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;

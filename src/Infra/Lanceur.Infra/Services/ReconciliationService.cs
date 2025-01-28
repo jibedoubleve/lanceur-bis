@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.Services;
 

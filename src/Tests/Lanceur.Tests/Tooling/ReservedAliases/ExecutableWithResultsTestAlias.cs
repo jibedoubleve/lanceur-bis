@@ -1,5 +1,5 @@
 ﻿using Lanceur.Core.Models;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Tests.Tooling.ReservedAliases;
 

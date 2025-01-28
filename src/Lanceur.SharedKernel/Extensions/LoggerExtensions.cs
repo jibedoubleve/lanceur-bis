@@ -2,9 +2,9 @@ using System.Runtime.CompilerServices;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
-public static class LoggerMixin
+public static class LoggerExtensions
 {
     #region Methods
 

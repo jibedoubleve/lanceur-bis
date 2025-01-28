@@ -2,7 +2,7 @@
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.SQLite.DataAccess;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite.Repositories;
