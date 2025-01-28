@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Tooling;
 
-public static class TestOutputHelperMixin
+public static class TestOutputHelperExtensions
 {
     public static void WriteJson(this ITestOutputHelper output, string message, object toDump)
     {

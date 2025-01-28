@@ -3,7 +3,7 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Core.BusinessLogic;
 
-public static class AliasQueryResultMixin
+public static class AliasQueryResultExtensions
 {
     #region Methods
 

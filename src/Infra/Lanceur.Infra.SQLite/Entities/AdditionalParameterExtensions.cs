@@ -3,7 +3,7 @@ using AdditionalParameter = Lanceur.Core.Models.AdditionalParameter;
 
 namespace Lanceur.Infra.Sqlite.Entities;
 
-public static class AdditionalParameterMixin
+public static class AdditionalParameterExtensions
 {
     #region Methods
 

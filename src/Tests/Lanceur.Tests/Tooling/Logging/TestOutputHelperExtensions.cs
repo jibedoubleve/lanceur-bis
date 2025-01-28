@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Tooling.Logging;
 
-public static class TestOutputHelperMixin
+public static class TestOutputHelperExtensions
 {
     #region Fields
 

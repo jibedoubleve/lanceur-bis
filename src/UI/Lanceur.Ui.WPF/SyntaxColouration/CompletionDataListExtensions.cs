@@ -2,7 +2,7 @@ using ICSharpCode.AvalonEdit.CodeCompletion;
 
 namespace Lanceur.Ui.WPF.SyntaxColouration;
 
-public static class CompletionDataListMixin
+public static class CompletionDataListExtensions
 {
     #region Fields
 
@@ -14,7 +14,7 @@ public static class CompletionDataListMixin
 
     #region Constructors
 
-    static CompletionDataListMixin()
+    static CompletionDataListExtensions()
     {
         ContextCompletion = new() { new("FileName", "Path to the file to execute or the URL"), new("Parameters", "The parameters of the command to execute") };
 

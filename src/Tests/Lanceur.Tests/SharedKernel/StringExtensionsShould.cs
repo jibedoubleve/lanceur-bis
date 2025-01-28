@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
-public class StringMixinShould
+public class StringExtensionsShould
 {
     #region Enums
 
