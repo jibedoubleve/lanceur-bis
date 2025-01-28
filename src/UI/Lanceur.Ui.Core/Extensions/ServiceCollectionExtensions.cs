@@ -81,7 +81,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IServiceProvider>(x => x)
+        serviceCollection.AddMemoryCache()
+                         .AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(
                              sp => new(
                                  sp.GetService<IDataStoreVersionService>(),
