@@ -1,6 +1,6 @@
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
-public static class UriMixin
+public static class UriExtensions
 {
     #region Methods
 

@@ -3,7 +3,7 @@ using Lanceur.Infra.Constants;
 using Lanceur.SharedKernel.Web;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Lanceur.Infra.Managers;

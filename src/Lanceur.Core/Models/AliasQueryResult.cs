@@ -1,4 +1,4 @@
-﻿using Lanceur.SharedKernel.Mixins;
+﻿using Lanceur.SharedKernel.Extensions;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using static Lanceur.SharedKernel.Constants;

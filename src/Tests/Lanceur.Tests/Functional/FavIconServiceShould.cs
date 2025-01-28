@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Managers;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Web;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

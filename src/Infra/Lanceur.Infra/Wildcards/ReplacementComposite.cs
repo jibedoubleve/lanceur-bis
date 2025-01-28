@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.Wildcards;
 

@@ -3,7 +3,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Lanceur.Infra.Win32.PackagedApp;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;
@@ -28,7 +28,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
     public async Task<IEnumerable<Core.Models.PackagedApp>> GetByInstalledDirectory(string fileName)
     {
         fileName = fileName.Replace("package:", "");
-        var installedDir = Path.GetDirectoryName(fileName);
+        var installedDir = fileName.GetDirectoryName();
 
         return await Task.Run(
             () =>

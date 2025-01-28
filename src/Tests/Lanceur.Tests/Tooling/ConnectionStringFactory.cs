@@ -1,6 +1,6 @@
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Utils;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Tests.Tooling;
 

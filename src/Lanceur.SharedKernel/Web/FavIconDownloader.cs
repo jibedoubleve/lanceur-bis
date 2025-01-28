@@ -1,5 +1,5 @@
 using System.Net;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.SharedKernel.Web;

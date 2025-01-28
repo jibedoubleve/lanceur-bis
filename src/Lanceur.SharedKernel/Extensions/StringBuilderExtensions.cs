@@ -1,8 +1,8 @@
 using System.Text;
 
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
-public static class StringBuilderMixin
+public static class StringBuilderExtensions
 {
     #region Methods
 

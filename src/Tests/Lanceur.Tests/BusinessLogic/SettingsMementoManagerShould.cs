@@ -3,7 +3,7 @@ using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Managers;
 using Lanceur.Infra.Repositories;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;
 using NSubstitute;
 using System.Text.RegularExpressions;

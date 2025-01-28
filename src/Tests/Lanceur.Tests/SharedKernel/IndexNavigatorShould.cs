@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using NSubstitute.Core;
 using Xunit;
 

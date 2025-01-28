@@ -6,7 +6,7 @@ using Humanizer;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.Logging;

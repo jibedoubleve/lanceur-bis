@@ -1,9 +1,9 @@
-﻿using Lanceur.SharedKernel.Mixins;
+﻿using Lanceur.SharedKernel.Extensions;
 using System.Text.RegularExpressions;
 
 namespace Lanceur.Core.Models;
 
-public static class QueryResultMixin
+public static class QueryResultExtensions
 {
     #region Fields
 

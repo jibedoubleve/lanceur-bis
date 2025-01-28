@@ -1,6 +1,6 @@
 using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Core.Models;
 

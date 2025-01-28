@@ -5,7 +5,7 @@ using System.SQLite.Updater;
 using Dapper;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Scripts;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tooling.SQL;
 using StackExchange.Profiling.Data;
 using Xunit.Abstractions;

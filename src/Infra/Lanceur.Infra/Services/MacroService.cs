@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Microsoft.Extensions.Logging;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.Managers;
 

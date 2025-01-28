@@ -1,6 +1,6 @@
 ﻿using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
 
@@ -28,7 +28,7 @@ public class LightConnectionString : BaseConnectionString, IConnectionString
     {
         if (_connectionString is not null) return _connectionString;
 
-        var path = Environment.ExpandEnvironmentVariables(_dbPath);
+        var path = _dbPath.ExpandPath();
         _connectionString = CSTRING_PATTERN.Format(path);
 
         return _connectionString;

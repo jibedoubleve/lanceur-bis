@@ -1,4 +1,4 @@
-namespace Lanceur.SharedKernel.Mixins;
+namespace Lanceur.SharedKernel.Extensions;
 
 public static class FileHelper
 {

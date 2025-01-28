@@ -1,4 +1,4 @@
-﻿namespace Lanceur.SharedKernel.Mixins;
+﻿namespace Lanceur.SharedKernel.Extensions;
 
 /// <remarks>
 /// https://stackoverflow.com/questions/1196991/get-property-value-from-string-using-reflection

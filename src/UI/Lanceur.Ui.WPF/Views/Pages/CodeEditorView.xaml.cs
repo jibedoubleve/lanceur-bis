@@ -8,7 +8,7 @@ using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.ViewModels.Pages;

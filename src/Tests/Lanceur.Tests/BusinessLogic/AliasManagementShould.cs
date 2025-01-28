@@ -8,7 +8,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tooling;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.Logging;

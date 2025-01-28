@@ -1,5 +1,5 @@
 using System.Text;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Tests.Tooling.SQL;
 

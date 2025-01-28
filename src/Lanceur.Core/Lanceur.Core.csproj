@@ -16,5 +16,8 @@
       <Compile Update="Models\AliasQueryResultExtensions.cs">
         <DependentUpon>AliasQueryResult.cs</DependentUpon>
       </Compile>
+      <Compile Update="Models\QueryResultExtensions.cs">
+        <DependentUpon>QueryResult.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

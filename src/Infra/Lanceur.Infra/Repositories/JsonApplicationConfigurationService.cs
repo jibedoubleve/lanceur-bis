@@ -2,7 +2,7 @@
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Constants;
 using Lanceur.Infra.Services;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;
 
 namespace Lanceur.Infra.Repositories;
@@ -22,7 +22,7 @@ public class JsonApplicationConfigurationService : IApplicationConfigurationServ
     public JsonApplicationConfigurationService(string path = null)
     {
         path ??= Paths.Settings;
-        _filePath = Environment.ExpandEnvironmentVariables(path);
+        _filePath = path.ExpandPath();
     }
 
     #endregion Constructors
@@ -44,7 +44,7 @@ public class JsonApplicationConfigurationService : IApplicationConfigurationServ
 
     private FileStream OpenFile()
     {
-        var dir = Path.GetDirectoryName(_filePath);
+        var dir = _filePath.GetDirectoryName();
         if (dir.IsNullOrEmpty()) throw new DirectoryNotFoundException($"Directory '{dir}' does not exist.");
 
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir!);

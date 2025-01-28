@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Lanceur.SharedKernel.Mixins;
+using Lanceur.SharedKernel.Extensions;
 using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
