@@ -69,10 +69,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Miscellaneous
         DbPath = _settings.Local.DbPath;
         WindowBackdropStyle = _settings.Application.Window.BackdropStyle;
-        SearchDelay = _settings.Application.SearchDelay;
-        ShowResult = _settings.Application.ShowResult;
-        ShowAtStartup = _settings.Application.ShowAtStartup;
-        ShowLastQuery = _settings.Application.ShowLastQuery;
+        SearchDelay = _settings.Application.SearchBox.SearchDelay;
+        ShowResult = _settings.Application.SearchBox.ShowResult;
+        ShowAtStartup = _settings.Application.SearchBox.ShowAtStartup;
+        ShowLastQuery = _settings.Application.SearchBox.ShowLastQuery;
         BookmarkSourceBrowser = _settings.Application.Stores.BookmarkSourceBrowser;
             
     }
@@ -95,10 +95,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     {
         Settings.Local.DbPath = DbPath;
         Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
-        Settings.Application.SearchDelay = SearchDelay;
-        Settings.Application.ShowResult = ShowResult;
-        Settings.Application.ShowAtStartup = ShowAtStartup;
-        Settings.Application.ShowLastQuery = ShowLastQuery;
+        Settings.Application.SearchBox.SearchDelay = SearchDelay;
+        Settings.Application.SearchBox.ShowResult = ShowResult;
+        Settings.Application.SearchBox.ShowAtStartup = ShowAtStartup;
+        Settings.Application.SearchBox.ShowLastQuery = ShowLastQuery;
         Settings.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
     }
 

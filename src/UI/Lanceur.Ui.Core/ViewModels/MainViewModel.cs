@@ -58,14 +58,14 @@ public partial class MainViewModel : ObservableObject
 
         //Settings
         _settingsFacade = settingsFacade;
-        _doesReturnAllIfEmpty = settingsFacade.Application.ShowResult;
+        _doesReturnAllIfEmpty = settingsFacade.Application.SearchBox.ShowResult;
         _windowBackdropStyle = settingsFacade.Application.Window.BackdropStyle;
-        ShowAtStartup = settingsFacade.Application.ShowAtStartup;
-        ShowLastQuery = settingsFacade.Application.ShowLastQuery;
+        ShowAtStartup = settingsFacade.Application.SearchBox.ShowAtStartup;
+        ShowLastQuery = settingsFacade.Application.SearchBox.ShowLastQuery;
 
         // Configuration
         _watchdog = watchdogBuilder.WithAction(SearchAsync)
-                                   .WithInterval(settingsFacade.Application.SearchDelay.Milliseconds())
+                                   .WithInterval(settingsFacade.Application.SearchBox.SearchDelay.Milliseconds())
                                    .Build();
     }
 
@@ -186,7 +186,7 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            if (_settingsFacade.Application.ShowResult)
+            if (_settingsFacade.Application.SearchBox.ShowResult)
             {
                 var results = await Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true));
                 Results = new(results);
@@ -204,7 +204,7 @@ public partial class MainViewModel : ObservableObject
     {
         _settingsFacade.Reload();
         WindowBackdropStyle = _settingsFacade.Application.Window.BackdropStyle;
-        _watchdog.ResetDelay(_settingsFacade.Application.SearchDelay);
+        _watchdog.ResetDelay(_settingsFacade.Application.SearchBox.SearchDelay);
     }
 
     #endregion

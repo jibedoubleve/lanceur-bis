@@ -90,7 +90,7 @@ public class SettingsShould : TestBase
         var scope = new DbSingleConnectionManager(c);
         var settings = new SQLiteDatabaseConfigurationService(scope);
 
-        settings.Current.ShowAtStartup.Should().BeTrue();
+        settings.Current.SearchBox.ShowAtStartup.Should().BeTrue();
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class SettingsShould : TestBase
         var scope = new DbSingleConnectionManager(c);
         var settings = new SQLiteDatabaseConfigurationService(scope);
 
-        settings.Current.ShowResult.Should().BeFalse();
+        settings.Current.SearchBox.ShowResult.Should().BeFalse();
     }
 
     [Theory, InlineData(1, 2), InlineData(10, 20)]
