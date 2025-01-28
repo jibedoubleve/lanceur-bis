@@ -145,16 +145,19 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         {
             const string sql = """
                                select 
-                               	file_name             as FileName,
-                               	ifnull(exec_count, 0) as Counter
-                               from alias
+                                    an.name                 as AliasName,
+                                    ifnull(a.exec_count, 0) as Counter
+                               from 
+                                    alias a
+                                    inner join alias_name an on a.id = an.id_alias
                                where 
-                               	hidden is true	
-                               	and deleted_at is null
-                               order by id desc
+                               	    a.hidden is true
+                                    and a.deleted_at is null
+                                    and an.name = a.file_name
+                               order by a.id desc
                                """;
             var dictionary = tx.Connection!.Query<dynamic>(sql)
-                               .Select(e => new { Key = e.FileName, Value = e.Counter })
+                               .Select(e => new { Key = e.AliasName, Value = e.Counter })
                                .ToDictionary(e => (string)e.Key, e => (int)e.Value);
             return dictionary;
         }
