@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Lanceur.Tests.BusinessLogic;
 
-public class InternalAliasStoreShould
+public class ReservedKeywordsStoreShould
 {
     #region Methods
 
@@ -52,18 +52,27 @@ public class InternalAliasStoreShould
     }
 
     [Fact]
-    public void ReturnSpecifiedReservedKeyword()
+    public void UpdateCounterOnSearch()
     {
-        var serviceProvider  = new ServiceCollection().AddMockSingleton<IAliasRepository>((_, repository) => repository)
-                                                      .BuildServiceProvider();
+        const int count = 100;
 
-        var store = GetStore(serviceProvider.GetService<IAliasRepository>());
-        var query = new Cmdline("anothertest");
+        var aliasRepository = Substitute.For<IAliasRepository>();
+        aliasRepository.GetHiddenCounters().Returns(new Dictionary<string, int> { { Names.Name1, count } });
 
-        store.Search(query)
-             .Should()
-             .HaveCount(1);
+
+        var sp = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = Assembly.GetExecutingAssembly() })
+                                        .AddSingleton(aliasRepository)
+                                        .AddSingleton(Substitute.For<ILogger<ReservedAliasStore>>())
+                                        .BuildServiceProvider();
+
+        var store = new ReservedAliasStore(sp);
+
+        var result = store.Search(Cmdline.Empty)
+                          .ToArray();
+
+        result.Should().HaveCount(1);
+        var current = result.First();
+        current.Count.Should().Be(count);
     }
-
     #endregion
 }
