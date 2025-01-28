@@ -150,7 +150,7 @@ public class AliasDbAction
     /// <param name="names">The list of names to find.</param>
     /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
-    internal IEnumerable<AliasQueryResult> GetExact(IDbTransaction tx, IEnumerable<string> names, bool includeHidden = false)
+    internal IEnumerable<AliasQueryResult> GetByNames(IDbTransaction tx, IEnumerable<string> names, bool includeHidden = false)
     {
         const string sql = $"""
                             select
