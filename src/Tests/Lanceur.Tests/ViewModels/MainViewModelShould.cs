@@ -182,7 +182,7 @@ public class MainViewModelShould : TestBase
         {
             VisitSettings = settings =>
             {
-                var application = new DatabaseConfiguration { ShowResult = showAllResults, };
+                var application = new DatabaseConfiguration { SearchBox = new() { ShowResult = showAllResults, } };
                 settings.Application.Returns(application);
             }
         };
