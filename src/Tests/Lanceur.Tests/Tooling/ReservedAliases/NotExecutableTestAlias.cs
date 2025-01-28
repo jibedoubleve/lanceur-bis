@@ -5,7 +5,7 @@ using Lanceur.Core.Models;
 
 namespace Lanceur.Tests.Tooling.ReservedAliases;
 
-[ReservedAlias("Invalid")]
+[ReservedAlias(Names.Name2)]
 [Description("To be a keyword, you should be executable")]
 [DebuggerDisplay("Name: {Name}")]
 public class NotExecutableTestAlias : QueryResult

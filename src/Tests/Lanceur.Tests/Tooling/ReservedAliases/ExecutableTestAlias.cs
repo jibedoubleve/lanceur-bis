@@ -1,14 +1,18 @@
 ﻿using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Tests.Tooling.ReservedAliases;
 
-[ReservedAlias("anothertest"), Description("description")]
+[ReservedAlias(Names.Name1)]
+[Description("description")]
 public class ExecutableTestAlias : MacroQueryResult
 {
+    #region Fields
+
     private readonly IServiceProvider _serviceProvider;
+
+    #endregion
 
     #region Constructors
 
@@ -18,17 +22,17 @@ public class ExecutableTestAlias : MacroQueryResult
         Name = Guid.NewGuid().ToString()[..8];
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
+    public override SelfExecutableQueryResult Clone() => new ExecutableTestAlias(_serviceProvider);
+
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
-        Parameters = cmdline.Parameters;
+        Parameters = cmdline?.Parameters;
         return NoResultAsync;
     }
 
-    public override SelfExecutableQueryResult Clone() => new ExecutableTestAlias(_serviceProvider);
-
-    #endregion Methods
+    #endregion
 }
