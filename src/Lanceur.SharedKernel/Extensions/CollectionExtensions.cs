@@ -59,7 +59,5 @@ public static class CollectionExtensions
         return collection;
     }
 
-    public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> enumerable) => new(enumerable);
-
     #endregion
 }
