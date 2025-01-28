@@ -2,7 +2,7 @@ using System.Data;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
-public static class SQLiteSingleConnectionManagerMixin
+public static class SQLiteSingleConnectionManagerExtensions
 {
     #region Methods
 
