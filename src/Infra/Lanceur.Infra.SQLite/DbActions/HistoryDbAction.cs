@@ -65,4 +65,15 @@ internal class HistoryDbAction
     }
 
     #endregion
+
+    public IEnumerable<DataPoint<DateTime, double>> PerYear()
+    {
+        const string sql = """
+                           select
+                               year       as X,
+                           	   exec_count as Y
+                           from stat_usage_per_year_v;
+                           """;
+        return _db.WithConnection(conn => conn.Query<DataPoint<DateTime, double>>(sql));
+    }
 }

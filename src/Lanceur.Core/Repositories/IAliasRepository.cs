@@ -7,7 +7,8 @@ public enum Per
     HourOfDay,
     Day,
     DayOfWeek,
-    Month
+    Month,
+    Year
 }
 
 public interface IAliasRepository

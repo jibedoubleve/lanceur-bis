@@ -23,6 +23,12 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Menu>
+            <MenuItem Header="Yearly history" Command="{Binding RefreshYearlyHistoryCommand}"
+                      Visibility="{Binding IsYearlyVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Icon="{ui:SymbolIcon CalendarInfo20}"
+                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
+                            ConverterParameter={x:Static p:PlotType.YearlyHistory}}" Click="OnClickMenu"/>
+            
             <MenuItem Header="Monthly history" Command="{Binding RefreshMonthlyHistoryCommand}"
                       Visibility="{Binding IsMonthlyVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Icon="{ui:SymbolIcon CalendarMonth24}"

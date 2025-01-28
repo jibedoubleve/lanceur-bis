@@ -26,6 +26,7 @@ public partial class AnalyticsView : IDisposable
         _logger = logger;
 
         viewModel.OnRefreshDailyPlot = (x, y) => RefreshScatter(x, y, "Daily history");
+        viewModel.OnRefreshYearlyPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToYear, "Yearly history", "Year");
         viewModel.OnRefreshMonthlyPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToMonthYear, "Monthly history", "Month Year", new() { Rotation = -45, PositionMultipier =  2 });
         viewModel.OnRefreshUsageByHourPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToTimeString, "Usage by hour of day", "Hours of day");
         viewModel.OnRefreshUsageByDayOfWeekPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToDayOfWeek, "Usage by day of week", "Day of week");
