@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Everything.Wrapper;
 using FluentAssertions;
 using Lanceur.Core;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories;
 using Lanceur.Infra.Stores;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(AliasRepository)
                                                      .BuildServiceProvider();
         var store = new AdditionalParametersStore(serviceProvider);
@@ -56,6 +58,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton(AliasRepository)
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(LoggerFactory)
                                                      .BuildServiceProvider();
         var store = new AliasStore(serviceProvider);
@@ -77,7 +80,8 @@ public class SearchServicesShould
     public void ActivateCalculatorStore(string query)
     {
         // ACT
-        var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                                                     .BuildServiceProvider();
         var store = new CalculatorStore(serviceProvider);
 
         // ASSERT
@@ -97,6 +101,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<IEverythingApi>())
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(LoggerFactory)
                                                      .BuildServiceProvider();
         var store = new EverythingStore(serviceProvider);
@@ -117,6 +122,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton<AssemblySource>()
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(AliasRepository)
                                                      .AddSingleton(LoggerFactory)
                                                      .BuildServiceProvider();
@@ -145,6 +151,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(AliasRepository)
                                                      .BuildServiceProvider();
         var store = new AdditionalParametersStore(serviceProvider);
@@ -165,7 +172,8 @@ public class SearchServicesShould
     public void DeactivateCalculatorStore(string query)
     {
         // ACT
-        var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                                                     .BuildServiceProvider();
         var store = new CalculatorStore(serviceProvider);
 
         // ASSERT
@@ -184,6 +192,7 @@ public class SearchServicesShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton(AliasRepository)
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(Substitute.For<IEverythingApi>())
                                                      .BuildServiceProvider();
         var store = new EverythingStore(serviceProvider);

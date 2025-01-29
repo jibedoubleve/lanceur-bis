@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -82,6 +83,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddMemoryCache()
+                         .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(
                              sp => new(

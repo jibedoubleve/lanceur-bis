@@ -2,6 +2,7 @@ using System.Reflection;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
@@ -47,6 +48,7 @@ public class AliasUseCases : TestBase
         return new ServiceCollection().AddLogging(builder => builder.AddXUnit(OutputHelper))
                                       .AddDatabase(db)
                                       .AddApplicationSettings()
+                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                       .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                       .AddSingleton<IMappingService, AutoMapperMappingService>()
                                       .AddSingleton<ISearchService, SearchService>()

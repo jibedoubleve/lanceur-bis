@@ -1,20 +1,17 @@
-﻿using Humanizer;
-using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Logging;
-using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Extensions;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class AliasStore : IStoreService
+public class AliasStore : Store, IStoreService
 {
     #region Fields
 
@@ -25,7 +22,7 @@ public class AliasStore : IStoreService
 
     #region Constructors
 
-    public AliasStore(IServiceProvider serviceProvider)
+    public AliasStore(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _aliasRepository = serviceProvider.GetService<IAliasRepository>();
         _logger = serviceProvider.GetService<ILoggerFactory>()
@@ -37,7 +34,10 @@ public class AliasStore : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestration.SharedAlwaysActive();
+    public bool IsOverridable => false;
+
+    /// <inheritdoc />
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.SharedAlwaysActive();
 
     #endregion
 

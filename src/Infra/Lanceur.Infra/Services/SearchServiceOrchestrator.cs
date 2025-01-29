@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,8 @@ namespace Lanceur.Infra.Services;
 
 public class SearchServiceOrchestrator : ISearchServiceOrchestrator
 {
+    private readonly ISettingsFacade _settingsFacade;
+
     #region Fields
 
     private readonly ILogger<SearchServiceOrchestrator> _log;
@@ -18,8 +21,9 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
 
     #region Constructors
 
-    public SearchServiceOrchestrator(ILoggerFactory factory)
+    public SearchServiceOrchestrator(ILoggerFactory factory, ISettingsFacade settingsFacade)
     {
+        _settingsFacade = settingsFacade;
         _log = factory.GetLogger<SearchServiceOrchestrator>();
     }
 
@@ -30,7 +34,12 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
     /// <inheritdoc />
     public bool IsAlive(IStoreService storeService, Cmdline query)
     {
-        var regex = new Regex(storeService.StoreOrchestration.AlivePattern);
+        if (storeService is null) return false;
+
+        var storeOverride = _settingsFacade.Application.Stores.StoreOverrides
+                                           .FirstOrDefault(x => x.StoreType == storeService.GetType());
+        var regex = new Regex(storeOverride?.AliasOverride ?? storeService.StoreOrchestration.AlivePattern);
+        
         var isAlive = regex.IsMatch(query.Name);
         return isAlive;
     }

@@ -10,8 +10,8 @@
     x:Name="Self"
     d:DesignHeight="800"
     d:DesignWidth="800"
-    Background="{DynamicResource ApplicationBackgroundBrush}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
     <Page.Resources>
         <conv:DivideByConverter x:Key="DivideBy200Converter" Divider="200" />
@@ -30,20 +30,20 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="Display usage for year:" Margin="5,5,5,2" />
-            <ComboBox ItemsSource="{Binding Years}" Margin="5,0,5,5" x:Name="CbYear" SelectedIndex="0">
+        <Menu>
+            <TextBlock Text="Display usage for year:" />
+            <ComboBox ItemsSource="{Binding Years}" x:Name="CbYear" SelectedIndex="0">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="SelectionChanged">
                         <interactivity:InvokeCommandAction
-                            Command="{Binding RefreshAliasesCommand}"
-                            CommandParameter="{Binding ElementName=CbYear, Path=SelectedItem}" />
+                Command="{Binding RefreshAliasesCommand}"
+                CommandParameter="{Binding ElementName=CbYear, Path=SelectedItem}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ComboBox>
-        </StackPanel>
+        </Menu>
         <ui:DataGrid
             Grid.Row="1"
             AutoGenerateColumns="False"

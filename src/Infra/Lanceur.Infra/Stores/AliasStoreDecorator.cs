@@ -18,12 +18,15 @@ public class AliasStoreDecorator : IStoreService
     #endregion
 
     #region Constructors
-    
+
     public AliasStoreDecorator(AliasStore aliasStore) => _aliasStore = aliasStore;
 
     #endregion
 
     #region Properties
+
+    /// <inheritdoc />
+    public bool IsOverridable => _aliasStore.IsOverridable;
 
     /// <inheritdoc />
     public StoreOrchestration StoreOrchestration => _aliasStore.StoreOrchestration;
@@ -36,13 +39,13 @@ public class AliasStoreDecorator : IStoreService
     public IEnumerable<QueryResult> GetAll() => _aliasStore.GetAll()
                                                            .Cast<AliasQueryResult>()
                                                            .Where(x => x.IsHidden == false)
-                                                           .OrderBy(x=>x.Name);
+                                                           .OrderBy(x => x.Name);
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query) => _aliasStore.Search(query)
                                                                         .Cast<AliasQueryResult>()
                                                                         .Where(x => x.IsHidden == false)
-                                                                        .OrderBy(x=>x.Name);
+                                                                        .OrderBy(x => x.Name);
 
     #endregion
 }

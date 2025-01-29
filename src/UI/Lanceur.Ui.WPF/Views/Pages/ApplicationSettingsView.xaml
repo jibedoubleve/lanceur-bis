@@ -7,13 +7,16 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="ApplicationSettings"
+    x:Name="Self"
     d:Height="1200"
-    d:Width="800"
+    d:Width="1800"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
     <Page.Resources>
         <!-- STYLE -->
         <Thickness x:Key="RegionMargin">10,5,5,10</Thickness>
-        <ui:FontTypography x:Key="RegionFontTypography">Subtitle</ui:FontTypography>
+        <ui:FontTypography x:Key="RegionFontTypography">BodyStrong</ui:FontTypography>
 
         <!-- Data providers -->
         <ObjectDataProvider
@@ -37,20 +40,22 @@
             <sys:String>Zen</sys:String>
         </x:Array>
     </Page.Resources>
-    <Grid>
+
+    <Grid Grid.Column="1">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
-            <ui:Button
-                Margin="6"
+        <Menu>
+            <MenuItem 
                 Command="{Binding SaveSettingsCommand}"
-                Content="Save"
+                Header="Save"
                 Icon="{ui:SymbolIcon Save24}"
-                Appearance="Primary" />
-        </StackPanel>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
+                Foreground="{StaticResource TextFillColorPrimaryBrush}"/>
+        </Menu>
+        <ScrollViewer
+                Grid.Row="1"
+                VerticalScrollBarVisibility="Visible">
             <StackPanel>
                 <ui:TextBlock Margin="{StaticResource RegionMargin}"
                               FontTypography="{StaticResource RegionFontTypography}"
@@ -151,6 +156,77 @@
                                   SelectedItem="{Binding BookmarkSourceBrowser}" />
                     </StackPanel>
                 </ui:CardControl>
+
+                <ui:TextBlock Margin="{StaticResource RegionMargin}"
+                              FontTypography="{StaticResource RegionFontTypography}"
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Stores" />
+
+                <ui:CardExpander
+                        Margin="5,5,5,12"
+                        Icon="{ui:SymbolIcon ArrowUpRight24}"
+                        IsExpanded="True">
+                    <ui:CardExpander.Header>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ui:TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    FontTypography="Body"
+                                    Text="Shortcut overrides" />
+                        </Grid>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+
+                        <ui:DataGrid
+                                AreRowDetailsFrozen="True"
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                CanUserDeleteRows="False"
+                                CanUserResizeColumns="True"
+                                ItemsSource="{Binding StoreShortcuts}"
+                                SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Width="Auto" Header="Store name">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding StoreType, Converter={StaticResource StoreTypeToStoreNameConverter}}" Margin="10,0,10,0"
+                                                           VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Width="*" Header="Shortcut override">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding AliasOverride, Converter={StaticResource StoreOrchestrationToStringConverter}}" Margin="10,0,10,0"
+                                                           VerticalAlignment="Center" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Width="100" Header="Actions">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button
+                                                        Command="{Binding ElementName=Self, Path=DataContext.EditStoreShortcutCommand}"
+                                                        HorizontalAlignment="Center" ToolTip="Edit"
+                                                        Margin="5" CommandParameter="{Binding .}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <ui:SymbolIcon Symbol="Edit24" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </ui:DataGrid>
+                    </StackPanel>
+                </ui:CardExpander>
 
                 <ui:TextBlock Margin="{StaticResource RegionMargin}"
                               FontTypography="{StaticResource RegionFontTypography}"

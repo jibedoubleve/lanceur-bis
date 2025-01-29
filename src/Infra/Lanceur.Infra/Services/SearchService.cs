@@ -7,13 +7,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
-public class SearchService : SearchServiceCache, ISearchService
+/// <inheritdoc />
+public class SearchService : ISearchService
 {
     #region Fields
 
     private readonly ILogger<SearchService> _logger;
     private readonly IMacroService _macroService;
     private readonly ISearchServiceOrchestrator _orchestrator;
+    private readonly IStoreLoader _storeLoader;
     private readonly IThumbnailService _thumbnailService;
 
     #endregion
@@ -26,13 +28,20 @@ public class SearchService : SearchServiceCache, ISearchService
         IThumbnailService thumbnailService,
         ILoggerFactory loggerFactory,
         ISearchServiceOrchestrator orchestrator
-    ) : base(storeLoader)
+    )
     {
+        _storeLoader = storeLoader;
         _macroService = macroService;
         _thumbnailService = thumbnailService;
         _orchestrator = orchestrator;
         _logger = loggerFactory.GetLogger<SearchService>();
     }
+
+    #endregion
+
+    #region Properties
+
+    public IEnumerable<IStoreService> Stores => _storeLoader.Load();
 
     #endregion
 
@@ -58,6 +67,7 @@ public class SearchService : SearchServiceCache, ISearchService
             : DisplayQueryResult.NoResultFound;
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<QueryResult>> GetAllAsync()
     {
         using var measurement = _logger.MeasureExecutionTime(this);
@@ -70,6 +80,7 @@ public class SearchService : SearchServiceCache, ISearchService
         return SetupAndSort(results);
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<QueryResult>> SearchAsync(Cmdline query, bool doesReturnAllIfEmpty = false)
     {
         using var measurement = _logger.MeasureExecutionTime(this);

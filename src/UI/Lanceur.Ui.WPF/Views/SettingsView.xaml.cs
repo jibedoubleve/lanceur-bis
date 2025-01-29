@@ -6,6 +6,7 @@ using Humanizer;
 using Lanceur.Ui.Core.Messages;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace Lanceur.Ui.WPF.Views;
 
@@ -13,6 +14,7 @@ public partial class SettingsView
 {
     #region Fields
 
+    private readonly IContentDialogService _contentDialogService;
     private readonly ISnackbarService _snackbarService;
 
     #endregion
@@ -30,6 +32,7 @@ public partial class SettingsView
         ArgumentNullException.ThrowIfNull(snackbarService);
 
         InitializeComponent();
+        _contentDialogService = contentDialogService;
         _snackbarService = snackbarService;
         PageNavigationView.SetPageService(pageService);
         contentDialogService.SetDialogHost(ContentPresenterForDialogs);
@@ -37,8 +40,22 @@ public partial class SettingsView
 
         WeakReferenceMessenger.Default.Register<SettingsView, NotificationMessage>(this, (_, m) => Notify(m));
         WeakReferenceMessenger.Default.Register<SettingsView, NavigationMessage>(this, (_, m) => NavigateTo(m));
+        WeakReferenceMessenger.Default.Register<SettingsView, QuestionRequestMessage>(this, (_, m) => m.Reply(HandleMessageBoxAsync(m)));
     }
 
+    private async Task<bool> HandleMessageBoxAsync(QuestionRequestMessage request)
+    {
+        var result = await _contentDialogService.ShowSimpleDialogAsync(
+            new()
+            {
+                Title = request.Title,
+                Content = request.Content,
+                PrimaryButtonText = request.YesText,
+                CloseButtonText = request.NoText
+            }
+        );
+        return result == ContentDialogResult.Primary;
+    }
     #endregion
 
     #region Methods

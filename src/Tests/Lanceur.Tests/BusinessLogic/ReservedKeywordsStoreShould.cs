@@ -5,8 +5,8 @@ using Lanceur.Infra.Stores;
 using NSubstitute;
 using System.Reflection;
 using Lanceur.Core;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.ReservedAliases;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +25,7 @@ public class ReservedKeywordsStoreShould
         
         var reservedAliasStoreLogger = Substitute.For<ILogger<ReservedAliasStore>>();
         var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(Substitute.For<IDatabaseConfigurationService>())
                                                      .AddSingleton(aliasRepository)
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
@@ -62,6 +63,7 @@ public class ReservedKeywordsStoreShould
 
 
         var sp = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = Assembly.GetExecutingAssembly() })
+                                        .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                         .AddSingleton(aliasRepository)
                                         .AddSingleton(Substitute.For<ILogger<ReservedAliasStore>>())
                                         .BuildServiceProvider();

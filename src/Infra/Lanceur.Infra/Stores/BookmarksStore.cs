@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class BookmarksStore : IStoreService
+public class BookmarksStore : Store, IStoreService
 {
     #region Fields
 
@@ -27,7 +27,7 @@ public class BookmarksStore : IStoreService
 
     #region Constructors
 
-    public BookmarksStore(IServiceProvider serviceProvider)
+    public BookmarksStore(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _settings = serviceProvider.GetService<ISettingsFacade>();
         _bookmarkRepositoryFactory = serviceProvider.GetService<IBookmarkRepositoryFactory>();
@@ -38,12 +38,14 @@ public class BookmarksStore : IStoreService
 
     #region Properties
 
-    public StoreOrchestration StoreOrchestration => StoreOrchestration.Exclusive(@"^\s{0,}/.*");
+    /// <inheritdoc />
+    public bool IsOverridable => true;
+
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(@"^\s{0,}/.*");
 
     #endregion
 
     #region Methods
-
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll()
@@ -51,7 +53,7 @@ public class BookmarksStore : IStoreService
         var bookmarks = _bookmarkRepositoryFactory.CreateBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
                                                   .GetBookmarks()
                                                   .Select(
-                                                      e => new AliasQueryResult { Name = e.Name.Truncate(Length, "(...)"), FileName = e.Url, Count = -1}
+                                                      e => new AliasQueryResult { Name = e.Name.Truncate(Length, "(...)"), FileName = e.Url, Count = -1 }
                                                   )
                                                   .ToList();
         return bookmarks;
@@ -60,15 +62,12 @@ public class BookmarksStore : IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query)
     {
-        if (query.Parameters.IsNullOrWhiteSpace())
-        {
-            return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
-        }
-        
+        if (query.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
+
         var bookmarks  = _bookmarkRepositoryFactory.CreateBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
                                                    .GetBookmarks(query.Parameters)
                                                    .Select(
-                                                       e => new AliasQueryResult { Name = e.Name.Truncate(Length, "(...)"), FileName = e.Url, Count = -1}
+                                                       e => new AliasQueryResult { Name = e.Name.Truncate(Length, "(...)"), FileName = e.Url, Count = -1 }
                                                    )
                                                    .ToList();
         return bookmarks;
