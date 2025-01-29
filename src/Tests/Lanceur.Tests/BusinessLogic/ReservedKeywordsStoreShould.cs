@@ -74,6 +74,7 @@ public class ReservedKeywordsStoreShould
         result.Should().HaveCount(1);
         var current = result.First();
         current.Count.Should().Be(count);
+        current.Id.Should().Be(id);
     }
     #endregion
 }
