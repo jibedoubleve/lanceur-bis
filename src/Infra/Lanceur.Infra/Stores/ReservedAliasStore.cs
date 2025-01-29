@@ -82,16 +82,18 @@ public class ReservedAliasStore : IStoreService
         _reservedAliases = foundItems;
     }
 
-    private static IEnumerable<QueryResult> RefreshCounters(List<QueryResult> result, Dictionary<string, int> counters)
+    private static IEnumerable<QueryResult> RefreshCounters(List<QueryResult> result, Dictionary<string, (long Id,int Count)> counters)
     {
         var orderedResult = result.Select(
             alias =>
             {
                 if (counters is null) return alias;
 
-                alias.Count = counters.Where(counter => counter.Key == alias.Name)
-                                      .Select(a => a.Value)
-                                      .FirstOrDefault();
+                var r = counters.Where(counter => counter.Key == alias.Name)
+                                .Select(a => a.Value)
+                                .FirstOrDefault();
+                alias.Id = r.Id;
+                alias.Count = r.Count;
                 return alias;
             }
         );

@@ -74,14 +74,13 @@ public interface IAliasRepository
     AliasQueryResult GetById(long id);
 
     /// <summary>
-    ///     Retrieves the counters for items that are not aliases. Specifically, this includes aliases that are hidden but not
-    ///     deleted.
+    ///     Retrieves counters for hidden but non-deleted aliases.
     /// </summary>
     /// <returns>
-    ///     A dictionary where the key is the file name of each special alias (hidden, non-deleted), and the value is its
-    ///     associated counter.
+    ///     A dictionary where each key represents the file name of a hidden (but not deleted) alias, 
+    ///     and each value is a tuple containing the alias ID and its associated counter.
     /// </returns>
-    Dictionary<string, int> GetHiddenCounters();
+    Dictionary<string, (long Id, int Counter)> GetHiddenCounters();
 
     /// <summary>
     ///     Retrieves a collection of aliases that have been logically deleted.
@@ -122,8 +121,7 @@ public interface IAliasRepository
     ///     count.
     /// </returns>
     IEnumerable<QueryResult> GetMostUsedAliases(int year);
-
-
+    
     /// <summary>
     ///     Returns usage trends. The result is meant to be dislayed as a chart
     /// </summary>
@@ -179,7 +177,6 @@ public interface IAliasRepository
     /// <param name="aliases">The list of aliases to mark as removed from the repository.</param>
     void Remove(IEnumerable<AliasQueryResult> aliases);
 
-
     /// <summary>
     ///     Restores the specified aliases by reversing their logical deletion status.
     ///     Aliases that are not marked as logically deleted will remain unchanged.
@@ -189,7 +186,6 @@ public interface IAliasRepository
     ///     Only aliases marked as logically deleted will be affected.
     /// </param>
     void Restore(IEnumerable<SelectableAliasQueryResult> aliases);
-
 
     /// <summary>
     ///     Creates a new alias if the ID is '0'; otherwise, updates the existing alias.
@@ -207,8 +203,7 @@ public interface IAliasRepository
     ///     Each object in the collection contains the details of a single alias, including its updated values.
     /// </param>
     void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases);
-
-
+    
     /// <summary>
     ///     Searches for all aliases that match the specified criteria.
     /// </summary>
@@ -233,7 +228,6 @@ public interface IAliasRepository
     /// <param name="names">The names to find in the database</param>
     /// <returns></returns>
     public ExistingNameResponse SelectNames(string[] names);
-
 
     /// <summary>
     ///     Searches for a hidden alias with the specified name. and, if exists, set the usage into the specified QueryResult's

@@ -55,9 +55,10 @@ public class ReservedKeywordsStoreShould
     public void UpdateCounterOnSearch()
     {
         const int count = 100;
+        const int id = 12;
 
         var aliasRepository = Substitute.For<IAliasRepository>();
-        aliasRepository.GetHiddenCounters().Returns(new Dictionary<string, int> { { Names.Name1, count } });
+        aliasRepository.GetHiddenCounters().Returns(new Dictionary<string, (long, int)> { { Names.Name1, (id, count) } });
 
 
         var sp = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = Assembly.GetExecutingAssembly() })
