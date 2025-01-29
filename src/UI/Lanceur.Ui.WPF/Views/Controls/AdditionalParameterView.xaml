@@ -8,9 +8,9 @@
     <StackPanel>
         <!--  NAME  -->
         <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasName}">Name</Label>
-        <TextBox Text="{Binding Name}" Margin="0,0,0,10" />
+        <TextBox Text="{Binding Name}" Margin="0,0,0,10" x:Name="TbAliasName"/>
         <!--  PARAMETER  -->
-        <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasName}">Parameter</Label>
-        <TextBox Text="{Binding Parameter}" />
+        <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasParameter}">Parameter</Label>
+        <TextBox Text="{Binding Parameter}" x:Name="TbAliasParameter"/>
     </StackPanel>
 </UserControl>

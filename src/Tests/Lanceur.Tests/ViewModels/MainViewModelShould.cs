@@ -2,6 +2,7 @@ using System.Reflection;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
@@ -48,6 +49,7 @@ public class MainViewModelShould : TestBase
                                                        .AddApplicationSettings(
                                                            stg => configurator?.VisitSettings?.Invoke(stg)
                                                        )
+                                                       .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                        .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                        .AddSingleton<IMappingService, AutoMapperMappingService>()
                                                        .AddSingleton<ISearchService, SearchService>()

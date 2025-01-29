@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class CalculatorStore : IStoreService
+public class CalculatorStore :Store, IStoreService
 {
     #region Fields
 
@@ -22,14 +22,17 @@ public class CalculatorStore : IStoreService
 
     #region Constructors
 
-    public CalculatorStore(IServiceProvider serviceProvider) => _logger = serviceProvider.GetService<ILogger<CalculatorStore>>();
+    public CalculatorStore(IServiceProvider serviceProvider) : base(serviceProvider) => _logger = serviceProvider.GetService<ILogger<CalculatorStore>>();
 
     #endregion
 
     #region Properties
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestration.Shared(@"^\s{0,}[0-9(]");
+    public bool IsOverridable => false;
+
+    /// <inheritdoc />
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Shared(@"^\s{0,}[0-9(]");
 
     #endregion
 
@@ -51,13 +54,9 @@ public class CalculatorStore : IStoreService
          *       that there's no result to display. */
         if (!float.TryParse(result, out _)) return QueryResult.NoResult;
 
-        var returnResult = new DisplayQueryResult(result, query.ToString())
-        {
-            Icon = "calculator",
-            Count = int.MaxValue
-        };
-        return isError 
-            ? QueryResult.NoResult 
+        var returnResult = new DisplayQueryResult(result, query.ToString()) { Icon = "calculator", Count = int.MaxValue };
+        return isError
+            ? QueryResult.NoResult
             : returnResult.ToEnumerable();
     }
 

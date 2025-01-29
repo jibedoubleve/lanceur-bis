@@ -7,7 +7,6 @@
       xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:p="clr-namespace:Lanceur.Ui.Core.ViewModels.Pages;assembly=Lanceur.Ui.Core"
-      Background="{DynamicResource ApplicationBackgroundBrush}"
       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
       mc:Ignorable="d"
       Title="HistoryView">

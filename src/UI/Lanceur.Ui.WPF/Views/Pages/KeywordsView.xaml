@@ -13,12 +13,9 @@
     Title="KeywordsView"
     d:DesignHeight="1200"
     d:DesignWidth="1800"
-    Background="{DynamicResource ApplicationBackgroundBrush}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
-    <Page.Resources>
-    </Page.Resources>
     <interactivity:Interaction.Triggers>
         <interactivity:EventTrigger EventName="Loaded">
             <interactivity:InvokeCommandAction Command="{Binding LoadAliasesCommand}" />

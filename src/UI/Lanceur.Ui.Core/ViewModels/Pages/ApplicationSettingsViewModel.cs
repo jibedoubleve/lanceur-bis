@@ -1,16 +1,22 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Services;
+using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.Ui.Core.Utils;
+using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
 using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
+[Singleton]
 public partial class ApplicationSettingsViewModel : ObservableObject
 {
     #region Fields
@@ -25,14 +31,18 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private  bool _isTraceEnabled;
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
+    private readonly ILogger<ApplicationSettingsViewModel> _logger;
     [ObservableProperty] private double _searchDelay;
+
     [ObservableProperty] private ISettingsFacade _settings;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
+    [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts;
     private readonly IUserInteractionService _userInteraction;
 
     private readonly IUserNotificationService _userNotificationService;
+    private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _windowBackdropStyle;
 
     #endregion
@@ -41,9 +51,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     public ApplicationSettingsViewModel(
         IUserNotificationService userNotificationService,
+        ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
         ISettingsFacade settings,
         LoggingLevelSwitch loggingLevelSwitch,
+        IViewFactory viewFactory,
         IUserInteractionService userInteraction
     )
     {
@@ -51,8 +63,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(appRestartService);
 
         _userNotificationService = userNotificationService;
+        _logger = logger;
         _appRestartService = appRestartService;
         _settings = settings;
+        _viewFactory = viewFactory;
         _userInteraction = userInteraction;
 
         // Hotkey
@@ -74,7 +88,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ShowAtStartup = _settings.Application.SearchBox.ShowAtStartup;
         ShowLastQuery = _settings.Application.SearchBox.ShowLastQuery;
         BookmarkSourceBrowser = _settings.Application.Stores.BookmarkSourceBrowser;
-            
+
+        // Store overrides
+        StoreShortcuts = new(_settings.Application.Stores.StoreOverrides);
     }
 
     #endregion
@@ -100,6 +116,23 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Settings.Application.SearchBox.ShowAtStartup = ShowAtStartup;
         Settings.Application.SearchBox.ShowLastQuery = ShowLastQuery;
         Settings.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
+    }
+
+    [RelayCommand]
+    private async Task OnEditStoreShortcut(StoreShortcut? storeShortcut)
+    {
+        if (storeShortcut is null)
+        {
+            _logger.LogWarning("No store shortcut selected.");
+            return;
+        }
+        var view = _viewFactory.CreateView(storeShortcut);
+
+        var result = await _userInteraction.AskUserYesNoAsync(view, "Apply", "Cancel", $"Edit shortcut for store '{storeShortcut.StoreType.Name.Replace("Store", "")}'");
+        if (!result) return;
+
+
+        _userNotificationService.Success($"Modification has been done on {storeShortcut.StoreType.Name.Replace("Store", "")}. Don't forget to save to apply changes", "Updated.");
     }
 
     [RelayCommand]

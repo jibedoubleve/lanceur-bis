@@ -30,6 +30,6 @@ public class DatabaseConfiguration
     /// This includes dimensions, position, and other display-related preferences.
     /// </summary>
     public WindowSection Window { get; set; } = WindowSection.Default;
-
+    
     #endregion
 }

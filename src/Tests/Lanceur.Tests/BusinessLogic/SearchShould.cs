@@ -4,8 +4,10 @@ using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Managers;
@@ -19,7 +21,6 @@ using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Ui.Core.Utils;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -60,6 +61,7 @@ public class SearchShould : TestBase
     {
         var serviceProvider
             = new ServiceCollection().AddMockSingleton<ILoggerFactory>()
+                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                      .AddMockSingleton<ILogger<StoreLoader>>()
                                      .AddSingleton<AssemblySource>()
                                      .AddSingleton<IStoreLoader, StoreLoader>()
@@ -150,6 +152,7 @@ public class SearchShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<IThumbnailService>()
                                                      .AddLogger<StoreLoader>(OutputHelper)
                                                      .AddLogger<MacroService>(OutputHelper)
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton<IMacroService, MacroService>()
                                                      .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
@@ -219,6 +222,8 @@ public class SearchShould : TestBase
 
         var serviceProvider = new ServiceCollection().AddDatabase(conn)
                                                      .AddLogging(builder => builder.AddXUnit(OutputHelper))
+                                                     .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+                                                     .AddMockSingleton<ISettingsFacade>()
                                                      .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton(_testLoggerFactory)
                                                      .AddSingleton(converter)

@@ -10,7 +10,7 @@
     Title="DataReconciliationView"
     d:DesignHeight="800"
     d:DesignWidth="800"
-    Background="{DynamicResource ApplicationBackgroundBrush}"
+    ScrollViewer.CanContentScroll="False"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     mc:Ignorable="d">
     <Page.Resources>
@@ -58,10 +58,12 @@
             <interactivity:InvokeCommandAction Command="{Binding ShowDoubloonsCommand}" />
         </interactivity:EventTrigger>
     </interactivity:Interaction.Triggers>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Menu>
             <MenuItem Header="Show data" Icon="{ui:SymbolIcon Database24}">
@@ -104,11 +106,15 @@
                 Icon="{ui:SymbolIcon DeleteDismiss24}"
                 Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=Restore}" />
         </Menu>
-        <StackPanel Grid.Row="1">
-            <ui:TextBlock
-                Margin="15,5,5,15"
-                FontTypography="Title"
-                Text="{Binding Title}" />
+
+        <ui:TextBlock 
+            Margin="15,5,5,15"
+            FontTypography="Title"
+            Text="{Binding Title}"  Grid.Row="1"/>
+
+        <ScrollViewer
+            Grid.Row="2"
+            VerticalScrollBarVisibility="Visible">
             <ui:DataGrid
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
@@ -230,6 +236,6 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </ui:DataGrid>
-        </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

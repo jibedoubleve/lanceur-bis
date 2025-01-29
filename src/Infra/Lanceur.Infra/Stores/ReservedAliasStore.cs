@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class ReservedAliasStore : IStoreService
+public class ReservedAliasStore : Store, IStoreService
 {
     #region Fields
 
@@ -35,7 +35,7 @@ public class ReservedAliasStore : IStoreService
     /// <remarks>
     ///     Each reserved alias should be decorated with <see cref="ReservedAliasAttribute" />
     /// </remarks>
-    public ReservedAliasStore(IServiceProvider serviceProvider)
+    public ReservedAliasStore(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _serviceProvider = serviceProvider;
         _assembly = serviceProvider.GetService<AssemblySource>()?.ReservedKeywordSource ?? throw new NullReferenceException("The AssemblySource is not set in the DI container.");
@@ -48,7 +48,10 @@ public class ReservedAliasStore : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestration.SharedAlwaysActive();
+    public bool IsOverridable => false;
+
+    /// <inheritdoc />
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.SharedAlwaysActive();
 
     #endregion
 
@@ -82,7 +85,7 @@ public class ReservedAliasStore : IStoreService
         _reservedAliases = foundItems;
     }
 
-    private static IEnumerable<QueryResult> RefreshCounters(List<QueryResult> result, Dictionary<string, (long Id,int Count)> counters)
+    private static IEnumerable<QueryResult> RefreshCounters(List<QueryResult> result, Dictionary<string, (long Id, int Count)> counters)
     {
         var orderedResult = result.Select(
             alias =>

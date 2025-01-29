@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class AdditionalParametersStore : IStoreService
+public class AdditionalParametersStore : Store, IStoreService
 {
     #region Fields
 
@@ -21,7 +21,7 @@ public class AdditionalParametersStore : IStoreService
 
     #region Constructors
 
-    public AdditionalParametersStore(IServiceProvider serviceProvider)
+    public AdditionalParametersStore(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _aliasService = serviceProvider.GetService<IAliasRepository>();
         _logger = serviceProvider.GetService<ILogger<AdditionalParametersStore>>();
@@ -32,7 +32,10 @@ public class AdditionalParametersStore : IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration { get; } = StoreOrchestration.Shared(".*:.*");
+    public bool IsOverridable => false;
+
+    /// <inheritdoc />
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Shared(".*:.*");
 
     #endregion
 

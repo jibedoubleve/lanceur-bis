@@ -1,15 +1,20 @@
 using System.IO;
 using System.Windows;
 using Lanceur.Core.Services;
-using Lanceur.Ui.Core.Services;
+using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Win32;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
+[Singleton]
 public partial class ApplicationSettingsView
 {
+    #region Fields
+
     private readonly IUserNotificationService _userNotification;
+
+    #endregion
 
     #region Constructors
 
@@ -20,6 +25,7 @@ public partial class ApplicationSettingsView
     {
         _userNotification = userNotification;
         DataContext = ViewModel = viewModel;
+
         InitializeComponent();
     }
 
