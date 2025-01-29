@@ -140,11 +140,12 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public AliasQueryResult GetById(long id) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
 
     /// <inheritdoc />
-    public Dictionary<string, int> GetHiddenCounters() => Db.WithinTransaction(
+    public Dictionary<string, (long Id, int Counter)> GetHiddenCounters() => Db.WithinTransaction(
         tx =>
         {
             const string sql = """
                                select 
+                                    a.Id                    as Id,
                                     an.name                 as AliasName,
                                     ifnull(a.exec_count, 0) as Counter
                                from 
@@ -157,8 +158,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                order by a.id desc
                                """;
             var dictionary = tx.Connection!.Query<dynamic>(sql)
-                               .Select(e => new { Key = e.AliasName, Value = e.Counter })
-                               .ToDictionary(e => (string)e.Key, e => (int)e.Value);
+                               .Select(e => new { Key = e.AliasName, Value = ((long)e.Id, (int)e.Counter) })
+                               .ToDictionary(e => (string)e.Key, e => e.Value);
             return dictionary;
         }
     );
