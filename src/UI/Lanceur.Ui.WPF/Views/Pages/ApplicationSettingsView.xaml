@@ -7,10 +7,15 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="ApplicationSettings"
-    d:Height="600"
+    d:Height="1200"
     d:Width="800"
     mc:Ignorable="d">
     <Page.Resources>
+        <!-- STYLE -->
+        <Thickness x:Key="RegionMargin">10,5,5,10</Thickness>
+        <ui:FontTypography x:Key="RegionFontTypography">Subtitle</ui:FontTypography>
+
+        <!-- Data providers -->
         <ObjectDataProvider
             x:Key="KeySource"
             MethodName="GetValues"
@@ -47,6 +52,10 @@
         </StackPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
             <StackPanel>
+                <ui:TextBlock Margin="{StaticResource RegionMargin}"
+                              FontTypography="{StaticResource RegionFontTypography}"
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Window" />
+
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Keyboard24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Hot key" />
@@ -69,6 +78,21 @@
                               ItemsSource="{StaticResource WindowBackdropStyles}" />
 
                 </ui:CardControl>
+
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Glasses24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Show search after Windows loads and Lanceur starts?" />
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ToggleSwitch OffContent="No" OnContent="Yes"
+                                         IsChecked="{Binding ShowAtStartup}" />
+                    </StackPanel>
+                </ui:CardControl>
+
+                <ui:TextBlock Margin="{StaticResource RegionMargin}"
+                              FontTypography="{StaticResource RegionFontTypography}"
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Search box" />
+
                 <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon Timer24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Search Trigger Delay (ms)" />
@@ -98,27 +122,9 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Glasses24}">
-                    <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body" Text="Show search after Windows loads and Lanceur starts?" />
-                    </ui:CardControl.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:ToggleSwitch OffContent="No" OnContent="Yes"
-                                         IsChecked="{Binding ShowAtStartup}" />
-                    </StackPanel>
-                </ui:CardControl>
-
-                <ui:CardControl Margin="5,0,5,12"
-                                Icon="{ui:SymbolIcon BookmarkSearch24}"
-                                ToolTip="Select the main browser to use for searching your bookmarks.">
-
-                    <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body" Text="Source of the bookmarks" />
-                    </ui:CardControl.Header>
-                    <StackPanel>
-                        <ComboBox ItemsSource="{StaticResource Browsers}" SelectedItem="{Binding BookmarkSourceBrowser}"/>
-                    </StackPanel>
-                </ui:CardControl>
+                <ui:TextBlock Margin="{StaticResource RegionMargin}"
+                              FontTypography="{StaticResource RegionFontTypography}"
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Data sources" />
 
                 <ui:CardControl
                     Margin="5,0,5,12"
@@ -133,6 +139,23 @@
                     </StackPanel>
                 </ui:CardControl>
 
+                <ui:CardControl Margin="5,0,5,12"
+                                Icon="{ui:SymbolIcon BookmarkSearch24}"
+                                ToolTip="Select the main browser to use for searching your bookmarks.">
+
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Source of the bookmarks" />
+                    </ui:CardControl.Header>
+                    <StackPanel>
+                        <ComboBox ItemsSource="{StaticResource Browsers}"
+                                  SelectedItem="{Binding BookmarkSourceBrowser}" />
+                    </StackPanel>
+                </ui:CardControl>
+
+                <ui:TextBlock Margin="{StaticResource RegionMargin}"
+                              FontTypography="{StaticResource RegionFontTypography}"
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Miscellaneous" />
+
                 <ui:CardControl Margin="5,0,5,12" Icon="{ui:SymbolIcon NoteBookError24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Enable trace until the next restart" />
@@ -141,6 +164,7 @@
                                      OffContent="Trace disabled"
                                      IsChecked="{Binding IsTraceEnabled}" />
                 </ui:CardControl>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>
