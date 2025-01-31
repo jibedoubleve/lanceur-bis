@@ -52,7 +52,7 @@ public static class ServiceRegistrationExtensions
     /// <returns>
     /// Returns the modified <see cref="IServiceCollection"/> to allow for method chaining (fluent interface).
     /// </returns>
-    public static IServiceCollection Register(this IServiceCollection serviceCollection, string suffix, Assembly asm)
+    private static IServiceCollection Register(this IServiceCollection serviceCollection, string suffix, Assembly asm)
     {
         var types = asm.GetTypes()
                        .Where(e => e.FullName!.EndsWith(suffix))

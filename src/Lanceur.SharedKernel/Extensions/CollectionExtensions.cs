@@ -18,17 +18,12 @@ public static class CollectionExtensions
     /// <param name="items">
     ///     The collection of items to add to the list.
     /// </param>
-    /// <returns>
-    ///     The updated list containing the original elements along with the added items.
-    /// </returns>
     /// <exception cref="ArgumentNullException">
     ///     Thrown if either <paramref name="list" /> or <paramref name="items" /> is null.
     /// </exception>
-    public static IList<T> AddRange<T>(this IList<T> list, IEnumerable<T> items)
+    public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
     {
         foreach (var item in items) list.Add(item);
-
-        return list;
     }
 
     /// <summary>

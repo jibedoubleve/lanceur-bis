@@ -18,5 +18,5 @@ public static class StartModeExtensions
         };
     }
 
-    #endregion Methods
+    #endregion
 }
