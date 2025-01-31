@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.SharedKernel;
 
-public class Constants
+public abstract class Constants
 {
     #region Enums
 

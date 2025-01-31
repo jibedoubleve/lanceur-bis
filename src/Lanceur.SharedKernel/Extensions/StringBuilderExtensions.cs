@@ -8,5 +8,5 @@ public static class StringBuilderExtensions
 
     public static void AppendNewLine(this StringBuilder stringBuilder) => stringBuilder.Append(Environment.NewLine);
 
-    #endregion Methods
+    #endregion
 }

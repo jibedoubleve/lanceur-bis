@@ -38,7 +38,5 @@ public sealed class Measurement : IDisposable
 
     public void Dispose() => Log(string.Empty, true);
 
-    public void LogSplitTime(string message = null) => Log(message, false);
-
     #endregion Methods
 }
