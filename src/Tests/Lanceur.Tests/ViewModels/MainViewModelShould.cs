@@ -17,6 +17,7 @@ using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.SQL;
+using Lanceur.Tests.ViewModels.Helpers;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.Utils.Watchdogs;
@@ -40,14 +41,14 @@ public class MainViewModelShould : TestBase
 
     #region Methods
 
-    private async Task TestViewModel(Func<MainViewModel, Task> scope, SqlBuilder sqlBuilder = null, ServiceVisitors configurator = null)
+    private async Task TestViewModel(Func<MainViewModel, Task> scope, SqlBuilder sqlBuilder = null, ServiceVisitors visitors = null)
     {
         using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty);
         var serviceCollection = new ServiceCollection().AddView<MainViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                                        .AddDatabase(db)
                                                        .AddApplicationSettings(
-                                                           stg => configurator?.VisitSettings?.Invoke(stg)
+                                                           stg => visitors?.VisitSettings?.Invoke(stg)
                                                        )
                                                        .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                        .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
@@ -67,7 +68,7 @@ public class MainViewModelShould : TestBase
                                                            {
                                                                i.ExecuteAsync(Arg.Any<ExecutionRequest>())
                                                                 .Returns(ExecutionResponse.NoResult);
-                                                               return configurator?.VisitExecutionManager?.Invoke(sp, i) ?? i;
+                                                               return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
                                                            }
                                                        )
                                                        .AddMockSingleton<ISearchServiceOrchestrator>(
@@ -200,17 +201,4 @@ public class MainViewModelShould : TestBase
     }
     #endregion
 
-    /// <summary>
-    ///     Manages a collection of visitor functions that allow users to configure
-    ///     custom behaviour for the <c>serviceProvider</c> with specific types.
-    /// </summary>
-    private class ServiceVisitors
-    {
-        #region Properties
-
-        public Func<IServiceProvider, IExecutionService, IExecutionService> VisitExecutionManager { get; set; }
-        public Action<ISettingsFacade> VisitSettings { get; set; }
-
-        #endregion
-    }
 }
