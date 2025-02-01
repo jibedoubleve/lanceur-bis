@@ -1,5 +1,8 @@
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Core.Utils;
+using Lanceur.Tests.Tooling;
+using Lanceur.Ui.Core.Utils.ConnectionStrings;
 
 namespace Lanceur.Tests.ViewModels.Helpers;
 
@@ -11,6 +14,7 @@ public class ServiceVisitors
 {
     #region Properties
 
+    public IConnectionString OverridenConnectionString { get; init; }
     public Func<IServiceProvider, IExecutionService, IExecutionService> VisitExecutionManager { get; init; }
     public Action<ISettingsFacade> VisitSettings { get; init; }
     public Func<IServiceProvider, IUserNotificationService, IUserNotificationService> VisitUserNotificationService { get; init; }
