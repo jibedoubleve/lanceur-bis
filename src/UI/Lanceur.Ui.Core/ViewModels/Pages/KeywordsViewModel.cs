@@ -89,8 +89,18 @@ public partial class KeywordsViewModel : ObservableObject
 
     private void CreateAlias(AddAliasMessage message)
     {
-        _logger.LogTrace("Creating new alias with name '{Name}'", message.Cmdline?.Parameters);
         var names = message.Cmdline?.Parameters;
+        if (Aliases.Any(x => x.Id == 0))
+        {
+            // An alias for creation already exists in the list,
+            // select it again to continue creation.
+            SelectedAlias = Aliases.Single(x => x.Id == 0);
+            SelectedAlias.Name = names;
+            SelectedAlias.Synonyms = names;
+            return;
+        }
+        
+        _logger.LogTrace("Creating new alias with name '{Name}'", message.Cmdline?.Parameters);
         Aliases.Insert(0, new()  { Name = names, Synonyms = names });
         SelectedAlias = Aliases[0];
     }
