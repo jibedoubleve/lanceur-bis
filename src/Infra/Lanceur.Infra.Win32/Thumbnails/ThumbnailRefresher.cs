@@ -23,7 +23,7 @@ public class ThumbnailRefresher
     private readonly IPackagedAppSearchService _searchService;
     private readonly ThumbnailLoader _thumbnailLoader;
 
-    private const string WebIcon = "Web";
+    private const string WebIcon = "Link24";
 
     #endregion
 
@@ -95,6 +95,7 @@ public class ThumbnailRefresher
             return;
         }
 
+        _logger.LogTrace("Alias {Name} is an Url. Thumbnail is set to null and icon is {Icon}", alias.Name, alias.Thumbnail);
         alias.Icon = WebIcon;
         alias.Thumbnail = null;
 

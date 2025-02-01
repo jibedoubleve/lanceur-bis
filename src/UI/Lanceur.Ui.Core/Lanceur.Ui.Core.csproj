@@ -5,7 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
-    </PropertyGroup>
+      <UserSecretsId>2564c422-03ea-4570-83d4-cc2003b8f50c</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="12.0.1" />
