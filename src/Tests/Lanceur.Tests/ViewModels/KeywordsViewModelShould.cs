@@ -25,7 +25,6 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.EventSource;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
@@ -44,7 +43,8 @@ public class KeywordsViewModelShould : TestBase
 
     private async Task TestViewModel(Func<KeywordsViewModel, IDbConnectionManager, Task> scope, SqlBuilder sqlBuilder = null, ServiceVisitors visitors = null)
     {
-        using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty);
+        var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
+        using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
         var serviceCollection = new ServiceCollection().AddView<KeywordsViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                                        .AddDatabase(db)
@@ -101,7 +101,41 @@ public class KeywordsViewModelShould : TestBase
     }
 
     [Fact]
-    public async Task DeletedAliasLogically()
+    public async Task CreateAliasWithLuaScript()
+    {
+        await TestViewModel(
+            async (viewModel, db) =>
+            {
+                // ARRANGE
+                const string name = "SomeTestName";
+                const string script = "some random text that represent a lua script";
+
+                // ACT
+                await viewModel.CreateNewAlias(name, luaScript: script);
+
+                //ASSERT
+                const string sql = """
+                                   select 
+                                       a.id         as Id,
+                                       an.name      as Name,
+                                       a.lua_script as Field
+                                   from 
+                                       alias a
+                                       inner join alias_name an on a.id = an.id_alias
+                                   """;
+                var res = db.WithConnection(c => c.Query<DynamicAlias<string>>(sql))
+                            .ToArray();
+
+                res.Length.Should().Be(1);
+                var alias = res.First();
+                alias.Field.Should().Be(script);
+            },
+            SqlBuilder.Empty
+        );
+    }
+
+    [Fact]
+    public async Task DeleteAliasLogically()
     {
         var visitors = new ServiceVisitors
         {
@@ -129,8 +163,6 @@ public class KeywordsViewModelShould : TestBase
 
                 // ACT
                 await viewModel.CreateNewAlias(name, fileName);
-
-                // --- Delete the alias
                 await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null);
 
                 // ASSERT
@@ -141,29 +173,28 @@ public class KeywordsViewModelShould : TestBase
                                    	    case
                                    		    when a.deleted_at is null then false
                                    		    else true
-                                   	    end as IsDeleted
+                                   	    end as Field
                                    from alias a 
                                    inner join alias_name an on a.id = an.id_alias 
-                                   --where an.Name = @name;
                                    """;
-                var result = db.WithConnection(c => c.Query<CheckAliasDeleted>(sql, new { name = (string[]) [name] }));
-                result = result.ToArray();
+                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[]) [name] }))
+                               .ToArray();
 
                 using (new AssertionScope())
                 {
-                    result.Should().HaveCountGreaterThan(0);
-                    
+                    result.Length.Should().BeGreaterThan(0);
+
                     var alias = result.First();
                     alias.Id.Should().BeGreaterThan(0);
                     alias.Name.Should().Be(name);
-                    alias.IsDeleted.Should().BeTrue();
+                    alias.Field.Should().BeTrue();
                 }
             },
             SqlBuilder.Empty,
             visitors
         );
     }
-    
+
     [Fact]
     public async Task NotBeAbleToCreateAliasWithDeletedAliasName()
     {
@@ -198,13 +229,9 @@ public class KeywordsViewModelShould : TestBase
                 const string fileName = "SomeFileName";
 
                 // ACT
-                await viewModel.CreateNewAlias(name, fileName);
-
-                // --- Delete the alias
-                await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null);
-                
-                // --- Recreate alias
-                await viewModel.CreateNewAlias(name, fileName);
+                await viewModel.CreateNewAlias(name, fileName);               // Create alias
+                await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null); // Delete alias
+                await viewModel.CreateNewAlias(name, fileName);               // Recreate the alias
 
                 // ASSERT
                 const string sql = """
@@ -214,12 +241,12 @@ public class KeywordsViewModelShould : TestBase
                                    	    case
                                    		    when a.deleted_at is null then false
                                    		    else true
-                                   	    end as IsDeleted
+                                   	    end as Field
                                    from alias a 
                                    inner join alias_name an on a.id = an.id_alias 
                                    --where an.Name = @name;
                                    """;
-                var result = db.WithConnection(c => c.Query<CheckAliasDeleted>(sql, new { name = (string[]) [name] }));
+                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[]) [name] }));
                 result = result.ToArray();
 
                 using (new AssertionScope())
@@ -231,7 +258,7 @@ public class KeywordsViewModelShould : TestBase
                     var alias = result.First();
                     alias.Id.Should().BeGreaterThan(0);
                     alias.Name.Should().Be(name);
-                    alias.IsDeleted.Should().BeTrue();
+                    alias.Field.Should().BeTrue();
                 }
             },
             SqlBuilder.Empty,
@@ -239,16 +266,44 @@ public class KeywordsViewModelShould : TestBase
         );
     }
 
-    #endregion
-
-    private record CheckAliasDeleted
+    [Fact]
+    public async Task UpdateAliasWithLuaScript()
     {
-        #region Properties
+        await TestViewModel(
+            async (viewModel, db) =>
+            {
+                // ARRANGE
+                const string name = "SomeTestName";
+                const string script = "some random text that represent a lua script";
+                const string script2 = "7a3f4c8f-9142-44f0-8455-6818e11845c3";
 
-        public long Id { get; init; }
-        public bool IsDeleted { get; init; }
-        public string Name { get; init; }
+                // ACT
+                await viewModel.CreateNewAlias(name, luaScript: script);
 
-        #endregion
+                viewModel.SelectedAlias.Should().NotBeNull("it is already selected for update");
+                viewModel.SelectedAlias!.LuaScript = script2;
+                await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null);
+
+                //ASSERT
+                const string sql = """
+                                   select 
+                                       a.id         as Id,
+                                       an.name      as Name,
+                                       a.lua_script as Field
+                                   from 
+                                       alias a
+                                       inner join alias_name an on a.id = an.id_alias
+                                   """;
+                var res = db.WithConnection(c => c.Query<DynamicAlias<string>>(sql))
+                            .ToArray();
+
+                res.Length.Should().Be(1);
+                var alias = res.First();
+                alias.Field.Should().Be(script2);
+            },
+            SqlBuilder.Empty
+        );
     }
+
+    #endregion
 }
