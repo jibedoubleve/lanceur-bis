@@ -54,7 +54,7 @@ public class ThumbnailRefresher
         if (query.Entity is not AliasQueryResult alias) return;
         if (alias.FileName.IsNullOrEmpty()) return;
 
-        if (File.Exists(alias.Thumbnail) || alias.Icon == WebIcon) return;
+        if (File.Exists(alias.Thumbnail)) return;
 
         var filePath = alias.FileName.GetThumbnailPath();
         if (File.Exists(filePath)) { alias.Thumbnail = filePath; }
@@ -82,7 +82,11 @@ public class ThumbnailRefresher
             return;
         }
 
-        if (!alias.FileName.IsUrl()) return;
+        if (!alias.FileName.IsUrl())
+        {
+            _logger.LogTrace("Skipping thumbnail for alias {Name} because this is not an URL. {@Alias}", alias.Name, alias);
+            return;
+        }
 
         var favicon = alias.FileName
                            .GetKeyForFavIcon()
@@ -94,12 +98,7 @@ public class ThumbnailRefresher
             query.Soil();
             return;
         }
-
-        _logger.LogTrace("Alias {Name} is an Url. Thumbnail is set to null and icon is {Icon}", alias.Name, alias.Thumbnail);
-        alias.Icon = WebIcon;
-        alias.Thumbnail = null;
-
-        _ = _favIconService.RetrieveFaviconAsync(alias.FileName); // Fire & forget favicon retrieving
+        _ = _favIconService.RetrieveFaviconAsync(alias); // Fire & forget favicon retrieving
     }
 
     #endregion
