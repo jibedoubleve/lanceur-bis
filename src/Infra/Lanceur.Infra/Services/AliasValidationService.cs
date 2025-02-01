@@ -41,8 +41,8 @@ public class AliasValidationService : IAliasValidationService
 
     public ValidationStatus AreNamesUnique(object names, long idAlias)
     {
-        if (names is null) return ValidationStatus.Invalid("The value cannot be null. Please provide a valid input.");
-        if (names is not string s) return ValidationStatus.Invalid("The input must be a valid string. Please enter text.");
+        if (names is null) return ValidationStatus.Invalid("The names cannot be null. Please provide a valid input.");
+        if (names is not string s) return ValidationStatus.Invalid("The names must be a valid string. Please enter text.");
 
         var nameArray = s.Split(',', StringSplitOptions.RemoveEmptyEntries)
                          .Select(e => e.Trim())
@@ -59,14 +59,14 @@ public class AliasValidationService : IAliasValidationService
 
     public ValidationStatus IsDeleted(object names, long idAlias)
     {
-        if (names is null) return ValidationStatus.Invalid("The value cannot be null. Please provide a valid input.");
-        if (names is not string s) return ValidationStatus.Invalid("The input must be a valid string. Please enter text.");
+        if (names is null) return ValidationStatus.Valid();
+        if (names is not string s) return ValidationStatus.Valid();
 
         var nameArray = s.Split(',', StringSplitOptions.RemoveEmptyEntries)
                          .Select(e => e.Trim())
                          .ToArray();
 
-        if (!nameArray.Any()) return ValidationStatus.Invalid("Names are required and cannot be empty.");
+        if (!nameArray.Any()) return ValidationStatus.Valid();
 
         var existing = _repository.GetExistingDeletedAliases(nameArray, idAlias)
                                   .ToArray();
