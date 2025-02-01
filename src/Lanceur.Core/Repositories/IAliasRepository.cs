@@ -65,22 +65,13 @@ public interface IAliasRepository
     /// </summary>
     /// <param name="id">The unique identifier of the <see cref="AliasQueryResult" />. It must be greater than zero.</param>
     /// <returns>
-    ///     An <see cref="AliasQueryResult" /> object that matches the specified <paramref name="id" /> 
+    ///     An <see cref="AliasQueryResult" /> object that matches the specified <paramref name="id" />
     ///     Returns null if no matching object is found.
     /// </returns>
     /// <exception cref="ArgumentException">
     ///     Thrown when the <paramref name="id" /> is less than or equal to zero.
     /// </exception>
     AliasQueryResult GetById(long id);
-
-    /// <summary>
-    ///     Retrieves counters for hidden but non-deleted aliases.
-    /// </summary>
-    /// <returns>
-    ///     A dictionary where each key represents the file name of a hidden (but not deleted) alias, 
-    ///     and each value is a tuple containing the alias ID and its associated counter.
-    /// </returns>
-    Dictionary<string, (long Id, int Counter)> GetHiddenCounters();
 
     /// <summary>
     ///     Retrieves a collection of aliases that have been logically deleted.
@@ -107,6 +98,26 @@ public interface IAliasRepository
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
 
     /// <summary>
+    ///     Retrieves aliases from the provided list that exist in the database and are marked as logically deleted.
+    /// </summary>
+    /// <param name="aliasesToCheck">A collection of alias names to verify against the database.</param>
+    /// <param name="idAlias">The unique identifier of the alias being validated.</param>
+    /// <returns>
+    ///     An <see cref="IEnumerable{string}" /> containing aliases that are both present in the provided list
+    ///     and marked as logically deleted in the database.
+    /// </returns>
+    IEnumerable<string> GetExistingDeletedAliases(IEnumerable<string> aliasesToCheck, long idAlias);
+
+    /// <summary>
+    ///     Retrieves counters for hidden but non-deleted aliases.
+    /// </summary>
+    /// <returns>
+    ///     A dictionary where each key represents the file name of a hidden (but not deleted) alias,
+    ///     and each value is a tuple containing the alias ID and its associated counter.
+    /// </returns>
+    Dictionary<string, (long Id, int Counter)> GetHiddenCounters();
+
+    /// <summary>
     ///     Get list of all the aliases with count greater than 0
     /// </summary>
     /// <returns>The list of aliases</returns>
@@ -121,7 +132,7 @@ public interface IAliasRepository
     ///     count.
     /// </returns>
     IEnumerable<QueryResult> GetMostUsedAliases(int year);
-    
+
     /// <summary>
     ///     Returns usage trends. The result is meant to be dislayed as a chart
     /// </summary>
@@ -203,7 +214,7 @@ public interface IAliasRepository
     ///     Each object in the collection contains the details of a single alias, including its updated values.
     /// </param>
     void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases);
-    
+
     /// <summary>
     ///     Searches for all aliases that match the specified criteria.
     /// </summary>
