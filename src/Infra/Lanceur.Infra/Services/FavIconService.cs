@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Constants;
 using Lanceur.SharedKernel.Extensions;
@@ -6,7 +7,7 @@ using Lanceur.SharedKernel.Web;
 using Microsoft.Extensions.Logging;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace Lanceur.Infra.Managers;
+namespace Lanceur.Infra.Services;
 
 public class FavIconService : IFavIconService
 {
@@ -46,20 +47,26 @@ public class FavIconService : IFavIconService
 
     #region Methods
 
-    public async Task RetrieveFaviconAsync(string url)
+    public async Task RetrieveFaviconAsync(AliasQueryResult alias)
     {
+        var url = alias.FileName;
         if (url is null) return;
         if (IsMacroRegex.Match(url).Success) return;
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return;
 
-        var output = Path.Combine(_imageRepository, $"{FavIconHelpers.FilePrefix}{uri.Host}.png");
-        if (File.Exists(output)) return;
+        var favIconPath = Path.Combine(_imageRepository, $"{FavIconExtensions.FilePrefix}{uri.Host}.png");
+        if (File.Exists(favIconPath))
+        {
+            alias.Thumbnail = favIconPath;
+            return;
+        }
 
         var uriAuthority = uri.GetAuthority();
 
         if (!await _favIconDownloader.CheckExistsAsync(uriAuthority)) return;
 
-        await _favIconDownloader.SaveToFileAsync(uriAuthority, output);
+        alias.Thumbnail = favIconPath;
+        await _favIconDownloader.SaveToFileAsync(uriAuthority, favIconPath);
     }
 
     #endregion

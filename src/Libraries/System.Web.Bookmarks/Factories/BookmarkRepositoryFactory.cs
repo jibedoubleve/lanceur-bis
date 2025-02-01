@@ -29,7 +29,7 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
     #region Methods
 
     ///<inheritdoc />
-    public IBookmarkRepository CreateBookmarkRepository(Browser browser)
+    public IBookmarkRepository BuildBookmarkRepository(Browser browser)
     {
         return browser switch
         {
@@ -41,10 +41,10 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
     }
 
     ///<inheritdoc />
-    public IBookmarkRepository CreateBookmarkRepository(string browser)
+    public IBookmarkRepository BuildBookmarkRepository(string browser)
     {
         var browserEnum = Enum.Parse<Browser>(browser, true);
-        return CreateBookmarkRepository(browserEnum);
+        return BuildBookmarkRepository(browserEnum);
     }
 
     #endregion

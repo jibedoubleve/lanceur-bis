@@ -16,8 +16,6 @@ public class BookmarksStore : Store, IStoreService
 {
     #region Fields
 
-    private readonly IAliasRepository _aliasRepository;
-
     private readonly IBookmarkRepositoryFactory _bookmarkRepositoryFactory;
     private readonly ISettingsFacade _settings;
 
@@ -29,7 +27,7 @@ public class BookmarksStore : Store, IStoreService
     {
         _settings = serviceProvider.GetService<ISettingsFacade>();
         _bookmarkRepositoryFactory = serviceProvider.GetService<IBookmarkRepositoryFactory>();
-        _aliasRepository = serviceProvider.GetService<IAliasRepository>();
+        serviceProvider.GetService<IAliasRepository>();
     }
 
     #endregion
@@ -48,7 +46,7 @@ public class BookmarksStore : Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll()
     {
-        var bookmarks = _bookmarkRepositoryFactory.CreateBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
+        var bookmarks = _bookmarkRepositoryFactory.BuildBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
                                                   .GetBookmarks()
                                                   .Select(e => e.ToAliasQueryResult())
                                                   .ToList();
@@ -60,7 +58,7 @@ public class BookmarksStore : Store, IStoreService
     {
         if (query.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
 
-        var bookmarks  = _bookmarkRepositoryFactory.CreateBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
+        var bookmarks  = _bookmarkRepositoryFactory.BuildBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
                                                    .GetBookmarks(query.Parameters)
                                                    .Select(e => e.ToAliasQueryResult())
                                                    .ToList();

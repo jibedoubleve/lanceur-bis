@@ -1,14 +1,17 @@
-﻿namespace Lanceur.Core.Services;
+﻿using Lanceur.Core.Models;
+
+namespace Lanceur.Core.Services;
 
 public interface IFavIconService
 {
     #region Methods
 
     /// <summary>
-    /// Retrieve favicon (if exists) and copy it into the thumbnails repository
+    /// Retrieve favicon (if exists) and copy it into the thumbnails repository.
+    /// If thumbnail exists, update the alias with the favicon information
     /// </summary>
-    /// <param name="url">The url configured in the alias</param>
-    Task RetrieveFaviconAsync(string url);
+    /// <param name="alias">The alias</param>
+    Task RetrieveFaviconAsync(AliasQueryResult alias);
 
     #endregion Methods
 }

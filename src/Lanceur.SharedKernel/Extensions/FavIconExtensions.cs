@@ -1,6 +1,6 @@
 namespace Lanceur.SharedKernel.Extensions;
 
-public static class FavIconHelpers
+public static class FavIconExtensions
 {
     #region Fields
 
