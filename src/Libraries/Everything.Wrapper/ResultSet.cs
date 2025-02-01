@@ -2,11 +2,11 @@ using System.Collections;
 
 namespace Everything.Wrapper;
 
-public class ResultSet : IEnumerable<Result>
+public class ResultSet : IEnumerable<EverythingResult>
 {
     #region Fields
 
-    private readonly List<Result> _results = new();
+    private readonly List<EverythingResult> _results = new();
 
     #endregion Fields
 
@@ -25,9 +25,9 @@ public class ResultSet : IEnumerable<Result>
 
     #region Methods
 
-    public void Add(Result result) => _results.Add(result);
+    public void Add(EverythingResult everythingResult) => _results.Add(everythingResult);
 
-    public IEnumerator<Result> GetEnumerator() => _results.GetEnumerator();
+    public IEnumerator<EverythingResult> GetEnumerator() => _results.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

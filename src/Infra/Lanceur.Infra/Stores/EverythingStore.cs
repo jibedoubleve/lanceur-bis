@@ -4,6 +4,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Extensions;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class EverythingStore :Store, IStoreService
+public class EverythingStore : Store, IStoreService
 {
     #region Fields
 
@@ -37,30 +38,14 @@ public class EverythingStore :Store, IStoreService
     #region Properties
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(@"^\s{0,}:.*");
+    public bool IsOverridable => true;
 
     /// <inheritdoc />
-    public bool IsOverridable => true;
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(@"^\s{0,}:.*");
 
     #endregion
 
     #region Methods
-
-    private static string GetIcon(ResultType itemResultType) => itemResultType switch
-    {
-        ResultType.File       => "FileOutline",
-        ResultType.Excel      => "FileExcelOutline",
-        ResultType.Pdf        => "FilePdfBox",
-        ResultType.Zip        => "ZipBoxOutline",
-        ResultType.Image      => "FileImageOutline",
-        ResultType.Word       => "FileWordBoxOutline",
-        ResultType.Directory  => "FolderOutline",
-        ResultType.Music      => "FileMusicOutline",
-        ResultType.Text       => "FileDocumentOutline",
-        ResultType.Code       => "FileCodeOutline",
-        ResultType.Executable => "FileCogOutline",
-        _                     => "HelpCircleOutline"
-    };
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll() => QueryResult.NoResult;
@@ -68,27 +53,12 @@ public class EverythingStore :Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query)
     {
-        
-        if (query.Parameters.IsNullOrWhiteSpace())
-        {
-            return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
-        }
+        if (query.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
 
         var result =  _everythingApi.Search(query.Parameters)
-                                    .Select(
-                                        item => new AliasQueryResult
-                                        {
-                                            Name = item.Name,
-                                            FileName = item.Path,
-                                            Icon = GetIcon(item.ResultType),
-                                            Thumbnail = null,
-                                            IsThumbnailDisabled = true,
-                                            Count = -1
-                                        }
-                                    )
+                                    .Select(item => item.ToAliasQueryResult())
                                     .Cast<QueryResult>()
                                     .ToList();
-        _logger.LogTrace("Found {Count} results for request {Request}", result.Count, query);
         return result;
     }
 

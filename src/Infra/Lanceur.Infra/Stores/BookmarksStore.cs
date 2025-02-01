@@ -1,11 +1,11 @@
 using System.Web.Bookmarks;
-using Humanizer;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Extensions;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,8 +20,6 @@ public class BookmarksStore : Store, IStoreService
 
     private readonly IBookmarkRepositoryFactory _bookmarkRepositoryFactory;
     private readonly ISettingsFacade _settings;
-
-    private const int Length = 66;
 
     #endregion
 
@@ -52,9 +50,7 @@ public class BookmarksStore : Store, IStoreService
     {
         var bookmarks = _bookmarkRepositoryFactory.CreateBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
                                                   .GetBookmarks()
-                                                  .Select(
-                                                      e => new AliasQueryResult { Name = e.Name.Truncate(Length, "(...)"), FileName = e.Url, Count = -1 }
-                                                  )
+                                                  .Select(e => e.ToAliasQueryResult())
                                                   .ToList();
         return bookmarks;
     }
@@ -66,9 +62,7 @@ public class BookmarksStore : Store, IStoreService
 
         var bookmarks  = _bookmarkRepositoryFactory.CreateBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
                                                    .GetBookmarks(query.Parameters)
-                                                   .Select(
-                                                       e => new AliasQueryResult { Name = e.Name.Truncate(Length, "(...)"), FileName = e.Url, Count = -1 }
-                                                   )
+                                                   .Select(e => e.ToAliasQueryResult())
                                                    .ToList();
         return bookmarks;
     }

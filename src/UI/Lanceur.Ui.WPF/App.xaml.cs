@@ -9,6 +9,7 @@ using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,7 @@ public partial class App
     private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
                                                   .CreateDefaultBuilder()
                                                   .ConfigureServices(
-                                                      (_, services) =>
+                                                      (context, services) =>
                                                       {
                                                           services.Register("View", "Lanceur.Ui.WPF")
                                                                   .Register("ViewModel", "Lanceur.Ui.Core")
@@ -35,18 +36,24 @@ public partial class App
                                                                   .AddMapping()
                                                                   .AddConfiguration()
                                                                   .AddDatabaseServices()
-                                                                  .AddLoggers();
+                                                                  .AddLoggers(context);
+                                                      }
+                                                  )
+                                                  .ConfigureAppConfiguration(
+                                                      (context, config) =>
+                                                      {
+                                                          if (context.HostingEnvironment.IsDevelopment()) config.AddUserSecrets<App>();
                                                       }
                                                   )
                                                   .Build();
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public App() => DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -75,8 +82,8 @@ public partial class App
          */
         var cs = Ioc.Default.GetService<IConnectionString>()!;
         Ioc.Default.GetService<SQLiteUpdater>()!
-                   .Update(cs.ToString());
-        
+           .Update(cs.ToString());
+
         /* Now the database is up to date, let's start the application
          */
         Host.Services
@@ -84,8 +91,7 @@ public partial class App
             .ShowOnStartup();
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application started");
-
     }
 
-    #endregion Methods
+    #endregion
 }

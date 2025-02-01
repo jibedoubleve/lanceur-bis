@@ -1,6 +1,6 @@
 namespace Everything.Wrapper;
 
-public record Result
+public record EverythingResult
 {
     #region Properties
 

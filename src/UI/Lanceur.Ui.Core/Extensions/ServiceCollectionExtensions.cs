@@ -28,11 +28,11 @@ using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using Serilog.Formatting.Compact;
 
 namespace Lanceur.Ui.Core.Extensions;
 
@@ -47,7 +47,7 @@ public static class ServiceCollectionExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddLoggers(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddLoggers(this IServiceCollection serviceCollection, HostBuilderContext context)
     {
         var conditional = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
         var levelSwitch = new LoggingLevelSwitch(conditional);
@@ -57,15 +57,20 @@ public static class ServiceCollectionExtensions
         var loggerCfg = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch)
                                                  .Enrich.FromLogContext()
                                                  .Enrich.WithEnvironmentUserName()
-                                                 .WriteTo.File(
-                                                     new CompactJsonFormatter(),
-                                                     Paths.LogFile,
-                                                     rollingInterval: RollingInterval.Day
-                                                 )
                                                  .WriteTo.Console();
 #if DEBUG
         // For now, only seq is configured in my development machine and not anymore in AWS.
-        loggerCfg.WriteTo.Seq(Paths.TelemetryUrl);
+        var apiKey = context.Configuration["SEQ_LANCEUR_DEV"];
+        if(apiKey is null)
+            throw new NotSupportedException("Api key not found. Create a environment variable 'SEQ_LANCEUR_DEV' with the api key");
+        
+        loggerCfg.WriteTo.Seq(Paths.TelemetryUrl,apiKey: apiKey);
+#else
+        loggerCfg.WriteTo.File(
+            new Serilog.Formatting.Compact.CompactJsonFormatter(),
+            Paths.LogFile,
+            rollingInterval: RollingInterval.Day
+        );
 #endif
         Log.Logger = loggerCfg.CreateLogger();
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true))

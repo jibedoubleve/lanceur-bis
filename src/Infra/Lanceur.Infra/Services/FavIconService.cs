@@ -1,9 +1,9 @@
-﻿using Lanceur.Core.Services;
+﻿using System.Text.RegularExpressions;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Constants;
+using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Web;
 using Microsoft.Extensions.Logging;
-using System.Text.RegularExpressions;
-using Lanceur.SharedKernel.Extensions;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Lanceur.Infra.Managers;
@@ -12,23 +12,20 @@ public class FavIconService : IFavIconService
 {
     #region Fields
 
+    private readonly IFavIconDownloader _favIconDownloader;
+    private readonly string _imageRepository;
+    private readonly ILogger _logger;
+
     /// <summary>
-    /// A regex to check whether the specified text
-    /// is the template of a Macro
+    ///     A regex to check whether the specified text
+    ///     is the template of a Macro
     /// </summary>
     private static readonly Regex IsMacroRegex = new("@.*@");
 
-    private readonly IFavIconDownloader _favIconDownloader;
-    private readonly ILogger _logger;
-    private readonly string _imageRepository;
-
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    /// <param name="imageRepository">
-    /// This is used for unit tests. Keep default value unless you're testing
-    /// </param>
     public FavIconService(
         IPackagedAppSearchService searchService,
         IFavIconDownloader favIconDownloader,
@@ -36,16 +33,16 @@ public class FavIconService : IFavIconService
         string imageRepository = null
     )
     {
-        _imageRepository = imageRepository ?? Paths.ImageRepository;
         ArgumentNullException.ThrowIfNull(searchService);
         ArgumentNullException.ThrowIfNull(favIconDownloader);
         ArgumentNullException.ThrowIfNull(loggerFactory);
 
+        _imageRepository = imageRepository ?? Paths.ImageRepository;
         _favIconDownloader = favIconDownloader;
         _logger = loggerFactory.CreateLogger<FavIconDownloader>();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -65,5 +62,5 @@ public class FavIconService : IFavIconService
         await _favIconDownloader.SaveToFileAsync(uriAuthority, output);
     }
 
-    #endregion Methods
+    #endregion
 }
