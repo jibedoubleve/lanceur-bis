@@ -63,7 +63,7 @@ public class TestBase
     protected IDbConnection BuildFreshDb(string sql = null, string connectionString = null)
     {
         var db = BuildConnection(connectionString);
-        var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbededResourcePattern);
+        var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbeddedResourcePattern);
         updater.UpdateFromScratch();
 
         if (_isProfilingSql) SqlProfiler.IsActive = true;

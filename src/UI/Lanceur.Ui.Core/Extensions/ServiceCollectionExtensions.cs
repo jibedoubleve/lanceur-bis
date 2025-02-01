@@ -91,7 +91,7 @@ public static class ServiceCollectionExtensions
                                  sp.GetService<ILoggerFactory>(),
                                  sp.GetService<IDbConnection>(),
                                  ScriptRepository.Asm,
-                                 ScriptRepository.DbScriptEmbededResourcePattern
+                                 ScriptRepository.DbScriptEmbeddedResourcePattern
                              )
                          )
                          .AddTransient<IDataStoreVersionService, SQLiteVersionService>()
