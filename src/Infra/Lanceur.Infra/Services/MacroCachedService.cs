@@ -5,6 +5,7 @@ using Lanceur.Infra.Logging;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 using System.Reflection;
+using Lanceur.Infra.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Managers;

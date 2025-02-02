@@ -29,7 +29,7 @@ internal class GetAllAliasDbAction
                                 a.Id                              as {nameof(AliasQueryResult.Id)},
                                 COALESCE(a.arguments, '') || ' ' || aa.argument as {nameof(AliasQueryResult.Parameters)},
                                 a.file_name                       as {nameof(AliasQueryResult.FileName)},
-                                a.notes                           as {nameof(AliasQueryResult.Notes)},
+                                a.notes                           as {nameof(AliasQueryResult.Description)},
                                 a.run_as                          as {nameof(AliasQueryResult.RunAs)},
                                 a.start_mode                      as {nameof(AliasQueryResult.StartMode)},
                                 a.working_dir                     as {nameof(AliasQueryResult.WorkingDirectory)},

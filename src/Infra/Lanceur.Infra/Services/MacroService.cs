@@ -1,9 +1,10 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Microsoft.Extensions.Logging;
+using Lanceur.Infra.Managers;
 using Lanceur.SharedKernel.Extensions;
+using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.Managers;
+namespace Lanceur.Infra.Services;
 
 public class MacroService : MacroCachedService, IMacroService
 {
@@ -57,6 +58,7 @@ public class MacroService : MacroCachedService, IMacroService
         var macro = i.Clone();
         macro.Name = alias.Name;
         macro.Parameters = alias.Parameters;
+        macro.Description = alias.Description;
         return macro;
     }
 

@@ -1,6 +1,6 @@
-﻿using Lanceur.SharedKernel.Extensions;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Lanceur.SharedKernel.Extensions;
 using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Core.Models;
@@ -15,17 +15,13 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 
     private string _synonyms;
 
-    #endregion Fields
+    #endregion
 
     #region Properties
 
-    public static AliasQueryResult EmptyForCreation => new() { Name = "new alias" };
-
-    public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();
-
     /// <summary>
-    /// Additional parameters are a way to not duplicate alias to create other with the same
-    /// configuration but with only one parameter that differs
+    ///     Additional parameters are a way to not duplicate alias to create other with the same
+    ///     configuration but with only one parameter that differs
     /// </summary>
     public ObservableCollection<AdditionalParameter> AdditionalParameters
     {
@@ -35,16 +31,9 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 
     public int Delay { get; set; }
 
-    public override string Description
-    {
-        get => Notes.IsNullOrWhiteSpace() ? FileName : Notes;
-        set 
-        {
-            Notes = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(Notes));
-        }
-    }
+    public override string DescriptionDisplay => Description.IsNullOrEmpty() ? FileName : Description;
+
+    public static AliasQueryResult EmptyForCreation => new() { Name = "new alias" };
 
     public string FileName
     {
@@ -53,8 +42,8 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     }
 
     /// <summary>
-    /// Indicates whether the alias should override the RunAs value and execute
-    /// in privilege mode (as admin).
+    ///     Indicates whether the alias should override the RunAs value and execute
+    ///     in privilege mode (as admin).
     /// </summary>
     public override bool IsElevated
     {
@@ -65,19 +54,19 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     public bool IsHidden { get; set; }
 
     /// <summary>
-    /// Gets or sets a Lua script that will be executed
-    /// when user launch an alias
+    ///     Gets or sets a Lua script that will be executed
+    ///     when user launch an alias
     /// </summary>
     public string LuaScript { get; set; }
 
-    public string Notes { get; set; }
+    public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();
 
     public RunAs RunAs { get; set; } = RunAs.CurrentUser;
     public StartMode StartMode { get; set; } = StartMode.Default;
 
     /// <summary>
-    /// Get or set a string representing all the name this alias has.
-    /// It should be a coma separated list of names.
+    ///     Get or set a string representing all the name this alias has.
+    ///     It should be a coma separated list of names.
     /// </summary>
     public string Synonyms
     {
@@ -90,7 +79,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     }
 
     /// <summary>
-    /// New synonyms added when updated
+    ///     New synonyms added when updated
     /// </summary>
     public string SynonymsToAdd => Synonyms.SplitCsv()
                                            .Where(n => !SynonymsWhenLoaded.SplitCsv().Contains(n))
@@ -98,17 +87,17 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
                                            .JoinCsv();
 
     /// <summary>
-    /// Synonyms present when the entity was loaded
+    ///     Synonyms present when the entity was loaded
     /// </summary>
     public string SynonymsWhenLoaded { get; set; }
 
     public string WorkingDirectory { get; set; }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
     public static AliasQueryResult FromName(string aliasName) => new() { Name = aliasName, Synonyms = aliasName };
 
-    #endregion Methods
+    #endregion
 }

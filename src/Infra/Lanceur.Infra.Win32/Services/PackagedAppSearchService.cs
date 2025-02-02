@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
 using Lanceur.Infra.Win32.PackagedApp;
@@ -72,10 +71,8 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
         if (!results.Any()) return false;
 
         var result = results.First();
-        if (queryResult.Notes.IsNullOrEmpty())
-            queryResult.Description = result.Description.IsNullOrEmpty()
-                ? result.DisplayName
-                : result.Description;
+        if (queryResult.Description.IsNullOrEmpty()) queryResult.Description = result.DisplayName ?? "Packaged App";
+        
         queryResult.FileName = result.FileName;
         return true;
     }
