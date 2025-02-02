@@ -39,20 +39,20 @@
                         <ui:TextBlock
                             Margin="12,0,0,0"
                             FontTypography="Subtitle"
-                            Foreground="{DynamicResource TextFillColorPrimarydBrush}"
+                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                             Opacity="{StaticResource PrimaryTextOpacity}"
                             Text="{Binding Name}" />
                     </StackPanel>
                     <DockPanel Margin="12,0,15,0" Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ui:TextBlock
                             FontTypography="Body"
-                            Foreground="{DynamicResource TextFillColorTerciarydBrush}"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Opacity="{StaticResource SecondaryTextOpacity}"
-                            Text="{Binding Description, Converter={StaticResource TextToTruncatedTextConverter}}" />
+                            Text="{Binding DescriptionDisplay, Converter={StaticResource TextToTruncatedTextConverter}}" />
                         <ui:TextBlock
                             HorizontalAlignment="Right"
                             FontTypography="Caption"
-                            Foreground="{DynamicResource TextFillColorTerciarydBrush}"
+                            Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                             Opacity="{StaticResource SecondaryTextOpacity}"
                             Visibility="{Binding Count, Converter={StaticResource CounterToVisibilityConverter}}"
                             Text="{Binding Count, StringFormat=Count: {0}}" />
@@ -97,7 +97,7 @@
                             Margin="12,0,0,0"
                             VerticalAlignment="Center"
                             FontTypography="BodyStrong"
-                            Foreground="{DynamicResource TextFillColorPrimarydBrush}"
+                            Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                             Opacity="{StaticResource PrimaryTextOpacity}"
                             Text="{Binding Name}" />
                     </StackPanel>

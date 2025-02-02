@@ -18,6 +18,8 @@ public abstract class QueryResult : ObservableModel
 
     private int _count  ;
 
+    private string _description;
+
     private string _thumbnail;
 
     #endregion
@@ -39,7 +41,13 @@ public abstract class QueryResult : ObservableModel
         set => SetField(ref _count, value);
     }
 
-    public virtual string Description { get; set; }
+    public virtual string DescriptionDisplay => Description;
+
+    public string Description
+    {
+        get => _description;
+        set => SetField(ref _description, value);
+    }
 
     /// <summary>
     ///     Fall back for <see cref="Thumbnail" />. This property is expected to

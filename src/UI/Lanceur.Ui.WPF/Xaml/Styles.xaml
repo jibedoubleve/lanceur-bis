@@ -1,8 +1,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <!--  BOOLEANS  -->
     <sys:Boolean x:Key="True">True</sys:Boolean>
     <sys:Boolean x:Key="False">False</sys:Boolean>
@@ -25,6 +24,6 @@
     <!--  OPACITY  -->
     <sys:Double x:Key="PrimaryTextOpacity">1</sys:Double>
     <sys:Double x:Key="SecondaryTextOpacity">0.7</sys:Double>
-    <sys:Double x:Key="TerciaryTextOpacity">0.4</sys:Double>
+    <sys:Double x:Key="TertiaryTextOpacity">0.4</sys:Double>
 
 </ResourceDictionary>

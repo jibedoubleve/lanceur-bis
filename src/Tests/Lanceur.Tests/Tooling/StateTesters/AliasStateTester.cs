@@ -25,7 +25,7 @@ public class AliasStateTester
         Name = faker.Lorem.Word();
         Name2 = faker.Lorem.Word();
         Name3 = faker.Lorem.Word();
-        Notes = faker.Lorem.Sentence();
+        Description = faker.Lorem.Sentence();
         Parameters = string.Join(
             ", ",
             faker.Lorem.Word(),
@@ -43,7 +43,7 @@ public class AliasStateTester
     public string Name { get;  }
     private string Name2 { get;  }
     private string Name3 { get;  }
-    private string Notes { get;  }
+    private string Description { get;  }
     private string Parameters { get;  }
     private string WorkingDirectory { get;  }
 
@@ -58,17 +58,17 @@ public class AliasStateTester
         alias.FileName.Should().Be(FileName);
         alias.LuaScript.Should().Be(LuaScript);
         alias.Name.Should().Be(Name);
-        alias.Notes.Should().Be(Notes);
+        alias.DescriptionDisplay.Should().Be(Description);
         alias.Parameters.Should().Be(Parameters);
         alias.WorkingDirectory.Should().Be(WorkingDirectory);
-        alias.Description.Should().Be(Notes);
+        alias.Description.Should().Be(Description);
     }
 
     public void UpdateValues(ref AliasQueryResult alias)
     {
         alias.Name = Name;
         alias.Synonyms = $"{Name}, {Name2}, {Name3}";
-        alias.Notes = Notes;
+        alias.Description = Description;
         alias.FileName = FileName;
         alias.Parameters = Parameters;
         alias.WorkingDirectory = WorkingDirectory;

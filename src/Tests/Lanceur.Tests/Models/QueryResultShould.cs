@@ -10,8 +10,7 @@ public class QueryResultShould
 {
     #region Methods
 
-    [Fact]
-    public void HaveEmptyNameByDefault() => new TestQueryResult().Name.Should().BeEmpty();
+    [Fact] public void HaveEmptyNameByDefault() => new TestQueryResult().Name.Should().BeEmpty();
 
     [Fact]
     public void HaveEmptyQueryByDefault()
@@ -20,15 +19,32 @@ public class QueryResultShould
         query.Should().NotBeNull();
     }
 
-    [Fact]
-    public void HaveNullDescriptionByDefault() { new TestQueryResult().Description.Should().BeNull(); }
-
-    [Fact]
-    public void HaveTrimmedResultInSynonyms()
+    [Theory]
+    [InlineData(null, "un", "un")]
+    [InlineData("un", null, "un")]
+    [InlineData(null, null, null)]
+    public void HaveFileNameAsDescriptionWhenNoDescription(string description, string fileName, string expected)
     {
         // arrange
-        var synonyms = "un, deux,trois,quatre,cinq";
-        var queryResult = new AliasQueryResult() { Synonyms = synonyms };
+        var queryResult = new AliasQueryResult { Description = description, FileName = fileName };
+
+        // act
+
+        // assert
+        queryResult.DescriptionDisplay.Should().Be(expected);
+    }
+
+    [Fact] public void HaveNullDescriptionByDefault() { new TestQueryResult().Description.Should().BeNull(); }
+
+    [Theory]
+    [InlineData("un, deux,trois,quatre,cinq", 5)]
+    [InlineData(" un, deux,trois,quatre,cinq ", 5)]
+    [InlineData("un, deux,trois,quatre,cinq ", 5)]
+    [InlineData(" un, deux,trois,quatre,cinq", 5)]
+    public void HaveTrimmedResultInSynonyms(string synonyms, int count)
+    {
+        // arrange
+        var queryResult = new AliasQueryResult { Synonyms = synonyms };
 
         // act
         var names = queryResult.Synonyms.SplitCsv();
@@ -36,16 +52,15 @@ public class QueryResultShould
         // assert
         using (new AssertionScope())
         {
-            names.Should().HaveCount(5);
-            names.Select(x => x.Should().NotStartWith(" "));
-            names.Select(x => x.Should().NotEndWith(" "));
+            names.Should().HaveCount(count);
+            _ = names.Select(x => x.Should().NotStartWith(" "));
+            _ = names.Select(x => x.Should().NotEndWith(" "));
         }
     }
 
-    [Fact]
-    public void HaveZeroCountByDefault() { new TestQueryResult().Count.Should().Be(0); }
+    [Fact] public void HaveZeroCountByDefault() { new TestQueryResult().Count.Should().Be(0); }
 
-    #endregion Methods
+    #endregion
 
     #region Classes
 

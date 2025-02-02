@@ -107,7 +107,7 @@
                             <!--  NOTES  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbNotes}">Comments</Label>
                             <ui:TextBox x:Name="TbNotes"
-                                        Text="{Binding SelectedAlias.Notes, UpdateSourceTrigger=PropertyChanged}" />
+                                        Text="{Binding SelectedAlias.Description, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </ui:CardExpander>
                     <!--  PROCESS  -->

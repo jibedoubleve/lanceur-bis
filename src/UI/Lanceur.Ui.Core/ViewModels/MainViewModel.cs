@@ -164,7 +164,6 @@ public partial class MainViewModel : ObservableObject
             if (criterion.IsNullOrEmpty()) Results.Clear();
             var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
             Results = new(results);
-
             SelectedResult = Results.FirstOrDefault()!;
             Suggestion = GetSuggestion(criterion.Name, SelectedResult);
 
