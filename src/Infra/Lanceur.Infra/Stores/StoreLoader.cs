@@ -62,9 +62,9 @@ public class StoreLoader : IStoreLoader
                     // and otherwise, check whether it can be overriden
                     return !store.StoreOrchestration.AlivePattern.IsNullOrWhiteSpace() 
                            && store.IsOverridable 
-                           && storeOverrides.All(e => e.StoreType != store.GetType()); 
+                           && storeOverrides.All(e => e.StoreType != store.GetType().ToString()); 
                 })
-                    .Select(store => new StoreShortcut { AliasOverride = store.StoreOrchestration.AlivePattern, StoreType = store.GetType() })
+                    .Select(store => new StoreShortcut { AliasOverride = store.StoreOrchestration.AlivePattern, StoreType = store.GetType().ToString() })
                     .Where(storeOverride => settingsOverrides.All(x => x.StoreType != storeOverride.StoreType))
                     .ToList();
         

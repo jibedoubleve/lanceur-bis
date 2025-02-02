@@ -28,7 +28,7 @@ public class GuidMacro : MacroQueryResult
 
     #region Properties
 
-    public override string Icon => "SlotMachineOutline";
+    public override string Icon => "ClipboardCode24";
 
     #endregion
 

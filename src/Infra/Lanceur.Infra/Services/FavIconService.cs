@@ -4,8 +4,6 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Constants;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Web;
-using Microsoft.Extensions.Logging;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Lanceur.Infra.Services;
 
@@ -15,7 +13,6 @@ public class FavIconService : IFavIconService
 
     private readonly IFavIconDownloader _favIconDownloader;
     private readonly string _imageRepository;
-    private readonly ILogger _logger;
 
     /// <summary>
     ///     A regex to check whether the specified text
@@ -30,17 +27,14 @@ public class FavIconService : IFavIconService
     public FavIconService(
         IPackagedAppSearchService searchService,
         IFavIconDownloader favIconDownloader,
-        ILoggerFactory loggerFactory,
         string imageRepository = null
     )
     {
         ArgumentNullException.ThrowIfNull(searchService);
         ArgumentNullException.ThrowIfNull(favIconDownloader);
-        ArgumentNullException.ThrowIfNull(loggerFactory);
 
         _imageRepository = imageRepository ?? Paths.ImageRepository;
         _favIconDownloader = favIconDownloader;
-        _logger = loggerFactory.CreateLogger<FavIconDownloader>();
     }
 
     #endregion

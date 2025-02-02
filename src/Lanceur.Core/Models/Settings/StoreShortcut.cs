@@ -5,7 +5,7 @@ public class StoreShortcut : ObservableModel
     #region Fields
 
     private string _storeOverride;
-    private Type _storeType;
+    private string _storeType;
 
     #endregion
 
@@ -24,7 +24,7 @@ public class StoreShortcut : ObservableModel
     /// <summary>
     ///     Key to help to find the store. This is the result of a GetType().ToString()
     /// </summary>
-    public Type StoreType
+    public string StoreType
     {
         get => _storeType;
         set => SetField(ref _storeType, value);

@@ -16,7 +16,7 @@ public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfEx
 
     #region Properties
 
-    public override string Icon => "Console";
+    public override string Icon => "WindowConsole20";
 
     #endregion Properties
 

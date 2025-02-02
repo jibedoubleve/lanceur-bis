@@ -64,7 +64,8 @@ public static class ThumbnailExtensions
     /// </summary>
     /// <param name="fileName">The file name, possibly containing a prefix like "package:", for which to generate the thumbnail path.</param>
     /// <returns>The absolute path to the thumbnail image corresponding to the given file name.</returns>
-    public static string GetThumbnailPath(this string fileName) => Path.Combine(Paths.ImageRepository, $"{fileName.Replace("package:", "")}.png");
+    public static string GetThumbnailPath(this string fileName) 
+        => Path.Combine(Paths.ImageRepository, $"{fileName.Replace("package:", "")}.ico");
 
     #endregion Methods
 }

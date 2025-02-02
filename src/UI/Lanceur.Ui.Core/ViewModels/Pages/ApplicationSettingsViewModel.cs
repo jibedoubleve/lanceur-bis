@@ -127,12 +127,14 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             return;
         }
         var view = _viewFactory.CreateView(storeShortcut);
+        var storeName = storeShortcut.StoreType
+                                     .Replace("Store", "")
+                                     .Replace("Lanceur.Infra.Stores.", "");
 
-        var result = await _userInteraction.AskUserYesNoAsync(view, "Apply", "Cancel", $"Edit shortcut for store '{storeShortcut.StoreType.Name.Replace("Store", "")}'");
+        var result = await _userInteraction.AskUserYesNoAsync(view, "Apply", "Cancel", $"Edit shortcut for store '{storeName}'");
         if (!result) return;
 
-
-        _userNotificationService.Success($"Modification has been done on {storeShortcut.StoreType.Name.Replace("Store", "")}. Don't forget to save to apply changes", "Updated.");
+        _userNotificationService.Success($"Modification has been done on {storeName}. Don't forget to save to apply changes", "Updated.");
     }
 
     [RelayCommand]

@@ -44,14 +44,19 @@ public class AliasStore : Store, IStoreService
     #region Methods
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll() => _aliasRepository.GetAll();
+    public IEnumerable<QueryResult> GetAll()
+    {
+        using var _ = _logger.MeasureExecutionTime(this);
+        var entries = _aliasRepository.GetAll();
+        return entries;
+    }
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline query)
     {
         using var _ = _logger.MeasureExecutionTime(this);
-        var entry = _aliasRepository.Search(query.Name).ToArray();
-        return entry;
+        var entries = _aliasRepository.Search(query.Name).ToArray();
+        return entries;
     }
 
     #endregion
