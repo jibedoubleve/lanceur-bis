@@ -37,7 +37,7 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
         if (storeService is null) return false;
 
         var storeOverride = _settingsFacade.Application.Stores.StoreOverrides
-                                           .FirstOrDefault(x => x.StoreType == storeService.GetType());
+                                           .FirstOrDefault(x => x.StoreType == storeService.GetType().ToString());
         var regex = new Regex(storeOverride?.AliasOverride ?? storeService.StoreOrchestration.AlivePattern);
         
         var isAlive = regex.IsMatch(query.Name);

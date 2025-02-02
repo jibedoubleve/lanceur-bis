@@ -51,7 +51,6 @@ public class FavIconServiceShould
         var manager = new FavIconService(
             searchService,
             favIconDownloader,
-            logger,
             repository
         );
         var alias = new AliasQueryResult { FileName = url };
