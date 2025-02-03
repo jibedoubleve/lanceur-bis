@@ -23,8 +23,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     private readonly IAppRestartService _appRestartService;
 
-    [ObservableProperty] private string _bookmarkSourceBrowser;
-    [ObservableProperty] private string _dbPath;
+    [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
+    [ObservableProperty] private string _dbPath = string.Empty;
     [ObservableProperty] private bool _isAlt;
     [ObservableProperty] private bool _isCtrl;
     [ObservableProperty] private bool _isShift;
@@ -32,18 +32,19 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
     private readonly ILogger<ApplicationSettingsViewModel> _logger;
+    [ObservableProperty] private int _notificationDisplayDuration;
     [ObservableProperty] private double _searchDelay;
 
     [ObservableProperty] private ISettingsFacade _settings;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
-    [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts;
+    [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = new();
     private readonly IUserInteractionService _userInteraction;
 
     private readonly IUserNotificationService _userNotificationService;
     private readonly IViewFactory _viewFactory;
-    [ObservableProperty] private string _windowBackdropStyle;
+    [ObservableProperty] private string _windowBackdropStyle = "Mica";
 
     #endregion
 
@@ -81,16 +82,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IsTraceEnabled = loggingLevelSwitch.MinimumLevel == LogEventLevel.Verbose;
 
         // Miscellaneous
-        DbPath = _settings.Local.DbPath;
-        WindowBackdropStyle = _settings.Application.Window.BackdropStyle;
-        SearchDelay = _settings.Application.SearchBox.SearchDelay;
-        ShowResult = _settings.Application.SearchBox.ShowResult;
-        ShowAtStartup = _settings.Application.SearchBox.ShowAtStartup;
-        ShowLastQuery = _settings.Application.SearchBox.ShowLastQuery;
-        BookmarkSourceBrowser = _settings.Application.Stores.BookmarkSourceBrowser;
-
-        // Store overrides
-        StoreShortcuts = new(_settings.Application.Stores.StoreOverrides);
+        MapSettingsFromSource();
     }
 
     #endregion
@@ -107,16 +99,45 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         return result;
     }
 
-    private void MapSettings()
+    private void MapSettingsFromSource()
+    {
+        DbPath = Settings.Local.DbPath;
+        
+        // Search box section
+        SearchDelay = Settings.Application.SearchBox.SearchDelay;
+        ShowResult = Settings.Application.SearchBox.ShowResult;
+        ShowAtStartup = Settings.Application.SearchBox.ShowAtStartup;
+        ShowLastQuery = Settings.Application.SearchBox.ShowLastQuery;
+
+        // Store section
+        BookmarkSourceBrowser = Settings.Application.Stores.BookmarkSourceBrowser;
+
+        // Store overrides
+        BookmarkSourceBrowser = Settings.Application.Stores.BookmarkSourceBrowser;
+        StoreShortcuts = new(Settings.Application.Stores.StoreOverrides);
+
+        // Window section
+        NotificationDisplayDuration = Settings.Application.Window.NotificationDisplayDuration;
+        WindowBackdropStyle = Settings.Application.Window.BackdropStyle;
+    }
+
+    private void MapSettingsToSource()
     {
         Settings.Local.DbPath = DbPath;
-        Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
+
+        // Search box section
         Settings.Application.SearchBox.SearchDelay = SearchDelay;
         Settings.Application.SearchBox.ShowResult = ShowResult;
         Settings.Application.SearchBox.ShowAtStartup = ShowAtStartup;
         Settings.Application.SearchBox.ShowLastQuery = ShowLastQuery;
+
+        // Store section
         Settings.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
         Settings.Application.Stores.StoreOverrides = StoreShortcuts.ToArray();
+
+        // Window section
+        Settings.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
+        Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
     }
 
     [RelayCommand]
@@ -127,12 +148,18 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             _logger.LogWarning("No store shortcut selected.");
             return;
         }
+
         var view = _viewFactory.CreateView(storeShortcut);
         var storeName = storeShortcut.StoreType
                                      .Replace("Lanceur.Infra.Stores.", "")
                                      .Replace("Store", "");
 
-        var result = await _userInteraction.AskUserYesNoAsync(view, "Apply", "Cancel", $"Edit shortcut for store '{storeName}'");
+        var result = await _userInteraction.AskUserYesNoAsync(
+            view,
+            "Apply",
+            "Cancel",
+            $"Edit shortcut for store '{storeName}'"
+        );
         if (!result) return;
 
         _userNotificationService.Success($"Modification has been done on {storeName}. Don't forget to save to apply changes", "Updated.");
@@ -146,13 +173,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
-        
-        List<bool> reboot = [
-            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
-            Settings.Local.DbPath != DbPath
-        ];
 
-        MapSettings();
+        List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
+
+        MapSettingsToSource();
         Settings.Save();
         _userNotificationService.Success("Configuration saved.", "Saved");
 
