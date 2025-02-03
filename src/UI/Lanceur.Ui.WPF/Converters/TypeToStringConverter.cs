@@ -9,7 +9,9 @@ public class StoreTypeToStoreNameConverter : IValueConverter
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is Type t) return t.Name.Replace("Store", "");
+        if (value is string t)
+            return t.Replace("Lanceur.Infra.Stores.", "")
+                    .Replace("Store", "");
 
         return Binding.DoNothing;
     }
