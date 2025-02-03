@@ -116,6 +116,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Settings.Application.SearchBox.ShowAtStartup = ShowAtStartup;
         Settings.Application.SearchBox.ShowLastQuery = ShowLastQuery;
         Settings.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
+        Settings.Application.Stores.StoreOverrides = StoreShortcuts.ToArray();
     }
 
     [RelayCommand]
