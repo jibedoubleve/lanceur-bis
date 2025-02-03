@@ -4,6 +4,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Ui.Core.Messages;
+using Lanceur.Ui.Core.ViewModels;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Extensions;
@@ -22,6 +23,7 @@ public partial class SettingsView
     #region Constructors
 
     public SettingsView(
+        SettingsViewModel viewModel,
         IPageService pageService,
         IContentDialogService contentDialogService,
         ISnackbarService snackbarService
@@ -31,6 +33,8 @@ public partial class SettingsView
         ArgumentNullException.ThrowIfNull(contentDialogService);
         ArgumentNullException.ThrowIfNull(snackbarService);
 
+        DataContext = viewModel;
+        
         InitializeComponent();
         _contentDialogService = contentDialogService;
         _snackbarService = snackbarService;
@@ -61,14 +65,14 @@ public partial class SettingsView
         return result == ContentDialogResult.Primary;
     }
 
-    private ControlAppearance MapAppearance(MessageLevel level) => level switch
+    private static ControlAppearance MapAppearance(MessageLevel level) => level switch
     {
         MessageLevel.Success => ControlAppearance.Success,
         MessageLevel.Warning => ControlAppearance.Caution,
         _                    => throw new ArgumentOutOfRangeException(nameof(level), level, null)
     };
 
-    private IconElement MapIcon(MessageLevel level)
+    private static IconElement MapIcon(MessageLevel level)
     {
         var icon = level switch
         {
@@ -88,7 +92,7 @@ public partial class SettingsView
             message.Value.Message,
             MapAppearance(message.Value.Level),
             MapIcon(message.Value.Level),
-            5.Seconds()
+            15.Seconds()
         );
     }
 

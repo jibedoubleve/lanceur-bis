@@ -10,12 +10,11 @@
     Width="1920"
     Height="1080"
     ExtendsContentIntoTitleBar="True"
-    WindowBackdropType="Mica"
+    WindowBackdropType="{Binding WindowBackdropStyle}"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
     Closing="OnClosing"
     KeyDown="OnKeyDown"
-    
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
@@ -33,9 +32,9 @@
                     Icon="{ui:SymbolIcon Keyboard24}"
                     TargetPageType="{x:Type pages:KeywordsView}" />
                 <ui:NavigationViewItem
-                    Content="Data Reconciliation" 
+                    Content="Data Reconciliation"
                     Icon="{ui:SymbolIcon Database24}"
-                    TargetPageType="{x:Type pages:DataReconciliationView}"/>
+                    TargetPageType="{x:Type pages:DataReconciliationView}" />
                 <ui:NavigationViewItem
                     Content="Analytics"
                     Icon="{ui:SymbolIcon ChartMultiple24}"
