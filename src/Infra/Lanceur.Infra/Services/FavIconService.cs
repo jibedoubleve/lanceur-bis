@@ -48,7 +48,7 @@ public class FavIconService : IFavIconService
         if (IsMacroRegex.Match(url).Success) return;
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return;
 
-        var favIconPath = Path.Combine(_imageRepository, $"{FavIconExtensions.FilePrefix}{uri.Host}.png");
+        var favIconPath = Path.Combine(_imageRepository, $"{FavIconExtensions.FilePrefix}{uri.Host}.ico");
         if (File.Exists(favIconPath))
         {
             alias.Thumbnail = favIconPath;
