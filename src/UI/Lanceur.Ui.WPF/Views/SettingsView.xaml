@@ -15,6 +15,7 @@
     WindowStartupLocation="CenterScreen"
     Closing="OnClosing"
     KeyDown="OnKeyDown"
+    
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>

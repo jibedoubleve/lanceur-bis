@@ -109,7 +109,11 @@ public partial class MainView
 
     private void OnLoaded(object _, RoutedEventArgs e)
     {
-        SystemThemeWatcher.Watch(this);
+        SystemThemeWatcher.Watch(
+            this,
+            _settings.Application.Window.BackdropStyle.ToWindowBackdropType(),
+            updateAccents: true
+        );
 
         var hk = _databaseConfig!.Current.HotKey;
         SetGlobalShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);
