@@ -14,6 +14,8 @@ using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using NSubstitute;
+using NSubstitute.ReceivedExtensions;
 using Serilog.Core;
 using Serilog.Events;
 using Xunit;
@@ -36,7 +38,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
         serviceCollection.AddMockSingleton<IAppRestartService>()
                          .AddSingleton<ISettingsFacade, SettingsFacadeService>()
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
-                         .AddMockSingleton<IApplicationConfigurationService>()
+                         .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddMockSingleton<IViewFactory>()
                          .AddMockSingleton<IUserInteractionService>(
                              (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
@@ -53,7 +55,38 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
     {
         const string shortcut = "shortcut";
         const string defaultConfig = """
-                                     {"HotKey":{"Key":18,"ModifierKey":3},"SearchBox":{"SearchDelay":50.0,"ShowAtStartup":true,"ShowLastQuery":true,"ShowResult":false},"Stores":{"BookmarkSourceBrowser":"Zen","StoreOverrides":[{"AliasOverride":"^\\s{0,}/.*","StoreType":"Lanceur.Infra.Stores.BookmarksStore"},{"AliasOverride":"^\\s{0,}::.*","StoreType":"Lanceur.Infra.Stores.EverythingStore"}]},"Window":{"Position":{"Left":2200.0,"Top":200.0},"BackdropStyle":"Acrylic"}}
+                                     {
+                                         "HotKey": {
+                                             "Key": 18,
+                                             "ModifierKey": 3
+                                         },
+                                         "SearchBox": {
+                                             "SearchDelay": 50.0,
+                                             "ShowAtStartup": true,
+                                             "ShowLastQuery": true,
+                                             "ShowResult": false
+                                         },
+                                         "Stores": {
+                                             "BookmarkSourceBrowser": "Zen",
+                                             "StoreOverrides": [
+                                                 {
+                                                     "AliasOverride": "^\\s{0,}/.*",
+                                                     "StoreType": "Lanceur.Infra.Stores.BookmarksStore"
+                                                 },
+                                                 {
+                                                     "AliasOverride": "^\\s{0,}::.*",
+                                                     "StoreType": "Lanceur.Infra.Stores.EverythingStore"
+                                                 }
+                                             ]
+                                         },
+                                         "Window": {
+                                             "Position": {
+                                                 "Left": 2200.0,
+                                                 "Top": 200.0
+                                             },
+                                             "BackdropStyle": "Acrylic"
+                                         }
+                                     }
                                      """;
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModel(
@@ -81,6 +114,73 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                 results.Should().HaveCount(2);
                 _ = results.Select(e => e.Should().Be(shortcut));
 
+            },
+            SqlBuilder.Empty,
+            visitors
+        );
+    }
+
+    [Fact]
+    public async Task AskRebootAfterShortcutChanged()
+    {
+        IUserInteractionService userInteractionService = null;
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                userInteractionService = i;
+                return i;
+            }
+        };
+        await TestViewModel(
+            async (viewModel, _) =>
+            {
+                // arrange
+                
+                // act
+                viewModel.Settings.Application.HotKey = new(3, 18); // This is the default configuration
+                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+                
+                viewModel.Settings.Application.HotKey = new(1, 1);
+                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+
+                // assert
+                await userInteractionService.Received(1)
+                                            .AskUserYesNoAsync(Arg.Any<object>());
+            },
+            SqlBuilder.Empty,
+            visitors
+        );
+    }
+    
+    [Fact]
+    public async Task AskRebootAfterDbPathChanged()
+    {
+        IUserInteractionService userInteractionService = null;
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                userInteractionService = i;
+                return i;
+            }
+        };
+        await TestViewModel(
+            async (viewModel, _) =>
+            {
+                // arrange
+                
+                // act
+                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+                
+                viewModel.DbPath = Guid.NewGuid().ToString();
+                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+
+                // assert
+                await userInteractionService.Received(1)
+                                            .AskUserYesNoAsync(Arg.Any<object>());
             },
             SqlBuilder.Empty,
             visitors
