@@ -146,15 +146,17 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
-
-        var reboot = hash != (hk.ModifierKey, hk.Key).GetHashCode();
-        reboot &= Settings.Local.DbPath == DbPath;
+        
+        List<bool> reboot = [
+            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
+            Settings.Local.DbPath != DbPath
+        ];
 
         MapSettings();
         Settings.Save();
         _userNotificationService.Success("Configuration saved.", "Saved");
 
-        if (reboot)
+        if (reboot.Any(r => r))
         {
             const string msg = "Do you want to restart now to apply the new configuration?";
             if (await _userInteraction.AskUserYesNoAsync(msg)) _appRestartService.Restart();
