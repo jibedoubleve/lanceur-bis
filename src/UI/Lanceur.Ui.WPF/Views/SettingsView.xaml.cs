@@ -43,6 +43,10 @@ public partial class SettingsView
         WeakReferenceMessenger.Default.Register<SettingsView, QuestionRequestMessage>(this, (_, m) => m.Reply(HandleMessageBoxAsync(m)));
     }
 
+    #endregion
+
+    #region Methods
+
     private async Task<bool> HandleMessageBoxAsync(QuestionRequestMessage request)
     {
         var result = await _contentDialogService.ShowSimpleDialogAsync(
@@ -56,9 +60,6 @@ public partial class SettingsView
         );
         return result == ContentDialogResult.Primary;
     }
-    #endregion
-
-    #region Methods
 
     private ControlAppearance MapAppearance(MessageLevel level) => level switch
     {
