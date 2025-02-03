@@ -66,7 +66,19 @@ public class ThumbnailService : IThumbnailService
                                                   .OfType<AliasQueryResult>()
                                                   .ToArray();
                              _logger.LogTrace("Updating thumbnails for {Count} alias(es)", aliases.Length);
-                             if (aliases.Any()) _aliasRepository.UpdateThumbnails(aliases);
+                             try
+                             {
+                                 if (aliases.Any()) _aliasRepository.UpdateThumbnails(aliases);
+                             }
+                             catch (Exception ex)
+                             {
+                                 _logger.LogError(
+                                     ex,
+                                     "Error occured while updating the thumbnails. Aliases: {@AliasNames}",
+                                     aliases.Select(e => new { e.Id, e.Thumbnail })
+                                 );
+                                 throw;
+                             }
                          }
                      );
             _logger.LogTrace("Fire and forget the refresh of thumbnails.");
