@@ -14,7 +14,9 @@ public record Cmdline
         
         if (name.Contains(' ')) throw new ArgumentException("The name of a cmdline cannot contain whitespaces.", nameof(name));
 
-        Name = name ?? string.Empty;
+        name = name.Trim();
+        
+        Name = name;
         Parameters = parameters ?? string.Empty;
     }
 
