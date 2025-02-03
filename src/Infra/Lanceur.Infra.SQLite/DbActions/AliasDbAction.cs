@@ -384,7 +384,7 @@ public class AliasDbAction
 
     internal IEnumerable<long> UpdateThumbnails(IDbTransaction tx, IEnumerable<AliasQueryResult> aliases)
     {
-        const string sql = "update alias set thumbnail = @thumbnail where id = @id";
+        const string sql = "update alias set thumbnail = @Thumbnail where id = @Id;";
         var ids = new List<long>();
         foreach (var alias in aliases)
         {
