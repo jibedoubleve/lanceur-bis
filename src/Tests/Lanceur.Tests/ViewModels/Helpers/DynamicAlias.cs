@@ -1,4 +1,4 @@
-namespace Lanceur.Tests.ViewModels;
+namespace Lanceur.Tests.ViewModels.Helpers;
 
 /// <summary>
 ///     Represents a dynamic alias used in SQL queries to retrieve a single field.

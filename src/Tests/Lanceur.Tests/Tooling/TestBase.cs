@@ -12,8 +12,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Tooling;
 
-public class TestBase
-
+public abstract class TestBase
 {
     #region Fields
 
@@ -42,13 +41,6 @@ public class TestBase
     #endregion
 
     #region Methods
-    
-    /// <summary>
-    /// Activates SQL logging to provide detailed insights into SQL operations executed against the database.
-    /// This enables the capturing and display of SQL queries for profiling and debugging purposes.
-    /// </summary>
-    protected void EnableSqlProfiling() => _isProfilingSql = true;
-
 
     protected IDbConnection BuildConnection(string connectionString = null)
     {
@@ -75,11 +67,18 @@ public class TestBase
         return db;
     }
 
+
     protected static void CreateVersion(IDbConnection db, string version)
     {
         var sql = $"insert into settings (s_key, s_value) values ('db_version', '{version}')";
         db.Execute(sql);
     }
+
+    /// <summary>
+    ///     Activates SQL logging to provide detailed insights into SQL operations executed against the database.
+    ///     This enables the capturing and display of SQL queries for profiling and debugging purposes.
+    /// </summary>
+    protected void EnableSqlProfiling() => _isProfilingSql = true;
 
     protected DbSingleConnectionManager GetDatabase(SqlBuilder builder, string connectionString = null)
     {

@@ -10,7 +10,6 @@ using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
@@ -19,7 +18,6 @@ using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Tests.ViewModels.Helpers;
 using Lanceur.Ui.Core.Utils;
-using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
 using Microsoft.Extensions.Caching.Memory;
@@ -31,7 +29,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class MainViewModelShould : TestBase
+public class MainViewModelShould : ViewModelTest<MainViewModel>
 {
     #region Constructors
 
@@ -41,54 +39,48 @@ public class MainViewModelShould : TestBase
 
     #region Methods
 
-    private async Task TestViewModel(Func<MainViewModel, Task> scope, SqlBuilder sqlBuilder = null, ServiceVisitors visitors = null)
+    protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
-        using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty);
-        var serviceCollection = new ServiceCollection().AddView<MainViewModel>()
-                                                       .AddLogging(builder => builder.AddXUnit(OutputHelper))
-                                                       .AddDatabase(db)
-                                                       .AddApplicationSettings(
-                                                           stg => visitors?.VisitSettings?.Invoke(stg)
-                                                       )
-                                                       .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                                                       .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                                       .AddSingleton<IMappingService, AutoMapperMappingService>()
-                                                       .AddSingleton<ISearchService, SearchService>()
-                                                       .AddSingleton<IMacroService, MacroService>()
-                                                       .AddSingleton<IDbActionFactory, DbActionFactory>()
-                                                       .AddMockSingleton<IDatabaseConfigurationService>()
-                                                       .AddMockSingleton<IThumbnailService>()
-                                                       .AddMockSingleton<IUserInteractionService>()
-                                                       .AddMockSingleton<IUserNotificationService>()
-                                                       .AddMockSingleton<IUserInteractionHub>()
-                                                       .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
-                                                       .AddSingleton<IMemoryCache, MemoryCache>()
-                                                       .AddMockSingleton<IExecutionService>(
-                                                           (sp, i) =>
-                                                           {
-                                                               i.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                                                                .Returns(ExecutionResponse.NoResult);
-                                                               return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
-                                                           }
-                                                       )
-                                                       .AddMockSingleton<ISearchServiceOrchestrator>(
-                                                           (_, i) =>
-                                                           {
-                                                               i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
-                                                                .Returns(true);
-                                                               return i;
-                                                           }
-                                                       )
-                                                       .AddMockSingleton<IStoreLoader>(
-                                                           (sp, i) =>
-                                                           {
-                                                               i.Load().Returns([new AliasStore(sp), new ReservedAliasStore(sp), new CalculatorStore(sp)]);
-                                                               return i;
-                                                           }
-                                                       );
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        var viewModel = serviceProvider.GetService<MainViewModel>();
-        await scope(viewModel);
+        serviceCollection.AddApplicationSettings(
+                             stg => visitors?.VisitSettings?.Invoke(stg)
+                         )
+                         .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                         .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
+                         .AddSingleton<IMappingService, AutoMapperMappingService>()
+                         .AddSingleton<ISearchService, SearchService>()
+                         .AddSingleton<IMacroService, MacroService>()
+                         .AddSingleton<IDbActionFactory, DbActionFactory>()
+                         .AddMockSingleton<IDatabaseConfigurationService>()
+                         .AddMockSingleton<IThumbnailService>()
+                         .AddMockSingleton<IUserInteractionService>()
+                         .AddMockSingleton<IUserNotificationService>()
+                         .AddMockSingleton<IUserInteractionHub>()
+                         .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
+                         .AddSingleton<IMemoryCache, MemoryCache>()
+                         .AddMockSingleton<IExecutionService>(
+                             (sp, i) =>
+                             {
+                                 i.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                                  .Returns(ExecutionResponse.NoResult);
+                                 return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
+                             }
+                         )
+                         .AddMockSingleton<ISearchServiceOrchestrator>(
+                             (_, i) =>
+                             {
+                                 i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
+                                  .Returns(true);
+                                 return i;
+                             }
+                         )
+                         .AddMockSingleton<IStoreLoader>(
+                             (sp, i) =>
+                             {
+                                 i.Load().Returns([new AliasStore(sp), new ReservedAliasStore(sp), new CalculatorStore(sp)]);
+                                 return i;
+                             }
+                         );
+        return serviceCollection;
     }
 
     [Fact]
@@ -104,7 +96,7 @@ public class MainViewModelShould : TestBase
             }
         };
         await TestViewModel(
-            async viewModel =>
+            async (viewModel, _) =>
             {
                 // ARRANGE
                 var alias = Substitute.For<ExecutableQueryResult>();
@@ -115,7 +107,7 @@ public class MainViewModelShould : TestBase
                 await viewModel.ExecuteCommand.ExecuteAsync(false); //RunAsAdmin: false
 
                 // ASSERT done in ServiceCollectionConfigurator
-                using var _ = new AssertionScope();
+                using var scope = new AssertionScope();
                 sut.Should().NotBeNull();
                 await sut.Received().ExecuteAsync(Arg.Any<ExecutionRequest>());
             },
@@ -131,7 +123,7 @@ public class MainViewModelShould : TestBase
     public async Task BeAbleToExecuteCalculation(string operation, string result)
     {
         await TestViewModel(
-            async viewModel =>
+            async (viewModel, _) =>
             {
                 // ARRANGE
                 var alias = Substitute.For<ExecutableQueryResult>();
@@ -142,7 +134,7 @@ public class MainViewModelShould : TestBase
                 await viewModel.SearchCommand.ExecuteAsync(null);
 
                 // ASSERT done in ServiceCollectionConfigurator
-                using var _ = new AssertionScope();
+                using var scope = new AssertionScope();
                 viewModel.Results.Should().HaveCountGreaterThan(0);
                 viewModel.Results.ElementAt(0).Name.Should().Be(result);
             }
@@ -159,7 +151,7 @@ public class MainViewModelShould : TestBase
 
 
         await TestViewModel(
-            async viewModel =>
+            async (viewModel, _) =>
             {
                 // ACT
                 viewModel.Query = "alias";
@@ -180,17 +172,17 @@ public class MainViewModelShould : TestBase
         var builder = new SqlBuilder().AppendAlias(1, synonyms: ["alias1", "alias_1"])
                                       .AppendAlias(2, synonyms: ["alias2", "alias_2"])
                                       .AppendAlias(3, synonyms: ["alias3", "alias_3"]);
-                
+
         var visitors = new ServiceVisitors
         {
             VisitSettings = settings =>
             {
-                var application = new DatabaseConfiguration { SearchBox = new() { ShowResult = showAllResults, } };
+                var application = new DatabaseConfiguration { SearchBox = new() { ShowResult = showAllResults } };
                 settings.Application.Returns(application);
             }
         };
         await TestViewModel(
-            async viewModel =>
+            async (viewModel, _) =>
             {
                 await viewModel.DisplayResultsIfAllowed();
                 viewModel.Results.Should().HaveCountGreaterOrEqualTo(count);
@@ -199,6 +191,6 @@ public class MainViewModelShould : TestBase
             visitors
         );
     }
-    #endregion
 
+    #endregion
 }

@@ -1,20 +1,12 @@
-using System.Reflection;
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
-using Lanceur.Core;
-using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
-using Lanceur.Core.Stores;
-using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
-using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
-using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.SQL;
@@ -24,14 +16,13 @@ using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class KeywordsViewModelShould : TestBase
+public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
 {
     #region Constructors
 
@@ -41,63 +32,34 @@ public class KeywordsViewModelShould : TestBase
 
     #region Methods
 
-    private async Task TestViewModel(Func<KeywordsViewModel, IDbConnectionManager, Task> scope, SqlBuilder sqlBuilder = null, ServiceVisitors visitors = null)
+    protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
-        var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
-        using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
-        var serviceCollection = new ServiceCollection().AddView<KeywordsViewModel>()
-                                                       .AddLogging(builder => builder.AddXUnit(OutputHelper))
-                                                       .AddDatabase(db)
-                                                       .AddApplicationSettings(
-                                                           stg => visitors?.VisitSettings?.Invoke(stg)
-                                                       )
-                                                       .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                                                       .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                                       .AddSingleton<IMappingService, AutoMapperMappingService>()
-                                                       .AddSingleton<ISearchService, SearchService>()
-                                                       .AddSingleton<IMacroService, MacroService>()
-                                                       .AddSingleton<IDbActionFactory, DbActionFactory>()
-                                                       .AddMockSingleton<IDatabaseConfigurationService>()
-                                                       .AddSingleton<IAliasManagementService, AliasManagementService>()
-                                                       .AddSingleton<IAliasValidationService, AliasValidationService>()
-                                                       .AddMockSingleton<IViewFactory>()
-                                                       .AddMockSingleton<IPackagedAppSearchService>()
-                                                       .AddMockSingleton<IThumbnailService>()
-                                                       .AddMockSingleton<IUserInteractionService>(
-                                                           (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
-                                                       )
-                                                       .AddMockSingleton<IUserNotificationService>(
-                                                           (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
-                                                       )
-                                                       .AddMockSingleton<IUserInteractionHub>()
-                                                       .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
-                                                       .AddSingleton<IMemoryCache, MemoryCache>()
-                                                       .AddMockSingleton<IExecutionService>(
-                                                           (sp, i) =>
-                                                           {
-                                                               i.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                                                                .Returns(ExecutionResponse.NoResult);
-                                                               return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
-                                                           }
-                                                       )
-                                                       .AddMockSingleton<ISearchServiceOrchestrator>(
-                                                           (_, i) =>
-                                                           {
-                                                               i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
-                                                                .Returns(true);
-                                                               return i;
-                                                           }
-                                                       )
-                                                       .AddMockSingleton<IStoreLoader>(
-                                                           (sp, i) =>
-                                                           {
-                                                               i.Load().Returns([new AliasStore(sp), new ReservedAliasStore(sp), new CalculatorStore(sp)]);
-                                                               return i;
-                                                           }
-                                                       );
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        var viewModel = serviceProvider.GetService<KeywordsViewModel>();
-        await scope(viewModel, db);
+        serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>()
+                         .AddSingleton<IDbActionFactory, DbActionFactory>()
+                         .AddMockSingleton<IDatabaseConfigurationService>()
+                         .AddSingleton<IAliasManagementService, AliasManagementService>()
+                         .AddSingleton<IAliasValidationService, AliasValidationService>()
+                         .AddMockSingleton<IViewFactory>()
+                         .AddMockSingleton<IPackagedAppSearchService>()
+                         .AddMockSingleton<IThumbnailService>()
+                         .AddMockSingleton<IUserInteractionService>(
+                             (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
+                         )
+                         .AddMockSingleton<IUserNotificationService>(
+                             (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
+                         )
+                         .AddMockSingleton<IUserInteractionHub>()
+                         .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
+                         .AddSingleton<IMemoryCache, MemoryCache>()
+                         .AddMockSingleton<IExecutionService>(
+                             (sp, i) =>
+                             {
+                                 i.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                                  .Returns(ExecutionResponse.NoResult);
+                                 return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
+                             }
+                         );
+        return serviceCollection;
     }
 
     [Fact]
