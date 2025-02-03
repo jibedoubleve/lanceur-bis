@@ -105,7 +105,7 @@ public partial class SettingsView : INavigationWindow
             message.Value.Message,
             MapAppearance(message.Value.Level),
             MapIcon(message.Value.Level),
-            15.Seconds()
+           _settings.Application.Window.NotificationDisplayDuration.Seconds()
         );
     }
 
@@ -140,10 +140,11 @@ public partial class SettingsView : INavigationWindow
     /// <inheritdoc />
     public bool Navigate(Type pageType) => PageNavigationView.Navigate(pageType);
 
-    public void SetPageService(INavigationViewPageProvider navigationViewPageProvider) => PageNavigationView.SetPageProviderService(navigationViewPageProvider);
-
     /// <inheritdoc />
     public void SetServiceProvider(IServiceProvider serviceProvider) => _logger.LogWarning("Method '{Method}' is not implemented", nameof(SetServiceProvider));
+
+    /// <inheritdoc />
+    public void SetPageService(INavigationViewPageProvider navigationViewPageProvider) => _logger.LogWarning("Method '{Method}' is not implemented", nameof(SetServiceProvider));
 
     /// <inheritdoc />
     public void ShowWindow() => Show();

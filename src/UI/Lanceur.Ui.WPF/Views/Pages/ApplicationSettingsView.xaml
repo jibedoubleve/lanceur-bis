@@ -93,6 +93,14 @@
                                          IsChecked="{Binding ShowAtStartup}" />
                     </StackPanel>
                 </ui:CardControl>
+                
+                <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon ReadingList24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Notification Duration (in seconds)." />
+                    </ui:CardControl.Header>
+                    <ui:CardControl.ToolTip>Set the duration (in seconds) that notifications remain visible.</ui:CardControl.ToolTip>
+                    <ui:NumberBox Value="{Binding NotificationDisplayDuration, UpdateSourceTrigger=PropertyChanged}" />
+                </ui:CardControl>
 
                 <ui:TextBlock Margin="{StaticResource RegionMargin}"
                               FontTypography="{StaticResource RegionFontTypography}"
