@@ -5,18 +5,23 @@ using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
+using Microsoft.Extensions.Logging;
 using Wpf.Ui;
+using Wpf.Ui.Abstractions;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Extensions;
+using ILogger = Serilog.ILogger;
 
 namespace Lanceur.Ui.WPF.Views;
 
-public partial class SettingsView
+public partial class SettingsView : INavigationWindow
 {
     #region Fields
 
     private readonly IContentDialogService _contentDialogService;
     private readonly ISnackbarService _snackbarService;
+    private readonly ILogger<SettingsView> _logger;
 
     #endregion
 
@@ -24,21 +29,25 @@ public partial class SettingsView
 
     public SettingsView(
         SettingsViewModel viewModel,
-        IPageService pageService,
         IContentDialogService contentDialogService,
-        ISnackbarService snackbarService
+        ISnackbarService snackbarService,
+        IServiceProvider serviceProvider,
+        ILogger<SettingsView> logger
     )
     {
-        ArgumentNullException.ThrowIfNull(pageService);
         ArgumentNullException.ThrowIfNull(contentDialogService);
         ArgumentNullException.ThrowIfNull(snackbarService);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+
 
         DataContext = viewModel;
-        
+
         InitializeComponent();
+
+        PageNavigationView.SetServiceProvider(serviceProvider);
         _contentDialogService = contentDialogService;
         _snackbarService = snackbarService;
-        PageNavigationView.SetPageService(pageService);
+        _logger = logger;
         contentDialogService.SetDialogHost(ContentPresenterForDialogs);
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
 
@@ -107,7 +116,24 @@ public partial class SettingsView
         if (e.Key == Key.Escape) Close();
     }
 
+    /// <inheritdoc />
+    public void CloseWindow() => Close();
+
+    /// <inheritdoc />
+    public INavigationView GetNavigation() => PageNavigationView;
+
     public void Navigate<T>(object? dataContext = null) where T : Page => PageNavigationView.Navigate(typeof(T), dataContext);
+
+    /// <inheritdoc />
+    public bool Navigate(Type pageType) => PageNavigationView.Navigate(pageType);
+
+    public void SetPageService(INavigationViewPageProvider navigationViewPageProvider) => PageNavigationView.SetPageProviderService(navigationViewPageProvider);
+
+    /// <inheritdoc />
+    public void SetServiceProvider(IServiceProvider serviceProvider) => _logger.LogWarning("Method '{Method}' is not implemented", nameof(SetServiceProvider));
+
+    /// <inheritdoc />
+    public void ShowWindow() => Show();
 
     #endregion
 }
