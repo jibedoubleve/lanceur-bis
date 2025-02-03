@@ -36,6 +36,7 @@ public static class CmdlineManager
 
     public static Cmdline BuildFromText(string cmdline)
     {
+        cmdline = cmdline?.Trim();
         var name = string.Empty;
         var args = string.Empty;
         cmdline ??= string.Empty;
