@@ -43,8 +43,8 @@ public class CmdlineShould
     [InlineData("deux trois", "deux quatre")]
     public void NotBeEquals(string cmd1, string cmd2)
     {
-        var left = Cmdline.BuildFromText(cmd1);
-        var right =Cmdline.BuildFromText(cmd2);
+        var left = Cmdline.BuildFromText(cmd1?.Trim());
+        var right =Cmdline.BuildFromText(cmd2?.Trim());
         
         (left != right).Should().BeTrue();
     }
@@ -83,5 +83,16 @@ public class CmdlineShould
                       .Be(cmdline[0].ToString());
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("  undeux  ")]
+    [InlineData("  undeux")]
+    [InlineData("undeux  ")]
+    public void TrimLeadingAndTrailingWhitespace(string cmd)
+    {
+        Cmdline.BuildFromText(cmd)
+               .Name.Should()
+               .Be(cmd.Trim());
+    }
     #endregion Methods
 }

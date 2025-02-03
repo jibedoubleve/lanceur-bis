@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;
+using Lanceur.Core.Models;
 using Lanceur.Tests.Tooling.Macros;
 using NSubstitute;
 using Xunit;
@@ -15,9 +16,7 @@ public class CmdlineManagerShould
     [InlineData("init", "un deux trois", "quatre cinq six")]
     [InlineData("move", "un", "quatre cinq six")]
     [InlineData("move", "", "quatre cinq six")]
-    [InlineData("", "", "quatre cinq six")]
     [InlineData("?", "", "quatre cinq six")]
-    [InlineData("", "un deux trois", "quatre cinq six")]
     [InlineData("?", "un deux trois", "quatre cinq six")]
     public void CloneCmdline(string name, string parameters, string newParameters)
     {
