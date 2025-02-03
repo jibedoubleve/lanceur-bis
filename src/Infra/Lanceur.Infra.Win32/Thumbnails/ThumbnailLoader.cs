@@ -25,7 +25,7 @@ internal class ThumbnailLoader
 
     #region Methods
 
-    private ImageSource GetThumbnail(string path, ThumbnailOptions options) => WindowsThumbnailProvider.GetThumbnail(
+    private static ImageSource GetThumbnail(string path, ThumbnailOptions options) => WindowsThumbnailProvider.GetThumbnail(
         path,
         ThumbnailSize,
         ThumbnailSize,

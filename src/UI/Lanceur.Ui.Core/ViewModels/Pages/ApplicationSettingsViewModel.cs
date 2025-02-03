@@ -129,8 +129,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         }
         var view = _viewFactory.CreateView(storeShortcut);
         var storeName = storeShortcut.StoreType
-                                     .Replace("Store", "")
-                                     .Replace("Lanceur.Infra.Stores.", "");
+                                     .Replace("Lanceur.Infra.Stores.", "")
+                                     .Replace("Store", "");
 
         var result = await _userInteraction.AskUserYesNoAsync(view, "Apply", "Cancel", $"Edit shortcut for store '{storeName}'");
         if (!result) return;
