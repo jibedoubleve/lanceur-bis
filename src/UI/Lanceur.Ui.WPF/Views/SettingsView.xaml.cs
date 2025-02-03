@@ -1,17 +1,19 @@
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
+using Lanceur.Ui.WPF.Extensions;
 using Microsoft.Extensions.Logging;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Extensions;
-using ILogger = Serilog.ILogger;
 
 namespace Lanceur.Ui.WPF.Views;
 
@@ -20,8 +22,9 @@ public partial class SettingsView : INavigationWindow
     #region Fields
 
     private readonly IContentDialogService _contentDialogService;
-    private readonly ISnackbarService _snackbarService;
     private readonly ILogger<SettingsView> _logger;
+    private readonly ISettingsFacade _settings;
+    private readonly ISnackbarService _snackbarService;
 
     #endregion
 
@@ -32,13 +35,13 @@ public partial class SettingsView : INavigationWindow
         IContentDialogService contentDialogService,
         ISnackbarService snackbarService,
         IServiceProvider serviceProvider,
-        ILogger<SettingsView> logger
+        ILogger<SettingsView> logger,
+        ISettingsFacade settings
     )
     {
         ArgumentNullException.ThrowIfNull(contentDialogService);
         ArgumentNullException.ThrowIfNull(snackbarService);
         ArgumentNullException.ThrowIfNull(serviceProvider);
-
 
         DataContext = viewModel;
 
@@ -48,6 +51,7 @@ public partial class SettingsView : INavigationWindow
         _contentDialogService = contentDialogService;
         _snackbarService = snackbarService;
         _logger = logger;
+        _settings = settings;
         contentDialogService.SetDialogHost(ContentPresenterForDialogs);
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
 
@@ -114,6 +118,15 @@ public partial class SettingsView : INavigationWindow
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape) Close();
+    }
+
+    private void OnLoaded(object _, RoutedEventArgs e)
+    {
+        SystemThemeWatcher.Watch(
+            this,
+            _settings.Application.Window.BackdropStyle.ToWindowBackdropType(),
+            updateAccents: true
+        );
     }
 
     /// <inheritdoc />
