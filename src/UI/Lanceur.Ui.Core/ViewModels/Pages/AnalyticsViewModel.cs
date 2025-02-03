@@ -2,9 +2,12 @@ using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Humanizer;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
@@ -12,10 +15,10 @@ public partial class AnalyticsViewModel : ObservableObject
 {
     #region Fields
 
-    private IEnumerable<DataPoint<DateTime, double>> _cachedDataPoints = [];
-
+    private const string CacheKey = $"analytics_{nameof(AnalyticsViewModel)}";
     [ObservableProperty] private PlotType _currentPlotType;
     private readonly IAliasRepository _aliasRepository;
+    private readonly IMemoryCache _memoryCache;
     [ObservableProperty] private bool _isMonthlyVisible;
     [ObservableProperty] private bool _isYearVisible;
     private readonly ILogger<AnalyticsViewModel> _logger;
@@ -25,10 +28,11 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #region Constructors
 
-    public AnalyticsViewModel(ILogger<AnalyticsViewModel> logger, IAliasRepository aliasRepository)
+    public AnalyticsViewModel(ILogger<AnalyticsViewModel> logger, IAliasRepository aliasRepository, IMemoryCache memoryCache)
     {
         _logger = logger;
         _aliasRepository = aliasRepository;
+        _memoryCache = memoryCache;
     }
 
     #endregion
@@ -47,7 +51,14 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #region Methods
 
-    private void Cache(IEnumerable<DataPoint<DateTime, double>> points) => _cachedDataPoints = points;
+    private CancellationTokenSource _cancellationCacheTokenSource = new();
+
+    private void InvalidateCache(IEnumerable<DataPoint<DateTime, double>> points)
+    {
+        _cancellationCacheTokenSource.Cancel();
+        _cancellationCacheTokenSource = new(1.Minutes());
+        _memoryCache.Set(CacheKey, points, new CancellationChangeToken(_cancellationCacheTokenSource.Token));
+    }
 
     private ObservableCollection<string> GetYears(IEnumerable<DataPoint<DateTime, double>> points)
     {
@@ -64,7 +75,7 @@ public partial class AnalyticsViewModel : ObservableObject
         IsYearVisible = true;
         var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Day));
         points = points.ToList();
-        Cache(points);
+        InvalidateCache(points);
         RedrawPlot(OnRefreshDailyPlot, points, PlotType.DailyHistory);
     }
 
@@ -74,7 +85,7 @@ public partial class AnalyticsViewModel : ObservableObject
         IsYearVisible = true;
         var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Month));
         points = points.ToList();
-        Cache(points);
+        InvalidateCache(points);
 
         IsMonthlyVisible = points.Any();
         if (IsMonthlyVisible)
@@ -89,7 +100,7 @@ public partial class AnalyticsViewModel : ObservableObject
         IsYearVisible = false;
         var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Year));
         points = points.ToList();
-        Cache(points);
+        InvalidateCache(points);
 
         IsMonthlyVisible = points.Any();
         if (IsMonthlyVisible)
@@ -104,7 +115,7 @@ public partial class AnalyticsViewModel : ObservableObject
         IsYearVisible = false;
         var points = await Task.Run(() => _aliasRepository.GetUsage(Per.DayOfWeek));
         points = points.ToList();
-        Cache(points);
+        InvalidateCache(points);
         RedrawPlot(OnRefreshUsageByDayOfWeekPlot, points, PlotType.UsageByDayOfWeek, e => (double)e.DayOfWeek);
     }
 
@@ -114,7 +125,7 @@ public partial class AnalyticsViewModel : ObservableObject
         IsYearVisible = false;
         var points = await Task.Run(() => _aliasRepository.GetUsage(Per.HourOfDay));
         points = points.ToList();
-        Cache(points);
+        InvalidateCache(points);
         RedrawPlot(OnRefreshUsageByHourPlot, points, PlotType.UsageByHourOfDay, e => e.TimeOfDay.TotalHours);
     }
 
@@ -122,9 +133,10 @@ public partial class AnalyticsViewModel : ObservableObject
     private void OnSelectYear(string year)
     {
         _logger.LogTrace("Display history for year {Year}", year);
-        var points = int.TryParse(year, out var y)
-            ? _cachedDataPoints.Where(p => p.X.Year == y)
-            : _cachedDataPoints;
+
+        var points = _memoryCache.Get<IEnumerable<DataPoint<DateTime, double>>>(CacheKey);
+
+        if (points == null) throw new NullReferenceException("No chart preloaded. Cannot display history.");
 
         RedrawPlot(LastPlotContext, points);
     }

@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Windows.ApplicationModel;
 
-namespace Lanceur.Infra.Win32.PackagedApp;
+namespace Lanceur.Infra.Win32.Extensions;
 
 public static class PackageExtensions
 {

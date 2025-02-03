@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Logging;
-using Lanceur.Infra.Win32.PackagedApp;
+using Lanceur.Infra.Win32.Extensions;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
