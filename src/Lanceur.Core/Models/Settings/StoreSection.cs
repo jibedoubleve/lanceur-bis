@@ -25,7 +25,7 @@ public class StoreSection
     ///     Represents a user-defined alias that replaces the default shortcut
     ///     to perform a search using the store associated with that shortcut.
     /// </summary>
-    public IEnumerable<StoreShortcut> StoreOverrides { get; set; }
+    public IEnumerable<StoreShortcut> StoreOverrides { get; set; } = new List<StoreShortcut>();
 
     #endregion
 }
