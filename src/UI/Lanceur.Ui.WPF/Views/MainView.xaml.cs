@@ -7,6 +7,7 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Win32.Extensions;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
+using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,9 @@ using Microsoft.Extensions.Logging;
 using NHotkey;
 using NHotkey.Wpf;
 using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
+using ListViewItem = System.Windows.Controls.ListViewItem;
+using MenuItem = System.Windows.Controls.MenuItem;
 
 namespace Lanceur.Ui.WPF.Views;
 
@@ -28,12 +32,19 @@ public partial class MainView
     private readonly FallbackShortcuts _fallbackShortcuts = new();
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ISettingsFacade _settings;
 
     #endregion
 
     #region Constructors
 
-    public MainView(MainViewModel viewModel, IDatabaseConfigurationService databaseConfigurationService, ILogger<MainView> logger, IServiceProvider serviceProvider)
+    public MainView(
+        MainViewModel viewModel,
+        IDatabaseConfigurationService databaseConfigurationService,
+        ILogger<MainView> logger,
+        IServiceProvider serviceProvider,
+        ISettingsFacade settings
+    )
     {
         ArgumentNullException.ThrowIfNull(databaseConfigurationService);
         ArgumentNullException.ThrowIfNull(logger);
@@ -42,6 +53,7 @@ public partial class MainView
         _databaseConfig = databaseConfigurationService;
         _logger = logger;
         _serviceProvider = serviceProvider;
+        _settings = settings;
 
         DataContext = viewModel;
 
@@ -74,14 +86,26 @@ public partial class MainView
 
     private void HideWindow()
     {
-        if (ViewModel.ShowLastQuery) QueryTextBox.SelectAll();
-        else QueryTextBox.Clear();
+        if (ViewModel.ShowLastQuery)
+            QueryTextBox.SelectAll();
+        else
+            QueryTextBox.Clear();
         Hide();
     }
 
-    private void OnClickDarkTheme(object sender, RoutedEventArgs e) => ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+    private void OnClickDarkTheme(object sender, RoutedEventArgs e)
+    {
+        var windowBackdropType = _settings.Application.Window.BackdropStyle.ToWindowBackdropType();
+        _logger.LogTrace("Change theme to {Theme} and backdrop type {BackdropType}", ApplicationTheme.Dark, windowBackdropType);
+        ApplicationThemeManager.Apply(ApplicationTheme.Dark, windowBackdropType);
+    }
 
-    private void OnClickLightTheme(object sender, RoutedEventArgs e) => ApplicationThemeManager.Apply(ApplicationTheme.Light);
+    private void OnClickLightTheme(object sender, RoutedEventArgs e)
+    {
+        var windowBackdropType = _settings.Application.Window.BackdropStyle.ToWindowBackdropType();
+        _logger.LogTrace("Change theme to {Theme} and backdrop type {BackdropType}", ApplicationTheme.Light, windowBackdropType);
+        ApplicationThemeManager.Apply(ApplicationTheme.Light, windowBackdropType);
+    }
 
     private void OnLoaded(object _, RoutedEventArgs e)
     {
