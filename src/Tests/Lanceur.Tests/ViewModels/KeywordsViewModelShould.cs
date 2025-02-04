@@ -229,6 +229,26 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     }
 
     [Fact]
+    public async Task NotRecreateAliasOnLoad()
+    {
+        var builder = new SqlBuilder().AppendAlias(1, "un", "", ["deux"])
+                                      .AppendAlias(2, "deux", "", ["trois"]);
+        var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        await TestViewModel(
+            async (viewModel, _) =>
+            {
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
+                viewModel.Aliases.Should().HaveCount(2);
+
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
+                viewModel.Aliases.Should().HaveCount(2);
+            },
+            builder,
+            visitor
+        );
+    }
+
+    [Fact]
     public async Task UpdateAliasWithLuaScript()
     {
         await TestViewModel(

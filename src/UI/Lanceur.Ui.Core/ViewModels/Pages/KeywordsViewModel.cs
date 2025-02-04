@@ -216,7 +216,7 @@ public partial class KeywordsViewModel : ObservableObject
         var result = await Task.Run(() => _aliasManagementService.GetAll());
         _bufferedAliases = result.ToList();
 
-        if (Aliases.Count == 0)
+        if (Aliases.Count > 0)
         {
             SelectedAlias = _bufferedAliases.Reselect(SelectedAlias);
             Aliases = new(_bufferedAliases);
