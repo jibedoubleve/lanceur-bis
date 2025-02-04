@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,10 +29,15 @@ public class PageNavigator
 
     public void NavigateToSettings<TView>() where TView : Page
     {
-        var view = _serviceProvider.GetService<SettingsView>()!;
+        var windows = Application.Current.Windows.OfType<SettingsView>().ToArray();
+        var view  = windows.Length != 0
+            ? windows.ElementAt(0)
+            : _serviceProvider.GetService<SettingsView>()!;
+        
         _logger.LogTrace("Navigating to settings subview '{View}'", view.GetType().FullName);
         view.Show();
         view.Navigate<TView>();
+        
     }
 
     #endregion
