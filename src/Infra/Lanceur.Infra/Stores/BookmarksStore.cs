@@ -62,7 +62,7 @@ public class BookmarksStore : Store, IStoreService
 
         if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
 
-        return repository.GetBookmarks(cmdline.Parameters)
+        return repository. GetBookmarks(cmdline.Parameters)
                          .Select(e => e.ToAliasQueryResult())
                          .ToList();
     }
