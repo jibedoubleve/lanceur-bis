@@ -36,7 +36,7 @@ public class SetupAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        _navigator.Navigate<KeywordsView>();
+        _navigator.NavigateToSettings<KeywordsView>();
         return NoResultAsync;
     }
 

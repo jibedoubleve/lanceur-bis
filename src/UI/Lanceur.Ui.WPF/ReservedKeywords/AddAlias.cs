@@ -34,7 +34,7 @@ public class AddAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        _navigator.Navigate<KeywordsView>();
+        _navigator.NavigateToSettings<KeywordsView>();
         WeakReferenceMessenger.Default.Send(new AddAliasMessage(cmdline));
         return NoResultAsync;
     }
