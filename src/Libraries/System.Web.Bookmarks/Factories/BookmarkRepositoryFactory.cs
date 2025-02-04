@@ -28,8 +28,7 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
 
     #region Methods
 
-    ///<inheritdoc />
-    public IBookmarkRepository BuildBookmarkRepository(Browser browser)
+    private IBookmarkRepository BuildBookmarkRepository(Browser browser)
     {
         return browser switch
         {
