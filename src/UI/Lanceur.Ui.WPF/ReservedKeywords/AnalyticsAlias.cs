@@ -28,7 +28,7 @@ public class SettingsViewModel : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        _navigator.Navigate<AnalyticsView>();
+        _navigator.NavigateToSettings<AnalyticsView>();
         return NoResultAsync;
     }
 
