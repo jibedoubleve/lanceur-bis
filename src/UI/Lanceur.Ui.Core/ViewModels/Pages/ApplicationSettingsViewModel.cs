@@ -5,6 +5,8 @@ using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Core.Utils;
+using Lanceur.Infra.Stores.Everything;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Extensions;
@@ -40,6 +42,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = new();
+    [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
+    [ObservableProperty] private bool _excludeSystemFilesWithEverything;
+    [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     private readonly IUserInteractionService _userInteraction;
 
     private readonly IUserNotificationService _userNotificationService;
@@ -102,7 +107,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     private void MapSettingsFromSource()
     {
         DbPath = Settings.Local.DbPath;
-        
+
         // Search box section
         SearchDelay = Settings.Application.SearchBox.SearchDelay;
         ShowResult = Settings.Application.SearchBox.ShowResult;
@@ -115,6 +120,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Store overrides
         BookmarkSourceBrowser = Settings.Application.Stores.BookmarkSourceBrowser;
         StoreShortcuts = new(Settings.Application.Stores.StoreOverrides);
+        
+        // -- Everything Store
+        var adapter = new EverythingQueryAdapter(Settings.Application.Stores.EverythingQuerySuffix);
+        ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
+        ExcludeSystemFilesWithEverything = adapter.IsSystemFilesExcluded;
+        IncludeOnlyExecFilesWithEverything = adapter.SelectOnlyExecutable;
 
         // Window section
         NotificationDisplayDuration = Settings.Application.Window.NotificationDisplayDuration;
@@ -134,6 +145,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Store section
         Settings.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
         Settings.Application.Stores.StoreOverrides = StoreShortcuts.ToArray();
+
+        // -- Everything Store
+        var query = new EverythingQueryBuilder();
+        if (ExcludeHiddenFilesWithEverything) query.ExcludeHiddenFiles();
+        if (ExcludeSystemFilesWithEverything) query.ExcludeSystemFiles();
+        if (IncludeOnlyExecFilesWithEverything) query.OnlyExecFiles();
+        Settings.Application.Stores.EverythingQuerySuffix = query.ToString();
 
         // Window section
         Settings.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;

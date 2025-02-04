@@ -111,11 +111,11 @@ public class ReservedAliasStore : Store, IStoreService
     }
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> Search(Cmdline query)
+    public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
         using var _ = _logger.MeasureExecutionTime(this);
         var result = GetAll()
-                     .Where(k => k.Name.ToLower().StartsWith(query.Name))
+                     .Where(k => k.Name.ToLower().StartsWith(cmdline.Name))
                      .ToList();
 
         var counters = _aliasRepository.GetHiddenCounters();

@@ -42,10 +42,10 @@ public class CalculatorStore :Store, IStoreService
     public IEnumerable<QueryResult> GetAll() => QueryResult.NoResult;
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> Search(Cmdline query)
+    public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
         using var time = _logger.MeasureExecutionTime(this);
-        var (isError, result) = Calculator.Evaluate(query.ToString());
+        var (isError, result) = Calculator.Evaluate(cmdline.ToString());
 
         /* Hack: if user search for 'gc' the result is
          *       "CodingSeb.ExpressionEvaluator.ClassOrEnumType"
@@ -54,7 +54,7 @@ public class CalculatorStore :Store, IStoreService
          *       that there's no result to display. */
         if (!float.TryParse(result, out _)) return QueryResult.NoResult;
 
-        var returnResult = new DisplayQueryResult(result, query.ToString()) { Icon = "calculator", Count = int.MaxValue };
+        var returnResult = new DisplayQueryResult(result, cmdline.ToString()) { Icon = "calculator", Count = int.MaxValue };
         return isError
             ? QueryResult.NoResult
             : returnResult.ToEnumerable();

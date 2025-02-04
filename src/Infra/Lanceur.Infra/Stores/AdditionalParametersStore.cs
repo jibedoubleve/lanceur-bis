@@ -45,10 +45,10 @@ public class AdditionalParametersStore : Store, IStoreService
     public IEnumerable<QueryResult> GetAll() => _aliasService.GetAllAliasWithAdditionalParameters();
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> Search(Cmdline query)
+    public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
         using var _ = _logger.MeasureExecutionTime(this);
-        return _aliasService.SearchAliasWithAdditionalParameters(query.Name);
+        return _aliasService.SearchAliasWithAdditionalParameters(cmdline.Name);
     }
 
     #endregion
