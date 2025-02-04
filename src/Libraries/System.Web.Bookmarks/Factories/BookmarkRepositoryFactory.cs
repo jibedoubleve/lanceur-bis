@@ -34,6 +34,7 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
         return browser switch
         {
             Browser.Chrome  => new ChromeBookmarksRepository(_memoryCache),
+            Browser.Edge    => new EdgeBookmarksRepository(_memoryCache),
             Browser.Firefox => new GeckoBrowserBookmarkRepository(_memoryCache, _loggerFactory, BrowserConfiguration.Firefox),
             Browser.Zen     => new GeckoBrowserBookmarkRepository(_memoryCache, _loggerFactory, BrowserConfiguration.Zen),
             _               => throw new ArgumentOutOfRangeException(nameof(browser), browser, null)

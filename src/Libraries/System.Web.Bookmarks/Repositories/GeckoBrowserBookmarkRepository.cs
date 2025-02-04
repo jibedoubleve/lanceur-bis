@@ -35,7 +35,7 @@ public class GeckoBrowserBookmarkRepository : IBookmarkRepository
 
         _bookmarksPath = configuration.Database.Format(path).ExpandPath();
         ConfiguredBrowser = configuration.CacheKey;
-        _cacheKey = $"{configuration.CacheKey}_{nameof(ChromeBookmarksRepository)}";
+        _cacheKey = $"{configuration.CacheKey}_{nameof(ChromiumBookmarksRepository)}";
         _memoryCache = memoryCache;
     }
 
