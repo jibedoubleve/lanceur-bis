@@ -126,11 +126,13 @@
                 ItemsSource="{Binding Aliases}">
                 <DataGrid.Columns>
                     <!--  CHECKBOX  -->
-                    <DataGridTemplateColumn Width="35">
+                    <DataGridTemplateColumn Width="45">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox
-                                    IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                    IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
                                     <interactivity:Interaction.Triggers>
                                         <interactivity:EventTrigger EventName="Checked">
                                             <interactivity:InvokeCommandAction
