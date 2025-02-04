@@ -21,9 +21,9 @@
         <PackageReference Include="Bogus" Version="35.6.1"/>
         <!-- This version should be pinned as FluentAssertion 8.0 onwards is not free anymore-->
         <PackageReference Include="FluentAssertions" Version="7.*"/>
-        <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.4.0"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0"/>
-        <PackageReference Include="MiniProfiler.Shared" Version="4.3.8"/>
+        <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.5.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="MiniProfiler.Shared" Version="4.5.4" />
         <PackageReference Include="NSubstitute" Version="4.4.*"/>
         <PackageReference Include="xunit" Version="2.9.3" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
