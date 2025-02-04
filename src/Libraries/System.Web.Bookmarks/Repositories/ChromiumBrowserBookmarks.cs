@@ -1,10 +1,11 @@
 using System.Text.Json.Nodes;
 using System.Web.Bookmarks.Domain;
+using System.Web.Bookmarks.RepositoryConfiiguration;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace System.Web.Bookmarks.Repositories;
 
-public abstract class ChromiumBookmarksRepository : IBookmarkRepository
+public class ChromiumBrowserBookmarks : IBookmarkRepository
 {
     #region Fields
 
@@ -14,21 +15,21 @@ public abstract class ChromiumBookmarksRepository : IBookmarkRepository
 
     #region Constructors
 
-    public ChromiumBookmarksRepository(IMemoryCache memoryCache)
+    public ChromiumBrowserBookmarks(IMemoryCache memoryCache, IChromiumBrowserConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(memoryCache);
         _memoryCache = memoryCache;
+        Path = configuration.Path;
+        CacheKey = configuration.CacheKey;
     }
 
     #endregion
 
     #region Properties
 
-    protected abstract string Path { get; }
-    protected abstract string CacheKey { get; }
+    private string CacheKey { get; }
 
-    ///<inheritdoc />
-    public string ConfiguredBrowser => "Chrome";
+    private string Path { get; }
 
     #endregion
 
@@ -70,7 +71,7 @@ public abstract class ChromiumBookmarksRepository : IBookmarkRepository
             CacheKey,
             IEnumerable<Bookmark> (_) =>
             {
-                var json = File.ReadAllText(Path);
+                var json = GetJson();
                 var node = JsonNode.Parse(json);
                 var results = new List<Bookmark>();
 
@@ -80,6 +81,10 @@ public abstract class ChromiumBookmarksRepository : IBookmarkRepository
             }
         )!;
     }
+
+    private string GetJson() => File.Exists(Path)
+        ? File.ReadAllText(Path)
+        : "{}";
 
     public IEnumerable<Bookmark> GetBookmarks() => FetchAll();
 

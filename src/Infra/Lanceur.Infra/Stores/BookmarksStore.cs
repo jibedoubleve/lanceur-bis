@@ -56,12 +56,13 @@ public class BookmarksStore : Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
+        var repository = _bookmarkRepositoryFactory.BuildBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser);
+        if (!repository.IsBookmarkSourceAvailable()) { return DisplayQueryResult.SingleFromResult("The bookmark source is not available!"); }
 
-        var bookmarks  = _bookmarkRepositoryFactory.BuildBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
-                                                   .GetBookmarks(cmdline.Parameters)
-                                                   .Select(e => e.ToAliasQueryResult())
-                                                   .ToList();
+        if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
+        var bookmarks  = repository.GetBookmarks(cmdline.Parameters)
+                                   .Select(e => e.ToAliasQueryResult())
+                                   .ToList();
         return bookmarks;
     }
 

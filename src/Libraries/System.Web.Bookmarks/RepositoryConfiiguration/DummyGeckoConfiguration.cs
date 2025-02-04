@@ -1,7 +1,7 @@
-namespace System.Web.Bookmarks.Configuration;
+namespace System.Web.Bookmarks.RepositoryConfiiguration;
 
 /// <inheritdoc />
-public class DummyGeckoConfiguration : IGeckoBrowserConfiguration
+internal class DummyGeckoConfiguration : IGeckoBrowserConfiguration
 {
     #region Constructors
 
@@ -26,4 +26,10 @@ public class DummyGeckoConfiguration : IGeckoBrowserConfiguration
     public string IniFilename { get;  }
 
     #endregion
+}
+
+internal class DummyChromiumConfiguration : IChromiumBrowserConfiguration
+{
+    public string CacheKey => Guid.NewGuid().ToString();
+    public string Path => System.IO.Path.GetRandomFileName();
 }

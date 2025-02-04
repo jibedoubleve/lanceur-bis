@@ -44,12 +44,7 @@ public class Conditional<T>
     #region Methods
 
     [Conditional("DEBUG")]
-    private static void GetConditional(ref T result, T onDebug)
-    {
-        if (result == null) throw new ArgumentNullException(nameof(result));
-
-        result = onDebug;
-    }
+    private static void GetConditional(ref T result, T onDebug) => result = onDebug;
 
     public static implicit operator T(Conditional<T> src) => src.Value;
 

@@ -1,6 +1,6 @@
 using System.Data.SQLite;
-using System.Web.Bookmarks.Configuration;
 using System.Web.Bookmarks.Domain;
+using System.Web.Bookmarks.RepositoryConfiiguration;
 using Dapper;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Caching.Memory;
@@ -8,13 +8,13 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Repositories;
 
-public class GeckoBrowserBookmarkRepository : IBookmarkRepository
+public class GeckoBrowserBookmarks : IBookmarkRepository
 {
     #region Fields
 
     private  readonly string _bookmarksPath;
     private readonly string _cacheKey;
-    private readonly ILogger<GeckoBrowserBookmarkRepository> _logger;
+    private readonly ILogger<GeckoBrowserBookmarks> _logger;
 
     private readonly IMemoryCache _memoryCache;
 
@@ -22,29 +22,21 @@ public class GeckoBrowserBookmarkRepository : IBookmarkRepository
 
     #region Constructors
 
-    public GeckoBrowserBookmarkRepository(IMemoryCache memoryCache, ILoggerFactory loggerFactory, IGeckoBrowserConfiguration configuration)
+    public GeckoBrowserBookmarks(IMemoryCache memoryCache, ILoggerFactory loggerFactory, IGeckoBrowserConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(memoryCache);
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(loggerFactory);
 
 
-        _logger = loggerFactory.CreateLogger<GeckoBrowserBookmarkRepository>();
+        _logger = loggerFactory.CreateLogger<GeckoBrowserBookmarks>();
         var query = new IniFileLoader(loggerFactory).LoadQuery(configuration.IniFilename.ExpandPath());
         var path = query.GetDefaultProfile();
 
         _bookmarksPath = configuration.Database.Format(path).ExpandPath();
-        ConfiguredBrowser = configuration.CacheKey;
-        _cacheKey = $"{configuration.CacheKey}_{nameof(ChromiumBookmarksRepository)}";
+        _cacheKey = $"{configuration.CacheKey}_{nameof(ChromiumBrowserBookmarks)}";
         _memoryCache = memoryCache;
     }
-
-    #endregion
-
-    #region Properties
-
-    /// <inheritdoc />
-    public string ConfiguredBrowser { get;  }
 
     #endregion
 
@@ -53,7 +45,7 @@ public class GeckoBrowserBookmarkRepository : IBookmarkRepository
     private IEnumerable<Bookmark> FetchAll()
     {
         if (_bookmarksPath.IsNullOrWhiteSpace()) return [];
-        
+
         const string sql = """
                            select 
                            	b.title as name,
