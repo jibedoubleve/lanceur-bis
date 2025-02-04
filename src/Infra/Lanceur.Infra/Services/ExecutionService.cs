@@ -183,6 +183,7 @@ public class ExecutionService : IExecutionService
         }
     }
 
+    /// <inheritdoc />
     public ExecutionResponse ExecuteMultiple(IEnumerable<QueryResult> queryResults, int delay = 0)
     {
         var currentDelay = 0;
@@ -194,6 +195,16 @@ public class ExecutionService : IExecutionService
         }
 
         return ExecutionResponse.NoResult;
+    }
+
+    /// <inheritdoc />
+    public void OpenDirectoryAsync(QueryResult queryResult)
+    {
+        if (queryResult is not AliasQueryResult alias) return;
+        if (!File.Exists(alias.FileName)) return;
+
+        var directory = Path.GetDirectoryName(alias.FileName);
+        if (directory is not null) Process.Start("explorer.exe", directory);
     }
 
     #endregion

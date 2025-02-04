@@ -80,6 +80,12 @@
                                 Command="{Binding ExecuteCommand}"
                                 CommandParameter="{StaticResource True}"
                                 Modifiers="Control" />
+                            <!-- This should open the source directory whenever possible -->
+                            <KeyBinding
+                                Key="Enter"
+                                Command="{Binding OpenDirectoryCommand}"
+                                CommandParameter="{StaticResource True}"
+                                Modifiers="Shift" />
                             <KeyBinding Key="Tab" Command="{Binding CompleteQueryCommand}" />
                         </TextBox.InputBindings>
                         <interactivity:Interaction.Triggers>

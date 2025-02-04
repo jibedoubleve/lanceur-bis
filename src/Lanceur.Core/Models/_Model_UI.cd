@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Lanceur.Core.Models.CompositeAliasQueryResult">
-    <Position X="12.5" Y="13.5" Width="2.25" />
+    <Position X="12.5" Y="12.75" Width="2.25" />
     <Members>
       <Method Name="CompositeAliasQueryResult" Hidden="true" />
     </Members>
@@ -13,29 +13,31 @@
   <Class Name="Lanceur.Core.Models.DisplayQueryResult">
     <Position X="2.75" Y="6.25" Width="2" />
     <Members>
-      <Field Name="_description" Hidden="true" />
       <Field Name="_icon" Hidden="true" />
       <Method Name="DisplayQueryResult" Hidden="true" />
+      <Method Name="SingleFromResult" Hidden="true" />
     </Members>
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAAEAAAAAEAAAABAAACAAAAAAAEAAIA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAABAAACAAAAAAAEAAIA=</HashCode>
       <FileName>Models\DisplayQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.DisplayUsageQueryResult">
+  <Class Name="Lanceur.Core.Models.UsageQueryResult">
     <Position X="0.5" Y="6.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAEAAAA=</HashCode>
-      <FileName>Models\DisplayUsageQueryResult.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Models\UsageQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.SelfExecutableQueryResult">
     <Position X="7" Y="8.25" Width="3" />
     <Members>
+      <Method Name="ExecuteAsync" Hidden="true" />
       <Method Name="SelfExecutableQueryResult" Hidden="true" />
+      <Method Name="ToQuery" Hidden="true" />
     </Members>
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
@@ -50,38 +52,31 @@
     <Position X="5.25" Y="1.5" Width="2.5" />
     <Members>
       <Field Name="_thumbnail" Hidden="true" />
+      <Method Name="ToQuery" Hidden="true" />
     </Members>
     <Compartments>
       <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAACAAAAAAAgAEBAAAEACAQAAABAAAgAAAAAAAEEQCA=</HashCode>
+      <HashCode>AAACAAAAAAAgAEBEQAEACAQAAABAAAgAAACAAAEEQCA=</HashCode>
       <FileName>Models\QueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.SelectableAliasQueryResult">
-    <Position X="10" Y="13.5" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Models\SelectableAliasQueryResult.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Lanceur.Core.Models.PluginExecutableQueryResult">
-    <Position X="7.25" Y="10.75" Width="2.5" />
+    <Position X="10" Y="12.75" Width="2.25" />
     <Members>
-      <Field Name="_logger" Hidden="true" />
-      <Field Name="_plugin" Hidden="true" />
-      <Method Name="PluginExecutableQueryResult" Hidden="true" />
+      <Field Name="_isSelected" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAgAAAAAAAAAAAAIEAgAAAAAAAAAAAAAEA=</HashCode>
-      <FileName>Models\PluginExecutableQueryResult.cs</FileName>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAAACAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\SelectableAliasQueryResult.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.ObservableModel" Collapsed="true">
     <Position X="5.5" Y="0.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAABAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAgAAAAAAAAAIAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\ObservableModel.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -100,9 +95,10 @@
       <Field Name="_additionalParameters" Hidden="true" />
       <Field Name="_fileName" Hidden="true" />
       <Field Name="_synonyms" Hidden="true" />
+      <Method Name="FromName" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>BABwAAAAAQAgAQQAAgAAAACAAgAMAAAAQAAAACRAECI=</HashCode>
+      <HashCode>BABQAAAAAQAAAQQAQgAAAACAAgAMAAAAQAAAACRAECI=</HashCode>
       <FileName>Models\AliasQueryResult.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
