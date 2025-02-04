@@ -1,9 +1,7 @@
-using System.Web.Bookmarks.Domain;
-
-namespace System.Web.Bookmarks.Configuration;
+namespace System.Web.Bookmarks.RepositoryConfiiguration;
 
 /// <inheritdoc />
-public class FirefoxConfiguration : IGeckoBrowserConfiguration
+internal class FirefoxConfiguration : IGeckoBrowserConfiguration
 {
     #region Properties
 

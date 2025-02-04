@@ -1,6 +1,6 @@
-using System.Web.Bookmarks.Configuration;
 using System.Web.Bookmarks.Domain;
 using System.Web.Bookmarks.Repositories;
+using System.Web.Bookmarks.RepositoryConfiiguration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -33,10 +33,10 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
     {
         return browser switch
         {
-            Browser.Chrome  => new ChromeBookmarksRepository(_memoryCache),
-            Browser.Edge    => new EdgeBookmarksRepository(_memoryCache),
-            Browser.Firefox => new GeckoBrowserBookmarkRepository(_memoryCache, _loggerFactory, BrowserConfiguration.Firefox),
-            Browser.Zen     => new GeckoBrowserBookmarkRepository(_memoryCache, _loggerFactory, BrowserConfiguration.Zen),
+            Browser.Chrome  => new ChromiumBrowserBookmarks(_memoryCache, BrowserConfigurationFactory.Chrome),
+            Browser.Edge    => new ChromiumBrowserBookmarks(_memoryCache, BrowserConfigurationFactory.Edge),
+            Browser.Firefox => new GeckoBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Firefox),
+            Browser.Zen     => new GeckoBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Zen),
             _               => throw new ArgumentOutOfRangeException(nameof(browser), browser, null)
         };
     }

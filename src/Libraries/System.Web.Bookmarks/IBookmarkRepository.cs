@@ -39,12 +39,5 @@ public interface IBookmarkRepository
     /// </remarks>
     bool IsBookmarkSourceAvailable();
 
-    /// <summary>
-    /// The configured browser to be used for the search. 
-    /// The search will be executed based on the bookmarks stored in this browser.
-    /// </summary>
-    string ConfiguredBrowser { get; }
-
-
     #endregion
 }
