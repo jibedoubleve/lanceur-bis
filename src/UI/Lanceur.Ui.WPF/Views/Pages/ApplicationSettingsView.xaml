@@ -35,9 +35,10 @@
             <sys:String>Tabbed</sys:String>
         </x:Array>
         <x:Array x:Key="Browsers" Type="{x:Type sys:String}">
-            <sys:String>Chrome</sys:String>
             <sys:String>Firefox</sys:String>
             <sys:String>Zen</sys:String>
+            <sys:String>Chrome</sys:String>
+            <sys:String>Edge</sys:String>
         </x:Array>
     </Page.Resources>
 
