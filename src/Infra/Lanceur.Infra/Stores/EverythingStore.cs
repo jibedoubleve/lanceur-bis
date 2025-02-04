@@ -51,11 +51,14 @@ public class EverythingStore : Store, IStoreService
     public IEnumerable<QueryResult> GetAll() => QueryResult.NoResult;
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> Search(Cmdline query)
+    public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        if (query.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
+        if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
 
-        var result =  _everythingApi.Search(query.Parameters)
+        var query = $"{cmdline.Parameters} {_settings.Application.Stores.EverythingQuerySuffix}";
+        _logger.LogTrace("Everything query {Query}", query);
+
+        var result =  _everythingApi.Search(query)
                                     .Select(item => item.ToAliasQueryResult())
                                     .Cast<QueryResult>()
                                     .ToList();

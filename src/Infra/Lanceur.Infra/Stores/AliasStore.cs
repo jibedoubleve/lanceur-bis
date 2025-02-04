@@ -52,10 +52,10 @@ public class AliasStore : Store, IStoreService
     }
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> Search(Cmdline query)
+    public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
         using var _ = _logger.MeasureExecutionTime(this);
-        var entries = _aliasRepository.Search(query.Name).ToArray();
+        var entries = _aliasRepository.Search(cmdline.Name).ToArray();
         return entries;
     }
 

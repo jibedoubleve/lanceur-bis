@@ -31,11 +31,11 @@ public interface IStoreService
     /// <summary>
     ///     Execute a search with the specified query
     /// </summary>
-    /// <param name="query">The query for the search</param>
+    /// <param name="cmdline">The query for the search</param>
     /// <returns>
     ///     The result of the search or empty <see cref="IEnumerable{T}" /> if idle or no results.
     /// </returns>
-    IEnumerable<QueryResult> Search(Cmdline query);
+    IEnumerable<QueryResult> Search(Cmdline cmdline);
 
     #endregion
 }

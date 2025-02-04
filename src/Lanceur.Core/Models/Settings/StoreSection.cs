@@ -22,6 +22,12 @@ public class StoreSection
     public static StoreSection Default => new();
 
     /// <summary>
+    ///     Gets or sets the suffix appended to queries executed with the Everything search engine.
+    ///     This suffix can be used to modify search behavior, such as excluding system or hidden files.
+    /// </summary>
+    public string EverythingQuerySuffix { get; set; } = string.Empty;
+
+    /// <summary>
     ///     Represents a user-defined alias that replaces the default shortcut
     ///     to perform a search using the store associated with that shortcut.
     /// </summary>

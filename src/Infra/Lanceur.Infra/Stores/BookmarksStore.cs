@@ -54,12 +54,12 @@ public class BookmarksStore : Store, IStoreService
     }
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> Search(Cmdline query)
+    public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        if (query.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
+        if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
 
         var bookmarks  = _bookmarkRepositoryFactory.BuildBookmarkRepository(_settings.Application.Stores.BookmarkSourceBrowser)
-                                                   .GetBookmarks(query.Parameters)
+                                                   .GetBookmarks(cmdline.Parameters)
                                                    .Select(e => e.ToAliasQueryResult())
                                                    .ToList();
         return bookmarks;

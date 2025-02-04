@@ -8,7 +8,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="ApplicationSettings"
     x:Name="Self"
-    d:Height="1200"
+    d:Height="1600"
     d:Width="1800"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
@@ -168,7 +168,59 @@
                 <ui:TextBlock Margin="{StaticResource RegionMargin}"
                               FontTypography="{StaticResource RegionFontTypography}"
                               Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Stores" />
+                <ui:CardExpander
+                        Margin="5,5,5,12"
+                        Icon="{ui:SymbolIcon DatabaseSearch24}"
+                        IsExpanded="True">
+                    <ui:CardExpander.Header>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ui:TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                FontTypography="Body"
+                                Text="Everything Store Configuration"/>
+                        </Grid>
+                    </ui:CardExpander.Header>
+                            <StackPanel Grid.Row="1">
+                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
+                            <ui:CardControl.Header>
+                                <ui:TextBlock FontTypography="Body" 
+                                              Text="Should hidden files be excluded from the results?" />
+                            </ui:CardControl.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <ui:ToggleSwitch OffContent="No" OnContent="Yes"
+                                         IsChecked="{Binding ExcludeHiddenFilesWithEverything}" />
+                            </StackPanel>
+                        </ui:CardControl>
 
+                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ShieldKeyhole24}">
+                            <ui:CardControl.Header>
+                                <ui:TextBlock FontTypography="Body" 
+                                              Text="Should system files be excluded from the results?" />
+                            </ui:CardControl.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <ui:ToggleSwitch OffContent="No" OnContent="Yes"
+                                         IsChecked="{Binding ExcludeSystemFilesWithEverything}" />
+                            </StackPanel>
+                        </ui:CardControl>
+
+                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Run24}">
+                            <ui:CardControl.Header>
+                                <ui:TextBlock FontTypography="Body" 
+                                              Text="Should only executable files be included in the results?" />
+                            </ui:CardControl.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <ui:ToggleSwitch OffContent="No" OnContent="Yes"
+                                         IsChecked="{Binding IncludeOnlyExecFilesWithEverything}" />
+                            </StackPanel>
+                        </ui:CardControl>
+                    </StackPanel>
+                </ui:CardExpander>
+                    
                 <ui:CardExpander
                         Margin="5,5,5,12"
                         Icon="{ui:SymbolIcon ArrowUpRight24}"
@@ -233,6 +285,7 @@
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </ui:DataGrid>
+                        
                     </StackPanel>
                 </ui:CardExpander>
 
