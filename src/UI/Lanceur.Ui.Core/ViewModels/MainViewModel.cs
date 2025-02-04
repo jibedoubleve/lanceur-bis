@@ -88,6 +88,19 @@ public partial class MainViewModel : ObservableObject
             : name;
     }
 
+    /// <summary>
+    ///     Handles the "Tab" key press event, typically used to expand an unfinished query.
+    /// </summary>
+    [RelayCommand]
+    private void OnCompleteQuery()
+    {
+        if (SelectedResult is null) return;
+
+        var query = Cmdline.BuildFromText(Query);
+        var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
+        WeakReferenceMessenger.Default.Send<SetQueryMessage>(new(cmd));
+    }
+
     [RelayCommand]
     private async Task OnExecute(bool runAsAdmin)
     {
@@ -140,20 +153,16 @@ public partial class MainViewModel : ObservableObject
         Suggestion = GetSuggestion(Query ?? "", SelectedResult);
     }
 
-    [RelayCommand] private async Task OnSearch() => await _watchdog.Pulse();
-
-    /// <summary>
-    /// Handles the "Tab" key press event, typically used to expand an unfinished query.
-    /// </summary>
     [RelayCommand]
-    private void OnCompleteQuery()
+    private void OnOpenDirectory()
     {
         if (SelectedResult is null) return;
 
-        var query = Cmdline.BuildFromText(Query);
-        var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
-        WeakReferenceMessenger.Default.Send<SetQueryMessage>(new(cmd));
+        _logger.LogTrace("Open directory of {Alias}", SelectedResult.Name);
+        _executionService.OpenDirectoryAsync(SelectedResult);
     }
+
+    [RelayCommand] private async Task OnSearch() => await _watchdog.Pulse();
 
     private async Task SearchAsync()
     {
@@ -177,9 +186,9 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Displays search results based on application settings. If allowed, the method will query 
-    /// the database for results when the search box is shown. It checks if all aliases should be 
-    /// displayed immediately or if results should wait until the user starts typing a query.
+    ///     Displays search results based on application settings. If allowed, the method will query
+    ///     the database for results when the search box is shown. It checks if all aliases should be
+    ///     displayed immediately or if results should wait until the user starts typing a query.
     /// </summary>
     public async Task DisplayResultsIfAllowed()
     {
@@ -196,7 +205,6 @@ public partial class MainViewModel : ObservableObject
             _logger.LogError(ex, "An error occured while performing search.");
             _interactionHub.GlobalNotifications.Error("An error occured while performing search.");
         }
-
     }
 
     public void RefreshSettings()
