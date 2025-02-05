@@ -9,19 +9,19 @@ public interface ISettingsFacade
     DatabaseConfiguration Application { get; }
     IApplicationSettings Local { get; }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
     /// <summary>
-    /// Save all the changes into the disk
-    /// </summary>
-    void Save();
-
-    /// <summary>
-    /// Reload the settings from the disk
+    ///     Reload the settings from the disk
     /// </summary>
     void Reload();
 
-    #endregion Methods
+    /// <summary>
+    ///     Save all the changes into the disk
+    /// </summary>
+    void Save();
+
+    #endregion
 }

@@ -1,7 +1,7 @@
-using Newtonsoft.Json;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
-namespace Lanceur.Infra.Logging;
+namespace Lanceur.SharedKernel.Logging;
 
 public class TraceLoggerScope : IDisposable
 {
@@ -9,13 +9,13 @@ public class TraceLoggerScope : IDisposable
 
     private readonly object _state;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public TraceLoggerScope(object state) => _state = state;
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -25,5 +25,5 @@ public class TraceLoggerScope : IDisposable
         Trace.WriteLine($"Display scope:\r\n{json}");
     }
 
-    #endregion Methods
+    #endregion
 }

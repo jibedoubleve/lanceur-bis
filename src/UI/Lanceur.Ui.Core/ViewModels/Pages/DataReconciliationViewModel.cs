@@ -4,8 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Logging;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.SharedKernel.Logging;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Microsoft.Extensions.Logging;
 

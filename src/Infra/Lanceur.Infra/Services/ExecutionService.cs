@@ -7,10 +7,10 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Logging;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Utils;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;

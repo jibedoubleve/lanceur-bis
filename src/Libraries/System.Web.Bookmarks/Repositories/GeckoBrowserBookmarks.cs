@@ -1,6 +1,7 @@
 using System.Data.SQLite;
 using System.Web.Bookmarks.Domain;
-using System.Web.Bookmarks.RepositoryConfiiguration;
+using System.Web.Bookmarks.Factories;
+using System.Web.Bookmarks.RepositoryConfiguration;
 using Dapper;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Caching.Memory;
@@ -34,7 +35,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
         var path = query.GetDefaultProfile();
 
         _bookmarksPath = configuration.Database.Format(path).ExpandPath();
-        _cacheKey = $"{configuration.CacheKey}_{nameof(ChromiumBrowserBookmarks)}";
+        _cacheKey = configuration.CacheKey;
         _memoryCache = memoryCache;
     }
 
@@ -59,7 +60,8 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
         return _memoryCache.GetOrCreate(
                    _cacheKey,
                    IEnumerable<Bookmark> (_)
-                       => new SQLiteConnection(_bookmarksPath.ToSQLiteConnectionString()).Query<Bookmark>(sql)
+                       => new SQLiteConnection(_bookmarksPath.ToSQLiteConnectionString()).Query<Bookmark>(sql),
+                   CacheEntryOptions.Default
                ) ??
                Array.Empty<Bookmark>();
     }

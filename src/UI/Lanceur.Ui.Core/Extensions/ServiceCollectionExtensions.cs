@@ -10,7 +10,6 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
-using Lanceur.Infra.Managers;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
@@ -21,12 +20,14 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Scripts;
+using Lanceur.SharedKernel.Caching;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.Utils.Watchdogs;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -61,10 +62,9 @@ public static class ServiceCollectionExtensions
 #if DEBUG
         // For now, only seq is configured in my development machine and not anymore in AWS.
         var apiKey = context.Configuration["SEQ_LANCEUR_DEV"];
-        if(apiKey is null)
-            throw new NotSupportedException("Api key not found. Create a environment variable 'SEQ_LANCEUR_DEV' with the api key");
-        
-        loggerCfg.WriteTo.Seq(Paths.TelemetryUrl,apiKey: apiKey);
+        if (apiKey is null) throw new NotSupportedException("Api key not found. Create a environment variable 'SEQ_LANCEUR_DEV' with the api key");
+
+        loggerCfg.WriteTo.Seq(Paths.TelemetryUrl, apiKey: apiKey);
 #else
         loggerCfg.WriteTo.File(
             new Serilog.Formatting.Compact.CompactJsonFormatter(),
@@ -87,8 +87,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddMemoryCache()
-                         .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+        serviceCollection.AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(
                              sp => new(
@@ -134,6 +133,14 @@ public static class ServiceCollectionExtensions
         );
 
         return serviceCollection;
+    }
+
+    public static IServiceCollection AddTrackedMemoryCache(this IServiceCollection services)
+    {
+        services.AddMemoryCache();
+        services.Decorate<IMemoryCache, TrackedMemoryCache>();
+
+        return services;
     }
 
     #endregion

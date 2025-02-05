@@ -1,8 +1,8 @@
-﻿using Lanceur.SharedKernel.Extensions;
+﻿using System.Diagnostics;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
-namespace Lanceur.Infra.Logging;
+namespace Lanceur.SharedKernel.Logging;
 
 /// <summary>
 /// The use of this logger is NOT recommended. It's there
