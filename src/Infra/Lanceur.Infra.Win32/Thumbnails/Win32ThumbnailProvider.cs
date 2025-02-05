@@ -17,7 +17,10 @@ public enum ThumbnailOptions
     InCacheOnly = 0x10
 }
 
-internal class WindowsThumbnailProvider
+/// <summary>
+/// Encapsulates P/Invoke functionality for retrieving the thumbnails of Win32 applications.
+/// </summary>
+internal static class Win32ThumbnailProvider
 {
     // Based on https://stackoverflow.com/questions/21751747/extract-thumbnail-for-any-file-in-windows
 

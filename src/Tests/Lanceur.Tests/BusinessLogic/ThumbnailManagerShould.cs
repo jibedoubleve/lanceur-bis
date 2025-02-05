@@ -4,6 +4,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
+using Lanceur.Infra.Win32.Services;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Logging;
@@ -58,7 +59,7 @@ public class ThumbnailManagerShould : TestBase
         var aliases = dbRepository.Search("a");
 
         // ACT
-        thumbnailManager.RefreshThumbnails(aliases);
+        thumbnailManager.UpdateThumbnails(aliases);
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection!.ExecuteScalar("select count(*) from alias_argument")!)

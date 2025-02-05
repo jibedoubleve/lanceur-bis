@@ -55,7 +55,7 @@ public class SearchService : ISearchService
             : new();
 
         // Refresh the thumbnails
-        _thumbnailService.RefreshThumbnails(results);
+        _thumbnailService.UpdateThumbnails(results);
 
         // Order the list and return the result
         var orderedResults = results.OrderByDescending(e => e.Count)

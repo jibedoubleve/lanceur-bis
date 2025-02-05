@@ -1,31 +1,34 @@
 ﻿using System.IO;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails;
 
-internal class ThumbnailLoader
+/// <summary>
+/// This class is responsible for loading the thumbnail of a Win32 application (not a packaged app) or a directory.
+/// It provides functionality to retrieve and display preview images associated with executable files or folder contents.
+/// </summary>
+internal class Win32ThumbnailService
+
 {
     #region Fields
 
     private readonly ILogger _logger;
-    private static readonly Dictionary<string, ImageSource> Cache = new();
-
     private static readonly string[] ImageExtensions = { ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff", ".ico" };
-
     private const int ThumbnailSize = 64;
 
     #endregion
 
     #region Constructors
 
-    public ThumbnailLoader(ILogger<ThumbnailLoader> logger) => _logger = logger;
+    public Win32ThumbnailService(ILogger<Win32ThumbnailService> logger) => _logger = logger;
 
     #endregion
 
     #region Methods
 
-    private static ImageSource GetThumbnail(string path, ThumbnailOptions options) => WindowsThumbnailProvider.GetThumbnail(
+    private static BitmapSource GetThumbnail(string path, ThumbnailOptions options) => Win32ThumbnailProvider.GetThumbnail(
         path,
         ThumbnailSize,
         ThumbnailSize,
@@ -34,13 +37,12 @@ internal class ThumbnailLoader
 
     public ImageSource? GetThumbnail(string path)
     {
+        if (string.IsNullOrEmpty(path)) return null;
+
         ImageSource? image = null;
+
         try
         {
-            if (string.IsNullOrEmpty(path)) return null;
-
-            if (Cache.TryGetValue(path, out var value)) return value;
-
             if (Directory.Exists(path))
             {
                 /* Directories can also have thumbnails instead of shell icons.
@@ -66,11 +68,8 @@ internal class ThumbnailLoader
                 );
             }
 
-            if (image != null)
-            {
-                image.Freeze();
-                Cache[path] = image;
-            }
+            image?.Freeze();
+            return image;
         }
         catch (Exception ex) { _logger.LogWarning(ex, "Failed to extract thumbnail for {Path}", path); }
 

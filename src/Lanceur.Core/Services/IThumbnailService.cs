@@ -11,8 +11,8 @@ public interface IThumbnailService
     /// and returns. Callbacks will set the property <see cref="QueryResult.Thumbnail"/>
     /// when thread has done its work
     /// </summary>
-    /// <param name="results">The <see cref="QueryResult"/> to refresh</param>
-    void RefreshThumbnails(IEnumerable<QueryResult> results);
+    /// <param name="queryResults">The <see cref="QueryResult"/> to refresh</param>
+    void UpdateThumbnails(IEnumerable<QueryResult> queryResults);
 
     #endregion Methods
 }

@@ -294,14 +294,14 @@ public class AliasDbAction
         {
             arguments = alias.Parameters,
             id = alias.Id == 0 ? null : (int?)alias.Id,
-            fileName = alias.FileName ?? "",
-            notes = alias.Description ?? "",
+            fileName = alias.FileName,
+            notes = alias.Description,
             runAs = alias.RunAs,
             startMode = alias.StartMode,
-            workingDirectory = alias.WorkingDirectory ?? "",
-            icon = alias.Icon ?? "",
-            thumbnail = alias.Thumbnail ?? "",
-            luaScript = alias.LuaScript ?? "",
+            workingDirectory = alias.WorkingDirectory,
+            icon = alias.Icon,
+            thumbnail = alias.Thumbnail,
+            luaScript = alias.LuaScript,
             isHidden = alias.IsHidden,
             isExecutionConfirmationRequired = alias.IsExecutionConfirmationRequired
         };
@@ -382,19 +382,14 @@ public class AliasDbAction
         return foundAlias is not null;
     }
 
-    internal IEnumerable<long> UpdateThumbnails(IDbTransaction tx, IEnumerable<AliasQueryResult> aliases)
+    internal long UpdateThumbnail(IDbTransaction tx, AliasQueryResult alias)
     {
         const string sql = "update alias set thumbnail = @Thumbnail where id = @Id;";
-        var ids = new List<long>();
-        foreach (var alias in aliases)
-        {
-            if (alias.Id == 0) continue;
 
-            tx.Connection!.Execute(sql, new { alias.Thumbnail, alias.Id });
-            ids.Add(alias.Id);
-        }
+        if (alias.Id == 0) return 0;
 
-        return ids.ToArray();
+        tx.Connection!.Execute(sql, new { alias.Thumbnail, alias.Id });
+        return alias.Id;
     }
 
     #endregion
