@@ -1,4 +1,4 @@
-namespace System.Web.Bookmarks.RepositoryConfiiguration;
+namespace System.Web.Bookmarks.RepositoryConfiguration;
 
 /// <inheritdoc />
 internal class FirefoxConfiguration : IGeckoBrowserConfiguration
@@ -6,7 +6,7 @@ internal class FirefoxConfiguration : IGeckoBrowserConfiguration
     #region Properties
 
     /// <inheritdoc />
-    public string CacheKey => "Firefox";
+    public string CacheKey => CacheKeys.Firefox;
 
     /// <inheritdoc />
     public string Database => @"%AppData%\Mozilla\Firefox\{0}\places.sqlite";

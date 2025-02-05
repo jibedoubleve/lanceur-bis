@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.Logging;
+namespace Lanceur.SharedKernel.Logging;
 
 //TODO: analyse, it should probably be removed.
 public static class LoggerFactoryExtensions

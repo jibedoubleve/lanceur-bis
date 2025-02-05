@@ -3,18 +3,14 @@ using System.Data.SQLite;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
-using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tooling.Logging;
-using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit.Abstractions;
-using ILogger = Castle.Core.Logging.ILogger;
 
 namespace Lanceur.Tests.Tooling.Extensions;
 

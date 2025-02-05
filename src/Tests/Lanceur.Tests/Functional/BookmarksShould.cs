@@ -1,6 +1,6 @@
 using System.Web.Bookmarks;
 using System.Web.Bookmarks.Repositories;
-using System.Web.Bookmarks.RepositoryConfiiguration;
+using System.Web.Bookmarks.RepositoryConfiguration;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +32,7 @@ public class BookmarksShould
     {
         // ARRANGE
         var serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddXUnit(_outputHelper))
-                                                     .AddTransient<IMemoryCache, MemoryCache>()
+                                                     .AddSingleton<IMemoryCache, MemoryCache>()
                                                      .AddSingleton<IGeckoBrowserConfiguration>(new DummyGeckoConfiguration("", "", ""))
                                                      .AddTransient<IBookmarkRepository, GeckoBrowserBookmarks>()
                                                      .BuildServiceProvider();
@@ -47,7 +47,7 @@ public class BookmarksShould
     {
         // ARRANGE
         var serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddXUnit(_outputHelper))
-                                                     .AddTransient<IMemoryCache, MemoryCache>()
+                                                     .AddSingleton<IMemoryCache, MemoryCache>()
                                                      .AddSingleton<IChromiumBrowserConfiguration>(new DummyChromiumConfiguration())
                                                      .AddTransient<IBookmarkRepository, ChromiumBrowserBookmarks>()
                                                      .BuildServiceProvider();

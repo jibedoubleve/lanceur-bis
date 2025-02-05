@@ -2,7 +2,7 @@
 using System.Windows;
 using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Infra.Logging;
+using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

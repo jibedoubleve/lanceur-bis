@@ -29,7 +29,8 @@ public partial class App
                                                   .ConfigureServices(
                                                       (context, services) =>
                                                       {
-                                                          services.Register("View", "Lanceur.Ui.WPF")
+                                                          services.AddTrackedMemoryCache()
+                                                                  .Register("View", "Lanceur.Ui.WPF")
                                                                   .Register("ViewModel", "Lanceur.Ui.Core")
                                                                   .AddServices()
                                                                   .AddWpfServices()

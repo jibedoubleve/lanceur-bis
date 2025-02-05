@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using System.Web.Bookmarks.Domain;
-using System.Web.Bookmarks.RepositoryConfiiguration;
+using System.Web.Bookmarks.Factories;
+using System.Web.Bookmarks.RepositoryConfiguration;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace System.Web.Bookmarks.Repositories;
@@ -78,7 +79,8 @@ public class ChromiumBrowserBookmarks : IBookmarkRepository
                 var startNode = node?["roots"]?["bookmark_bar"];
                 if (startNode is not null) FetchAll(startNode, results);
                 return results.OrderByDescending(e => e.SortKey);
-            }
+            },
+            CacheEntryOptions.Default
         )!;
     }
 

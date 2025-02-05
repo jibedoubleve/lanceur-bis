@@ -1,6 +1,6 @@
-using Lanceur.Infra.Logging;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using Lanceur.SharedKernel.Logging;
 
 namespace Lanceur.Infra.Utils;
 

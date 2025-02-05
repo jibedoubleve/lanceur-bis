@@ -6,11 +6,11 @@ using FluentAssertions.Execution;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Lanceur.Infra.Managers;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
@@ -61,8 +61,23 @@ public class SearchShould : TestBase
     {
         var serviceProvider
             = new ServiceCollection().AddMockSingleton<ILoggerFactory>()
-                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                      .AddMockSingleton<ILogger<StoreLoader>>()
+                                     .AddMockSingleton<ISettingsFacade>(
+                                         (_, i) =>
+                                         {
+                                             var dbc = new DatabaseConfiguration
+                                             {
+                                                 Caching =
+                                                 {
+                                                     StoreCacheDuration = 0, 
+                                                     ThumbnailCacheDuration = 0
+                                                 }
+                                             };
+                                             i.Application.Returns(dbc);
+                                             return i;
+                                         }
+                                     )
+                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                      .AddSingleton<AssemblySource>()
                                      .AddSingleton<IStoreLoader, StoreLoader>()
                                      .AddSingleton<IMacroService, MacroService>()

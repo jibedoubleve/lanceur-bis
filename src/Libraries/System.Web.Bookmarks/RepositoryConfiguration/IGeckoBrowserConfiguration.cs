@@ -1,4 +1,4 @@
-namespace System.Web.Bookmarks.RepositoryConfiiguration;
+namespace System.Web.Bookmarks.RepositoryConfiguration;
 
 /// <summary>
 ///     Defines configuration settings related to bookmarks for the browser.

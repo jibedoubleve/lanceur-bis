@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.Logging;
+namespace Lanceur.SharedKernel.Logging;
 
 public static class LoggerExtensions
 {

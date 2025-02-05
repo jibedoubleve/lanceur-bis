@@ -1,10 +1,10 @@
 using System.Data;
 using Dapper;
 using Lanceur.Core.Models;
-using Lanceur.Infra.Logging;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Sqlite.Entities;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;

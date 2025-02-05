@@ -1,7 +1,6 @@
 ﻿using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Infra.Logging;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 using System.Reflection;

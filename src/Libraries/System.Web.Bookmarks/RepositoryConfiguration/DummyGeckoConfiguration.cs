@@ -1,4 +1,4 @@
-namespace System.Web.Bookmarks.RepositoryConfiiguration;
+namespace System.Web.Bookmarks.RepositoryConfiguration;
 
 /// <inheritdoc />
 internal class DummyGeckoConfiguration : IGeckoBrowserConfiguration
