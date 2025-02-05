@@ -226,7 +226,7 @@ public partial class KeywordsViewModel : ObservableObject
             Aliases.AddRange(_bufferedAliases);
         }
 
-        _thumbnailService.RefreshThumbnails(_bufferedAliases);
+        _thumbnailService.UpdateThumbnails(_bufferedAliases);
         _logger.LogTrace("Loaded {Count} alias(es)", _bufferedAliases.Count);
     }
 

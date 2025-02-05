@@ -459,7 +459,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     );
 
     /// <inheritdoc />
-    public void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.UpdateThumbnails(tx, aliases));
+    public void UpdateThumbnail(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.UpdateThumbnail(tx, alias));
 
     #endregion
 }

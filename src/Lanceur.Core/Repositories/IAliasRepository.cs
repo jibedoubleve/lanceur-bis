@@ -263,17 +263,17 @@ public interface IAliasRepository
     void SetUsage(QueryResult alias);
 
     /// <summary>
-    ///     Updates thumbnail of many aliases at once.
+    ///     Updates the thumbnail for the specified alias.
     /// </summary>
-    /// <param name="aliases">Aliases to update</param>
-    /// <returns>The ids of the updated aliases</returns>
+    /// <param name="alias">The alias to update.</param>
+    /// <returns>The IDs of the updated aliases.</returns>
     /// <remarks>
-    ///     This method does not create new aliases. If the id of an alias is 0
-    ///     No update will occur as this alias is considered as non existing.
-    ///     This methods will only update thumbnails, all other properties
-    ///     will be ignored.
+    ///     This method does not create new aliases. If the ID of the alias is 0, 
+    ///     no update will occur as the alias is considered non-existent. 
+    ///     This method will only update the thumbnail; all other properties will be ignored.
     /// </remarks>
-    void UpdateThumbnails(IEnumerable<AliasQueryResult> aliases);
+    void UpdateThumbnail(AliasQueryResult alias);
+
 
     #endregion
 }
