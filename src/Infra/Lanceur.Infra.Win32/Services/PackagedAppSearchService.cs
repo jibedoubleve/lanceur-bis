@@ -24,7 +24,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
     #region Methods
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Core.Models.PackagedApp>> GetByInstalledDirectory(string fileName)
+    public async Task<IEnumerable<PackagedApp>> GetByInstalledDirectory(string fileName)
     {
         fileName = fileName.Replace("package:", "");
         var installedDir = fileName.GetDirectoryName();
@@ -37,7 +37,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
                                    .Where(
                                        p =>
                                        {
-                                           try { return p is { IsFramework: false, IsDevelopmentMode: false } && (p.InstalledLocation.Path == installedDir || p.IsAppUserModelId(fileName)); }
+                                           try { return p is { IsFramework: false, IsDevelopmentMode: false } && (installedDir.StartsWith(p.InstalledLocation.Path) || p.IsAppUserModelId(fileName)); }
                                            catch (Exception ex)
                                            {
                                                _logger.LogWarning(ex, "An error occured when selecting package {FileName}", fileName);
@@ -46,7 +46,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
                                        }
                                    )
                                    .Select(
-                                       p => new Core.Models.PackagedApp
+                                       p => new PackagedApp
                                        {
                                            AppUserModelId    = p.GetAppUserModelId(),
                                            InstalledLocation = p.InstalledLocation.Path,
@@ -72,7 +72,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
 
         var result = results.First();
         if (queryResult.Description.IsNullOrEmpty()) queryResult.Description = result.DisplayName ?? "Packaged App";
-        
+
         queryResult.FileName = result.FileName;
         return true;
     }
