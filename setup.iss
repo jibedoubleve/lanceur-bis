@@ -13,6 +13,7 @@
 #define MyAppPublisher "JB Wautier"
 #define MyAppURL "https://github.com/jibedoubleve/lanceur-bis"
 #define MyAppExeName "Lanceur.Ui.WPF.exe"
+#define ScheduledTaskName "Autorun Lanceur 2"
 
 [Setup]
 PrivilegesRequired=admin
@@ -22,7 +23,6 @@ PrivilegesRequired=admin
 AppId={{73909BA2-D53C-4C49-9C0D-4E38F25148BC}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -37,21 +37,42 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-; Chose how the appplications starts up
-Name: "startregistry"; Description: "Start the application via the registry"; GroupDescription: "Startup options"; Flags: exclusive
-Name: "starttask"; Description: "Start the application via a scheduled task"; GroupDescription: "Startup options"; Flags: exclusive
+Name: "desktopicon"; \
+    Description: "{cm:CreateDesktopIcon}"; \
+    GroupDescription: "{cm:AdditionalIcons}"; \
+    Flags: unchecked
+
+; Choose how the application starts up (radio button)
+Name: "starts_cheduled_task"; \
+    Description: "Start the application via a scheduled task"; \
+    GroupDescription: "Startup options"; \
+    Flags: exclusive unchecked
+
+Name: "start_registry"; \
+    Description: "Start the application via the registry"; \
+    GroupDescription: "Startup options"; \
+    Flags: exclusive unchecked
 
 [Registry]
-Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Lanceur 2"; ValueData: """{app}\{#MyAppExeName}"""; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; \
+    ValueType: string; \
+    ValueName: "Lanceur 2"; \
+    ValueData: """{app}\{#MyAppExeName}"""; \
+    Tasks: start_registry; \
+    Flags: uninsdeletevalue
 
 [Run]
-Filename: "schtasks"; \
-    Parameters: "/Create /F /SC ONLOGON /TN ""Autorun Lanceur 2"" /TR ""'{app}\{#MyAppExeName}' par1"""; \
+Filename: "cmd"; \
+    Parameters: "/C schtasks /Create /F /SC ONLOGON /TN ""{#ScheduledTaskName}"" /TR ""'{app}\{#MyAppExeName}'"""; \
+    Tasks: starts_cheduled_task; \
     Flags: runhidden
 
 [UninstallRun]
-Filename: "schtasks"; Parameters: "/Delete /TN {#MyAppName} /F"; Flags: runhidden
+Filename: "cmd"; \
+    Parameters: "/C schtasks /Delete /TN ""{#ScheduledTaskName}"" /F"; \
+    RunOnceId: "delete_schedule_task"; \
+    Tasks: starts_cheduled_task; \
+    Flags: runhidden runascurrentuser
 
 [Files]
 Source: "{#BinDirectory}{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
