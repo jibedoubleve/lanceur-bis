@@ -48,24 +48,14 @@ public class ThumbnailService : IThumbnailService
     ///     executables, Windows Store applications, and URLs. It attempts to retrieve and assign the appropriate
     ///     thumbnail or favicon based on the query information.
     /// </summary>
-    /// <param name="queryResults">An object containing the necessary information to retrieve and update the thumbnail.</param>
+    /// <param name="queryResult">An object containing the necessary information to retrieve and update the thumbnail.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    private async Task UpdateThumbnailAsync(EntityDecorator<QueryResult> queryResults)
+    private async Task UpdateThumbnailAsync(EntityDecorator<QueryResult> queryResult)
     {
-        if (queryResults.Entity?.IsThumbnailDisabled ?? true) return;
-        if (queryResults.Entity is not AliasQueryResult alias) return;
+        if (queryResult.Entity?.IsThumbnailDisabled ?? true) return;
+        if (queryResult.Entity is not AliasQueryResult alias) return;
         if (alias.FileName.IsNullOrEmpty()) return;
-
-        if (File.Exists(alias.Thumbnail))
-        {
-            _logger.LogTrace(
-                "Thumbnail found for alias {Alias}. [File name: {FileName}, Thumbnail: {Thumbnail}]",
-                alias.Name,
-                alias.FileName,
-                alias.Thumbnail
-            );
-            return;
-        }
+        if (File.Exists(alias.Thumbnail))  return; 
 
         // ----
         // Manage packaged applications
@@ -79,7 +69,7 @@ public class ThumbnailService : IThumbnailService
             if (response is not null)
             {
                 alias.Thumbnail = response.Logo.LocalPath;
-                queryResults.Soil();
+                queryResult.Soil();
             }
 
             alias.Thumbnail.CopyToImageRepository(alias.FileName);
@@ -95,7 +85,7 @@ public class ThumbnailService : IThumbnailService
             var file = new FileInfo(alias.FileName);
             imageSource.CopyToImageRepository(file.Name);
             alias.Thumbnail = file.Name.GetThumbnailPath();
-            queryResults.Soil();
+            queryResult.Soil();
             return;
         }
 
@@ -115,12 +105,12 @@ public class ThumbnailService : IThumbnailService
         if (File.Exists(favicon))
         {
             alias.Thumbnail = favicon;
-            queryResults.Soil();
+            queryResult.Soil();
             return;
         }
 
         var t1 = _favIconService.RetrieveFaviconAsync(alias);
-        UpdateThumbnailInDb(queryResults);
+        UpdateThumbnailInDb(queryResult);
 
         await t1;
     }
@@ -160,8 +150,8 @@ public class ThumbnailService : IThumbnailService
         try
         {
             _logger.LogTrace("Refreshing thumbnails for {Count} alias", queryResults.Count());
-            foreach (var query in queries) // Fire & forget thumbnail refresh
-                UpdateThumbnailAsync(query)
+            foreach (var query in queries)
+                UpdateThumbnailAsync(query) // Fire & forget thumbnail refresh
                     .ContinueWith(t => throw t.Exception!, TaskContinuationOptions.OnlyOnFaulted);
             _logger.LogTrace("Fire and forget the refresh of thumbnails.");
         }
