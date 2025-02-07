@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.SharedKernel.Web;
 
 ///<inheritdoc />
+[Obsolete($"Use {nameof(FavIconDownloader2)} instead)")]
 public class FavIconDownloader : IFavIconDownloader
 {
     #region Fields
