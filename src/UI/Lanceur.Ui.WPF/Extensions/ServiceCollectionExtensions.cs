@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<ISnackbarService, SnackbarService>()
                          .AddSingleton<IUserNotificationService, UserNotificationService>()
                          .AddSingleton<IViewFactory, ViewFactory>()
+                         .AddSingleton<IHotKeyService, HotKeyService>()
                          .AddSingleton<IUserInteractionHub, UserInteractionHub>()
                          .AddSingleton(new AssemblySource
                          {
