@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net8.0-windows10.0.19041</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -10,6 +10,7 @@
       <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
       <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
       <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
+      <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

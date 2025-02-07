@@ -1,6 +1,7 @@
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
+using Lanceur.Ui.Core.Utils;
 
 namespace Lanceur.Tests.Tools.ViewModels;
 
@@ -17,6 +18,7 @@ public class ServiceVisitors
     public Action<ISettingsFacade>? VisitSettings { get; init; }
     public Func<IServiceProvider, IUserInteractionService, IUserInteractionService>? VisitUserInteractionService { get; init; }
     public Func<IServiceProvider, IUserNotificationService, IUserNotificationService>? VisitUserNotificationService { get; init; }
+    public Func<IServiceProvider, IViewFactory, IViewFactory>? VisitViewFactory { get; init; }
 
     #endregion
 }

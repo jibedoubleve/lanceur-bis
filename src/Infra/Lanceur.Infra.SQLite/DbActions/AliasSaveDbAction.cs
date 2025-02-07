@@ -34,11 +34,10 @@ public class AliasSaveDbAction
         ArgumentNullException.ThrowIfNull(alias.Id);
 
         alias.SanitizeSynonyms();
-        var action = _dbActionFactory.AliasManagement;
-
+       
         using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
 
-        action.SaveOrUpdate(tx, ref alias);
+        _dbActionFactory.AliasManagement.SaveOrUpdate(tx, ref alias);
 
         // Reset state after save
         alias.SynonymsWhenLoaded = alias.Synonyms;

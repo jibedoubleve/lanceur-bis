@@ -112,14 +112,14 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         var dataContext = new DoubloonViewModel(parameters, alias.Synonyms);
 
-        var response = await _userInteraction.AskUserYesNoAsync(
+        var response = await _userInteraction.InteractAsync(
             content,
             "Update changes",
             "Cancel",
             "Merge aliases",
             dataContext
         );
-        if (!response) return;
+        if (!response.IsConfirmed) return;
 
         // Merge all the alias into this one (That's add additional parameters) 
         alias.Synonyms = dataContext.Synonyms;

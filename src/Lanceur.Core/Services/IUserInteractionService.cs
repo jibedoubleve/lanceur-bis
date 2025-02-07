@@ -26,10 +26,29 @@ public interface IUserInteractionService
     /// <param name="yesText">The label for the "Yes" button; defaults to "yes" if not provided.</param>
     /// <param name="noText">The label for the "No" button; defaults to "no" if not provided.</param>
     /// <param name="title">The title of the modal dialog; defaults to "Question" if not specified.</param>
-    /// <param name="dataContext">Optional parameter for the data context that can be bound to the modal dialog.</param>
     /// <returns>
     /// A task representing the asynchronous operation. The task result will be 
     /// a boolean value: <c>true</c> if the user selects "Yes", or <c>false</c> if the user selects "No".
     /// </returns>
-    Task<bool> AskUserYesNoAsync(object content, string yesText = "yes", string noText = "no", string title = "Question", object? dataContext = null);
+    Task<bool> AskUserYesNoAsync(object content, string yesText = "yes", string noText = "no", string title = "Question");
+
+    /// <summary>
+    /// Displays an interactive message box to the user, prompting for input.
+    /// The message box presents a question or message and allows the user to respond.
+    /// </summary>
+    /// <param name="content">The content to display in the message box (e.g., a question or form).</param>
+    /// <param name="yesText">The text for the confirmation button (default: "Apply").</param>
+    /// <param name="noText">The text for the cancellation button (default: "Cancel").</param>
+    /// <param name="title">The title of the message box (default: "Interaction").</param>
+    /// <param name="dataContext">Optional additional data context associated with the interaction.</param>
+    /// <returns>A task returning a tuple where:
+    /// - <c>IsConfirmed</c>: A boolean indicating whether the user confirmed (true) or canceled (false).
+    /// - <c>DataContext</c>: The provided or modified data context after the interaction.</returns>
+    Task<(bool IsConfirmed, object DataContext)> InteractAsync(
+        object content, 
+        string yesText = "Apply", 
+        string noText = "Cancel", 
+        string title = "Interaction",  
+        object? dataContext = null);
+
 }
