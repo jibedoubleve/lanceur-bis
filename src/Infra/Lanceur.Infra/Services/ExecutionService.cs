@@ -201,10 +201,14 @@ public class ExecutionService : IExecutionService
     public void OpenDirectoryAsync(QueryResult queryResult)
     {
         if (queryResult is not AliasQueryResult alias) return;
-        if (!File.Exists(alias.FileName)) return;
-
+        
+        if (!File.Exists(alias.FileName) && !Directory.Exists(alias.FileName)) return;
+        
         var directory = Path.GetDirectoryName(alias.FileName);
         if (directory is not null) Process.Start("explorer.exe", directory);
+        if (Directory.Exists(alias.FileName)) { Process.Start("explorer.exe", alias.FileName); }
+
+
     }
 
     #endregion
