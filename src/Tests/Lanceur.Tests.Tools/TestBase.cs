@@ -43,17 +43,18 @@ public abstract class TestBase
 
     #region Methods
 
-    protected IDbConnection BuildConnection(string connectionString = null)
+    protected IDbConnection BuildConnection(string? connectionString = null)
     {
-        DbConnection connection = new SQLiteConnection(connectionString ?? InMemoryConnectionString);
-
-        if (SqlProfiler is not null) connection = new ProfiledDbConnection(connection, SqlProfiler);
+        var connection = new ProfiledDbConnection(
+            new SQLiteConnection(connectionString ?? InMemoryConnectionString),
+            SqlProfiler
+        );
 
         connection.Open();
         return connection;
     }
 
-    protected IDbConnection BuildFreshDb(string sql = null, string connectionString = null)
+    protected IDbConnection BuildFreshDb(string? sql = null, string? connectionString = null)
     {
         var db = BuildConnection(connectionString);
         var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbeddedResourcePattern);
@@ -81,9 +82,9 @@ public abstract class TestBase
     /// </summary>
     protected void EnableSqlProfiling() => _isProfilingSql = true;
 
-    protected DbSingleConnectionManager GetDatabase(SqlBuilder builder, string connectionString = null)
+    protected DbSingleConnectionManager GetDatabase(SqlBuilder builder, string? connectionString = null)
     {
-        DbSingleConnectionManager connectionManager = null;
+        DbSingleConnectionManager? connectionManager = null;
         try
         {
             var database = BuildFreshDb(builder.ToString(), connectionString);

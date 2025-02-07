@@ -15,7 +15,7 @@ namespace Lanceur.Ui.WPF.Converters
 
         #region Methods
 
-        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is Visibility ? _conditional.Value : Binding.DoNothing;
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is Visibility ? _conditional : Binding.DoNothing;
 
         public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
 

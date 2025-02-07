@@ -61,8 +61,10 @@ public static class ServiceCollectionExtensions
                                                  .Enrich.WithEnvironmentUserName()
                                                  .WriteTo.Console();
 
-        new Conditional<Action>(ConfigureLogForDebug, ConfigureLogForRelease)
-            .Value.Invoke();
+        ConditionalExecution.Execute(
+            ConfigureLogForDebug, 
+            ConfigureLogForRelease
+        );
         
         Log.Logger = loggerCfg.CreateLogger();
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true))

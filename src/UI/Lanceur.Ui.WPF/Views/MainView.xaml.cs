@@ -133,7 +133,7 @@ public partial class MainView
 
         ConditionalExecution.Execute(
             () => { },
-            () => HideWindow()
+            HideWindow
         );
     }
 

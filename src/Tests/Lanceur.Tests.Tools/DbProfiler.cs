@@ -48,12 +48,13 @@ public class DbProfiler : IDbProfiler
     {
         var parameters = profiledDbCommand.Parameters.Cast<SQLiteParameter>()
                                           .Select(x => $"{x.ParameterName}: {x.Value}")
+                                          .Cast<object>()
                                           .ToArray();
         var sql = profiledDbCommand.CommandText;
         log(sql, parameters);
     }
 
-    public void ExecuteFinish(IDbCommand profiledDbCommand, SqlExecuteType executeType, DbDataReader reader)
+    public void ExecuteFinish(IDbCommand profiledDbCommand, SqlExecuteType executeType, DbDataReader? reader)
     {
         Log(
             profiledDbCommand,

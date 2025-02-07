@@ -20,9 +20,9 @@ public abstract class ViewModelTest<TViewModel> : TestBase
 
     #region Methods
 
-    protected abstract IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors);
+    protected abstract IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors? visitors);
 
-    protected async Task TestViewModel(Func<TViewModel, IDbConnectionManager, Task> scope, SqlBuilder sqlBuilder = null, ServiceVisitors visitors = null)
+    protected async Task TestViewModel(Func<TViewModel, IDbConnectionManager, Task> scope, SqlBuilder? sqlBuilder = null, ServiceVisitors? visitors = null)
     {
         var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
         using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
@@ -32,7 +32,7 @@ public abstract class ViewModelTest<TViewModel> : TestBase
                                                        .AddDatabase(db);
 
         var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
-        var viewModel = serviceProvider.GetService<TViewModel>();
+        var viewModel = serviceProvider.GetService<TViewModel>() !;
         await scope(viewModel, db);
     }
 

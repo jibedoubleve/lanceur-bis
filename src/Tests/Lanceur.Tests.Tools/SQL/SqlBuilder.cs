@@ -13,7 +13,7 @@ public class SqlBuilder
 
     #region Constructors
 
-    public SqlBuilder(SqlBuilder initialSql = null)
+    public SqlBuilder(SqlBuilder? initialSql = null)
     {
         if (initialSql is not null) _sql.Append(initialSql);
     }
@@ -28,7 +28,7 @@ public class SqlBuilder
 
     #region Methods
 
-    public SqlBuilder AppendAlias(long idAlias, string fileName = null, string arguments = null, string[] synonyms = null)
+    public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, string[]? synonyms = null)
     {
         fileName ??= Guid.NewGuid().ToString();
         arguments ??= Guid.NewGuid().ToString();
@@ -42,7 +42,7 @@ public class SqlBuilder
         return this;
     }
 
-    public SqlBuilder AppendArgument(long idAlias, string name = null, string argument = null)
+    public SqlBuilder AppendArgument(long idAlias, string? name = null, string? argument = null)
     {
         name ??= Guid.NewGuid().ToString();
         argument ??= Guid.NewGuid().ToString();

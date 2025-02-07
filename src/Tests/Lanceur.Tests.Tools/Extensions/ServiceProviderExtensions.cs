@@ -18,7 +18,7 @@ public static class ServiceProviderExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddApplicationSettings(this IServiceCollection serviceCollection, Action<ISettingsFacade> setupAction = null)
+    public static IServiceCollection AddApplicationSettings(this IServiceCollection serviceCollection, Action<ISettingsFacade>? setupAction = null)
     {
         var settings = Substitute.For<ISettingsFacade>();
         settings.Application.Returns(new DatabaseConfiguration());

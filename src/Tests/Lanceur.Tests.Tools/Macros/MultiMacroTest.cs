@@ -21,7 +21,7 @@ public class MultiMacroTest : MacroQueryResult
 
     public override SelfExecutableQueryResult Clone() => new MultiMacro(_serviceProvider);
 
-    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         cmdline ??= Cmdline.Empty;
         var list = new List<QueryResult> { new DisplayQueryResult(cmdline.Name, cmdline.Parameters) };
