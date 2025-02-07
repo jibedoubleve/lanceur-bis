@@ -47,12 +47,12 @@ public class SearchService : ISearchService
 
     #region Methods
 
-    private IEnumerable<QueryResult> SetupAndSort(QueryResult[] input)
+    private IEnumerable<QueryResult> SetupAndSort(QueryResult[] collection)
     {
         // Upgrade alias to executable macro and return the result
-        var results = input?.Any() ?? false
-            ? _macroService.Handle(input).ToList()
-            : new();
+        var results = collection?.Any() ?? false
+            ? _macroService.ExpandMacroAlias(collection).ToList()
+            : [];
 
         // Refresh the thumbnails
         _thumbnailService.UpdateThumbnails(results);
@@ -62,7 +62,7 @@ public class SearchService : ISearchService
                                     .ThenBy(e => e.Name)
                                     .ToArray();
 
-        return input?.Any() ?? false
+        return collection?.Any() ?? false
             ? orderedResults
             : DisplayQueryResult.NoResultFound;
     }

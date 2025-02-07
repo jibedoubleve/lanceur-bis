@@ -1,6 +1,5 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Managers;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
@@ -16,50 +15,57 @@ public class MacroService : MacroCachedService, IMacroService
 
     #region Properties
 
-    public int MacroCount => MacroInstances?.Count ?? 0;
+    public int MacroCount => MacroTemplates?.Count ?? 0;
 
     #endregion
 
     #region Methods
 
-    /// <inheritdoc/>
-    public IEnumerable<string> GetAll() => MacroInstances.Keys;
-
-    /// <inheritdoc/>
-    public IEnumerable<QueryResult> Handle(QueryResult[] collection)
-    {
-        using var _ = Logger.MeasureExecutionTime(this);
-        var result = collection.Select(Handle)
-                               .Where(item => item is not null)
-                               .ToArray();
-        return result;
-    }
-
-    /// <inheritdoc/>
-    public QueryResult Handle(QueryResult item)
+    /// <summary>
+    /// Expands a macro alias into its corresponding macro definition by cloning the related template
+    /// and applying the alias's properties.
+    /// </summary>
+    /// <param name="item">The <see cref="QueryResult"/> to process.</param>
+    /// <returns>
+    /// The expanded <see cref="MacroQueryResult"/> if the input is a valid macro alias.
+    /// Returns the original <see cref="QueryResult"/> if it's not an alias.
+    /// Returns <c>null</c> if the alias refers to a misconfigured macro or if the resolved instance is of an unexpected type.
+    /// </returns>
+    internal QueryResult? ExpandMacroAlias(QueryResult item)
     {
         if (item is not AliasQueryResult alias || !alias.IsMacro()) return item;
 
-        var macroInstances = MacroInstances;
-        var macroName = alias.GetMacroName();
-
-        if (!macroInstances.TryGetValue(macroName, out var instance))
+        if (!MacroTemplates.TryGetValue(alias.GetMacroName(), out var instance))
         {
             /* Well, this is a misconfigured macro, log it and forget it */
-            Logger.LogInformation(
+            Logger.LogWarning(
                 "User has misconfigured a Macro with name {FileName}. Fix the name of the macro or remove the alias from the database",
                 alias.FileName
             );
             return null;
         }
 
-        if (instance is not MacroQueryResult i) throw new NotSupportedException($"Cannot cast '{instance.GetType()}' into '{typeof(MacroQueryResult)}'");
+        if (instance is not MacroQueryResult i)
+        {
+            Logger.LogWarning("Cannot cast '{Instance}' into '{MacroQueryResult}'", instance.GetType(), typeof(MacroQueryResult));
+            return null;
+        }
 
         var macro = i.Clone();
         macro.Name = alias.Name;
         macro.Parameters = alias.Parameters;
         macro.Description = alias.Description;
         return macro;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<QueryResult> ExpandMacroAlias(QueryResult[] collection)
+    {
+        using var _ = Logger.MeasureExecutionTime(this);
+        var result = collection.Select(ExpandMacroAlias)
+                               .Where(item => item is not null)
+                               .ToArray();
+        return result;
     }
 
     #endregion
