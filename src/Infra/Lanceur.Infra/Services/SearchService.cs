@@ -91,10 +91,10 @@ public class SearchService : ISearchService
         //Get the alive stores
         var aliveStores = Stores.Where(service => _orchestrator.IsAlive(service, query))
                                 .ToArray();
-        var tasks = new List<Task<IEnumerable<QueryResult>>>();
 
         // I've got a services that stunt all the others, then
         // I execute the search for this one only
+        var tasks = new List<Task<IEnumerable<QueryResult>>>();
         if (aliveStores.Any(x => x.StoreOrchestration.IdleOthers))
         {
             var store = aliveStores.First(x => x.StoreOrchestration.IdleOthers);
@@ -120,9 +120,10 @@ public class SearchService : ISearchService
         // Remember the query
         foreach (var result in results) result.Query = query;
 
+        var orderedResults = SetupAndSort(results).ToList();
+        
         // If there's an exact match, promote it to the top
         // of the list.
-        var orderedResults = SetupAndSort(results).ToList();
         var match = orderedResults.FirstOrDefault(r => r.Name == query.Name);
         if (match is not null) orderedResults.Move(match, 0);
 

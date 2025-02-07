@@ -87,7 +87,7 @@ public class AliasDbAction
         var entities = parameters.ToEntity(idAlias).ToList();
         var addedRowsCount = entities.Sum(
             entity =>
-                tx.Connection.Execute(sql2, new { idAlias = entity.Id, parameter = entity.Parameter, name = entity.Name })
+                tx.Connection.Execute(sql2, new { idAlias = entity.IdAlias, parameter = entity.Parameter, name = entity.Name })
         );
 
         if (deletedRowsCount > 0 && addedRowsCount == 0) _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);

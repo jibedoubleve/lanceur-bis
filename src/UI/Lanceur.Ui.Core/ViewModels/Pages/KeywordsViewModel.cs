@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Navigation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -130,13 +131,22 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnAddParameter()
     {
-        var parameter = new AdditionalParameter();
+        if (SelectedAlias is null) return;
+
+        var parameter = this.NewAdditionalParameter();
+        if (parameter is null)
+        {
+            _logger.LogInformation("No alias selected. Impossible to add new additional parameter");
+            return;
+        }
+        
         var view = _viewFactory.CreateView(parameter);
 
-        var result = await _userInteraction.AskUserYesNoAsync(view, "Apply", "Cancel", "Add parameter");
-        if (!result) return;
+        var result = await _userInteraction.InteractAsync(view, "Apply", "Cancel", "Add parameter");
+        if (!result.IsConfirmed) return;
 
-        SelectedAlias?.AdditionalParameters.Add(parameter);
+        var vm = result.DataContext as AdditionalParameter;
+        SelectedAlias?.AdditionalParameters.Add(vm);
         _userNotificationService.Success($"Parameter {parameter.Name} has been added. Don't forget to save to apply changes", "Updated.");
     }
 

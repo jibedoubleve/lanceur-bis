@@ -10,8 +10,10 @@ using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tooling;
+using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Tests.Tools;
 using Lanceur.Ui.Core.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -47,9 +49,9 @@ public class SQLiteAliasRepositoryShould : TestBase
         };
     }
 
-    private static AliasDbAction BuildAliasDbAction()
+    private static AliasDbAction BuildAliasDbAction(ILoggerFactory loggerFactory = null)
     {
-        var log = Substitute.For<ILoggerFactory>();
+        var log = loggerFactory ?? Substitute.For<ILoggerFactory>();
         var action = new AliasDbAction(log);
         return action;
     }
@@ -118,6 +120,54 @@ public class SQLiteAliasRepositoryShould : TestBase
             found.Should().NotBeNull();
             found.Synonyms.SplitCsv().Should().HaveCount(5);
         }
+    }
+
+    [Fact]
+    public void BeAbleToFindById()
+    {
+        // ARRANGE
+        const string sql = """
+                           insert into alias(id) values (100);
+                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);
+                           """;
+
+        var connection = BuildFreshDb(sql);
+        var action = BuildAliasDbAction();
+        var c = new DbSingleConnectionManager(connection);
+
+        // ACT
+        var found = c.WithinTransaction(tx => action.GetById(tx, 100));
+
+        // ASSERT
+        using (new AssertionScope())
+        {
+            found.Should().NotBeNull();
+            found.Name.Should().Be("noname");
+        }
+    }
+
+    [Fact]
+    public void BeAbleToNotFindById()
+    {
+        // ARRANGE
+        const string sql = """
+                           insert into alias(id) values (100);
+                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);
+                           """;
+
+        var connection = BuildFreshDb(sql);
+        var action = BuildAliasDbAction();
+        var c = new DbSingleConnectionManager(connection);
+
+        // ACT
+        var found = c.WithinTransaction(tx => action.GetById(tx, 1000));
+
+        // ASSERT
+        using (new AssertionScope()) { found.Should().BeNull(); }
     }
 
     [Fact]
@@ -255,6 +305,30 @@ public class SQLiteAliasRepositoryShould : TestBase
     }
 
     [Fact]
+    public void CreateAliasWithAdditionalParameters()
+    {
+        // ARRANGE
+        var sb = new ServiceCollection().AddLogging(b => b.AddXUnit(OutputHelper))
+                                        .BuildServiceProvider();
+
+        var sql = new SqlBuilder().AppendAlias(1, "Alias")
+                                  .ToString();
+
+        var connection = BuildFreshDb(sql, ConnectionStringFactory.InDesktop.ToString());
+        var dbAction = BuildAliasDbAction(sb.GetService<ILoggerFactory>());
+
+        var alias = new AliasQueryResult { Id = 1, Name = "Alias" };
+
+        // ACT
+        alias.AdditionalParameters.Add(new() { AliasId = 1, Name = "someName", Parameter = "someParameter" });
+        dbAction.SaveOrUpdate(connection.BeginTransaction(), ref alias);
+
+        // ASSERT
+        const string sqlCount = "select count(*) from alias_argument";
+        connection.ExecuteScalar<int>(sqlCount).Should().Be(1);
+    }
+
+    [Fact]
     public void CreateAliasWithPrivilegeUsingService()
     {
         // ARRANGE
@@ -285,54 +359,6 @@ public class SQLiteAliasRepositoryShould : TestBase
             sut.Name.Should().Be(name);
             sut.RunAs.Should().Be(RunAs.Admin);
         }
-    }
-
-    [Fact]
-    public void BeAbleToFindById()
-    {
-        // ARRANGE
-        const string sql = """
-                           insert into alias(id) values (100);
-                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
-                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
-                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);
-                           """;
-
-        var connection = BuildFreshDb(sql);
-        var action = BuildAliasDbAction();
-        var c = new DbSingleConnectionManager(connection);
-
-        // ACT
-        var found = c.WithinTransaction(tx => action.GetById(tx, 100));
-
-        // ASSERT
-        using (new AssertionScope())
-        {
-            found.Should().NotBeNull();
-            found.Name.Should().Be("noname");
-        }
-    }
-
-    [Fact]
-    public void BeAbleToNotFindById()
-    {
-        // ARRANGE
-        const string sql = """
-                           insert into alias(id) values (100);
-                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
-                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
-                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);
-                           """;
-
-        var connection = BuildFreshDb(sql);
-        var action = BuildAliasDbAction();
-        var c = new DbSingleConnectionManager(connection);
-
-        // ACT
-        var found = c.WithinTransaction(tx => action.GetById(tx, 1000));
-
-        // ASSERT
-        using (new AssertionScope()) { found.Should().BeNull(); }
     }
 
     [Fact]
@@ -386,7 +412,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         alias1.Id.Should().BeGreaterThan(0);
         connection.ExecuteScalar<int>(sql2).Should().Be(2);
         connection.ExecuteScalar<int>(sql3).Should().Be(3); // Logical deletion don't remove data: the names of the
-                                                            // deleted alias should remain in the database
+        // deleted alias should remain in the database
     }
 
     [Fact]

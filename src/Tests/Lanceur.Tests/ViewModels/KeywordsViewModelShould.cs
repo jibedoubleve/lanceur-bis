@@ -1,6 +1,7 @@
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
@@ -40,7 +41,9 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
                          .AddMockSingleton<IDatabaseConfigurationService>()
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()
-                         .AddMockSingleton<IViewFactory>()
+                         .AddMockSingleton<IViewFactory>(
+                             (sp, i) => visitors?.VisitViewFactory?.Invoke(sp, i) ?? i
+                         )
                          .AddMockSingleton<IPackagedAppSearchService>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IUserInteractionService>(
@@ -105,13 +108,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
             VisitUserInteractionService = (_, i) =>
             {
                 // Configured to say yes when it'll be asked to delete the alias
-                i.AskUserYesNoAsync(
-                     Arg.Any<object>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<object>()
-                 )
+                i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
                 return i;
             }
@@ -159,6 +156,47 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     }
 
     [Fact]
+    public async Task HaveViewModelInMessageBoxWhenUpdatingAdditionalParameters()
+    {
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                var parameter = new AdditionalParameter { Name = "SomeTestName", Parameter = "SomeParameter" };
+                i.InteractAsync(
+                     Arg.Any<object>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<object>()
+                 )
+                 .Returns(_ => (IsConfirmed: true, DataContext: parameter));
+                return i;
+            }
+        };
+        await TestViewModel(
+            async (viewModel, db) =>
+            {
+                // ARRANGE
+                const string name = "SomeTestName";
+
+                // ACT
+                await viewModel.CreateNewAlias(name);
+                await viewModel.AddParameterCommand.ExecuteAsync(null);
+                await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null);
+
+                // ASSERT
+                const string sql = "select count(*) from alias_argument";
+                var count = db.WithConnection(c => c.ExecuteScalar(sql));
+                count.Should().Be(1);
+            },
+            SqlBuilder.Empty,
+            visitors
+        );
+    }
+
+    [Fact]
     public async Task NotBeAbleToCreateAliasWithDeletedAliasName()
     {
         IUserNotificationService userNotificationService = null;
@@ -172,13 +210,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
             VisitUserInteractionService = (_, i) =>
             {
                 // Configured to say yes when it'll be asked to delete the alias
-                i.AskUserYesNoAsync(
-                     Arg.Any<object>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<object>()
-                 )
+                i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
                 return i;
             }
@@ -232,8 +264,18 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     [Fact]
     public async Task NotRecreateAliasOnLoad()
     {
-        var builder = new SqlBuilder().AppendAlias(1, "un", "", ["deux"])
-                                      .AppendAlias(2, "deux", "", ["trois"]);
+        var builder = new SqlBuilder().AppendAlias(
+                                          1,
+                                          "un",
+                                          "",
+                                          ["deux"]
+                                      )
+                                      .AppendAlias(
+                                          2,
+                                          "deux",
+                                          "",
+                                          ["trois"]
+                                      );
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModel(
             async (viewModel, _) =>
@@ -267,7 +309,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
                 viewModel.SelectedAlias!.LuaScript = script2;
                 await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null);
 
-                //ASSERT
+                // ASSERT
                 const string sql = """
                                    select 
                                        a.id         as Id,

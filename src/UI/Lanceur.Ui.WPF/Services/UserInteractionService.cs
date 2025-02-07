@@ -2,12 +2,13 @@ using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Services;
 using Lanceur.Ui.Core.Messages;
+using ScottPlot.Interactivity;
 using MessageBox = Wpf.Ui.Controls.MessageBox;
 using MessageBoxResult = Wpf.Ui.Controls.MessageBoxResult;
 
 namespace Lanceur.Ui.WPF.Services;
 
-public class UserUserInteractionService : IUserInteractionService
+public class UserInteractionService : IUserInteractionService
 {
     #region Methods
 
@@ -20,9 +21,8 @@ public class UserUserInteractionService : IUserInteractionService
     }
 
     ///<inheritdoc />
-    public async Task<bool> AskUserYesNoAsync(object content, string yesTextMessage = "yes", string noTextMessage = "no", string title = "Question", object? dataContext = null)
+    public async Task<bool> AskUserYesNoAsync(object content, string yesTextMessage = "yes", string noTextMessage = "no", string title = "Question")
     {
-        if (content is FrameworkElement d && dataContext is not null) d.DataContext = dataContext;
         return await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
             new(
                 content,
@@ -31,6 +31,21 @@ public class UserUserInteractionService : IUserInteractionService
                 noTextMessage
             )
         );
+    }
+
+    ///<inheritdoc />
+    public async Task<(bool IsConfirmed, object DataContext)> InteractAsync(object content, string yesText = "Apply", string noText = "Cancel", string title = "Interaction",  object? dataContext = null)
+    {
+        if (content is FrameworkElement d)
+        {
+            if(dataContext is not null)
+                d.DataContext = dataContext;
+            else dataContext = d.DataContext;
+        }
+        var isConfirmed = await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
+            new(content, title, yesText, noText)
+        );
+        return (IsConfirmed: isConfirmed, DataContext: dataContext)!;
     }
 
     ///<inheritdoc />

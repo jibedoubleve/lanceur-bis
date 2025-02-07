@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddSingleton<IUserGlobalNotificationService, ToastUserNotificationService>()
                          .AddSingleton<IContentDialogService, ContentDialogService>()
-                         .AddSingleton<IUserInteractionService, UserUserInteractionService>()
+                         .AddSingleton<IUserInteractionService, UserInteractionService>()
                          .AddSingleton<ISnackbarService, SnackbarService>()
                          .AddSingleton<IUserNotificationService, UserNotificationService>()
                          .AddSingleton<IViewFactory, ViewFactory>()
