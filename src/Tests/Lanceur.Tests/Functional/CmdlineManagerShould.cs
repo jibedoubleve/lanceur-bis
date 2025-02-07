@@ -1,9 +1,5 @@
 ﻿using FluentAssertions;
-using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.Managers;
-using Lanceur.Core.Models;
-using Lanceur.Tests.Tooling.Macros;
-using NSubstitute;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;
@@ -38,8 +34,8 @@ public class CmdlineManagerShould
     public void CloneCmdlineWithEmptyParameters(string newParameters)
     {
         // Arrange
-        var name = "init";
-        var parameters = "un deux trois";
+        const string name = "init";
+        const string parameters = "un deux trois";
         var cmd = CmdlineManager.BuildFromText($"{name} {parameters}");
 
         // Act

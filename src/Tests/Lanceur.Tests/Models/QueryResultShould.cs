@@ -25,12 +25,10 @@ public class QueryResultShould
     [InlineData(null, null, null)]
     public void HaveFileNameAsDescriptionWhenNoDescription(string description, string fileName, string expected)
     {
-        // arrange
+        // ARRANGE
         var queryResult = new AliasQueryResult { Description = description, FileName = fileName };
 
-        // act
-
-        // assert
+        // ACT && ASSERT
         queryResult.DescriptionDisplay.Should().Be(expected);
     }
 
@@ -43,13 +41,13 @@ public class QueryResultShould
     [InlineData(" un, deux,trois,quatre,cinq", 5)]
     public void HaveTrimmedResultInSynonyms(string synonyms, int count)
     {
-        // arrange
+        // ARRANGE
         var queryResult = new AliasQueryResult { Synonyms = synonyms };
 
-        // act
+        // ACT
         var names = queryResult.Synonyms.SplitCsv();
 
-        // assert
+        // ASSERT
         using (new AssertionScope())
         {
             names.Should().HaveCount(count);
@@ -64,7 +62,7 @@ public class QueryResultShould
 
     #region Classes
 
-    public class TestQueryResult : QueryResult { }
+    private class TestQueryResult : QueryResult { }
 
     #endregion Classes
 }

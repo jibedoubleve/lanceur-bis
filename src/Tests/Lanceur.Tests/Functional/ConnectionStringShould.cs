@@ -4,7 +4,6 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.Routing.Handlers;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;
