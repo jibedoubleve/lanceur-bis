@@ -1,13 +1,12 @@
-﻿using Lanceur.Core;
+﻿using System.ComponentModel;
+using System.Reflection;
+using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Microsoft.Extensions.Logging;
-using System.ComponentModel;
-using System.Reflection;
-using Lanceur.Infra.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.Managers;
+namespace Lanceur.Infra.Services;
 
 public abstract class MacroCachedService
 {
@@ -38,7 +37,7 @@ public abstract class MacroCachedService
 
     protected ILogger Logger { get; }
 
-    protected Dictionary<string, ISelfExecutable> MacroInstances
+    protected Dictionary<string, ISelfExecutable> MacroTemplates
     {
         get
         {

@@ -96,7 +96,7 @@ public class MacroServiceShould : TestBase
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroService>();
         var macro = new MultiMacroTest(serviceProvider) { Parameters = parameters };
-        var handler = (SelfExecutableQueryResult)macroMgr.Handle(macro);
+        var handler = (SelfExecutableQueryResult)macroMgr.ExpandMacroAlias(macro);
 
         var cmdline = new Cmdline(name, parameters);
         var results = (await handler.ExecuteAsync(cmdline))
@@ -118,7 +118,7 @@ public class MacroServiceShould : TestBase
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroService>();
         var macro = new MultiMacroTest(serviceProvider);
-        var result = macroMgr.Handle(macro);
+        var result = macroMgr.ExpandMacroAlias(macro);
 
         result.Should().BeAssignableTo<SelfExecutableQueryResult>();
     }
@@ -245,7 +245,7 @@ public class MacroServiceShould : TestBase
                                                      .BuildServiceProvider();
 
         var output = serviceProvider.GetService<MacroService>()
-                                    .Handle(queryResults)
+                                    .ExpandMacroAlias(queryResults)
                                     .ToArray();
 
         using (new AssertionScope())

@@ -261,7 +261,7 @@ public class SearchServiceShould : TestBase
                                                              var results = sp.GetService<IAliasRepository>()
                                                                              .Search(criterion)
                                                                              .ToList();
-                                                             macroManager.Handle(Arg.Any<QueryResult[]>())
+                                                             macroManager.ExpandMacroAlias(Arg.Any<QueryResult[]>())
                                                                          .Returns(results);
                                                              return macroManager;
                                                          }
