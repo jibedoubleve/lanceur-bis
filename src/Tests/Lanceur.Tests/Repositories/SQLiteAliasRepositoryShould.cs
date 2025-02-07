@@ -314,7 +314,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sql = new SqlBuilder().AppendAlias(1, "Alias")
                                   .ToString();
 
-        var connection = BuildFreshDb(sql, ConnectionStringFactory.InDesktop.ToString());
+        var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory.ToString());
         var dbAction = BuildAliasDbAction(sb.GetService<ILoggerFactory>());
 
         var alias = new AliasQueryResult { Id = 1, Name = "Alias" };

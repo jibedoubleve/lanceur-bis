@@ -31,7 +31,7 @@ public class MacroService : MacroCachedService, IMacroService
     /// Returns the original <see cref="QueryResult"/> if it's not an alias.
     /// Returns <c>null</c> if the alias refers to a misconfigured macro or if the resolved instance is of an unexpected type.
     /// </returns>
-    internal QueryResult? ExpandMacroAlias(QueryResult item)
+    internal QueryResult ExpandMacroAlias(QueryResult item)
     {
         if (item is not AliasQueryResult alias || !alias.IsMacro()) return item;
 
