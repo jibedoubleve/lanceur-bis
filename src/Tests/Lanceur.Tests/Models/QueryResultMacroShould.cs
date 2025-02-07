@@ -8,10 +8,14 @@ public class QueryResultMacroShould
 {
     #region Methods
 
-    [Theory, InlineData("calendar", false), InlineData("CaLeNdAr", false), InlineData("multi", true), InlineData("MuLtI", true)]
+    [Theory]
+    [InlineData("calendar", false)]
+    [InlineData("CaLeNdAr", false)]
+    [InlineData("multi", true)]
+    [InlineData("MuLtI", true)]
     public void BeAsExpected(string name, bool expected)
     {
-        var item = new AliasQueryResult() { FileName = $"@{name}@" };
+        var item = new AliasQueryResult { FileName = $"@{name}@" };
 
         item.IsComposite().Should().Be(expected);
     }
@@ -23,12 +27,20 @@ public class QueryResultMacroShould
         queryResult.IsMacro().Should().BeTrue();
     }
 
-    [Theory, InlineData("aze"), InlineData("@aze"), InlineData("aze@"), InlineData("une/deux/trois/aze@"), InlineData("une/deux/trois/@aze"), InlineData(@"une\deux\trois\aze@"), InlineData(@"une\deux\trois\@aze"), InlineData(@"C:\Users\jibedoubleve\AppData\Local\Microsoft\TypeScript\4.4\node_modules\@types\sass-loader\node_modules\@types")]
+    [Theory]
+    [InlineData("aze")]
+    [InlineData("@aze")]
+    [InlineData("aze@")]
+    [InlineData("une/deux/trois/aze@")]
+    [InlineData("une/deux/trois/@aze")]
+    [InlineData(@"une\deux\trois\aze@")]
+    [InlineData(@"une\deux\trois\@aze")]
+    [InlineData(@"C:\Users\jibedoubleve\AppData\Local\Microsoft\TypeScript\4.4\node_modules\@types\sass-loader\node_modules\@types")]
     public void NotBeMacroWhenNotSurroundedWithArobase(string name)
     {
         var queryResult = new AliasQueryResult { FileName = name };
         queryResult.IsMacro().Should().BeFalse();
     }
 
-    #endregion Methods
+    #endregion
 }

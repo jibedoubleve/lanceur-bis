@@ -4,7 +4,6 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Web;
-using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
@@ -44,7 +43,6 @@ public class FavIconServiceShould
         // ARRANGE
         var searchService = Substitute.For<IPackagedAppSearchService>();
         var favIconDownloader = Substitute.For<IFavIconDownloader>();
-        var logger = Substitute.For<ILoggerFactory>();
         var repository = Path.GetTempPath();
 
         // ACT

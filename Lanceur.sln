@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infra", "Infra", "{350959D7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Bookmarks", "src\Libraries\System.Web.Bookmarks\System.Web.Bookmarks.csproj", "{D8A94002-28BC-4E7A-9DBE-2690E5E63272}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanceur.Tests.Tools", "src\Tests\Lanceur.Tests.Tools\Lanceur.Tests.Tools.csproj", "{C0D2DF30-B891-4481-BACB-CD8892DC86CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{D8A94002-28BC-4E7A-9DBE-2690E5E63272}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8A94002-28BC-4E7A-9DBE-2690E5E63272}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8A94002-28BC-4E7A-9DBE-2690E5E63272}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0D2DF30-B891-4481-BACB-CD8892DC86CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0D2DF30-B891-4481-BACB-CD8892DC86CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0D2DF30-B891-4481-BACB-CD8892DC86CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0D2DF30-B891-4481-BACB-CD8892DC86CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +109,7 @@ Global
 		{6FC5DBA4-F987-419F-AD2B-438552A9DA78} = {350959D7-AF81-4739-8F5E-ED16E635CB46}
 		{64C3C9B1-874E-4CF5-905B-DCBF063D8A0F} = {350959D7-AF81-4739-8F5E-ED16E635CB46}
 		{D8A94002-28BC-4E7A-9DBE-2690E5E63272} = {42FC3E6A-9D1C-464D-A828-2D02E12F7192}
+		{C0D2DF30-B891-4481-BACB-CD8892DC86CF} = {8B2E553D-1F68-4EE2-80D1-61940075435B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F1CB5DA-802E-408C-B009-A94BE0FE61F3}

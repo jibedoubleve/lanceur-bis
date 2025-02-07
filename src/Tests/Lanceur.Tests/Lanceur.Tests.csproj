@@ -41,5 +41,6 @@
         <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj"/>
         <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj"/>
         <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj"/>
+        <ProjectReference Include="..\Lanceur.Tests.Tools\Lanceur.Tests.Tools.csproj" />
     </ItemGroup>
 </Project>
