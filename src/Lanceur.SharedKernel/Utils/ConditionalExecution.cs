@@ -48,7 +48,7 @@ public static class ConditionalExecution
     /// <param name="onDebug">The function to execute in DEBUG mode.</param>
     /// <param name="onRelease">The function to execute in RELEASE mode.</param>
     /// <returns>The result of the executed function.</returns>
-    public static TReturn Return<TReturn>(Func<TReturn> onDebug, Func<TReturn> onRelease)
+    public static TReturn Execute<TReturn>(Func<TReturn> onDebug, Func<TReturn> onRelease)
     {
         var isDebug = false;
         CheckIfDebug(ref isDebug);

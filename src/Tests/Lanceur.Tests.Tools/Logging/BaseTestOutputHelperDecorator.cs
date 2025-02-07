@@ -23,7 +23,7 @@ public class BaseTestOutputHelperDecorator
 
     #region Methods
 
-    protected void Write(Exception ex, string message, object[] propertyValues)
+    protected void Write(Exception? ex, string message, object[] propertyValues)
     {
         var msg = $"{(propertyValues.Length == 0 ? message : message.Format(propertyValues))}";
         if (ex is not null) msg += $" - {ex}";

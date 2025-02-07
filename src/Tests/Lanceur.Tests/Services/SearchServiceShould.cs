@@ -20,6 +20,7 @@ using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Logging;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

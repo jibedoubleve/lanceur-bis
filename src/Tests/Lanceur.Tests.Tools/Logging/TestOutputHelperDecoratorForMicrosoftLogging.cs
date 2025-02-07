@@ -22,7 +22,7 @@ public class TestOutputHelperDecoratorForMicrosoftLogging<T> : BaseTestOutputHel
     public IDisposable BeginScope<TState>(TState state) where TState : notnull => new TestOutputHelperDisposable(state, Write);
     public bool IsEnabled(LogLevel logLevel) => true;
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) => _logger.Log(logLevel, eventId, state, exception, formatter);
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) => _logger.Log(logLevel, eventId, state, exception, formatter);
 
     #endregion
 }
@@ -56,7 +56,7 @@ public class TestOutputHelperDecoratorForMicrosoftLogging : BaseTestOutputHelper
 
     public bool IsEnabled(LogLevel logLevel) => true;
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         var message = formatter(state, exception);
         var parameters = new object[] { eventId, ToShortLevel(logLevel), message };

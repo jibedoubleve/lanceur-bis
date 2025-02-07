@@ -28,7 +28,7 @@ public class ExecutableTestAlias : MacroQueryResult
 
     public override SelfExecutableQueryResult Clone() => new ExecutableTestAlias(_serviceProvider);
 
-    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         Parameters = cmdline?.Parameters;
         return NoResultAsync;

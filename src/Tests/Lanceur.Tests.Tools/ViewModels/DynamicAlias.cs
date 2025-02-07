@@ -13,7 +13,7 @@ public record DynamicAlias<T>
     ///     A generic field that stores a dynamically mapped value from the SQL query.
     ///     The SQL query defines which field is assigned to this property.
     /// </summary>
-    public T Field { get; init; }
+    public required T Field { get; init; }
 
     /// <summary>
     ///     The unique identifier of the alias.
@@ -23,7 +23,7 @@ public record DynamicAlias<T>
     /// <summary>
     ///     The name of the alias.
     /// </summary>
-    public string Name { get; init; }
+    public required string Name { get; init; }
 
     #endregion
 }
