@@ -34,6 +34,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Formatting.Display;
 
 namespace Lanceur.Ui.Core.Extensions;
 
@@ -59,24 +60,43 @@ public static class ServiceCollectionExtensions
                                                  .Enrich.FromLogContext()
                                                  .Enrich.WithEnvironmentUserName()
                                                  .WriteTo.Console();
-#if DEBUG
-        // For now, only seq is configured in my development machine and not anymore in AWS.
-        var apiKey = context.Configuration["SEQ_LANCEUR_DEV"];
-        if (apiKey is null) throw new NotSupportedException("Api key not found. Create a environment variable 'SEQ_LANCEUR_DEV' with the api key");
 
-        loggerCfg.WriteTo.Seq(Paths.TelemetryUrl, apiKey: apiKey);
-#else
-        loggerCfg.WriteTo.File(
-            new Serilog.Formatting.Compact.CompactJsonFormatter(),
-            Paths.LogFile,
-            rollingInterval: RollingInterval.Day
-        );
-#endif
+        new Conditional<Action>(ConfigureLogForDebug, ConfigureLogForRelease)
+            .Value.Invoke();
+        
         Log.Logger = loggerCfg.CreateLogger();
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true))
                          .BuildServiceProvider();
         Log.Logger.Information("Logger configured");
         return serviceCollection;
+
+        void ConfigureLogForDebug()
+        {
+            // For now, only seq is configured in my development machine and not anymore in AWS.
+            var apiKey = context.Configuration["SEQ_LANCEUR_DEV"];
+            if (apiKey is null) throw new NotSupportedException("Api key not found. Create a environment variable 'SEQ_LANCEUR_DEV' with the api key");
+
+            loggerCfg.WriteTo.Seq(
+                Paths.TelemetryUrl,
+                apiKey: apiKey
+            );
+        }
+
+        void ConfigureLogForRelease()
+        {
+            // Clef file, easier to import into SEQ
+            loggerCfg.WriteTo.File(
+                new Serilog.Formatting.Compact.CompactJsonFormatter(),
+                Paths.ClefLogFile,
+                rollingInterval: RollingInterval.Day
+            );
+            // Raw log file, easier to read
+            loggerCfg.WriteTo.File(
+                new MessageTemplateTextFormatter("[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"),
+                Paths.RawLogFile,
+                rollingInterval: RollingInterval.Day
+            );
+        }
     }
 
     public static IServiceCollection AddMapping(this IServiceCollection serviceCollection)
