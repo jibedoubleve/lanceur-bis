@@ -131,7 +131,10 @@ public partial class MainView
          */
         if (e is KeyboardFocusChangedEventArgs { NewFocus: ListViewItem }) return;
 
-        new Conditional<Action?>(null, HideWindow).Value?.Invoke();
+        ConditionalExecution.Execute(
+            () => { },
+            () => HideWindow()
+        );
     }
 
     private void OnMouseDown(object _, MouseButtonEventArgs e)

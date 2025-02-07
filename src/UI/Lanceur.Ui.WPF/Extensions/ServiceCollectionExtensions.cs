@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
                              MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
                          });
 
-        ConditionalExecution.Set(
+        ConditionalExecution.Execute(
             serviceCollection,
             onPrd => onPrd.AddSingleton<IAppRestartService, AppRestartDummyService>(),
             onDbg => onDbg.AddSingleton<IAppRestartService, AppRestartService>()

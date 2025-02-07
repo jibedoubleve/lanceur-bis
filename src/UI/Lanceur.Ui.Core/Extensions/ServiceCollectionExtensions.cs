@@ -146,7 +146,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>();
 
-        ConditionalExecution.Set(
+        ConditionalExecution.Execute(
             serviceCollection,
             s => s.AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>(),
             s => s.AddSingleton<IApplicationConfigurationService, JsonApplicationConfigurationService>()

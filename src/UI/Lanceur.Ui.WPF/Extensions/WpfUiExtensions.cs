@@ -15,10 +15,10 @@ public static class WpfUiExtensions
         if (string.Equals(value, WindowBackdropType.Mica.ToString(), StringComparison.CurrentCultureIgnoreCase)) return WindowBackdropType.Mica;
         if (string.Equals(value, WindowBackdropType.Tabbed.ToString(), StringComparison.CurrentCultureIgnoreCase)) return WindowBackdropType.Tabbed;
 
-        return new Conditional<Func<WindowBackdropType>>(OnDebug, OnRelease).Value();
-
-        WindowBackdropType OnRelease() => WindowBackdropType.Auto;
-        WindowBackdropType OnDebug() => throw new NotSupportedException($"{value} is not a wpf backdrop type.");
+        return ConditionalExecution.Return(
+            () => throw new NotSupportedException($"{value} is not a wpf backdrop type."),
+            () => WindowBackdropType.Auto
+        );
     }
 
     #endregion
