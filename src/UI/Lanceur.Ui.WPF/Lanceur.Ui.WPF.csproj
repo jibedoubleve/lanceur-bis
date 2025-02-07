@@ -10,6 +10,7 @@
         <Company>JB Wautier</Company>
         <Product>Lanceur</Product>
         <LangVersion>12</LangVersion>
+        <AssemblyTitle>Lanceur</AssemblyTitle>
     </PropertyGroup>
 
     <ItemGroup>

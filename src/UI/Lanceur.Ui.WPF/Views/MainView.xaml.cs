@@ -9,13 +9,12 @@ using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Helpers;
+using Lanceur.Ui.WPF.Services;
 using Lanceur.Ui.WPF.Views.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NHotkey;
-using NHotkey.Wpf;
 using Wpf.Ui.Appearance;
-using Wpf.Ui.Controls;
 using ListViewItem = System.Windows.Controls.ListViewItem;
 using MenuItem = System.Windows.Controls.MenuItem;
 
@@ -29,7 +28,7 @@ public partial class MainView
     #region Fields
 
     private readonly IDatabaseConfigurationService _databaseConfig;
-    private readonly FallbackShortcuts _fallbackShortcuts = new();
+    private readonly IHotKeyService _hotKeyService;
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly ISettingsFacade _settings;
@@ -40,20 +39,26 @@ public partial class MainView
 
     public MainView(
         MainViewModel viewModel,
-        IDatabaseConfigurationService databaseConfigurationService,
         ILogger<MainView> logger,
         IServiceProvider serviceProvider,
-        ISettingsFacade settings
+        ISettingsFacade settings,
+        IHotKeyService hotKeyService,
+        IDatabaseConfigurationService databaseConfig
     )
     {
-        ArgumentNullException.ThrowIfNull(databaseConfigurationService);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewModel);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(hotKeyService);
+        ArgumentNullException.ThrowIfNull(databaseConfig);
 
-        _databaseConfig = databaseConfigurationService;
         _logger = logger;
         _serviceProvider = serviceProvider;
         _settings = settings;
+        _hotKeyService = hotKeyService;
+        _databaseConfig = databaseConfig;
 
         DataContext = viewModel;
 
@@ -78,7 +83,7 @@ public partial class MainView
 
     #region Properties
 
-    private MainViewModel ViewModel => (MainViewModel)DataContext;
+    public MainViewModel ViewModel => (MainViewModel)DataContext;
 
     #endregion
 
@@ -111,15 +116,10 @@ public partial class MainView
     {
         SystemThemeWatcher.Watch(
             this,
-            _settings.Application.Window.BackdropStyle.ToWindowBackdropType(),
-            updateAccents: true
+            _settings.Application.Window.BackdropStyle.ToWindowBackdropType()
         );
 
-        var hk = _databaseConfig!.Current.HotKey;
-        SetGlobalShortcut((Key)hk.Key, (ModifierKeys)hk.ModifierKey);
-
         SetWindowPosition();
-
         ShowWindow();
     }
 
@@ -181,44 +181,6 @@ public partial class MainView
         }
     }
 
-    private void OnShowWindow(object? _, HotkeyEventArgs? e)
-    {
-        ShowWindow();
-        if (e is not null) e.Handled = true;
-    }
-
-    private void SetGlobalShortcut(Key key, ModifierKeys modifier)
-    {
-        _logger.LogInformation("Setup shortcut. (Key: {Key}, Modifier: {Modifier})", key, modifier);
-        try
-        {
-            HotkeyManager.Current.AddOrReplace(
-                "OnShowWindow",
-                key,
-                modifier,
-                OnShowWindow
-            );
-        }
-        catch (HotkeyAlreadyRegisteredException ex)
-        {
-            if (!_fallbackShortcuts.CanNext)
-            {
-                _logger.LogError("All the fallback shortcuts have been tried. Impossible to setup the shortcut.");
-                return;
-            }
-
-            //Default values
-            _logger.LogWarning(
-                ex,
-                "Impossible to set shortcut. (Key: {Key}, Modifier: {Modifier})",
-                key,
-                modifier
-            );
-            var sc = _fallbackShortcuts.Next();
-            SetGlobalShortcut(sc.Key, sc.ModifierKeys);
-        }
-    }
-
     private void SetQuery(string suggestion)
     {
         QueryTextBox.Text = suggestion;
@@ -258,6 +220,12 @@ public partial class MainView
         Focus();
     }
 
+    public void OnShowWindow(object? _, HotkeyEventArgs? e)
+    {
+        ShowWindow();
+        if (e is not null) e.Handled = true;
+    }
+
     /// <summary>
     ///     Call this method to display the window the first time. It checks the settings and hides the window
     ///     immediately after showing it if the <c>ShowAtStartup</c> setting is set to <c>True</c>.
@@ -265,8 +233,7 @@ public partial class MainView
     /// </summary>
     public void ShowOnStartup()
     {
-        Show();
-        if (false == ViewModel.ShowAtStartup) Hide();
+        if (ViewModel.ShowAtStartup) Show();
     }
 
     #endregion

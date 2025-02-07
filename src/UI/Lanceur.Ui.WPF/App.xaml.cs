@@ -1,6 +1,8 @@
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite;
@@ -8,11 +10,13 @@ using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Extensions;
+using Lanceur.Ui.WPF.Services;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Serilog;
 
 namespace Lanceur.Ui.WPF;
@@ -70,6 +74,9 @@ public partial class App
 
     protected override void OnExit(ExitEventArgs e)
     {
+        // Remove all persisting notifications...
+        ToastNotificationManagerCompat.Uninstall();
+
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application has closed");
     }
@@ -82,16 +89,35 @@ public partial class App
         /* Checks whether database update is needed...
          */
         var cs = Ioc.Default.GetService<IConnectionString>()!;
-        Ioc.Default.GetService<SQLiteUpdater>()!
-           .Update(cs.ToString());
+        Ioc.Default.GetService<SQLiteUpdater>()!.Update(cs.ToString());
 
-        /* Now the database is up to date, let's start the application
+        /* Register HotKey to the application
          */
-        Host.Services
-            .GetRequiredService<MainView>()
-            .ShowOnStartup();
-        Host.Services.GetRequiredService<ILogger<App>>()!
-            .LogInformation("Application started");
+        var mainView = Host.Services.GetRequiredService<MainView>();
+        var notification = Host.Services.GetRequiredService<IUserGlobalNotificationService>();
+        var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
+        var isRegistered = hotKeyService.RegisterHandler(nameof(mainView.OnShowWindow), mainView.OnShowWindow);
+        string hotKey;
+
+        if (isRegistered) { hotKey = hotKeyService.GetHotkeyToString(); }
+        else
+        {
+            var hk = new HotKeySection((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R);
+            hotKey = "Control, Windows - R";
+
+            var success = hotKeyService.RegisterHandler(hotKey, mainView.OnShowWindow, hk);
+            if (!success) throw new NotSupportedException($"The shortcut '{hotKey}' cannot be registered.");
+        }
+
+        /* Now all preliminary stuff is done, let's start the application
+         */
+        if (mainView.ViewModel.ShowAtStartup) { mainView.ShowOnStartup(); }
+        else
+        {
+            Host.Services.GetRequiredService<ILogger<App>>()!
+                .LogInformation("Application started");
+            notification.Information($"Lanceur has started.\r\nHotkey is '{hotKey}'");
+        }
     }
 
     #endregion
