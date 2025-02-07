@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Win32.Extensions;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
@@ -130,9 +131,7 @@ public partial class MainView
          */
         if (e is KeyboardFocusChangedEventArgs { NewFocus: ListViewItem }) return;
 
-#if !DEBUG
-        HideWindow();
-#endif
+        new Conditional<Action?>(null, HideWindow).Value?.Invoke();
     }
 
     private void OnMouseDown(object _, MouseButtonEventArgs e)
