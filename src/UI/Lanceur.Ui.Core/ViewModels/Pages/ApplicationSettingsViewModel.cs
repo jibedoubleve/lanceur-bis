@@ -87,7 +87,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IsTraceEnabled = loggingLevelSwitch.MinimumLevel == LogEventLevel.Verbose;
 
         // Miscellaneous
-        MapSettingsFromSource();
+        MapSettingsFromDbToUi();
     }
 
     #endregion
@@ -104,7 +104,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         return result;
     }
 
-    private void MapSettingsFromSource()
+    private void MapSettingsFromDbToUi()
     {
         DbPath = Settings.Local.DbPath;
 
@@ -132,7 +132,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         WindowBackdropStyle = Settings.Application.Window.BackdropStyle;
     }
 
-    private void MapSettingsToSource()
+    private void MapSettingsFromUiToDb()
     {
         Settings.Local.DbPath = DbPath;
 
@@ -194,7 +194,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
 
-        MapSettingsToSource();
+        MapSettingsFromUiToDb();
         Settings.Save();
         _userNotificationService.Success("Configuration saved.", "Saved");
 

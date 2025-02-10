@@ -51,8 +51,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddLoggers(this IServiceCollection serviceCollection, HostBuilderContext context)
     {
-        var conditional = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
-        var levelSwitch = new LoggingLevelSwitch(conditional);
+        var logEventLevel = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
+        var levelSwitch = new LoggingLevelSwitch(logEventLevel);
 
         serviceCollection.AddSingleton(levelSwitch);
 
