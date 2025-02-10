@@ -226,14 +226,19 @@ public partial class KeywordsViewModel : ObservableObject
         var result = await Task.Run(() => _aliasManagementService.GetAll());
         _bufferedAliases = result.ToList();
 
-        if (Aliases.Count > 0)
+        /* If the list of aliases already contains a new alias (with Id = 0),
+         * then add the loaded aliases from the database to the existing list.
+         * Otherwise, replace the entire list with the newly loaded aliases,
+         * while preserving the selected alias if possible.
+         */
+        if (Aliases is [{ Id: 0 }])
         {
-            SelectedAlias = _bufferedAliases.Reselect(SelectedAlias);
-            Aliases = new(_bufferedAliases);
+            Aliases.AddRange(_bufferedAliases);
         }
         else
         {
-            Aliases.AddRange(_bufferedAliases);
+            SelectedAlias = _bufferedAliases.Reselect(SelectedAlias);
+            Aliases = new(_bufferedAliases);
         }
 
         _thumbnailService.UpdateThumbnails(_bufferedAliases);
