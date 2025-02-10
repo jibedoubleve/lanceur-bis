@@ -38,6 +38,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private double _searchDelay;
 
     [ObservableProperty] private ISettingsFacade _settings;
+    private LoggingLevelSwitch _loggingLevelSwitch;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
@@ -72,6 +73,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         _logger = logger;
         _appRestartService = appRestartService;
         _settings = settings;
+        _loggingLevelSwitch = loggingLevelSwitch;
         _viewFactory = viewFactory;
         _userInteraction = userInteraction;
 
@@ -84,7 +86,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Key = hk.Key;
 
         // Logging
-        IsTraceEnabled = loggingLevelSwitch.MinimumLevel == LogEventLevel.Verbose;
+        IsTraceEnabled = _loggingLevelSwitch.MinimumLevel == LogEventLevel.Verbose;
 
         // Miscellaneous
         MapSettingsFromDbToUi();
@@ -156,6 +158,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Window section
         Settings.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
         Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
+        
+        // Miscellaneous
+        
     }
 
     [RelayCommand]
@@ -195,6 +200,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
 
         MapSettingsFromUiToDb();
+        _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;
         Settings.Save();
         _userNotificationService.Success("Configuration saved.", "Saved");
 
