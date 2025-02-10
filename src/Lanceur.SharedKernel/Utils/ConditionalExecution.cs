@@ -6,14 +6,7 @@ public static class ConditionalExecution
 {
     #region Methods
 
-    private static void CheckIfDebug(ref bool isDebug) => isDebug = true;
-
-    [Conditional("DEBUG")]
-    private static void ExecuteIfDebug<TContext>(ref bool isDebug, TContext context, Func<TContext, object> onDebug)
-    {
-        isDebug = true;
-        onDebug?.Invoke(context);
-    }
+    [Conditional("DEBUG")] private static void SetIfDebug(ref bool isDebug) => isDebug = true;
 
     /// <summary>
     ///     Executes one of the provided functions based on the current compilation mode.
@@ -22,23 +15,28 @@ public static class ConditionalExecution
     /// <param name="serviceCollection">The context object passed to the functions.</param>
     /// <param name="onDebug">The function to execute in DEBUG mode.</param>
     /// <param name="onRelease">The function to execute in RELEASE mode.</param>
-    public static void Execute<TContext>(TContext serviceCollection, Func<TContext, object> onDebug, Func<TContext, object> onRelease)
+    public static void Execute<TContext>(TContext serviceCollection, Action<TContext> onDebug, Action<TContext> onRelease)
     {
         var isDebug = false;
+        SetIfDebug(ref isDebug);
 
-        ExecuteIfDebug(ref isDebug, serviceCollection, onDebug);
-        if (!isDebug) onRelease(serviceCollection);
+        if(isDebug) onDebug(serviceCollection);
+        else onRelease(serviceCollection);
     }
 
+    /// <summary>
+    ///     Executes one of the provided functions based on the current compilation mode and returns a value.
+    /// </summary>
+    /// <param name="onDebug">The function to execute in DEBUG mode.</param>
+    /// <param name="onRelease">The function to execute in RELEASE mode.</param>
+    /// <returns>The result of the executed function.</returns>
     public static void Execute(Action onDebug, Action onRelease)
     {
         var isDebug = false;
-        CheckIfDebug(ref isDebug);
+        SetIfDebug(ref isDebug);
 
-        if (isDebug)
-            onDebug();
-        else
-            onRelease();
+        if (isDebug) onDebug();
+        else onRelease();
     }
 
     /// <summary>
@@ -51,7 +49,7 @@ public static class ConditionalExecution
     public static TReturn Execute<TReturn>(Func<TReturn> onDebug, Func<TReturn> onRelease)
     {
         var isDebug = false;
-        CheckIfDebug(ref isDebug);
+        SetIfDebug(ref isDebug);
 
         return isDebug
             ? onDebug()
