@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -13,6 +14,7 @@ using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Tests.ViewModels.Extensions;
+using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels.Pages;
@@ -64,6 +66,38 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
                              }
                          );
         return serviceCollection;
+    }
+
+    [Fact]
+    public async Task CreateAliasWithAddKeyword()
+    {
+        var sqlBuilder = new SqlBuilder();
+        sqlBuilder.AppendAlias(1)
+                  .AppendAlias(2)
+                  .AppendAlias(3);
+        await TestViewModel(
+            async (viewModel, _) =>
+            {
+                // ARRANGE
+                const string name = "add";
+                const string parameters = "aliasToCreate";
+                var cmdline = new Cmdline(name, parameters);
+
+                // ACT
+                WeakReferenceMessenger.Default.Send(new AddAliasMessage(cmdline));
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate navigate to this page
+                await viewModel.SaveCurrentAliasCommand.ExecuteAsync(cmdline);
+
+                // ASSERT
+                using (new AssertionScope())
+                {
+                    viewModel.SelectedAlias.Should().NotBeNull();
+                    viewModel.Aliases.Should().HaveCount(4);
+                    viewModel.SelectedAlias!.Name.Should().Be(parameters);
+                }
+            },
+            sqlBuilder
+        );
     }
 
     [Fact]
@@ -264,19 +298,9 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     [Fact]
     public async Task NotRecreateAliasOnLoad()
     {
-        var builder = new SqlBuilder().AppendAlias(
-                                          1,
-                                          "un",
-                                          "",
-                                          ["deux"]
-                                      )
-                                      .AppendAlias(
-                                          2,
-                                          "deux",
-                                          "",
-                                          ["trois"]
-                                      );
-        var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var builder = new SqlBuilder().AppendAlias(1, "un", "", ["deux"])
+                                      .AppendAlias(2, "deux", "", ["trois"]);
+        var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InDesktop };
         await TestViewModel(
             async (viewModel, _) =>
             {
