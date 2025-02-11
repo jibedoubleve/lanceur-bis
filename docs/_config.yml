@@ -1,0 +1,16 @@
+
+title: Lanceur
+description: >- 
+  Lanceur : Launch anything, instantly.
+github_username:  jibedoubleve
+
+theme: minima
+plugins:
+  #- jekyll-feed
+
+# ---------------------------
+# - Configure Minima theme  -
+# ---------------------------
+
+favicon_ico: "/assets/images/favicon.ico"
+logo: "/assets/images/logo.png"
