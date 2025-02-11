@@ -3,10 +3,12 @@ title: Lanceur
 description: >- 
   Lanceur : Launch anything, instantly.
 github_username:  jibedoubleve
+theme: just-the-docs
 
-theme: minima
-plugins:
-  #- jekyll-feed
+url: https://jibedoubleve.github.io/gitsandbox/
+
+aux_links:
+  Template Repository: https://github.com/just-the-docs/just-the-docs-template
 
 # ---------------------------
 # - Configure Minima theme  -
