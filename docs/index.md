@@ -1,18 +1,18 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
 layout: home
 title: Home
+nav_order: 0
 ---
 
 # Lanceur – Launch Anything, Instantly  
+
+![Lanceur](./assets/images/usermanual/search.png)
 
 ## What is Lanceur?  
 
 Lanceur is a lightweight and highly customizable application launcher built in .NET. Inspired by [SlickRun](https://www.bayden.com/slickrun/), with features influenced by [Wox](https://github.com/Wox-launcher/Wox) and [Flow Launcher](https://www.flowlauncher.com/), it helps you open applications, files, and web pages instantly—just type a shortcut and press `ENTER`.  
 
-I originally started Lanceur because I wanted to build my own project—something that carried my name and worked exactly the way I envisioned. I liked SlickRun, but I wanted my own take on it, with a few differences that better suited my workflow. If others find it useful too, that’s a bonus!
+I originally started Lanceur because I wanted to build my own project—something that carried my name and worked exactly the way I envisioned. I love SlickRun, but I wanted my own take on it, with a few differences that better suited my workflow. If others find it useful too, that’s a bonus!
 
 ## A little bit different than the others
 
