@@ -1,8 +1,7 @@
 
 title: Lanceur 
 description: >- 
-  Lanceur : Launch anything, instantly.
-baseurl: ""
+Lanceur : Launch anything, instantly.
 url: "https://jibedoubleve.github.io/lanceur-bis/"
 repository: jibedoublebe/lanceur-bis 
 theme: just-the-docs
