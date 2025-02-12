@@ -1,11 +1,9 @@
-
-title: Lanceur 
-description: >- 
+title: Lanceur
+description: >-
   Lanceur : Launch anything, instantly.
 theme: just-the-docs
 favicon_ico: "/assets/favicon.ico"
 
-permalink: /:title:output_ext
 aux_links:
   Lanceur on GitHub: https://github.com/jibedoubleve/lanceur-bis
 
