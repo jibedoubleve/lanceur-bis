@@ -222,7 +222,7 @@
                     <!--  CONFIRM ACTION  -->
                     <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ChatBubblesQuestion24}">
                         <ui:CardControl.Header>
-                            <ui:TextBlock FontTypography="Body" Text="Confirm before exiting" />
+                            <ui:TextBlock FontTypography="Body" Text="Confirm before executing" />
                         </ui:CardControl.Header>
                         <StackPanel>
                             <ui:ToggleSwitch
