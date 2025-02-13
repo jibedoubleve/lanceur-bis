@@ -1,14 +1,14 @@
 # Lanceur Bis
 
-> **The *user manual* and the *developer guide* are [HERE](https://github.com/jibedoubleve/lanceur-bis/wiki)**
+> [!IMPORTANT]  
+> Looking for documentation? Here’s where to find it:  
+> - 📖 **User Manual:** [Read it here](https://jibedoubleve.github.io/lanceur-bis/)  
+> - 🛠️ **Technical Documentation:** [Explore it here](https://github.com/jibedoubleve/lanceur-bis/wiki)  
 
-## What is it?
+## What is Lanceur?
 
-This is a free adaptation of [Slickrun](https://bayden.com/slickrun/) written in .NET and with features inspired by [Wox](https://github.com/Wox-launcher/Wox).
+![Lanceur](./docs/assets/images/usermanual/search.png)
 
-It is also a rewriting of my project [Lanceur](https://github.com/jibedoubleve/lanceur)
+Lanceur is a lightweight and highly customizable application launcher built in .NET. Inspired by SlickRun, with features influenced by Wox and Flow Launcher, it helps you open applications, files, and web pages instantly—just type a shortcut and press ENTER.
 
-## What does it do?
-
-Make a list of shortcuts, configure them and earn a lot of time by just typing the shortcut and press ENTER
-
+I originally started Lanceur because I wanted to build my own project—something that carried my name and worked exactly the way I envisioned. I love SlickRun, but I wanted my own take on it, with a few differences that better suited my workflow. If others find it useful too, that’s a bonus!
