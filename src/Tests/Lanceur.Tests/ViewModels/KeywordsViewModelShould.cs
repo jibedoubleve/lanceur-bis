@@ -300,7 +300,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     {
         var builder = new SqlBuilder().AppendAlias(1, "un", "", ["deux"])
                                       .AppendAlias(2, "deux", "", ["trois"]);
-        var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InDesktop };
+        var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModel(
             async (viewModel, _) =>
             {
