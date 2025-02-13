@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 
-namespace Lanceur.Infra.Managers;
+namespace Lanceur.Infra.Services;
 
 public class SettingsMementoService
 {

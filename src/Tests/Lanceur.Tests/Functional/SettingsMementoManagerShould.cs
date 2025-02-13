@@ -2,8 +2,8 @@
 using FluentAssertions;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Managers;
 using Lanceur.Infra.Repositories;
+using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tooling;
 using Newtonsoft.Json;
