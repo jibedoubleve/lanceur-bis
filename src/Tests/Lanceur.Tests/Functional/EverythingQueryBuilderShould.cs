@@ -15,6 +15,14 @@ public class EverythingQueryBuilderShould
         var adapter = new EverythingQueryAdapter(query);
         adapter.IsHiddenFilesExcluded.Should().BeTrue();
     }
+    
+    [Fact]
+    public void ExcludeFilesInTrashBin()
+    {
+        const string query = EverythingModifiers.ExcludeFileInTrashBin;
+        var adapter = new EverythingQueryAdapter(query);
+        adapter.IsFilesInTrashBinExcluded.Should().BeTrue();
+    }
 
     [Fact]
     public void ExcludeSystemFiles()
