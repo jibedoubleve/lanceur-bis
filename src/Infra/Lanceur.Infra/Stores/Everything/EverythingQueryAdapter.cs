@@ -19,6 +19,7 @@ public class EverythingQueryAdapter
     public bool IsHiddenFilesExcluded => Contains($"!{EverythingModifiers.IncludeHiddenFilesSwitch}");
     public bool SelectOnlyExecutable => Contains(EverythingModifiers.OnlyExecFilesSwitch);
     public bool IsSystemFilesExcluded => Contains($"!{EverythingModifiers.IncludeSystemFilesSwitch}");
+    public bool IsFilesInTrashBinExcluded => Contains(EverythingModifiers.ExcludeFileInTrashBin);
 
     #endregion
 

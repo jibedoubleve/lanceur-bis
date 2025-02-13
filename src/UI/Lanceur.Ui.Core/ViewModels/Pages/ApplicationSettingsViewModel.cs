@@ -45,6 +45,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = new();
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
+    [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     private readonly IUserInteractionService _userInteraction;
 
@@ -128,6 +129,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
         ExcludeSystemFilesWithEverything = adapter.IsSystemFilesExcluded;
         IncludeOnlyExecFilesWithEverything = adapter.SelectOnlyExecutable;
+        ExcludeFilesInBinWithEverything = adapter.IsFilesInTrashBinExcluded;
 
         // Window section
         NotificationDisplayDuration = Settings.Application.Window.NotificationDisplayDuration;
@@ -153,6 +155,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (ExcludeHiddenFilesWithEverything) query.ExcludeHiddenFiles();
         if (ExcludeSystemFilesWithEverything) query.ExcludeSystemFiles();
         if (IncludeOnlyExecFilesWithEverything) query.OnlyExecFiles();
+        if (ExcludeFilesInBinWithEverything) query.ExcludeFilesInBin();
         Settings.Application.Stores.EverythingQuerySuffix = query.ToString();
 
         // Window section
