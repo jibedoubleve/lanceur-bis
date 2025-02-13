@@ -1,7 +1,7 @@
 create:
   include-footer: true
   footer-heading: Where to get it
-  footer-content: You can download this release from [Lanceur 2.0](https://github.com/jibedoubleve/lanceur-bis/releases/{milestone})
+  footer-content: You can download this release from [Lanceur {milestone}](https://github.com/jibedoubleve/lanceur-bis/releases/{milestone})
   footer-includes-milestone: true
   milestone-replace-text: '{milestone}'
 export:
@@ -13,7 +13,6 @@ export:
 issue-labels-include:
 - breaking change
 - bug
-- feature plugin
 - feature
 issue-labels-exclude:
 - documentation
