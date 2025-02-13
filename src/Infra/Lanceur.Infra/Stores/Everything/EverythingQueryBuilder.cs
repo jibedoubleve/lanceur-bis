@@ -28,6 +28,12 @@ public class EverythingQueryBuilder
         return this;
     }
 
+    public EverythingQueryBuilder ExcludeFilesInBin()
+    {
+        _prefixes.Add(EverythingModifiers.ExcludeFileInTrashBin);
+        return this;
+    }
+
     public override string ToString() => string.Join(" ", _prefixes).Trim();
 
     #endregion

@@ -219,6 +219,17 @@
                                          IsChecked="{Binding IncludeOnlyExecFilesWithEverything}" />
                             </StackPanel>
                         </ui:CardControl>
+
+                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Delete24}">
+                            <ui:CardControl.Header>
+                                <ui:TextBlock FontTypography="Body" 
+                                              Text="Should files in the Recycle Bin be excluded from the results?" />
+                            </ui:CardControl.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <ui:ToggleSwitch OffContent="No" OnContent="Yes"
+                                         IsChecked="{Binding ExcludeFilesInBinWithEverything}" />
+                            </StackPanel>
+                        </ui:CardControl>
                     </StackPanel>
                 </ui:CardExpander>
                     
