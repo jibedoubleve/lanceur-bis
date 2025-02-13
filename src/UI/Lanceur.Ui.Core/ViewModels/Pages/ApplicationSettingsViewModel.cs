@@ -38,7 +38,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private double _searchDelay;
 
     [ObservableProperty] private ISettingsFacade _settings;
-    private LoggingLevelSwitch _loggingLevelSwitch;
+    private readonly LoggingLevelSwitch _loggingLevelSwitch;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
