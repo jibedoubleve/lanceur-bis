@@ -126,7 +126,9 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occured while performing alias execution");
-            _interactionHub.GlobalNotifications.Error($"An error occured while performing alias execution.{Environment.NewLine}Alias name '{SelectedResult?.Name ?? "<NULL>"}'");
+            _interactionHub.GlobalNotifications.Error(
+                $"An error occured while performing alias execution.{Environment.NewLine}Alias name '{SelectedResult?.Name ?? "<NULL>"}'",
+                ex);
         }
     }
 
@@ -181,7 +183,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occured while performing search");
-            _interactionHub.GlobalNotifications.Error("An error occured while performing search.");
+            _interactionHub.GlobalNotifications.Error("An error occured while performing search.", ex);
         }
     }
 
@@ -203,7 +205,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occured while performing search.");
-            _interactionHub.GlobalNotifications.Error("An error occured while performing search.");
+            _interactionHub.GlobalNotifications.Error("An error occured while performing search.", ex);
         }
     }
 

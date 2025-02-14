@@ -8,16 +8,10 @@ using Microsoft.Toolkit.Uwp.Notifications;
 namespace Lanceur.Ui.WPF.Services;
 
 public class ToastUserNotificationService : IUserGlobalNotificationService
-{    
-    #region Enums
-
-    private enum Level { Information, Warning, Error };
-
-    #endregion Enums
-
+{
     #region Methods
 
-    private static void Show(Level level, string message, [CallerMemberName] string? title = null)
+    private static string GetIconUri(Level level)
     {
         var uri = level switch
         {
@@ -26,6 +20,12 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             Level.Error       => Icon.Error,
             _                 => Icon.None
         };
+        return uri;
+    }
+
+    private static void Show(Level level, string message, [CallerMemberName] string? title = null)
+    {
+        var uri = GetIconUri(level);
         new ToastContentBuilder()
             .AddText(title)
             .AddText(message)
@@ -33,13 +33,40 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             .Show();
     }
 
-    public void Error(string message) => Show(Level.Error, message);
+    /// <inheritdoc />
+    public void Error(string message, Exception ex)
+    {
+        var uri = GetIconUri(Level.Error);
+        var btnError = new ToastButton().SetContent("Show Error")
+                                        .AddArgument("Type", ToastNotificationArguments.ClickShowError)
+                                        .AddArgument("Message", message)
+                                        .AddArgument("StackTrace", ex.ToString());
+        
+        var btnLogs = new ToastButton().SetContent("Show Logs")
+                                       .AddArgument("Type", ToastNotificationArguments.ClickShowLogs);
+        
+        new ToastContentBuilder()
+            .AddText("Error")
+            .AddText(message)
+            .AddButton(btnError)
+            .AddButton(btnLogs)
+            .AddAppLogoOverride(uri.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .Show();
+    }
 
+    /// <inheritdoc />
     public void Information(string message) => Show(Level.Information, message);
 
+    /// <inheritdoc />
     public void Warning(string message) => Show(Level.Warning, message);
 
-    #endregion Methods
+    #endregion
+
+    #region Enums
+
+    private enum Level { Information, Warning, Error }
+
+    #endregion Enums
 
     #region Classes
 
@@ -55,7 +82,7 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             Error = Path.Combine(path, @"Assets\IconError.png");
         }
 
-        #endregion Constructors
+        #endregion
 
         #region Properties
 
@@ -64,8 +91,8 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
         public static string None => string.Empty;
         public static string Warn { get; }
 
-        #endregion Properties
-    };
+        #endregion
+    }
 
     #endregion Classes
 }
