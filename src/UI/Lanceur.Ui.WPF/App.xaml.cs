@@ -143,13 +143,11 @@ public partial class App
 
         /* Now all preliminary stuff is done, let's start the application
          */
-        if (mainView.ViewModel.ShowAtStartup) { mainView.ShowOnStartup(); }
+        if (mainView.ViewModel.ShowAtStartup)
+            mainView.ShowOnStartup();
         else
-        {
             Host.Services.GetRequiredService<ILogger<App>>()!
                 .LogInformation("Application started");
-            notification.Information($"Lanceur has started.\r\nHotkey is '{hotKey}'");
-        }
     }
 
     #endregion
