@@ -9,11 +9,11 @@
 ;#define public BinDirectory 
 ;----------------------------------------------------------------
 
-#define MyAppName "Lanceur 2"
+#define MyAppName "Lanceur"
 #define MyAppPublisher "JB Wautier"
 #define MyAppURL "https://github.com/jibedoubleve/lanceur-bis"
 #define MyAppExeName "Lanceur.Ui.WPF.exe"
-#define ScheduledTaskName "Autorun Lanceur 2"
+#define ScheduledTaskName "Lanceur - Autorun at startup"
 
 [Setup]
 PrivilegesRequired=admin
@@ -43,13 +43,13 @@ Name: "desktopicon"; \
     Flags: unchecked
 
 ; Choose how the application starts up (radio button)
-Name: "starts_cheduled_task"; \
-    Description: "Start the application via a scheduled task"; \
-    GroupDescription: "Startup options"; \
-    Flags: exclusive unchecked
-
 Name: "start_registry"; \
     Description: "Start the application via the registry"; \
+    GroupDescription: "Startup options"; \
+    Flags: exclusive checkedonce
+
+Name: "starts_cheduled_task"; \
+    Description: "Start the application via a scheduled task (experimental)"; \
     GroupDescription: "Startup options"; \
     Flags: exclusive unchecked
 
