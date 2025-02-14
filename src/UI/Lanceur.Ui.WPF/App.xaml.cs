@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -68,8 +69,38 @@ public partial class App
         var notify = Host.Services.GetRequiredService<IUserGlobalNotificationService>();
 
         logger.LogCritical(e.Exception, "Fatal error: {Message}", e.Exception.Message);
-        notify.Error(e.Exception.Message);
+        notify.Error(e.Exception.Message, e.Exception);
         Log.CloseAndFlush();
+    }
+
+    private void RegisterToastNotifications()
+    {
+        ToastNotificationManagerCompat.OnActivated += toastArgs =>
+        {
+            var arguments = ToastArguments.Parse(toastArgs.Argument);
+            if (arguments.Count == 0) return;
+
+            Action action = arguments["Type"] switch
+            {
+                ToastNotificationArguments.ClickShowError => () =>
+                {
+                    var view = Host.Services.GetService<ExceptionView>()!;
+                    view.ExceptionMessage.Text = arguments["Message"];
+                    view.ExceptionTrace.Text = arguments["StackTrace"];
+                    view.Show();
+                },
+                ToastNotificationArguments.ClickShowLogs  => () =>
+                {
+                    var path = Environment.ExpandEnvironmentVariables(@"%appdata%\probel\lanceur2\logs");
+                    Process.Start("explorer.exe", path);
+                },
+                _ => () => Log.Warning("The argument '{Argument}' is not supported in the toast arguments. Are you using a button that has not been configured yet?", toastArgs.Argument)
+            };
+
+            Current.Dispatcher.Invoke(
+                delegate { action.Invoke(); }
+            );
+        };
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -85,6 +116,7 @@ public partial class App
     {
         Ioc.Default.ConfigureServices(Host.Services);
         Host.Start();
+        RegisterToastNotifications();
 
         /* Checks whether database update is needed...
          */
