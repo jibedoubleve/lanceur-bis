@@ -1,6 +1,7 @@
 ---
 layout: page
 title: User Manual
+nav_order: 2
 ---
 
 # User Manual
