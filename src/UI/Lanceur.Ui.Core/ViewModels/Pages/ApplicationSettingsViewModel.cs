@@ -3,9 +3,9 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Utils;
 using Lanceur.Infra.Stores.Everything;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.DI;
@@ -48,6 +48,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     private readonly IUserInteractionService _userInteraction;
+    private readonly IDataDoctorRepository _dataDoctorRepository;
 
     private readonly IUserNotificationService _userNotificationService;
     private readonly IViewFactory _viewFactory;
@@ -64,7 +65,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ISettingsFacade settings,
         LoggingLevelSwitch loggingLevelSwitch,
         IViewFactory viewFactory,
-        IUserInteractionService userInteraction
+        IUserInteractionService userInteraction,
+        IDataDoctorRepository dataDoctorRepository
     )
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -77,6 +79,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         _loggingLevelSwitch = loggingLevelSwitch;
         _viewFactory = viewFactory;
         _userInteraction = userInteraction;
+        _dataDoctorRepository = dataDoctorRepository;
 
         // Hotkey
         var hk = _settings.Application.HotKey;
@@ -211,6 +214,23 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         {
             const string msg = "Do you want to restart now to apply the new configuration?";
             if (await _userInteraction.AskUserYesNoAsync(msg)) _appRestartService.Restart();
+        }
+    }
+
+    [RelayCommand]
+    private async Task OnClearThumbnails()
+    {
+        const string msg = """
+                Thumbnail references will be removed from the database, 
+                and thumbnails will refresh dynamically as you use the application. 
+                
+                Do you want to proceed?
+                """;
+        var result = await _userInteraction.AskUserYesNoAsync(msg);
+        if (result)
+        {
+            _dataDoctorRepository.ClearThumbnails();
+            _userNotificationService.Success("All thumbnails have been cleared.");
         }
     }
 

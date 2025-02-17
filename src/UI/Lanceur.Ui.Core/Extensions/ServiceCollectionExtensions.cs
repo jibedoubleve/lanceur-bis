@@ -125,6 +125,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IAliasManagementService, AliasManagementService>()
                          .AddTransient<IMemoryStorageService, MemoryStorageService>()
                          .AddTransient<IAliasRepository, SQLiteAliasRepository>()
+                         .AddTransient<IDataDoctorRepository, SQLiteDataDoctorRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
