@@ -145,9 +145,9 @@ public partial class App
          */
         if (mainView.ViewModel.ShowAtStartup)
             mainView.ShowOnStartup();
-        else
-            Host.Services.GetRequiredService<ILogger<App>>()!
-                .LogInformation("Application started");
+
+        Host.Services.GetRequiredService<ILogger<App>>()!
+            .LogInformation("Application started");
     }
 
     #endregion
