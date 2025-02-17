@@ -39,7 +39,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
                          .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddMockSingleton<IViewFactory>()
-                         .AddMockSingleton<IDataDoctorRepository>()
+                         .AddSingleton<IDataDoctorRepository, SQLiteDataDoctorRepository>()
                          .AddMockSingleton<IUserInteractionService>(
                              (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
@@ -48,6 +48,109 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                          )
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose));
         return serviceCollection;
+    }
+
+    [Fact]
+    public async Task AskRebootAfterDbPathChanged()
+    {
+        IUserInteractionService userInteractionService = null;
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                userInteractionService = i;
+                return i;
+            }
+        };
+        await TestViewModel(
+            async (viewModel, _) =>
+            {
+                // arrange
+
+                // act
+                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+
+                viewModel.DbPath = Guid.NewGuid().ToString();
+                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+
+                // assert
+                await userInteractionService.Received(1)
+                                            .AskUserYesNoAsync(Arg.Any<object>());
+            },
+            SqlBuilder.Empty,
+            visitors
+        );
+    }
+
+    [Fact]
+    public async Task AskRebootAfterShortcutChanged()
+    {
+        IUserInteractionService userInteractionService = null;
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                userInteractionService = i;
+                return i;
+            }
+        };
+        await TestViewModel(
+            async (viewModel, _) =>
+            {
+                // arrange
+
+                // act
+                viewModel.Settings.Application.HotKey = new(3, 18); // This is the default configuration
+                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+
+                viewModel.Settings.Application.HotKey = new(1, 1);
+                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+
+                // assert
+                await userInteractionService.Received(1)
+                                            .AskUserYesNoAsync(Arg.Any<object>());
+            },
+            SqlBuilder.Empty,
+            visitors
+        );
+    }
+
+    [Fact]
+    public async Task ResetThumbnailWhenClearingTriggered()
+    {
+        var i = 0;
+        var sqlBuilder = new SqlBuilder().AppendAlias(++i, thumbnail: Guid.NewGuid().ToString())
+                                         .AppendAlias(++i, thumbnail: Guid.NewGuid().ToString())
+                                         .AppendAlias(++i, thumbnail: Guid.NewGuid().ToString())
+                                         .AppendAlias(++i, thumbnail: Guid.NewGuid().ToString());
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.AskUserYesNoAsync(Arg.Any<string>()).Returns(true);
+                return i;
+            }
+        };
+
+        await TestViewModel(
+            async (viewModel, db) =>
+            {
+                // arrange
+
+                // act
+                await viewModel.ClearThumbnailsCommand.ExecuteAsync(null);
+
+                // assert 
+                const string sql = "select count(*) from alias where thumbnail is not null;";
+                db.WithConnection(c => c.ExecuteScalar(sql))
+                  .Should().Be(0);
+            },
+            sqlBuilder,
+            visitors
+        );
     }
 
     [Fact]
@@ -95,10 +198,10 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                 // arrange
                 var sqlDefaultConfig = $"insert into settings(s_key, s_value) values ('json', '{defaultConfig}');";
                 db.WithinTransaction(t => t.Connection!.Execute(sqlDefaultConfig));
-                
+
                 // act
                 StoreShortcut[] shortcuts = [new() { AliasOverride = shortcut }, new()  { AliasOverride = shortcut }];
-                viewModel.StoreShortcuts = new (shortcuts);
+                viewModel.StoreShortcuts = new(shortcuts);
                 await viewModel.SaveSettingsCommand.ExecuteAsync(null);
 
                 // assert
@@ -110,77 +213,9 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                                    """;
                 var results = db.WithConnection(c => c.Query<string>(sql))
                                 .ToArray();
-                
+
                 results.Should().HaveCount(2);
                 _ = results.Select(e => e.Should().Be(shortcut));
-
-            },
-            SqlBuilder.Empty,
-            visitors
-        );
-    }
-
-    [Fact]
-    public async Task AskRebootAfterShortcutChanged()
-    {
-        IUserInteractionService userInteractionService = null;
-        var visitors = new ServiceVisitors
-        {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
-            {
-                userInteractionService = i;
-                return i;
-            }
-        };
-        await TestViewModel(
-            async (viewModel, _) =>
-            {
-                // arrange
-                
-                // act
-                viewModel.Settings.Application.HotKey = new(3, 18); // This is the default configuration
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
-                
-                viewModel.Settings.Application.HotKey = new(1, 1);
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
-
-                // assert
-                await userInteractionService.Received(1)
-                                            .AskUserYesNoAsync(Arg.Any<object>());
-            },
-            SqlBuilder.Empty,
-            visitors
-        );
-    }
-    
-    [Fact]
-    public async Task AskRebootAfterDbPathChanged()
-    {
-        IUserInteractionService userInteractionService = null;
-        var visitors = new ServiceVisitors
-        {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
-            {
-                userInteractionService = i;
-                return i;
-            }
-        };
-        await TestViewModel(
-            async (viewModel, _) =>
-            {
-                // arrange
-                
-                // act
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
-                
-                viewModel.DbPath = Guid.NewGuid().ToString();
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
-
-                // assert
-                await userInteractionService.Received(1)
-                                            .AskUserYesNoAsync(Arg.Any<object>());
             },
             SqlBuilder.Empty,
             visitors
