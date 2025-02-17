@@ -152,7 +152,11 @@ public class ThumbnailService : IThumbnailService
             _logger.LogTrace("Refreshing thumbnails for {Count} alias", queryResults.Count());
             foreach (var query in queries)
                 UpdateThumbnailAsync(query) // Fire & forget thumbnail refresh
-                    .ContinueWith(t => throw t.Exception!, TaskContinuationOptions.OnlyOnFaulted);
+                    .ContinueWith(
+                        t =>
+                        {
+                            _logger.LogWarning(t.Exception!, "An error occured when updating thumbnail: {Message}", t.Exception!.Message);
+                        }, TaskContinuationOptions.OnlyOnFaulted);
             _logger.LogTrace("Fire and forget the refresh of thumbnails.");
         }
         catch (Exception ex) { _logger.LogWarning(ex, "An error occured during the refresh of the icons"); }
