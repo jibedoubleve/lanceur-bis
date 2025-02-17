@@ -1,6 +1,7 @@
 using Dapper;
 using FluentAssertions;
 using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
@@ -38,6 +39,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
                          .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddMockSingleton<IViewFactory>()
+                         .AddMockSingleton<IDataDoctorRepository>()
                          .AddMockSingleton<IUserInteractionService>(
                              (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
