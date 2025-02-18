@@ -19,8 +19,10 @@ using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
+using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
+using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -57,38 +59,30 @@ public class SearchServiceShould : TestBase
 
     #region Methods
 
+    private ServiceProvider BuildConfigureServices(IServiceCollection serviceCollection = null, ServiceVisitors visitors = null)
+    {
+        serviceCollection??= new ServiceCollection();
+        serviceCollection.AddMockSingleton<ILoggerFactory>()
+                         .AddApplicationSettings(
+                             stg => visitors?.VisitSettings?.Invoke(stg)
+                         )
+                         .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                         .AddSingleton<AssemblySource>()
+                         .AddSingleton<IStoreLoader, StoreLoader>()
+                         .AddSingleton<IMacroService, MacroService>()
+                         .AddSingleton<SearchService>()
+                         .AddMockSingleton<ISearchServiceOrchestrator>()
+                         .AddMockSingleton<IThumbnailService>()
+                         .AddMemoryCache();
+        
+        return serviceCollection.BuildServiceProvider();
+    }
+
     [Fact]
     public void HaveStores()
     {
-        var serviceProvider
-            = new ServiceCollection().AddMockSingleton<ILoggerFactory>()
-                                     .AddMockSingleton<ILogger<StoreLoader>>()
-                                     .AddMockSingleton<ISettingsFacade>(
-                                         (_, i) =>
-                                         {
-                                             var dbc = new DatabaseConfiguration
-                                             {
-                                                 Caching =
-                                                 {
-                                                     StoreCacheDuration = 0, 
-                                                     ThumbnailCacheDuration = 0
-                                                 }
-                                             };
-                                             i.Application.Returns(dbc);
-                                             return i;
-                                         }
-                                     )
-                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                                     .AddSingleton<AssemblySource>()
-                                     .AddSingleton<IStoreLoader, StoreLoader>()
-                                     .AddSingleton<IMacroService, MacroService>()
-                                     .AddSingleton<SearchService>()
-                                     .AddMockSingleton<ISearchServiceOrchestrator>()
-                                     .AddMockSingleton<IThumbnailService>()
-                                     .AddMemoryCache()
-                                     .BuildServiceProvider();
 
-
+        var serviceProvider = BuildConfigureServices();
         var service = serviceProvider.GetService<SearchService>();
         service.Stores.Should().HaveCountGreaterThan(4);
     }

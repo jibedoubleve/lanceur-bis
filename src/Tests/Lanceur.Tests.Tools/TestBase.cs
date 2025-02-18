@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Data.Common;
 using System.Data.SQLite;
 using System.SQLite.Updater;
 using Dapper;
@@ -7,11 +6,10 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tooling.SQL;
-using Lanceur.Tests.Tools;
 using StackExchange.Profiling.Data;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Tooling;
+namespace Lanceur.Tests.Tools;
 
 public abstract class TestBase
 {

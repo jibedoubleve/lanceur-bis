@@ -21,7 +21,7 @@ public static class ServiceProviderExtensions
     public static IServiceCollection AddApplicationSettings(this IServiceCollection serviceCollection, Action<ISettingsFacade>? setupAction = null)
     {
         var settings = Substitute.For<ISettingsFacade>();
-        settings.Application.Returns(new DatabaseConfiguration());
+        settings.Application.Returns(new NoCacheDatabaseConfiguration());
 
         serviceCollection.AddSingleton(settings);
         setupAction?.Invoke(settings);

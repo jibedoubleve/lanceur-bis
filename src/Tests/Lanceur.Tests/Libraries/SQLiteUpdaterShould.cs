@@ -3,6 +3,7 @@ using System.SQLite.Updater;
 using Dapper;
 using FluentAssertions;
 using Lanceur.Tests.Tooling;
+using Lanceur.Tests.Tools;
 using Xunit;
 using Xunit.Abstractions;
 

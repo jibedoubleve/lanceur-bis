@@ -12,7 +12,7 @@ public class DatabaseConfiguration
     ///     Gets or sets the caching configuration settings used across the application.
     /// </summary>
     public CachingSession Caching { get; set; } = CachingSession.Default;
-    
+
     /// <summary>
     ///     Gets or sets the hotkey configuration for displaying the search window.
     ///     This setting allows users to customise the shortcut key for quick access.

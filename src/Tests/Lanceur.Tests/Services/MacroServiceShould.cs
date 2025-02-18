@@ -17,6 +17,7 @@ using Lanceur.Infra.Utils;
 using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.Macros;
+using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
