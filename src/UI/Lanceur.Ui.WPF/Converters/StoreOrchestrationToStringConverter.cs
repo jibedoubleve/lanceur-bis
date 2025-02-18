@@ -20,8 +20,9 @@ public class StoreOrchestrationToStringConverter : IValueConverter
     {
         if (value is not string storeOverride) return Binding.DoNothing;
 
-        return storeOverride.Replace(@"^\s{0,}", "")
-                            .Replace(".*", "");
+        var result = storeOverride.Replace(@"^\s{0,}", "")
+                                  .Replace(".*", "");
+        return result.Replace("\\", "");
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
