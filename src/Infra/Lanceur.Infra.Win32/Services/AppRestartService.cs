@@ -9,12 +9,13 @@ public class AppRestartService : IAppRestartService
 {
     #region Fields
 
-    private readonly Mutex _mutex = SingleInstance.Mutex;
+    private readonly Mutex _mutex = new(true, @"Global\Lanceur2");
 
     #endregion
 
     #region Methods
 
+    /// <inheritdoc />
     public void Restart()
     {
         _mutex.ReleaseMutex();

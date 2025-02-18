@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -9,6 +10,7 @@ using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.SharedKernel.DI;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Services;
@@ -73,7 +75,7 @@ public partial class App
         Log.CloseAndFlush();
     }
 
-    private void RegisterToastNotifications()
+    private static void RegisterToastNotifications()
     {
         ToastNotificationManagerCompat.OnActivated += toastArgs =>
         {
@@ -108,6 +110,12 @@ public partial class App
         // Remove all persisting notifications...
         ToastNotificationManagerCompat.Uninstall();
 
+        // Release mutex to allow app to start again...
+        ConditionalExecution.Execute(
+            () => { },
+            SingleInstance.ReleaseMutex
+        );
+        
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application has closed");
     }
@@ -121,30 +129,46 @@ public partial class App
         /* Checks whether database update is needed...
          */
         var cs = Ioc.Default.GetService<IConnectionString>()!;
-        Ioc.Default.GetService<SQLiteUpdater>()!.Update(cs.ToString());
+        Ioc.Default.GetService<SQLiteUpdater>()!
+           .Update(cs.ToString());
 
         /* Register HotKey to the application
          */
         var mainView = Host.Services.GetRequiredService<MainView>();
-        var notification = Host.Services.GetRequiredService<IUserGlobalNotificationService>();
         var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
-        var isRegistered = hotKeyService.RegisterHandler(nameof(mainView.OnShowWindow), mainView.OnShowWindow);
-        string hotKey;
 
-        if (isRegistered) { hotKey = hotKeyService.GetHotkeyToString(); }
-        else
+        var hk = new Conditional<HotKeySection>(
+            new((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R),
+            hotKeyService.HotKey
+        );
+        
+        /* Only one instance allowed in prod...
+         */
+        ConditionalExecution.Execute(
+            () => { },
+            () =>
+            {
+                if (SingleInstance.WaitOne()) return;
+
+                const string msg = "The application is already running.";
+                MessageBox.Show(msg, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Environment.Exit(0);
+            }
+        );
+
+        var success = hotKeyService.RegisterHandler(mainView.OnShowWindow, hk);
+        if (!success)
         {
-            var hk = new HotKeySection((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R);
-            hotKey = "Control, Windows - R";
-
-            var success = hotKeyService.RegisterHandler(hotKey, mainView.OnShowWindow, hk);
-            if (!success) throw new NotSupportedException($"The shortcut '{hotKey}' cannot be registered.");
+            // Should be only useful in debug mode as Mutex should avoid this situation...
+            var errorMessage = $"The shortcut '{hk.Value.ToStringHotKey()}' is already registered.";
+            MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Current.Shutdown();
+            return;
         }
 
         /* Now all preliminary stuff is done, let's start the application
          */
-        if (mainView.ViewModel.ShowAtStartup)
-            mainView.ShowOnStartup();
+        if (mainView.ViewModel.ShowAtStartup) mainView.ShowOnStartup();
 
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application started");
