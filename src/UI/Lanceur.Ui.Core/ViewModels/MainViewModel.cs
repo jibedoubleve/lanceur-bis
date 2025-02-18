@@ -96,7 +96,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (SelectedResult is null) return;
 
-        var query = Cmdline.BuildFromText(Query);
+        var query = Cmdline.Parse(Query);
         var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
         WeakReferenceMessenger.Default.Send<SetQueryMessage>(new(cmd));
     }
@@ -170,7 +170,7 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            var criterion = Cmdline.BuildFromText(Query);
+            var criterion = Cmdline.Parse(Query);
 
             if (criterion.IsNullOrEmpty()) Results.Clear();
             var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);

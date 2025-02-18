@@ -13,7 +13,7 @@ public class CmdLineArgumentsToVisibility : IValueConverter
     {
         if (value is not string str) return Binding.DoNothing;
 
-        var cmdline = Cmdline.BuildFromText(str);
+        var cmdline = Cmdline.Parse(str);
         return cmdline.Parameters.Any() ? Visibility.Collapsed : Visibility.Visible;
     }
 
