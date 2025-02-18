@@ -122,9 +122,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Store section
         BookmarkSourceBrowser = Settings.Application.Stores.BookmarkSourceBrowser;
-
-        // Store overrides
-        BookmarkSourceBrowser = Settings.Application.Stores.BookmarkSourceBrowser;
         StoreShortcuts = new(Settings.Application.Stores.StoreOverrides);
         
         // -- Everything Store
@@ -203,7 +200,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
 
-        List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
+        List<bool> reboot = [
+            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
+            Settings.Local.DbPath != DbPath
+        ];
 
         MapSettingsFromUiToDb();
         _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;
