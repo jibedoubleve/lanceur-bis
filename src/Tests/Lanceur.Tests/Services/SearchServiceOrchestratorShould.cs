@@ -19,14 +19,27 @@ public class SearchServiceOrchestratorShould
     #region Methods
 
     [Theory]
-    [InlineData(".", "^\\s{0,}\\..*")]
-    [InlineData("", "^\\s{0,}.*")]
-    [InlineData("m", "^\\s{0,}m.*")]
-    public void ConvertDotAsValueNotOperator(string input, string output)
+    [InlineData(".", @"^\s{0,}\..*")]
+    [InlineData("", @"^\s{0,}.*")]
+    [InlineData("m", @"^\s{0,}m.*")]
+    public void ConvertBackDotAsValueNotOperator(string input, string output)
     {
         var converter = new StoreOrchestrationToStringConverter();
 
         converter.ConvertBack(input, null!, null, null!)
+                 .Should()
+                 .Be(output);
+    }
+    
+    [Theory]
+    [InlineData(@"^\s{0,}\..*", ".")]
+    [InlineData(@"^\s{0,}.*", "")]
+    [InlineData(@"^\s{0,}m.*", "m")]
+    public void ConvertDotAsValueNotOperator(string input, string output)
+    {
+        var converter = new StoreOrchestrationToStringConverter();
+
+        converter.Convert(input, null!, null, null!)
                  .Should()
                  .Be(output);
     }
@@ -39,6 +52,8 @@ public class SearchServiceOrchestratorShould
     [InlineData("    mm", "^\\s{0,}m.*", true)]
     [InlineData("dm", "^\\s{0,}m.*", false)]
     [InlineData("/", "^\\s{0,}/.*", true)]
+    //--
+    [InlineData(".somest", "^\\s{0,}\\..*", true)]
     public void SelectExpectedCmdlines(string cmd, string regex, bool expected)
     {
         // arrange
