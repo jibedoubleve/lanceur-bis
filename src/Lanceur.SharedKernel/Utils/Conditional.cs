@@ -37,7 +37,10 @@ public class Conditional<T>
 
     #region Properties
 
-    private T Value => _value;
+    /// <summary>
+    /// Gets the value of the conditional
+    /// </summary>
+    public T Value => _value;
 
     #endregion
 

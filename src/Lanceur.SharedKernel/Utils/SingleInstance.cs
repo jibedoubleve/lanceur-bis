@@ -2,9 +2,21 @@
 
 public static class SingleInstance
 {
-    #region Properties
+    #region Fields
 
-    public static Mutex Mutex { get; } = new(true, @"Global\Lanceur2");
+    private static readonly Mutex Mutex = new(true, @"Global\Lanceur2");
 
-    #endregion
+    #endregion Fields
+
+    #region Methods
+
+    public static void ReleaseMutex() => Mutex.ReleaseMutex();
+
+    public static bool WaitOne()
+    {
+        try { return Mutex.WaitOne(100); }
+        catch (AbandonedMutexException) { return false; }
+    }
+
+    #endregion Methods
 }

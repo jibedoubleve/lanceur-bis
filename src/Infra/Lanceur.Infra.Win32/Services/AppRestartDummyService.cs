@@ -18,6 +18,13 @@ public class AppRestartDummyService : IAppRestartService
 
     #region Methods
 
+    /// <inheritdoc />
+    public void HoldInstance() { }
+
+    /// <inheritdoc />
+    public void ReleaseInstance() { }
+
+    /// <inheritdoc />
     public void Restart() { _notification.LogInformation("Application restart requested. Note: This is a placeholder restarter for development purposes only."); }
 
     #endregion

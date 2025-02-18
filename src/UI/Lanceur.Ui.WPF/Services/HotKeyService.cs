@@ -28,17 +28,16 @@ public class HotKeyService : IHotKeyService
 
     #endregion
 
+    #region Properties
+
+    public HotKeySection HotKey => _databaseConfigurationService.Current.HotKey;
+
+    #endregion
+
     #region Methods
 
     /// <inheritdoc />
-    public string GetHotkeyToString()
-    {
-        var hotKey = _databaseConfigurationService.Current.HotKey;
-        return $"{(ModifierKeys)hotKey.ModifierKey} - {(Key)hotKey.Key}";
-    }
-
-    /// <inheritdoc />
-    public bool RegisterHandler(string name, EventHandler<HotkeyEventArgs> handler, HotKeySection hotkey)
+    public bool RegisterHandler(EventHandler<HotkeyEventArgs> handler, HotKeySection hotkey)
     {
         var key = (Key)hotkey.Key;
         var modifier = (ModifierKeys)hotkey.ModifierKey;
@@ -46,7 +45,7 @@ public class HotKeyService : IHotKeyService
         try
         {
             HotkeyManager.Current.AddOrReplace(
-                name,
+                hotkey.ToString(),
                 key,
                 modifier,
                 handler
@@ -55,7 +54,6 @@ public class HotKeyService : IHotKeyService
         }
         catch (HotkeyAlreadyRegisteredException ex)
         {
-            //Default values
             _logger.LogWarning(
                 ex,
                 "Impossible to set shortcut. (Key: {Key}, Modifier: {Modifier})",
@@ -64,13 +62,6 @@ public class HotKeyService : IHotKeyService
             );
             return false;
         }
-    }
-
-    /// <inheritdoc />
-    public bool RegisterHandler(string name, EventHandler<HotkeyEventArgs> handler)
-    {
-        var hotKey = _databaseConfigurationService.Current.HotKey;
-        return RegisterHandler(name, handler, hotKey);
     }
 
     #endregion
