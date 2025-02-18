@@ -8,6 +8,7 @@ using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tooling.SQL;
+using Lanceur.Tests.Tools;
 using Lanceur.Ui.Core.Utils;
 using NSubstitute;
 using Xunit;

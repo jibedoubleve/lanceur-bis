@@ -4,6 +4,7 @@ using FluentAssertions;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tooling;
+using Lanceur.Tests.Tools;
 using Xunit;
 using Xunit.Abstractions;
 
