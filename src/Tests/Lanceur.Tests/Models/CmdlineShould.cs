@@ -51,7 +51,7 @@ public class CmdlineShould
     [InlineData(".AAAA aa")]
     public void HandleSpecialCmdCharacter(string cmdline)
     {
-        CmdlineManager.BuildFromText(cmdline)
+        CmdlineManager.Parse(cmdline)
                       .Name.Should()
                       .Be(cmdline[0].ToString());
     }
@@ -67,7 +67,7 @@ public class CmdlineShould
     [InlineData("a?rg2", "arg1 a?rg2")]
     public void HaveArguments(string asExpected, string actual)
     {
-        var line = CmdlineManager.BuildFromText(actual);
+        var line = CmdlineManager.Parse(actual);
 
         line.Parameters.Should().Be(asExpected);
     }
@@ -89,7 +89,7 @@ public class CmdlineShould
     [InlineData("a", "a")]
     public void HaveName(string asExpected, string actual)
     {
-        var line = CmdlineManager.BuildFromText(actual);
+        var line = CmdlineManager.Parse(actual);
 
         line.Name.Should().Be(asExpected);
     }
@@ -120,7 +120,7 @@ public class CmdlineShould
     [InlineData("m&& fff", "m&&")]
     public void RecogniseDoubleOrSingleSpecialChar(string cmdline, string expected)
     {
-        CmdlineManager.BuildFromText(cmdline)
+        CmdlineManager.Parse(cmdline)
                       .Name
                       .Should()
                       .Be(expected);
@@ -129,7 +129,7 @@ public class CmdlineShould
     [Fact]
     public void ReturnsEmptyOnEmptyCmdline()
     {
-        var line = CmdlineManager.BuildFromText(string.Empty);
+        var line = CmdlineManager.Parse(string.Empty);
 
         line.Name.Should().BeEmpty();
         line.Parameters.Should().BeEmpty();
@@ -138,7 +138,7 @@ public class CmdlineShould
     [Fact]
     public void ReturnsEmptyOnNullCmdline()
     {
-        var line = CmdlineManager.BuildFromText(null);
+        var line = CmdlineManager.Parse(null);
 
         line.Name.Should().BeEmpty();
         line.Parameters.Should().BeEmpty();

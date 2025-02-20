@@ -43,7 +43,7 @@ public record Cmdline
     /// <returns>A <see cref="string" /> representation of the <paramref name="source" />.</returns>
     public static implicit operator string(Cmdline source) => source.ToString();
 
-    public static Cmdline Parse(string commandline) => CmdlineManager.BuildFromText(commandline);
+    public static Cmdline Parse(string commandline) => CmdlineManager.Parse(commandline);
 
     public override string ToString() => $"{Name ?? string.Empty} {Parameters ?? string.Empty}".Trim();
 

@@ -34,7 +34,7 @@ public static class CmdlineManager
         return res1 || res2;
     }
 
-    public static Cmdline BuildFromText(string cmdline)
+    public static Cmdline Parse(string cmdline)
     {
         cmdline = cmdline?.Trim();
         var name = string.Empty;
@@ -59,7 +59,7 @@ public static class CmdlineManager
         return new(name, args.Trim());
     }
 
-    public static Cmdline CloneWithNewParameters(string newParameters, Cmdline cmd) => BuildFromText($"{cmd?.Name} {newParameters}");
+    public static Cmdline CloneWithNewParameters(string newParameters, Cmdline cmd) => Parse($"{cmd?.Name} {newParameters}");
 
     #endregion
 }
