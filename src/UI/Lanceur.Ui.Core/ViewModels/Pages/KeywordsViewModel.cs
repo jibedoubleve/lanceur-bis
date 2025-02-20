@@ -57,7 +57,7 @@ public partial class KeywordsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(viewFactory);
         ArgumentNullException.ThrowIfNull(packagedAppSearchService);
 
-        WeakReferenceMessenger.Default.Register<AddAliasMessage>(this, (r, m) => ((KeywordsViewModel)r).CreateAlias(m));
+        WeakReferenceMessenger.Default.Register<AddAliasMessage>(this, (r, m) => ((KeywordsViewModel)r).OnCreateAlias(m));
 
         _userNotificationService = userNotificationService;
         _validationService = validationService;
@@ -88,21 +88,24 @@ public partial class KeywordsViewModel : ObservableObject
 
     #region Methods
 
-    private void CreateAlias(AddAliasMessage message)
+    [RelayCommand]
+    private void OnCreateAlias(AddAliasMessage? message = null)
     {
-        var names = message.Cmdline?.Parameters;
         if (Aliases.Any(x => x.Id == 0))
         {
             // An alias for creation already exists in the list,
-            // select it again to continue creation.
-            SelectedAlias = Aliases.Single(x => x.Id == 0);
-            SelectedAlias.Name = names;
-            SelectedAlias.Synonyms = names;
-            return;
+            // remove all these aliases...
+            var toDelete = Aliases.Where(e => e.Id == 0);
+            Aliases.RemoveMultiple(toDelete);
         }
-        
-        _logger.LogTrace("Creating new alias with name '{Name}'", message.Cmdline?.Parameters);
-        Aliases.Insert(0, new()  { Name = names, Synonyms = names });
+
+        var names = message?.Cmdline?.Parameters;
+        var newAlias = names is null
+            ? new() { Name = names, Synonyms = names }
+            : AliasQueryResult.EmptyForCreation;
+            
+        _logger.LogTrace("Creating new alias with name '{Name}'", names);
+        Aliases.Insert(0, newAlias);
         SelectedAlias = Aliases[0];
     }
     private bool CanExecuteCurrentAlias() => SelectedAlias != null;
@@ -148,21 +151,6 @@ public partial class KeywordsViewModel : ObservableObject
         var vm = result.DataContext as AdditionalParameter;
         SelectedAlias?.AdditionalParameters.Add(vm);
         _userNotificationService.Success($"Parameter {parameter.Name} has been added. Don't forget to save to apply changes", "Updated.");
-    }
-
-    [RelayCommand]
-    private void OnCreateAlias()
-    {
-        if (Aliases.Any(x => x.Id == 0))
-        {
-            // An alias for creation already exists in the list,
-            // select it again to continue creation.
-            SelectedAlias = Aliases.Single(x => x.Id == 0);
-            return;
-        }
-
-        Aliases.Insert(0, AliasQueryResult.EmptyForCreation);
-        SelectedAlias = Aliases[0];
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
