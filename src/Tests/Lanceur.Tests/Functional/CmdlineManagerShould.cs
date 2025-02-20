@@ -18,7 +18,7 @@ public class CmdlineManagerShould
     {
         // Arrange
         var cmdline = $"{name} {parameters}";
-        var cmd = CmdlineManager.BuildFromText(cmdline);
+        var cmd = CmdlineManager.Parse(cmdline);
 
         // Act
         var newCmd = CmdlineManager.CloneWithNewParameters(newParameters, cmd);
@@ -36,7 +36,7 @@ public class CmdlineManagerShould
         // Arrange
         const string name = "init";
         const string parameters = "un deux trois";
-        var cmd = CmdlineManager.BuildFromText($"{name} {parameters}");
+        var cmd = CmdlineManager.Parse($"{name} {parameters}");
 
         // Act
         var newCmd = CmdlineManager.CloneWithNewParameters(newParameters, cmd);

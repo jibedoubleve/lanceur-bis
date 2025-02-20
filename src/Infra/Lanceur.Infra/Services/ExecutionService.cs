@@ -176,7 +176,7 @@ public class ExecutionService : IExecutionService
                 _logger.LogInformation("Executing self executable {Name}", name);
                 exec.IsElevated = request.ExecuteWithPrivilege;
                 return ExecutionResponse.FromResults(
-                    await exec.ExecuteAsync(CmdlineManager.BuildFromText(request.Query))
+                    await exec.ExecuteAsync(CmdlineManager.Parse(request.Query))
                 );
 
             default: throw new NotSupportedException($"Cannot execute query result '{request.QueryResult?.Name ?? "<EMPTY>"}'");
