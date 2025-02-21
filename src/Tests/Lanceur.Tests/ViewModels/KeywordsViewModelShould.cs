@@ -69,6 +69,42 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     }
 
     [Fact]
+    public async Task CreateAliasWorkOnSecondNavigation()
+    {
+        var sqlBuilder = new SqlBuilder();
+        sqlBuilder.AppendAlias(1)
+                  .AppendAlias(2)
+                  .AppendAlias(3);
+        await TestViewModel(
+            async (viewModel, _) =>
+            {
+                // ARRANGE
+                const string cmdName = "add";
+                const string parameters = "aliasToCreate";
+                var cmdline = new Cmdline(cmdName, parameters);
+
+                // ACT
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate navigate to this page once
+                
+                viewModel.CreateAliasCommand.Execute(new(cmdline));
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
+
+                // ASSERT
+                using (new AssertionScope())
+                {
+                    viewModel.SelectedAlias.Should().NotBeNull();
+                    viewModel.Aliases.Should().HaveCount(4);
+                    
+                    viewModel.SelectedAlias!.Id.Should().Be(0);
+                    viewModel.SelectedAlias!.Name.Should().Be(parameters);
+                    viewModel.SelectedAlias!.Synonyms.Should().Be(parameters);
+                }
+            },
+            sqlBuilder
+        );
+    }
+
+    [Fact]
     public async Task CreateAliasWithAddKeyword()
     {
         var sqlBuilder = new SqlBuilder();
@@ -84,6 +120,8 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
                 var cmdline = new Cmdline(name, parameters);
 
                 // ACT
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate first navigation to this page
+                
                 WeakReferenceMessenger.Default.Send(new AddAliasMessage(cmdline));
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate navigate to this page
                 await viewModel.SaveCurrentAliasCommand.ExecuteAsync(cmdline);
