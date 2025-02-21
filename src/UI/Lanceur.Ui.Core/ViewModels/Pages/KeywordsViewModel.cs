@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Windows.Navigation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -108,6 +107,7 @@ public partial class KeywordsViewModel : ObservableObject
         Aliases.Insert(0, newAlias);
         SelectedAlias = Aliases[0];
     }
+    
     private bool CanExecuteCurrentAlias() => SelectedAlias != null;
 
     [RelayCommand]
@@ -214,21 +214,13 @@ public partial class KeywordsViewModel : ObservableObject
         var result = await Task.Run(() => _aliasManagementService.GetAll());
         _cachedAliases = result.ToList();
 
-        /* If the list of aliases already contains a new alias (with Id = 0),
-         * then add the loaded aliases from the database to the existing list.
-         * Otherwise, replace the entire list with the newly loaded aliases,
-         * while preserving the selected alias if possible.
-         */
-        if (Aliases is [{ Id: 0 }])
-        {
-            Aliases.AddRange(_cachedAliases);
-        }
-        else
-        {
-            SelectedAlias = _cachedAliases.Reselect(SelectedAlias);
-            Aliases = new(_cachedAliases);
-        }
-
+        var newAlias = Aliases.FirstOrDefault(e => e.Id == 0);
+        Aliases.Clear();
+        
+        if(newAlias is not null) Aliases.Add(newAlias);
+        Aliases.AddRange(_cachedAliases);
+        SelectedAlias = Aliases.Reselect(SelectedAlias);
+        
         _thumbnailService.UpdateThumbnails(_cachedAliases);
         _logger.LogTrace("Loaded {Count} alias(es)", _cachedAliases.Count);
     }
@@ -236,6 +228,8 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
     private async Task OnLoadCurrentAliasAsync()
     {
+        if ((SelectedAlias?.Id ?? 0) == 0) return;
+        
         SelectedAlias = await Task.Run(() => _aliasManagementService.Hydrate(SelectedAlias));
         _logger.LogTrace("Loading alias {AliasName}", SelectedAlias.Name);
     }
