@@ -103,6 +103,34 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
             sqlBuilder
         );
     }
+    
+    
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    [InlineData(" ")]
+    public async Task ListAllAliasOnEmptySearch(string criterion)
+    {
+        var sqlBuilder = new SqlBuilder();
+        sqlBuilder.AppendAlias(1)
+                  .AppendAlias(2)
+                  .AppendAlias(3);
+        await TestViewModel(
+            async (viewModel, _) =>
+            {
+                // ARRANGE
+
+                // ACT
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
+                viewModel.SearchCommand.Execute(criterion);
+
+                // ASSERT
+                viewModel.Aliases.Should().HaveCount(3);
+                
+            },
+            sqlBuilder
+        );
+    }
 
     [Fact]
     public async Task CreateAliasWithAddKeyword()
