@@ -94,8 +94,7 @@ public partial class KeywordsViewModel : ObservableObject
         {
             // An alias for creation already exists in the list,
             // remove all these aliases...
-            var toDelete = Aliases.Where(e => e.Id == 0);
-            Aliases.RemoveMultiple(toDelete);
+            Aliases.RemoveWhere(e => e.Id == 0);
         }
 
         var names = message?.Cmdline?.Parameters;

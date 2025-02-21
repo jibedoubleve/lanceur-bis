@@ -26,5 +26,19 @@ public static class ListExtensions
         foreach (var item in toRemove) source.Remove(item);
     }
 
+    /// <summary>
+    /// Removes all items from the list that satisfy the specified predicate.
+    /// </summary>
+    /// <param name="source">The list from which elements will be removed.</param>
+    /// <param name="predicate">A function that determines whether an element should be removed.</param>
+    /// <typeparam name="T">The type of elements in the list.</typeparam>
+    public static void RemoveWhere<T>(this IList<T> source, Func<T, bool> predicate)
+    {
+        for (var i = 0; i < source.Count; ++i)
+        {
+            if (predicate(source[i])) source.RemoveAt(i);
+        }
+    }
+
     #endregion
 }
