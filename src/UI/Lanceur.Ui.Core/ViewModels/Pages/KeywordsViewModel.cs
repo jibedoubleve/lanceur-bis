@@ -258,6 +258,12 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private void OnSearch(string criterion)
     {
+        if (criterion.IsNullOrWhiteSpace())
+        {
+            Aliases = new(_cachedAliases);
+            return;
+        }
+        
         criterion = criterion.ToLower();
         var aliases = _cachedAliases.Where(x => x.Name.ToLower().StartsWith(criterion))
                                       .ToArray();
