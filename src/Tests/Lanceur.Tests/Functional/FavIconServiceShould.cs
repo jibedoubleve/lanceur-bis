@@ -56,7 +56,7 @@ public class FavIconServiceShould
 
         // ASSERT
         await favIconDownloader.Received()
-                               .CheckExistsAsync(new(asExpected));
+                               .SaveToFileAsync(new(asExpected), Arg.Any<string>());
     }
 
     #endregion

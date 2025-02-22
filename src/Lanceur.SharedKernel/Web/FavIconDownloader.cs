@@ -4,14 +4,27 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.SharedKernel.Web;
 
-///<inheritdoc />
-[Obsolete($"Use {nameof(FavIconDownloader2)} instead)")]
 public class FavIconDownloader : IFavIconDownloader
 {
     #region Fields
 
-    private readonly HashSet<string> _failedPaths = new();
+    private readonly HttpClient _client = new();
+
+    /// <summary>
+    ///     Cache the path where it is impossible to retrieve the favicon to not spend time
+    ///     on something that doesn't work
+    /// </summary>
+    private readonly HashSet<string> _failedPaths = [];
+
     private readonly ILogger<FavIconDownloader> _logger;
+
+    private static readonly Dictionary<string, (bool IsManual, string Url)> FavIconManagers = new()
+    {
+        ["DuckDuckGo"] = (IsManual: false, Url: "https://icons.duckduckgo.com/ip2/{0}.ico"),
+        ["Google"] = (IsManual: false, Url: "https://www.google.com/s2/favicons?domain_url={0}"),
+        ["Manual (png)"] = (IsManual: true, Url: "favicon.png"),
+        ["Manual (ico)"] = (IsManual: true, Url: "favicon.ico")
+    };
 
     #endregion
 
@@ -23,55 +36,87 @@ public class FavIconDownloader : IFavIconDownloader
 
     #region Methods
 
-    ///<inheritdoc />
-    public async Task<bool> CheckExistsAsync(Uri url)
+    private string  RequestUrl(Uri url, KeyValuePair<string, (bool IsManual, string Url)> manager)
     {
-        try
-        {
-            var client = new HttpClient();
-            var result = await client.SendAsync(new(HttpMethod.Head, url));
-            return result.StatusCode == HttpStatusCode.OK;
-        }
-        catch { return false; }
+        var requestUrl = manager.Value.IsManual
+            ? new Uri(url, manager.Value.Url).ToString()
+            : manager.Value.Url.Format(url.Host);
+
+        _logger.LogTrace("Request Url: {Url}", requestUrl);
+        return requestUrl;
     }
 
-    ///<inheritdoc />
-    public async Task<bool> SaveToFileAsync(Uri url, string outputPath)
+    private async Task<bool> SaveThumbnailAsync(Uri favIconUrl, string outputPath)
     {
+        ArgumentNullException.ThrowIfNull(favIconUrl);
+        ArgumentNullException.ThrowIfNull(outputPath);
+
+        var foundFavIcon = false;
+
         try
         {
-            ArgumentNullException.ThrowIfNull(url);
-            ArgumentNullException.ThrowIfNull(outputPath);
-
-            if (_failedPaths.Contains(outputPath)) return false;
-            if (File.Exists(outputPath)) return true;
-
-            var uris = url.GetFavicons();
-            var httpClient = new HttpClient();
-
-            foreach (var uri in uris)
+            var bytes = await _client.GetByteArrayAsync(favIconUrl);
+            if (bytes.Length == 0)
             {
-                if (!await CheckExistsAsync(uri)) continue;
-
-                var bytes = await httpClient.GetByteArrayAsync(uri);
-                if (bytes.Length == 0)
-                {
-                    _logger.LogTrace("No favicon found for {uri}", uri);
-                    continue;
-                }
-
-                await File.WriteAllBytesAsync(outputPath, bytes);
-                return true;
+                _logger.LogInformation("Failed to save favicon to {Url} with {FavIconUrl}", favIconUrl, favIconUrl);
+                return false;
             }
 
-            return false;
+            await File.WriteAllBytesAsync(outputPath, bytes);
+            foundFavIcon = true;
+            return true;
         }
         catch (Exception ex)
         {
-            _failedPaths.Add(outputPath);
-            _logger.LogInformation(ex, "An error occured while saving FavIcon {Path}", outputPath);
+            _logger.LogInformation(
+                ex,
+                "Failed to retrieve favicon for {Url} with {FavIconUrl}",
+                favIconUrl,
+                favIconUrl
+            );
+        }
+
+        return foundFavIcon;
+    }
+
+    public async Task<bool> SaveToFileAsync(Uri url, string outputPath)
+    {
+        if (_failedPaths.Contains(url.ToString()))
+        {
+            _logger.LogInformation("'{Url}' is in the failed paths for favicon retrieving.", url);
             return false;
         }
+
+        foreach (var manager in FavIconManagers)
+            try
+            {
+                var requestUrl = RequestUrl(url, manager);
+                var result = await _client.SendAsync(new(HttpMethod.Get, requestUrl));
+
+                _logger.LogTrace(
+                    "Checking favicon with {FavIconManager} - Status: {Status} - Host: {Host}",
+                    manager.Key,
+                    result.StatusCode,
+                    url.Host
+                );
+                if (result.StatusCode != HttpStatusCode.OK) continue;
+
+                if (!await SaveThumbnailAsync(new(requestUrl), outputPath)) continue;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(
+                    ex,
+                    "Error while retrieving favicon for {Url} - {Manager}",
+                    url,
+                    manager.Value.Url
+                );
+            }
+
+        _failedPaths.Add(url.ToString());
+        return false;
     }
 
     #endregion
