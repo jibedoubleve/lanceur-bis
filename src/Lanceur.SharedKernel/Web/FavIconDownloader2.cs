@@ -20,10 +20,10 @@ public class FavIconDownloader2 : IFavIconDownloader
 
     private static readonly Dictionary<string, (bool IsManual, string Url)> FavIconManagers = new()
     {
+        ["DuckDuckGo"] = (IsManual: false, Url: "https://icons.duckduckgo.com/ip2/{0}.ico"),
+        ["Google"] = (IsManual: false, Url: "https://www.google.com/s2/favicons?domain_url={0}"),
         ["Manual_png"] = (IsManual: true, Url: "favicon.png"),
         ["Manual_ico"] = (IsManual: true, Url: "favicon.ico"),
-        ["DuckDuckGo"] = (IsManual: false, Url: "https://icons.duckduckgo.com/ip2/{0}.ico"),
-        ["Google"] = (IsManual: false, Url: "https://www.google.com/s2/favicons?domain_url={0}")
     };
 
     #endregion
@@ -48,6 +48,12 @@ public class FavIconDownloader2 : IFavIconDownloader
 
     public async Task<bool> CheckExistsAsync(Uri url)
     {
+        if (_failedPaths.Contains(url.AbsolutePath))
+        {
+            _logger.LogInformation("'{Url}' is in the failed paths for favicon retrieving.", url);
+            return false;
+        }
+        
         foreach (var manager in FavIconManagers)
             try
             {
