@@ -56,11 +56,9 @@ public class FavIconService : IFavIconService
         }
 
         var uriAuthority = uri.GetAuthority();
-
-        if (!await _favIconDownloader.CheckExistsAsync(uriAuthority)) return;
-
-        alias.Thumbnail = favIconPath;
-        await _favIconDownloader.SaveToFileAsync(uriAuthority, favIconPath);
+        var success = await _favIconDownloader.SaveToFileAsync(uriAuthority, favIconPath);
+        
+        alias.Thumbnail = success ? favIconPath : null;
     }
 
     #endregion

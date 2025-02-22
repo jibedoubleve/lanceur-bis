@@ -140,7 +140,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IFavIconService, FavIconService>()
-                         .AddSingleton<IFavIconDownloader, FavIconDownloader2>()
+                         .AddSingleton<IFavIconDownloader, FavIconDownloader>()
                          .AddTransient<IEverythingApi, EverythingApi>()
                          .AddTransient<IExecutionService, ExecutionService>()
                          .AddTransient<IWildcardService, ReplacementComposite>()

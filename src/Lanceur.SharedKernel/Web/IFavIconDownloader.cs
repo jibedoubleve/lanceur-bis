@@ -9,13 +9,6 @@ public interface IFavIconDownloader
     #region Methods
 
     /// <summary>
-    ///     Check whether the website exists
-    /// </summary>
-    /// <param name="url">The URL to check</param>
-    /// <returns><c>True</c> if the website exists; otherwise <c>False</c></returns>
-    Task<bool> CheckExistsAsync(Uri url);
-
-    /// <summary>
     ///     Download the favicon and save it to a file. If there's no
     ///     favicon, nothing is saved
     /// </summary>
