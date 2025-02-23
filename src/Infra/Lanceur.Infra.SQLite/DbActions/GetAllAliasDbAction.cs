@@ -34,7 +34,6 @@ internal class GetAllAliasDbAction
                                 a.start_mode                      as {nameof(AliasQueryResult.StartMode)},
                                 a.working_dir                     as {nameof(AliasQueryResult.WorkingDirectory)},
                                 a.icon                            as {nameof(AliasQueryResult.Icon)},
-                                a.thumbnail                       as {nameof(AliasQueryResult.Thumbnail)},
                                 a.lua_script                      as {nameof(AliasQueryResult.LuaScript)},
                                 a.exec_count                      as {nameof(AliasQueryResult.Count)},
                                 s.synonyms                        as {nameof(AliasQueryResult.Synonyms)},

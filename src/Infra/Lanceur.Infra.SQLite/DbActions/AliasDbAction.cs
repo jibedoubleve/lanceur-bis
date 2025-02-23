@@ -117,7 +117,6 @@ public class AliasDbAction
                                 a.start_mode            as {nameof(AliasQueryResult.StartMode)},
                                 a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
                                 a.icon                  as {nameof(AliasQueryResult.Icon)},
-                                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
                                 a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
                                 a.exec_count            as {nameof(AliasQueryResult.Count)},
                                 a.hidden                as {nameof(AliasQueryResult.IsHidden)},
@@ -163,7 +162,6 @@ public class AliasDbAction
                                 a.start_mode            as {nameof(AliasQueryResult.StartMode)},
                                 a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
                                 a.icon                  as {nameof(AliasQueryResult.Icon)},
-                                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
                                 a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
                                 a.hidden                as {nameof(AliasQueryResult.IsHidden)},
                                 a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
@@ -253,7 +251,6 @@ public class AliasDbAction
                                     start_mode  = @startMode,
                                     working_dir = @workingDirectory,
                                     icon        = @icon,
-                                    thumbnail   = @thumbnail,
                                     lua_script  = @luaScript,
                                     hidden      = @isHidden,
                                     confirmation_required = @isExecutionConfirmationRequired
@@ -268,7 +265,6 @@ public class AliasDbAction
                                     start_mode,
                                     working_dir,
                                     icon,
-                                    thumbnail,
                                     lua_script,
                                     hidden,
                                     confirmation_required
@@ -281,7 +277,6 @@ public class AliasDbAction
                                     @startMode,
                                     @workingDirectory,
                                     @icon,
-                                    @thumbnail,
                                     @luaScript,
                                     @isHidden,
                                     @isExecutionConfirmationRequired
@@ -300,7 +295,6 @@ public class AliasDbAction
             startMode = alias.StartMode,
             workingDirectory = alias.WorkingDirectory,
             icon = alias.Icon,
-            thumbnail = alias.Thumbnail,
             luaScript = alias.LuaScript,
             isHidden = alias.IsHidden,
             isExecutionConfirmationRequired = alias.IsExecutionConfirmationRequired
@@ -380,16 +374,6 @@ public class AliasDbAction
 
         if (foundAlias is not null) alias.Id = foundAlias.Id;
         return foundAlias is not null;
-    }
-
-    internal long UpdateThumbnail(IDbTransaction tx, AliasQueryResult alias)
-    {
-        const string sql = "update alias set thumbnail = @Thumbnail where id = @Id;";
-
-        if (alias.Id == 0) return 0;
-
-        tx.Connection!.Execute(sql, new { alias.Thumbnail, alias.Id });
-        return alias.Id;
     }
 
     #endregion

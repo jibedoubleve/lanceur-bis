@@ -28,13 +28,12 @@ public class SqlBuilder
 
     #region Methods
     
-    public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, string[]? synonyms = null, string? thumbnail = null)
+    public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, string[]? synonyms = null)
     {
         fileName ??= Guid.NewGuid().ToString();
         arguments ??= Guid.NewGuid().ToString();
-        thumbnail = thumbnail is null ? "null" : $"'{thumbnail}'";
 
-        _sql.Append($"insert into alias (id, file_name, thumbnail, arguments) values ({idAlias}, '{fileName}', {thumbnail}, '{arguments}');");
+        _sql.Append($"insert into alias (id, file_name, arguments) values ({idAlias}, '{fileName}', '{arguments}');");
         _sql.AppendNewLine();
 
         if (synonyms is null) return this;
