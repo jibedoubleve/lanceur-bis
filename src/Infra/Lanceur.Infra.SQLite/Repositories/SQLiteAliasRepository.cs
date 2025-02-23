@@ -73,7 +73,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
                                 sub.synonyms as {nameof(SelectableAliasQueryResult.Synonyms)},
                                 a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
-                                a.thumbnail  as {nameof(SelectableAliasQueryResult.Thumbnail)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -115,7 +114,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name     as {nameof(SelectableAliasQueryResult.Name)},
                                 a.icon      as {nameof(SelectableAliasQueryResult.Icon)},
-                                a.thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -175,7 +173,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name     as {nameof(SelectableAliasQueryResult.Name)},
                                 a.icon      as {nameof(SelectableAliasQueryResult.Icon)},
-                                a.thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -196,7 +193,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 arguments as {nameof(SelectableAliasQueryResult.Parameters)},
                                 name      as {nameof(SelectableAliasQueryResult.Name)},
                                 icon      as {nameof(SelectableAliasQueryResult.Icon)},
-                                thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
                             from
                                 data_doubloons_v
                             order by file_name
@@ -457,9 +453,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             _dbActionFactory.UsageManagement.SetUsage(tx, ref alias);
         }
     );
-
-    /// <inheritdoc />
-    public void UpdateThumbnail(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.UpdateThumbnail(tx, alias));
 
     #endregion
 }

@@ -109,28 +109,7 @@ public class ThumbnailService : IThumbnailService
             return;
         }
 
-        var t1 = _favIconService.RetrieveFaviconAsync(alias);
-        UpdateThumbnailInDb(queryResult);
-
-        await t1;
-    }
-
-    private void UpdateThumbnailInDb(EntityDecorator<QueryResult> queryResults)
-    {
-        if (!queryResults.IsDirty) return;
-        if (queryResults.Entity is not AliasQueryResult alias) return;
-
-        _logger.LogTrace("Updating thumbnails for alias '{Name}'", alias.Name);
-        try { _aliasRepository.UpdateThumbnail(alias); }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                ex,
-                "Error occured while updating the thumbnails. Aliases: {@Alias}",
-                alias
-            );
-            throw;
-        }
+        await _favIconService.RetrieveFaviconAsync(alias);
     }
 
     /// <summary>

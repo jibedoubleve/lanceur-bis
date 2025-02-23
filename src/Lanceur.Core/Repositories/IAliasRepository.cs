@@ -262,18 +262,5 @@ public interface IAliasRepository
     /// <param name="alias">The QueryResult object representing the alias to be updated. Must not be null.</param>
     void SetUsage(QueryResult alias);
 
-    /// <summary>
-    ///     Updates the thumbnail for the specified alias.
-    /// </summary>
-    /// <param name="alias">The alias to update.</param>
-    /// <returns>The IDs of the updated aliases.</returns>
-    /// <remarks>
-    ///     This method does not create new aliases. If the ID of the alias is 0, 
-    ///     no update will occur as the alias is considered non-existent. 
-    ///     This method will only update the thumbnail; all other properties will be ignored.
-    /// </remarks>
-    void UpdateThumbnail(AliasQueryResult alias);
-
-
     #endregion
 }

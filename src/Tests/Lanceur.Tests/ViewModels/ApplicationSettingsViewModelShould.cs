@@ -39,7 +39,6 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
                          .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddMockSingleton<IViewFactory>()
-                         .AddSingleton<IDataDoctorRepository, SQLiteDataDoctorRepository>()
                          .AddMockSingleton<IUserInteractionService>(
                              (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
@@ -113,42 +112,6 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                                             .AskUserYesNoAsync(Arg.Any<object>());
             },
             SqlBuilder.Empty,
-            visitors
-        );
-    }
-
-    [Fact]
-    public async Task ResetThumbnailWhenClearingTriggered()
-    {
-        var i = 0;
-        var sqlBuilder = new SqlBuilder().AppendAlias(++i, thumbnail: Guid.NewGuid().ToString())
-                                         .AppendAlias(++i, thumbnail: Guid.NewGuid().ToString())
-                                         .AppendAlias(++i, thumbnail: Guid.NewGuid().ToString())
-                                         .AppendAlias(++i, thumbnail: Guid.NewGuid().ToString());
-        var visitors = new ServiceVisitors
-        {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
-            {
-                i.AskUserYesNoAsync(Arg.Any<string>()).Returns(true);
-                return i;
-            }
-        };
-
-        await TestViewModel(
-            async (viewModel, db) =>
-            {
-                // arrange
-
-                // act
-                await viewModel.ClearThumbnailsCommand.ExecuteAsync(null);
-
-                // assert 
-                const string sql = "select count(*) from alias where thumbnail is not null;";
-                db.WithConnection(c => c.ExecuteScalar(sql))
-                  .Should().Be(0);
-            },
-            sqlBuilder,
             visitors
         );
     }

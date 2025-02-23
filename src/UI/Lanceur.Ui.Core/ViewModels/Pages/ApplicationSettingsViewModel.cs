@@ -48,7 +48,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     private readonly IUserInteractionService _userInteraction;
-    private readonly IDataDoctorRepository _dataDoctorRepository;
 
     private readonly IUserNotificationService _userNotificationService;
     private readonly IViewFactory _viewFactory;
@@ -65,8 +64,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ISettingsFacade settings,
         LoggingLevelSwitch loggingLevelSwitch,
         IViewFactory viewFactory,
-        IUserInteractionService userInteraction,
-        IDataDoctorRepository dataDoctorRepository
+        IUserInteractionService userInteraction
     )
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -79,7 +77,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         _loggingLevelSwitch = loggingLevelSwitch;
         _viewFactory = viewFactory;
         _userInteraction = userInteraction;
-        _dataDoctorRepository = dataDoctorRepository;
 
         // Hotkey
         var hk = _settings.Application.HotKey;
@@ -229,7 +226,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         var result = await _userInteraction.AskUserYesNoAsync(msg);
         if (result)
         {
-            _dataDoctorRepository.ClearThumbnails();
             _userNotificationService.Success("All thumbnails have been cleared.");
         }
     }
