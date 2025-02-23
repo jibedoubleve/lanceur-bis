@@ -44,7 +44,7 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
     public void Save()
     {
         /*Does nothing, settings is already in memory*/
-        _logger.LogWarning("This is a mock service for development purposes. It simulates saving the settings. Current settings: {@Settings}", Settings);
+        _logger.LogWarning("This is a mock service for development purposes. It simulates saving the settings. Debug database: {Settings}", Settings.DbPath);
     }
 
     #endregion Methods
