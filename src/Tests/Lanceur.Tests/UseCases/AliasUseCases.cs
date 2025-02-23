@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using System.Reflection;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -24,6 +25,7 @@ using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
@@ -136,6 +138,10 @@ public class AliasUseCases : TestBase
             mainViewModel.Results.Should().NotBeNull();
             mainViewModel.Results!.Count.Should().BeGreaterThan(0);
             var current = mainViewModel.Results![0];
+
+            OutputHelper.WriteLine($"Type of first element in results is '{current.GetType()}'");
+            OutputHelper.WriteLine($"{JsonConvert.SerializeObject(current, Formatting.Indented)}");
+            
             stateTester.AssertValues(current as AliasQueryResult);
         }
 
