@@ -16,6 +16,8 @@ public class FavIconDownloader : IFavIconDownloader
     /// </summary>
     private readonly HashSet<string> _failedPaths = [];
 
+    private readonly IImageValidationService _imageValidationService;
+
     private readonly ILogger<FavIconDownloader> _logger;
 
     private static readonly Dictionary<string, (bool IsManual, string Url)> FavIconManagers = new()
@@ -30,7 +32,14 @@ public class FavIconDownloader : IFavIconDownloader
 
     #region Constructors
 
-    public FavIconDownloader(ILogger<FavIconDownloader> logger) => _logger = logger;
+    public FavIconDownloader(ILogger<FavIconDownloader> logger, IImageValidationService imageValidationService)
+    {
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(imageValidationService);
+
+        _logger = logger;
+        _imageValidationService = imageValidationService;
+    }
 
     #endregion
 
@@ -59,6 +68,12 @@ public class FavIconDownloader : IFavIconDownloader
             if (bytes.Length == 0)
             {
                 _logger.LogInformation("Failed to save favicon to {Url} with {FavIconUrl}", favIconUrl, favIconUrl);
+                return false;
+            }
+
+            if (!_imageValidationService.IsValidImage(bytes))
+            {
+                _logger.LogInformation("The favicon of '{Url}' is not valid", favIconUrl);
                 return false;
             }
 

@@ -146,6 +146,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IClipboardService, WindowsClipboardService>()
                          .AddTransient<IReconciliationService, ReconciliationService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
+                         .AddTransient<IImageValidationService, ImageValidationService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>();
 
         ConditionalExecution.Execute(

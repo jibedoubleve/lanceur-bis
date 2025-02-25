@@ -10,6 +10,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
         <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj"/>
+        <PackageReference Include="System.Drawing.Common" Version="9.0.2"/>
     </ItemGroup>
 
 </Project>
