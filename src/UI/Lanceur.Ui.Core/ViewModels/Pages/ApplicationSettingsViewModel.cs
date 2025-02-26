@@ -3,7 +3,6 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models.Settings;
-using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Stores.Everything;
@@ -27,6 +26,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
     [ObservableProperty] private string _dbPath = string.Empty;
+    [ObservableProperty] private bool _excludeFilesInBinWithEverything;
+    [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
+    [ObservableProperty] private bool _excludeSystemFilesWithEverything;
+    [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     [ObservableProperty] private bool _isAlt;
     [ObservableProperty] private bool _isCtrl;
     [ObservableProperty] private bool _isShift;
@@ -34,19 +37,15 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
     private readonly ILogger<ApplicationSettingsViewModel> _logger;
+    private readonly LoggingLevelSwitch _loggingLevelSwitch;
     [ObservableProperty] private int _notificationDisplayDuration;
     [ObservableProperty] private double _searchDelay;
 
     [ObservableProperty] private ISettingsFacade _settings;
-    private readonly LoggingLevelSwitch _loggingLevelSwitch;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = new();
-    [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
-    [ObservableProperty] private bool _excludeSystemFilesWithEverything;
-    [ObservableProperty] private bool _excludeFilesInBinWithEverything;
-    [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     private readonly IUserInteractionService _userInteraction;
 
     private readonly IUserNotificationService _userNotificationService;
@@ -120,7 +119,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Store section
         BookmarkSourceBrowser = Settings.Application.Stores.BookmarkSourceBrowser;
         StoreShortcuts = new(Settings.Application.Stores.StoreOverrides);
-        
+
         // -- Everything Store
         var adapter = new EverythingQueryAdapter(Settings.Application.Stores.EverythingQuerySuffix);
         ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
@@ -158,9 +157,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Window section
         Settings.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
         Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
-        
+
         // Miscellaneous
-        
     }
 
     [RelayCommand]
@@ -211,22 +209,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         {
             const string msg = "Do you want to restart now to apply the new configuration?";
             if (await _userInteraction.AskUserYesNoAsync(msg)) _appRestartService.Restart();
-        }
-    }
-
-    [RelayCommand]
-    private async Task OnClearThumbnails()
-    {
-        const string msg = """
-                Thumbnail references will be removed from the database, 
-                and thumbnails will refresh dynamically as you use the application. 
-                
-                Do you want to proceed?
-                """;
-        var result = await _userInteraction.AskUserYesNoAsync(msg);
-        if (result)
-        {
-            _userNotificationService.Success("All thumbnails have been cleared.");
         }
     }
 
