@@ -313,17 +313,7 @@
                                      OffContent="Trace disabled"
                                      IsChecked="{Binding IsTraceEnabled}" />
                 </ui:CardControl>
-
-                <ui:CardControl Margin="5,0,5,12" Icon="{ui:SymbolIcon PaintBrushArrowDown20}">
-                    <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body" Text="Clear thumbnails to trigger regeneration as needed"/>
-                    </ui:CardControl.Header>
-                    <ui:Button Content="Clear Thumbnails"
-                               ToolTipService.ToolTip="Removes thumbnail references from the database. Thumbnails will refresh dynamically as you use the application."
-                               Command="{Binding ClearThumbnailsCommand}"/>
-                </ui:CardControl>
-
-
+                
             </StackPanel>
         </ScrollViewer>
     </Grid>
