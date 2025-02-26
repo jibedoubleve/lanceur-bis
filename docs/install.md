@@ -1,7 +1,7 @@
 ---
 layout: page
 title: How to install?
-nav_order: 1
+nav_order: 2
 ---
 
 # Installation
