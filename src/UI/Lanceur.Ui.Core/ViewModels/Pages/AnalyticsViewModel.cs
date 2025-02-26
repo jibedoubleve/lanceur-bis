@@ -15,6 +15,7 @@ public partial class AnalyticsViewModel : ObservableObject
 {
     #region Fields
 
+    private const string SelectAll = "All";
     private const string CacheKey = $"analytics_{nameof(AnalyticsViewModel)}";
     [ObservableProperty] private PlotType _currentPlotType;
     private readonly IAliasRepository _aliasRepository;
@@ -65,7 +66,7 @@ public partial class AnalyticsViewModel : ObservableObject
         var list = points.Select(e => e.X.Year.ToString())
                          .Distinct()
                          .ToList();
-        list.Insert(0, "All");
+        list.Insert(0, SelectAll);
         return new(list);
     }
 
@@ -134,10 +135,9 @@ public partial class AnalyticsViewModel : ObservableObject
     {
         _logger.LogTrace("Display history for year {Year}", year);
 
-        var points = _memoryCache.Get<IEnumerable<DataPoint<DateTime, double>>>(CacheKey);
-
-        if (points == null) throw new NullReferenceException("No chart preloaded. Cannot display history.");
-
+        var p = _memoryCache.Get<IEnumerable<DataPoint<DateTime, double>>>(CacheKey) ?? [];
+        var points = year == SelectAll ? p : p.Where(e => e.X.Year.ToString() == year);
+        
         RedrawPlot(LastPlotContext, points);
     }
 
