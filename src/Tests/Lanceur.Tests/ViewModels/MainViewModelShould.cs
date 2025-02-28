@@ -94,7 +94,7 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
                 return i;
             }
         };
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 // ARRANGE
@@ -121,7 +121,7 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
     [InlineData("2 * 5", "10")]
     public async Task BeAbleToExecuteCalculation(string operation, string result)
     {
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 // ARRANGE
@@ -149,7 +149,7 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
                                          .AppendAlias(3, synonyms: ["alias3", "alias_3"]);
 
 
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 // ACT
@@ -180,7 +180,7 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
                 settings.Application.Returns(application);
             }
         };
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 await viewModel.DisplayResultsIfAllowed();

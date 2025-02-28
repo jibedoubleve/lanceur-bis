@@ -62,7 +62,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                 return i;
             }
         };
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 // arrange
@@ -95,7 +95,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                 return i;
             }
         };
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 // arrange
@@ -155,7 +155,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                                      }
                                      """;
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, db) =>
             {
                 // arrange

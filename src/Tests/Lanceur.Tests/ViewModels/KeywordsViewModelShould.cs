@@ -75,7 +75,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
         sqlBuilder.AppendAlias(1)
                   .AppendAlias(2)
                   .AppendAlias(3);
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 // ARRANGE
@@ -115,7 +115,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
         sqlBuilder.AppendAlias(1)
                   .AppendAlias(2)
                   .AppendAlias(3);
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 // ARRANGE
@@ -139,7 +139,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
         sqlBuilder.AppendAlias(1)
                   .AppendAlias(2)
                   .AppendAlias(3);
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 // ARRANGE
@@ -169,7 +169,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     [Fact]
     public async Task CreateAliasWithLuaScript()
     {
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, db) =>
             {
                 // ARRANGE
@@ -214,7 +214,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
             }
         };
 
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, db) =>
             {
                 // ARRANGE
@@ -275,7 +275,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
                 return i;
             }
         };
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, db) =>
             {
                 // ARRANGE
@@ -316,7 +316,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
             }
         };
 
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, db) =>
             {
                 // ARRANGE
@@ -367,7 +367,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
         var builder = new SqlBuilder().AppendAlias(1, "un", "", ["deux"])
                                       .AppendAlias(2, "deux", "", ["trois"]);
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, _) =>
             {
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
@@ -384,7 +384,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     [Fact]
     public async Task UpdateAliasWithLuaScript()
     {
-        await TestViewModel(
+        await TestViewModelAsync(
             async (viewModel, db) =>
             {
                 // ARRANGE
