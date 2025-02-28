@@ -31,14 +31,10 @@ public class AnaliticsViewModelShould : ViewModelTest<AnalyticsViewModel>
     }
 
     [Fact]
-    public async Task NotCrashWhenNoResultRetrievedFromDb()
+    public void NotCrashWhenNoResultRetrievedFromDb()
     {
-        await TestViewModel(
-            (viewModel, _) =>
-            {
-                viewModel.SelectYearCommand.Execute(null);
-                return Task.CompletedTask;
-            },
+        TestViewModel(
+            (viewModel, _) => viewModel.SelectYearCommand.Execute(null),
             SqlBuilder.Empty
         );
     }
