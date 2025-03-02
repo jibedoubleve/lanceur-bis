@@ -5,7 +5,7 @@ namespace Lanceur.Infra.Constants;
 public static class Paths
 {
     #region Properties
-
+    public static string LogRepository { get; } = @"%appdata%\probel\lanceur2\logs".ExpandPath();
     public static string DefaultDb { get; } = @"%appdata%\probel\lanceur2\data.sqlite".ExpandPath();
     public static string ImageRepository { get; } = @"%appdata%\probel\lanceur2\thumbnails".ExpandPath();
     public static string ClefLogFile { get; } = @"%appdata%\probel\lanceur2\logs\clef\probel-lanceur..clef".ExpandPath();

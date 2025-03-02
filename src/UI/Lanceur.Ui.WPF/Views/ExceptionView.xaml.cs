@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Windows;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Infra.Constants;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
 using Wpf.Ui.Appearance;
@@ -43,6 +45,8 @@ public partial class ExceptionView
             _settings.Application.Window.BackdropStyle.ToWindowBackdropType()
         );
     }
+
+    private void OnOpenLogs(object sender, RoutedEventArgs e) => Process.Start("explorer.exe", Paths.LogRepository);
 
     #endregion
 }

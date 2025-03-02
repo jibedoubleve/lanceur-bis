@@ -8,6 +8,7 @@
     Title="Lanceur"
     Width="400"
     Height="40"
+    d:DesignHeight="140"
     SizeToContent="WidthAndHeight"
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="{Binding WindowBackdropStyle}"
@@ -53,6 +54,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <ui:Button Icon="{ui:SymbolIcon ArrowBounce20}" Click="OnOpenLogs" Margin="5">Show logs</ui:Button>
             <ui:Button Appearance="Primary" Click="OnClose" Margin="5">Close</ui:Button>
         </StackPanel>
     </Grid>
