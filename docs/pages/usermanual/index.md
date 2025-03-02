@@ -10,7 +10,7 @@ nav_order: 2
 
 An alias is a keyword linked to an application. When users type it, the application will launch as configured.
 
-![Start alias](../assets/images/usermanual/start_alias.png)
+![Start alias](../../assets/images/usermanual/start_alias.png)
 
 Create a list of shortcuts, configure them, and save time by simply typing the shortcut and pressing `ENTER`.
 
