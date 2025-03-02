@@ -150,16 +150,6 @@ public interface IAliasRepository
     IEnumerable<int> GetYearsWithUsage();
 
     /// <summary>
-    ///     Update the id and the counter of <paramref name="queryResult" />
-    ///     with the data of the database. It is used mainly to update
-    ///     plugins therfore it'll make an exact search on the name
-    ///     of the <see cref="QueryResult" /> and take the first item
-    ///     of the list (that should only have one item)
-    /// </summary>
-    /// <param name="queryResult">The query result to hydrate</param>
-    void Hydrate(QueryResult queryResult);
-
-    /// <summary>
     ///     Hydrate the <see cref="AliasQueryResult" /> with the additional parameters.
     /// </summary>
     /// <param name="alias">The alias to hydrate</param>
