@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.Constants;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.SharedKernel.DI;
@@ -91,11 +92,7 @@ public partial class App
                     view.ExceptionTrace.Text = arguments["StackTrace"];
                     view.Show();
                 },
-                ToastNotificationArguments.ClickShowLogs  => () =>
-                {
-                    var path = Environment.ExpandEnvironmentVariables(@"%appdata%\probel\lanceur2\logs");
-                    Process.Start("explorer.exe", path);
-                },
+                ToastNotificationArguments.ClickShowLogs  => () => Process.Start("explorer.exe", Paths.LogRepository),
                 _ => () => Log.Warning("The argument '{Argument}' is not supported in the toast arguments. Are you using a button that has not been configured yet?", toastArgs.Argument)
             };
 
