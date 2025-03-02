@@ -72,7 +72,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
                                 sub.synonyms as {nameof(SelectableAliasQueryResult.Synonyms)},
-                                a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.icon       as {nameof(SelectableAliasQueryResult.Icon)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -113,7 +113,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.file_name as {nameof(SelectableAliasQueryResult.FileName)},
                                 a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name     as {nameof(SelectableAliasQueryResult.Name)},
-                                a.icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.icon      as {nameof(SelectableAliasQueryResult.Icon)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -172,7 +172,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.file_name as {nameof(SelectableAliasQueryResult.FileName)},
                                 a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name     as {nameof(SelectableAliasQueryResult.Name)},
-                                a.icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.icon      as {nameof(SelectableAliasQueryResult.Icon)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -192,7 +192,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 file_name as {nameof(SelectableAliasQueryResult.FileName)},
                                 arguments as {nameof(SelectableAliasQueryResult.Parameters)},
                                 name      as {nameof(SelectableAliasQueryResult.Name)},
-                                icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                                icon      as {nameof(SelectableAliasQueryResult.Icon)}
                             from
                                 data_doubloons_v
                             order by file_name
@@ -287,35 +287,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     {
         const string sql = "select distinct strftime('%Y', time_stamp) from alias_usage";
         return Db.WithinTransaction(tx => tx.Connection!.Query<int>(sql));
-    }
-
-    /// <inheritdoc />
-    public void Hydrate(QueryResult queryResult)
-    {
-        const string sql =
-            """
-            select
-                a.id       as id,
-               count(a.id) as count
-            from
-            	alias a
-                inner join alias_name  an on a.id = an.id_alias
-                inner join alias_usage au on a.id = au.id_alias
-            where an.name = @name
-            group by a.id;
-            """;
-
-        var result = Db.WithinTransaction(
-            tx => tx.Connection!
-                    .Query<AliasQueryResult>(sql, new { queryResult.Name })
-                    .ToArray()
-        );
-
-        if (!result.Any()) return;
-
-        var first = result.First();
-        queryResult.Id = first.Id;
-        queryResult.Count = first.Count;
     }
 
     /// <inheritdoc />
