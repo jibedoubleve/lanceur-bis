@@ -8,28 +8,39 @@ public class ResultSet : IEnumerable<EverythingResult>
 
     private readonly List<EverythingResult> _results = new();
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    public ResultSet(string query) => Query = query;
+    public ResultSet() : this(false, string.Empty) { }
 
-    #endregion Constructors
+    private ResultSet(bool hasError, string errorMessage)
+    {
+        HasError = hasError;
+        ErrorMessage = errorMessage;
+    }
+
+    #endregion
 
     #region Properties
 
     public int Count => _results.Count;
-    public string Query { get; }
 
-    #endregion Properties
+    public string ErrorMessage { get; }
+
+    public bool HasError { get; }
+
+    #endregion
 
     #region Methods
 
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
     public void Add(EverythingResult everythingResult) => _results.Add(everythingResult);
+
+    public static ResultSet Failure(string message) => new(true, message);
 
     public IEnumerator<EverythingResult> GetEnumerator() => _results.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    #endregion Methods
+    #endregion
 }
