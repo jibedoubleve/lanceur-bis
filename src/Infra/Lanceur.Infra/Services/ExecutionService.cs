@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.BusinessLogic;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
@@ -176,7 +175,7 @@ public class ExecutionService : IExecutionService
                 _logger.LogInformation("Executing self executable {Name}", name);
                 exec.IsElevated = request.ExecuteWithPrivilege;
                 return ExecutionResponse.FromResults(
-                    await exec.ExecuteAsync(CmdlineManager.Parse(request.Query))
+                    await exec.ExecuteAsync(Cmdline.Parse(request.Query))
                 );
 
             default: throw new NotSupportedException($"Cannot execute query result '{request.QueryResult?.Name ?? "<EMPTY>"}'");
