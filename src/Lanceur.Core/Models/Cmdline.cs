@@ -9,14 +9,10 @@ public record Cmdline
 
     public Cmdline(string name, string parameters = "")
     {
-        name ??= string.Empty;
+        Name = (name ?? "").Trim();
+        Parameters = (parameters ?? "").Trim();
 
-        if (name.Contains(' ')) throw new ArgumentException("The name of a cmdline cannot contain whitespaces.", nameof(name));
-
-        name = name.Trim();
-
-        Name = name;
-        Parameters = parameters ?? string.Empty;
+        if (Name.Contains(' ')) throw new ArgumentException("The name of a cmdline cannot contain whitespaces.", nameof(name));
     }
 
     #endregion
@@ -33,6 +29,8 @@ public record Cmdline
 
     #region Methods
 
+    public static Cmdline CloneWithNewParameters(string newParameters, Cmdline cmd) => Parse($"{cmd?.Name} {newParameters}");
+
     public bool IsNullOrEmpty() => Name.IsNullOrWhiteSpace();
 
     /// <summary>
@@ -43,7 +41,26 @@ public record Cmdline
     /// <returns>A <see cref="string" /> representation of the <paramref name="source" />.</returns>
     public static implicit operator string(Cmdline source) => source.ToString();
 
-    public static Cmdline Parse(string commandline) => CmdlineManager.Parse(commandline);
+    public static Cmdline Parse(string cmdline)
+    {
+        cmdline = (cmdline ?? string.Empty).Trim();
+
+        if (CmdlineManager.HasSpecialName(cmdline))
+        {
+            return new(
+                CmdlineManager.GetSpecialName(cmdline),
+                cmdline[1..]
+            );
+        }
+
+        var elements = cmdline.Split(" ");
+        if (elements.Length <= 0) return Empty;
+
+        var name = elements[0];
+        return new(
+            name,
+            cmdline[name.Length..]);
+    }
 
     public override string ToString() => $"{Name ?? string.Empty} {Parameters ?? string.Empty}".Trim();
 

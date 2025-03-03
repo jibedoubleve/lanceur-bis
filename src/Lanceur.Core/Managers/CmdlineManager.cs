@@ -1,5 +1,3 @@
-using Lanceur.Core.Models;
-
 namespace Lanceur.Core.Managers;
 
 public static class CmdlineManager
@@ -12,7 +10,7 @@ public static class CmdlineManager
 
     #region Methods
 
-    private static string GetSpecialName(string cmdline)
+    public static string GetSpecialName(string cmdline)
     {
         return cmdline.Length switch
         {
@@ -22,7 +20,7 @@ public static class CmdlineManager
         };
     }
 
-    private static bool HasSpecialName(string cmdName)
+    public static bool HasSpecialName(string cmdName)
     {
         cmdName = cmdName.Trim();
         var res1 = false;
@@ -33,33 +31,6 @@ public static class CmdlineManager
 
         return res1 || res2;
     }
-
-    public static Cmdline Parse(string cmdline)
-    {
-        cmdline = cmdline?.Trim();
-        var name = string.Empty;
-        var args = string.Empty;
-        cmdline ??= string.Empty;
-
-        if (HasSpecialName(cmdline))
-        {
-            name = GetSpecialName(cmdline);
-            args = cmdline[name.Length..];
-        }
-        else
-        {
-            var elements = cmdline.Split(" ");
-            if (elements.Length > 0)
-            {
-                name = elements[0];
-                args = cmdline[name.Length..];
-            }
-        }
-
-        return new(name, args.Trim());
-    }
-
-    public static Cmdline CloneWithNewParameters(string newParameters, Cmdline cmd) => Parse($"{cmd?.Name} {newParameters}");
 
     #endregion
 }
