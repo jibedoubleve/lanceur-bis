@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Reflection;
+using Dapper;
 
 namespace System.SQLite.Updater;
 
@@ -7,43 +8,36 @@ public class DatabaseUpdater
 {
     #region Fields
 
-    private readonly Assembly _asm;
     private readonly IDbConnection _db;
-    private readonly string _pattern;
     private readonly ScriptManager _scriptManager;
-    private readonly SqlManager _sqlManager;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public DatabaseUpdater(IDbConnection db, Assembly asm, string pattern)
     {
-        _db = db ?? throw new ArgumentNullException(nameof(db));
-        _asm = asm ?? throw new ArgumentNullException(nameof(asm));
-        _pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
+        ArgumentNullException.ThrowIfNull(pattern);
+        ArgumentNullException.ThrowIfNull(asm);
 
-        _sqlManager = new(_db);
-        _scriptManager = new(_asm, _pattern);
+        _db = db ?? throw new ArgumentNullException(nameof(db));
+
+        _scriptManager = new(asm, pattern);
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
+    private void ExecuteScript(IEnumerable<string> scripts)
+    {
+        foreach (var script in scripts) _db.Execute(script);
+    }
+
     public Version MaxVersion() => _scriptManager.GetScripts().MaxVersion();
 
-    public void UpdateFrom(Version version)
-    {
-        var scripts = _scriptManager.GetScripts();
-        _sqlManager.Execute(scripts.After(version));
-    }
+    public void UpdateFrom(Version version) => ExecuteScript(_scriptManager.GetScripts().After(version));
+    public void UpdateFromScratch() => ExecuteScript(_scriptManager.GetScripts());
 
-    public void UpdateFromScratch()
-    {
-        var scripts = _scriptManager.GetScripts();
-        _sqlManager.Execute(scripts);
-    }
-
-    #endregion Methods
+    #endregion
 }

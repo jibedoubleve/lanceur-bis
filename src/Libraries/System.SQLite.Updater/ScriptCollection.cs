@@ -8,18 +8,31 @@ public class ScriptCollection : IEnumerable<string>
 
     private readonly IDictionary<Version, string> _resources;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public ScriptCollection(IDictionary<Version, string> resources)
     {
-        if (resources is null) throw new ArgumentNullException(nameof(resources));
+        ArgumentNullException.ThrowIfNull(resources);
 
         _resources = resources;
     }
 
-    #endregion Constructors
+    #endregion
+
+    #region Methods
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public IEnumerable<string> After(Version version) => _resources.Where(item => item.Key > version)
+                                                                   .Select(item => item.Value);
+
+    public IEnumerator<string> GetEnumerator() => _resources.Values.GetEnumerator();
+
+    public Version MaxVersion() => _resources.Keys.Max() ?? new Version();
+
+    #endregion
 
     #region Indexers
 
@@ -28,18 +41,4 @@ public class ScriptCollection : IEnumerable<string>
         : string.Empty;
 
     #endregion Indexers
-
-    #region Methods
-
-    public IEnumerable<string> After(Version ver) => from version in _resources.Keys
-                                                     where version > ver
-                                                     select _resources[version];
-
-    public IEnumerator<string> GetEnumerator() => _resources.Values.GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public Version MaxVersion() => _resources?.Keys?.Max() ?? new Version();
-
-    #endregion Methods
 }
