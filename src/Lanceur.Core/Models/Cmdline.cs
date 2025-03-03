@@ -29,8 +29,6 @@ public record Cmdline
 
     #region Methods
 
-    public static Cmdline CloneWithNewParameters(string newParameters, Cmdline cmd) => Parse($"{cmd?.Name} {newParameters}");
-
     public bool IsNullOrEmpty() => Name.IsNullOrWhiteSpace();
 
     /// <summary>
