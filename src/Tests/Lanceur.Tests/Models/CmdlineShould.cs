@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Xunit;
 
@@ -20,6 +19,59 @@ public class CmdlineShould
         var right = Cmdline.Parse(cmd);
 
         (left == right).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("cmd", "cmd", "")]
+    [InlineData("cmd", " cmd ", "")]
+    [InlineData("cmd", "  cmd  ", "")]
+    [InlineData("cmd", "cmd", " arg1 arg2")]
+    [InlineData("cmd", "cmd", "     arg1 arg2")]
+    [InlineData("%", "%", " arg1 arg2")]
+    [InlineData("$", "$", "arg1 arg2")]
+    public void Build(string asExpected, string cmd, string args)
+    {
+        var line = new Cmdline(cmd, args);
+
+        line.Name.Should().Be(asExpected);
+    }
+
+    [Theory]
+    [InlineData("init", "un deux trois", "quatre cinq six")]
+    [InlineData("move", "un", "quatre cinq six")]
+    [InlineData("move", "", "quatre cinq six")]
+    [InlineData("?", "", "quatre cinq six")]
+    [InlineData("?", "un deux trois", "quatre cinq six")]
+    public void CloneCmdline(string name, string parameters, string newParameters)
+    {
+        // Arrange
+        var cmdline = $"{name} {parameters}";
+        var cmd = Cmdline.Parse(cmdline);
+
+        // Act
+        var newCmd = Cmdline.CloneWithNewParameters(newParameters, cmd);
+
+        // Assert
+        newCmd.Name.Should().Be(name);
+        newCmd.Parameters.Should().Be(newParameters);
+    }
+
+    [Theory]
+    [InlineData("un deux trois")]
+    [InlineData("quatre cinq six")]
+    public void CloneCmdlineWithEmptyParameters(string newParameters)
+    {
+        // Arrange
+        const string name = "init";
+        const string parameters = "un deux trois";
+        var cmd = Cmdline.Parse($"{name} {parameters}");
+
+        // Act
+        var newCmd = Cmdline.CloneWithNewParameters(newParameters, cmd);
+
+        // Assert
+        newCmd.Name.Should().Be(name);
+        newCmd.Parameters.Should().Be(newParameters);
     }
 
     [Theory]
@@ -51,9 +103,9 @@ public class CmdlineShould
     [InlineData(".AAAA aa")]
     public void HandleSpecialCmdCharacter(string cmdline)
     {
-        CmdlineManager.Parse(cmdline)
-                      .Name.Should()
-                      .Be(cmdline[0].ToString());
+        Cmdline.Parse(cmdline)
+               .Name.Should()
+               .Be(cmdline[0].ToString());
     }
 
     [Theory]
@@ -67,7 +119,7 @@ public class CmdlineShould
     [InlineData("a?rg2", "arg1 a?rg2")]
     public void HaveArguments(string asExpected, string actual)
     {
-        var line = CmdlineManager.Parse(actual);
+        var line = Cmdline.Parse(actual);
 
         line.Parameters.Should().Be(asExpected);
     }
@@ -81,15 +133,16 @@ public class CmdlineShould
     [Fact] public void HaveEmptyParametersWhenCtorNull() { new Cmdline(null, null).Parameters.Should().BeEmpty(); }
 
     [Theory]
-    [InlineData("cls", "cls arg1 arg2")]
-    [InlineData("excel", "excel arg1 arg2")]
-    [InlineData("excel", "excel")]
+    [InlineData("cmd", "cmd")]
+    [InlineData("cmd", " cmd ")]
+    [InlineData("cmd", "  cmd  ")]
+    [InlineData("cmd", "cmd arg1 arg2")]
+    [InlineData("cmd", "cmd     arg1 arg2")]
     [InlineData("%", "% arg1 arg2")]
     [InlineData("$", "$arg1 arg2")]
-    [InlineData("a", "a")]
     public void HaveName(string asExpected, string actual)
     {
-        var line = CmdlineManager.Parse(actual);
+        var line = Cmdline.Parse(actual);
 
         line.Name.Should().Be(asExpected);
     }
@@ -120,16 +173,16 @@ public class CmdlineShould
     [InlineData("m&& fff", "m&&")]
     public void RecogniseDoubleOrSingleSpecialChar(string cmdline, string expected)
     {
-        CmdlineManager.Parse(cmdline)
-                      .Name
-                      .Should()
-                      .Be(expected);
+        Cmdline.Parse(cmdline)
+               .Name
+               .Should()
+               .Be(expected);
     }
 
     [Fact]
     public void ReturnsEmptyOnEmptyCmdline()
     {
-        var line = CmdlineManager.Parse(string.Empty);
+        var line = Cmdline.Parse(string.Empty);
 
         line.Name.Should().BeEmpty();
         line.Parameters.Should().BeEmpty();
@@ -138,7 +191,7 @@ public class CmdlineShould
     [Fact]
     public void ReturnsEmptyOnNullCmdline()
     {
-        var line = CmdlineManager.Parse(null);
+        var line = Cmdline.Parse(null);
 
         line.Name.Should().BeEmpty();
         line.Parameters.Should().BeEmpty();
