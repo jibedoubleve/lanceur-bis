@@ -3,32 +3,34 @@ using System.Text.RegularExpressions;
 
 namespace System.SQLite.Updater;
 
-public class ScriptManager
+public partial class ScriptManager
 {
     #region Fields
 
     private readonly Assembly _asm;
     private readonly Regex _regex;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public ScriptManager(Assembly asm, string pattern)
     {
-        if (asm is null) throw new ArgumentNullException(nameof(asm));
-
-        if (pattern is null) throw new ArgumentNullException(nameof(pattern));
+        ArgumentNullException.ThrowIfNull(asm);
+        ArgumentNullException.ThrowIfNull(pattern);
 
         _regex = new(pattern);
         _asm = asm;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
-    public string? GetResource(string resourceName)
+    [GeneratedRegex(@"^.*?(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*")]
+    private static partial Regex RegexSelectVersion();
+
+    public string GetResource(string resourceName)
     {
         using var stream = _asm.GetManifestResourceStream(resourceName);
         if (stream == null)
@@ -41,24 +43,16 @@ public class ScriptManager
         return reader.ReadToEnd();
     }
 
-    public IDictionary<string, string> GetResources()
-    {
-        var dico = new Dictionary<string, string>();
-
-        foreach (var item in ListResources()) dico.Add(item, GetResource(item) ?? "");
-
-        return dico;
-    }
+    public IDictionary<string, string> GetResources() => ListResources().ToDictionary(item => item, GetResource)!;
 
     public ScriptCollection GetScripts()
     {
-        var dico = GetResources();
+        var resources = GetResources();
         var src = new SortedDictionary<Version, string>();
 
-        foreach (var item in dico)
+        foreach (var item in resources)
         {
-            var regex = new Regex(@"^.*?(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*");
-            var match = regex.Matches(item.Key);
+            var match = RegexSelectVersion().Matches(item.Key);
             if (match.Count <= 0 || match[0].Groups.Count < 1) continue;
 
             var ver = match[0].Groups[1].Value.Trim('.');
@@ -73,5 +67,5 @@ public class ScriptManager
     public IEnumerable<string> ListResources() => _asm.GetManifestResourceNames()
                                                       .Where(s => _regex.IsMatch(s));
 
-    #endregion Methods
+    #endregion
 }
