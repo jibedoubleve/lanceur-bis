@@ -30,7 +30,7 @@ public class AliasSearchDbAction
 
     internal IEnumerable<AliasQueryResult> Search(IDbTransaction tx, string name = null, bool isReturnAllIfEmpty = false)
     {
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = _logger.WarnIfSlow(this);
 
         if (name.IsNullOrEmpty() && !isReturnAllIfEmpty) return Array.Empty<AliasQueryResult>();
 

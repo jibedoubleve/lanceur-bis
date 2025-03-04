@@ -76,7 +76,7 @@ public class StoreLoader : IStoreLoader
     public IEnumerable<IStoreService> Load()
     {
         var duration = _settings.Application.Caching.StoreCacheDuration;
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = _logger.WarnIfSlow(this);
         return _memoryCache.GetOrCreate(
             CacheKey,
             IEnumerable<IStoreService> (_) =>

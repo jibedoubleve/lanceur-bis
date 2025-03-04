@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.CompilerServices;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
@@ -9,25 +8,16 @@ public static class LoggerExtensions
 {
     #region Methods
 
-    private static void LogTime(ILogger logger, Type source, string memberName, TimeSpan elapsed, string message, double executionThreshold)
+    private static void WarnIfSlow(ILogger logger, Type source, string memberName, TimeSpan elapsed, double executionThreshold)
     {
         if (elapsed.TotalMilliseconds <= executionThreshold) return;
 
-        if (string.IsNullOrEmpty(message))
-            logger.LogWarning(
-                "Slow execution of {SourceFullName}.{CallerMemberName} in {ElapsedMilliseconds} milliseconds",
-                source.FullName,
-                memberName,
-                elapsed.TotalMilliseconds
-            );
-        else
-            logger.LogWarning(
-                "Slow execution of {SourceFullName}.{CallerMemberName} in {ElapsedMilliseconds} milliseconds. ['{Message}']",
-                source.FullName,
-                memberName,
-                elapsed.TotalMilliseconds,
-                message
-            );
+        logger.LogWarning(
+            "Slow execution of {SourceFullName}.{CallerMemberName} in {ElapsedMilliseconds} milliseconds",
+            source.FullName,
+            memberName,
+            elapsed.TotalMilliseconds
+        );
     }
 
     /// <summary>
@@ -45,25 +35,24 @@ public static class LoggerExtensions
     ///     logging.
     /// </param>
     /// <returns>A <see cref="Measurement" /> object that logs the execution time when disposed.</returns>
-    public static Measurement MeasureExecutionTime(
+    public static Measurement WarnIfSlow(
         this ILogger logger,
         object source,
         double executionThreshold = 100,
         [CallerMemberName] string callerMemberName = null
     )
     {
-        if (logger is null) throw new ArgumentNullException(nameof(logger));
+        ArgumentNullException.ThrowIfNull(logger);
 
         return source is null
             ? Measurement.Empty
             : TimeMeter.Measure(
-                (timespan, message) =>
-                    LogTime(
+                timespan =>
+                    WarnIfSlow(
                         logger,
                         source.GetType(),
                         callerMemberName,
                         timespan,
-                        message,
                         executionThreshold
                     )
             );

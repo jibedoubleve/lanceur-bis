@@ -6,37 +6,31 @@ public sealed class Measurement : IDisposable
 {
     #region Fields
 
-    private readonly Action<TimeSpan, string> _log;
+    private readonly Action<TimeSpan> _log;
     private readonly Stopwatch _stopwatch;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    internal Measurement(Action<TimeSpan, string> log)
+    internal Measurement(Action<TimeSpan> log)
     {
         _log = log;
         _stopwatch = new();
         _stopwatch.Start();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     public static Measurement Empty => new(null);
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
-    private void Log(string message, bool stopTime)
-    {
-        if (stopTime) _stopwatch.Stop();
-        _log?.Invoke(_stopwatch.Elapsed, message);
-    }
+    public void Dispose() => _log?.Invoke(_stopwatch.Elapsed);
 
-    public void Dispose() => Log(string.Empty, true);
-
-    #endregion Methods
+    #endregion
 }

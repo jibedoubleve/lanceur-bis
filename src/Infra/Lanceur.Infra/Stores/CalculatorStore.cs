@@ -44,7 +44,7 @@ public class CalculatorStore :Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        using var time = _logger.MeasureExecutionTime(this);
+        using var time = _logger.WarnIfSlow(this);
         var (isError, result) = Calculator.Evaluate(cmdline.ToString());
 
         /* Hack: if user search for 'gc' the result is

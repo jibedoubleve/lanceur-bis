@@ -61,7 +61,7 @@ public class MacroService : MacroCachedService, IMacroService
     /// <inheritdoc />
     public IEnumerable<QueryResult> ExpandMacroAlias(QueryResult[] collection)
     {
-        using var _ = Logger.MeasureExecutionTime(this);
+        using var _ = Logger.WarnIfSlow(this);
         var result = collection.Select(ExpandMacroAlias)
                                .Where(item => item is not null)
                                .ToArray();

@@ -125,7 +125,7 @@ public class ThumbnailService : IThumbnailService
         var queries = EntityDecorator<QueryResult>.FromEnumerable(queryResults)
                                                   .ToArray();
 
-        using var m = _logger.MeasureExecutionTime(this);
+        using var m = _logger.WarnIfSlow(this);
         try
         {
             _logger.LogTrace("Refreshing thumbnails for {Count} alias", queryResults.Count());
