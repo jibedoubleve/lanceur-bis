@@ -52,10 +52,6 @@ public partial class MostUsedViewModel : ObservableObject
     [RelayCommand]
     private async Task OnRefreshAliases(string selectedYear)
     {
-        var parsed = int.TryParse(selectedYear, out var valYear);
-        _logger.LogTrace("Parsing succeeded: {Parsed}. Value: {ValYear}", parsed, valYear);
-            
-            
         _logger.LogTrace("Refreshing data for {Year}", selectedYear);
         var aliases = int.TryParse(selectedYear, out var year)
             ? await Task.Run(() => _repository.GetMostUsedAliases(year))
