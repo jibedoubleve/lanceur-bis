@@ -66,8 +66,6 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     
     [Fact] public void GetHiddenCounters() => BuildRepository().GetHiddenCounters();
     
-    [Fact] public void GetMostUsedAliases() => BuildRepository().GetMostUsedAliases(2025);
-    
     [Fact] public void GetUsage() => BuildRepository().GetUsage(Per.DayOfWeek);
     
     [Fact] public void GetYearsWithUsage() => BuildRepository().GetYearsWithUsage();

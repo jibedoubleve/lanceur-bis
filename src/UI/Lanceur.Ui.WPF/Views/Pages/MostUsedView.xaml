@@ -51,6 +51,7 @@
             CanUserReorderColumns="False"
             GridLinesVisibility="Vertical"
             HeadersVisibility="none"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True"            
             ItemsSource="{Binding Source={StaticResource AliasCollectionViewSource}}">
             <DataGrid.GroupStyle>
                 <GroupStyle>
@@ -60,20 +61,20 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type GroupItem}">
-                                        <Expander
-                                            Margin="3"
+                                        <HeaderedContentControl
+                                            Margin="5"
                                             Foreground="{DynamicResource AccentTextFillColorTertiaryBrush}"
-                                            IsExpanded="True">
-                                            <Expander.Header>
-                                                <Grid>
+                                            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+                                            <HeaderedContentControl.Header>
+                                                <Grid Margin="15" >
                                                     <Label Panel.ZIndex="10" />
                                                     <ui:RatingControl Value="{Binding Name}" />
                                                 </Grid>
-                                            </Expander.Header>
-                                            <Expander.Content>
+                                            </HeaderedContentControl.Header>
+                                            <HeaderedContentControl.Content>
                                                 <ItemsPresenter />
-                                            </Expander.Content>
-                                        </Expander>
+                                            </HeaderedContentControl.Content>
+                                        </HeaderedContentControl>
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
@@ -81,6 +82,7 @@
                     </GroupStyle.ContainerStyle>
                 </GroupStyle>
             </DataGrid.GroupStyle>
+            
             <ui:DataGrid.Columns>
 
                 <!--  ICON  -->
