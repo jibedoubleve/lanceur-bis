@@ -235,7 +235,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> GetMostUsedAliases()
+    public IEnumerable<UsageQueryResult> GetMostUsedAliases()
     {
         const string sql = $"""
                             select
@@ -247,23 +247,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 by exec_count desc
                             """;
         return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql));
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<QueryResult> GetMostUsedAliases(int year)
-    {
-        ArgumentNullException.ThrowIfNull(year);
-        const string sql = $"""
-                            select
-                            	keywords   as {nameof(UsageQueryResult.Name)},
-                                exec_count as {nameof(UsageQueryResult.Count)}
-                            from
-                                stat_execution_count_by_year_v
-                            where year = @year
-                            order
-                                by exec_count desc
-                            """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql, new { year = year.ToString() }));
     }
 
     /// <inheritdoc />

@@ -121,17 +121,7 @@ public interface IAliasRepository
     ///     Get list of all the aliases with count greater than 0
     /// </summary>
     /// <returns>The list of aliases</returns>
-    IEnumerable<QueryResult> GetMostUsedAliases();
-
-    /// <summary>
-    ///     Retrieves a list of aliases with a count greater than 0 for the specified year.
-    /// </summary>
-    /// <param name="year">The year for which aliases are being retrieved.</param>
-    /// <returns>
-    ///     A collection of <see cref="QueryResult" /> objects, where each item contains the alias name and its associated
-    ///     count.
-    /// </returns>
-    IEnumerable<QueryResult> GetMostUsedAliases(int year);
+    IEnumerable<UsageQueryResult> GetMostUsedAliases();
 
     /// <summary>
     ///     Returns usage trends. The result is meant to be dislayed as a chart

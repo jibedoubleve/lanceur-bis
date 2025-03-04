@@ -4,13 +4,7 @@ public class UsageQueryResult : QueryResult
 {
     #region Properties
 
-    public string Color => Count switch
-    {
-        > 500 => "green",
-        > 100 => "lightgreen",
-        > 50  => "orange",
-        _     => "red"
-    };
+    public int Year { get; set; }
 
-    #endregion Properties
+    #endregion
 }

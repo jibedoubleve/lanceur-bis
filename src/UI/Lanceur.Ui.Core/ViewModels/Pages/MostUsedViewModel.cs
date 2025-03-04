@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
@@ -11,10 +12,11 @@ public partial class MostUsedViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private ObservableCollection<QueryResult> _aliases = new();
+    [ObservableProperty] private ObservableCollection<QueryResult> _aliases = [];
     private readonly ILogger<MostUsedViewModel> _logger;
     private readonly IAliasRepository _repository;
-    [ObservableProperty] private ObservableCollection<string> _years = new();
+    [ObservableProperty] private ObservableCollection<string> _years = [];
+    private IEnumerable<UsageQueryResult> _aliasesCache = [];
 
     #endregion
 
@@ -44,19 +46,26 @@ public partial class MostUsedViewModel : ObservableObject
                            .Select(e => e.ToString())
                            .ToList();
         yearStr.Insert(0, "All time usage");
-        
-        Aliases = new(aliases.Result);
+
+        _aliasesCache = aliases.Result;
         Years = new(yearStr);
     }
 
     [RelayCommand]
     private async Task OnRefreshAliases(string selectedYear)
     {
+        using var _ = _logger.WarnIfSlow(this);
         _logger.LogTrace("Refreshing data for {Year}", selectedYear);
-        var aliases = int.TryParse(selectedYear, out var year)
-            ? await Task.Run(() => _repository.GetMostUsedAliases(year))
-            : await Task.Run(() => _repository.GetMostUsedAliases());
-        Aliases = new(aliases);
+
+        var a = await Task.Run(
+            () =>
+            {
+                return (int.TryParse(selectedYear, out var year))
+                    ? _aliasesCache.Where(x => x.Year >= year)
+                    : _aliasesCache;
+            }
+        );
+        Aliases = new(a);
     }
 
     #endregion
