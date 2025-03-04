@@ -47,7 +47,7 @@ public class AdditionalParametersStore : Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = _logger.WarnIfSlow(this);
         return _aliasService.SearchAliasWithAdditionalParameters(cmdline.Name);
     }
 

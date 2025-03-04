@@ -88,7 +88,7 @@ public class ExecutionService : IExecutionService
     {
         if (query is null) return QueryResult.NoResult;
 
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = _logger.WarnIfSlow(this);
 
         query.Parameters = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
         ExecuteLuaScript(ref query);

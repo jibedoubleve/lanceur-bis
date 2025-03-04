@@ -88,7 +88,7 @@ public class MacroDbAction
     /// </returns>
     internal IEnumerable<AliasQueryResult> UpgradeToComposite(IDbTransaction tx, IEnumerable<AliasQueryResult> collection)
     {
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = _logger.WarnIfSlow(this);
         var list = new List<AliasQueryResult>(collection);
         var composites = list.Where(item => false == item.FileName.IsNullOrEmpty())
                              .Where(item => item.FileName.ToUpper().Contains("@MULTI@"))

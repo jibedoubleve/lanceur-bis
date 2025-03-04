@@ -70,7 +70,7 @@ public class SearchService : ISearchService
     /// <inheritdoc />
     public async Task<IEnumerable<QueryResult>> GetAllAsync()
     {
-        using var measurement = _logger.MeasureExecutionTime(this);
+        using var measurement = _logger.WarnIfSlow(this);
 
         var tasks = Stores.Select(store => Task.Run(store.GetAll));
         var results = (await Task.WhenAll(tasks))
@@ -83,7 +83,7 @@ public class SearchService : ISearchService
     /// <inheritdoc />
     public async Task<IEnumerable<QueryResult>> SearchAsync(Cmdline query, bool doesReturnAllIfEmpty = false)
     {
-        using var measurement = _logger.MeasureExecutionTime(this);
+        using var measurement = _logger.WarnIfSlow(this);
 
         if (doesReturnAllIfEmpty && (query is null || query.IsEmpty)) return await GetAllAsync();
         if (query is null || query.IsEmpty) return new List<QueryResult>();

@@ -46,7 +46,7 @@ public class AliasStore : Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> GetAll()
     {
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = _logger.WarnIfSlow(this);
         var entries = _aliasRepository.GetAll();
         return entries;
     }
@@ -54,7 +54,7 @@ public class AliasStore : Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = _logger.WarnIfSlow(this);
         var entries = _aliasRepository.Search(cmdline.Name).ToArray();
         return entries;
     }

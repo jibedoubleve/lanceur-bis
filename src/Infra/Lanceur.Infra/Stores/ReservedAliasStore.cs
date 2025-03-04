@@ -113,7 +113,7 @@ public class ReservedAliasStore : Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        using var _ = _logger.MeasureExecutionTime(this);
+        using var _ = _logger.WarnIfSlow(this);
         var result = GetAll()
                      .Where(k => k.Name.ToLower().StartsWith(cmdline.Name))
                      .ToList();
