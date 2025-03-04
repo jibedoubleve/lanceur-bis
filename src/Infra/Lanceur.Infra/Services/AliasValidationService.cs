@@ -39,6 +39,24 @@ public class AliasValidationService : IAliasValidationService
 
     #region Methods
 
+    private ValidationStatus IsDeleted(object names, long idAlias)
+    {
+        if (names is null) return ValidationStatus.Valid();
+        if (names is not string s) return ValidationStatus.Valid();
+
+        var nameArray = s.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                         .Select(e => e.Trim())
+                         .ToArray();
+
+        if (nameArray.Length == 0) return ValidationStatus.Valid();
+
+        var existing = _repository.GetExistingDeletedAliases(nameArray, idAlias)
+                                  .ToArray();
+        return existing.Length != 0
+            ? ValidationStatus.Invalid($"These names belong to a deleted alias: '{string.Join(", ", existing)}'. To use these names, restore the alias.")
+            : ValidationStatus.Valid();
+    }
+
     public ValidationStatus AreNamesUnique(object names, long idAlias)
     {
         if (names is null) return ValidationStatus.Invalid("The names cannot be null. Please provide a valid input.");
@@ -48,30 +66,12 @@ public class AliasValidationService : IAliasValidationService
                          .Select(e => e.Trim())
                          .ToArray();
 
-        if (!nameArray.Any()) return ValidationStatus.Invalid("Names are required and cannot be empty.");
+        if (nameArray.Length == 0) return ValidationStatus.Invalid("Names are required and cannot be empty.");
 
         var existing = _repository.GetExistingAliases(nameArray, idAlias)
                                   .ToArray();
-        return existing.Any()
+        return existing.Length != 0
             ? ValidationStatus.Invalid($"These names are already in use for other aliases: '{string.Join(", ", existing)}'")
-            : ValidationStatus.Valid();
-    }
-
-    public ValidationStatus IsDeleted(object names, long idAlias)
-    {
-        if (names is null) return ValidationStatus.Valid();
-        if (names is not string s) return ValidationStatus.Valid();
-
-        var nameArray = s.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                         .Select(e => e.Trim())
-                         .ToArray();
-
-        if (!nameArray.Any()) return ValidationStatus.Valid();
-
-        var existing = _repository.GetExistingDeletedAliases(nameArray, idAlias)
-                                  .ToArray();
-        return existing.Any()
-            ? ValidationStatus.Invalid($"These names belong to a deleted alias: '{string.Join(", ", existing)}'. To use these names, restore the alias.")
             : ValidationStatus.Valid();
     }
 

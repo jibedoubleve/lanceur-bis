@@ -57,7 +57,7 @@ public class MultiMacro : MacroQueryResult
 
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
-        var items = Parameters?.Split('@') ?? Array.Empty<string>();
+        var items = Parameters?.Split('@') ?? [];
         var aliases = new List<AliasQueryResult>();
 
         foreach (var item in items)

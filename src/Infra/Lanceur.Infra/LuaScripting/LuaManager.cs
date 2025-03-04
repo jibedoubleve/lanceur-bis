@@ -11,7 +11,14 @@ public static class LuaManager
 
     public static ScriptResult ExecuteScript(Script script)
     {
-        if (script.Code.IsNullOrWhiteSpace()) return new() { Code    = script.Code ?? string.Empty, Context = new() { FileName = script.Context?.FileName ?? string.Empty, Parameters = script.Context?.Parameters ?? string.Empty } };
+        if (script.Code.IsNullOrWhiteSpace()) return new() 
+            { Code = script.Code ?? string.Empty, 
+                Context = new()
+                {
+                    FileName = script.Context?.FileName ?? string.Empty, 
+                    Parameters = script.Context?.Parameters ?? string.Empty
+                } 
+            };
 
         using var lua = new Lua();
         try
@@ -20,10 +27,18 @@ public static class LuaManager
             lua["context"] = script.Context;
             var result = lua.DoString(script.Code);
 
-            if (!result.Any()) return script.ToScriptResult();
-            if (result[0] is not ScriptContext output) return script.ToScriptResult();
-
-            return new() { Code = script.Code, Context = new() { FileName = output.FileName, Parameters = output.Parameters } };
+            if (result.Length == 0) return script.ToScriptResult();
+            return result[0] is not ScriptContext output 
+                ? script.ToScriptResult() 
+                : new()
+                {
+                    Code = script.Code, 
+                    Context = new()
+                    {
+                        FileName = output.FileName, 
+                        Parameters = output.Parameters
+                    }
+                };
         }
         catch (Exception e) { return new() { Code = script.Code, Exception = e }; }
     }
