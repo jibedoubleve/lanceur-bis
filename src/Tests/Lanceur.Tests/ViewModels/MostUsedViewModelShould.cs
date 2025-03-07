@@ -15,6 +15,8 @@ namespace Lanceur.Tests.ViewModels;
 
 public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
 {
+    private const int HistorySize = 5;
+
     #region Constructors
 
     public MostUsedViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
@@ -33,7 +35,9 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
                                        a.WithUsage(
                                            DateTime.Parse("2025-01-01"),
                                            DateTime.Parse("2025-02-01"),
-                                           DateTime.Parse("2025-03-01")
+                                           DateTime.Parse("2025-03-01"),
+                                           DateTime.Parse("2021-03-01"),
+                                           DateTime.Parse("2022-03-01")
                                        );
                                    }
                                )
@@ -45,7 +49,9 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
                                        a.WithUsage(
                                            DateTime.Parse("2024-01-01"),
                                            DateTime.Parse("2024-02-01"),
-                                           DateTime.Parse("2024-03-01")
+                                           DateTime.Parse("2024-03-01"),
+                                           DateTime.Parse("2021-03-01"),
+                                           DateTime.Parse("2022-03-01")
                                        );
                                    }
                                );
@@ -58,29 +64,6 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
         return serviceCollection;
     }
 
-    [Fact]
-    public async Task ShowAllUsage()
-    {
-        var sqlBuilder = BuildSqlBuilder();
-
-        await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
-                // act
-                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
-                await viewModel.RefreshAliasesCommand.ExecuteAsync("Select all");
-
-                // assert
-                using (new AssertionScope())
-                {
-                    viewModel.Aliases.Should().HaveCount(2);
-                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(3);
-                }
-            },
-            sqlBuilder
-        );
-    }
-
     [Theory]
     [InlineData("")]
     [InlineData("Get all aliases")]
@@ -88,6 +71,7 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
     [InlineData("All")]
     public async Task ShowAllUsageForAll(string filter)
     {
+        var visitor  = new ServiceVisitors() { OverridenConnectionString = ConnectionStringFactory.InDesktop };
         var sqlBuilder = BuildSqlBuilder();
 
         await TestViewModelAsync(
@@ -101,10 +85,11 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
                 using (new AssertionScope())
                 {
                     viewModel.Aliases.Should().HaveCount(2);
-                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(3);
+                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(HistorySize);
                 }
             },
-            sqlBuilder
+            sqlBuilder,
+            visitor
         );
     }
 

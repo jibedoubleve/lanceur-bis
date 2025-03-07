@@ -243,7 +243,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 exec_count as {nameof(UsageQueryResult.Count)},
                                 year       as {nameof(UsageQueryResult.Year)}
                             from
-                                stat_execution_count_v
+                                stat_execution_count_by_year_v
                             order
                                 by exec_count desc
                             """;

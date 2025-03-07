@@ -20,19 +20,3 @@ from
 group by
     su.time_stamp;
 
-/* 
- * View: stat_execution_count_v
- */
-drop view if exists stat_execution_count_v;
-create view stat_execution_count_v as
-select
-    id_keyword as id_keyword,
-    count(*)   as exec_count,
-    keywords   as keywords,
-    year       as year
-    from
-        stat_history_v sh
-    group by
-        id_keyword
-    order by
-        exec_count desc;
