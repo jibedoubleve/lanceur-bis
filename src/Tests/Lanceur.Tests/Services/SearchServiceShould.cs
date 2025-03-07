@@ -6,7 +6,6 @@ using FluentAssertions.Execution;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -16,7 +15,6 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
-using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
@@ -61,7 +59,7 @@ public class SearchServiceShould : TestBase
 
     private ServiceProvider BuildConfigureServices(IServiceCollection serviceCollection = null, ServiceVisitors visitors = null)
     {
-        serviceCollection??= new ServiceCollection();
+        serviceCollection ??= new ServiceCollection();
         serviceCollection.AddMockSingleton<ILoggerFactory>()
                          .AddApplicationSettings(
                              stg => visitors?.VisitSettings?.Invoke(stg)
@@ -74,14 +72,13 @@ public class SearchServiceShould : TestBase
                          .AddMockSingleton<ISearchServiceOrchestrator>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddMemoryCache();
-        
+
         return serviceCollection.BuildServiceProvider();
     }
 
     [Fact]
     public void HaveStores()
     {
-
         var serviceProvider = BuildConfigureServices();
         var service = serviceProvider.GetService<SearchService>();
         service.Stores.Should().HaveCountGreaterThan(4);
@@ -119,9 +116,7 @@ public class SearchServiceShould : TestBase
          * Check counter is still -1
          */
         OutputHelper.Arrange();
-        var sql = new SqlBuilder().AppendAlias(1)
-                                  .AppendSynonyms(1, "a")
-                                  .ToString();
+        var sql = new SqlBuilder().AppendAlias(1,aliasSql: a => a.WithSynonyms("a", "b")).ToString();
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         var converter = Substitute.For<IMappingService>();
@@ -316,11 +311,16 @@ public class SearchServiceShould : TestBase
     public void SetUsageDoesNotResetAdditionalParameters()
     {
         OutputHelper.Arrange();
-        var sql = new SqlBuilder().AppendAlias(1)
-                                  .AppendSynonyms(1, "a")
-                                  .AppendArgument(1)
-                                  .AppendArgument(1)
-                                  .AppendArgument(1)
+        var sql = new SqlBuilder().AppendAlias(
+                                      1,
+                                      aliasSql: a =>
+                                      {
+                                          a.WithSynonyms("a");
+                                          a.WithArgument();
+                                          a.WithArgument();
+                                          a.WithArgument();
+                                      }
+                                  )
                                   .ToString();
 
         var connectionManager = new DbSingleConnectionManager(BuildFreshDb(sql));

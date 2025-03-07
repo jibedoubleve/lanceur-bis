@@ -23,22 +23,40 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
 
     #region Methods
 
+    private static SqlBuilder BuildSqlBuilder()
+    {
+        return new SqlBuilder().AppendAlias(
+                                   1,
+                                   aliasSql: a =>
+                                   {
+                                       a.WithSynonyms("a");
+                                       a.WithUsage(
+                                           DateTime.Parse("2025-01-01"),
+                                           DateTime.Parse("2025-02-01"),
+                                           DateTime.Parse("2025-03-01")
+                                       );
+                                   }
+                               )
+                               .AppendAlias(
+                                   2,
+                                   aliasSql: a =>
+                                   {
+                                       a.WithSynonyms("b");
+                                       a.WithUsage(
+                                           DateTime.Parse("2024-01-01"),
+                                           DateTime.Parse("2024-02-01"),
+                                           DateTime.Parse("2024-03-01")
+                                       );
+                                   }
+                               );
+    }
+
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
         serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>();
         return serviceCollection;
     }
-
-    private static SqlBuilder BuildSqlBuilder() => new SqlBuilder()
-                                                   .AppendAlias(1, synonyms: ["a"])
-                                                   .AppendUsage(1, DateTime.Parse("2025-01-01"))
-                                                   .AppendUsage(1, DateTime.Parse("2025-02-01"))
-                                                   .AppendUsage(1, DateTime.Parse("2025-03-01"))
-                                                   .AppendAlias(2, synonyms: ["b"])
-                                                   .AppendUsage(2, DateTime.Parse("2024-01-01"))
-                                                   .AppendUsage(2, DateTime.Parse("2024-02-01"))
-                                                   .AppendUsage(2, DateTime.Parse("2024-03-01"));
 
     [Fact]
     public async Task ShowAllUsage()
@@ -56,7 +74,34 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
                 using (new AssertionScope())
                 {
                     viewModel.Aliases.Should().HaveCount(2);
-                    foreach (var alias in viewModel.Aliases) { alias.Count.Should().Be(3); }
+                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(3);
+                }
+            },
+            sqlBuilder
+        );
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("Get all aliases")]
+    [InlineData(null)]
+    [InlineData("All")]
+    public async Task ShowAllUsageForAll(string filter)
+    {
+        var sqlBuilder = BuildSqlBuilder();
+
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                // act
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
+                await viewModel.RefreshAliasesCommand.ExecuteAsync(filter);
+
+                // assert
+                using (new AssertionScope())
+                {
+                    viewModel.Aliases.Should().HaveCount(2);
+                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(3);
                 }
             },
             sqlBuilder
@@ -77,43 +122,16 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
                 // act
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
                 await viewModel.RefreshAliasesCommand.ExecuteAsync(year);
-                
+
                 // assert 
                 using (new AssertionScope())
                 {
-                    viewModel.Aliases.Should().HaveCount(1); 
-                    foreach (var alias in viewModel.Aliases) { alias.Count.Should().Be(3); }
+                    viewModel.Aliases.Should().HaveCount(1);
+                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(3);
                 }
             },
             sqlBuilder,
             visitors
-        );
-    }
-    
-    [Theory]
-    [InlineData("")]
-    [InlineData("Get all aliases")]
-    [InlineData(null)]
-    [InlineData("All")]
-    public async Task ShowAllUsageForAll(string filter)
-    {
-        var sqlBuilder = BuildSqlBuilder();
-
-        await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
-                // act
-                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
-                await viewModel.RefreshAliasesCommand.ExecuteAsync(filter);
-                
-                // assert
-                using (new AssertionScope())
-                {
-                    viewModel.Aliases.Should().HaveCount(2); 
-                    foreach (var alias in viewModel.Aliases) { alias.Count.Should().Be(3); }
-                }
-            },
-            sqlBuilder
         );
     }
 

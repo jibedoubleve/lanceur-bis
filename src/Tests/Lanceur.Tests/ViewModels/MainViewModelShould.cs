@@ -144,9 +144,9 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
     public async Task BeAbleToSearchAliases()
     {
         // ARRANGE
-        var sqlBuilder = new SqlBuilder().AppendAlias(1, synonyms: ["alias1", "alias_1"])
-                                         .AppendAlias(2, synonyms: ["alias2", "alias_2"])
-                                         .AppendAlias(3, synonyms: ["alias3", "alias_3"]);
+        var sqlBuilder = new SqlBuilder().AppendAlias(1,aliasSql: a=> a.WithSynonyms("alias1", "alias_1"))
+                                         .AppendAlias(2,aliasSql: a=> a.WithSynonyms("alias2", "alias_2"))
+                                         .AppendAlias(3,aliasSql: a=> a.WithSynonyms("alias3", "alias_3"));
 
 
         await TestViewModelAsync(
@@ -168,9 +168,9 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
     [InlineData(false, 0)]
     public async Task ShowAllResultsOrNotDependingOnConfiguration(bool showAllResults, int count)
     {
-        var builder = new SqlBuilder().AppendAlias(1, synonyms: ["alias1", "alias_1"])
-                                      .AppendAlias(2, synonyms: ["alias2", "alias_2"])
-                                      .AppendAlias(3, synonyms: ["alias3", "alias_3"]);
+        var builder = new SqlBuilder().AppendAlias(1, aliasSql: a => a.WithSynonyms("alias1", "alias_1"))
+                                      .AppendAlias(2, aliasSql: a => a.WithSynonyms("alias2", "alias_2"))
+                                      .AppendAlias(3, aliasSql: a => a.WithSynonyms("alias3", "alias_3"));
 
         var visitors = new ServiceVisitors
         {
