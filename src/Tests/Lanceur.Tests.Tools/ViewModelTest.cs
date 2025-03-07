@@ -1,7 +1,6 @@
 using Lanceur.Infra.SQLite.DataAccess;
-using Lanceur.Tests.Tooling;
-using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

@@ -1,7 +1,7 @@
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
-using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Tests.Tools;
+using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
@@ -12,11 +12,11 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class AnaliticsViewModelShould : ViewModelTest<AnalyticsViewModel>
+public class AnalyticsViewModelShould : ViewModelTest<AnalyticsViewModel>
 {
     #region Constructors
 
-    public AnaliticsViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public AnalyticsViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
