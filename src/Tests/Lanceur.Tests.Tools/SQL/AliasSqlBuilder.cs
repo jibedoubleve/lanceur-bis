@@ -55,6 +55,7 @@ public class AliasSqlBuilder
         {
             var dateStr = date.ToString("o", CultureInfo.InvariantCulture);
             _sql.Append($"insert into alias_usage (id_alias, time_stamp) values ({_idAlias}, '{dateStr}');");
+            _sql.AppendNewLine();
         }
 
         return this;
