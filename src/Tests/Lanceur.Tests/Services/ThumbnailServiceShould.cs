@@ -29,32 +29,63 @@ public class ThumbnailServiceShould : TestBase
     public void RefreshThumbnailsWithoutRemovingAdditionalParameters()
     {
         // ARRANGE
-        var sql = new SqlBuilder().AppendAlias(1, "fileName1", "arguments1")
-                                  .AppendSynonyms(1, "a1", "a2", "a3")
-                                  .AppendArgument(1, "name_0", "argument_0")
-                                  .AppendArgument(1, "name_0", "argument_0")
-                                  //--
-                                  .AppendAlias(110, "fileName2", "arguments2")
-                                  .AppendSynonyms(110, "aa1", "ab2", "ab3")
-                                  .AppendArgument(110, "name_0", "argument_0")
-                                  .AppendArgument(110, "name_0", "argument_0")
-                                  //--
-                                  .AppendAlias(120, "fileName3", "arguments3")
-                                  .AppendSynonyms(120, "ac1", "ac2", "ac3")
-                                  .AppendArgument(120, "name_0", "argument_0")
-                                  .AppendArgument(120, "name_0", "argument_0")
+        var sql = new SqlBuilder().AppendAlias(
+                                      1,
+                                      "fileName1",
+                                      "some parameters 1",
+                                      a =>
+                                      {
+                                          a.WithSynonyms("a1", "a2", "a3");
+                                          a.WithArgument("name_0", "argument_0");
+                                          a.WithArgument("name_0", "argument_0");
+                                      }
+                                  )
+                                  .AppendAlias(
+                                      110,
+                                      "fileName2",
+                                      "some parameters 2",
+                                      a =>
+                                      {
+                                          a.WithSynonyms("aa1", "ab2", "ab3");
+                                          a.WithArgument("name_0", "argument_0");
+                                          a.WithArgument("name_0", "argument_0");
+                                      }
+                                  )
+                                  .AppendAlias(
+                                      120,
+                                      "fileName3",
+                                      "some parameters 3",
+                                      a =>
+                                      {
+                                          a.WithSynonyms("ac1", "ac2", "ac3");
+                                          a.WithArgument("name_0", "argument_0");
+                                          a.WithArgument("name_0", "argument_0");
+                                      }
+                                  )
                                   .ToString();
 
-        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
+        OutputHelper.WriteLine(sql);
+        var connectionString = ConnectionStringFactory.InMemory.ToString();
+        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql, connectionString));
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
         var conversionService = new AutoMapperMappingService();
-        var dbRepository = new SQLiteAliasRepository(connectionMgr, loggerFactory, conversionService, new DbActionFactory(new AutoMapperMappingService(), loggerFactory));
+        var dbRepository = new SQLiteAliasRepository(
+            connectionMgr,
+            loggerFactory,
+            conversionService,
+            new DbActionFactory(new AutoMapperMappingService(), loggerFactory)
+        );
 
         var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();
         var favIconManager = Substitute.For<IFavIconService>();
-        var thumbnailService = new ThumbnailService(loggerFactory, dbRepository, packagedAppSearchService, favIconManager);
-        
+        var thumbnailService = new ThumbnailService(
+            loggerFactory,
+            dbRepository,
+            packagedAppSearchService,
+            favIconManager
+        );
+
         var aliases = dbRepository.Search("a");
 
         // ACT

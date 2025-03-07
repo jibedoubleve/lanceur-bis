@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using Lanceur.SharedKernel.Extensions;
 
@@ -28,8 +27,8 @@ public class SqlBuilder
     #endregion
 
     #region Methods
-    
-    public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, string[]? synonyms = null)
+
+    public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, Action<AliasSqlBuilder>? aliasSql = null)
     {
         fileName ??= Guid.NewGuid().ToString();
         arguments ??= Guid.NewGuid().ToString();
@@ -37,44 +36,12 @@ public class SqlBuilder
         _sql.Append($"insert into alias (id, file_name, arguments) values ({idAlias}, '{fileName}', '{arguments}');");
         _sql.AppendNewLine();
 
-        if (synonyms is null) return this;
-
-        AppendSynonyms(idAlias, synonyms);
-        return this;
-    }
-
-    public SqlBuilder AppendUsage(int idAlias, DateTime date)
-    {
-        var dateStr = date.ToString("o", CultureInfo.InvariantCulture);
-        _sql.Append($"insert into alias_usage (id_alias, time_stamp) values ({idAlias}, '{dateStr}');");
-        return this;
-    }
-    public SqlBuilder AppendArgument(long idAlias, string? name = null, string? argument = null)
-    {
-        name ??= Guid.NewGuid().ToString();
-        argument ??= Guid.NewGuid().ToString();
-
-        _sql.Append($"insert into alias_argument(id_alias, name, argument) values ({idAlias}, '{name}', '{argument}');");
-        _sql.AppendNewLine();
-        return this;
-    }
-
-    public SqlBuilder AppendSynonyms(long idAlias, params string[] synonyms)
-    {
-        if (synonyms is null || synonyms.Length == 0) throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias");
-
-        foreach (var synonym in synonyms)
-        {
-            _sql.Append($"insert into alias_name(id_alias, name) values ({idAlias}, '{synonym}');");
-            _sql.AppendNewLine();
-        }
-
+        var builder = new AliasSqlBuilder(idAlias, _sql);
+        aliasSql?.Invoke(builder);
         return this;
     }
 
     public override string ToString() => _sql.ToString();
 
     #endregion
-
-    
 }

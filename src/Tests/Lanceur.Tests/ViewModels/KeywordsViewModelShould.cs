@@ -69,70 +69,6 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     }
 
     [Fact]
-    public async Task CreateAliasWorkOnSecondNavigation()
-    {
-        var sqlBuilder = new SqlBuilder();
-        sqlBuilder.AppendAlias(1)
-                  .AppendAlias(2)
-                  .AppendAlias(3);
-        await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
-                // ARRANGE
-                const string cmdName = "add";
-                const string parameters = "aliasToCreate";
-                var cmdline = new Cmdline(cmdName, parameters);
-
-                // ACT
-                await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate navigate to this page once
-                
-                viewModel.CreateAliasCommand.Execute(new(cmdline));
-                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
-
-                // ASSERT
-                using (new AssertionScope())
-                {
-                    viewModel.SelectedAlias.Should().NotBeNull();
-                    viewModel.Aliases.Should().HaveCount(4);
-                    
-                    viewModel.SelectedAlias!.Id.Should().Be(0);
-                    viewModel.SelectedAlias!.Name.Should().Be(parameters);
-                    viewModel.SelectedAlias!.Synonyms.Should().Be(parameters);
-                }
-            },
-            sqlBuilder
-        );
-    }
-    
-    
-    [Theory]
-    [InlineData("")]
-    [InlineData(null)]
-    [InlineData(" ")]
-    public async Task ListAllAliasOnEmptySearch(string criterion)
-    {
-        var sqlBuilder = new SqlBuilder();
-        sqlBuilder.AppendAlias(1)
-                  .AppendAlias(2)
-                  .AppendAlias(3);
-        await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
-                // ARRANGE
-
-                // ACT
-                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
-                viewModel.SearchCommand.Execute(criterion);
-
-                // ASSERT
-                viewModel.Aliases.Should().HaveCount(3);
-                
-            },
-            sqlBuilder
-        );
-    }
-
-    [Fact]
     public async Task CreateAliasWithAddKeyword()
     {
         var sqlBuilder = new SqlBuilder();
@@ -149,7 +85,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
 
                 // ACT
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate first navigation to this page
-                
+
                 WeakReferenceMessenger.Default.Send(new AddAliasMessage(cmdline));
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate navigate to this page
                 await viewModel.SaveCurrentAliasCommand.ExecuteAsync(cmdline);
@@ -197,6 +133,42 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
                 alias.Field.Should().Be(script);
             },
             SqlBuilder.Empty
+        );
+    }
+
+    [Fact]
+    public async Task CreateAliasWorkOnSecondNavigation()
+    {
+        var sqlBuilder = new SqlBuilder();
+        sqlBuilder.AppendAlias(1)
+                  .AppendAlias(2)
+                  .AppendAlias(3);
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                // ARRANGE
+                const string cmdName = "add";
+                const string parameters = "aliasToCreate";
+                var cmdline = new Cmdline(cmdName, parameters);
+
+                // ACT
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate navigate to this page once
+
+                viewModel.CreateAliasCommand.Execute(new(cmdline));
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
+
+                // ASSERT
+                using (new AssertionScope())
+                {
+                    viewModel.SelectedAlias.Should().NotBeNull();
+                    viewModel.Aliases.Should().HaveCount(4);
+
+                    viewModel.SelectedAlias!.Id.Should().Be(0);
+                    viewModel.SelectedAlias!.Name.Should().Be(parameters);
+                    viewModel.SelectedAlias!.Synonyms.Should().Be(parameters);
+                }
+            },
+            sqlBuilder
         );
     }
 
@@ -296,6 +268,33 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
         );
     }
 
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    [InlineData(" ")]
+    public async Task ListAllAliasOnEmptySearch(string criterion)
+    {
+        var sqlBuilder = new SqlBuilder();
+        sqlBuilder.AppendAlias(1)
+                  .AppendAlias(2)
+                  .AppendAlias(3);
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                // ARRANGE
+
+                // ACT
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
+                viewModel.SearchCommand.Execute(criterion);
+
+                // ASSERT
+                viewModel.Aliases.Should().HaveCount(3);
+            },
+            sqlBuilder
+        );
+    }
+
     [Fact]
     public async Task NotBeAbleToCreateAliasWithDeletedAliasName()
     {
@@ -364,8 +363,18 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
     [Fact]
     public async Task NotRecreateAliasOnLoad()
     {
-        var builder = new SqlBuilder().AppendAlias(1, "un", "", ["deux"])
-                                      .AppendAlias(2, "deux", "", ["trois"]);
+        var builder = new SqlBuilder().AppendAlias(
+                                          1,
+                                          "un",
+                                          "params un",
+                                          a => a.WithSynonyms("deux")
+                                      )
+                                      .AppendAlias(
+                                          2,
+                                          "deux",
+                                          "params deux",
+                                          a => a.WithSynonyms("trois")
+                                      );
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModelAsync(
             async (viewModel, _) =>
