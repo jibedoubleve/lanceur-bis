@@ -61,7 +61,7 @@ public partial class MostUsedViewModel : ObservableObject
             () =>
             {
                 return (int.TryParse(selectedYear, out var year))
-                    ? _aliasesCache.Where(x => x.Year >= year)
+                    ? _aliasesCache.Where(x => x.Year == year)
                     : _aliasesCache;
             }
         );
