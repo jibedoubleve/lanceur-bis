@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using System.Reflection;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -13,11 +12,10 @@ using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
-using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tooling.Extensions;
-using Lanceur.Tests.Tooling.SQL;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.StateTesters;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;

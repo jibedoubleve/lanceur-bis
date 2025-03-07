@@ -1,7 +1,8 @@
+using System.Globalization;
 using System.Text;
 using Lanceur.SharedKernel.Extensions;
 
-namespace Lanceur.Tests.Tooling.SQL;
+namespace Lanceur.Tests.Tools.SQL;
 
 public class SqlBuilder
 {
@@ -42,6 +43,12 @@ public class SqlBuilder
         return this;
     }
 
+    public SqlBuilder AppendUsage(int idAlias, DateTime date)
+    {
+        var dateStr = date.ToString("o", CultureInfo.InvariantCulture);
+        _sql.Append($"insert into alias_usage (id_alias, time_stamp) values ({idAlias}, '{dateStr}');");
+        return this;
+    }
     public SqlBuilder AppendArgument(long idAlias, string? name = null, string? argument = null)
     {
         name ??= Guid.NewGuid().ToString();
@@ -68,4 +75,6 @@ public class SqlBuilder
     public override string ToString() => _sql.ToString();
 
     #endregion
+
+    
 }

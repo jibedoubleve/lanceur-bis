@@ -240,7 +240,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         const string sql = $"""
                             select
                             	keywords   as {nameof(UsageQueryResult.Name)},
-                                exec_count as {nameof(UsageQueryResult.Count)}
+                                exec_count as {nameof(UsageQueryResult.Count)},
+                                year       as {nameof(UsageQueryResult.Year)}
                             from
                                 stat_execution_count_v
                             order
