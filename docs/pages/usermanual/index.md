@@ -2,6 +2,7 @@
 layout: page
 title: User Manual
 nav_order: 2
+permalink: user-manual
 ---
 
 # User Manual
@@ -49,4 +50,4 @@ then to search for "_aeroplane_" in Google, you would type:
 
 `search aeroplane`.
 
-> The use of `$W$` is explained [HERE](UM_new_keyword#predefined-keywords).
+> The use of `$W$` is explained [HERE](keywords-macros-wildcards/).

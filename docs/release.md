@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Releases
-nav_order: 1
+nav_order: 10
 ---
 
 # Releases
