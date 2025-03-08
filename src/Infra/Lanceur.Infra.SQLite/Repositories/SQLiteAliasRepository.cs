@@ -240,14 +240,30 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         const string sql = $"""
                             select
                             	keywords   as {nameof(UsageQueryResult.Name)},
-                                exec_count as {nameof(UsageQueryResult.Count)},
-                                year       as {nameof(UsageQueryResult.Year)}
+                                exec_count as {nameof(UsageQueryResult.Count)}
                             from
-                                stat_execution_count_by_year_v
+                                stat_execution_count_v
                             order
                                 by exec_count desc
                             """;
         return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql));
+    }
+    
+    /// <inheritdoc />
+    public IEnumerable<UsageQueryResult> GetMostUsedAliasesByYear(int year)
+    {
+        const string sql = $"""
+                            select
+                            	keywords   as {nameof(UsageQueryResult.Name)},
+                                exec_count as {nameof(UsageQueryResult.Count)},
+                                year       as {nameof(UsageQueryResult.Year)}
+                            from
+                                stat_execution_count_by_year_v
+                            where year = @year
+                            order
+                                by exec_count desc
+                            """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql, new { year = $"{year}" }));
     }
 
     /// <inheritdoc />

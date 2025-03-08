@@ -124,6 +124,13 @@ public interface IAliasRepository
     IEnumerable<UsageQueryResult> GetMostUsedAliases();
 
     /// <summary>
+    ///     Retrieves the most used aliases for a given year.
+    /// </summary>
+    /// <param name="year">The year for which to retrieve alias usage statistics.</param>
+    /// <returns>A collection of <see cref="UsageQueryResult" /> representing the most used aliases for the specified year.</returns>
+    IEnumerable<UsageQueryResult> GetMostUsedAliasesByYear(int year);
+
+    /// <summary>
     ///     Returns usage trends. The result is meant to be dislayed as a chart
     /// </summary>
     /// <param name="per">The level of the trend. Can be hour, day, day of week or month</param>
