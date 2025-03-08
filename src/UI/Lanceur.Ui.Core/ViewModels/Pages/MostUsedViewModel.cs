@@ -12,7 +12,7 @@ public partial class MostUsedViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private ObservableCollection<QueryResult> _aliases = [];
+    [ObservableProperty] private ObservableCollection<UsageQueryResult> _aliases = [];
     private readonly ILogger<MostUsedViewModel> _logger;
     private readonly IAliasRepository _repository;
     [ObservableProperty] private ObservableCollection<string> _years = [];
@@ -58,12 +58,9 @@ public partial class MostUsedViewModel : ObservableObject
         _logger.LogTrace("Refreshing data for {Year}", selectedYear);
 
         var a = await Task.Run(
-            () =>
-            {
-                return (int.TryParse(selectedYear, out var year))
-                    ? _aliasesCache.Where(x => x.Year == year)
-                    : _aliasesCache;
-            }
+            () => int.TryParse(selectedYear, out var year)
+                ? _repository.GetMostUsedAliasesByYear(year)
+                : _aliasesCache
         );
         Aliases = new(a);
     }
