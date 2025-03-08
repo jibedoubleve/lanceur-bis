@@ -12,6 +12,13 @@ plugins:
 aux_links:
   Lanceur on GitHub: https://github.com/jibedoubleve/lanceur-bis
 
+nav_external_links:
+  - title: Releases download page
+    url: https://github.com/jibedoubleve/lanceur-bis/releases
+    hide_icon: false
+    opens_in_new_tab: true
+
+
 color_scheme: dark
 
 callouts:
