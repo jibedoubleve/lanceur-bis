@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +32,8 @@ public partial class ProcessFinderButton
     );
 
     private readonly Cursor _crosshairsCursor;
-    private readonly ILogger<ProcessFinderButton> _logger = Ioc.Default.GetService<ILogger<ProcessFinderButton>>()!;
+    private readonly ILogger<ProcessFinderButton> _logger;
+    private readonly IUserNotificationService _notify;
     private static readonly Point CursorHotSpot = new(16, 20);
 
     #endregion
@@ -41,6 +43,8 @@ public partial class ProcessFinderButton
     public ProcessFinderButton()
     {
         InitializeComponent();
+        _logger = Ioc.Default.GetService<ILogger<ProcessFinderButton>>()!;
+        _notify = Ioc.Default.GetService<IUserNotificationService>()!;
         _crosshairsCursor = ConvertToCursor(WindowInfoControl, CursorHotSpot);
     }
 
@@ -144,14 +148,21 @@ public partial class ProcessFinderButton
             base.OnMouseLeftButtonUp(e);
             IconCrossHair.Visibility = Visibility.Visible;
 
-            var ps = ProcessHelper.GetExecutablePath();
+            var ps = ProcessHelper.GetExecutablePathAtMousePosition();
             ProcessName = ps.FileName;
             FileDescription = ps.FileDescription;
-
+        }
+        catch (Exception ex)
+        {
+            const string msg = "Failed to retrieve the executable path of the process under the mouse cursor.";
+            _logger.LogWarning(ex, msg);
+            _notify.Warn($"{msg}\r\n{ex.Message}");
+        }
+        finally
+        {
             ReleaseMouseCapture();
             Cursor = null;
         }
-        catch (Exception ex) { _logger.LogError(ex, "An error occured when trying to retrieve the path of the executable with the mouse"); }
     }
 
     protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
