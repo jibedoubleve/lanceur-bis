@@ -29,7 +29,6 @@ public partial class MainView
     #region Fields
 
     private readonly IDatabaseConfigurationService _databaseConfig;
-    private readonly IHotKeyService _hotKeyService;
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly ISettingsFacade _settings;
@@ -58,7 +57,6 @@ public partial class MainView
         _logger = logger;
         _serviceProvider = serviceProvider;
         _settings = settings;
-        _hotKeyService = hotKeyService;
         _databaseConfig = databaseConfig;
 
         DataContext = viewModel;
