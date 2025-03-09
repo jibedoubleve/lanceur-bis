@@ -4,11 +4,9 @@ using System.Runtime.InteropServices;
 
 namespace Lanceur.Core.Utils;
 
-public class ProcessHelper
+public static class ProcessHelper
 {
     #region Methods
-
-    private static Exception GenericException(Exception ex) => new NotSupportedException($"Cannot find the executable path: {ex.Message}", ex);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -23,10 +21,24 @@ public class ProcessHelper
     [DllImport("user32.dll", SetLastError = true)]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-    [DllImport("user32.dll")]
-    private static extern IntPtr WindowFromPoint(Win32Point point);
+    [DllImport("user32.dll")] private static extern IntPtr WindowFromPoint(Win32Point point);
 
-    public static PsInfo GetExecutablePath()
+    /// <summary>
+    ///     Retrieves the file path and description of the executable associated with the process
+    ///     under the current mouse position.
+    /// </summary>
+    /// <returns>
+    ///     A tuple containing the executable file path and its description. Returns <c>(null, null)</c>
+    ///     if the information is unavailable.
+    /// </returns>
+    /// <exception cref="NotSupportedException">
+    ///     Thrown when the application lacks sufficient permissions to access the target process.
+    ///     Administrative privileges may be required.
+    /// </exception>
+    /// <exception cref="Exception">
+    ///     Thrown for any other unexpected errors encountered while retrieving process information.
+    /// </exception>
+    public static (string FileName, string FileDescription) GetExecutablePathAtMousePosition()
     {
         try
         {
@@ -34,30 +46,23 @@ public class ProcessHelper
             var point = Win32Point.NewPoint(c.X, c.Y);
             var hWnd = WindowFromPoint(point);
 
-            var threadId = GetWindowThreadProcessId(hWnd, out var processId);
-
+            _ = GetWindowThreadProcessId(hWnd, out var processId);
             var ps = Process.GetProcessById((int)processId);
-            var fileName = ps.MainModule.FileName;
-            var fileDescription = ps.MainModule.FileVersionInfo.FileDescription;
-
-            return new()
-            {
-                HWnd = $"ThreadId: {threadId} - ProcessId: {processId} - hWnd: {hWnd}",
-                FileName = fileName,
-                FileDescription = fileDescription
-            };
+            return ps.GetInformation();
         }
         catch (Win32Exception ex)
         {
             if (ex.ErrorCode.ToString("X") == "80004005")
-                throw new NotSupportedException($"You don't have sufficient right to access the process. You probably must have administration rights for this application, which is not yet supported.", ex);
-            else
-                throw GenericException(ex);
+                throw new NotSupportedException(
+                    "You don't have sufficient right to access the process. You probably must have administration rights for this application, which is not yet supported.",
+                    ex
+                );
+
+            throw new NotSupportedException($"Cannot find the executable path: {ex.Message}", ex);
         }
-        catch (Exception ex) { throw GenericException(ex); }
     }
 
-    #endregion Methods
+    #endregion
 
     #region Structs
 
