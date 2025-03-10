@@ -106,9 +106,7 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            using var _  = _interactionHub.Notifications.TrackLoadingState();
             if (SelectedResult is null) return;
-
             if (SelectedResult.IsExecutionConfirmationRequired)
             {
                 var result = await _interactionHub.Interactions.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
