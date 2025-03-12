@@ -27,10 +27,7 @@ public class AliasDbAction
 
     private void ClearAlias(IDbTransaction tx, params long[] ids)
     {
-        const string sql = """
-                           delete from alias
-                           where id = @id
-                           """;
+        const string sql = "delete from alias where id = @id";
 
         var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
@@ -39,10 +36,7 @@ public class AliasDbAction
 
     private void ClearAliasArgument(IDbTransaction tx, params long[] ids)
     {
-        const string sql = """
-                           delete from alias_argument
-                           where id_alias = @id
-                           """;
+        const string sql = "delete from alias_argument where id_alias = @id";
 
         var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
@@ -51,10 +45,7 @@ public class AliasDbAction
 
     private void ClearAliasName(IDbTransaction tx, params long[] ids)
     {
-        const string sql = """
-                           delete from alias_name
-                           where id_alias = @id
-                           """;
+        const string sql = "delete from alias_name where id_alias = @id";
 
         var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
@@ -63,10 +54,7 @@ public class AliasDbAction
 
     private void ClearAliasUsage(IDbTransaction tx, params long[] ids)
     {
-        const string sql = """
-                           delete from alias_usage
-                           where id_alias = @id;
-                           """;
+        const string sql = "delete from alias_usage where id_alias = @id;";
 
         var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);

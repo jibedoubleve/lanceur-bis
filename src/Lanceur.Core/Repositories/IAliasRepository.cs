@@ -160,12 +160,27 @@ public interface IAliasRepository
     void HydrateMacro(QueryResult alias);
 
     /// <summary>
+    ///     Moves the history from the specified aliases (identified by their primary keys)
+    ///     to the target alias identified by its primary key.
+    /// </summary>
+    /// <param name="fromAliases">A collection of primary keys representing the source aliases.</param>
+    /// <param name="toAlias">The primary key of the target alias to which the history will be moved.</param>
+    void MergeHistory(IEnumerable<long> fromAliases, long toAlias);
+
+    /// <summary>
+    ///     Removes the specified aliases from the database.
+    ///     This operation also deletes their usage history, additional parameters, and associated synonyms.
+    /// </summary>
+    /// <param name="aliases">A collection of aliases to be removed.</param>
+    void Remove(IEnumerable<AliasQueryResult> aliases);
+
+    /// <summary>
     ///     Marks the specified alias as removed from the repository.
     ///     This is a logical removal; the alias remains in the database
     ///     but is flagged as deleted and excluded from subsequent queries.
     /// </summary>
     /// <param name="alias">The alias to mark as removed from the repository.</param>
-    void Remove(AliasQueryResult alias);
+    void RemoveLogically(AliasQueryResult alias);
 
     /// <summary>
     ///     Marks the specified list of aliases as removed from the repository.
@@ -173,7 +188,7 @@ public interface IAliasRepository
     ///     but are flagged as deleted and excluded from subsequent queries.
     /// </summary>
     /// <param name="aliases">The list of aliases to mark as removed from the repository.</param>
-    void Remove(IEnumerable<AliasQueryResult> aliases);
+    void RemoveLogically(IEnumerable<AliasQueryResult> aliases);
 
     /// <summary>
     ///     Restores the specified aliases by reversing their logical deletion status.

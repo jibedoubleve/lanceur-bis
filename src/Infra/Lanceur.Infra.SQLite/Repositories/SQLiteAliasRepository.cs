@@ -138,31 +138,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public AliasQueryResult GetById(long id) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
 
     /// <inheritdoc />
-    public Dictionary<string, (long Id, int Counter)> GetHiddenCounters() => Db.WithinTransaction(
-        tx =>
-        {
-            const string sql = """
-                               select 
-                                    a.Id                    as Id,
-                                    an.name                 as AliasName,
-                                    ifnull(a.exec_count, 0) as Counter
-                               from 
-                                    alias a
-                                    inner join alias_name an on a.id = an.id_alias
-                               where 
-                               	    a.hidden is true
-                                    and a.deleted_at is null
-                                    and an.name = a.file_name
-                               order by a.id desc
-                               """;
-            var dictionary = tx.Connection!.Query<dynamic>(sql)
-                               .Select(e => new { Key = e.AliasName, Value = ((long)e.Id, (int)e.Counter) })
-                               .ToDictionary(e => (string)e.Key, e => e.Value);
-            return dictionary;
-        }
-    );
-
-    /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetDeletedAlias()
     {
         const string sql = $"""
@@ -203,22 +178,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<string> GetExistingDeletedAliases(IEnumerable<string> aliasesToCheck, long idAlias)
-    {
-        const string  sql = """
-                            select name
-                            from
-                                alias_name an
-                                inner join alias a on a.id = an.id_alias
-                            where 
-                                name in @names
-                                and a.deleted_at is not null
-                                and id_alias != @idAlias
-                            """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
-    }
-    
-    /// <inheritdoc />
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)
     {
         const string  sql = """
@@ -235,6 +194,47 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
+    public IEnumerable<string> GetExistingDeletedAliases(IEnumerable<string> aliasesToCheck, long idAlias)
+    {
+        const string  sql = """
+                            select name
+                            from
+                                alias_name an
+                                inner join alias a on a.id = an.id_alias
+                            where 
+                                name in @names
+                                and a.deleted_at is not null
+                                and id_alias != @idAlias
+                            """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
+    }
+
+    /// <inheritdoc />
+    public Dictionary<string, (long Id, int Counter)> GetHiddenCounters() => Db.WithinTransaction(
+        tx =>
+        {
+            const string sql = """
+                               select 
+                                    a.Id                    as Id,
+                                    an.name                 as AliasName,
+                                    ifnull(a.exec_count, 0) as Counter
+                               from 
+                                    alias a
+                                    inner join alias_name an on a.id = an.id_alias
+                               where 
+                               	    a.hidden is true
+                                    and a.deleted_at is null
+                                    and an.name = a.file_name
+                               order by a.id desc
+                               """;
+            var dictionary = tx.Connection!.Query<dynamic>(sql)
+                               .Select(e => new { Key = e.AliasName, Value = ((long)e.Id, (int)e.Counter) })
+                               .ToDictionary(e => (string)e.Key, e => e.Value);
+            return dictionary;
+        }
+    );
+
+    /// <inheritdoc />
     public IEnumerable<UsageQueryResult> GetMostUsedAliases()
     {
         const string sql = $"""
@@ -248,7 +248,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             """;
         return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql));
     }
-    
+
     /// <inheritdoc />
     public IEnumerable<UsageQueryResult> GetMostUsedAliasesByYear(int year)
     {
@@ -352,14 +352,37 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public void Remove(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.LogicalRemove(tx, alias));
+    public void MergeHistory(IEnumerable<long> fromAliases, long toAlias) => Db.WithinTransaction(
+        tx =>
+        {
+            const string sql = """
+                               update alias_usage 
+                               set id_alias = @destinationId
+                               where id_alias in @sourceIds
+                               """;
+            tx.Connection!.Execute(sql, new { destinationId = toAlias, sourceIds = fromAliases });
+        }
+    );
 
     /// <inheritdoc />
     public void Remove(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
         tx =>
         {
             var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
-            _logger.LogInformation("Removing {Length} alias(es)", list.Length);
+            _logger.LogInformation("Removing {Length} alias(es) from database", list.Length);
+            foreach (var item in list) _dbActionFactory.AliasManagement.Remove(tx, item);
+        }
+    );
+
+    /// <inheritdoc />
+    public void RemoveLogically(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.LogicalRemove(tx, alias));
+
+    /// <inheritdoc />
+    public void RemoveLogically(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
+        tx =>
+        {
+            var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
+            _logger.LogInformation("Logically removing {Length} alias(es)", list.Length);
             _dbActionFactory.AliasManagement.LogicalRemove(tx, list);
         }
     );

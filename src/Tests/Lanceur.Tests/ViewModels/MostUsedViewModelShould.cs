@@ -29,7 +29,7 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
     {
         return new SqlBuilder().AppendAlias(
                                    1,
-                                   aliasSql: a =>
+                                   cfg: a =>
                                    {
                                        a.WithSynonyms("a");
                                        a.WithUsage(
@@ -43,7 +43,7 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
                                )
                                .AppendAlias(
                                    2,
-                                   aliasSql: a =>
+                                   cfg: a =>
                                    {
                                        a.WithSynonyms("b");
                                        a.WithUsage(

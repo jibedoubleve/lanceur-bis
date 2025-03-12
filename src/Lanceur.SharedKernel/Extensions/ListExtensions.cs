@@ -23,7 +23,16 @@ public static class ListExtensions
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(toRemove);
 
-        foreach (var item in toRemove) source.Remove(item);
+        var listToRemove = toRemove.ToList();
+            
+        //foreach (var item in toRemove) source.Remove(item);
+        for (var i = 0; i < listToRemove.Count(); i++)
+        {
+            if (source.Contains(listToRemove[i]))
+            {
+                source.Remove(listToRemove[i]);
+            }
+        }
     }
 
     /// <summary>

@@ -310,7 +310,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sb = new ServiceCollection().AddLogging(b => b.AddXUnit(OutputHelper))
                                         .BuildServiceProvider();
 
-        var sql = new SqlBuilder().AppendAlias(1, aliasSql: a => a.WithSynonyms("Alias")).ToString();
+        var sql = new SqlBuilder().AppendAlias(1, cfg: a => a.WithSynonyms("Alias")).ToString();
 
         var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory.ToString());
         var dbAction = BuildAliasDbAction(sb.GetService<ILoggerFactory>());
@@ -401,7 +401,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         service.SaveOrUpdate(ref alias1);
         service.SaveOrUpdate(ref alias2);
         service.SaveOrUpdate(ref alias3);
-        service.Remove(alias1);
+        service.RemoveLogically(alias1);
 
         //ASSERT
         const string sql2 = "select count(*) from alias where deleted_at is null";
@@ -465,7 +465,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var service = BuildDataService(connection);
 
         // ACT
-        service.Remove((AliasQueryResult)new() { Id = 256 });
+        service.RemoveLogically((AliasQueryResult)new() { Id = 256 });
 
         // ASSERT
         const string sql2 = "select count(*) from alias where id = 256 and deleted_at is null";

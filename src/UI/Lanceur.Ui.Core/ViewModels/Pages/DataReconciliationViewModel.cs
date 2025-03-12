@@ -78,7 +78,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         var response = await _userInteraction.AskUserYesNoAsync($"Do you want to delete the {toDelete.Length} selected aliases?");
         if (!response) return;
 
-        await Task.Run(() => _repository.Remove(toDelete));
+        await Task.Run(() => _repository.RemoveLogically(toDelete));
         Aliases.RemoveMultiple(toDelete);
         _userNotification.Success($"Deleted {toDelete.Length} aliases.");
         _logger.LogInformation("Deleted {Items} aliases", toDelete.Length);
@@ -98,20 +98,22 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         using var _ = _logger.BeginCorrelatedLogs();
 
-        var selectedAliases = GetSelectedAliases().ToArray();
-        if (selectedAliases.Length == 0) return;
-
-        var firstSelectedAlias = selectedAliases.FirstOrDefault();
-        var parameters = selectedAliases.Where(e => !e.Parameters.IsNullOrEmpty())
-                                        .Select(item => new AdditionalParameter { Name = item.Name, Parameter = item.Parameters })
-                                        .ToList();
-
-        var alias = await Task.Run(() => _repository.GetById(firstSelectedAlias!.Id));
+        var selectedAliases = GetSelectedAliases().ToList();
+        if (selectedAliases.Count == 0) return;
+        
+                                                                           
+        var alias = await Task.Run(() => _repository.GetById(
+                                       selectedAliases.FirstOrDefault()!.Id)
+                                   );
+        _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
+        var parameters = _repository.GetAdditionalParameter(
+            selectedAliases.Select(item => item.Id)
+        ).ToList();
+        
+        alias.AdditionalParameters = new(parameters);
         alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
-        alias.AdditionalParameters(_repository.GetAdditionalParameter(selectedAliases.Select(e => e.Id).ToArray()));
 
         var dataContext = new DoubloonViewModel(parameters, alias.Synonyms);
-
         var response = await _userInteraction.InteractAsync(
             content,
             "Update changes",
@@ -121,14 +123,13 @@ public partial class DataReconciliationViewModel : ObservableObject
         );
         if (!response.IsConfirmed) return;
 
-        // Merge all the alias into this one (That's add additional parameters) 
         alias.Synonyms = dataContext.Synonyms;
-        foreach (var item in dataContext.List) alias.AdditionalParameters.Add(new() { Name = item.Name, Parameter = item.Parameter });
 
         await Task.Run(() => _repository.SaveOrUpdate(ref alias));
 
         // Removing merged aliases
-        _repository.Remove(selectedAliases.Where(e => e.Id != alias.Id).Select(a => a));
+        var toRemove = selectedAliases.Where(e => e.Id != alias.Id);
+        await Task.Run(() =>_repository.Remove(toRemove));
 
         //Reload when finished
         await OnShowDoubloons();
