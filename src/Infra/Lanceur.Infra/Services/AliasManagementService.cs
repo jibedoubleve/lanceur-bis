@@ -30,7 +30,7 @@ public class AliasManagementService : IAliasManagementService
         return queryResult;
     }
 
-    public void Delete(AliasQueryResult alias) => _repository.Remove(alias);
+    public void Delete(AliasQueryResult alias) => _repository.RemoveLogically(alias);
     public void SaveOrUpdate(ref AliasQueryResult alias) => _repository.SaveOrUpdate(ref alias); 
 
     #endregion

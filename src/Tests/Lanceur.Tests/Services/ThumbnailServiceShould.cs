@@ -33,33 +33,33 @@ public class ThumbnailServiceShould : TestBase
                                       1,
                                       "fileName1",
                                       "some parameters 1",
-                                      a =>
+                                      cfg: alias =>
                                       {
-                                          a.WithSynonyms("a1", "a2", "a3");
-                                          a.WithArgument("name_0", "argument_0");
-                                          a.WithArgument("name_0", "argument_0");
+                                          alias.WithSynonyms("a1", "a2", "a3")
+                                               .WithArgument("name_0", "argument_0")
+                                               .WithArgument("name_0", "argument_0");
                                       }
                                   )
                                   .AppendAlias(
                                       110,
                                       "fileName2",
                                       "some parameters 2",
-                                      a =>
+                                      cfg: alias =>
                                       {
-                                          a.WithSynonyms("aa1", "ab2", "ab3");
-                                          a.WithArgument("name_0", "argument_0");
-                                          a.WithArgument("name_0", "argument_0");
+                                          alias.WithSynonyms("aa1", "ab2", "ab3")
+                                           .WithArgument("name_0", "argument_0")
+                                           .WithArgument("name_0", "argument_0");
                                       }
                                   )
                                   .AppendAlias(
                                       120,
                                       "fileName3",
                                       "some parameters 3",
-                                      a =>
+                                      cfg: alias =>
                                       {
-                                          a.WithSynonyms("ac1", "ac2", "ac3");
-                                          a.WithArgument("name_0", "argument_0");
-                                          a.WithArgument("name_0", "argument_0");
+                                          alias.WithSynonyms("ac1", "ac2", "ac3")
+                                               .WithArgument("name_0", "argument_0")
+                                               .WithArgument("name_0", "argument_0");
                                       }
                                   )
                                   .ToString();

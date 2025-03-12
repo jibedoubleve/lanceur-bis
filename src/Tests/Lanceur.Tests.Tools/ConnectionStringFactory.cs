@@ -20,7 +20,7 @@ public static class ConnectionStringFactory
             if (!Directory.Exists(desktop)) Directory.CreateDirectory(desktop);
             var path = Path.Join(
                 desktop,
-                $"Output_Test_Database__{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.sqlite"
+                $"Output_Test_Database__{DateTime.Now:yyyy-MM-dd_HH-mm-ss_}{Guid.NewGuid().ToString()[..8]}.sqlite"
             ).ToSQLiteConnectionString();
             return new ConnectionString(path);
         }

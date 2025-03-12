@@ -26,6 +26,22 @@ public class AliasSqlBuilder
 
     #region Methods
 
+    public static string GenerateAliasSql(long idAlias, string? fileName, string? arguments, AliasProps? props)
+    {
+        fileName ??= Guid.NewGuid().ToString();
+        arguments ??= Guid.NewGuid().ToString();
+        var runAs = props?.RunAs == null ? ", 1" : props.RunAs.ToString(); 
+        var startMode = props?.StartMode == null ? ", 1 " : props.StartMode.ToString();
+        
+        var fileNameDef = fileName == "null" ? "" : ", file_name";
+        var argumentsDef = arguments == "null" ? "" : ", arguments"; 
+        
+        var fileNameVal = fileName == "null" ? "" : $", '{fileName}'";
+        var argumentsVal = arguments == "null" ? "" : $", '{arguments}'";
+        var sql = $"insert into alias (id, run_as, start_mode{fileNameDef}{argumentsDef}) values ({idAlias}{runAs}{startMode}{fileNameVal}{argumentsVal});";
+        return sql;
+    }
+
     public AliasSqlBuilder WithArgument(string? name = null, string? argument = null)
     {
         name ??= Guid.NewGuid().ToString();
@@ -33,6 +49,13 @@ public class AliasSqlBuilder
 
         _sql.Append($"insert into alias_argument(id_alias, name, argument) values ({_idAlias}, '{name}', '{argument}');");
         _sql.AppendNewLine();
+        return this;
+    }
+
+    public AliasSqlBuilder WithArguments(Dictionary<string, string> arguments)
+    {
+        foreach (var argument in arguments) WithArgument(argument.Key, argument.Value);
+
         return this;
     }
 

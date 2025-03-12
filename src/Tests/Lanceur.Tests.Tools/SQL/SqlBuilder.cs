@@ -1,4 +1,5 @@
 using System.Text;
+using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Tests.Tools.SQL;
@@ -28,16 +29,30 @@ public class SqlBuilder
 
     #region Methods
 
-    public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, Action<AliasSqlBuilder>? aliasSql = null)
+    /// <summary>
+    ///     Appends a new alias to the SQL script.
+    /// </summary>
+    /// <param name="idAlias">The primary key of the alias.</param>
+    /// <param name="fileName">
+    ///     The file name for the alias. If <c>null</c>, a random value will be assigned.
+    ///     If the string <c>"null"</c> is provided, a null value will be set in the database.
+    /// </param>
+    /// <param name="arguments">
+    ///     The arguments for the alias. If <c>null</c>, a random value will be assigned.
+    ///     If the string <c>"null"</c> is provided, a null value will be set in the database.
+    /// </param>
+    /// <param name="props">Additional properties to apply to the alias</param>
+    /// <param name="cfg">
+    ///     A configurator that allows customization of the alias, including Usage, Additional Parameters, or Synonyms.
+    /// </param>
+    /// <returns>The updated <see cref="SqlBuilder" /> instance.</returns>
+    public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, AliasProps? props = null, Action<AliasSqlBuilder>? cfg = null)
     {
-        fileName ??= Guid.NewGuid().ToString();
-        arguments ??= Guid.NewGuid().ToString();
-
-        _sql.Append($"insert into alias (id, file_name, arguments) values ({idAlias}, '{fileName}', '{arguments}');");
+        _sql.Append(AliasSqlBuilder.GenerateAliasSql(idAlias, fileName, arguments, props));
         _sql.AppendNewLine();
 
         var builder = new AliasSqlBuilder(idAlias, _sql);
-        aliasSql?.Invoke(builder);
+        cfg?.Invoke(builder);
         return this;
     }
 
@@ -45,3 +60,5 @@ public class SqlBuilder
 
     #endregion
 }
+
+public record AliasProps(Constants.RunAs? RunAs, Constants.StartMode? StartMode);

@@ -367,13 +367,13 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
                                           1,
                                           "un",
                                           "params un",
-                                          a => a.WithSynonyms("deux")
+                                          cfg: alias => alias.WithSynonyms("deux")
                                       )
                                       .AppendAlias(
                                           2,
                                           "deux",
                                           "params deux",
-                                          a => a.WithSynonyms("trois")
+                                          cfg: alias => alias.WithSynonyms("trois")
                                       );
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModelAsync(

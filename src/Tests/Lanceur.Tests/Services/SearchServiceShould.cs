@@ -116,7 +116,7 @@ public class SearchServiceShould : TestBase
          * Check counter is still -1
          */
         OutputHelper.Arrange();
-        var sql = new SqlBuilder().AppendAlias(1,aliasSql: a => a.WithSynonyms("a", "b")).ToString();
+        var sql = new SqlBuilder().AppendAlias(1,cfg: a => a.WithSynonyms("a", "b")).ToString();
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         var converter = Substitute.For<IMappingService>();
@@ -313,7 +313,7 @@ public class SearchServiceShould : TestBase
         OutputHelper.Arrange();
         var sql = new SqlBuilder().AppendAlias(
                                       1,
-                                      aliasSql: a =>
+                                      cfg: a =>
                                       {
                                           a.WithSynonyms("a");
                                           a.WithArgument();

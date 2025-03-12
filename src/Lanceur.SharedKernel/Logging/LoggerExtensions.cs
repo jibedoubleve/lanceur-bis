@@ -66,8 +66,5 @@ public static class LoggerExtensions
                                    .BeginScope();
     }
 
-    [Obsolete("Will be removed...")]
-    public static void LogActivate<TView>(this ILogger logger) { logger.LogTrace("Activating view {View}", typeof(TView)); }
-
     #endregion Methods
 }
