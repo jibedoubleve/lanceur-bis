@@ -199,6 +199,16 @@ public interface IAliasRepository
     ///     Only aliases marked as logically deleted will be affected.
     /// </param>
     void Restore(IEnumerable<SelectableAliasQueryResult> aliases);
+    
+    /// <summary>
+    ///     Restores the specified alias by reversing its logical deletion status.
+    ///     Aliases that are not marked as logically deleted will remain unchanged.
+    /// </summary>
+    /// <param name="alias">
+    ///     A <see cref="AliasQueryResult" /> objects representing the aliases to restore.
+    ///     Only aliases marked as logically deleted will be affected.
+    /// </param>
+    void Restore(AliasQueryResult alias);
 
     /// <summary>
     ///     Creates a new alias if the ID is '0'; otherwise, updates the existing alias.

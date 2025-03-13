@@ -125,7 +125,12 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         alias.Synonyms = dataContext.Synonyms;
 
-        await Task.Run(() => _repository.SaveOrUpdate(ref alias));
+        await Task.Run(
+            () =>
+            {
+                _repository.SaveOrUpdate(ref alias);
+                _repository.Restore(alias);
+            });
 
         // Removing merged aliases
         var toRemove = selectedAliases.Where(e => e.Id != alias.Id);
