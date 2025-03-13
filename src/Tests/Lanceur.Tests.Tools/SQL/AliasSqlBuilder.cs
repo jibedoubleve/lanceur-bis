@@ -33,12 +33,32 @@ public class AliasSqlBuilder
         var runAs = props?.RunAs == null ? ", 1" : props.RunAs.ToString(); 
         var startMode = props?.StartMode == null ? ", 1 " : props.StartMode.ToString();
         
-        var fileNameDef = fileName == "null" ? "" : ", file_name";
-        var argumentsDef = arguments == "null" ? "" : ", arguments"; 
+        var deletedAtDef = props?.DeletedAt == null ? "" : ", deleted_at";
+        var deletedAtVal= props?.DeletedAt == null ? "" : $", '{props.DeletedAt.Value.ToString("o", CultureInfo.InvariantCulture)}'";
         
+        var fileNameDef = fileName == "null" ? "" : ", file_name";
         var fileNameVal = fileName == "null" ? "" : $", '{fileName}'";
+        
+        var argumentsDef = arguments == "null" ? "" : ", arguments"; 
         var argumentsVal = arguments == "null" ? "" : $", '{arguments}'";
-        var sql = $"insert into alias (id, run_as, start_mode{fileNameDef}{argumentsDef}) values ({idAlias}{runAs}{startMode}{fileNameVal}{argumentsVal});";
+        
+        var sql = $"""
+                   insert into alias (
+                       id 
+                       , run_as 
+                       , start_mode
+                       {fileNameDef}
+                       {argumentsDef}
+                       {deletedAtDef}) 
+                   values (
+                       {idAlias}
+                       {runAs}
+                       {startMode}
+                       {fileNameVal}
+                       {argumentsVal}
+                       {deletedAtVal}
+                   );
+                   """;
         return sql;
     }
 

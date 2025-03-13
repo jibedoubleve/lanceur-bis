@@ -402,6 +402,21 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
+    public void Restore(AliasQueryResult alias) => Db.WithinTransaction(
+        tx =>
+        {
+            const string sql = """"
+                               update alias 
+                               set
+                                    deleted_at = null,
+                                    hidden     = 0
+                               where id = @id
+                               """";
+            tx.Connection!.Execute(sql, new { id = alias.Id });
+        }
+    );
+
+    /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias) => Db.WithinTransaction((tx, current) =>  _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref current), alias);
 
     /// <inheritdoc />
