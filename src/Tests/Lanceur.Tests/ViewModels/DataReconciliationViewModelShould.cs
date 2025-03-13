@@ -87,6 +87,54 @@ public class DataReconciliationViewModelShould : ViewModelTest<DataReconciliatio
             visitors
         );
     }
+
+    [Fact]
+    public async Task NotDeleteWhenMergingDoubloons()
+    {
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.InteractAsync(
+                     Arg.Any<object>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<object>()
+                 )
+                 .Returns((IsConfirmed: true, DataContext: null));
+                return i;
+            }
+        };
+        var fileName = Guid.NewGuid().ToString();
+        var sqlBuilder = new SqlBuilder().AppendAlias(
+                                             1,
+                                             fileName,
+                                             props: new(deleted: DateTime.Now),
+                                             cfg: alias => alias.WithSynonyms("a1", "a2")
+                                         )
+                                         .AppendAlias(2, fileName, cfg: alias =>  alias.WithSynonyms("b1", "b2"))
+                                         .AppendAlias(3, fileName, cfg: alias =>  alias.WithSynonyms("c1", "c2"));
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                const string sql = "select count(*) from alias where deleted_at is not null";
+                db.WithConnection(c => c.ExecuteScalar(sql)).Should().Be(1, "an alias is already deleted logically");
+                
+                await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
+
+                foreach (var item in viewModel.Aliases) item.IsSelected = true;
+
+                await viewModel.MergeCommand.ExecuteAsync(null);
+                viewModel.Aliases.Should().HaveCount(0);
+                
+                db.WithConnection(c => c.ExecuteScalar(sql)).Should().Be(0, "merging undelete alias");
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
     
     [Fact]
     public async Task HaveDoubloonsWithoutParameters()
