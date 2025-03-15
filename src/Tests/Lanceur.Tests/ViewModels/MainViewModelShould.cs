@@ -144,9 +144,9 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
     public async Task BeAbleToSearchAliases()
     {
         // ARRANGE
-        var sqlBuilder = new SqlBuilder().AppendAlias(1,cfg: a=> a.WithSynonyms("alias1", "alias_1"))
-                                         .AppendAlias(2,cfg: a=> a.WithSynonyms("alias2", "alias_2"))
-                                         .AppendAlias(3,cfg: a=> a.WithSynonyms("alias3", "alias_3"));
+        var sqlBuilder = new SqlBuilder().AppendAlias(1, cfg: a => a.WithSynonyms("alias1", "alias_1"))
+                                         .AppendAlias(2, cfg: a => a.WithSynonyms("alias2", "alias_2"))
+                                         .AppendAlias(3, cfg: a => a.WithSynonyms("alias3", "alias_3"));
 
 
         await TestViewModelAsync(
@@ -187,6 +187,30 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
                 viewModel.Results.Should().HaveCountGreaterOrEqualTo(count);
             },
             builder,
+            visitors
+        );
+    }
+
+    [Theory]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void ShowLastResultOrNotDependingOnConfiguration(bool expected, bool expected2)
+    {
+        ISettingsFacade settings = null;
+        var visitors = new ServiceVisitors { VisitSettings = s => settings = s };
+        TestViewModel(
+            (viewModel, _) =>
+            {
+                using(new AssertionScope())
+                {
+                    settings.Application.SearchBox.ShowLastQuery = expected;
+                    viewModel.ShowLastQuery.Should().Be(expected, "this is the first call");
+                    
+                    settings.Application.SearchBox.ShowLastQuery = expected2;
+                    viewModel.ShowLastQuery.Should().Be(expected2, "this is the second call");
+                }
+            },
+            SqlBuilder.Empty,
             visitors
         );
     }
