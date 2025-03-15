@@ -90,6 +90,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         MapSettingsFromDbToUi();
+
+        PropertyChanged += async (_, e) =>
+        {
+            _logger.LogTrace("Property '{Property}' changed", e.PropertyName);
+            await OnSaveSettingsAsync();
+        };
     }
 
     #endregion
