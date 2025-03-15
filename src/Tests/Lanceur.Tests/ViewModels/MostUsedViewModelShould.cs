@@ -71,7 +71,7 @@ public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
     [InlineData("All")]
     public async Task ShowAllUsageForAll(string filter)
     {
-        var visitor  = new ServiceVisitors() { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var visitor  = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         var sqlBuilder = BuildSqlBuilder();
 
         await TestViewModelAsync(
