@@ -35,7 +35,7 @@ public class RawClipboardReplacement : IReplacement
     /// <inheritdoc/>
     public string Replace(string text, string replacement)
     {
-        var clipboard = _clipboard.GetText() ?? string.Empty;
+        var clipboard = _clipboard.RetrieveText() ?? string.Empty;
         text ??= string.Empty;
 
         return Regex.Replace(text, clipboard);

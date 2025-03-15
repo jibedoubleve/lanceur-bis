@@ -3,11 +3,11 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Ui.Core.Services;
 
-public class MemoryStorageService : IMemoryStorageService
+public class ClipboardService : IClipboardService
 {
     #region Methods
 
-    public string RetrieveText() => Clipboard.GetText();
+    public string RetrieveText() => Clipboard.GetText(TextDataFormat.Text);
     public void SaveText(string text) => Clipboard.SetText(text);
 
     #endregion

@@ -40,7 +40,7 @@ public class ClipboardServiceShould
     public void ReplaceWithText(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
-        clipboard.GetText().Returns(param);
+        clipboard.RetrieveText().Returns(param);
         var mgr = new ReplacementComposite(clipboard);
 
         mgr.Replace(actual, param)
