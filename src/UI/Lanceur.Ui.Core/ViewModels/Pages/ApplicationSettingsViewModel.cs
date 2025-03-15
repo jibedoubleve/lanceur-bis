@@ -90,6 +90,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         MapSettingsFromDbToUi();
+
+        PropertyChanged += async (_, e) =>
+        {
+            _logger.LogTrace("Property '{Property}' changed", e.PropertyName);
+            await OnSaveSettingsAsync();
+        };
     }
 
     #endregion
@@ -195,10 +201,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
 
-        List<bool> reboot = [
-            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
-            Settings.Local.DbPath != DbPath
-        ];
+        List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
 
         MapSettingsFromUiToDb();
         _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;
