@@ -17,7 +17,6 @@ public partial class MainViewModel : ObservableObject
 {
     #region Fields
 
-    private readonly bool _doesReturnAllIfEmpty;
     private readonly IExecutionService _executionService;
     private readonly IUserInteractionHub _interactionHub;
     private readonly ILogger<MainViewModel> _logger;
@@ -58,10 +57,7 @@ public partial class MainViewModel : ObservableObject
 
         //Settings
         _settingsFacade = settingsFacade;
-        _doesReturnAllIfEmpty = settingsFacade.Application.SearchBox.ShowResult;
-        _windowBackdropStyle = settingsFacade.Application.Window.BackdropStyle;
-        ShowAtStartup = settingsFacade.Application.SearchBox.ShowAtStartup;
-        ShowLastQuery = settingsFacade.Application.SearchBox.ShowLastQuery;
+        WindowBackdropStyle = settingsFacade.Application.Window.BackdropStyle;
 
         // Configuration
         _watchdog = watchdogBuilder.WithAction(SearchAsync)
@@ -73,8 +69,11 @@ public partial class MainViewModel : ObservableObject
 
     #region Properties
 
-    public bool ShowAtStartup { get;  }
-    public bool ShowLastQuery { get; }
+    private bool DoesReturnAllIfEmpty => _settingsFacade.Application.SearchBox.ShowResult;
+
+    public bool ShowAtStartup => _settingsFacade.Application.SearchBox.ShowAtStartup;
+
+    public bool ShowLastQuery => _settingsFacade.Application.SearchBox.ShowLastQuery;
 
     #endregion
 
@@ -126,7 +125,8 @@ public partial class MainViewModel : ObservableObject
             _logger.LogError(ex, "An error occured while performing alias execution");
             _interactionHub.GlobalNotifications.Error(
                 $"An error occured while performing alias execution.{Environment.NewLine}Alias name '{SelectedResult?.Name ?? "<NULL>"}'",
-                ex);
+                ex
+            );
         }
     }
 
@@ -171,7 +171,7 @@ public partial class MainViewModel : ObservableObject
             var criterion = Cmdline.Parse(Query);
 
             if (criterion.IsNullOrEmpty()) Results.Clear();
-            var results = await _searchService.SearchAsync(criterion, _doesReturnAllIfEmpty);
+            var results = await _searchService.SearchAsync(criterion, DoesReturnAllIfEmpty);
             Results = new(results);
             SelectedResult = Results.FirstOrDefault()!;
             Suggestion = GetSuggestion(criterion.Name, SelectedResult);
@@ -183,6 +183,16 @@ public partial class MainViewModel : ObservableObject
             _logger.LogError(ex, "An error occured while performing search");
             _interactionHub.GlobalNotifications.Error("An error occured while performing search.", ex);
         }
+    }
+
+    /// <summary>
+    ///     Resets the search UI by clearing both the query input and the displayed results.
+    ///     This ensures a clean slate for a new search operation.
+    /// </summary>
+    public void Clear()
+    {
+        Query = string.Empty;
+        Results.Clear();
     }
 
     /// <summary>
