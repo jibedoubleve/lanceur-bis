@@ -14,8 +14,6 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Utils;
-using Lanceur.Tests.Tooling;
-using Lanceur.Tests.Tooling.Extensions;
 using Lanceur.Tests.Tooling.Macros;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
@@ -207,6 +205,18 @@ public class MacroServiceShould : TestBase
 
         //Assert
         results.ElementAt(0).GetMacroName().Should().Be("MULTI");
+    }
+
+    [Fact]
+    public void LoadExpectedMacros()
+    {
+        var serviceProvider = new ServiceCollection()
+                              .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
+                              .AddLogging()
+                              .AddMockSingleton<IAliasRepository>()
+                              .BuildServiceProvider();
+        var sut = new MacroService(serviceProvider);
+        sut.MacroCount.Should().Be(3);
     }
 
     [Fact]

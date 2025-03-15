@@ -123,7 +123,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IDataStoreVersionService, SQLiteVersionService>()
                          .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()
-                         .AddTransient<IMemoryStorageService, MemoryStorageService>()
+                         .AddTransient<IClipboardService, ClipboardService>()
                          .AddTransient<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
@@ -143,7 +143,6 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IEverythingApi, EverythingApi>()
                          .AddTransient<IExecutionService, ExecutionService>()
                          .AddTransient<IWildcardService, ReplacementComposite>()
-                         .AddTransient<IClipboardService, WindowsClipboardService>()
                          .AddTransient<IReconciliationService, ReconciliationService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>();

@@ -51,11 +51,11 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
         );
     }
 
-    private string Sql(string jsonQuery) => $"""
-                                             select s_value ->> '$.{jsonQuery}' as value
-                                             from settings
-                                             where s_key = 'json'
-                                             """;
+    private static string Sql(string jsonQuery) => $"""
+                                                    select s_value ->> '$.{jsonQuery}' as value
+                                                    from settings
+                                                    where s_key = 'json'
+                                                    """;
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {

@@ -11,7 +11,7 @@ public class GuidMacro : MacroQueryResult
 {
     #region Fields
 
-    private readonly IMemoryStorageService _memoryMemento;
+    private readonly IClipboardService _memoryMemento;
     private readonly IServiceProvider _serviceProvider;
 
     #endregion
@@ -21,14 +21,14 @@ public class GuidMacro : MacroQueryResult
     public GuidMacro(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _memoryMemento = serviceProvider.GetService<IMemoryStorageService>();
+        _memoryMemento = serviceProvider.GetService<IClipboardService>();
     }
 
     #endregion
 
     #region Properties
 
-    public override string Icon => "ClipboardCode24";
+    public override string Icon => "Code24";
 
     #endregion
 

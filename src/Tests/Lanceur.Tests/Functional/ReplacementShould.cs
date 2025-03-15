@@ -31,7 +31,7 @@ public class ReplacementShould
     public void ReplaceWithClipboardText(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
-        clipboard.GetText().Returns(param);
+        clipboard.RetrieveText().Returns(param);
 
         var rpl = new RawClipboardReplacement(clipboard);
 
@@ -90,7 +90,7 @@ public class ReplacementShould
     public void ReplaceWithWebClipboardText(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
-        clipboard.GetText().Returns(param);
+        clipboard.RetrieveText().Returns(param);
 
         var rpl = new WebClipboardReplacement(clipboard);
 
