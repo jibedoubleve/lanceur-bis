@@ -88,6 +88,11 @@ public partial class MainView
 
     #region Methods
 
+    /// <remarks>
+    ///     Handles the "Show Last Query" option when closing the window to prevent UI flickering.
+    ///     Clearing the results when the window is transparent avoids an unsightly refresh effect
+    ///     that would be visible to the user.
+    /// </remarks>
     private void HideWindow()
     {
         if (ViewModel.ShowLastQuery)
@@ -205,6 +210,11 @@ public partial class MainView
     private void ShowWindow()
     {
         _logger.LogTrace("Current window is at {Coordinate}", this.ToCoordinate());
+        
+        // HACK: Settings take effect only after closing the window.  
+        // When changing settings, the previous ones persist until the window is hidden at least once.  
+        // This ensures the window is cleared immediately if settings are updated.  
+        if (!_settings.Application.SearchBox.ShowLastQuery) ViewModel.Clear();
 
         ViewModel.RefreshSettings();
         _ = ViewModel.DisplayResultsIfAllowed();
