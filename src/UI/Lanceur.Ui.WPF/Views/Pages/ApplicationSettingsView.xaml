@@ -47,13 +47,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Menu>
-            <MenuItem 
-                Command="{Binding SaveSettingsCommand}"
-                Header="Save"
-                Icon="{ui:SymbolIcon Save24}"
-                Foreground="{StaticResource TextFillColorPrimaryBrush}"/>
-        </Menu>
         <ScrollViewer
                 Grid.Row="1"
                 VerticalScrollBarVisibility="Visible">
