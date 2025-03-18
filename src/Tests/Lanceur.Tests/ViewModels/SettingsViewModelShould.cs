@@ -29,17 +29,17 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
 
     #region Methods
 
-    private async Task CheckProperty(Action<ApplicationSettingsViewModel> act, Func<string> getSql, Func<string> expected)
+    private void CheckProperty(Action<ApplicationSettingsViewModel> act, Func<string> getSql, Func<string> expected)
     {
         var sqlBuilder = new SqlBuilder();
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
 
-        await TestViewModelAsync(
-            async (viewModel, db) =>
+        TestViewModel(
+            (viewModel, db) =>
             {
                 // act
                 act(viewModel);
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+                viewModel.SaveSettingsCommand.Execute(null);
 
                 // assert
                 var sql = getSql();
@@ -64,6 +64,7 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
                          .AddSingleton<ISettingsFacade, SettingsFacadeService>()
                          .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
+                         .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IUserNotificationService>()
                          .AddMockSingleton<IAppRestartService>()
                          .AddMockSingleton<IViewFactory>()
@@ -73,7 +74,7 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
 
     [Theory]
     [InlineData(500, "500")]
-    public async Task SaveOptionSearchDelay(double value, string expected) => await CheckProperty(
+    public void SaveOptionSearchDelay(double value, string expected) => CheckProperty(
         viewModel => viewModel.SearchDelay = value,
         () => Sql("SearchBox.SearchDelay"),
         () => expected
@@ -82,7 +83,7 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
     [Theory]
     [InlineData(true, "1")]
     [InlineData(false, "0")]
-    public async Task SaveOptionShowAtStartup(bool value, string expected) => await CheckProperty(
+    public void SaveOptionShowAtStartup(bool value, string expected) => CheckProperty(
         viewModel => viewModel.ShowAtStartup = value,
         () => Sql("SearchBox.ShowAtStartup"),
         () => expected
@@ -91,16 +92,19 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
     [Theory]
     [InlineData(true, "1")]
     [InlineData(false, "0")]
-    public async Task SaveOptionShowLastQuery(bool value, string expected) => await CheckProperty(
-        viewModel => viewModel.ShowLastQuery = value,
-        () => Sql("SearchBox.ShowLastQuery"),
-        () => expected
-    );
+    public void SaveOptionShowLastQuery(bool value, string expected)
+    {
+        CheckProperty(
+            viewModel => viewModel.ShowLastQuery = value,
+            () => Sql("SearchBox.ShowLastQuery"),
+            () => expected
+        );
+    }
 
     [Theory]
     [InlineData(true, "1")]
     [InlineData(false, "0")]
-    public async Task SaveOptionShowResult(bool value, string expected) => await CheckProperty(
+    public void SaveOptionShowResult(bool value, string expected) =>  CheckProperty(
         viewModel => viewModel.ShowResult = value,
         () => Sql("SearchBox.ShowResult"),
         () => expected
@@ -112,7 +116,7 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
     [InlineData("Edge")]
     [InlineData("Firefox")]
     [InlineData("SomeUnknownValue")]
-    public async Task SaveOptionStoresBookmarkSourceBrowser(string value) => await CheckProperty(
+    public void SaveOptionStoresBookmarkSourceBrowser(string value) => CheckProperty(
         viewModel => viewModel.BookmarkSourceBrowser = value,
         () => Sql("Stores.BookmarkSourceBrowser"),
         () => value

@@ -1,7 +1,6 @@
 using Dapper;
 using FluentAssertions;
 using Lanceur.Core.Models.Settings;
-using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
@@ -39,6 +38,9 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
                          .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddMockSingleton<IViewFactory>()
+                         .AddMockSingleton<IUserGlobalNotificationService>(
+                             (sp, i) => visitors?.VisitGlobalUserInteractionService?.Invoke(sp, i) ?? i
+                         )
                          .AddMockSingleton<IUserInteractionService>(
                              (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
@@ -50,32 +52,30 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
     }
 
     [Fact]
-    public async Task AskRebootAfterDbPathChanged()
+    public void AskRebootAfterDbPathChanged()
     {
-        IUserInteractionService userInteractionService = null;
+        IUserGlobalNotificationService userInteractionService = null;
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
+            VisitGlobalUserInteractionService = (_, i) =>
             {
                 userInteractionService = i;
                 return i;
             }
         };
-        await TestViewModelAsync(
-            async (viewModel, _) =>
+        TestViewModel(
+            (viewModel, _) =>
             {
-                // arrange
-
                 // act
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+                viewModel.SaveSettingsCommand.Execute(null);
 
                 viewModel.DbPath = Guid.NewGuid().ToString();
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+                viewModel.SaveSettingsCommand.Execute(null);
 
                 // assert
-                await userInteractionService.Received(1)
-                                            .AskUserYesNoAsync(Arg.Any<object>());
+                userInteractionService.Received(1)
+                                      .AskRestart();
             },
             SqlBuilder.Empty,
             visitors
@@ -83,33 +83,33 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
     }
 
     [Fact]
-    public async Task AskRebootAfterShortcutChanged()
+    public void AskRebootAfterShortcutChanged()
     {
-        IUserInteractionService userInteractionService = null;
+        IUserGlobalNotificationService userInteractionService = null;
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
+            VisitGlobalUserInteractionService = (_, i) =>
             {
                 userInteractionService = i;
                 return i;
             }
         };
-        await TestViewModelAsync(
-            async (viewModel, _) =>
+        TestViewModel(
+            (viewModel, _) =>
             {
                 // arrange
 
                 // act
                 viewModel.Settings.Application.HotKey = new(3, 18); // This is the default configuration
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+                viewModel.SaveSettingsCommand.Execute(null);
 
                 viewModel.Settings.Application.HotKey = new(1, 1);
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+                viewModel.SaveSettingsCommand.Execute(null);
 
                 // assert
-                await userInteractionService.Received(1)
-                                            .AskUserYesNoAsync(Arg.Any<object>());
+                userInteractionService.Received()
+                                      .AskRestart();
             },
             SqlBuilder.Empty,
             visitors
@@ -117,7 +117,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
     }
 
     [Fact]
-    public async Task SaveStoreShortcutOverrides()
+    public void SaveStoreShortcutOverrides()
     {
         const string shortcut = "shortcut";
         const string defaultConfig = """
@@ -155,8 +155,8 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                                      }
                                      """;
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
-        await TestViewModelAsync(
-            async (viewModel, db) =>
+        TestViewModel(
+            (viewModel, db) =>
             {
                 // arrange
                 var sqlDefaultConfig = $"insert into settings(s_key, s_value) values ('json', '{defaultConfig}');";
@@ -165,7 +165,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                 // act
                 StoreShortcut[] shortcuts = [new() { AliasOverride = shortcut }, new()  { AliasOverride = shortcut }];
                 viewModel.StoreShortcuts = new(shortcuts);
-                await viewModel.SaveSettingsCommand.ExecuteAsync(null);
+                viewModel.SaveSettingsCommand.Execute(null);
 
                 // assert
                 // I select all the shortcuts directly in the database
