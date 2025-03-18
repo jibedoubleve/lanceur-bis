@@ -12,6 +12,7 @@ using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
+using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Serilog.Core;
@@ -47,6 +48,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                          .AddMockSingleton<IUserNotificationService>(
                              (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
+                         .AddSingleton<IInteractionHub, InteractionHub>()
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose));
         return serviceCollection;
     }

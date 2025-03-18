@@ -13,7 +13,6 @@ using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;
-using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
@@ -22,13 +21,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 {
     #region Fields
 
-    private readonly IAppRestartService _appRestartService;
-
     [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
     [ObservableProperty] private string _dbPath = string.Empty;
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
+    private readonly IInteractionHub _hub;
     [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     [ObservableProperty] private bool _isAlt;
     [ObservableProperty] private bool _isCtrl;
@@ -40,16 +38,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     private readonly LoggingLevelSwitch _loggingLevelSwitch;
     [ObservableProperty] private int _notificationDisplayDuration;
     [ObservableProperty] private double _searchDelay;
-
     [ObservableProperty] private ISettingsFacade _settings;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = new();
-    private readonly IUserGlobalNotificationService _userGlobalNotificationService;
-    private readonly IUserInteractionService _userInteraction;
-
-    private readonly IUserNotificationService _userNotificationService;
     private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _windowBackdropStyle = "Mica";
 
@@ -58,9 +51,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     #region Constructors
 
     public ApplicationSettingsViewModel(
-        IUserNotificationService userNotificationService,
-        IUserInteractionService userInteraction,
-        IUserGlobalNotificationService userGlobalNotificationService,
+        IInteractionHub interactionHub,
         ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
         ISettingsFacade settings,
@@ -71,11 +62,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appRestartService);
 
-        _userNotificationService = userNotificationService;
-        _userGlobalNotificationService = userGlobalNotificationService;
-        _userInteraction = userInteraction;
+        _hub = interactionHub;
         _logger = logger;
-        _appRestartService = appRestartService;
         _settings = settings;
         _loggingLevelSwitch = loggingLevelSwitch;
         _viewFactory = viewFactory;
@@ -184,7 +172,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
                                      .Replace("Lanceur.Infra.Stores.", "")
                                      .Replace("Store", "");
 
-        var result = await _userInteraction.AskUserYesNoAsync(
+        var result = await _hub.Interactions.AskUserYesNoAsync(
             view,
             "Apply",
             "Cancel",
@@ -192,7 +180,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         );
         if (!result) return;
 
-        _userNotificationService.Success($"Modification has been done on {storeName}. Don't forget to save to apply changes", "Updated.");
+        _hub.Notifications.Success($"Modification has been done on {storeName}. Don't forget to save to apply changes", "Updated.");
     }
 
     [RelayCommand]
@@ -204,17 +192,14 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
 
-        List<bool> reboot = [
-            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
-            Settings.Local.DbPath != DbPath
-        ];
+        List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
 
         MapSettingsFromUiToDb();
         _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;
         Settings.Save();
-        _userNotificationService.Success("Configuration saved.", "Saved");
+        _hub.Notifications.Success("Configuration saved.", "Saved");
 
-        if (reboot.Any(r => r)) _userGlobalNotificationService.AskRestart();
+        if (reboot.Any(r => r)) _hub.GlobalNotifications.AskRestart();
     }
 
     #endregion

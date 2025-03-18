@@ -18,7 +18,7 @@ public partial class MainViewModel : ObservableObject
     #region Fields
 
     private readonly IExecutionService _executionService;
-    private readonly IUserInteractionHub _interactionHub;
+    private readonly IInteractionHub _interactionHub;
     private readonly ILogger<MainViewModel> _logger;
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
@@ -39,7 +39,7 @@ public partial class MainViewModel : ObservableObject
         ISearchService searchService,
         ISettingsFacade settingsFacade,
         IExecutionService executionService,
-        IUserInteractionHub interactionHub,
+        IInteractionHub interactionHub,
         IWatchdogBuilder watchdogBuilder
     )
     {

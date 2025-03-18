@@ -54,7 +54,7 @@ public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
                          .AddMockSingleton<IUserNotificationService>(
                              (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IUserInteractionHub>()
+                         .AddMockSingleton<IInteractionHub>()
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                          .AddSingleton<IMemoryCache, MemoryCache>()
                          .AddMockSingleton<IExecutionService>(
