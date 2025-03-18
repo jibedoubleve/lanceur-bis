@@ -4,7 +4,7 @@ namespace Lanceur.Core.Services;
 /// Represents a hub that centralises all tools for handling user interactions. 
 /// This includes managing messages, user input mechanisms, and notifications.
 /// </summary>
-public interface IUserInteractionHub
+public interface IInteractionHub
 {
     #region Properties
 

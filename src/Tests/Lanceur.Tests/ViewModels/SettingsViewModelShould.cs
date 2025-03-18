@@ -11,6 +11,7 @@ using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
+using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Core;
 using Serilog.Events;
@@ -62,6 +63,7 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
         serviceCollection.AddLogger<ApplicationSettingsViewModel>(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                          .AddSingleton<ISettingsFacade, SettingsFacadeService>()
+                         .AddSingleton<IInteractionHub, InteractionHub>()
                          .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
                          .AddMockSingleton<IUserGlobalNotificationService>()

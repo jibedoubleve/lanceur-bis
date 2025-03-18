@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IUserNotificationService, UserNotificationService>()
                          .AddSingleton<IViewFactory, ViewFactory>()
                          .AddSingleton<IHotKeyService, HotKeyService>()
-                         .AddSingleton<IUserInteractionHub, UserInteractionHub>()
+                         .AddSingleton<IInteractionHub, InteractionHub>()
                          .AddSingleton(new AssemblySource
                          {
                              ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)), 

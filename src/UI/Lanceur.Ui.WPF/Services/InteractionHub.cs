@@ -3,11 +3,11 @@ using Lanceur.Core.Services;
 namespace Lanceur.Ui.WPF.Services;
 
 /// <inheritdoc />
-public class UserInteractionHub : IUserInteractionHub
+public class InteractionHub : IInteractionHub
 {
     #region Constructors
 
-    public UserInteractionHub(
+    public InteractionHub(
         IUserGlobalNotificationService userGlobalNotificationService,
         IUserInteractionService userInteractionService,
         IUserNotificationService userNotificationService
