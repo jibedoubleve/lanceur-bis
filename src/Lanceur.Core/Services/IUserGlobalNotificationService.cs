@@ -5,6 +5,11 @@ public interface IUserGlobalNotificationService
     #region Methods
 
     /// <summary>
+    ///     Display a notification to ask the user whether a restart of the application should be executed.
+    /// </summary>
+    void AskRestart();
+
+    /// <summary>
     ///     Displays a notification to inform the user of an error and provides additional details about the exception.
     /// </summary>
     /// <param name="message">The error message to be displayed in the notification.</param>
@@ -33,6 +38,11 @@ public interface IUserGlobalNotificationService
 public static class ToastNotificationArguments
 {
     #region Fields
+
+    /// <summary>
+    ///     Indicates that the user requested an application restart
+    /// </summary>
+    public const string ClickRestart = nameof(ClickRestart);
 
     /// <summary>
     ///     Indicates that the user requested to view detailed information about the error displayed in the toast notification.

@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -10,6 +9,7 @@ using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
+using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
@@ -85,6 +85,7 @@ public partial class App
 
             Action action = arguments["Type"] switch
             {
+                // ---- Show logs on error ----
                 ToastNotificationArguments.ClickShowError => () =>
                 {
                     var view = Host.Services.GetService<ExceptionView>()!;
@@ -93,6 +94,9 @@ public partial class App
                     view.Show();
                 },
                 ToastNotificationArguments.ClickShowLogs  => () => Process.Start("explorer.exe", Paths.LogRepository),
+                // ---- Restart application ----
+                ToastNotificationArguments.ClickRestart => () => Host.Services.GetRequiredService<IAppRestartService>().Restart(),
+                // ---- Default  ----
                 _ => () => Log.Warning("The argument '{Argument}' is not supported in the toast arguments. Are you using a button that has not been configured yet?", toastArgs.Argument)
             };
 

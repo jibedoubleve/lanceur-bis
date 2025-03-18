@@ -34,6 +34,22 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     }
 
     /// <inheritdoc />
+    public void AskRestart()
+    {
+        const string msg = "To apply the changes, a restart of the application is required.  \n\nPlease click \"Restart Application\" to continue.";
+        var uri = GetIconUri(Level.Information);
+        var btnRestart = new ToastButton().SetContent("Restart Lanceur")
+                                          .AddArgument("Type", ToastNotificationArguments.ClickRestart);
+
+        new ToastContentBuilder()
+            .AddText("Settings Updated")
+            .AddText(msg)
+            .AddButton(btnRestart)
+            .AddAppLogoOverride(uri.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .Show();
+    }
+
+    /// <inheritdoc />
     public void Error(string message, Exception ex)
     {
         var uri = GetIconUri(Level.Error);
@@ -41,10 +57,10 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
                                         .AddArgument("Type", ToastNotificationArguments.ClickShowError)
                                         .AddArgument("Message", message)
                                         .AddArgument("StackTrace", ex.ToString());
-        
+
         var btnLogs = new ToastButton().SetContent("Show Logs")
                                        .AddArgument("Type", ToastNotificationArguments.ClickShowLogs);
-        
+
         new ToastContentBuilder()
             .AddText("Error")
             .AddText(message)

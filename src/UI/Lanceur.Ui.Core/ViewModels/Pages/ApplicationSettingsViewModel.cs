@@ -46,6 +46,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = new();
+    private readonly IUserGlobalNotificationService _userGlobalNotificationService;
     private readonly IUserInteractionService _userInteraction;
 
     private readonly IUserNotificationService _userNotificationService;
@@ -58,24 +59,26 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     public ApplicationSettingsViewModel(
         IUserNotificationService userNotificationService,
+        IUserInteractionService userInteraction,
+        IUserGlobalNotificationService userGlobalNotificationService,
         ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
         ISettingsFacade settings,
         LoggingLevelSwitch loggingLevelSwitch,
-        IViewFactory viewFactory,
-        IUserInteractionService userInteraction
+        IViewFactory viewFactory
     )
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appRestartService);
 
         _userNotificationService = userNotificationService;
+        _userGlobalNotificationService = userGlobalNotificationService;
+        _userInteraction = userInteraction;
         _logger = logger;
         _appRestartService = appRestartService;
         _settings = settings;
         _loggingLevelSwitch = loggingLevelSwitch;
         _viewFactory = viewFactory;
-        _userInteraction = userInteraction;
 
         // Hotkey
         var hk = _settings.Application.HotKey;
@@ -91,10 +94,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Miscellaneous
         MapSettingsFromDbToUi();
 
-        PropertyChanged += async (_, e) =>
+        PropertyChanged += (_, e) =>
         {
             _logger.LogTrace("Property '{Property}' changed", e.PropertyName);
-            await OnSaveSettingsAsync();
+            OnSaveSettings();
         };
     }
 
@@ -193,7 +196,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OnSaveSettingsAsync()
+    private void OnSaveSettings()
     {
         var hk = Settings.Application.HotKey;
         var hash = (hk.ModifierKey, hk.Key).GetHashCode();
@@ -211,11 +214,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Settings.Save();
         _userNotificationService.Success("Configuration saved.", "Saved");
 
-        if (reboot.Any(r => r))
-        {
-            const string msg = "Do you want to restart now to apply the new configuration?";
-            if (await _userInteraction.AskUserYesNoAsync(msg)) _appRestartService.Restart();
-        }
+        if (reboot.Any(r => r)) _userGlobalNotificationService.AskRestart();
     }
 
     #endregion

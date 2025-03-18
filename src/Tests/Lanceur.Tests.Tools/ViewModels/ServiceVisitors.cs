@@ -15,6 +15,7 @@ public class ServiceVisitors
 
     public IConnectionString? OverridenConnectionString { get; init; }
     public Func<IServiceProvider, IExecutionService, IExecutionService>? VisitExecutionManager { get; init; }
+    public Func<IServiceProvider, IUserGlobalNotificationService, IUserGlobalNotificationService>? VisitGlobalUserInteractionService { get; init; }
     public Action<ISettingsFacade>? VisitSettings { get; init; }
     public Func<IServiceProvider, IUserInteractionService, IUserInteractionService>? VisitUserInteractionService { get; init; }
     public Func<IServiceProvider, IUserNotificationService, IUserNotificationService>? VisitUserNotificationService { get; init; }
