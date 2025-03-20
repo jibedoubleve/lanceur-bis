@@ -4,15 +4,13 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Domain;
 
-public class IniFileLoader
+public partial class IniFileLoader
 {
     #region Fields
 
     private readonly ILogger<IniFileLoader> _logger;
 
     private readonly ILoggerFactory _loggerFactory;
-
-    private const string IsSectionPattern = @"^\[(.*)\]";
 
     #endregion
 
@@ -28,12 +26,14 @@ public class IniFileLoader
 
     #region Methods
 
+    [GeneratedRegex(@"^\[(.*)\]")] private static partial Regex IsSectionPattern();
+
     private IEnumerable<IniNode> Load(string filename)
     {
-        if(!File.Exists(filename))return [];
-        
-        List<IniNode> nodes = new();
-        var isSection = new Regex(IsSectionPattern);
+        if (!File.Exists(filename)) return [];
+
+        List<IniNode> nodes = [];
+        var isSection = IsSectionPattern();
         var currentSection = string.Empty;
         foreach (var line in File.ReadAllLines(filename))
         {
@@ -48,7 +48,7 @@ public class IniFileLoader
             var row = line.Split("=");
             nodes.Add(new(currentSection, row[0], row[1]));
         }
-        
+
         return nodes;
     }
 

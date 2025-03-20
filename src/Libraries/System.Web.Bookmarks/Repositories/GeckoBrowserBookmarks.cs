@@ -14,7 +14,6 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
     #region Fields
 
     private  readonly string _bookmarksPath;
-    private readonly string _cacheKey;
     private readonly ILogger<GeckoBrowserBookmarks> _logger;
 
     private readonly IMemoryCache _memoryCache;
@@ -35,9 +34,16 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
         var path = query.GetDefaultProfile();
 
         _bookmarksPath = configuration.Database.Format(path).ExpandPath();
-        _cacheKey = configuration.CacheKey;
+        CacheKey = configuration.CacheKey;
         _memoryCache = memoryCache;
+        _logger.LogInformation("Using {Browser} based browser bookmarks path is '{Path}'", "Gecko", _bookmarksPath);
     }
+
+    #endregion
+
+    #region Properties
+
+    public string CacheKey { get;  }
 
     #endregion
 
@@ -58,7 +64,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
                            where type = 1;
                            """;
         return _memoryCache.GetOrCreate(
-                   _cacheKey,
+                   CacheKey,
                    IEnumerable<Bookmark> (_)
                        => new SQLiteConnection(_bookmarksPath.ToSQLiteConnectionString()).Query<Bookmark>(sql),
                    CacheEntryOptions.Default
