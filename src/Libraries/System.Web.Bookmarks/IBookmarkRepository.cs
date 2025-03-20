@@ -4,6 +4,15 @@ namespace System.Web.Bookmarks;
 
 public interface IBookmarkRepository
 {
+    #region Properties
+
+    /// <summary>
+    ///     Represent the name of the cache where the bookmarks are saved
+    /// </summary>
+    public string CacheKey { get; }
+
+    #endregion
+
     #region Methods
 
     /// <summary>

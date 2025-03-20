@@ -2,7 +2,9 @@ using System.Text.Json.Nodes;
 using System.Web.Bookmarks.Domain;
 using System.Web.Bookmarks.Factories;
 using System.Web.Bookmarks.RepositoryConfiguration;
+using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Repositories;
 
@@ -10,25 +12,33 @@ public class ChromiumBrowserBookmarks : IBookmarkRepository
 {
     #region Fields
 
+    private readonly ILogger<ChromiumBrowserBookmarks> _logger;
     private readonly IMemoryCache _memoryCache;
 
     #endregion
 
     #region Constructors
 
-    public ChromiumBrowserBookmarks(IMemoryCache memoryCache, IChromiumBrowserConfiguration configuration)
+    public ChromiumBrowserBookmarks(IMemoryCache memoryCache, ILoggerFactory loggerFactory, IChromiumBrowserConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(memoryCache);
+        ArgumentNullException.ThrowIfNull(loggerFactory);
+        ArgumentNullException.ThrowIfNull(configuration);
+        
+        _logger = loggerFactory.GetLogger<ChromiumBrowserBookmarks>();
         _memoryCache = memoryCache;
+        
         Path = configuration.Path;
         CacheKey = configuration.CacheKey;
+        
+        _logger.LogInformation("Using {Browser} based browser bookmarks path is '{Path}'", "Chrome", Path);
     }
 
     #endregion
 
     #region Properties
 
-    private string CacheKey { get; }
+    public string CacheKey { get; }
 
     private string Path { get; }
 
@@ -66,9 +76,9 @@ public class ChromiumBrowserBookmarks : IBookmarkRepository
         }
     }
 
-    private IEnumerable<Bookmark>  FetchAll()
+    private IEnumerable<Bookmark>  FetchAll(string? filter = null)
     {
-        return _memoryCache.GetOrCreate(
+        var bookmarks = _memoryCache.GetOrCreate(
             CacheKey,
             IEnumerable<Bookmark> (_) =>
             {
@@ -82,15 +92,27 @@ public class ChromiumBrowserBookmarks : IBookmarkRepository
             },
             CacheEntryOptions.Default
         )!;
+
+        _logger.LogTrace("(Chromium) Getting bookmarks with filter '{Filter}' in path '{Path}'", filter ?? "<empty>", Path);
+        return filter is null 
+            ? bookmarks 
+            : bookmarks.Where(e => e.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase));
     }
 
-    private string GetJson() => File.Exists(Path)
-        ? File.ReadAllText(Path)
-        : "{}";
+    private string GetJson()
+    {
+        if (!File.Exists(Path))
+        {
+            _logger.LogWarning("(Chromium) Cannot find bookmark at '{Path}'", Path);       
+            return  "{}";
+        }
+
+        return File.ReadAllText(Path);
+    }
 
     public IEnumerable<Bookmark> GetBookmarks() => FetchAll();
 
-    public IEnumerable<Bookmark> GetBookmarks(string filter) => FetchAll().Where(e => e.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase));
+    public IEnumerable<Bookmark> GetBookmarks(string filter) => FetchAll(filter);
 
     public bool IsBookmarkSourceAvailable() => File.Exists(Path);
 

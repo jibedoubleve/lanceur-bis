@@ -1,4 +1,3 @@
-using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -27,32 +26,30 @@ public class TrackedMemoryCache : IMemoryCache
 
     public ICacheEntry CreateEntry(object key)
     {
-        _logger.LogDebug("TrackedMemoryCache: Creating cache");
+        _logger.LogTrace("Creating cache with key '{Key}'", key);
         return _memoryCache.CreateEntry(key);
     }
 
     public void Dispose()
     {
-        _logger.LogDebug("Disposing TrackedMemoryCache");
+        _logger.LogTrace($"Disposing {nameof(TrackedMemoryCache)}");
         _memoryCache.Dispose();
     }
 
     public void Remove(object key)
     {
-        _logger.LogDebug("Removing cache for {@Key}", key);
+        _logger.LogTrace("Removing cache with key '{Key}'", key);
         _memoryCache.Remove(key);
     }
 
     public bool TryGetValue(object key, out object value)
     {
-        var result =  _memoryCache.TryGetValue(key, out value);
+        var hasHit = _memoryCache.TryGetValue(key, out value);
+        var hit = hasHit ? "Hit" : "Miss";
 
-        if (result)
-            _logger.LogDebug("Hit cache for '{Key}'", key);
-        else
-            _logger.LogDebug("Miss cache for {Key}", key);
+        _logger.LogTrace("{Hit} cache with key '{Key}'", hit, key);
 
-        return result;
+        return hasHit;
     }
 
     #endregion
