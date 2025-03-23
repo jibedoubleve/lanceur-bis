@@ -62,7 +62,7 @@ public class EverythingQueryBuilderShould
         var query = new EverythingQueryBuilder().ExcludeSystemFiles()
                                                 .ExcludeHiddenFiles()
                                                 .OnlyExecFiles()
-                                                .ToString();
+                                                .BuildQuery();
         query.Should().Be($"!{EverythingModifiers.IncludeSystemFilesSwitch} !{EverythingModifiers.IncludeHiddenFilesSwitch} {EverythingModifiers.OnlyExecFilesSwitch}");
     }
 
@@ -72,7 +72,7 @@ public class EverythingQueryBuilderShould
         var query = new EverythingQueryBuilder().ExcludeHiddenFiles()
                                                 .ExcludeHiddenFiles()
                                                 .ExcludeHiddenFiles()
-                                                .ToString();
+                                                .BuildQuery();
         query.Should().Be($"!{EverythingModifiers.IncludeHiddenFilesSwitch}");
     }
 
@@ -82,7 +82,7 @@ public class EverythingQueryBuilderShould
         var query = new EverythingQueryBuilder().OnlyExecFiles()
                                                 .OnlyExecFiles()
                                                 .OnlyExecFiles()
-                                                .ToString();
+                                                .BuildQuery();
         query.Should().Be(EverythingModifiers.OnlyExecFilesSwitch);
     }
 
@@ -92,7 +92,7 @@ public class EverythingQueryBuilderShould
         var query = new EverythingQueryBuilder().ExcludeSystemFiles()
                                                 .ExcludeSystemFiles()
                                                 .ExcludeSystemFiles()
-                                                .ToString();
+                                                .BuildQuery();
         query.Should().Be($"!{EverythingModifiers.IncludeSystemFilesSwitch}");
     }
 

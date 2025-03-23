@@ -26,7 +26,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class KeywordsViewModelShould : ViewModelTest<KeywordsViewModel>
+public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
 {
     #region Constructors
 

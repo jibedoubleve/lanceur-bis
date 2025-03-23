@@ -12,7 +12,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class AnalyticsViewModelShould : ViewModelTest<AnalyticsViewModel>
+public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
 {
     #region Constructors
 

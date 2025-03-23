@@ -22,7 +22,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSettingsViewModel>
+public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSettingsViewModel>
 {
     #region Constructors
 
@@ -103,10 +103,10 @@ public class ApplicationSettingsViewModelShould : ViewModelTest<ApplicationSetti
                 // arrange
 
                 // act
-                viewModel.Settings.Application.HotKey = new(3, 18); // This is the default configuration
+                viewModel.Settings.Application.SetHotKey(3, 18); // This is the default configuration
                 viewModel.SaveSettingsCommand.Execute(null);
 
-                viewModel.Settings.Application.HotKey = new(1, 1);
+                viewModel.Settings.Application.SetHotKey(1, 1);
                 viewModel.SaveSettingsCommand.Execute(null);
 
                 // assert

@@ -7,17 +7,16 @@ namespace Lanceur.Infra.Repositories;
 
 public class MemoryApplicationConfigurationService : IApplicationConfigurationService
 {
-
     #region Fields
 
-    private static readonly ApplicationSettings Settings;
     private readonly ILogger<MemoryApplicationConfigurationService> _logger;
 
-    #endregion Fields
+    private static readonly ApplicationSettings Settings;
+
+    #endregion
 
     #region Constructors
 
-    public MemoryApplicationConfigurationService(ILogger<MemoryApplicationConfigurationService> logger) { _logger = logger; }
     static MemoryApplicationConfigurationService()
     {
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -26,13 +25,15 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
         Settings = new() { DbPath = path };
     }
 
-    #endregion Constructors
+    public MemoryApplicationConfigurationService(ILogger<MemoryApplicationConfigurationService> logger) => _logger = logger;
+
+    #endregion
 
     #region Properties
 
     public IApplicationSettings Current => Settings;
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -47,5 +48,5 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
         _logger.LogWarning("This is a mock service for development purposes. It simulates saving the settings. Debug database: {Settings}", Settings.DbPath);
     }
 
-    #endregion Methods
+    #endregion
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Lanceur.Tests.Tools.Logging;
+using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Tooling.Logging;

@@ -15,8 +15,6 @@ public abstract class TestBase
 {
     #region Fields
 
-    private bool _isProfilingSql;
-
     private const string InMemoryConnectionString = "Data Source =:memory:";
 
     #endregion
@@ -33,6 +31,8 @@ public abstract class TestBase
 
     #region Properties
 
+    private static bool IsProfilingSql => false;
+
     private DbProfiler SqlProfiler { get;  }
 
     protected ITestOutputHelper OutputHelper { get; }
@@ -43,11 +43,13 @@ public abstract class TestBase
 
     protected IDbConnection BuildConnection(string? connectionString = null)
     {
+        if (IsProfilingSql) SqlProfiler.IsActive = true;
         var connection = new ProfiledDbConnection(
             new SQLiteConnection(connectionString ?? InMemoryConnectionString),
             SqlProfiler
         );
 
+        OutputHelper.WriteLine($"Connection string: '{connection.ConnectionString}'");
         connection.Open();
         return connection;
     }
@@ -58,11 +60,7 @@ public abstract class TestBase
         var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbeddedResourcePattern);
         updater.UpdateFromScratch();
 
-        if (_isProfilingSql) SqlProfiler.IsActive = true;
-
-        if (sql.IsNullOrEmpty()) return db;
-
-        db.Execute(sql!);
+        if (!sql.IsNullOrEmpty()) db.Execute(sql!);
 
         return db;
     }
@@ -74,13 +72,7 @@ public abstract class TestBase
         db.Execute(sql);
     }
 
-    /// <summary>
-    ///     Activates SQL logging to provide detailed insights into SQL operations executed against the database.
-    ///     This enables the capturing and display of SQL queries for profiling and debugging purposes.
-    /// </summary>
-    protected void EnableSqlProfiling() => _isProfilingSql = true;
-
-    protected DbSingleConnectionManager GetDatabase(SqlBuilder builder, string? connectionString = null)
+    protected DbSingleConnectionManager GetConnectionManager(SqlBuilder builder, string? connectionString = null)
     {
         DbSingleConnectionManager? connectionManager = null;
         try

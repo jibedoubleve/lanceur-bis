@@ -10,7 +10,7 @@ public class LightConnectionString : BaseConnectionString, IConnectionString
 
     private static string? _connectionString;
 
-    private readonly string _dbPath = Paths.DefaultDb;
+    private readonly string _dbPath;
 
     #endregion Fields
 

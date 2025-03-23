@@ -6,7 +6,7 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Tests.Tooling.Logging;
+using Lanceur.Tests.Tools.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -28,12 +28,12 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddLogger<T>(this IServiceCollection serviceCollection, ITestOutputHelper outputHelper) => serviceCollection.AddSingleton<ILogger<T>>(new TestOutputHelperDecoratorForMicrosoftLogging<T>(outputHelper));
+    public static IServiceCollection AddLoggingForTests<T>(this IServiceCollection serviceCollection, ITestOutputHelper outputHelper) 
+        => serviceCollection.AddSingleton<ILogger<T>>(new TestOutputHelperDecoratorForMicrosoftLogging<T>(outputHelper));
 
     public static IServiceCollection AddDatabase(this IServiceCollection serviceCollection, IDbConnectionManager connectionManager)
     {
-        serviceCollection.AddMockSingleton<IConnectionString>()
-                         .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
+        serviceCollection.AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))
                          .AddSingleton(connectionManager);
         return serviceCollection;

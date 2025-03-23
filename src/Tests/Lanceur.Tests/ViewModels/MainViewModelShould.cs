@@ -28,7 +28,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class MainViewModelShould : ViewModelTest<MainViewModel>
+public class MainViewModelShould : ViewModelTester<MainViewModel>
 {
     #region Constructors
 
@@ -176,7 +176,7 @@ public class MainViewModelShould : ViewModelTest<MainViewModel>
         {
             VisitSettings = settings =>
             {
-                var application = new DatabaseConfiguration { SearchBox = new() { ShowResult = showAllResults } };
+                var application = new DatabaseConfiguration { SearchBox = { ShowResult = showAllResults } };
                 settings.Application.Returns(application);
             }
         };

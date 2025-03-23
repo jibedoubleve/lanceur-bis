@@ -149,13 +149,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (ExcludeSystemFilesWithEverything) query.ExcludeSystemFiles();
         if (IncludeOnlyExecFilesWithEverything) query.OnlyExecFiles();
         if (ExcludeFilesInBinWithEverything) query.ExcludeFilesInBin();
-        Settings.Application.Stores.EverythingQuerySuffix = query.ToString();
+        Settings.Application.Stores.EverythingQuerySuffix = query.BuildQuery();
 
         // Window section
         Settings.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
         Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
-
-        // Miscellaneous
     }
 
     [RelayCommand]
@@ -192,7 +190,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
 
-        List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
+        List<bool> reboot = [
+            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
+            Settings.Local.DbPath != DbPath
+        ];
 
         MapSettingsFromUiToDb();
         _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;
