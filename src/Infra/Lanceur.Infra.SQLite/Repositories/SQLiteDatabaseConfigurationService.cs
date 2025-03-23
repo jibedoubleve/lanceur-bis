@@ -7,20 +7,22 @@ using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite.Repositories;
 
-/// <inheritdoc cref="IDatabaseConfigurationService"/>
+/// <inheritdoc cref="IDatabaseConfigurationService" />
 public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabaseConfigurationService
 {
     #region Fields
 
     private DatabaseConfiguration _current;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    public SQLiteDatabaseConfigurationService(IDbConnectionManager manager) : base(manager) { }
+    public SQLiteDatabaseConfigurationService(IDbConnectionManager manager) : base(manager)
+    {
+    }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -33,7 +35,7 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
         }
     }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -52,15 +54,15 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
                            from settings
                            where s_key = 'json';
                            """;
-        var s = Db.WithinTransaction(
-            tx =>
-                tx.Connection!.Query<string>(sql)
-                  .FirstOrDefault()
+        var json = Db.WithConnection(
+            conn =>
+                conn.Query<string>(sql)
+                    .FirstOrDefault()
         );
 
-        _current = s.IsNullOrEmpty()
+        _current = json.IsNullOrEmpty()
             ? new()
-            : JsonConvert.DeserializeObject<DatabaseConfiguration>(s);
+            : JsonConvert.DeserializeObject<DatabaseConfiguration>(json);
     }
 
     public void Save()
@@ -81,5 +83,5 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
         );
     }
 
-    #endregion Methods
+    #endregion
 }

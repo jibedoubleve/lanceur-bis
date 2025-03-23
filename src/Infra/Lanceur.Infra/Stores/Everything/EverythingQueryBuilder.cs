@@ -34,7 +34,7 @@ public class EverythingQueryBuilder
         return this;
     }
 
-    public override string ToString() => string.Join(" ", _prefixes).Trim();
+    public string BuildQuery() => string.Join(" ", _prefixes).Trim();
 
     #endregion
 }

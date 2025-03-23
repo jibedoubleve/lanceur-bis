@@ -13,7 +13,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class MostUsedViewModelShould : ViewModelTest<MostUsedViewModel>
+public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
 {
     private const int HistorySize = 5;
 

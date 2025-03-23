@@ -155,8 +155,8 @@ public class SearchServiceShould : TestBase
         using var conn = new DbSingleConnectionManager(db);
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<IThumbnailService>()
-                                                     .AddLogger<StoreLoader>(OutputHelper)
-                                                     .AddLogger<MacroService>(OutputHelper)
+                                                     .AddLoggingForTests<StoreLoader>(OutputHelper)
+                                                     .AddLoggingForTests<MacroService>(OutputHelper)
                                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton<IMacroService, MacroService>()

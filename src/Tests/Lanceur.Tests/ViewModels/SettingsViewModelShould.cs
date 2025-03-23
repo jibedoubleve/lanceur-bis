@@ -20,7 +20,7 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewModel>
+public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewModel>
 {
     #region Constructors
 
@@ -30,37 +30,36 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
 
     #region Methods
 
-    private void CheckProperty(Action<ApplicationSettingsViewModel> act, Func<string> getSql, Func<string> expected)
+    private void AssertProperty(Action<ApplicationSettingsViewModel> act, Func<string> getSql, Func<string> expected)
     {
-        var sqlBuilder = new SqlBuilder();
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
 
         TestViewModel(
             (viewModel, db) =>
             {
                 // act
+                viewModel.SaveSettingsCommand.Execute(null); //Force default values
                 act(viewModel);
-                viewModel.SaveSettingsCommand.Execute(null);
 
                 // assert
                 var sql = getSql();
-                var result = db.WithConnection(c => c.Query<string>(sql).Single());
+                var result = db.WithConnection(c => c.Query<string>(sql).SingleOrDefault());
                 result.Should().Be(expected());
             },
-            sqlBuilder,
+            SqlBuilder.Empty,
             visitors
         );
     }
 
-    private static string Sql(string jsonQuery) => $"""
-                                                    select s_value ->> '$.{jsonQuery}' as value
-                                                    from settings
-                                                    where s_key = 'json'
-                                                    """;
+    private static string GetProperty(string jsonPath) => $"""
+                                                           select s_value ->> '$.{jsonPath}' as value
+                                                           from settings
+                                                           where s_key = 'json'
+                                                           """;
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
-        serviceCollection.AddLogger<ApplicationSettingsViewModel>(OutputHelper)
+        serviceCollection.AddLoggingForTests<ApplicationSettingsViewModel>(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                          .AddSingleton<ISettingsFacade, SettingsFacadeService>()
                          .AddSingleton<IInteractionHub, InteractionHub>()
@@ -76,39 +75,37 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
 
     [Theory]
     [InlineData(500, "500")]
-    public void SaveOptionSearchDelay(double value, string expected) => CheckProperty(
+    [InlineData(123, "123")]
+    public void SaveOptionSearchDelay(double value, string expected) => AssertProperty(
         viewModel => viewModel.SearchDelay = value,
-        () => Sql("SearchBox.SearchDelay"),
+        () => GetProperty("SearchBox.SearchDelay"),
         () => expected
     );
 
     [Theory]
     [InlineData(true, "1")]
     [InlineData(false, "0")]
-    public void SaveOptionShowAtStartup(bool value, string expected) => CheckProperty(
+    public void SaveOptionShowAtStartup(bool value, string expected) => AssertProperty(
         viewModel => viewModel.ShowAtStartup = value,
-        () => Sql("SearchBox.ShowAtStartup"),
+        () => GetProperty("SearchBox.ShowAtStartup"),
         () => expected
     );
 
     [Theory]
     [InlineData(true, "1")]
     [InlineData(false, "0")]
-    public void SaveOptionShowLastQuery(bool value, string expected)
-    {
-        CheckProperty(
-            viewModel => viewModel.ShowLastQuery = value,
-            () => Sql("SearchBox.ShowLastQuery"),
-            () => expected
-        );
-    }
+    public void SaveOptionShowLastQuery(bool value, string expected) => AssertProperty(
+        viewModel => viewModel.ShowLastQuery = value,
+        () => GetProperty("SearchBox.ShowLastQuery"),
+        () => expected
+    );
 
     [Theory]
     [InlineData(true, "1")]
     [InlineData(false, "0")]
-    public void SaveOptionShowResult(bool value, string expected) =>  CheckProperty(
+    public void SaveOptionShowResult(bool value, string expected) =>  AssertProperty(
         viewModel => viewModel.ShowResult = value,
-        () => Sql("SearchBox.ShowResult"),
+        () => GetProperty("SearchBox.ShowResult"),
         () => expected
     );
 
@@ -118,9 +115,9 @@ public class SettingsViewModelShould : ViewModelTest<ApplicationSettingsViewMode
     [InlineData("Edge")]
     [InlineData("Firefox")]
     [InlineData("SomeUnknownValue")]
-    public void SaveOptionStoresBookmarkSourceBrowser(string value) => CheckProperty(
+    public void SaveOptionStoresBookmarkSourceBrowser(string value) => AssertProperty(
         viewModel => viewModel.BookmarkSourceBrowser = value,
-        () => Sql("Stores.BookmarkSourceBrowser"),
+        () => GetProperty("Stores.BookmarkSourceBrowser"),
         () => value
     );
 

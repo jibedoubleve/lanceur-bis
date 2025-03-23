@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Lanceur.Tests.Tooling.Logging;
+using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Tooling.Logging;
+namespace Lanceur.Tests.Tools.Logging;
 
 public class TestOutputHelperDecoratorForMicrosoftLogging<T> : BaseTestOutputHelperDecorator, ILogger<T>
 {

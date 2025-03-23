@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Constants;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tools;
 using Newtonsoft.Json;
 using Xunit;
@@ -18,7 +18,7 @@ public class SettingsShould : TestBase
 
     public SettingsShould(ITestOutputHelper output) : base(output) { }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -88,7 +88,7 @@ public class SettingsShould : TestBase
     public void HaveDefaultShowAtStartup()
     {
         var c = BuildFreshDb();
-        var scope = new DbSingleConnectionManager(c);
+        using var scope = new DbSingleConnectionManager(c);
         var settings = new SQLiteDatabaseConfigurationService(scope);
 
         settings.Current.SearchBox.ShowAtStartup.Should().BeTrue();
@@ -98,20 +98,22 @@ public class SettingsShould : TestBase
     public void HaveDefaultShowResult()
     {
         var c = BuildFreshDb();
-        var scope = new DbSingleConnectionManager(c);
+        using var scope = new DbSingleConnectionManager(c);
         var settings = new SQLiteDatabaseConfigurationService(scope);
 
         settings.Current.SearchBox.ShowResult.Should().BeFalse();
     }
 
-    [Theory, InlineData(1, 2), InlineData(10, 20)]
+    [Theory]
+    [InlineData(1, 2)]
+    [InlineData(10, 20)]
     public void SaveHotKey(int modifierKey, int key)
     {
         WithConfiguration(
             repository =>
             {
                 var settings = repository.Current;
-                settings.HotKey = new(modifierKey, key);
+                settings.SetHotKey(key, modifierKey);
 
                 repository.Save();
                 settings.HotKey.ModifierKey.Should().Be(modifierKey);
@@ -134,7 +136,8 @@ public class SettingsShould : TestBase
         json.Should().Be(asThisJson);
     }
 
-    [Theory, InlineData(1.1d, 2.1d)]
+    [Theory]
+    [InlineData(1.1d, 2.1d)]
     public void SavePosition(double left, double top)
     {
         WithConfiguration(
@@ -153,5 +156,5 @@ public class SettingsShould : TestBase
         );
     }
 
-    #endregion Methods
+    #endregion
 }

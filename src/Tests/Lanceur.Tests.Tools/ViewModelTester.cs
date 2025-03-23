@@ -8,12 +8,12 @@ using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Tools;
 
-public abstract class ViewModelTest<TViewModel> : TestBase
+public abstract class ViewModelTester<TViewModel> : TestBase
     where TViewModel : class
 {
     #region Constructors
 
-    protected ViewModelTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    protected ViewModelTester(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -24,29 +24,29 @@ public abstract class ViewModelTest<TViewModel> : TestBase
     protected async Task TestViewModelAsync(Func<TViewModel, IDbConnectionManager, Task> scope, SqlBuilder? sqlBuilder = null, ServiceVisitors? visitors = null)
     {
         var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
-        using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
+        using var connectionManager = GetConnectionManager(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
 
         var serviceCollection = new ServiceCollection().AddView<TViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
-                                                       .AddDatabase(db);
+                                                       .AddDatabase(connectionManager);
 
         var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
         var viewModel = serviceProvider.GetService<TViewModel>() !;
-        await scope(viewModel, db);
+        await scope(viewModel, connectionManager);
     }
     
     protected void TestViewModel(Action<TViewModel, IDbConnectionManager> scope, SqlBuilder? sqlBuilder = null, ServiceVisitors? visitors = null)
     {
         var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
-        using var db = GetDatabase(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
+        using var connectionManager = GetConnectionManager(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
 
         var serviceCollection = new ServiceCollection().AddView<TViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
-                                                       .AddDatabase(db);
+                                                       .AddDatabase(connectionManager);
 
         var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
         var viewModel = serviceProvider.GetService<TViewModel>() !;
-        scope(viewModel, db);
+        scope(viewModel, connectionManager);
     }
 
     #endregion
