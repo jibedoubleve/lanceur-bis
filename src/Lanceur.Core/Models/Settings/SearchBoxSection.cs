@@ -4,8 +4,6 @@ public class SearchBoxSection
 {
     #region Properties
 
-    public static SearchBoxSection Default { get; set; } = new();
-
     /// <summary>
     ///     Gets or sets the delay (in milliseconds) without keystrokes before triggering the search
     ///     with the text that has already been typed. Acts as a "watchdog" to wait for typing pauses.

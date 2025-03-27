@@ -11,39 +11,47 @@ public class DatabaseConfiguration
     /// <summary>
     ///     Gets or sets the caching configuration settings used across the application.
     /// </summary>
-    public CachingSession Caching { get; } = CachingSession.Default;
+    public CachingSession Caching { get; } = new();
 
     /// <summary>
     ///     Gets or sets the hotkey configuration for displaying the search window.
     ///     This setting allows users to customise the shortcut key for quick access.
     /// </summary>
-    public HotKeySection HotKey { get; } = HotKeySection.Default;
+    /// <remarks>
+    ///     The default hotkey configuration: ALTGR + Space.
+    ///     The values 3 and 18 represent the key codes for the ALTGR and Space keys, respectively.
+    /// </remarks>
+    public HotKeySection HotKey { get; } = new(3, 18);
 
     /// <summary>
     ///     Gets or sets the configuration settings for the search box.
     /// </summary>
-    public SearchBoxSection SearchBox { get; } = SearchBoxSection.Default;
+    public SearchBoxSection SearchBox { get; } = new();
 
     /// <summary>
     ///     Gets or sets the configuration settings for the store section.
     ///     This includes preferences and metadata related to connected stores or sources.
     /// </summary>
-    public StoreSection Stores { get; } = StoreSection.Default;
+    public StoreSection Stores { get; } = new();
 
     /// <summary>
     ///     Gets or sets the configuration settings for the application's main window.
     ///     This includes dimensions, position, and other display-related preferences.
     /// </summary>
-    public WindowSection Window { get; } = WindowSection.Default;
+    public WindowSection Window { get; } = new();
 
     #endregion
 }
 
 public static class DatabaseConfigurationExtensions
 {
+    #region Methods
+
     public static void SetHotKey(this DatabaseConfiguration databaseConfiguration, int key, int modifierKey)
     {
         databaseConfiguration.HotKey.Key = key;
         databaseConfiguration.HotKey.ModifierKey = modifierKey;
     }
+
+    #endregion
 }

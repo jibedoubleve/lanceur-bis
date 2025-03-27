@@ -28,9 +28,6 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddLoggingForTests<T>(this IServiceCollection serviceCollection, ITestOutputHelper outputHelper) 
-        => serviceCollection.AddSingleton<ILogger<T>>(new TestOutputHelperDecoratorForMicrosoftLogging<T>(outputHelper));
-
     public static IServiceCollection AddDatabase(this IServiceCollection serviceCollection, IDbConnectionManager connectionManager)
     {
         serviceCollection.AddSingleton<IAliasRepository, SQLiteAliasRepository>()
@@ -39,15 +36,17 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
+    public static IServiceCollection AddLoggingForTests<T>(this IServiceCollection serviceCollection, ITestOutputHelper outputHelper) => serviceCollection.AddSingleton<ILogger<T>>(new TestOutputHelperDecoratorForMicrosoftLogging<T>(outputHelper));
+
     /// <summary>
-    /// Configures the behaviour of a mocked singleton service within the specified <see cref="IServiceCollection"/>.
-    /// Note that <see cref="IServiceProvider"/> is built at the moment this method is invoked, meaning any registrations
-    /// added after this call will not be visible within the <paramref name="configurator"/> delegate.
+    ///     Configures the behaviour of a mocked singleton service within the specified <see cref="IServiceCollection" />.
+    ///     Note that <see cref="IServiceProvider" /> is built at the moment this method is invoked, meaning any registrations
+    ///     added after this call will not be visible within the <paramref name="configurator" /> delegate.
     /// </summary>
     /// <typeparam name="T">The service type to be mocked and configured.</typeparam>
     /// <param name="serviceCollection">The service collection to which the configured singleton is added.</param>
-    /// <param name="configurator">A delegate used to configure the mocked instance of <typeparamref name="T"/>.</param>
-    /// <returns>The updated <see cref="IServiceCollection"/> containing the configured singleton service.</returns>
+    /// <param name="configurator">A delegate used to configure the mocked instance of <typeparamref name="T" />.</param>
+    /// <returns>The updated <see cref="IServiceCollection" /> containing the configured singleton service.</returns>
     public static IServiceCollection AddMockSingleton<T>(this IServiceCollection serviceCollection, Func<IServiceProvider, T, T> configurator)
         where T : class
     {
@@ -65,8 +64,8 @@ public static class ServiceProviderExtensions
     }
 
     /// <summary>
-    /// Configures the view and logging services within the service provider.
-    /// Note that the logger is a mock implementation.
+    ///     Configures the view and logging services within the service provider.
+    ///     Note that the logger is a mock implementation.
     /// </summary>
     /// <param name="serviceCollection">The service collection to which services are added.</param>
     /// <typeparam name="T">The type representing the view component.</typeparam>
