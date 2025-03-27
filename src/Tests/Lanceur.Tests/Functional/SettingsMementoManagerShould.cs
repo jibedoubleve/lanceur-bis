@@ -117,7 +117,6 @@ public class SettingsMementoManagerShould
         // First state
         var dbPath = Guid.NewGuid().ToString();
         var initialAppConfig = JsonConvert.DeserializeObject<DatabaseConfiguration>(JsonAppConfig);
-        var initialDbPath = dbPath;
 
         // Second state
         var secondAppConfig = JsonConvert.DeserializeObject<DatabaseConfiguration>(JsonAppConfig);
@@ -125,7 +124,7 @@ public class SettingsMementoManagerShould
 
         // Setup SettingsFacade
         var databaseConfig = Substitute.For<IApplicationSettings>();
-        databaseConfig.DbPath.Returns(initialDbPath, secondDbPath);
+        databaseConfig.DbPath.Returns(dbPath, secondDbPath);
 
         var databaseConfigRepository = Substitute.For<IApplicationConfigurationService>();
         databaseConfigRepository.Current.Returns(databaseConfig);

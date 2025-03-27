@@ -11,11 +11,6 @@ public class WindowSection
     public string BackdropStyle { get; set; } = "Mica";
 
     /// <summary>
-    ///     Gets the default window configuration, with default position settings.
-    /// </summary>
-    public static WindowSection Default => new() { Position = PositionSection.Default };
-
-    /// <summary>
     ///     Gets or sets the duration (in seconds) that the notification remains visible in the UI before disappearing.
     /// </summary>
     public int NotificationDisplayDuration { get; set; } = 10;
@@ -23,7 +18,7 @@ public class WindowSection
     /// <summary>
     ///     Gets or sets the position of the window when it is displayed on the screen.
     /// </summary>
-    public PositionSection Position { get; set; } = new();
+    public PositionSection Position { get; } = new() { Left = double.MaxValue, Top = double.MaxValue };
 
     #endregion
 }

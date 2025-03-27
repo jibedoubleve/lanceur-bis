@@ -16,12 +16,6 @@ public class StoreSection
     public string BookmarkSourceBrowser { get; set; } = "Chrome";
 
     /// <summary>
-    ///     Gets a default instance of the <see cref="StoreSection" /> class
-    ///     with default values. Use this as a baseline configuration.
-    /// </summary>
-    public static StoreSection Default => new();
-
-    /// <summary>
     ///     Gets or sets the suffix appended to queries executed with the Everything search engine.
     ///     This suffix can be used to modify search behavior, such as excluding system or hidden files.
     /// </summary>

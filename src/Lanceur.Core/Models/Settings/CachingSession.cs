@@ -5,15 +5,7 @@ namespace Lanceur.Core.Models.Settings;
 /// </summary>
 public class CachingSession
 {
-    #region Constructors
-
-    private  CachingSession() { }
-
-    #endregion
-
     #region Properties
-
-    public static CachingSession Default => new();
 
     /// <summary>
     ///     Gets or sets the cache duration for stored data, in minutes.
