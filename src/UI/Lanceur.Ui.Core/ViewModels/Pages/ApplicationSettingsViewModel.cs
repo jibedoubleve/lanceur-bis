@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -26,6 +28,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
+    [ObservableProperty] private ObservableCollection<FeatureFlag> _featureFlags = new();
     private readonly IInteractionHub _hub;
     [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     [ObservableProperty] private bool _isAlt;
@@ -81,12 +84,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         MapSettingsFromDbToUi();
-
-        PropertyChanged += (_, e) =>
-        {
-            _logger.LogTrace("Property '{Property}' changed", e.PropertyName);
-            OnSaveSettings();
-        };
+        
+        // Setup behaviour on property changed
+        foreach (var flag in FeatureFlags) flag.PropertyChanged += OnPropertyChanged;
+        PropertyChanged += OnPropertyChanged;
     }
 
     #endregion
@@ -127,6 +128,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Window section
         NotificationDisplayDuration = Settings.Application.Window.NotificationDisplayDuration;
         WindowBackdropStyle = Settings.Application.Window.BackdropStyle;
+
+        // Feature flags
+        FeatureFlags = new(Settings.Application.FeatureFlags);
     }
 
     private void MapSettingsFromUiToDb()
@@ -154,6 +158,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Window section
         Settings.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
         Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
+
+        // Feature flags
+        Settings.Application.FeatureFlags = FeatureFlags;
     }
 
     [RelayCommand]
@@ -181,6 +188,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         _hub.Notifications.Success($"Modification has been done on {storeName}. Don't forget to save to apply changes", "Updated.");
     }
 
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        _logger.LogTrace("Property '{Property}' changed", e.PropertyName);
+        OnSaveSettings();
+    }
+
     [RelayCommand]
     private void OnSaveSettings()
     {
@@ -190,10 +203,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
 
-        List<bool> reboot = [
-            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
-            Settings.Local.DbPath != DbPath
-        ];
+        List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
 
         MapSettingsFromUiToDb();
         _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;

@@ -87,7 +87,7 @@
                                          IsChecked="{Binding ShowAtStartup}" />
                     </StackPanel>
                 </ui:CardControl>
-                
+
                 <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon ReadingList24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Notification Duration (in seconds)." />
@@ -167,19 +167,13 @@
                         Icon="{ui:SymbolIcon DatabaseSearch24}"
                         IsExpanded="True">
                     <ui:CardExpander.Header>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <ui:TextBlock
+                        <ui:TextBlock
                                 Grid.Row="0"
                                 Grid.Column="0"
                                 FontTypography="Body"
                                 Text="Everything Store Configuration"/>
-                        </Grid>
                     </ui:CardExpander.Header>
-                            <StackPanel Grid.Row="1">
+                    <StackPanel Grid.Row="1">
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" 
@@ -225,7 +219,7 @@
                         </ui:CardControl>
                     </StackPanel>
                 </ui:CardExpander>
-                    
+
                 <ui:CardExpander
                         Margin="5,5,5,12"
                         Icon="{ui:SymbolIcon ArrowUpRight24}"
@@ -290,8 +284,45 @@
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </ui:DataGrid>
-                        
+
                     </StackPanel>
+                </ui:CardExpander>
+
+                <ui:TextBlock Margin="{StaticResource RegionMargin}"
+                              FontTypography="{StaticResource RegionFontTypography}"
+                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Feature flags" />
+
+                <ui:CardExpander
+                        Margin="5,5,5,12"
+                        Icon="{ui:SymbolIcon FlagCheckered20}"
+                        IsExpanded="True">
+                    <ui:CardExpander.Header>
+                        <ui:TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                FontTypography="Body"
+                                Text="Feature flags (activate or deactivate features)"/>
+                    </ui:CardExpander.Header>
+                    <ItemsControl ItemsSource="{Binding FeatureFlags}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:CardControl Margin="5,5,5,12">
+                                    <ui:CardControl.Icon>
+                                        <ui:SymbolIcon Symbol="{Binding Icon}"/>
+                                    </ui:CardControl.Icon>
+
+                                    <ui:CardControl.Header>
+                                        <ui:TextBlock FontTypography="Body" 
+                                              Text="{Binding Description}" />
+                                    </ui:CardControl.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:ToggleSwitch OffContent="No" OnContent="Yes"
+                                         IsChecked="{Binding Enabled}" />
+                                    </StackPanel>
+                                </ui:CardControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </ui:CardExpander>
 
                 <ui:TextBlock Margin="{StaticResource RegionMargin}"
@@ -306,7 +337,7 @@
                                      OffContent="Trace disabled"
                                      IsChecked="{Binding IsTraceEnabled}" />
                 </ui:CardControl>
-                
+
             </StackPanel>
         </ScrollViewer>
     </Grid>

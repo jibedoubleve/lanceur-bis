@@ -1,9 +1,13 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Humanizer;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Extensions;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Messages;
@@ -28,7 +32,10 @@ public partial class MainView
 {
     #region Fields
 
+    private readonly IComputerInfoService _computerInfoService;
+
     private readonly IDatabaseConfigurationService _databaseConfig;
+    private readonly IFeatureFlagService _featureFlagService;
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly ISettingsFacade _settings;
@@ -43,7 +50,9 @@ public partial class MainView
         IServiceProvider serviceProvider,
         ISettingsFacade settings,
         IHotKeyService hotKeyService,
-        IDatabaseConfigurationService databaseConfig
+        IDatabaseConfigurationService databaseConfig,
+        IComputerInfoService computerInfoService,
+        IFeatureFlagService featureFlagService
     )
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -53,11 +62,15 @@ public partial class MainView
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(hotKeyService);
         ArgumentNullException.ThrowIfNull(databaseConfig);
+        ArgumentNullException.ThrowIfNull(computerInfoService);
+        ArgumentNullException.ThrowIfNull(featureFlagService);
 
         _logger = logger;
         _serviceProvider = serviceProvider;
         _settings = settings;
         _databaseConfig = databaseConfig;
+        _computerInfoService = computerInfoService;
+        _featureFlagService = featureFlagService;
 
         DataContext = viewModel;
 
@@ -88,6 +101,31 @@ public partial class MainView
 
     #region Methods
 
+    private void HandleCpuAndMemoryUsage()
+    {
+        var enabled = _featureFlagService.IsEnabled(Features.ResourceDisplay);
+        if (enabled)
+            _ = _computerInfoService.StartMonitoring(
+                500.Milliseconds(),
+                t =>
+                {
+                    Debug.WriteLine($"Cpu: {t.CpuLoad} % - Memory: {t.MemoryLoad} %");
+                    Application.Current.Dispatcher.Invoke(
+                        () =>
+                        {
+                            CpuProgressBar.Value = t.CpuLoad;
+                            MemoryProgressBar.Value = t.MemoryLoad;
+                        }
+                    );
+                }
+            );
+        
+        _logger.LogTrace("Feature flag '{FeatureFlag}' Enabled: {Enabled}", Features.ResourceDisplay, enabled);
+        PanelCpu.Visibility
+            = PanelMemory.Visibility
+                = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     /// <remarks>
     ///     Handles the "Show Last Query" option when closing the window to prevent UI flickering.
     ///     Clearing the results when the window is transparent avoids an unsightly refresh effect
@@ -99,6 +137,7 @@ public partial class MainView
             QueryTextBox.SelectAll();
         else
             QueryTextBox.Clear();
+        _computerInfoService.StopMonitoring();
         Hide();
     }
 
@@ -210,14 +249,17 @@ public partial class MainView
     private void ShowWindow()
     {
         _logger.LogTrace("Current window is at {Coordinate}", this.ToCoordinate());
-        
+
         // HACK: Settings take effect only after closing the window.  
         // When changing settings, the previous ones persist until the window is hidden at least once.  
         // This ensures the window is cleared immediately if settings are updated.  
         if (!_settings.Application.SearchBox.ShowLastQuery) ViewModel.Clear();
 
         ViewModel.RefreshSettings();
+
         _ = ViewModel.DisplayResultsIfAllowed();
+
+        HandleCpuAndMemoryUsage();
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();
 

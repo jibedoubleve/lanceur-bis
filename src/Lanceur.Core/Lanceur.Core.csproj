@@ -14,11 +14,15 @@
         <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <Compile Update="Models\AliasQueryResultExtensions.cs">
-        <DependentUpon>AliasQueryResult.cs</DependentUpon>
-      </Compile>
-      <Compile Update="Models\QueryResultExtensions.cs">
-        <DependentUpon>QueryResult.cs</DependentUpon>
-      </Compile>
+        <Compile Update="Models\AliasQueryResultExtensions.cs">
+            <DependentUpon>AliasQueryResult.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Models\QueryResultExtensions.cs">
+            <DependentUpon>QueryResult.cs</DependentUpon>
+        </Compile>
+        <Compile Remove="Repositories\FeatureFlags\Features.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Repositories\FeatureFlags\" />
     </ItemGroup>
 </Project>

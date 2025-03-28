@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddWpfServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddSingleton<IUserGlobalNotificationService, ToastUserNotificationService>()
+                         .AddSingleton<IComputerInfoService, ComputerInfoService>()
                          .AddSingleton<IContentDialogService, ContentDialogService>()
                          .AddSingleton<IUserInteractionService, UserInteractionService>()
                          .AddSingleton<ISnackbarService, SnackbarService>()
