@@ -18,7 +18,6 @@ using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
-using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Caching;
 using Lanceur.SharedKernel.Utils;
@@ -34,6 +33,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 using Serilog.Formatting.Display;
 
 namespace Lanceur.Ui.Core.Extensions;
@@ -62,10 +62,10 @@ public static class ServiceCollectionExtensions
                                                  .WriteTo.Console();
 
         ConditionalExecution.Execute(
-            ConfigureLogForDebug, 
+            ConfigureLogForDebug,
             ConfigureLogForRelease
         );
-        
+
         Log.Logger = loggerCfg.CreateLogger();
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true))
                          .BuildServiceProvider();
@@ -88,7 +88,7 @@ public static class ServiceCollectionExtensions
         {
             // Clef file, easier to import into SEQ
             loggerCfg.WriteTo.File(
-                new Serilog.Formatting.Compact.CompactJsonFormatter(),
+                new CompactJsonFormatter(),
                 Paths.ClefLogFile,
                 rollingInterval: RollingInterval.Day
             );
@@ -145,6 +145,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWildcardService, ReplacementComposite>()
                          .AddTransient<IReconciliationService, ReconciliationService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
+                         .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>();
 
         ConditionalExecution.Execute(

@@ -1,4 +1,6 @@
-﻿namespace Lanceur.Core.Models.Settings;
+using Lanceur.Core.Constants;
+
+namespace Lanceur.Core.Models.Settings;
 
 /// <summary>
 ///     Represents the configuration settings for the application.
@@ -12,6 +14,20 @@ public class DatabaseConfiguration
     ///     Gets or sets the caching configuration settings used across the application.
     /// </summary>
     public CachingSession Caching { get; } = new();
+
+    /// <summary>
+    ///     Get or sets the configuration settings for the feature flags.
+    /// </summary>
+    public IEnumerable<FeatureFlag> FeatureFlags { get; set; } =
+    [
+        new()
+        {
+            FeatureName = Features.ResourceDisplay,
+            Enabled = true,
+            Description = "Show CPU and Memory Usage in Search Box",
+            Icon = "Gauge24"
+        }
+    ];
 
     /// <summary>
     ///     Gets or sets the hotkey configuration for displaying the search window.

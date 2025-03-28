@@ -47,6 +47,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!--  QUERY BOXES  -->
@@ -139,19 +140,40 @@
                 Grid.Row="2"
                 Margin="5,6,5,2"
                 Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}" />
-            <StackPanel
-                Grid.Row="3"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Orientation="Horizontal"
-                Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}">
-                <ui:TextBlock
-                    Margin="0,0,15,6"
-                    FontTypography="Caption"
-                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                    Opacity="{StaticResource SecondaryTextOpacity}"
-                    Text="{Binding Results.Count, StringFormat={}{0} Item(s) found.}" />
-            </StackPanel>
+
+
+            <Grid Grid.Row="3"
+                  Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}"
+                  Margin="0,0,15,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <DockPanel LastChildFill="True" Grid.Column="0" x:Name="PanelCpu">
+                    <ui:TextBlock Text="CPU" Margin="15,0,10,0" FontTypography="Caption" HorizontalAlignment="Right"
+                                  Width="30" />
+                    <ProgressBar x:Name="CpuProgressBar" Maximum="100" Margin="0,0,5,0" Height="6" />
+                </DockPanel>
+
+                <DockPanel LastChildFill="True" Grid.Column="1" x:Name="PanelMemory">
+                    <ui:TextBlock Text="Memory" Margin="15,0,5,0" FontTypography="Caption" HorizontalAlignment="Right"
+                                  Width="46" />
+                    <ProgressBar x:Name="MemoryProgressBar" Minimum="0" Maximum="100" Margin="0,0,10,0" Height="6" />
+                </DockPanel>
+
+                <StackPanel Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal">
+                    <ui:TextBlock
+                        FontTypography="Caption"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        Opacity="{StaticResource SecondaryTextOpacity}"
+                        Text="{Binding Results.Count, StringFormat={}{0} Item(s) found.}" />
+                </StackPanel>
+            </Grid>
         </Grid>
 
         <tray:NotifyIcon
