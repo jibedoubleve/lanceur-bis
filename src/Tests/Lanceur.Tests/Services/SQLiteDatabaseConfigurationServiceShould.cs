@@ -10,13 +10,13 @@ using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Functional;
+namespace Lanceur.Tests.Services;
 
-public class SettingsShould : TestBase
+public class SQLiteDatabaseConfigurationServiceShould : TestBase
 {
     #region Constructors
 
-    public SettingsShould(ITestOutputHelper output) : base(output) { }
+    public SQLiteDatabaseConfigurationServiceShould(ITestOutputHelper output) : base(output) { }
 
     #endregion
 
