@@ -1,7 +1,10 @@
 using Dapper;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite.Repositories;
@@ -29,7 +32,10 @@ public class SQLiteFeatureFlagService : SQLiteRepositoryBase, IFeatureFlagServic
             conn =>
             {
                 var json = conn.Query<string>(sql).SingleOrDefault() ?? string.Empty;
-                return JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json);
+
+                return json.IsNullOrEmpty() 
+                    ? new DatabaseConfiguration().FeatureFlags 
+                    : JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json);
             }
         );
     }

@@ -9,13 +9,13 @@ using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.Functional;
+namespace Lanceur.Tests.Services;
 
-public class FeatureFlagShould : TestBase
+public class SQLiteFeatureFlagServiceShould : TestBase
 {
     #region Constructors
 
-    public FeatureFlagShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public SQLiteFeatureFlagServiceShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
