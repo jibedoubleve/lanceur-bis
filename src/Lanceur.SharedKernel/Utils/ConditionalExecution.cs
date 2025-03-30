@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Lanceur.SharedKernel.Utils;
 
 /// <summary>
-/// Provides methods for executing different logic depending on the compilation mode (DEBUG or RELEASE).
+///     Provides methods for executing different logic depending on the compilation mode (DEBUG or RELEASE).
 /// </summary>
 public static class ConditionalExecution
 {
@@ -23,10 +23,12 @@ public static class ConditionalExecution
         var isDebug = false;
         SetIfDebug(ref isDebug);
 
-        if(isDebug) onDebug(serviceCollection);
-        else onRelease(serviceCollection);
+        if (isDebug)
+            onDebug(serviceCollection);
+        else
+            onRelease(serviceCollection);
     }
-    
+
     /// <summary>
     ///     Executes one of the provided functions based on the current compilation mode.
     /// </summary>
@@ -37,27 +39,11 @@ public static class ConditionalExecution
         var isDebug = false;
         SetIfDebug(ref isDebug);
 
-        if (isDebug) onDebug?.Invoke();
-        else onRelease?.Invoke();
+        if (isDebug)
+            onDebug?.Invoke();
+        else
+            onRelease?.Invoke();
     }
-    
-    /// <summary>
-    /// Provides an inverted argument version of <see cref="Execute"/> to facilitate debugging.
-    /// This method swaps the logic, executing <paramref name="onDebug"/> in place of <paramref name="onRelease"/> and vice versa.
-    /// </summary>
-    /// <param name="onRelease">The action to execute in release mode.</param>
-    /// <param name="onDebug">The action to execute in debug mode.</param>
-    public static void ExecuteFlipped(Action onRelease, Action onDebug) => Execute(onDebug, onRelease);
-    
-    /// <summary>
-    /// Provides an inverted argument version of <see cref="Execute"/> to facilitate debugging.
-    /// This method swaps the logic, executing <paramref name="onDebug"/> in place of <paramref name="onRelease"/> and vice versa.
-    /// </summary>
-    /// <param name="onRelease">The action to execute in release mode.</param>
-    /// <param name="onDebug">The action to execute in debug mode.</param>
-    /// /// <returns>The result of the executed function.</returns>
-    public static TResult ExecuteFlipped<TResult>(Func<TResult> onRelease, Func<TResult> onDebug) => Execute(onDebug, onRelease);
-
 
     /// <summary>
     ///     Executes one of the provided functions based on the current compilation mode and returns a value.
