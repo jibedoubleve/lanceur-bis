@@ -92,6 +92,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         MapSettingsFromDbToUi();
+        IsResourceMonitorEnabled = Settings.Application.FeatureFlags.Any(
+            e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.OrdinalIgnoreCase) && e.Enabled
+        );
 
         // Setup behaviour on property changed
         foreach (var flag in FeatureFlags) flag.PropertyChanged += OnPropertyChanged;
