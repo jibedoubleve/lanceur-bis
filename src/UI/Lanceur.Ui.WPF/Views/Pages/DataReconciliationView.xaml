@@ -63,7 +63,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Menu>
             <MenuItem Header="Show data" Icon="{ui:SymbolIcon Database24}">
@@ -95,6 +95,15 @@
                 Icon="{ui:SymbolIcon Delete24}"
                 Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=Delete}" />
             <MenuItem
+                Command="{Binding DeletePermanentlyCommand}"
+                Header="Delete Permanently"
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=DeletePermanently}">
+                <MenuItem.Icon>
+                    <ui:SymbolIcon Symbol="Delete24"
+                                   Foreground="Red"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
                 Command="{Binding MergeCommand}"
                 CommandParameter="{StaticResource MergeDialog}"
                 Header="Merge selected"
@@ -107,10 +116,10 @@
                 Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=Restore}" />
         </Menu>
 
-        <ui:TextBlock 
+        <ui:TextBlock
             Margin="15,5,5,15"
             FontTypography="Title"
-            Text="{Binding Title}"  Grid.Row="1"/>
+            Text="{Binding Title}" Grid.Row="1" />
 
         <ScrollViewer
             Grid.Row="2"

@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Windows;
-using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Wpf.Ui;

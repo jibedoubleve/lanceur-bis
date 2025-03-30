@@ -10,7 +10,8 @@ public enum ActionOnAlias
     UpdateDescription,
     Delete,
     Merge,
-    Restore
+    Restore,
+    DeletePermanently
 }
 
 public class ReportTypeToVisibilityConverter : IValueConverter
@@ -25,6 +26,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.Delete            => Visibility.Visible,
             ActionOnAlias.Merge             => Visibility.Visible,
             ActionOnAlias.Restore           => Visibility.Collapsed,
+            ActionOnAlias.DeletePermanently   => Visibility.Collapsed,
             _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
         };
     }
@@ -37,6 +39,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.Delete            => Visibility.Visible,
             ActionOnAlias.Merge             => Visibility.Collapsed,
             ActionOnAlias.Restore           => Visibility.Collapsed,
+            ActionOnAlias.DeletePermanently   => Visibility.Collapsed,
             _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
         };
     }
@@ -49,6 +52,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.Delete            => Visibility.Collapsed,
             ActionOnAlias.Merge             => Visibility.Collapsed,
             ActionOnAlias.Restore           => Visibility.Visible,
+            ActionOnAlias.DeletePermanently   => Visibility.Visible,
             _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
         };
     }
@@ -61,6 +65,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.Delete            => Visibility.Collapsed,
             ActionOnAlias.Merge             => Visibility.Collapsed,
             ActionOnAlias.Restore           => Visibility.Collapsed,
+            ActionOnAlias.DeletePermanently   => Visibility.Collapsed,
             _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
         };
     }
@@ -75,11 +80,11 @@ public class ReportTypeToVisibilityConverter : IValueConverter
         return report switch
         {
             ReportType.DoubloonAliases    => GetVisibilityForDoubloon(actionOnAlias),
-            ReportType.BrokenAliases     => GetVisibilityForBroken(actionOnAlias),
+            ReportType.BrokenAliases      => GetVisibilityForBroken(actionOnAlias),
             ReportType.UnannotatedAliases => GetVisibilityForUnannotated(actionOnAlias),
             ReportType.RestoreAlias       => GetVisibilityForDeleted(actionOnAlias),
             ReportType.None               => Visibility.Visible,
-            _                             => throw new ArgumentOutOfRangeException()
+            _                             => throw new ArgumentOutOfRangeException(nameof(report), report, null)
         };
     }
 

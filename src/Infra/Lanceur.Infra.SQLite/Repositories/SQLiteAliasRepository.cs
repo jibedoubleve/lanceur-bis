@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -386,6 +387,28 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             _dbActionFactory.AliasManagement.LogicalRemove(tx, list);
         }
     );
+
+    /// <inheritdoc />
+    public void RemovePermanently(SelectableAliasQueryResult[] aliases)
+    {
+        const string delUsage = "delete from alias_usage where id_alias = @idAlias;";
+        const string delNames = "delete from alias_name where id_alias = @idAlias;";
+        const string delArguments = "delete from alias_argument where id_alias = @idAlias;";
+        const string delAlias = "delete from alias where id = @idAlias;";
+
+        Db.WithinTransaction(
+            tx =>
+            {
+                foreach (var idAlias in aliases.Select(e => e.Id).ToArray())
+                {
+                    tx.Connection!.Execute(delUsage, new {   idAlias });
+                    tx.Connection!.Execute(delNames, new {   idAlias });
+                    tx.Connection!.Execute(delArguments, new {   idAlias });
+                    tx.Connection!.Execute(delAlias, new {   idAlias });
+                }
+            }
+        );
+    }
 
     /// <inheritdoc />
     public void Restore(IEnumerable<SelectableAliasQueryResult> aliases)
