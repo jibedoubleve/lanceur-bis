@@ -401,10 +401,10 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             {
                 foreach (var idAlias in aliases.Select(e => e.Id).ToArray())
                 {
-                    tx.Connection!.Execute(delUsage, new {   idAlias });
-                    tx.Connection!.Execute(delNames, new {   idAlias });
-                    tx.Connection!.Execute(delArguments, new {   idAlias });
-                    tx.Connection!.Execute(delAlias, new {   idAlias });
+                    tx.Connection!.Execute(delUsage, new { idAlias });
+                    tx.Connection!.Execute(delNames, new { idAlias });
+                    tx.Connection!.Execute(delArguments, new { idAlias });
+                    tx.Connection!.Execute(delAlias, new { idAlias });
                 }
             }
         );
