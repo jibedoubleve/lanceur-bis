@@ -106,7 +106,7 @@ public partial class MainView
         var enabled = _featureFlagService.IsEnabled(Features.ResourceDisplay);
         if (enabled)
             _ = _computerInfoService.StartMonitoring(
-                500.Milliseconds(),
+                _settings.Application.ResourceMonitor.RefreshRate.Milliseconds(),
                 t =>
                 {
                     Debug.WriteLine($"Cpu: {t.CpuLoad} % - Memory: {t.MemoryLoad} %");
@@ -119,7 +119,7 @@ public partial class MainView
                     );
                 }
             );
-        
+
         _logger.LogTrace("Feature flag '{FeatureFlag}' Enabled: {Enabled}", Features.ResourceDisplay, enabled);
         PanelCpu.Visibility
             = PanelMemory.Visibility

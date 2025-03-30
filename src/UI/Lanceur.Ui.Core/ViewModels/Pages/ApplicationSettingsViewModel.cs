@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
@@ -48,7 +49,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = new();
     private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _windowBackdropStyle = "Mica";
-
+    [ObservableProperty] private int _cpuSmoothingIndex;
+    [ObservableProperty] private int _refreshRate;
+    [ObservableProperty] private bool _isResourceMonitorEnabled;
     #endregion
 
     #region Constructors
@@ -62,8 +65,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IViewFactory viewFactory
     )
     {
+        ArgumentNullException.ThrowIfNull(interactionHub);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appRestartService);
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(loggingLevelSwitch);
+        ArgumentNullException.ThrowIfNull(viewFactory);
+        
 
         _hub = interactionHub;
         _logger = logger;
@@ -84,7 +92,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         MapSettingsFromDbToUi();
-        
+
         // Setup behaviour on property changed
         foreach (var flag in FeatureFlags) flag.PropertyChanged += OnPropertyChanged;
         PropertyChanged += OnPropertyChanged;
@@ -131,6 +139,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Feature flags
         FeatureFlags = new(Settings.Application.FeatureFlags);
+
+        // Resource Monitor
+        CpuSmoothingIndex = Settings.Application.ResourceMonitor.CpuSmoothingIndex;
+        RefreshRate = Settings.Application.ResourceMonitor.RefreshRate;
     }
 
     private void MapSettingsFromUiToDb()
@@ -161,6 +173,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Feature flags
         Settings.Application.FeatureFlags = FeatureFlags;
+        IsResourceMonitorEnabled = FeatureFlags.Any(
+            e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.OrdinalIgnoreCase) && e.Enabled
+        );
+
+        // Resource Monitor
+        Settings.Application.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
+        Settings.Application.ResourceMonitor.RefreshRate = RefreshRate;
     }
 
     [RelayCommand]
@@ -177,19 +196,27 @@ public partial class ApplicationSettingsViewModel : ObservableObject
                                      .Replace("Lanceur.Infra.Stores.", "")
                                      .Replace("Store", "");
 
+        var savedAliasOverride = storeShortcut.AliasOverride;
         var result = await _hub.Interactions.AskUserYesNoAsync(
             view,
             "Apply",
             "Cancel",
             $"Edit shortcut for store '{storeName}'"
         );
-        if (!result) return;
+        
+        if (!result)
+        {
+            storeShortcut.AliasOverride = savedAliasOverride;
+            return;
+        }
 
-        _hub.Notifications.Success($"Modification has been done on {storeName}. Don't forget to save to apply changes", "Updated.");
+        OnSaveSettings();
     }
 
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(IsResourceMonitorEnabled)) return;
+        
         _logger.LogTrace("Property '{Property}' changed", e.PropertyName);
         OnSaveSettings();
     }
@@ -206,9 +233,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
 
         MapSettingsFromUiToDb();
+
         _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;
         Settings.Save();
-        _hub.Notifications.Success("Configuration saved.", "Saved");
 
         if (reboot.Any(r => r)) _hub.GlobalNotifications.AskRestart();
     }

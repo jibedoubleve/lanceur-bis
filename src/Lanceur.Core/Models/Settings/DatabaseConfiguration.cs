@@ -39,6 +39,14 @@ public class DatabaseConfiguration
     /// </remarks>
     public HotKeySection HotKey { get; } = new(3, 18);
 
+
+    /// <summary>
+    ///     Contains settings for the resource monitor.
+    ///     This section includes configuration options related to system resource monitoring,
+    ///     such as CPU, memory, and other performance metrics.
+    /// </summary>
+    public ResourceMonitorSection ResourceMonitor { get; } = new();
+
     /// <summary>
     ///     Gets or sets the configuration settings for the search box.
     /// </summary>
