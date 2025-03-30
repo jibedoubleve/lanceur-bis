@@ -1,11 +1,16 @@
 using System.Diagnostics;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Utils;
 using Microsoft.VisualBasic.Devices;
+using OpenTK.Platform.Windows;
 
 namespace Lanceur.Ui.WPF.Services;
 
 public class ComputerInfoService : IComputerInfoService
 {
+    private readonly CircularQueue<float> _circularQueue;
+
     #region Fields
 
     public float _totalPhysicalMemory;
@@ -19,7 +24,11 @@ public class ComputerInfoService : IComputerInfoService
 
     #region Constructors
 
-    public ComputerInfoService() => _totalPhysicalMemory = ComputerInfo.TotalPhysicalMemory / (1024 * 1024);
+    public ComputerInfoService(ISettingsFacade settings)
+    {
+        _circularQueue = new(settings.Application.ResourceMonitor.CpuSmoothingIndex);
+        _totalPhysicalMemory = ComputerInfo.TotalPhysicalMemory / (1024 * 1024);
+    }
 
     #endregion
 
@@ -37,7 +46,8 @@ public class ComputerInfoService : IComputerInfoService
         var memoryUsage = _memoryUsage.NextValue();
         var memoryLoad = (1 - memoryUsage / _totalPhysicalMemory) * 100;
 
-        var cpuLoad = _cpuLoad.NextValue();
+        _circularQueue.Enqueue(_cpuLoad.NextValue());
+        var cpuLoad = _circularQueue.Average();
 
         return (
             CpuLoad: (int)cpuLoad,
