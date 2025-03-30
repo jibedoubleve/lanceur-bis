@@ -31,6 +31,15 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
 
         return action(conn);
     }
+    
+    /// <inheritdoc />
+    public void WithConnection(Action<IDbConnection> action)
+    {
+        using var conn = _connectionFactory.CreateConnection();
+        if (conn.State != ConnectionState.Open) conn.Open();
+
+        action(conn);
+    }
 
     /// <inheritdoc />
     public void WithinTransaction(Action<IDbTransaction> action)

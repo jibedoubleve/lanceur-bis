@@ -53,6 +53,136 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         return serviceCollection;
     }
 
+    [Fact]
+    public async Task DeletePermanentlyWithValidation()
+    {
+        var visitors = new ServiceVisitors()
+        {
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.AskUserYesNoAsync(Arg.Any<object>())
+                 .Returns(true);
+                return i;
+            }
+        };
+        var sqlBuilder = new SqlBuilder().AppendAlias(
+            1,
+            "name",
+            props: new() { DeletedAt = DateTime.Now },
+            cfg: a =>
+            {
+                a.WithSynonyms("a1", "a2");
+                a.WithArguments(new() { ["1"] = "un", ["2"] = "deux", ["3"] = "trois" });
+                a.WithUsage(
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025")
+                );
+            }
+        );
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                // arrange
+                await viewModel.ShowRestoreAliasCommand.ExecuteAsync(null);
+
+                // act
+                viewModel.Aliases.ElementAt(0).IsSelected = true;
+                await viewModel.DeletePermanentlyCommand.ExecuteAsync(null);
+
+                // assert
+                db.WithConnection(
+                    c =>
+                    {
+                        using (new AssertionScope())
+                        {
+                            c.ExecuteScalar("select count(*) from alias_usage where id_alias = 1")
+                             .Should().Be(0, "usage should be cleared");
+
+                            c.ExecuteScalar("select count(*) from alias_name where id_alias = 1")
+                             .Should().Be(0, "names should be cleared");
+
+                            c.ExecuteScalar("select count(*) from alias_argument where id_alias = 1")
+                             .Should().Be(0, "arguments should be cleared");
+
+                            c.ExecuteScalar("select count(*) from alias where id = 1")
+                             .Should().Be(0, "alias should be cleared");
+                        }
+                    }
+                );
+            },
+            sqlBuilder, 
+            visitors
+        );
+    }
+    
+    [Fact]
+    public async Task NotDeletePermanentlyWithoutValidation()
+    {
+        var visitors = new ServiceVisitors()
+        {
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.AskUserYesNoAsync(Arg.Any<object>())
+                 .Returns(false);
+                return i;
+            }
+        };
+        var sqlBuilder = new SqlBuilder().AppendAlias(
+            1,
+            "name",
+            props: new() { DeletedAt = DateTime.Now },
+            cfg: a =>
+            {
+                a.WithSynonyms("a1", "a2");
+                a.WithArguments(new() { ["1"] = "un", ["2"] = "deux", ["3"] = "trois" });
+                a.WithUsage(
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025")
+                );
+            }
+        );
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                // arrange
+                await viewModel.ShowRestoreAliasCommand.ExecuteAsync(null);
+
+                // act
+                viewModel.Aliases.ElementAt(0).IsSelected = true;
+                await viewModel.DeletePermanentlyCommand.ExecuteAsync(null);
+
+                // assert
+                db.WithConnection(
+                    c =>
+                    {
+                        using (new AssertionScope())
+                        {
+                            c.ExecuteScalar<long>("select count(*) from alias_usage where id_alias = 1")
+                             .Should().BeGreaterThan(0, "usage should be cleared");
+
+                            c.ExecuteScalar<long>("select count(*) from alias_name where id_alias = 1")
+                             .Should().BeGreaterThan(0, "names should be cleared");
+
+                            c.ExecuteScalar<long>("select count(*) from alias_argument where id_alias = 1")
+                             .Should().BeGreaterThan(0, "arguments should be cleared");
+
+                            c.ExecuteScalar<long>("select count(*) from alias where id = 1")
+                             .Should().BeGreaterThan(0, "alias should be cleared");
+                        }
+                    }
+                );
+            },
+            sqlBuilder, 
+            visitors
+        );
+    }
+
     [Theory]
     [ClassData(typeof(DoubloonGenerator))]
     public async Task FixDoubloons(SqlBuilder sqlBuilder)
@@ -88,64 +218,6 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         );
     }
 
-    [Fact]
-    public async Task NotDeleteWhenMergingDoubloons()
-    {
-        var visitors = new ServiceVisitors
-        {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
-            {
-                i.InteractAsync(
-                     Arg.Any<object>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<object>()
-                 )
-                 .Returns((IsConfirmed: true, DataContext: null));
-                return i;
-            }
-        };
-        var fileName = Guid.NewGuid().ToString();
-        var arguments = Guid.NewGuid().ToString();
-        var sqlBuilder = new SqlBuilder().AppendAlias(
-                                             1,
-                                             fileName,
-                                             arguments,
-                                             props: new(DeletedAt: DateTime.Now),
-                                             cfg: alias => alias.WithSynonyms("a1", "a2")
-                                         )
-                                         .AppendAlias(
-                                             2,
-                                             fileName,
-                                             arguments,
-                                             cfg: alias =>  alias.WithSynonyms("b1", "b2")
-                                         )
-                                         .AppendAlias(
-                                             3,
-                                             fileName,
-                                             arguments,
-                                             cfg: alias =>  alias.WithSynonyms("c1", "c2")
-                                         );
-        await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
-                await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
-
-                foreach (var item in viewModel.Aliases) item.IsSelected = true;
-
-                await viewModel.MergeCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(0);
-                
-                const string sql = "select count(*) from alias where deleted_at is not null";
-                db.WithConnection(c => c.ExecuteScalar(sql)).Should().Be(0, "merging should undelete alias");
-            },
-            sqlBuilder,
-            visitors
-        );
-    }
-    
     [Fact]
     public async Task HaveDoubloonsWithoutParameters()
     {
@@ -190,38 +262,6 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
                 viewModel.Aliases.Should().HaveCount(2);
-            },
-            sqlBuilder,
-            visitors
-        );
-    }
-
-    [Theory]
-    [ClassData(typeof(DoubloonWithNullGenerator))]
-    public async Task NotHaveDoubloonWithNullValues(string description, int doubloons, SqlBuilder sqlBuilder)
-    {
-        OutputHelper.WriteLine($"Test description: {description}");
-        var visitors = new ServiceVisitors
-        {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
-            {
-                i.InteractAsync(
-                     Arg.Any<object>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<object>()
-                 )
-                 .Returns((IsConfirmed: true, DataContext: null));
-                return i;
-            }
-        };
-        await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
-                await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(doubloons);
             },
             sqlBuilder,
             visitors
@@ -309,6 +349,96 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                     var items3 = db.WithConnection(c => c.Query<string>(sql3, new { IdAlias = 1 }));
                     items3.Should().HaveCount(8);
                 }
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+
+    [Fact]
+    public async Task NotDeleteWhenMergingDoubloons()
+    {
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.InteractAsync(
+                     Arg.Any<object>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<object>()
+                 )
+                 .Returns((IsConfirmed: true, DataContext: null));
+                return i;
+            }
+        };
+        var fileName = Guid.NewGuid().ToString();
+        var arguments = Guid.NewGuid().ToString();
+        var sqlBuilder = new SqlBuilder().AppendAlias(
+                                             1,
+                                             fileName,
+                                             arguments,
+                                             new(DeletedAt: DateTime.Now),
+                                             alias => alias.WithSynonyms("a1", "a2")
+                                         )
+                                         .AppendAlias(
+                                             2,
+                                             fileName,
+                                             arguments,
+                                             cfg: alias =>  alias.WithSynonyms("b1", "b2")
+                                         )
+                                         .AppendAlias(
+                                             3,
+                                             fileName,
+                                             arguments,
+                                             cfg: alias =>  alias.WithSynonyms("c1", "c2")
+                                         );
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
+
+                foreach (var item in viewModel.Aliases) item.IsSelected = true;
+
+                await viewModel.MergeCommand.ExecuteAsync(null);
+                viewModel.Aliases.Should().HaveCount(0);
+
+                const string sql = "select count(*) from alias where deleted_at is not null";
+                db.WithConnection(c => c.ExecuteScalar(sql)).Should().Be(0, "merging should undelete alias");
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+
+    [Theory]
+    [ClassData(typeof(DoubloonWithNullGenerator))]
+    public async Task NotHaveDoubloonWithNullValues(string description, int doubloons, SqlBuilder sqlBuilder)
+    {
+        OutputHelper.WriteLine($"Test description: {description}");
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.InteractAsync(
+                     Arg.Any<object>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<object>()
+                 )
+                 .Returns((IsConfirmed: true, DataContext: null));
+                return i;
+            }
+        };
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
+                viewModel.Aliases.Should().HaveCount(doubloons);
             },
             sqlBuilder,
             visitors

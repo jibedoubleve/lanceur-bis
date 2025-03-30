@@ -25,6 +25,16 @@ public interface IDbConnectionManager : IDisposable
     ///     This could be the result of a database query or any other operation defined within the action.
     /// </returns>
     TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action);
+    
+    /// <summary>
+    ///     Manages database connections and ensures proper disposal of resources.
+    ///     This method creates a database connection and passes it to the provided action.
+    /// </summary>
+    /// <param name="action">
+    ///     A delegate that defines the operation to be performed using the provided <see cref="IDbConnection" />.
+    ///     The connection is passed as a parameter to the action.
+    /// </param>
+    void WithConnection(Action<IDbConnection> action);
 
     /// <summary>
     ///     Executes an action within a database transaction.

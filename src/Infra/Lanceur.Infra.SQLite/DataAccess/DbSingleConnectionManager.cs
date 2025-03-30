@@ -42,6 +42,13 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     }
 
     /// <inheritdoc />
+    public void WithConnection(Action<IDbConnection> action)
+    {
+        if (Connection.State != ConnectionState.Open) Connection.Open();
+        action(Connection);
+    }
+
+    /// <inheritdoc />
     public void WithinTransaction(Action<IDbTransaction> action)
     {
         WithinTransaction(
