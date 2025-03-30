@@ -4,6 +4,7 @@ description: >-
 theme: just-the-docs
 favicon_ico: "/assets/favicon.ico"
 
+repository: jibedoubleve/lanceur-bis
 url: 'https://jibedoubleve.github.io' 
 baseurl: '/lanceur-bis'
 
