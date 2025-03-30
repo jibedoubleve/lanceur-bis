@@ -6,6 +6,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Logging;
+using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Microsoft.Extensions.Logging;
 
@@ -84,6 +85,25 @@ public partial class DataReconciliationViewModel : ObservableObject
         _logger.LogInformation("Deleted {Items} aliases", toDelete.Length);
     }
 
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private async Task OnDeletePermanently()
+    {
+        var toDelete = GetSelectedAliases();
+        var response = await _userInteraction.AskUserYesNoAsync(
+            $"""
+             Are you sure you want to permanently delete the {toDelete.Length} selected aliases? 
+
+             This action is irreversible.
+             """
+        );
+        if (!response) return;
+
+        await Task.Run(() => _repository.RemovePermanently(toDelete));
+        Aliases.RemoveMultiple(toDelete);
+        _userNotification.Success($"Permanently deleted {toDelete.Length} aliases.");
+        _logger.LogInformation("Permanently deleted {Items} aliases", toDelete.Length);
+    }
+
     [RelayCommand]
     private void OnMarkSameIdAsSelected(AliasQueryResult alias)
     {
@@ -100,16 +120,19 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         var selectedAliases = GetSelectedAliases().ToList();
         if (selectedAliases.Count == 0) return;
-        
-                                                                           
-        var alias = await Task.Run(() => _repository.GetById(
-                                       selectedAliases.FirstOrDefault()!.Id)
-                                   );
+
+
+        var alias = await Task.Run(
+            () => _repository.GetById(
+                selectedAliases.FirstOrDefault()!.Id
+            )
+        );
         _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
         var parameters = _repository.GetAdditionalParameter(
-            selectedAliases.Select(item => item.Id)
-        ).ToList();
-        
+                                        selectedAliases.Select(item => item.Id)
+                                    )
+                                    .ToList();
+
         alias.AdditionalParameters = new(parameters);
         alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
 
@@ -130,11 +153,12 @@ public partial class DataReconciliationViewModel : ObservableObject
             {
                 _repository.SaveOrUpdate(ref alias);
                 _repository.Restore(alias);
-            });
+            }
+        );
 
         // Removing merged aliases
         var toRemove = selectedAliases.Where(e => e.Id != alias.Id);
-        await Task.Run(() =>_repository.Remove(toRemove));
+        await Task.Run(() => _repository.Remove(toRemove));
 
         //Reload when finished
         await OnShowDoubloons();
@@ -156,14 +180,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         await OnShowRestoreAlias();
     }
 
-    [RelayCommand]
-    private void OnSelectionChanged()
-    {
-        DeleteCommand.NotifyCanExecuteChanged();
-        MergeCommand.NotifyCanExecuteChanged();
-        RestoreCommand.NotifyCanExecuteChanged();
-        UpdateDescriptionCommand.NotifyCanExecuteChanged();
-    }
+    [RelayCommand] private void OnSelectionChanged() => this.NotifyCommandsUpdate();
 
     [RelayCommand]
     private async Task OnShowAliasesWithoutNotes() => await ShowAsync(
@@ -173,9 +190,9 @@ public partial class DataReconciliationViewModel : ObservableObject
         true
     );
 
-    [RelayCommand] private async Task OnShowDoubloons() => await ShowAsync("Doubloon Aliases", ReportType.DoubloonAliases, _repository.GetDoubloons);
-
     [RelayCommand] private async Task OnShowBrokenAliases() => await ShowAsync("Broken Aliases", ReportType.BrokenAliases, _repository.GetBrokenAliases);
+
+    [RelayCommand] private async Task OnShowDoubloons() => await ShowAsync("Doubloon Aliases", ReportType.DoubloonAliases, _repository.GetDoubloons);
 
     [RelayCommand] private async Task OnShowRestoreAlias() => await ShowAsync("Show deleted aliases", ReportType.RestoreAlias, _repository.GetDeletedAlias);
 

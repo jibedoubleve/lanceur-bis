@@ -191,6 +191,15 @@ public interface IAliasRepository
     void RemoveLogically(IEnumerable<AliasQueryResult> aliases);
 
     /// <summary>
+    ///     Permanently removes the specified list of aliases from the repository.
+    ///     This is a physical deletion; the aliases are completely removed from the database
+    ///     and cannot be recovered.
+    /// </summary>
+    /// <param name="aliases">The list of aliases to permanently remove from the repository.</param>
+    void RemovePermanently(SelectableAliasQueryResult[] aliases);
+
+
+    /// <summary>
     ///     Restores the specified aliases by reversing their logical deletion status.
     ///     Aliases that are not marked as logically deleted will remain unchanged.
     /// </summary>
@@ -199,7 +208,7 @@ public interface IAliasRepository
     ///     Only aliases marked as logically deleted will be affected.
     /// </param>
     void Restore(IEnumerable<SelectableAliasQueryResult> aliases);
-    
+
     /// <summary>
     ///     Restores the specified alias by reversing its logical deletion status.
     ///     Aliases that are not marked as logically deleted will remain unchanged.
