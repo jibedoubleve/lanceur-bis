@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Macros;
 
-[Macro("clipboard")]
+[Macro("clipboard_as_text")]
 [Description("Remove formatting from clipboard.")]
 public class ClipboardAsText : MacroQueryResult
 {
