@@ -38,6 +38,7 @@ public static class ServiceProviderExtensions
 
     public static IServiceCollection AddLoggingForTests<T>(this IServiceCollection serviceCollection, ITestOutputHelper outputHelper) => serviceCollection.AddSingleton<ILogger<T>>(new TestOutputHelperDecoratorForMicrosoftLogging<T>(outputHelper));
 
+
     /// <summary>
     ///     Configures the behaviour of a mocked singleton service within the specified <see cref="IServiceCollection" />.
     ///     Note that <see cref="IServiceProvider" /> is built at the moment this method is invoked, meaning any registrations

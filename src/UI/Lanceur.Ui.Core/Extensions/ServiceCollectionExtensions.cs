@@ -146,7 +146,8 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IReconciliationService, ReconciliationService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
-                         .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>();
+                         .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
+                         .AddSingleton<ICalculatorService, NCalcCalculatorService>();
 
         ConditionalExecution.Execute(
             serviceCollection,

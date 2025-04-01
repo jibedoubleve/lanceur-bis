@@ -56,6 +56,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                          .AddMockSingleton<IInteractionHub>()
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                          .AddSingleton<IMemoryCache, MemoryCache>()
+                         .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddMockSingleton<IExecutionService>(
                              (sp, i) =>
                              {

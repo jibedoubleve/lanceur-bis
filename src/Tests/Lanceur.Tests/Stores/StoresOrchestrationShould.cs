@@ -1,19 +1,37 @@
 using System.Text.RegularExpressions;
 using Everything.Wrapper;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
+using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Services;
+using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
+using Lanceur.Tests.Tools.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Stores;
 
 public class StoresOrchestrationShould
 {
+    #region Fields
+
+    private readonly ITestOutputHelper _outputHelper;
+
+    #endregion
+
+    #region Constructors
+
+    public StoresOrchestrationShould(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
+
+    #endregion
+
     #region Properties
 
     private static IAliasRepository AliasRepository => Substitute.For<IAliasRepository>();
@@ -72,7 +90,7 @@ public class StoresOrchestrationShould
     [InlineData("6+5")]
     [InlineData("(4+4)+5")]
     [InlineData("45 + (689)")]
-    [InlineData("(")]
+    [InlineData("( 10 + 10")]
     [InlineData("45  + (")]
     [InlineData(" 45  + (")]
     [InlineData("0")]
@@ -81,12 +99,48 @@ public class StoresOrchestrationShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                                                     .AddSingleton<ICalculatorService, NCalcCalculatorService>()
+                                                     .AddSingleton<IStoreService, CalculatorStore>()
+                                                     .AddLoggingForTests<NCalcCalculatorService>(_outputHelper)
                                                      .BuildServiceProvider();
-        var store = new CalculatorStore(serviceProvider);
+        var store = serviceProvider.GetService<IStoreService>();
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeTrue();
+    }
+    [Theory]
+    [InlineData("1+1", "2")]
+    [InlineData("2*3", "6")]
+    [InlineData("2-3", "-1")]
+    [InlineData("9/3", "3")]
+    [InlineData("Sqrt(9)", "3")]
+    [InlineData("sqrt(9)", "3")]
+    [InlineData("(8+2) * 2 ", "20")]
+    public void UseCalculatorAndReturnsExpectedResult(string query, string result)
+    {
+        // ACT
+        var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                                                     .AddSingleton<ICalculatorService, NCalcCalculatorService>()
+                                                     .AddSingleton<IStoreService, CalculatorStore>()
+                                                     .AddLoggingForTests<NCalcCalculatorService>(_outputHelper)
+                                                     .AddLoggingForTests<CalculatorStore>(_outputHelper)
+                                                     .BuildServiceProvider();
+        var store = serviceProvider.GetService<IStoreService>();
+
+        // ASSERT
+        using(new AssertionScope())
+        {
+            var regex = new Regex(store.StoreOrchestration.AlivePattern);
+            regex.IsMatch(query).Should().BeTrue();
+            
+            var results = store.Search(Cmdline.Parse(query))
+                               .ToList();
+            results.Should().HaveCountGreaterThan(0);
+            
+            results.ElementAt(0).Name
+                   .Should().Be(result);
+        }
     }
 
     [Theory]
@@ -173,6 +227,8 @@ public class StoresOrchestrationShould
     {
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                                                     .AddSingleton<ICalculatorService, NCalcCalculatorService>()
+                                                     .AddLoggingForTests<NCalcCalculatorService>(_outputHelper)
                                                      .BuildServiceProvider();
         var store = new CalculatorStore(serviceProvider);
 
