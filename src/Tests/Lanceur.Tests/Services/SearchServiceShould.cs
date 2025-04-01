@@ -71,6 +71,7 @@ public class SearchServiceShould : TestBase
                          .AddSingleton<SearchService>()
                          .AddMockSingleton<ISearchServiceOrchestrator>()
                          .AddMockSingleton<IThumbnailService>()
+                         .AddMockSingleton<ICalculatorService>()
                          .AddMemoryCache();
 
         return serviceCollection.BuildServiceProvider();

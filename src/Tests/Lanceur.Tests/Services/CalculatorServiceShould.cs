@@ -1,18 +1,87 @@
-﻿using FluentAssertions;
+﻿using System.Reflection;
+using System.Text.RegularExpressions;
+using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Infra.Services;
+using Lanceur.SharedKernel.Logging;
+using Lanceur.Tests.Tooling.Logging;
+using Lanceur.Tests.Tools.Logging;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Services;
 
 public class CalculatorServiceShould
 {
+    #region Fields
+
+    private readonly ITestOutputHelper _output;
+
+    private readonly MicrosoftLoggingLoggerFactory _testLoggerFactory;
+
+    #endregion
+
+    #region Constructors
+
+    public CalculatorServiceShould(ITestOutputHelper output)
+    {
+        _output = output;
+        _testLoggerFactory = new(output);
+    }
+
+    #endregion
+
     #region Methods
 
-    [Theory, InlineData("lkj")]
+    public static IEnumerable<object[]> GetMathFunctions()
+    {
+        var operations1 = typeof(Math).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                      .Select(e => e.Name)
+                                      .Distinct()
+                                      .Select(operation => (object[]) [operation])
+                                      .ToArray();
+        var operations2 = operations1.Select(e => (object[]) [$"       {e[0]}"])
+                                     .ToArray();
+        return operations1.Concat(operations2);
+    }
+
+    [Theory]
+    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
+    public void HandleMathematicalExpression(string operation)
+    {
+        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
+
+        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
+
+
+        var regex = new Regex(calculator!.ValidationRegex);
+
+        _output.WriteLine($"Expression: {operation}");
+        regex.IsMatch(operation).Should().BeTrue("'operation' is valid");
+    }
+    
+    [Theory]
+    [InlineData("6+5")]
+    [InlineData("(4+4)+5")]
+    [InlineData("45 + (689)")]
+    [InlineData("( 10 + 10")]
+    [InlineData("45  + (")]
+    [InlineData(" 45  + (")]
+    [InlineData("0")]
+    [InlineData(" 0")]
+    public void HandleNumbers_NCalc(string expression)
+    {
+        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
+        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
+        var regex = new Regex(calculator!.ValidationRegex);
+        regex.IsMatch(expression).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("lkj")]
     public void ReturnResultOnError(string expression)
     {
-        var calculator = new CodingSebCalculatorService();
+        var calculator = new NCalcCalculatorService(new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output));
 
         using (new AssertionScope())
         {
@@ -21,17 +90,25 @@ public class CalculatorServiceShould
         }
     }
 
-    [Theory, InlineData("1+1", "2"), InlineData("2*3", "6"), InlineData("2-3", "-1"), InlineData("9/3", "3"), InlineData("Sqrt(9)", "3"), InlineData("sqrt(9)", "3")]
+    [Theory]
+    [InlineData("1+1", "2")]
+    [InlineData("2*3", "6")]
+    [InlineData("2-3", "-1")]
+    [InlineData("9/3", "3")]
+    [InlineData("Sqrt(9)", "3")]
+    [InlineData("sqrt(9)", "3")]
+    [InlineData("(8+2) * 2 ", "20")]
     public void ReturnResultOnSuccess(string expression, string expected)
     {
-        var calculator = new CodingSebCalculatorService();
+        var calculator = new NCalcCalculatorService(new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output));
 
         using (new AssertionScope())
         {
-            calculator.Evaluate(expression).IsError.Should().BeFalse();
-            calculator.Evaluate(expression).Result.Should().Be(expected);
+            var result = calculator.Evaluate(expression);
+            result.IsError.Should().BeFalse();
+            result.Result.Should().Be(expected);
         }
     }
 
-    #endregion Methods
+    #endregion
 }

@@ -100,8 +100,7 @@ public class SearchService : ISearchService
             var store = aliveStores.First(x => x.StoreOrchestration.IdleOthers);
             tasks.Add(Task.Run(() => store.Search(query)));
         }
-        // No store that stunt all the other stores, execute aggregated search
-        else
+        else // No store that stunt all the other stores, execute aggregated search
         {
             tasks = aliveStores.Select(store => Task.Run(() => store.Search(query)))
                                .ToList();
