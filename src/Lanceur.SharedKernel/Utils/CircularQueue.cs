@@ -30,6 +30,18 @@ public class CircularQueue<T> : IEnumerable<T>
 
     #endregion
 
+    #region Properties
+
+    /// <summary>
+    ///     Gets the number of elements contained in the <see cref="CircularQueue{T}" />.
+    /// </summary>
+    /// <returns>
+    ///     The number of elements contained in the <see cref="CircularQueue{T}" />.
+    /// </returns>
+    public int Count => _queue.Count;
+
+    #endregion
+
     #region Methods
 
     /// <summary>
@@ -37,6 +49,11 @@ public class CircularQueue<T> : IEnumerable<T>
     /// </summary>
     /// <returns>An enumerator for the queue.</returns>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    ///     Removes all Objects from the queue.
+    /// </summary>
+    public void Clear() => _queue.Clear();
 
     /// <summary>
     ///     Adds an item to the queue. If the queue is at maximum capacity, the oldest item is removed first.
