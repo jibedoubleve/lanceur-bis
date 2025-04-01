@@ -3,20 +3,19 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.VisualBasic.Devices;
-using OpenTK.Platform.Windows;
 
 namespace Lanceur.Ui.WPF.Services;
 
 public class ComputerInfoService : IComputerInfoService
 {
-    private readonly CircularQueue<float> _circularQueue;
-
     #region Fields
 
-    public float _totalPhysicalMemory;
+    private readonly CircularQueue<float> _circularQueue;
 
     private readonly PerformanceCounter _cpuLoad = new("Processor", "% Processor Time", "_Total");
     private readonly PerformanceCounter _memoryUsage = new("Memory", "Available MBytes");
+
+    private readonly float _totalPhysicalMemory;
 
     private static readonly ComputerInfo ComputerInfo = new();
 
@@ -27,7 +26,7 @@ public class ComputerInfoService : IComputerInfoService
     public ComputerInfoService(ISettingsFacade settings)
     {
         _circularQueue = new(settings.Application.ResourceMonitor.CpuSmoothingIndex);
-        _totalPhysicalMemory = ComputerInfo.TotalPhysicalMemory / (1024 * 1024);
+        _totalPhysicalMemory = (float)ComputerInfo.TotalPhysicalMemory / (1024 * 1024);
     }
 
     #endregion
@@ -59,6 +58,8 @@ public class ComputerInfoService : IComputerInfoService
     public async Task StartMonitoring(TimeSpan interval, Action<(int CpuLoad, int MemoryLoad)> callback)
     {
         IsMonitoring = true;
+        _circularQueue.Clear();
+        
         while (true)
         {
             if (!IsMonitoring) break;
