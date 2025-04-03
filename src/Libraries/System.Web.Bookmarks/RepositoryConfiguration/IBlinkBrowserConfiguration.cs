@@ -1,6 +1,6 @@
 namespace System.Web.Bookmarks.RepositoryConfiguration;
 
-public interface IChromiumBrowserConfiguration
+public interface IBlinkBrowserConfiguration
 {
     #region Properties
 

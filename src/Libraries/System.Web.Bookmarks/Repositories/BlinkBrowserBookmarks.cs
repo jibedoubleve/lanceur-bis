@@ -8,24 +8,24 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Repositories;
 
-public class ChromiumBrowserBookmarks : IBookmarkRepository
+public class BlinkBrowserBookmarks : IBookmarkRepository
 {
     #region Fields
 
-    private readonly ILogger<ChromiumBrowserBookmarks> _logger;
+    private readonly ILogger<BlinkBrowserBookmarks> _logger;
     private readonly IMemoryCache _memoryCache;
 
     #endregion
 
     #region Constructors
 
-    public ChromiumBrowserBookmarks(IMemoryCache memoryCache, ILoggerFactory loggerFactory, IChromiumBrowserConfiguration configuration)
+    public BlinkBrowserBookmarks(IMemoryCache memoryCache, ILoggerFactory loggerFactory, IBlinkBrowserConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(memoryCache);
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(configuration);
         
-        _logger = loggerFactory.GetLogger<ChromiumBrowserBookmarks>();
+        _logger = loggerFactory.GetLogger<BlinkBrowserBookmarks>();
         _memoryCache = memoryCache;
         
         Path = configuration.Path;

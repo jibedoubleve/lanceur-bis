@@ -47,8 +47,8 @@ public class WebBookmarksShould
         // ARRANGE
         var serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddXUnit(_outputHelper))
                                                      .AddSingleton<IMemoryCache, MemoryCache>()
-                                                     .AddSingleton<IChromiumBrowserConfiguration>(new DummyChromiumConfiguration())
-                                                     .AddTransient<IBookmarkRepository, ChromiumBrowserBookmarks>()
+                                                     .AddSingleton<IBlinkBrowserConfiguration>(new DummyBlinkConfiguration())
+                                                     .AddTransient<IBookmarkRepository, BlinkBrowserBookmarks>()
                                                      .BuildServiceProvider();
         var repository = serviceProvider.GetService<IBookmarkRepository>();
 

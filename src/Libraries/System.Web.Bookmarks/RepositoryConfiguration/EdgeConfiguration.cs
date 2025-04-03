@@ -2,7 +2,7 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace System.Web.Bookmarks.RepositoryConfiguration;
 
-internal class EdgeConfiguration : IChromiumBrowserConfiguration
+internal class EdgeConfiguration : IBlinkBrowserConfiguration
 {
     #region Properties
 
