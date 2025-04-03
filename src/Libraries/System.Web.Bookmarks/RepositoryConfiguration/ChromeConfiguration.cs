@@ -2,7 +2,7 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace System.Web.Bookmarks.RepositoryConfiguration;
 
-public class ChromeConfiguration : IChromiumBrowserConfiguration
+public class ChromeConfiguration : IBlinkBrowserConfiguration
 {
     #region Properties
 

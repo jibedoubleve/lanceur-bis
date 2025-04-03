@@ -40,8 +40,8 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
         _logger.LogDebug("Returning bookmark repository for {Browser}", browser);
         IBookmarkRepository repository = browser switch
         {
-            Browser.Chrome  => new ChromiumBrowserBookmarks(_memoryCache,  _loggerFactory, BrowserConfigurationFactory.Chrome),
-            Browser.Edge    => new ChromiumBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Edge),
+            Browser.Chrome  => new BlinkBrowserBookmarks(_memoryCache,  _loggerFactory, BrowserConfigurationFactory.Chrome),
+            Browser.Edge    => new BlinkBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Edge),
             Browser.Firefox => new GeckoBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Firefox),
             Browser.Zen     => new GeckoBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Zen),
             _               => throw new ArgumentOutOfRangeException(nameof(browser), browser, null)

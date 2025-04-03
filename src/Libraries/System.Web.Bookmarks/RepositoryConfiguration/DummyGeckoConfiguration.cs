@@ -27,9 +27,3 @@ internal class DummyGeckoConfiguration : IGeckoBrowserConfiguration
 
     #endregion
 }
-
-internal class DummyChromiumConfiguration : IChromiumBrowserConfiguration
-{
-    public string CacheKey => Guid.NewGuid().ToString();
-    public string Path => System.IO.Path.GetRandomFileName();
-}

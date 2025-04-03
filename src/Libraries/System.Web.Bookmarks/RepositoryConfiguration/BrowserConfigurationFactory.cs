@@ -4,9 +4,9 @@ internal struct BrowserConfigurationFactory
 {
     #region Properties
 
-    public static IChromiumBrowserConfiguration Chrome => new ChromeConfiguration();
+    public static IBlinkBrowserConfiguration Chrome => new ChromeConfiguration();
 
-    public static IChromiumBrowserConfiguration Edge => new EdgeConfiguration();
+    public static IBlinkBrowserConfiguration Edge => new EdgeConfiguration();
 
     public static IGeckoBrowserConfiguration Firefox => new FirefoxConfiguration();
     
