@@ -25,7 +25,7 @@ public partial class AnalyticsView : IDisposable
 
         _logger = logger;
 
-        viewModel.OnRefreshDailyPlot = (x, y) => RefreshScatter(x, y, "Daily history");
+        viewModel.OnRefreshDailyPlot = (x, y) => RefreshHistogram(x, y, "Daily history");
         viewModel.OnRefreshYearlyPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToYear, "Yearly history", "Year");
         viewModel.OnRefreshMonthlyPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToMonthYear, "Monthly history", "Month Year", new() { Rotation = -45, PositionMultipier =  2 });
         viewModel.OnRefreshUsageByHourPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToTimeString, "Usage by hour of day", "Hours of day");
@@ -90,14 +90,21 @@ public partial class AnalyticsView : IDisposable
         HistoryPlot.Plot.Axes.Bottom.Label.Text = bottomAxesTitle;
         HistoryPlot.Plot.Axes.Left.Label.Text = "Usage";
         HistoryPlot.Refresh();
+        
+        // Usages
+        var uMax = y.Max();
+        HistoryPlot.Plot.Axes.Left.Label.Text = "Usage";
+        HistoryPlot.Plot.Axes.Left.Max = uMax + uMax * .1;
+        HistoryPlot.Plot.Axes.Left.Min = 0;
+        HistoryPlot.Refresh();
     }
 
-    private void RefreshScatter(IEnumerable<double> xPoint, IEnumerable<double> yPoint, string plotTitle)
+    private void RefreshHistogram(IEnumerable<double> xPoint, IEnumerable<double> yPoint, string plotTitle)
     {
         var x = xPoint.ToArray();
         var y = yPoint.ToArray();
 
-        _logger.LogDebug("[View] Refreshing SCATTER plot (Points: {Points})", x.Length);
+        _logger.LogDebug("[View] Refreshing HISTOGRAM plot (Points: {Points})", x.Length);
 
         if (!x.Any() || !y.Any()) return;
 
@@ -108,15 +115,22 @@ public partial class AnalyticsView : IDisposable
         // Manage data
         HistoryPlot.Plot.Clear();
 
-        var plot = HistoryPlot.Plot.Add.Scatter(x, y);
-        plot.MarkerSize = 0;
-        plot.ConnectStyle = ConnectStyle.StepHorizontal;
+        var plot = HistoryPlot.Plot.Add.Bars(x, y);
+        plot.ValueLabelStyle.ForeColor = CurrentTheme.LegendFontColor;
         HistoryPlot.Plot.Axes.Title.Label.Text = plotTitle;
 
         // Dates
         HistoryPlot.Plot.Axes.Bottom.Label.Text = "Date";
         HistoryPlot.Plot.Axes.Bottom.Max = x.Max();
         HistoryPlot.Plot.Axes.Bottom.Min = x.Min();
+        
+        // Configure
+        foreach (var bar in plot.Bars)
+        {
+            bar.Size = 1;
+            bar.LineWidth = 0;
+            bar.FillStyle.AntiAlias = false;
+        }
 
         // Usages
         var uMax = y.Max();
