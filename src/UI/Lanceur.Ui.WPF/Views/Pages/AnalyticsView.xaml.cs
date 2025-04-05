@@ -93,7 +93,7 @@ public partial class AnalyticsView : IDisposable
         
         // Usages
         var uMax = y.Max();
-        HistoryPlot.Plot.Axes.Left.Label.Text = "Usage";
+
         HistoryPlot.Plot.Axes.Left.Max = uMax + uMax * .1;
         HistoryPlot.Plot.Axes.Left.Min = 0;
         HistoryPlot.Refresh();
