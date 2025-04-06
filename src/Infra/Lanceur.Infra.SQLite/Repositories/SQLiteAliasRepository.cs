@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -268,16 +267,16 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per)
+    public IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, int? year = null)
     {
         var action = new HistoryDbAction(Db);
         return per switch
         {
-            Per.HourOfDay => action.PerHour(),
-            Per.Day       => action.PerDay(),
-            Per.DayOfWeek => action.PerDayOfWeek(),
-            Per.Month     => action.PerMonth(),
-            Per.Year      => action.PerYear(),
+            Per.HourOfDay => action.PerHour(year),
+            Per.Day       => action.PerDay(year),
+            Per.DayOfWeek => action.PerDayOfWeek(year),
+            Per.Month     => action.PerMonth(year),
+            Per.Year      => action.PerYear(year),
             _             => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
         };
     }

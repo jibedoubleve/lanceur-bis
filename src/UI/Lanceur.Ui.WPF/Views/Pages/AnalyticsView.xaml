@@ -57,7 +57,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <StackPanel Margin="5" Orientation="Horizontal" Visibility="{Binding IsYearVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel Margin="5" Orientation="Horizontal">
                 <Label Content="Year to display" VerticalAlignment="Center" Margin="5,5,15,5" />
                 <ComboBox ItemsSource="{Binding Years}" Margin="0,5,5,5" SelectedIndex="0" x:Name="CbYears">
                     <interactivity:Interaction.Triggers>
