@@ -142,15 +142,30 @@ public partial class AnalyticsViewModel : ObservableObject
 
         if (LastPlotContext?.IsTrendPlot() ?? false)
         {
-            // Trends charts means we have to goback to the database
+            // Trends charts means we have to go back to the database
             _memoryCache.Remove(CacheKey);
-             RedrawLastTrendPlot(year);
+            RedrawLastTrendPlot(year);
             return;
         }
 
         var p = _memoryCache.Get<IEnumerable<DataPoint<DateTime, double>>>(CacheKey) ?? [];
         var points = year == SelectAll ? p : p.Where(e => e.X.Year.ToString() == year);
 
+        RedrawPlot(LastPlotContext, points);
+    }
+
+    private void RedrawLastTrendPlot(string yearStr)
+    {
+        if (LastPlotContext is null) return;
+
+        int? year = int.TryParse(yearStr, out var yearValue) ? yearValue : null;
+        var per =  LastPlotContext.PlotType switch
+        {
+            PlotType.UsageByHourOfDay =>  Per.HourOfDay,
+            PlotType.UsageByDayOfWeek => Per.DayOfWeek,
+            _                         => throw new ArgumentOutOfRangeException($"Plot '{LastPlotContext.PlotType}' is not supported for a trend plot refresh.")
+        };
+        var points = _aliasRepository.GetUsage(per, year);
         RedrawPlot(LastPlotContext, points);
     }
 
@@ -187,21 +202,6 @@ public partial class AnalyticsViewModel : ObservableObject
         var y = points.Select(p => p.Y).ToArray();
         CurrentPlotType = plotType;
         redrawPlotAction?.Invoke(x, y);
-    }
-
-    private void RedrawLastTrendPlot(string yearStr)
-    {
-        if (LastPlotContext is null) return;
-
-        int? year = int.TryParse(yearStr, out var yearValue) ? yearValue : null;
-        var per =  LastPlotContext.PlotType switch
-        {
-            PlotType.UsageByHourOfDay =>  Per.HourOfDay,
-            PlotType.UsageByDayOfWeek => Per.DayOfWeek,
-            _                         => throw new ArgumentOutOfRangeException($"Plot '{LastPlotContext.PlotType}' is not supported for a trend plot refresh.")
-        };
-        var points = _aliasRepository.GetUsage(per, year);
-        RedrawPlot(LastPlotContext, points);
     }
 
     #endregion

@@ -33,12 +33,37 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel Margin="5" Orientation="Horizontal">
-            <Label Content="Display usage for year:" VerticalAlignment="Center" Margin="5,5,15,5" />
-            <ComboBox ItemsSource="{Binding Years}" x:Name="CbYear" SelectedIndex="0" VerticalAlignment="Center" Margin="5,5,15,5">
+            <Label
+                Margin="5,5,15,5"
+                VerticalAlignment="Center"
+                Content="Display usage for year:" />
+            <ComboBox
+                Margin="5,5,15,5"
+                VerticalAlignment="Center"
+                ItemsSource="{Binding Years}"
+                SelectedIndex="0"
+                SelectedItem="{Binding SelectedYear}">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="SelectionChanged">
-                        <interactivity:InvokeCommandAction Command="{Binding RefreshAliasesCommand}"
-                                                           CommandParameter="{Binding ElementName=CbYear, Path=SelectedItem}" />
+                        <interactivity:InvokeCommandAction Command="{Binding RefreshAliasesCommand}" />
+                    </interactivity:EventTrigger>
+                </interactivity:Interaction.Triggers>
+            </ComboBox>
+            <Separator Margin="5" />
+            <Label
+                Margin="0,5,15,5"
+                VerticalAlignment="Center"
+                Content="Filter: " />
+            <ComboBox
+                Margin="5,5,15,5"
+                VerticalAlignment="Center"
+                ItemsSource="{Binding Filters}"
+                SelectedIndex="0"
+                SelectedItem="{Binding SelectedFilter}"
+                DisplayMemberPath="Description">
+                <interactivity:Interaction.Triggers>
+                    <interactivity:EventTrigger EventName="SelectionChanged">
+                        <interactivity:InvokeCommandAction Command="{Binding RefreshAliasesCommand}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ComboBox>
@@ -51,8 +76,8 @@
             CanUserReorderColumns="False"
             GridLinesVisibility="Vertical"
             HeadersVisibility="none"
-            VirtualizingPanel.IsVirtualizingWhenGrouping="True"            
-            ItemsSource="{Binding Source={StaticResource AliasCollectionViewSource}}">
+            ItemsSource="{Binding Source={StaticResource AliasCollectionViewSource}}"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True">
             <DataGrid.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.ContainerStyle>
@@ -63,10 +88,10 @@
                                     <ControlTemplate TargetType="{x:Type GroupItem}">
                                         <HeaderedContentControl
                                             Margin="5"
-                                            Foreground="{DynamicResource AccentTextFillColorTertiaryBrush}"
-                                            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+                                            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                            Foreground="{DynamicResource AccentTextFillColorTertiaryBrush}">
                                             <HeaderedContentControl.Header>
-                                                <Grid Margin="15" >
+                                                <Grid Margin="15">
                                                     <Label Panel.ZIndex="10" />
                                                     <ui:RatingControl Value="{Binding Name}" />
                                                 </Grid>
@@ -82,7 +107,7 @@
                     </GroupStyle.ContainerStyle>
                 </GroupStyle>
             </DataGrid.GroupStyle>
-            
+
             <ui:DataGrid.Columns>
 
                 <!--  ICON  -->

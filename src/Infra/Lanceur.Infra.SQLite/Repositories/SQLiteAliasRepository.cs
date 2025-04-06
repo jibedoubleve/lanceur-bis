@@ -267,6 +267,27 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
+    public IEnumerable<UsageQueryResult> GetUnusedAliases()
+    {
+        const string sql = $"""
+                           select 
+                               0                           as {nameof(UsageQueryResult.Count)},
+                               group_concat(an.name, ', ') as {nameof(UsageQueryResult.Name)}
+                           from (
+                               select 
+                                   a.id  as id_alias        
+                               from 
+                                   alias a
+                                   left join alias_usage b on a.id = b.id_alias
+                               where 
+                                   b.id_alias is null) t
+                               inner join alias_name an on an.id_alias = t.id_alias
+                           group by t.id_alias
+                           """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql));
+    }
+
+    /// <inheritdoc />
     public IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, int? year = null)
     {
         var action = new HistoryDbAction(Db);
