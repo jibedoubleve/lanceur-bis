@@ -134,8 +134,12 @@ public interface IAliasRepository
     ///     Returns usage trends. The result is meant to be dislayed as a chart
     /// </summary>
     /// <param name="per">The level of the trend. Can be hour, day, day of week or month</param>
+    /// <param name="year">
+    ///     The specific year for which to retrieve usage data.
+    ///     Set to <c>null</c> to retrieve data across all available years.
+    /// </param>
     /// <returns>Points of the chart</returns>
-    IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per);
+    IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, int? year = null);
 
     /// <summary>
     ///     Retrieves all unique years where usage data is recorded.

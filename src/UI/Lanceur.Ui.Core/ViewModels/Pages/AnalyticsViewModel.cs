@@ -15,15 +15,17 @@ public partial class AnalyticsViewModel : ObservableObject
 {
     #region Fields
 
-    private const string SelectAll = "All";
-    private const string CacheKey = $"analytics_{nameof(AnalyticsViewModel)}";
-    [ObservableProperty] private PlotType _currentPlotType;
     private readonly IAliasRepository _aliasRepository;
-    private readonly IMemoryCache _memoryCache;
+
+    private CancellationTokenSource _cancellationCacheTokenSource = new();
+    [ObservableProperty] private PlotType _currentPlotType;
     [ObservableProperty] private bool _isMonthlyVisible;
-    [ObservableProperty] private bool _isYearVisible;
     private readonly ILogger<AnalyticsViewModel> _logger;
+    private readonly IMemoryCache _memoryCache;
     [ObservableProperty] private ObservableCollection<string> _years = [];
+    private const string CacheKey = $"analytics_{nameof(AnalyticsViewModel)}";
+
+    private const string SelectAll = "All";
 
     #endregion
 
@@ -43,23 +45,14 @@ public partial class AnalyticsViewModel : ObservableObject
     private PlotContext? LastPlotContext { get; set; }
 
     public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshDailyPlot { get; set; }
-    public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshYearlyPlot { get; set; }
     public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshMonthlyPlot { get; set; }
     public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshUsageByDayOfWeekPlot { get; set; }
     public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshUsageByHourPlot { get; set; }
+    public Action<IEnumerable<double>, IEnumerable<double>>? OnRefreshYearlyPlot { get; set; }
 
     #endregion
 
     #region Methods
-
-    private CancellationTokenSource _cancellationCacheTokenSource = new();
-
-    private void InvalidateCache(IEnumerable<DataPoint<DateTime, double>> points)
-    {
-        _cancellationCacheTokenSource.Cancel();
-        _cancellationCacheTokenSource = new(1.Minutes());
-        _memoryCache.Set(CacheKey, points, new CancellationChangeToken(_cancellationCacheTokenSource.Token));
-    }
 
     private ObservableCollection<string> GetYears(IEnumerable<DataPoint<DateTime, double>> points)
     {
@@ -70,10 +63,16 @@ public partial class AnalyticsViewModel : ObservableObject
         return new(list);
     }
 
+    private void InvalidateCache(IEnumerable<DataPoint<DateTime, double>> points)
+    {
+        _cancellationCacheTokenSource.Cancel();
+        _cancellationCacheTokenSource = new(1.Minutes());
+        _memoryCache.Set(CacheKey, points, new CancellationChangeToken(_cancellationCacheTokenSource.Token));
+    }
+
     [RelayCommand]
     private async Task OnRefreshDailyHistory()
     {
-        IsYearVisible = true;
         var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Day));
         points = points.ToList();
         InvalidateCache(points);
@@ -83,7 +82,6 @@ public partial class AnalyticsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnRefreshMonthlyHistory()
     {
-        IsYearVisible = true;
         var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Month));
         points = points.ToList();
         InvalidateCache(points);
@@ -94,11 +92,38 @@ public partial class AnalyticsViewModel : ObservableObject
         else // To be here means there's nothing to show, fallback is daily history...
             await OnRefreshDailyHistory();
     }
-    
+
+    [RelayCommand]
+    private async Task OnRefreshUsageByDayOfWeek()
+    {
+        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.DayOfWeek));
+        points = points.ToList();
+        InvalidateCache(points);
+        RedrawPlot(
+            OnRefreshUsageByDayOfWeekPlot,
+            points,
+            PlotType.UsageByDayOfWeek,
+            e => (double)e.DayOfWeek
+        );
+    }
+
+    [RelayCommand]
+    private async Task OnRefreshUsageByHourOfDay()
+    {
+        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.HourOfDay));
+        points = points.ToList();
+        InvalidateCache(points);
+        RedrawPlot(
+            OnRefreshUsageByHourPlot,
+            points,
+            PlotType.UsageByHourOfDay,
+            e => e.TimeOfDay.TotalHours
+        );
+    }
+
     [RelayCommand]
     private async Task OnRefreshYearlyHistory()
     {
-        IsYearVisible = false;
         var points = await Task.Run(() => _aliasRepository.GetUsage(Per.Year));
         points = points.ToList();
         InvalidateCache(points);
@@ -111,33 +136,21 @@ public partial class AnalyticsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OnRefreshUsageByDayOfWeek()
-    {
-        IsYearVisible = false;
-        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.DayOfWeek));
-        points = points.ToList();
-        InvalidateCache(points);
-        RedrawPlot(OnRefreshUsageByDayOfWeekPlot, points, PlotType.UsageByDayOfWeek, e => (double)e.DayOfWeek);
-    }
-
-    [RelayCommand]
-    private async Task OnRefreshUsageByHourOfDay()
-    {
-        IsYearVisible = false;
-        var points = await Task.Run(() => _aliasRepository.GetUsage(Per.HourOfDay));
-        points = points.ToList();
-        InvalidateCache(points);
-        RedrawPlot(OnRefreshUsageByHourPlot, points, PlotType.UsageByHourOfDay, e => e.TimeOfDay.TotalHours);
-    }
-
-    [RelayCommand]
     private void OnSelectYear(string year)
     {
         _logger.LogTrace("Display history for year {Year}", year);
 
+        if (LastPlotContext?.IsTrendPlot() ?? false)
+        {
+            // Trends charts means we have to goback to the database
+            _memoryCache.Remove(CacheKey);
+             RedrawLastTrendPlot(year);
+            return;
+        }
+
         var p = _memoryCache.Get<IEnumerable<DataPoint<DateTime, double>>>(CacheKey) ?? [];
         var points = year == SelectAll ? p : p.Where(e => e.X.Year.ToString() == year);
-        
+
         RedrawPlot(LastPlotContext, points);
     }
 
@@ -176,6 +189,21 @@ public partial class AnalyticsViewModel : ObservableObject
         redrawPlotAction?.Invoke(x, y);
     }
 
+    private void RedrawLastTrendPlot(string yearStr)
+    {
+        if (LastPlotContext is null) return;
+
+        int? year = int.TryParse(yearStr, out var yearValue) ? yearValue : null;
+        var per =  LastPlotContext.PlotType switch
+        {
+            PlotType.UsageByHourOfDay =>  Per.HourOfDay,
+            PlotType.UsageByDayOfWeek => Per.DayOfWeek,
+            _                         => throw new ArgumentOutOfRangeException($"Plot '{LastPlotContext.PlotType}' is not supported for a trend plot refresh.")
+        };
+        var points = _aliasRepository.GetUsage(per, year);
+        RedrawPlot(LastPlotContext, points);
+    }
+
     #endregion
 
     private record PlotContext
@@ -198,6 +226,17 @@ public partial class AnalyticsViewModel : ObservableObject
         ///     This action takes two collections of doubles, representing the X and Y coordinates of the points.
         /// </summary>
         public Action<IEnumerable<double>, IEnumerable<double>>? RedrawPlotAction { get; init; }
+
+        #endregion
+
+        #region Methods
+
+        public bool IsTrendPlot()
+        {
+            PlotType[] trends = [PlotType.UsageByDayOfWeek, PlotType.UsageByHourOfDay];
+
+            return trends.Contains(PlotType);
+        }
 
         #endregion
     }
