@@ -7,6 +7,7 @@ using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Abstractions;
@@ -54,13 +55,18 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
                                            DateTime.Parse("2022-03-01")
                                        );
                                    }
-                               );
+                               )
+                               .AppendAlias(3, cfg: a =>
+                               {
+                                   a.WithSynonyms("c");
+                               });
     }
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
         serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>()
-                         .AddSingleton<IDbActionFactory, DbActionFactory>();
+                         .AddSingleton<IDbActionFactory, DbActionFactory>()
+                         .AddSingleton<IMemoryCache, MemoryCache>();
         return serviceCollection;
     }
 
@@ -105,14 +111,42 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
             async (viewModel, _) =>
             {
                 // act
+                viewModel.SelectedYear = $"{year}";
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
-                await viewModel.RefreshAliasesCommand.ExecuteAsync(year);
+                await viewModel.RefreshAliasesCommand.ExecuteAsync(null);
 
                 // assert 
                 using (new AssertionScope())
                 {
                     viewModel.Aliases.Should().HaveCount(1);
                     foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(3);
+                }
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+    
+    
+    [Fact]
+    public async Task ShowUnusedAliases()
+    {
+        var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var sqlBuilder = BuildSqlBuilder();
+
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                // act
+                viewModel.SelectedFilter = AliasUsageFilter.ShowUnused();
+                await viewModel.LoadAliasesCommand.ExecuteAsync(null);
+                await viewModel.RefreshAliasesCommand.ExecuteAsync(null);
+
+                // assert 
+                using (new AssertionScope())
+                {
+                    viewModel.Aliases.Should().HaveCount(1);
+                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(0);
                 }
             },
             sqlBuilder,

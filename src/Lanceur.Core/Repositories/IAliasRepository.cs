@@ -1,4 +1,4 @@
-﻿using Lanceur.Core.Models;
+using Lanceur.Core.Models;
 
 namespace Lanceur.Core.Repositories;
 
@@ -129,6 +129,14 @@ public interface IAliasRepository
     /// <param name="year">The year for which to retrieve alias usage statistics.</param>
     /// <returns>A collection of <see cref="UsageQueryResult" /> representing the most used aliases for the specified year.</returns>
     IEnumerable<UsageQueryResult> GetMostUsedAliasesByYear(int year);
+
+    /// <summary>
+    ///     Retrieves the aliases that were not used at all.
+    /// </summary>
+    /// <returns>
+    ///     A collection of <see cref="UsageQueryResult" /> representing aliases that were not used.
+    /// </returns>
+    public IEnumerable<UsageQueryResult> GetUnusedAliases();
 
     /// <summary>
     ///     Returns usage trends. The result is meant to be dislayed as a chart
