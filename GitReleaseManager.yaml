@@ -14,7 +14,7 @@ issue-labels-include:
 - breaking change
 - bug
 - feature
-- Enhancement
+- enhancement
 issue-labels-exclude:
 - documentation
 - build
