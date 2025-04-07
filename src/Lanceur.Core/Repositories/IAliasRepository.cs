@@ -118,6 +118,34 @@ public interface IAliasRepository
     Dictionary<string, (long Id, int Counter)> GetHiddenCounters();
 
     /// <summary>
+    ///     Retrieves a list of aliases that have not been used for the specified number of months.
+    ///     These aliases are considered inactive or outdated.
+    /// </summary>
+    /// <param name="months">
+    ///     The number of months of inactivity used to determine if an alias is considered inactive.
+    ///     If the user specifies a value greater than 360 months, the value will be reduced to 360.
+    /// </param>
+    /// <returns>
+    ///     A collection of <see cref="SelectableAliasQueryResult" /> objects representing the inactive aliases.
+    /// </returns>
+    IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months);
+
+    /// <summary>
+    ///     Retrieves aliases that have been used fewer times than the specified threshold.
+    ///     This method is useful for identifying aliases that are rarely accessed and may be considered for cleanup or review.
+    /// </summary>
+    /// <param name="threshold">
+    ///     The maximum number of times an alias can be used to be included in the result.
+    ///     Aliases with usage counts less than this value will be returned.
+    /// </param>
+    /// <returns>
+    ///     A collection of <see cref="SelectableAliasQueryResult" /> representing aliases
+    ///     with usage counts below the specified threshold.
+    /// </returns>
+    IEnumerable<SelectableAliasQueryResult> GetRarekyUsedAliases(int threshold);
+
+
+    /// <summary>
     ///     Get list of all the aliases with count greater than 0
     /// </summary>
     /// <returns>The list of aliases</returns>

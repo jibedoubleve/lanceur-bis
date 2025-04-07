@@ -21,7 +21,7 @@ public partial class DataReconciliationView
     {
         _contentDialogService = contentDialogService;
         DataContext = viewModel;
-        viewModel.PropertyChanged += OnViewModelOnPropertyChanged;
+        viewModel.PropertyChanged += OnViewModelReportTypeChanged;
         InitializeComponent();
     }
 
@@ -35,7 +35,7 @@ public partial class DataReconciliationView
 
     #region Methods
 
-    private void OnViewModelOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnViewModelReportTypeChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(ViewModel.ReportType)) return;
 
@@ -45,12 +45,26 @@ public partial class DataReconciliationView
             case {ReportType: ReportType.RestoreAlias}:
                 ColumnParameters.Visibility = Visibility.Collapsed;
                 ColumnFileName.Visibility = Visibility.Collapsed;
-                ColumnProposedDescription.Visibility = Visibility.Visible;
+                ColumnProposedDescription.Visibility = Visibility.Collapsed;
+                ColumnLastUsed.Visibility = Visibility.Collapsed;
+                ColumnUsageCount.Visibility = Visibility.Collapsed;
+                break;
+            case {ReportType: ReportType.InactiveAliases}:
+                ColumnProposedDescription.Visibility = Visibility.Collapsed;
+                ColumnLastUsed.Visibility = Visibility.Visible;
+                ColumnUsageCount.Visibility = Visibility.Collapsed;
+                break;
+            case {ReportType: ReportType.RarelyUsedAliases}: 
+                ColumnProposedDescription.Visibility = Visibility.Collapsed;
+                ColumnLastUsed.Visibility = Visibility.Collapsed;
+                ColumnUsageCount.Visibility = Visibility.Visible;
                 break;
             default:
                 ColumnParameters.Visibility = Visibility.Visible;
                 ColumnFileName.Visibility = Visibility.Visible;
                 ColumnProposedDescription.Visibility = Visibility.Collapsed;
+                ColumnLastUsed.Visibility = Visibility.Collapsed;
+                ColumnUsageCount.Visibility = Visibility.Collapsed;
                 break;
         }
     }

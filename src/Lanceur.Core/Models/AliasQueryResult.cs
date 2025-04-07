@@ -54,6 +54,12 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     public bool IsHidden { get; set; }
 
     /// <summary>
+    ///     Gets or sets the date and time when this alias was last used.
+    ///     This value is used to track alias activity and determine usage recency.
+    /// </summary>
+    public DateTime LastUsedAt { get; set; }
+
+    /// <summary>
     ///     Gets or sets a Lua script that will be executed
     ///     when user launch an alias
     /// </summary>

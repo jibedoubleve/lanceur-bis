@@ -9,9 +9,9 @@
     x:Name="Self"
     Title="DataReconciliationView"
     d:DesignHeight="800"
-    d:DesignWidth="800"
-    ScrollViewer.CanContentScroll="False"
+    d:DesignWidth="1200"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
     <Page.Resources>
         <ResourceDictionary>
@@ -29,16 +29,18 @@
                 <Label Margin="0,10,0,0" Content="Alias names" />
                 <TextBox Text="{Binding Synonyms, UpdateSourceTrigger=PropertyChanged}" />
 
-                <Label Margin="0,10,0,0" Content="Parameters"
-                       Visibility="{Binding List, Converter={StaticResource EnumerableToVisibilityConverter}}" />
+                <Label
+                    Margin="0,10,0,0"
+                    Content="Parameters"
+                    Visibility="{Binding List, Converter={StaticResource EnumerableToVisibilityConverter}}" />
                 <DataGrid
-                    Visibility="{Binding List, Converter={StaticResource EnumerableToVisibilityConverter}}"
                     AutoGenerateColumns="False"
                     CanUserAddRows="False"
                     CanUserDeleteRows="False"
                     CanUserReorderColumns="False"
                     CanUserResizeColumns="True"
-                    ItemsSource="{Binding List}">
+                    ItemsSource="{Binding List}"
+                    Visibility="{Binding List, Converter={StaticResource EnumerableToVisibilityConverter}}">
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             Width="*"
@@ -68,13 +70,21 @@
         <Menu>
             <MenuItem Header="Show data" Icon="{ui:SymbolIcon Database24}">
                 <MenuItem
-                    Command="{Binding ShowRestoreAliasCommand}"
+                    Command="{Binding ShowRestoreAliasesCommand}"
                     Header="Deleted aliases"
                     Icon="{ui:SymbolIcon Delete24}" />
                 <MenuItem
                     Command="{Binding ShowUnusedAliasesCommand}"
                     Header="Never used aliases"
                     Icon="{ui:SymbolIcon HandRightOff20}" />
+                <MenuItem
+                    Command="{Binding ShowInactiveAliasesCommand}"
+                    Header="Inactive aliases"
+                    Icon="{ui:SymbolIcon TimerOff24}" />
+                <MenuItem
+                    Command="{Binding ShowRarelyUsedAliasesCommand}"
+                    Header="Rarely used aliases"
+                    Icon="{ui:SymbolIcon Hourglass24}" />
                 <MenuItem
                     Command="{Binding ShowAliasesWithoutNotesCommand}"
                     Header="Aliases without comments"
@@ -103,8 +113,7 @@
                 Header="Delete Permanently"
                 Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=DeletePermanently}">
                 <MenuItem.Icon>
-                    <ui:SymbolIcon Symbol="Delete24"
-                                   Foreground="Red"/>
+                    <ui:SymbolIcon Foreground="Red" Symbol="Delete24" />
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem
@@ -118,24 +127,33 @@
                 Header="Restore selected aliases"
                 Icon="{ui:SymbolIcon DeleteDismiss24}"
                 Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=Restore}" />
+            <MenuItem
+                Command="{Binding SetInactivityThresholdCommand}"
+                Header="Set Inactivity threshold"
+                Icon="{ui:SymbolIcon ClipboardMonth24}"
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=InactivitySelector}" />
+            <MenuItem
+                Command="{Binding SetLowUsageThresholdCommand}"
+                Header="Set Usage threshold"
+                Icon="{ui:SymbolIcon ClipboardMonth24}"
+                Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=LowUsageSelector}" />
         </Menu>
 
         <ui:TextBlock
+            Grid.Row="1"
             Margin="15,5,5,15"
             FontTypography="Title"
-            Text="{Binding Title}" Grid.Row="1" />
+            Text="{Binding Title}" />
 
-        <ScrollViewer
-            Grid.Row="2"
-            VerticalScrollBarVisibility="Visible">
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible">
             <ui:DataGrid
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
                 CanUserDeleteRows="False"
                 CanUserReorderColumns="False"
+                EnableColumnVirtualization="True"
                 GridLinesVisibility="Vertical"
                 HeadersVisibility="Column"
-                EnableColumnVirtualization="True"
                 ItemsSource="{Binding Aliases}">
                 <DataGrid.Columns>
                     <!--  CHECKBOX  -->
@@ -143,9 +161,9 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox
-                                    IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    HorizontalAlignment="Center">
+                                    IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                     <interactivity:Interaction.Triggers>
                                         <interactivity:EventTrigger EventName="Checked">
                                             <interactivity:InvokeCommandAction
@@ -208,9 +226,38 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
+                    <!--  LAST USED  -->
+                    <DataGridTemplateColumn
+                        x:Name="ColumnLastUsed"
+                        Header="Last used at">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock
+                                    Margin="5,5,50,5"
+                                    VerticalAlignment="Center"
+                                    FontTypography="BodyStrong"
+                                    Text="{Binding LastUsedAt}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  USAGE COUNT  -->
+                    <DataGridTemplateColumn
+                        x:Name="ColumnUsageCount"
+                        Header="Usage">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:TextBlock
+                                    Margin="5,5,50,5"
+                                    VerticalAlignment="Center"
+                                    FontTypography="BodyStrong"
+                                    Text="{Binding Count}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                     <!--  FILENAME  -->
-                    <DataGridTemplateColumn Header="File name"
-                                            x:Name="ColumnFileName">
+                    <DataGridTemplateColumn x:Name="ColumnFileName" Header="File name">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock
@@ -223,8 +270,7 @@
                     </DataGridTemplateColumn>
 
                     <!--  PARAMETERS  -->
-                    <DataGridTemplateColumn Header="Parameters"
-                                            x:Name="ColumnParameters">
+                    <DataGridTemplateColumn x:Name="ColumnParameters" Header="Parameters">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock
@@ -236,9 +282,8 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <!-- DESCRIPTION -->
-                    <DataGridTemplateColumn Header="Proposed Description"
-                                            x:Name="ColumnProposedDescription">
+                    <!--  DESCRIPTION  -->
+                    <DataGridTemplateColumn x:Name="ColumnProposedDescription" Header="Proposed Description">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock
