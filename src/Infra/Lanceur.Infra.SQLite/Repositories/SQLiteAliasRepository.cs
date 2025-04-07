@@ -267,46 +267,33 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<UsageQueryResult> GetUnusedAliases()
+    public IEnumerable<SelectableAliasQueryResult> GetUnusedAliases()
     {
         const string sql = $"""
-                           select 
-                               0                           as {nameof(UsageQueryResult.Count)},
-                               group_concat(an.name, ', ') as {nameof(UsageQueryResult.Name)}
+                           select
+                               id        as {nameof(SelectableAliasQueryResult.Id)},
+                               notes     as {nameof(SelectableAliasQueryResult.Description)},
+                               file_name as {nameof(SelectableAliasQueryResult.FileName)},
+                               arguments as {nameof(SelectableAliasQueryResult.Parameters)},
+                               name      as {nameof(SelectableAliasQueryResult.Name)},
+                               icon      as {nameof(SelectableAliasQueryResult.Icon)}
                            from (
                                select 
-                                   a.id  as id_alias        
-                               from 
-                                   alias a
-                                   left join alias_usage b on a.id = b.id_alias
-                               where 
-                                   b.id_alias is null) t
-                               inner join alias_name an on an.id_alias = t.id_alias
-                           group by t.id_alias
+                                   an.id_alias,
+                                   group_concat(an.name, ', ') as name
+                               from (
+                                   select 
+                                       a.id  as id_alias        
+                                   from 
+                                       alias a
+                                       left join alias_usage b on a.id = b.id_alias
+                                   where 
+                                       b.id_alias is null) t
+                                   inner join alias_name an on an.id_alias = t.id_alias
+                               group by t.id_alias
+                           ) tt inner join alias aa on aa.id = tt.id_alias
                            """;
-        return Db.WithConnection(conn => conn.Query<UsageQueryResult>(sql));
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<UsageQueryResult> GetUnusedAliases(int year)
-    {
-        const string sql = $"""
-                            select 
-                                0                          as {nameof(UsageQueryResult.Count)},
-                                group_concat(b.name, ', ') as {nameof(UsageQueryResult.Name)}
-                            from (
-                                select a.id_alias
-                                from 
-                                    (select distinct id_alias from alias_usage u where strftime('%Y', time_stamp) <> @year) a
-                                    left join (
-                                        select distinct id_alias from alias_usage where strftime('%Y', time_stamp) = @year
-                                    ) b on a.id_alias = b.id_alias
-                                where
-                                    b.id_alias is null) a
-                                inner join alias_name b on a.id_alias = b.id_alias
-                                group by a.id_alias
-                            """;
-        return Db.WithConnection(conn => conn.Query<UsageQueryResult>(sql, new { year = $"{year}" }));
+        return Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql));
     }
 
     /// <inheritdoc />

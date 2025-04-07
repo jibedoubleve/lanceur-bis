@@ -72,6 +72,10 @@
                     Header="Deleted aliases"
                     Icon="{ui:SymbolIcon Delete24}" />
                 <MenuItem
+                    Command="{Binding ShowUnusedAliasesCommand}"
+                    Header="Never used aliases"
+                    Icon="{ui:SymbolIcon HandRightOff20}" />
+                <MenuItem
                     Command="{Binding ShowAliasesWithoutNotesCommand}"
                     Header="Aliases without comments"
                     Icon="{ui:SymbolIcon ProhibitedNote20}" />

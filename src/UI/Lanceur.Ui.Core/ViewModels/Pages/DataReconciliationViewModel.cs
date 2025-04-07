@@ -18,7 +18,8 @@ public enum ReportType
     DoubloonAliases,
     BrokenAliases,
     UnannotatedAliases,
-    RestoreAlias
+    RestoreAlias,
+    UnusedAliases,
 }
 
 public partial class DataReconciliationViewModel : ObservableObject
@@ -191,6 +192,8 @@ public partial class DataReconciliationViewModel : ObservableObject
     );
 
     [RelayCommand] private async Task OnShowBrokenAliases() => await ShowAsync("Broken Aliases", ReportType.BrokenAliases, _repository.GetBrokenAliases);
+
+    [RelayCommand] private async Task OnShowUnusedAliases() => await ShowAsync("Unused Aliases", ReportType.UnusedAliases, _repository.GetUnusedAliases);
 
     [RelayCommand] private async Task OnShowDoubloons() => await ShowAsync("Doubloon Aliases", ReportType.DoubloonAliases, _repository.GetDoubloons);
 

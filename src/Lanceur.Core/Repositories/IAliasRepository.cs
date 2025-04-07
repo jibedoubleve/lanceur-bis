@@ -134,22 +134,9 @@ public interface IAliasRepository
     ///     Retrieves the aliases that were not used at all.
     /// </summary>
     /// <returns>
-    ///     A collection of <see cref="UsageQueryResult" /> representing aliases that were not used.
+    ///     A collection of <see cref="SelectableAliasQueryResult" /> representing aliases that were not used.
     /// </returns>
-    public IEnumerable<UsageQueryResult> GetUnusedAliases();
-
-    /// <summary>
-    ///     Retrieves the aliases that were used, but not during the specified year.
-    /// </summary>
-    /// <param name="year">
-    ///     The year to check for alias usage.
-    /// </param>
-    /// <returns>
-    ///     A collection of <see cref="UsageQueryResult" /> objects representing aliases that were not used in the specified
-    ///     year.
-    /// </returns>
-    public IEnumerable<UsageQueryResult> GetUnusedAliases(int year);
-
+    public IEnumerable<SelectableAliasQueryResult> GetUnusedAliases();
 
     /// <summary>
     ///     Returns usage trends. The result is meant to be dislayed as a chart
