@@ -76,7 +76,7 @@ public partial class MostUsedViewModel : ObservableObject
                     return await Task.Run(
                         () => SelectedFilter.IsUsage()
                             ? _repository.GetMostUsedAliasesByYear(year)
-                            : _repository.GetUnusedAliases() // No matter the year when it is unused ;-)
+                            : _repository.GetUnusedAliases(year)
                     );
 
                 return await Task.Run(

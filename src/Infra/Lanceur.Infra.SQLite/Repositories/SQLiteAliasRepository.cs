@@ -284,7 +284,29 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                inner join alias_name an on an.id_alias = t.id_alias
                            group by t.id_alias
                            """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql));
+        return Db.WithConnection(conn => conn.Query<UsageQueryResult>(sql));
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<UsageQueryResult> GetUnusedAliases(int year)
+    {
+        const string sql = $"""
+                            select 
+                                0                          as {nameof(UsageQueryResult.Count)},
+                                group_concat(b.name, ', ') as {nameof(UsageQueryResult.Name)}
+                            from (
+                                select a.id_alias
+                                from 
+                                    (select distinct id_alias from alias_usage u where strftime('%Y', time_stamp) <> @year) a
+                                    left join (
+                                        select distinct id_alias from alias_usage where strftime('%Y', time_stamp) = @year
+                                    ) b on a.id_alias = b.id_alias
+                                where
+                                    b.id_alias is null) a
+                                inner join alias_name b on a.id_alias = b.id_alias
+                                group by a.id_alias
+                            """;
+        return Db.WithConnection(conn => conn.Query<UsageQueryResult>(sql, new { year = $"{year}" }));
     }
 
     /// <inheritdoc />
