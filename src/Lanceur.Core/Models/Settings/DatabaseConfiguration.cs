@@ -39,6 +39,11 @@ public class DatabaseConfiguration
     /// </remarks>
     public HotKeySection HotKey { get; } = new(3, 18);
 
+    /// <summary>
+    ///     Gets or sets miscellaneous configuration settings that do not fall into other categories.
+    ///     These settings may include other application preferences not specifically handled elsewhere.
+    /// </summary>
+    public ReconciliationSection Reconciliation { get; set; } = new();
 
     /// <summary>
     ///     Contains settings for the resource monitor.

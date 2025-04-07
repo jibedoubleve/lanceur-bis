@@ -235,6 +235,60 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     );
 
     /// <inheritdoc />
+    public IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months)
+    {
+        if (months >= 12 * 30) months = 12 * 10; // 30 years max in the past...
+        var sql = $"""
+                           select 
+                               a.id_alias           as {nameof(SelectableAliasQueryResult.Id)},
+                               c.notes              as {nameof(SelectableAliasQueryResult.Description)},
+                               c.file_name          as {nameof(SelectableAliasQueryResult.FileName)},
+                               c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
+                               group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
+                               c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
+                               a.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)}
+                           from 
+                               (select 
+                                   id_alias        as id_alias,
+                                   max(time_stamp) as last_used
+                               from 
+                                   alias_usage  
+                               group by id_alias)    a
+                               inner join alias_name b on a.id_alias = b.id_alias
+                               inner join alias      c on a.id_alias = c.id
+                           where 
+                                a.last_used < date('now', '-{months} months')
+                                and deleted_at is null
+                           group by a.id_alias
+                           order by last_used asc
+                           """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<SelectableAliasQueryResult> GetRarekyUsedAliases(int threshold)
+    {
+        var sql = $"""
+                   select 
+                       a.id_alias           as {nameof(SelectableAliasQueryResult.Id)},
+                       c.notes              as {nameof(SelectableAliasQueryResult.Description)},
+                       c.file_name          as {nameof(SelectableAliasQueryResult.FileName)},
+                       c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
+                       group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
+                       c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
+                       a.count              as {nameof(SelectableAliasQueryResult.Count)}
+                   from 
+                       stat_usage_per_app_v a
+                       inner join alias_name b on a.id_alias = b.id_alias
+                       inner join alias c on c.id = a.id_alias
+                   where count < {threshold}
+                   group by b.id_alias
+                   order by a.count desc
+                   """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+    }
+
+    /// <inheritdoc />
     public IEnumerable<UsageQueryResult> GetMostUsedAliases()
     {
         const string sql = $"""

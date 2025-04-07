@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Logging;
@@ -20,6 +21,8 @@ public enum ReportType
     UnannotatedAliases,
     RestoreAlias,
     UnusedAliases,
+    InactiveAliases,
+    RarelyUsedAliases
 }
 
 public partial class DataReconciliationViewModel : ObservableObject
@@ -31,9 +34,11 @@ public partial class DataReconciliationViewModel : ObservableObject
     private readonly IReconciliationService _reconciliationService;
     [ObservableProperty] private ReportType _reportType = ReportType.None;
     private readonly IAliasRepository _repository;
+    private readonly ISettingsFacade _settingsFacade;
     [ObservableProperty] private string _title = string.Empty;
     private readonly IUserInteractionService _userInteraction;
     private readonly IUserNotificationService _userNotification;
+    private readonly IViewFactory _viewFactory;
 
     #endregion
 
@@ -44,7 +49,9 @@ public partial class DataReconciliationViewModel : ObservableObject
         ILogger<DataReconciliationViewModel> logger,
         IUserInteractionService userInteraction,
         IUserNotificationService userNotification,
-        IReconciliationService reconciliationService
+        IReconciliationService reconciliationService,
+        IViewFactory viewFactory,
+        ISettingsFacade settingsFacade
     )
     {
         _repository = repository;
@@ -52,6 +59,8 @@ public partial class DataReconciliationViewModel : ObservableObject
         _userInteraction = userInteraction;
         _userNotification = userNotification;
         _reconciliationService = reconciliationService;
+        _viewFactory = viewFactory;
+        _settingsFacade = settingsFacade;
     }
 
     #endregion
@@ -70,6 +79,28 @@ public partial class DataReconciliationViewModel : ObservableObject
     }
 
     private SelectableAliasQueryResult[] GetSelectedAliases() => Aliases.Where(e => e.IsSelected).ToArray();
+
+    private async Task<(bool IsSuccess, int NumericValue)> GetThreshold(string label, string toolTip, int minimum, int maximum, int numericValue)
+    {
+        var vm = new NumericSelectorViewModel
+        {
+            Label = label,
+            ToolTip = toolTip,
+            Minimum = minimum,
+            Maximum = maximum,
+            NumericValue = numericValue
+        };
+        ;
+        var answer = await _userInteraction.AskUserYesNoAsync(
+            _viewFactory.CreateView(vm),
+            "Ok",
+            "Cancel",
+            "Threshold"
+        );
+        return answer
+            ? (true, (int)vm.NumericValue)
+            : (false, 0);
+    }
 
     private bool HasSelection() => Aliases.Any(e => e.IsSelected);
 
@@ -178,10 +209,56 @@ public partial class DataReconciliationViewModel : ObservableObject
         _repository.Restore(selectedAliases);
         _userNotification.Success($"Restored {selectedAliases.Length} selected aliases");
         _logger.LogInformation("Restored {Items} aliases", selectedAliases.Length);
-        await OnShowRestoreAlias();
+        await OnShowRestoreAliases();
     }
 
     [RelayCommand] private void OnSelectionChanged() => this.NotifyCommandsUpdate();
+
+    [RelayCommand]
+    private async Task OnSetInactivityThreshold()
+    {
+        var result = await GetThreshold(
+            "Select Inactivity Period (in months)",
+            "The inactivity period refers to the number of months after which an alias is considered inactive.",
+            0,
+            12 * 30,
+            _settingsFacade.Application.Reconciliation.InactivityThreshold
+        );
+
+        if (!result.IsSuccess) return;
+
+        if (_settingsFacade.Application.Reconciliation.InactivityThreshold != result.NumericValue)
+        {
+            _settingsFacade.Application.Reconciliation.InactivityThreshold = result.NumericValue;
+            _settingsFacade.Save();
+            _logger.LogTrace("Inactivity threshold updated to {Months} months", result.NumericValue);
+        }
+
+        await OnShowInactiveAliases();
+    }
+
+    [RelayCommand]
+    private async Task OnSetLowUsageThreshold()
+    {
+        var result = await GetThreshold(
+            "Select Maximum Usage Count",
+            "The usage threshold refers to the number of accesses below which an alias is considered to have low usage.",
+            0,
+            int.MaxValue,
+            _settingsFacade.Application.Reconciliation.LowUsageThreshold
+        );
+
+        if (!result.IsSuccess) return;
+
+        if (_settingsFacade.Application.Reconciliation.LowUsageThreshold != result.NumericValue)
+        {
+            _settingsFacade.Application.Reconciliation.LowUsageThreshold = result.NumericValue;
+            _settingsFacade.Save();
+            _logger.LogTrace("Low Usage threshold updated to {Count}", result.NumericValue);
+        }
+
+        await OnShowRarelyUsedAliases();
+    }
 
     [RelayCommand]
     private async Task OnShowAliasesWithoutNotes() => await ShowAsync(
@@ -193,11 +270,25 @@ public partial class DataReconciliationViewModel : ObservableObject
 
     [RelayCommand] private async Task OnShowBrokenAliases() => await ShowAsync("Broken Aliases", ReportType.BrokenAliases, _repository.GetBrokenAliases);
 
-    [RelayCommand] private async Task OnShowUnusedAliases() => await ShowAsync("Unused Aliases", ReportType.UnusedAliases, _repository.GetUnusedAliases);
-
     [RelayCommand] private async Task OnShowDoubloons() => await ShowAsync("Doubloon Aliases", ReportType.DoubloonAliases, _repository.GetDoubloons);
 
-    [RelayCommand] private async Task OnShowRestoreAlias() => await ShowAsync("Show deleted aliases", ReportType.RestoreAlias, _repository.GetDeletedAlias);
+    [RelayCommand]
+    private async Task OnShowInactiveAliases() => await ShowAsync(
+        "Show inactive aliases",
+        ReportType.InactiveAliases,
+        () =>  _repository.GetInactiveAliases(_settingsFacade.Application.Reconciliation.InactivityThreshold)
+    );
+
+    [RelayCommand]
+    private async Task OnShowRarelyUsedAliases() => await ShowAsync(
+        "Show rarely used aliases",
+        ReportType.RarelyUsedAliases,
+        () =>  _repository.GetRarekyUsedAliases(_settingsFacade.Application.Reconciliation.LowUsageThreshold)
+    );
+
+    [RelayCommand] private async Task OnShowRestoreAliases() => await ShowAsync("Show deleted aliases", ReportType.RestoreAlias, _repository.GetDeletedAlias);
+
+    [RelayCommand] private async Task OnShowUnusedAliases() => await ShowAsync("Unused Aliases", ReportType.UnusedAliases, _repository.GetUnusedAliases);
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private async Task OnUpdateDescription()

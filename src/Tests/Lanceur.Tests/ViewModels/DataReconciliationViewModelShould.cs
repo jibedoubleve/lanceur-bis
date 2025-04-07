@@ -15,6 +15,7 @@ using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Tests.ViewModels.Generators;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
+using Lanceur.Ui.WPF.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
@@ -37,6 +38,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         serviceCollection.AddApplicationSettings(
                              stg => visitors?.VisitSettings?.Invoke(stg)
                          )
+                         .AddMockSingleton<IViewFactory>()
                          .AddSingleton<IMappingService, AutoMapperMappingService>()
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddMockSingleton<IDatabaseConfigurationService>()
@@ -86,7 +88,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, db) =>
             {
                 // arrange
-                await viewModel.ShowRestoreAliasCommand.ExecuteAsync(null);
+                await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null);
 
                 // act
                 viewModel.Aliases.ElementAt(0).IsSelected = true;
@@ -151,7 +153,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, db) =>
             {
                 // arrange
-                await viewModel.ShowRestoreAliasCommand.ExecuteAsync(null);
+                await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null);
 
                 // act
                 viewModel.Aliases.ElementAt(0).IsSelected = true;
@@ -524,7 +526,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     public async Task ShowRestoreAlias()
     {
         await TestViewModelAsync(
-            async (viewModel, _) =>  await viewModel.ShowRestoreAliasCommand.ExecuteAsync(null),
+            async (viewModel, _) =>  await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null),
             SqlBuilder.Empty
         );
     }
