@@ -49,24 +49,6 @@
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ComboBox>
-            <Separator Margin="5" />
-            <Label
-                Margin="0,5,15,5"
-                VerticalAlignment="Center"
-                Content="Filter: " />
-            <ComboBox
-                Margin="5,5,15,5"
-                VerticalAlignment="Center"
-                ItemsSource="{Binding Filters}"
-                SelectedIndex="0"
-                SelectedItem="{Binding SelectedFilter}"
-                DisplayMemberPath="Description">
-                <interactivity:Interaction.Triggers>
-                    <interactivity:EventTrigger EventName="SelectionChanged">
-                        <interactivity:InvokeCommandAction Command="{Binding RefreshAliasesCommand}" />
-                    </interactivity:EventTrigger>
-                </interactivity:Interaction.Triggers>
-            </ComboBox>
         </StackPanel>
         <ui:DataGrid
             Grid.Row="1"

@@ -18,20 +18,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
 {
     #region Methods
 
-    private static Visibility GetVisibilityForDoubloon(ActionOnAlias actionOnAlias)
-    {
-        return actionOnAlias switch
-        {
-            ActionOnAlias.UpdateDescription => Visibility.Collapsed,
-            ActionOnAlias.Delete            => Visibility.Visible,
-            ActionOnAlias.Merge             => Visibility.Visible,
-            ActionOnAlias.Restore           => Visibility.Collapsed,
-            ActionOnAlias.DeletePermanently   => Visibility.Collapsed,
-            _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
-        };
-    }
-
-    private static Visibility GetVisibilityForBroken(ActionOnAlias actionOnAlias)
+    private Visibility GetDefaultVisibility(ActionOnAlias actionOnAlias)
     {
         return actionOnAlias switch
         {
@@ -39,7 +26,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.Delete            => Visibility.Visible,
             ActionOnAlias.Merge             => Visibility.Collapsed,
             ActionOnAlias.Restore           => Visibility.Collapsed,
-            ActionOnAlias.DeletePermanently   => Visibility.Collapsed,
+            ActionOnAlias.DeletePermanently => Visibility.Collapsed,
             _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
         };
     }
@@ -52,7 +39,20 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.Delete            => Visibility.Collapsed,
             ActionOnAlias.Merge             => Visibility.Collapsed,
             ActionOnAlias.Restore           => Visibility.Visible,
-            ActionOnAlias.DeletePermanently   => Visibility.Visible,
+            ActionOnAlias.DeletePermanently => Visibility.Visible,
+            _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
+        };
+    }
+
+    private static Visibility GetVisibilityForDoubloon(ActionOnAlias actionOnAlias)
+    {
+        return actionOnAlias switch
+        {
+            ActionOnAlias.UpdateDescription => Visibility.Collapsed,
+            ActionOnAlias.Delete            => Visibility.Visible,
+            ActionOnAlias.Merge             => Visibility.Visible,
+            ActionOnAlias.Restore           => Visibility.Collapsed,
+            ActionOnAlias.DeletePermanently => Visibility.Collapsed,
             _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
         };
     }
@@ -65,7 +65,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.Delete            => Visibility.Collapsed,
             ActionOnAlias.Merge             => Visibility.Collapsed,
             ActionOnAlias.Restore           => Visibility.Collapsed,
-            ActionOnAlias.DeletePermanently   => Visibility.Collapsed,
+            ActionOnAlias.DeletePermanently => Visibility.Collapsed,
             _                               => throw new ArgumentOutOfRangeException(nameof(actionOnAlias), actionOnAlias, null)
         };
     }
@@ -80,11 +80,10 @@ public class ReportTypeToVisibilityConverter : IValueConverter
         return report switch
         {
             ReportType.DoubloonAliases    => GetVisibilityForDoubloon(actionOnAlias),
-            ReportType.BrokenAliases      => GetVisibilityForBroken(actionOnAlias),
             ReportType.UnannotatedAliases => GetVisibilityForUnannotated(actionOnAlias),
             ReportType.RestoreAlias       => GetVisibilityForDeleted(actionOnAlias),
             ReportType.None               => Visibility.Visible,
-            _                             => throw new ArgumentOutOfRangeException(nameof(report), report, null)
+            _                             => GetDefaultVisibility(actionOnAlias)
         };
     }
 
