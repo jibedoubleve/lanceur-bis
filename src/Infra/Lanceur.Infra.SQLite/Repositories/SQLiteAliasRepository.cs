@@ -240,13 +240,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         if (months >= 12 * 30) months = 12 * 10; // 30 years max in the past...
         var sql = $"""
                            select 
-                               a.id_alias           as {nameof(SelectableAliasQueryResult.Id)},
-                               c.notes              as {nameof(SelectableAliasQueryResult.Description)},
-                               c.file_name          as {nameof(SelectableAliasQueryResult.FileName)},
-                               c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
-                               group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
-                               c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
-                               a.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)}
+                               a.id_alias           ,
+                               c.notes              ,
+                               c.file_name          ,
+                               c.arguments          ,
+                               group_concat(b.name) ,
+                               c.icon               ,
+                               a.last_used          
                            from 
                                (select 
                                    id_alias        as id_alias,

@@ -17,6 +17,7 @@ using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Helpers;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualBasic;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
@@ -501,6 +502,142 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         await TestViewModelAsync(
             async (viewModel, _) => await viewModel.ShowAliasesWithoutNotesCommand.ExecuteAsync(null),
             SqlBuilder.Empty
+        );
+    }
+
+    [Fact]
+    public async Task ShowInactiveAliases()
+    {
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.AskUserYesNoAsync(Arg.Any<object>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                 .Returns(true);
+                return i;
+            },
+            VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 1
+        };
+        var sqlBuilder = new SqlBuilder().AppendAlias(1, cfg: alias =>
+                                         {
+                                             alias.WithSynonyms("A");
+                                             alias.WithUsage(
+                                                 DateTime.Now.AddMonths(-1), // Recent usage
+                                                 DateTime.Now.AddMonths(-100)
+                                             );
+                                         })
+                                         .AppendAlias(2, cfg: alias =>
+                                         {
+                                             alias.WithSynonyms("B");
+                                             alias.WithUsage(
+                                                 DateTime.Now.AddMonths(-100),
+                                                 DateTime.Now.AddMonths(-110),
+                                                 DateTime.Now.AddMonths(-120)
+                                             );
+                                         })
+                                         .AppendAlias(
+                                             3,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("C");
+                                                 alias.WithUsage(
+                                                     DateTime.Now,
+                                                     DateTime.Now.AddMonths(-1), // Recent usage
+                                                     DateTime.Now.AddMonths(-120),
+                                                     DateTime.Now.AddMonths(-121),
+                                                     DateTime.Now.AddMonths(-122),
+                                                     DateTime.Now.AddMonths(-123),
+                                                     DateTime.Now.AddMonths(-124)
+                                                 );
+                                             }
+                                         );
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
+                await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
+
+                viewModel.Aliases.Should().HaveCount(1);
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+    
+    [Fact]
+    public async Task ShowAliasesWithLowUsage()
+    {
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.AskUserYesNoAsync(Arg.Any<object>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                 .Returns(true);
+                return i;
+            },
+            VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 2
+        };
+        var sqlBuilder = new SqlBuilder().AppendAlias(1, cfg: alias =>
+                                         {
+                                             alias.WithSynonyms("A");
+                                             alias.WithUsage(
+                                                 DateTime.Now.AddMonths(-100) // Recent usage
+                                             );
+                                         })
+                                         .AppendAlias(2, cfg: alias =>
+                                         {
+                                             alias.WithSynonyms("B");
+                                             alias.WithUsage(
+                                                 DateTime.Now.AddMonths(-100),
+                                                 DateTime.Now.AddMonths(-110),
+                                                 DateTime.Now.AddMonths(-120)
+                                             );
+                                         })
+                                         .AppendAlias(
+                                             3,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("C");
+                                                 alias.WithUsage(
+                                                     DateTime.Now,
+                                                     DateTime.Now.AddMonths(-1), // Recent usage
+                                                     DateTime.Now.AddMonths(-120),
+                                                     DateTime.Now.AddMonths(-121),
+                                                     DateTime.Now.AddMonths(-122),
+                                                     DateTime.Now.AddMonths(-123),
+                                                     DateTime.Now.AddMonths(-124)
+                                                 );
+                                             }
+                                         );
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
+                await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
+
+                viewModel.Aliases.Should().HaveCount(2);
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+    
+    [Fact]
+    public async Task ShowNeverUsedAliases()
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(1, cfg: alias => alias.WithSynonyms("A"))
+                                         .AppendAlias(2, cfg: alias => alias.WithSynonyms("B"))
+                                         .AppendAlias(3, cfg: alias => alias.WithSynonyms("C"));
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                await viewModel.ShowUnusedAliasesCommand.ExecuteAsync(null);
+
+                viewModel.Aliases.Should().HaveCount(3);
+            },
+            sqlBuilder
         );
     }
 
