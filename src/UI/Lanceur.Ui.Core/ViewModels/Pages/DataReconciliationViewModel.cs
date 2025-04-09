@@ -90,7 +90,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             Maximum = maximum,
             NumericValue = numericValue
         };
-        ;
+        
         var answer = await _userInteraction.AskUserYesNoAsync(
             _viewFactory.CreateView(vm),
             "Ok",
