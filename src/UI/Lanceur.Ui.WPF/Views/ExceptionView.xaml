@@ -28,30 +28,34 @@
             Height="30"
             DockPanel.Dock="Top" />
 
-        <StackPanel Grid.Row="1">
-            <ui:CardExpander Margin="5,5,5,12"
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Auto">
+            <StackPanel>
+                <ui:CardExpander Margin="5,5,5,12"
                              Icon="{ui:SymbolIcon TextCaseTitle20}"
                              IsExpanded="true">
 
-                <ui:CardExpander.Header>
-                    <ui:TextBlock FontFamily="Body" Text="Error message" />
-                </ui:CardExpander.Header>
+                    <ui:CardExpander.Header>
+                        <ui:TextBlock FontFamily="Body" Text="Error message" />
+                    </ui:CardExpander.Header>
 
-                <StackPanel>
-                    <TextBlock x:Name="ExceptionMessage" />
-                </StackPanel>
-            </ui:CardExpander>
-            <ui:CardExpander Margin="5,5,5,12"
+                    <StackPanel>
+                        <TextBlock x:Name="ExceptionMessage" />
+                    </StackPanel>
+                </ui:CardExpander>
+                <ui:CardExpander Margin="5,5,5,12"
                              Icon="{ui:SymbolIcon DocumentBulletListMultiple20}">
-                <ui:CardExpander.Header>
-                    <TextBlock Text="Exception trace" />
-                </ui:CardExpander.Header>
+                    <ui:CardExpander.Header>
+                        <TextBlock Text="Exception trace" />
+                    </ui:CardExpander.Header>
 
-                <StackPanel>
-                    <TextBlock x:Name="ExceptionTrace" />
-                </StackPanel>
-            </ui:CardExpander>
-        </StackPanel>
+                    <StackPanel>
+                        <TextBlock x:Name="ExceptionTrace" />
+                    </StackPanel>
+                </ui:CardExpander>
+            </StackPanel>
+        </ScrollViewer>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <ui:Button Icon="{ui:SymbolIcon ArrowBounce20}" Click="OnOpenLogs" Margin="5">Show logs</ui:Button>
