@@ -142,7 +142,7 @@ public interface IAliasRepository
     ///     A collection of <see cref="SelectableAliasQueryResult" /> representing aliases
     ///     with usage counts below the specified threshold.
     /// </returns>
-    IEnumerable<SelectableAliasQueryResult> GetRarekyUsedAliases(int threshold);
+    IEnumerable<SelectableAliasQueryResult> GetRarelyUsedAliases(int threshold);
 
 
     /// <summary>
