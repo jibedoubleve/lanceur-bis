@@ -283,7 +283,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     private async Task OnShowRarelyUsedAliases() => await ShowAsync(
         "Show rarely used aliases",
         ReportType.RarelyUsedAliases,
-        () =>  _repository.GetRarekyUsedAliases(_settingsFacade.Application.Reconciliation.LowUsageThreshold)
+        () =>  _repository.GetRarelyUsedAliases(_settingsFacade.Application.Reconciliation.LowUsageThreshold)
     );
 
     [RelayCommand] private async Task OnShowRestoreAliases() => await ShowAsync("Show deleted aliases", ReportType.RestoreAlias, _repository.GetDeletedAlias);
