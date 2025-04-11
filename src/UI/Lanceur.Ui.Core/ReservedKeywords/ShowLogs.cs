@@ -4,7 +4,7 @@ using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Infra.Constants;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.Core.ReservedKeywords;
 
 [ReservedAlias("logs")]
 [Description("Open the directory containing the log files")]

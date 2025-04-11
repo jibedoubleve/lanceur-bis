@@ -6,12 +6,13 @@ using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.Helpers;
-using Lanceur.Ui.WPF.ReservedKeywords;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui;
+using INavigationService = Lanceur.Core.Services.INavigationService;
 using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
+using NavigationService = Lanceur.Ui.WPF.Services.NavigationService;
 
 namespace Lanceur.Ui.WPF.Extensions;
 
@@ -30,11 +31,8 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IViewFactory, ViewFactory>()
                          .AddSingleton<IHotKeyService, HotKeyService>()
                          .AddSingleton<IInteractionHub, InteractionHub>()
-                         .AddSingleton(new AssemblySource
-                         {
-                             ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)), 
-                             MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
-                         });
+                         .AddSingleton<INavigationService, NavigationService>()
+                         .AddSingleton<IApplicationService, ApplicationService>();
 
         ConditionalExecution.Execute(
             serviceCollection,

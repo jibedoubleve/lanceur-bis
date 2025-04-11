@@ -11,6 +11,10 @@ public class ViewFactory : IViewFactory
 {
     #region Methods
 
+    /// <inheritdoc />
+    public object CreateVersionView(string version, string commit) => new VersionView(version, commit);
+
+    /// <inheritdoc />
     public object CreateView(object viewModel) => viewModel switch
     {
         null                                    => throw new ArgumentNullException(nameof(viewModel), "The view model cannot be null."),

@@ -7,7 +7,10 @@ using System.Reflection;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.Tests.Tooling.ReservedAliases;
+using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -30,6 +33,7 @@ public class ReservedKeywordsStoreShould
                                                      .AddSingleton(aliasRepository)
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton(reservedAliasStoreLogger)
+                                                     .AddMockSingleton<IApplicationService>()
                                                      .BuildServiceProvider();
 
         var store = new ReservedAliasStore(serviceProvider);
@@ -44,7 +48,7 @@ public class ReservedKeywordsStoreShould
     public void ReturnSpecifiedReservedAliasFromLanceur(string criterion)
     {
         var repository = Substitute.For<IAliasRepository>();
-        var store = GetStore(repository, typeof(MainView));
+        var store = GetStore(repository, typeof(MainViewModel));
         var query = new Cmdline(criterion);
 
         store.Search(query)

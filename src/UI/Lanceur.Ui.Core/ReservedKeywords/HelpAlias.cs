@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.Core.ReservedKeywords;
 
 [ReservedAlias("help")]
 [Description("Open help page")]

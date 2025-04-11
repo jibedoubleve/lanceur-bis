@@ -1,8 +1,10 @@
 using System.Data;
 using System.Data.SQLite;
+using System.Reflection;
 using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
+using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
@@ -10,6 +12,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
+using Lanceur.Infra.Macros;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
@@ -22,6 +25,8 @@ using Lanceur.Scripts;
 using Lanceur.SharedKernel.Caching;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
+using Lanceur.Ui.Core.Messages;
+using Lanceur.Ui.Core.ReservedKeywords;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
@@ -120,6 +125,12 @@ public static class ServiceCollectionExtensions
                                  ScriptRepository.DbScriptEmbeddedResourcePattern
                              )
                          )
+                         .AddSingleton(new AssemblySource
+                         {
+                             ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)), 
+                             MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
+                         })
+                         .AddSingleton<IMessageService, MessageService>()
                          .AddTransient<IDataStoreVersionService, SQLiteVersionService>()
                          .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()

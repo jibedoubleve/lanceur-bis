@@ -1,23 +1,27 @@
 using System.ComponentModel;
-using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Win32.Extensions;
+using Lanceur.Core.Services;
 using Lanceur.Ui.Core.Messages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Coordinate = Lanceur.Core.Models.Coordinate;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.Core.ReservedKeywords;
 
 [ReservedAlias("centre")]
 [Description("Centre Lanceur in the middle of the screen.")]
 public class CentreAlias : SelfExecutableQueryResult
 {
-    private readonly ILogger<CentreAlias>? _logger;
+    #region Fields
+
     private readonly IDatabaseConfigurationService? _appConfig;
+    private readonly IApplicationService _application;
+    private readonly ILogger<CentreAlias>? _logger;
+
+    #endregion
 
     #region Constructors
 
@@ -25,9 +29,10 @@ public class CentreAlias : SelfExecutableQueryResult
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
-        var factory = serviceProvider.GetService<ILoggerFactory>() ?? throw new NullReferenceException("Logger factory is ont configured in the service provider");
+        var factory = serviceProvider.GetService<ILoggerFactory>() ?? throw new NullReferenceException("Logger factory is not configured in the service provider");
         _logger = factory.CreateLogger<CentreAlias>();
-        _appConfig = serviceProvider.GetService<IDatabaseConfigurationService>() ?? throw new NullReferenceException(nameof(_appConfig));
+        _appConfig = serviceProvider.GetService<IDatabaseConfigurationService>() ?? throw new NullReferenceException($"{nameof(IDatabaseConfigurationService)} is not configured in the service provider)");
+        _application = serviceProvider.GetService<IApplicationService>() ?? throw new NullReferenceException($"{nameof(IApplicationService)} is not configured in the service provider");
     }
 
     #endregion
@@ -53,7 +58,7 @@ public class CentreAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        var coordinate = Application.Current.MainWindow!.GetCenterCoordinate();
+        var coordinate = _application.GetCenterCoordinate();
         _logger!.LogInformation(
             "Put window at default position. (x: {X} - y: {Y})",
             coordinate.X,
