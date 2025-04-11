@@ -86,6 +86,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             where
                                 a.notes is null
                                 and a.hidden = 0
+                                and a.deleted_at is null
                             order by an.name
                             """;
         var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
@@ -119,6 +120,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 inner join alias_name an on a.id = an.id_alias
                             where
                                 deleted_at is null
+                                and a.deleted_at is null
                             	and (
                                     file_name like 'c:\%'
                             	    or file_name like 'd:\%'
@@ -282,7 +284,9 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                        stat_usage_per_app_v a
                        inner join alias_name b on a.id_alias = b.id_alias
                        inner join alias c on c.id = a.id_alias
-                   where count < {threshold}
+                   where 
+                       count < {threshold}
+                       and c.deleted_at is null
                    group by b.id_alias
                    order by a.count desc
                    """;
@@ -343,7 +347,9 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                        alias a
                                        left join alias_usage b on a.id = b.id_alias
                                    where 
-                                       b.id_alias is null) t
+                                       b.id_alias is null
+                                       and a.deleted_at is null
+                                ) t
                                    inner join alias_name an on an.id_alias = t.id_alias
                                group by t.id_alias
                            ) tt inner join alias aa on aa.id = tt.id_alias
