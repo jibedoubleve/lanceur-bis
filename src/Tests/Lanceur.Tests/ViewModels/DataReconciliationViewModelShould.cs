@@ -15,9 +15,7 @@ using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Tests.ViewModels.Generators;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
-using Lanceur.Ui.WPF.Helpers;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualBasic;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
@@ -59,7 +57,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     [Fact]
     public async Task DeletePermanentlyWithValidation()
     {
-        var visitors = new ServiceVisitors()
+        var visitors = new ServiceVisitors
         {
             VisitUserInteractionService = (_, i) =>
             {
@@ -116,72 +114,128 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                     }
                 );
             },
-            sqlBuilder, 
+            sqlBuilder,
+            visitors
+        );
+    }
+
+    [Theory]
+    [InlineData("A", 1)]
+    [InlineData("B", 1)]
+    [InlineData("C", 1)]
+    [InlineData("E", 0)]
+    public async Task FilterInactiveAliases(string filter, int count)
+    {
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.AskUserYesNoAsync(Arg.Any<object>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                 .Returns(true);
+                return i;
+            },
+            VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 2
+        };
+        var sqlBuilder = new SqlBuilder().AppendAlias(
+                                             1,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("A");
+                                                 alias.WithUsage(DateTime.Now.AddMonths(-10));
+                                             }
+                                         )
+                                         .AppendAlias(
+                                             2,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("B");
+                                                 alias.WithUsage(DateTime.Now.AddMonths(-10));
+                                             }
+                                         )
+                                         .AppendAlias(
+                                             3,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("C");
+                                                 alias.WithUsage(DateTime.Now.AddMonths(-10));
+                                             }
+                                         );
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
+                await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
+                await viewModel.FilterAliasCommand.ExecuteAsync(filter);
+
+                viewModel.Aliases.Should().HaveCount(count);
+            },
+            sqlBuilder,
             visitors
         );
     }
     
-    [Fact]
-    public async Task NotDeletePermanentlyWithoutValidation()
+    [Theory]
+    [InlineData("A", 1)]
+    [InlineData("B", 1)]
+    [InlineData("C", 1)]
+    [InlineData("E", 0)]
+    public async Task FilterRarelyUsedAliases(string filter, int count)
     {
-        var visitors = new ServiceVisitors()
+        var visitors = new ServiceVisitors
         {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
             VisitUserInteractionService = (_, i) =>
             {
-                i.AskUserYesNoAsync(Arg.Any<object>())
-                 .Returns(false);
+                i.AskUserYesNoAsync(Arg.Any<object>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                 .Returns(true);
                 return i;
-            }
+            },
+            VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 10
         };
         var sqlBuilder = new SqlBuilder().AppendAlias(
-            1,
-            "name",
-            props: new() { DeletedAt = DateTime.Now },
-            cfg: a =>
-            {
-                a.WithSynonyms("a1", "a2");
-                a.WithArguments(new() { ["1"] = "un", ["2"] = "deux", ["3"] = "trois" });
-                a.WithUsage(
-                    DateTime.Parse("01/01/2025"),
-                    DateTime.Parse("01/01/2025"),
-                    DateTime.Parse("01/01/2025"),
-                    DateTime.Parse("01/01/2025"),
-                    DateTime.Parse("01/01/2025")
-                );
-            }
-        );
+                                             1,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("A");
+                                                 alias.WithUsage(
+                                                     DateTime.Now.AddMonths(-10),
+                                                     DateTime.Now.AddMonths(-10)
+                                                 );
+                                             }
+                                         )
+                                         .AppendAlias(
+                                             2,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("B");
+                                                 alias.WithUsage(
+                                                     DateTime.Now.AddMonths(-10),
+                                                     DateTime.Now.AddMonths(-10)
+                                                 );
+                                             }
+                                         )
+                                         .AppendAlias(
+                                             3,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("C");
+                                                 alias.WithUsage(
+                                                     DateTime.Now.AddMonths(-10),
+                                                     DateTime.Now.AddMonths(-10)
+                                                 );
+                                             }
+                                         );
         await TestViewModelAsync(
-            async (viewModel, db) =>
+            async (viewModel, _) =>
             {
-                // arrange
-                await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null);
+                await viewModel.SetLowUsageThresholdCommand.ExecuteAsync(null);
+                await viewModel.ShowRarelyUsedAliasesCommand.ExecuteAsync(null);
+                await viewModel.FilterAliasCommand.ExecuteAsync(filter);
 
-                // act
-                viewModel.Aliases.ElementAt(0).IsSelected = true;
-                await viewModel.DeletePermanentlyCommand.ExecuteAsync(null);
-
-                // assert
-                db.WithConnection(
-                    c =>
-                    {
-                        using (new AssertionScope())
-                        {
-                            c.ExecuteScalar<long>("select count(*) from alias_usage where id_alias = 1")
-                             .Should().BeGreaterThan(0, "usage should be cleared");
-
-                            c.ExecuteScalar<long>("select count(*) from alias_name where id_alias = 1")
-                             .Should().BeGreaterThan(0, "names should be cleared");
-
-                            c.ExecuteScalar<long>("select count(*) from alias_argument where id_alias = 1")
-                             .Should().BeGreaterThan(0, "arguments should be cleared");
-
-                            c.ExecuteScalar<long>("select count(*) from alias where id = 1")
-                             .Should().BeGreaterThan(0, "alias should be cleared");
-                        }
-                    }
-                );
+                viewModel.Aliases.Should().HaveCount(count);
             },
-            sqlBuilder, 
+            sqlBuilder,
             visitors
         );
     }
@@ -359,6 +413,75 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
+    public async Task NotDeletePermanentlyWithoutValidation()
+    {
+        var visitors = new ServiceVisitors
+        {
+            VisitUserInteractionService = (_, i) =>
+            {
+                i.AskUserYesNoAsync(Arg.Any<object>())
+                 .Returns(false);
+                return i;
+            }
+        };
+        var sqlBuilder = new SqlBuilder().AppendAlias(
+            1,
+            "name",
+            props: new() { DeletedAt = DateTime.Now },
+            cfg: a =>
+            {
+                a.WithSynonyms("a1", "a2");
+                a.WithArguments(new() { ["1"] = "un", ["2"] = "deux", ["3"] = "trois" });
+                a.WithUsage(
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025"),
+                    DateTime.Parse("01/01/2025")
+                );
+            }
+        );
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                // arrange
+                await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null);
+
+                // act
+                viewModel.Aliases.ElementAt(0).IsSelected = true;
+                await viewModel.DeletePermanentlyCommand.ExecuteAsync(null);
+
+                // assert
+                db.WithConnection(
+                    c =>
+                    {
+                        using (new AssertionScope())
+                        {
+                            c.ExecuteScalar<long>("select count(*) from alias_usage where id_alias = 1")
+                             .Should()
+                             .BeGreaterThan(0, "usage should be cleared");
+
+                            c.ExecuteScalar<long>("select count(*) from alias_name where id_alias = 1")
+                             .Should()
+                             .BeGreaterThan(0, "names should be cleared");
+
+                            c.ExecuteScalar<long>("select count(*) from alias_argument where id_alias = 1")
+                             .Should()
+                             .BeGreaterThan(0, "arguments should be cleared");
+
+                            c.ExecuteScalar<long>("select count(*) from alias where id = 1")
+                             .Should()
+                             .BeGreaterThan(0, "alias should be cleared");
+                        }
+                    }
+                );
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+
+    [Fact]
     public async Task NotDeleteWhenMergingDoubloons()
     {
         var visitors = new ServiceVisitors
@@ -497,27 +620,18 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task ShowAliasesWithoutNotes()
-    {
-        await TestViewModelAsync(
-            async (viewModel, _) => await viewModel.ShowAliasesWithoutNotesCommand.ExecuteAsync(null),
-            SqlBuilder.Empty
-        );
-    }
-
-    [Fact]
-    public async Task ShowInactiveAliases()
+    public async Task ShowRarelyUsedAliases()
     {
         var visitors = new ServiceVisitors
         {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            OverridenConnectionString = ConnectionStringFactory.InDesktop,
             VisitUserInteractionService = (_, i) =>
             {
                 i.AskUserYesNoAsync(Arg.Any<object>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
                  .Returns(true);
                 return i;
             },
-            VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 1
+            VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 3
         };
         var sqlBuilder = new SqlBuilder().AppendAlias(1, cfg: alias =>
                                          {
@@ -556,7 +670,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, _) =>
             {
                 await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
-                await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
+                await viewModel.ShowRarelyUsedAliasesCommand.ExecuteAsync(null);
 
                 viewModel.Aliases.Should().HaveCount(1);
             },
@@ -564,37 +678,76 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             visitors
         );
     }
-    
+
     [Fact]
-    public async Task ShowAliasesWithLowUsage()
+    public async Task ShowAliasesWithoutNotes()
+    {
+        await TestViewModelAsync(
+            async (viewModel, _) => await viewModel.ShowAliasesWithoutNotesCommand.ExecuteAsync(null),
+            SqlBuilder.Empty
+        );
+    }
+
+    [Fact]
+    public async Task ShowBrokenAliasesAsync()
+    {
+        await TestViewModelAsync(
+            async (viewModel, _) => await viewModel.ShowBrokenAliasesCommand.ExecuteAsync(null),
+            SqlBuilder.Empty
+        );
+    }
+
+    [Fact]
+    public async Task ShowDoubloons()
+    {
+        await TestViewModelAsync(
+            async (viewModel, _) => await viewModel.ShowDoubloonsCommand.ExecuteAsync(null),
+            SqlBuilder.Empty
+        );
+    }
+
+    [Fact]
+    public async Task ShowInactiveAliases()
     {
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
             VisitUserInteractionService = (_, i) =>
             {
-                i.AskUserYesNoAsync(Arg.Any<object>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                i.AskUserYesNoAsync(
+                     Arg.Any<object>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>()
+                 )
                  .Returns(true);
                 return i;
             },
-            VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 2
+            VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 1
         };
-        var sqlBuilder = new SqlBuilder().AppendAlias(1, cfg: alias =>
-                                         {
-                                             alias.WithSynonyms("A");
-                                             alias.WithUsage(
-                                                 DateTime.Now.AddMonths(-100) // Recent usage
-                                             );
-                                         })
-                                         .AppendAlias(2, cfg: alias =>
-                                         {
-                                             alias.WithSynonyms("B");
-                                             alias.WithUsage(
-                                                 DateTime.Now.AddMonths(-100),
-                                                 DateTime.Now.AddMonths(-110),
-                                                 DateTime.Now.AddMonths(-120)
-                                             );
-                                         })
+        var sqlBuilder = new SqlBuilder().AppendAlias(
+                                             1,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("A");
+                                                 alias.WithUsage(
+                                                     DateTime.Now.AddMonths(-1), // Recent usage
+                                                     DateTime.Now.AddMonths(-100)
+                                                 );
+                                             }
+                                         )
+                                         .AppendAlias(
+                                             2,
+                                             cfg: alias =>
+                                             {
+                                                 alias.WithSynonyms("B");
+                                                 alias.WithUsage(
+                                                     DateTime.Now.AddMonths(-100),
+                                                     DateTime.Now.AddMonths(-110),
+                                                     DateTime.Now.AddMonths(-120)
+                                                 );
+                                             }
+                                         )
                                          .AppendAlias(
                                              3,
                                              cfg: alias =>
@@ -617,13 +770,13 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
                 await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
 
-                viewModel.Aliases.Should().HaveCount(2);
+                viewModel.Aliases.Should().HaveCount(1);
             },
             sqlBuilder,
             visitors
         );
     }
-    
+
     [Fact]
     public async Task ShowNeverUsedAliases()
     {
@@ -638,24 +791,6 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 viewModel.Aliases.Should().HaveCount(3);
             },
             sqlBuilder
-        );
-    }
-
-    [Fact]
-    public async Task ShowBrokenAliasesAsync()
-    {
-        await TestViewModelAsync(
-            async (viewModel, _) => await viewModel.ShowBrokenAliasesCommand.ExecuteAsync(null),
-            SqlBuilder.Empty
-        );
-    }
-
-    [Fact]
-    public async Task ShowDoubloons()
-    {
-        await TestViewModelAsync(
-            async (viewModel, _) => await viewModel.ShowDoubloonsCommand.ExecuteAsync(null),
-            SqlBuilder.Empty
         );
     }
 

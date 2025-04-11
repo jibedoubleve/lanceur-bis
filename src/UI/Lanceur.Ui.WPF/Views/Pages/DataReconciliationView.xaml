@@ -65,6 +65,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Menu>
@@ -145,7 +146,19 @@
             FontTypography="Title"
             Text="{Binding Title}" />
 
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible">
+        <ui:TextBox
+            x:Name="FilterBox"
+            Grid.Row="2"
+            Margin="5"
+            Icon="Search24"
+            PlaceholderText="Filter aliases...">
+            <interactivity:Interaction.Triggers>
+                <interactivity:EventTrigger EventName="TextChanged">
+                    <interactivity:InvokeCommandAction Command="{Binding FilterAliasCommand}" CommandParameter="{Binding ElementName=FilterBox, Path=Text}" />
+                </interactivity:EventTrigger>
+            </interactivity:Interaction.Triggers>
+        </ui:TextBox>
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Visible">
             <ui:DataGrid
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
@@ -166,15 +179,11 @@
                                     IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                     <interactivity:Interaction.Triggers>
                                         <interactivity:EventTrigger EventName="Checked">
-                                            <interactivity:InvokeCommandAction
-                                                Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
-                                            <interactivity:InvokeCommandAction
-                                                Command="{Binding ElementName=Self, Path=DataContext.MarkSameIdAsSelectedCommand}"
-                                                CommandParameter="{Binding .}" />
+                                            <interactivity:InvokeCommandAction Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
+                                            <interactivity:InvokeCommandAction Command="{Binding ElementName=Self, Path=DataContext.MarkSameIdAsSelectedCommand}" CommandParameter="{Binding .}" />
                                         </interactivity:EventTrigger>
                                         <interactivity:EventTrigger EventName="Unchecked">
-                                            <interactivity:InvokeCommandAction
-                                                Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
+                                            <interactivity:InvokeCommandAction Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
                                         </interactivity:EventTrigger>
                                     </interactivity:Interaction.Triggers>
                                 </CheckBox>
@@ -227,9 +236,7 @@
                     </DataGridTemplateColumn>
 
                     <!--  LAST USED  -->
-                    <DataGridTemplateColumn
-                        x:Name="ColumnLastUsed"
-                        Header="Last used at">
+                    <DataGridTemplateColumn x:Name="ColumnLastUsed" Header="Last used at">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock
@@ -242,9 +249,7 @@
                     </DataGridTemplateColumn>
 
                     <!--  USAGE COUNT  -->
-                    <DataGridTemplateColumn
-                        x:Name="ColumnUsageCount"
-                        Header="Usage">
+                    <DataGridTemplateColumn x:Name="ColumnUsageCount" Header="Usage">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:TextBlock

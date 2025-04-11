@@ -30,6 +30,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     #region Fields
 
     [ObservableProperty] private ObservableCollection<SelectableAliasQueryResult> _aliases = new();
+    private ObservableCollection<SelectableAliasQueryResult> _buffer = new();
     private readonly ILogger<DataReconciliationViewModel> _logger;
     private readonly IReconciliationService _reconciliationService;
     [ObservableProperty] private ReportType _reportType = ReportType.None;
@@ -90,7 +91,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             Maximum = maximum,
             NumericValue = numericValue
         };
-        
+
         var answer = await _userInteraction.AskUserYesNoAsync(
             _viewFactory.CreateView(vm),
             "Ok",
@@ -134,6 +135,22 @@ public partial class DataReconciliationViewModel : ObservableObject
         Aliases.RemoveMultiple(toDelete);
         _userNotification.Success($"Permanently deleted {toDelete.Length} aliases.");
         _logger.LogInformation("Permanently deleted {Items} aliases", toDelete.Length);
+    }
+
+    [RelayCommand]
+    private async Task OnFilterAlias(string filter)
+    {
+        IEnumerable<SelectableAliasQueryResult> results;
+        if (string.IsNullOrWhiteSpace(filter))
+        {
+            Aliases = new(_buffer);
+            return;
+        }
+
+        results = await Task.Run(
+            () => _buffer.Where(e => e.Name.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
+        );
+        Aliases = new(results);
     }
 
     [RelayCommand]
@@ -311,7 +328,8 @@ public partial class DataReconciliationViewModel : ObservableObject
         ReportType = reportType;
 
         var aliases = await Task.Run(refreshAliases);
-        Aliases = new(aliases);
+        _buffer = new(aliases);
+        Aliases = _buffer;
 
         if (isDescriptionUpdated) _ = _reconciliationService.ProposeDescriptionAsync(Aliases); // Fire & forget
         OnSelectionChanged();
