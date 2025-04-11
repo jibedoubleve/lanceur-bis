@@ -4,10 +4,10 @@ using System.Reflection;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Ui.WPF.Views.Controls;
+using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.Core.ReservedKeywords;
 
 [ReservedAlias("version")]
 [Description("Indicates the version of the application")]
@@ -17,6 +17,7 @@ public class VersionAlias : SelfExecutableQueryResult
 
     private readonly IUserInteractionService _userInteraction;
     private readonly IUserNotificationService _userNotification;
+    private readonly IViewFactory _viewFactory;
 
     #endregion
 
@@ -24,6 +25,7 @@ public class VersionAlias : SelfExecutableQueryResult
 
     public VersionAlias(IServiceProvider serviceProvider)
     {
+        _viewFactory = serviceProvider.GetService<IViewFactory>()!;
         _userInteraction = serviceProvider.GetService<IUserInteractionService>()!;
         _userNotification = serviceProvider.GetService<IUserNotificationService>()!;
     }
@@ -48,7 +50,7 @@ public class VersionAlias : SelfExecutableQueryResult
         var ver = semverSplit?.Length > 0 ? semverSplit[0] : fullVer;
         var commit = semverSplit?.Length > 0 ? semverSplit[1] : string.Empty;
 
-        await _userInteraction.ShowAsync("Lanceur - Version", new VersionView(ver!, commit!));
+        await _userInteraction.ShowAsync("Lanceur - Version", _viewFactory.CreateVersionView(ver!, commit));
 
         return await NoResultAsync;
     }

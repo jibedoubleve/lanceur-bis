@@ -624,7 +624,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     {
         var visitors = new ServiceVisitors
         {
-            OverridenConnectionString = ConnectionStringFactory.InDesktop,
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
             VisitUserInteractionService = (_, i) =>
             {
                 i.AskUserYesNoAsync(Arg.Any<object>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
