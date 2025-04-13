@@ -17,6 +17,7 @@ using Lanceur.Tests.ViewModels.Extensions;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
+using Lanceur.Ui.Core.ViewModels.Controls;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -227,6 +228,32 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         );
     }
 
+    public static IEnumerable<object[]> FeedNotCrashWhenCreatingMultipleParametersWithEmptyTrailingLine()
+    {
+        yield return
+        [
+            """
+            para1, undeuxtrois
+            para2, quatrecinq
+
+            """
+        ];
+        yield return
+        [
+            """
+            para1,undeuxtrois
+            para2,quatrecinq
+            """
+        ];
+        yield return
+        [
+            """
+            para1 , undeuxtrois
+            para2 , quatrecinq
+            """
+        ];
+    }
+
     [Fact]
     public async Task HaveViewModelInMessageBoxWhenUpdatingAdditionalParameters()
     {
@@ -356,6 +383,49 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 }
             },
             SqlBuilder.Empty,
+            visitors
+        );
+    }
+
+    [Theory]
+    [MemberData(nameof(FeedNotCrashWhenCreatingMultipleParametersWithEmptyTrailingLine))]
+    public async Task NotCrashWhenCreatingMultipleParametersWithEmptyTrailingLine(string additionalParameters)
+    {
+        var sqlBuilder = SqlBuilder.Empty;
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitUserInteractionService = (_, i) =>
+            {
+                var parameter = new MultipleAdditionalParameterViewModel { RawParameters = additionalParameters };
+                i.InteractAsync(
+                     Arg.Any<object>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<object>()
+                 )
+                 .Returns(_ => (IsConfirmed: true, DataContext: parameter));
+                return i;
+            }
+        };
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                // ARRANGE
+                const string name = "SomeTestName";
+
+                // ACT
+                await viewModel.CreateNewAlias(name);
+                await viewModel.AddMultiParametersCommand.ExecuteAsync(null);
+                await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null);
+
+                // ASSERT
+                const string sql = "select count(*) from alias_argument";
+                var count = db.WithConnection(c => c.ExecuteScalar(sql));
+                count.Should().Be(2);
+            },
+            sqlBuilder,
             visitors
         );
     }

@@ -112,21 +112,22 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnAddMultiParameters()
     {
-        var viewModel = new MultipleAdditionalParameterViewModel();
-        var view = _viewFactory.CreateView(viewModel);
+        var view = _viewFactory.CreateView(new MultipleAdditionalParameterViewModel());
 
-        var result = await _userInteraction.AskUserYesNoAsync(view, "Apply", "Cancel", "Add multiple parameters");
-        if (!result) return;
+        var result = await _userInteraction.InteractAsync(view, "Apply", "Cancel", "Add multiple parameters");
+        if (!result.IsConfirmed) return;
+        
+        var viewModel = result.DataContext as MultipleAdditionalParameterViewModel;
 
         var parser = new TextToParameterParser();
-        var parseResult = parser.Parse(viewModel.RawParameters);
+        var parseResult = parser.Parse(viewModel!.RawParameters);
 
         if (!parseResult.Success)
         {
             _userNotificationService.Warn("The parsing operation failed because the entered text is invalid and cannot be converted into parameters.");
             return;
         }
-
+        
         _selectedAlias?.AdditionalParameters.AddRange(parseResult.Parameters);
     }
 
