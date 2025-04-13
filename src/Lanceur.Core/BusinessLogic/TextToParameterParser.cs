@@ -37,7 +37,7 @@ public class TextToParameterParser
     public ParseResult Parse(string text)
     {
         var parameters = new List<AdditionalParameter>();
-        foreach (var line in text.Split(Environment.NewLine))
+        foreach (var line in text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
         {
             if (!TryParseLine(line, out var parameter)) return ParseResult.Failed();
             parameters.Add(parameter);
