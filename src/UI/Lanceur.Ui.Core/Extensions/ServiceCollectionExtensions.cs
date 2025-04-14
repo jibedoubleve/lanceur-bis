@@ -46,6 +46,7 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>();
         serviceCollection.AddTransient<ISettingsFacade, SettingsFacadeService>();
+        serviceCollection.AddTransient<IGithubService, GithubService>();
         return serviceCollection;
     }
 

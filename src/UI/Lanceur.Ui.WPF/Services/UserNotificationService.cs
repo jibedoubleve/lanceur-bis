@@ -37,7 +37,7 @@ public class UserNotificationService : IUserNotificationService
     public void Success(string message, string title) => Send(MessageLevel.Success, title, message);
 
     /// <inheritdoc />
-    public void Warn(string message, string title) => Send(MessageLevel.Warning, title, message);
+    public void Warning(string message, string title) => Send(MessageLevel.Warning, title, message);
 
     #endregion
 }

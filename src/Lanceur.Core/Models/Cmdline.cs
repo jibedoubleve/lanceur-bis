@@ -19,8 +19,9 @@ public record Cmdline
 
     #region Properties
 
-    private bool HasParameters => !Parameters.IsNullOrEmpty();
     public static Cmdline Empty => new(string.Empty, string.Empty);
+
+    public bool HasParameters => !Parameters.IsNullOrEmpty();
     public bool IsEmpty => Name.IsNullOrEmpty() && !HasParameters;
     public string Name { get; init; }
     public string Parameters { get; }
@@ -44,12 +45,10 @@ public record Cmdline
         cmdline = (cmdline ?? string.Empty).Trim();
 
         if (CmdlineManager.HasSpecialName(cmdline))
-        {
             return new(
                 CmdlineManager.GetSpecialName(cmdline),
                 cmdline[1..]
             );
-        }
 
         var elements = cmdline.Split(" ");
         if (elements.Length <= 0) return Empty;
@@ -57,7 +56,8 @@ public record Cmdline
         var name = elements[0];
         return new(
             name,
-            cmdline[name.Length..]);
+            cmdline[name.Length..]
+        );
     }
 
     public override string ToString() => $"{Name ?? string.Empty} {Parameters ?? string.Empty}".Trim();

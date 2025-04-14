@@ -2,21 +2,25 @@ using System.Reflection;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
-using Octokit;
 
-namespace Lanceur.Ui.WPF.Services;
+namespace Lanceur.Infra.Services;
 
 public class ReleaseService : IReleaseService
 {
     #region Fields
 
     private readonly ILogger<ReleaseService> _logger;
+    private readonly IGithubService _githubService;
 
     #endregion
 
     #region Constructors
 
-    public ReleaseService(ILogger<ReleaseService> logger) => _logger = logger;
+    public ReleaseService(ILogger<ReleaseService> logger, IGithubService githubService)
+    {
+        _logger = logger;
+        _githubService = githubService;
+    }
 
     #endregion
 
@@ -27,18 +31,17 @@ public class ReleaseService : IReleaseService
     {
         var currentVersion = CurrentVersion.FromAssembly(Assembly.GetExecutingAssembly());
 
-        var client = new GitHubClient(new ProductHeaderValue("Lanceur"));
-        var info = await client.Repository.Release.GetLatest("jibedoubleve", "lanceur-bis");
 
+        var tag = await _githubService.GetLatestVersion();
         _logger.LogInformation(
             "Application version is {AppVersion}, latest released version is {Tag}",
             currentVersion.Version,
-            info.TagName
+            tag
         );
 
-        if (!Version.TryParse(info.TagName, out var version))
+        if (!Version.TryParse(tag, out var version))
         {
-            _logger.LogWarning("The tag of the version ('{Tag}') is not a valid version number", info.TagName);
+            _logger.LogWarning("The tag of the version ('{Tag}') is not a valid version number", tag);
             return (false, new());
         }
 

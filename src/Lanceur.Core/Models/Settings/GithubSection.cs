@@ -5,6 +5,11 @@ public class GithubSection
     #region Properties
 
     /// <summary>
+    ///     Indicates whether the API token has been saved
+    /// </summary>
+    public bool HasToken => !string.IsNullOrEmpty(Token);
+
+    /// <summary>
     ///     Indicates the latest version released
     /// </summary>
     public Version LastCheckedVersion { get; set; }

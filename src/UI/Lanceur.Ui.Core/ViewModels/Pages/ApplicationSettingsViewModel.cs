@@ -24,16 +24,20 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 {
     #region Fields
 
+    [ObservableProperty] private string _apiToken = string.Empty;
     [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
+    [ObservableProperty] private int _cpuSmoothingIndex;
     [ObservableProperty] private string _dbPath = string.Empty;
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
-    [ObservableProperty] private ObservableCollection<FeatureFlag> _featureFlags = new();
+    [ObservableProperty] private ObservableCollection<FeatureFlag> _featureFlags = [];
     private readonly IInteractionHub _hub;
     [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
+    [ObservableProperty] private bool _isAdminModeEnabled;
     [ObservableProperty] private bool _isAlt;
     [ObservableProperty] private bool _isCtrl;
+    [ObservableProperty] private bool _isResourceMonitorEnabled;
     [ObservableProperty] private bool _isShift;
     [ObservableProperty] private  bool _isTraceEnabled;
     [ObservableProperty] private bool _isWin;
@@ -41,17 +45,16 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     private readonly ILogger<ApplicationSettingsViewModel> _logger;
     private readonly LoggingLevelSwitch _loggingLevelSwitch;
     [ObservableProperty] private int _notificationDisplayDuration;
+    [ObservableProperty] private int _refreshRate;
     [ObservableProperty] private double _searchDelay;
     [ObservableProperty] private ISettingsFacade _settings;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
-    [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = new();
+    [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = [];
     private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _windowBackdropStyle = "Mica";
-    [ObservableProperty] private int _cpuSmoothingIndex;
-    [ObservableProperty] private int _refreshRate;
-    [ObservableProperty] private bool _isResourceMonitorEnabled;
+
     #endregion
 
     #region Constructors
@@ -71,7 +74,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(loggingLevelSwitch);
         ArgumentNullException.ThrowIfNull(viewFactory);
-        
+
 
         _hub = interactionHub;
         _logger = logger;
@@ -146,6 +149,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Resource Monitor
         CpuSmoothingIndex = Settings.Application.ResourceMonitor.CpuSmoothingIndex;
         RefreshRate = Settings.Application.ResourceMonitor.RefreshRate;
+
+        // Miscellaneous
+        var token = Settings.Application.Github.Token;
+        ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : Enigma.Decrypt(token);
     }
 
     private void MapSettingsFromUiToDb()
@@ -183,6 +190,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Resource Monitor
         Settings.Application.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
         Settings.Application.ResourceMonitor.RefreshRate = RefreshRate;
+
+        // Miscellaneous
+        Settings.Application.Github.Token = ApiToken.IsNullOrWhiteSpace() ? string.Empty : Enigma.Encrypt(ApiToken);
     }
 
     [RelayCommand]
@@ -206,7 +216,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             "Cancel",
             $"Edit shortcut for store '{storeName}'"
         );
-        
+
         if (!result)
         {
             storeShortcut.AliasOverride = savedAliasOverride;
@@ -218,8 +228,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(IsResourceMonitorEnabled)) return;
-        
+        string[] properties = [nameof(IsResourceMonitorEnabled), nameof(IsAdminModeEnabled)];
+        if (properties.Contains(e.PropertyName)) return;
+
         _logger.LogTrace("Property '{Property}' changed", e.PropertyName);
         OnSaveSettings();
     }

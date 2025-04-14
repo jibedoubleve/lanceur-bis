@@ -156,7 +156,7 @@ public partial class ProcessFinderButton
         {
             const string msg = "Failed to retrieve the executable path of the process under the mouse cursor.";
             _logger.LogWarning(ex, msg);
-            _notify.Warn($"{msg}\r\n{ex.Message}");
+            _notify.Warning($"{msg}\r\n{ex.Message}");
         }
         finally
         {

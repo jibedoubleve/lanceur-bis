@@ -39,5 +39,5 @@ public interface IUserNotificationService
     /// </summary>
     /// <param name="message">The message to display in the notification.</param>
     /// <param name="title">The title of the notification. Defaults to "Warning".</param>
-    void Warn(string message, string title = "Warning");
+    void Warning(string message, string title = "Warning");
 }
