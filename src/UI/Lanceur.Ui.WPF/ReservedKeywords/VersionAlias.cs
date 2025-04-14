@@ -4,6 +4,7 @@ using System.Reflection;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.WPF.Views.Controls;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,14 +42,11 @@ public class VersionAlias : SelfExecutableQueryResult
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         _userNotification.DisableLoadingState();
-        var asm = Assembly.GetExecutingAssembly();
-        var fullVer = FileVersionInfo.GetVersionInfo(asm.Location).ProductVersion;
-        var semverSplit = fullVer?.Split(["+"], StringSplitOptions.RemoveEmptyEntries);
-        
-        var ver = semverSplit?.Length > 0 ? semverSplit[0] : fullVer;
-        var commit = semverSplit?.Length > 0 ? semverSplit[1] : string.Empty;
+        var currentVersion = CurrentVersion.FromAssembly(
+            Assembly.GetExecutingAssembly()
+        );
 
-        await _userInteraction.ShowAsync("Lanceur - Version", new VersionView(ver!, commit!));
+        await _userInteraction.ShowAsync("Lanceur - Version", new VersionView(currentVersion));
 
         return await NoResultAsync;
     }

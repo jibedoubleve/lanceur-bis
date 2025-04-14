@@ -46,6 +46,12 @@ public static class ConditionalExecution
     }
 
     /// <summary>
+    ///     Executes the provided functions only if the current compilation mode is RELEASE.
+    /// </summary>
+    /// <param name="onRelease">The function to execute in RELEASE mode.</param>
+    public static void ExecuteOnRelease(Action onRelease) => Execute(() => { }, onRelease);
+
+    /// <summary>
     ///     Executes one of the provided functions based on the current compilation mode and returns a value.
     /// </summary>
     /// <typeparam name="TReturn">The return type of the functions.</typeparam>
