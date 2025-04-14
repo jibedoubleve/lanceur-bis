@@ -23,6 +23,13 @@ public interface IUserGlobalNotificationService
     void Information(string message);
 
     /// <summary>
+    ///     Displays a notification indicating that a new version of the application is available,
+    ///     prompting the user to restart the application to apply the update.
+    /// </summary>
+    /// <param name="version">The new version that is available.</param>
+    void NotifyNewVersionAvailable(Version version);
+
+    /// <summary>
     ///     Displays a notification to warn the user about a potential issue.
     /// </summary>
     /// <param name="message">The warning message to be displayed in the notification.</param>
@@ -43,6 +50,16 @@ public static class ToastNotificationArguments
     ///     Indicates that the user requested an application restart
     /// </summary>
     public const string ClickRestart = nameof(ClickRestart);
+    
+    /// <summary>
+    ///     Indicates that the user requested a visit of the website
+    /// </summary>
+    public const string VisitWebsite = nameof(VisitWebsite);
+
+    /// <summary>
+    ///     Indicates that the user requested to skip the notification of this new version
+    /// </summary>
+    public const string SkipVersion = nameof(SkipVersion);
 
     /// <summary>
     ///     Indicates that the user requested to view detailed information about the error displayed in the toast notification.

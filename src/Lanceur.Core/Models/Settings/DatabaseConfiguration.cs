@@ -69,6 +69,7 @@ public class DatabaseConfiguration
     /// </summary>
     public WindowSection Window { get; } = new();
 
+    public GithubSection Github { get; } = new();
     #endregion
 }
 

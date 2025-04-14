@@ -50,6 +50,27 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     }
 
     /// <inheritdoc />
+    public void NotifyNewVersionAvailable(Version version)
+    {
+        var msg = $"A new version {version} is now available!";
+        var uri = GetIconUri(Level.Information);
+        var btnCheckWebsite = new ToastButton().SetContent("Check the website")
+                                               .AddArgument("Type", ToastNotificationArguments.VisitWebsite);
+        var btnSkipVersion = new ToastButton().SetContent("Skip this version")
+                                              .AddArgument("Type", ToastNotificationArguments.SkipVersion)
+                                              .AddArgument("Version", version.ToString());
+
+        new ToastContentBuilder()
+            .AddText("New version available")
+            .AddText(msg)
+            .AddButton(btnCheckWebsite)
+            .AddButton(btnSkipVersion)
+            .AddAppLogoOverride(uri.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .Show();
+    }
+
+
+    /// <inheritdoc />
     public void Error(string message, Exception ex)
     {
         var uri = GetIconUri(Level.Error);

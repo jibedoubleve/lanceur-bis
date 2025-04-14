@@ -5,10 +5,10 @@ using Lanceur.Infra.Macros;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.WPF.Commands;
 using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.ReservedKeywords;
 using Lanceur.Ui.WPF.Services;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui;
 using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
@@ -18,6 +18,12 @@ namespace Lanceur.Ui.WPF.Extensions;
 public static class ServiceCollectionExtensions
 {
     #region Methods
+
+    public static  IServiceCollection AddCommands(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddTransient<UpdateNotification>();
+        return serviceCollection;
+    }
 
     public static IServiceCollection AddWpfServices(this IServiceCollection serviceCollection)
     {
@@ -30,6 +36,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IViewFactory, ViewFactory>()
                          .AddSingleton<IHotKeyService, HotKeyService>()
                          .AddSingleton<IInteractionHub, InteractionHub>()
+                         .AddSingleton<IReleaseService, ReleaseService>()
                          .AddSingleton(new AssemblySource
                          {
                              ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)), 

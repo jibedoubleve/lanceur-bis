@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Constants;
@@ -13,6 +14,7 @@ using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
+using Lanceur.Ui.WPF.Commands;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Services;
 using Lanceur.Ui.WPF.Views;
@@ -42,6 +44,7 @@ public partial class App
                                                                   .Register("ViewModel", "Lanceur.Ui.Core")
                                                                   .AddServices()
                                                                   .AddWpfServices()
+                                                                  .AddCommands()
                                                                   .AddMapping()
                                                                   .AddConfiguration()
                                                                   .AddDatabaseServices()
@@ -96,6 +99,16 @@ public partial class App
                 ToastNotificationArguments.ClickShowLogs  => () => Process.Start("explorer.exe", Paths.LogRepository),
                 // ---- Restart application ----
                 ToastNotificationArguments.ClickRestart => () => Host.Services.GetRequiredService<IAppRestartService>().Restart(),
+                // ---- Visit Website ----
+                ToastNotificationArguments.VisitWebsite => () => Process.Start("explorer.exe", Paths.ReleasesUrl),
+                // ---- Skip current version ----
+                ToastNotificationArguments.SkipVersion => () =>
+                {
+                    var settings = Host.Services.GetRequiredService<ISettingsFacade>();
+                    settings.Application.Github.SnoozeVersionCheck = true;
+                    settings.Application.Github.LastCheckedVersion = new(arguments["Version"]);
+                    settings.Save();
+                },
                 // ---- Default  ----
                 _ => () => Log.Warning("The argument '{Argument}' is not supported in the toast arguments. Are you using a button that has not been configured yet?", toastArgs.Argument)
             };
@@ -145,8 +158,7 @@ public partial class App
         
         /* Only one instance allowed in prod...
          */
-        ConditionalExecution.Execute(
-            () => { },
+        ConditionalExecution.ExecuteOnRelease(
             () =>
             {
                 if (SingleInstance.WaitOne()) return;
@@ -173,6 +185,22 @@ public partial class App
 
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application started");
+        
+        /* Check new Version
+         */
+        var settings = Host.Services.GetRequiredService<ISettingsFacade>()!;
+        _ = Host.Services.GetRequiredService<IReleaseService>()
+                .HasUpdateAsync()
+                .ContinueWith(
+                    context =>
+                    {
+                        if (!context.Result.HasUpdate || settings.Application.Github.SnoozeVersionCheck) return;
+
+                        // A new version has been release, notify user...
+                        Host.Services.GetService<UpdateNotification>()!
+                            .Notify(context.Result.Version);
+                    }
+                );
     }
 
     #endregion

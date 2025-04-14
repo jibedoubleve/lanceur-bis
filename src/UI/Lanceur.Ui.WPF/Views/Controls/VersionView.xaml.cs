@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using Lanceur.Infra.Constants;
+using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Ui.WPF.Views.Controls;
 
@@ -8,16 +10,16 @@ public partial class VersionView : UserControl
 {
     #region Fields
 
-    private const string GithubUrl = "https://github.com/jibedoubleve/lanceur-bis";
+    private const string GithubUrl =Paths.GithubUrl;
 
     #endregion
 
     #region Constructors
 
-    public VersionView(string version, string sermver)
+    public VersionView(CurrentVersion currentVersion)
     {
-        Version = version;
-        Commit = sermver;
+        Version = currentVersion.Version.ToString();
+        Commit = currentVersion.Commit;
         InitializeComponent();
     }
 
