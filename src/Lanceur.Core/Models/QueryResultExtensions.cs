@@ -1,17 +1,19 @@
-﻿using Lanceur.SharedKernel.Extensions;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Core.Models;
 
-public static class QueryResultExtensions
+public static partial class QueryResultExtensions
 {
     #region Fields
 
-    private static readonly Regex Regex = new("@([a-zA-Z]*)@");
+    private static readonly Regex Regex = FindMacroRegex();
 
-    #endregion Fields
+    #endregion
 
     #region Methods
+
+    [GeneratedRegex("@([a-zA-Z_]*)@")] private static partial Regex FindMacroRegex();
 
     private static bool Is(this AliasQueryResult @this, CompositeMacros macro) => @this.FileName.ToLower().Contains($"@{macro.ToLowerString()}@".ToLower());
 
@@ -28,5 +30,5 @@ public static class QueryResultExtensions
 
     public static bool IsMacro(this AliasQueryResult @this) => !GetMacroName(@this).IsNullOrEmpty();
 
-    #endregion Methods
+    #endregion
 }

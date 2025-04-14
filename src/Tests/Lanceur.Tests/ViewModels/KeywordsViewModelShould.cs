@@ -373,7 +373,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 using (new AssertionScope())
                 {
                     // This is the warning saying the alias name is already used for a deleted alias
-                    userNotificationService.Received().Warn(Arg.Any<string>(), Arg.Any<string>());
+                    userNotificationService.Received().Warning(Arg.Any<string>(), Arg.Any<string>());
 
                     result.Should().HaveCountGreaterThan(0);
                     var alias = result.First();

@@ -48,7 +48,7 @@ public partial class ApplicationSettingsView
 
         if (!File.Exists(openFileDialog.FileName))
         {
-            _userNotification.Warn("The specified file could not be found.", "File not found");
+            _userNotification.Warning("The specified file could not be found.", "File not found");
             return;
         }
 

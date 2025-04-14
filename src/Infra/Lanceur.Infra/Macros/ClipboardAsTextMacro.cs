@@ -8,7 +8,7 @@ namespace Lanceur.Infra.Macros;
 
 [Macro("clipboard_as_text")]
 [Description("Remove formatting from clipboard.")]
-public class ClipboardAsText : MacroQueryResult
+public class ClipboardAsTextMacro : MacroQueryResult
 {
     #region Fields
 
@@ -19,7 +19,7 @@ public class ClipboardAsText : MacroQueryResult
 
     #region Constructors
 
-    public ClipboardAsText(IServiceProvider serviceProvider)
+    public ClipboardAsTextMacro(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
         _clipboard = _serviceProvider.GetService<IClipboardService>();
@@ -35,7 +35,7 @@ public class ClipboardAsText : MacroQueryResult
 
     #region Methods
 
-    public override SelfExecutableQueryResult Clone() => new ClipboardAsText(_serviceProvider);
+    public override SelfExecutableQueryResult Clone() => new ClipboardAsTextMacro(_serviceProvider);
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {

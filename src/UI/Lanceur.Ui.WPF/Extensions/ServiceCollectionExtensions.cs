@@ -2,6 +2,7 @@ using System.Reflection;
 using Lanceur.Core;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
+using Lanceur.Infra.Services;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Utils;

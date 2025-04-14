@@ -2,23 +2,24 @@
     x:Class="Lanceur.Ui.WPF.Views.Pages.ApplicationSettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="clr-namespace:Lanceur.Ui.WPF.Xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="ApplicationSettings"
     x:Name="Self"
+    Title="ApplicationSettings"
     d:Height="2800"
     d:Width="1800"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
     <Page.Resources>
-        <!-- STYLE -->
+        <!--  STYLE  -->
         <Thickness x:Key="RegionMargin">10,5,5,10</Thickness>
         <ui:FontTypography x:Key="RegionFontTypography">BodyStrong</ui:FontTypography>
 
-        <!-- Data providers -->
+        <!--  Data providers  -->
         <ObjectDataProvider
             x:Key="KeySource"
             MethodName="GetValues"
@@ -47,25 +48,36 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ScrollViewer
-            Grid.Row="1"
-            VerticalScrollBarVisibility="Visible">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
             <StackPanel>
-                <ui:TextBlock Margin="{StaticResource RegionMargin}"
-                              FontTypography="{StaticResource RegionFontTypography}"
-                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Window" />
+                <ui:TextBlock
+                    Margin="{StaticResource RegionMargin}"
+                    FontTypography="{StaticResource RegionFontTypography}"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="Window" />
 
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Keyboard24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Hot key" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Margin="0,0,5,0" Content="Ctrl" IsChecked="{Binding IsCtrl}" />
-                        <CheckBox Margin="0,0,5,0" Content="Alt" IsChecked="{Binding IsAlt}" />
-                        <CheckBox Margin="0,0,5,0" Content="Win" IsChecked="{Binding IsWin}" />
-                        <CheckBox Margin="0,0,5,0" Content="Shift" IsChecked="{Binding IsShift}" />
-                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}"
-                                  SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
+                        <CheckBox
+                            Margin="0,0,5,0"
+                            Content="Ctrl"
+                            IsChecked="{Binding IsCtrl}" />
+                        <CheckBox
+                            Margin="0,0,5,0"
+                            Content="Alt"
+                            IsChecked="{Binding IsAlt}" />
+                        <CheckBox
+                            Margin="0,0,5,0"
+                            Content="Win"
+                            IsChecked="{Binding IsWin}" />
+                        <CheckBox
+                            Margin="0,0,5,0"
+                            Content="Shift"
+                            IsChecked="{Binding IsShift}" />
+                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}" SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
                     </StackPanel>
                 </ui:CardControl>
 
@@ -73,8 +85,7 @@
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Glass Effect" />
                     </ui:CardControl.Header>
-                    <ComboBox SelectedItem="{Binding WindowBackdropStyle}"
-                              ItemsSource="{StaticResource WindowBackdropStyles}" />
+                    <ComboBox ItemsSource="{StaticResource WindowBackdropStyles}" SelectedItem="{Binding WindowBackdropStyle}" />
 
                 </ui:CardControl>
 
@@ -83,12 +94,14 @@
                         <ui:TextBlock FontTypography="Body" Text="Show search after Windows loads and Lanceur starts?" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <ui:ToggleSwitch OffContent="No" OnContent="Yes"
-                                         IsChecked="{Binding ShowAtStartup}" />
+                        <ui:ToggleSwitch
+                            IsChecked="{Binding ShowAtStartup}"
+                            OffContent="No"
+                            OnContent="Yes" />
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon ReadingList24}">
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ReadingList24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Notification Duration (in seconds)." />
                     </ui:CardControl.Header>
@@ -96,11 +109,13 @@
                     <ui:NumberBox Value="{Binding NotificationDisplayDuration, UpdateSourceTrigger=PropertyChanged}" />
                 </ui:CardControl>
 
-                <ui:TextBlock Margin="{StaticResource RegionMargin}"
-                              FontTypography="{StaticResource RegionFontTypography}"
-                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Search box" />
+                <ui:TextBlock
+                    Margin="{StaticResource RegionMargin}"
+                    FontTypography="{StaticResource RegionFontTypography}"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="Search box" />
 
-                <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon Timer24}">
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Timer24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Search Trigger Delay (ms)" />
                     </ui:CardControl.Header>
@@ -113,25 +128,30 @@
                         <ui:TextBlock FontTypography="Body" Text="When search box becomes visible..." />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <ui:ToggleSwitch OffContent="show no result" OnContent="Show all results"
-                                         IsChecked="{Binding ShowResult}" />
+                        <ui:ToggleSwitch
+                            IsChecked="{Binding ShowResult}"
+                            OffContent="show no result"
+                            OnContent="Show all results" />
                     </StackPanel>
                 </ui:CardControl>
 
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Search24}">
                     <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body"
-                                      Text="Should the last query be shown when the search opens?" />
+                        <ui:TextBlock FontTypography="Body" Text="Should the last query be shown when the search opens?" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <ui:ToggleSwitch OffContent="No" OnContent="Yes"
-                                         IsChecked="{Binding ShowLastQuery}" />
+                        <ui:ToggleSwitch
+                            IsChecked="{Binding ShowLastQuery}"
+                            OffContent="No"
+                            OnContent="Yes" />
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:TextBlock Margin="{StaticResource RegionMargin}"
-                              FontTypography="{StaticResource RegionFontTypography}"
-                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Data sources" />
+                <ui:TextBlock
+                    Margin="{StaticResource RegionMargin}"
+                    FontTypography="{StaticResource RegionFontTypography}"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="Data sources" />
 
                 <ui:CardControl
                     Margin="5,0,5,12"
@@ -141,27 +161,35 @@
                         <ui:TextBlock FontTypography="Body" Text="Database" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <ui:TextBox MinWidth="500" Margin="5" Text="{Binding DbPath}" />
-                        <ui:Button Margin="5,0,0,0" Content="Select database" Click="OnClickDbPath" />
+                        <ui:TextBox
+                            MinWidth="500"
+                            Margin="5"
+                            Text="{Binding DbPath}" />
+                        <ui:Button
+                            Margin="5,0,0,0"
+                            Click="OnClickDbPath"
+                            Content="Select database" />
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5,0,5,12"
-                                Icon="{ui:SymbolIcon BookmarkSearch24}"
-                                ToolTip="Select the main browser to use for searching your bookmarks.">
+                <ui:CardControl
+                    Margin="5,0,5,12"
+                    Icon="{ui:SymbolIcon BookmarkSearch24}"
+                    ToolTip="Select the main browser to use for searching your bookmarks.">
 
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Source of the bookmarks" />
                     </ui:CardControl.Header>
                     <StackPanel>
-                        <ComboBox ItemsSource="{StaticResource Browsers}"
-                                  SelectedItem="{Binding BookmarkSourceBrowser}" />
+                        <ComboBox ItemsSource="{StaticResource Browsers}" SelectedItem="{Binding BookmarkSourceBrowser}" />
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:TextBlock Margin="{StaticResource RegionMargin}"
-                              FontTypography="{StaticResource RegionFontTypography}"
-                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Stores" />
+                <ui:TextBlock
+                    Margin="{StaticResource RegionMargin}"
+                    FontTypography="{StaticResource RegionFontTypography}"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="Stores" />
                 <ui:CardExpander
                     Margin="5,5,5,12"
                     Icon="{ui:SymbolIcon DatabaseSearch24}"
@@ -176,45 +204,49 @@
                     <StackPanel>
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body"
-                                              Text="Should hidden files be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body" Text="Should hidden files be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
-                                <ui:ToggleSwitch OffContent="No" OnContent="Yes"
-                                                 IsChecked="{Binding ExcludeHiddenFilesWithEverything}" />
+                                <ui:ToggleSwitch
+                                    IsChecked="{Binding ExcludeHiddenFilesWithEverything}"
+                                    OffContent="No"
+                                    OnContent="Yes" />
                             </StackPanel>
                         </ui:CardControl>
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ShieldKeyhole24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body"
-                                              Text="Should system files be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body" Text="Should system files be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
-                                <ui:ToggleSwitch OffContent="No" OnContent="Yes"
-                                                 IsChecked="{Binding ExcludeSystemFilesWithEverything}" />
+                                <ui:ToggleSwitch
+                                    IsChecked="{Binding ExcludeSystemFilesWithEverything}"
+                                    OffContent="No"
+                                    OnContent="Yes" />
                             </StackPanel>
                         </ui:CardControl>
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Run24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body"
-                                              Text="Should only executable files be included in the results?" />
+                                <ui:TextBlock FontTypography="Body" Text="Should only executable files be included in the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
-                                <ui:ToggleSwitch OffContent="No" OnContent="Yes"
-                                                 IsChecked="{Binding IncludeOnlyExecFilesWithEverything}" />
+                                <ui:ToggleSwitch
+                                    IsChecked="{Binding IncludeOnlyExecFilesWithEverything}"
+                                    OffContent="No"
+                                    OnContent="Yes" />
                             </StackPanel>
                         </ui:CardControl>
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Delete24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body"
-                                              Text="Should files in the Recycle Bin be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body" Text="Should files in the Recycle Bin be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
-                                <ui:ToggleSwitch OffContent="No" OnContent="Yes"
-                                                 IsChecked="{Binding ExcludeFilesInBinWithEverything}" />
+                                <ui:ToggleSwitch
+                                    IsChecked="{Binding ExcludeFilesInBinWithEverything}"
+                                    OffContent="No"
+                                    OnContent="Yes" />
                             </StackPanel>
                         </ui:CardControl>
                     </StackPanel>
@@ -252,9 +284,9 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock
-                                                Text="{Binding StoreType, Converter={StaticResource StoreTypeToStoreNameConverter}}"
                                                 Margin="10,0,10,0"
-                                                VerticalAlignment="Center" />
+                                                VerticalAlignment="Center"
+                                                Text="{Binding StoreType, Converter={StaticResource StoreTypeToStoreNameConverter}}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -263,9 +295,9 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock
-                                                Text="{Binding AliasOverride, Converter={StaticResource StoreOrchestrationToStringConverter}}"
                                                 Margin="10,0,10,0"
-                                                VerticalAlignment="Center" />
+                                                VerticalAlignment="Center"
+                                                Text="{Binding AliasOverride, Converter={StaticResource StoreOrchestrationToStringConverter}}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -273,11 +305,13 @@
                                 <DataGridTemplateColumn Width="100" Header="Actions">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                                 <Button
+                                                    Margin="5"
+                                                    HorizontalAlignment="Center"
                                                     Command="{Binding ElementName=Self, Path=DataContext.EditStoreShortcutCommand}"
-                                                    HorizontalAlignment="Center" ToolTip="Edit"
-                                                    Margin="5" CommandParameter="{Binding .}">
+                                                    CommandParameter="{Binding .}"
+                                                    ToolTip="Edit">
                                                     <StackPanel Orientation="Horizontal">
                                                         <ui:SymbolIcon Symbol="Edit24" />
                                                     </StackPanel>
@@ -292,11 +326,13 @@
                     </StackPanel>
                 </ui:CardExpander>
 
-                <ui:TextBlock Margin="{StaticResource RegionMargin}"
-                              FontTypography="{StaticResource RegionFontTypography}"
-                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Feature flags" />
+                <ui:TextBlock
+                    Margin="{StaticResource RegionMargin}"
+                    FontTypography="{StaticResource RegionFontTypography}"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="Feature flags" />
 
-                <!-- Feature flags -->
+                <!--  Feature flags  -->
                 <ui:CardExpander
                     Margin="5,5,5,12"
                     Icon="{ui:SymbolIcon FlagCheckered20}"
@@ -317,12 +353,13 @@
                                     </ui:CardControl.Icon>
 
                                     <ui:CardControl.Header>
-                                        <ui:TextBlock FontTypography="Body"
-                                                      Text="{Binding Description}" />
+                                        <ui:TextBlock FontTypography="Body" Text="{Binding Description}" />
                                     </ui:CardControl.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <ui:ToggleSwitch OffContent="No" OnContent="Yes"
-                                                         IsChecked="{Binding Enabled}" />
+                                        <ui:ToggleSwitch
+                                            IsChecked="{Binding Enabled}"
+                                            OffContent="No"
+                                            OnContent="Yes" />
                                     </StackPanel>
                                 </ui:CardControl>
                             </DataTemplate>
@@ -330,27 +367,43 @@
                     </ItemsControl>
                 </ui:CardExpander>
 
-                <!-- MISCELLANEOUS
-                  -->
-                <ui:TextBlock Margin="{StaticResource RegionMargin}"
-                              FontTypography="{StaticResource RegionFontTypography}"
-                              Foreground="{DynamicResource TextFillColorPrimaryBrush}" Text="Miscellaneous" />
+                <!--
+                    MISCELLANEOUS
+                -->
+                <ui:TextBlock
+                    Margin="{StaticResource RegionMargin}"
+                    FontTypography="{StaticResource RegionFontTypography}"
+                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                    Text="Miscellaneous" />
 
                 <ui:CardControl Margin="5,0,5,12" Icon="{ui:SymbolIcon NoteBookError24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Enable trace until the next restart" />
                     </ui:CardControl.Header>
-                    <ui:ToggleSwitch OnContent="Trace enabled"
-                                     OffContent="Trace disabled"
-                                     IsChecked="{Binding IsTraceEnabled}" />
+                    <ui:ToggleSwitch
+                        IsChecked="{Binding IsTraceEnabled}"
+                        OffContent="Trace disabled"
+                        OnContent="Trace enabled" />
                 </ui:CardControl>
 
-                <!-- Resource monitor settings -->
+                <ui:CardControl
+                    Margin="5,0,5,12"
+                    Icon="{ui:SymbolIcon PersonKey20}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="GitHub API Token" />
+                    </ui:CardControl.Header>
+                    <ui:CardControl.ToolTip>
+                        Enter the API token from your GitHub account. It is used, among other things, to create new issues.
+                    </ui:CardControl.ToolTip>
+                    <ui:PasswordBox b:PasswordBoxBinding.BoundPassword="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter your API token" />
+                </ui:CardControl>
+
+                <!--  Resource monitor settings  -->
                 <ui:CardExpander
-                    Visibility="{Binding IsResourceMonitorEnabled, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                     Margin="5,5,5,12"
                     Icon="{ui:SymbolIcon Gauge24}"
-                    IsExpanded="True">
+                    IsExpanded="True"
+                    Visibility="{Binding IsResourceMonitorEnabled, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
                     <ui:CardExpander.Header>
                         <ui:TextBlock
                             Grid.Row="0"
@@ -360,19 +413,20 @@
                     </ui:CardExpander.Header>
 
                     <StackPanel>
-                        <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon Timer24}">
+                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Timer24}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" Text="Refresh rate (ms)" />
                             </ui:CardControl.Header>
                             <ui:CardControl.ToolTip>
                                 The refresh rate, measured in milliseconds, determines how frequently the system updates CPU and memory usage.
                             </ui:CardControl.ToolTip>
-                            <ui:NumberBox Value="{Binding RefreshRate, UpdateSourceTrigger=PropertyChanged}"
-                                          SmallChange="100"
-                                          LargeChange="1000" />
+                            <ui:NumberBox
+                                LargeChange="1000"
+                                SmallChange="100"
+                                Value="{Binding RefreshRate, UpdateSourceTrigger=PropertyChanged}" />
                         </ui:CardControl>
 
-                        <ui:CardControl Margin="5 5 5 12" Icon="{ui:SymbolIcon BezierCurveSquare20}">
+                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon BezierCurveSquare20}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" Text="CPU smoothing index" />
                             </ui:CardControl.Header>

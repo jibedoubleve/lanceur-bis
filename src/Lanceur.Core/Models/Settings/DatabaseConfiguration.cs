@@ -29,6 +29,8 @@ public class DatabaseConfiguration
         }
     ];
 
+    public GithubSection Github { get; } = new();
+
     /// <summary>
     ///     Gets or sets the hotkey configuration for displaying the search window.
     ///     This setting allows users to customise the shortcut key for quick access.
@@ -69,7 +71,6 @@ public class DatabaseConfiguration
     /// </summary>
     public WindowSection Window { get; } = new();
 
-    public GithubSection Github { get; } = new();
     #endregion
 }
 

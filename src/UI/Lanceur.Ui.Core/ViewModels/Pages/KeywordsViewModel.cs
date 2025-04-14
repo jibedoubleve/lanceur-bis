@@ -124,7 +124,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         if (!parseResult.Success)
         {
-            _userNotificationService.Warn("The parsing operation failed because the entered text is invalid and cannot be converted into parameters.");
+            _userNotificationService.Warning("The parsing operation failed because the entered text is invalid and cannot be converted into parameters.");
             return;
         }
         
@@ -240,9 +240,9 @@ public partial class KeywordsViewModel : ObservableObject
         var result = _validationService.IsValid(SelectedAlias);
         if (!result.IsSuccess)
         {
-            _userNotificationService.Warn(result.ErrorContent, "Validation failed");
+            _userNotificationService.Warning(result.ErrorContent, "Validation failed");
             _logger.LogInformation("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
-            _userNotificationService.Warn($"Alias validation failed:\n{result.ErrorContent}");
+            _userNotificationService.Warning($"Alias validation failed:\n{result.ErrorContent}");
             return;
         }
 
