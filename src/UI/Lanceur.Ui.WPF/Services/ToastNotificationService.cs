@@ -36,7 +36,7 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     /// <inheritdoc />
     public void AskRestart()
     {
-        const string msg = "To apply the changes, a restart of the application is required.  \n\nPlease click \"Restart Application\" to continue.";
+        const string msg = "To apply the changes, a restart of the application is required.";
         var uri = GetIconUri(Level.Information);
         var btnRestart = new ToastButton().SetContent("Restart Lanceur")
                                           .AddArgument("Type", ToastNotificationArguments.ClickRestart);
