@@ -18,7 +18,7 @@ public class GuidMacro : MacroQueryResult
 
     #region Constructors
 
-    public GuidMacro(IServiceProvider serviceProvider)
+    public GuidMacro(IServiceProvider serviceProvider) : base(typeof(GuidMacro))
     {
         _serviceProvider = serviceProvider;
         _memoryMemento = serviceProvider.GetService<IClipboardService>();

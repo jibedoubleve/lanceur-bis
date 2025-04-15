@@ -24,7 +24,7 @@ public class MultiMacro : MacroQueryResult
 
     #region Constructors
 
-    public MultiMacro(IServiceProvider serviceProvider)
+    public MultiMacro(IServiceProvider serviceProvider) : base(typeof(MultiMacro))
     {
         _serviceProvider = serviceProvider;
         _executionService = serviceProvider.GetService<IExecutionService>();
@@ -32,11 +32,11 @@ public class MultiMacro : MacroQueryResult
         _delay = DefaultDelay;
     }
 
-    public MultiMacro(IExecutionService executionService, ISearchService searchService, int? delay = null)
+    public MultiMacro(IExecutionService executionService, ISearchService searchService, int? delay = null) : base(typeof(MultiMacro))
     {
         ArgumentNullException.ThrowIfNull(executionService);
-        ArgumentNullException.ThrowIfNull(searchService);   
-        
+        ArgumentNullException.ThrowIfNull(searchService);
+
         _delay = delay ?? DefaultDelay;
         _executionService = executionService;
         _searchService = searchService;

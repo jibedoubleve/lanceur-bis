@@ -2,9 +2,8 @@
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Infra.Macros;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Lanceur.Tests.Tooling.Macros;
+namespace Lanceur.Tests.Tools.Macros;
 
 [Macro("multi"), Description("Allow to start multiple alias at once")]
 public class MultiMacroTest : MacroQueryResult
@@ -13,13 +12,13 @@ public class MultiMacroTest : MacroQueryResult
 
     #region Constructors
 
-    public MultiMacroTest(IServiceProvider serviceProvider) { _serviceProvider = serviceProvider; }
+    public MultiMacroTest(IServiceProvider serviceProvider) : base(typeof(MultiMacroTest)) { _serviceProvider = serviceProvider; }
 
     #endregion Constructors
 
     #region Methods
 
-    public override SelfExecutableQueryResult Clone() => new MultiMacro(_serviceProvider);
+    public override SelfExecutableQueryResult Clone() => new MultiMacro(_serviceProvider) { Description = "Start multiple aliases at once." };
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {

@@ -25,7 +25,7 @@ public class GithubIssueMacro : MacroQueryResult
 
     #region Constructors
 
-    public GithubIssueMacro(IServiceProvider serviceProvider)
+    public GithubIssueMacro(IServiceProvider serviceProvider) : base(typeof(GithubIssueMacro))
     {
         _serviceProvider = serviceProvider;
         _logger = _serviceProvider.GetService<ILogger<GithubIssueMacro>>();

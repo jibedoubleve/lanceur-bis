@@ -54,7 +54,7 @@ public class MacroService : MacroCachedService, IMacroService
         var macro = i.Clone();
         macro.Name = alias.Name;
         macro.Parameters = alias.Parameters;
-        macro.Description = alias.Description;
+        macro.Description = alias.Description.IsNullOrWhiteSpace() ? i.Description : alias.Description;
         return macro;
     }
 

@@ -14,7 +14,7 @@ public abstract class MacroCachedService
 
     private readonly Assembly _asm;
     private readonly IAliasRepository _aliasRepository;
-    private Dictionary<string, ISelfExecutable> _macroInstances;
+    private Dictionary<string, ISelfExecutable> _macroTemplates;
     private readonly IServiceProvider _serviceProvider;
 
     #endregion
@@ -42,7 +42,7 @@ public abstract class MacroCachedService
         get
         {
             LoadMacros();
-            return _macroInstances;
+            return _macroTemplates;
         }
     }
 
@@ -52,7 +52,7 @@ public abstract class MacroCachedService
 
     private void LoadMacros()
     {
-        if (_macroInstances is not null) return;
+        if (_macroTemplates is not null) return;
 
         var found = _asm.GetTypes()
                         .Where(t => t.GetCustomAttributes<MacroAttribute>().Any());
@@ -60,7 +60,7 @@ public abstract class MacroCachedService
         var macroInstances = new Dictionary<string, ISelfExecutable>();
         foreach (var type in found)
         {
-            var instance = Activator.CreateInstance(type, [_serviceProvider]);
+            var instance = Activator.CreateInstance(type, _serviceProvider);
             if (instance is not SelfExecutableQueryResult alias) continue;
 
             var name = alias.Name = (type.GetCustomAttribute(typeof(MacroAttribute)) as MacroAttribute)?.Name;
@@ -75,7 +75,7 @@ public abstract class MacroCachedService
             Logger.LogDebug("Found macro {Name}", name);
         }
 
-        _macroInstances = macroInstances;
+        _macroTemplates = macroInstances;
     }
 
     #endregion
