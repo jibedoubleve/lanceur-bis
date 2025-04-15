@@ -14,13 +14,13 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
 
     private DatabaseConfiguration _current;
 
+    private readonly JsonSerializerSettings _jsonSettings = new()  { ObjectCreationHandling = ObjectCreationHandling.Replace };
+
     #endregion
 
     #region Constructors
 
-    public SQLiteDatabaseConfigurationService(IDbConnectionManager manager) : base(manager)
-    {
-    }
+    public SQLiteDatabaseConfigurationService(IDbConnectionManager manager) : base(manager) { }
 
     #endregion
 
@@ -62,7 +62,7 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
 
         _current = json.IsNullOrEmpty()
             ? new()
-            : JsonConvert.DeserializeObject<DatabaseConfiguration>(json);
+            : JsonConvert.DeserializeObject<DatabaseConfiguration>(json, _jsonSettings);
     }
 
     public void Save()
