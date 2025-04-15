@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using Dapper;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Constants;
@@ -22,13 +24,13 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
     #region Methods
 
-    private void WithConfiguration(Action<IDatabaseConfigurationService> assert)
+    private void WithConfiguration(Action<IDatabaseConfigurationService> assert, string sql = null)
     {
         using var c = BuildFreshDb();
+        if (sql is not null) c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
         var settingRepository = new SQLiteDatabaseConfigurationService(scope);
-
-        assert(settingRepository);
+        using (new AssertionScope()) { assert(settingRepository); }
     }
 
     [Fact]
@@ -41,6 +43,33 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         var value = stg.Current.DbPath;
 
         value.Should().Be(Paths.DefaultDb);
+    }
+
+    [Fact]
+    public void DeserialiseFeatureFlags()
+    {
+        const string json = """
+                            { "FeatureFlags": [ { "Description": "Show CPU", "Enabled": false, "FeatureName": "ShowSystemUsage1", "Icon": "Gauge241" }, { "Description": "Enables administrator", "Enabled": true, "FeatureName": "AdminMode1", "Icon": "ShieldKeyhole241" } ] }
+                            """;
+        const string sql = $"insert into settings (s_key, s_value) values ('json', '{json}');";
+        WithConfiguration(
+            repository =>
+            {
+                var settings = repository.Current;
+                settings.FeatureFlags.Should().HaveCount(2);
+                
+                settings.FeatureFlags.ElementAt(0).Enabled.Should().BeFalse();
+                settings.FeatureFlags.ElementAt(0).FeatureName.Should().Be("ShowSystemUsage1");
+                settings.FeatureFlags.ElementAt(0).Icon.Should().Be("Gauge241");
+                settings.FeatureFlags.ElementAt(0).Description.Should().Be("Show CPU");
+                
+                settings.FeatureFlags.ElementAt(1).Enabled.Should().BeTrue();
+                settings.FeatureFlags.ElementAt(1).FeatureName.Should().Be("AdminMode1");
+                settings.FeatureFlags.ElementAt(1).Icon.Should().Be("ShieldKeyhole241");
+                settings.FeatureFlags.ElementAt(1).Description.Should().Be("Enables administrator");
+            },
+            sql
+        );
     }
 
     [Fact]

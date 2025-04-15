@@ -215,8 +215,8 @@ public class MacroServiceShould : TestBase
                               .AddLogging()
                               .AddMockSingleton<IAliasRepository>()
                               .BuildServiceProvider();
-        var sut = new MacroService(serviceProvider);
-        sut.MacroCount.Should().Be(3);
+        var macroService = new MacroService(serviceProvider);
+        macroService.MacroCount.Should().Be(4);
     }
 
     [Fact]
