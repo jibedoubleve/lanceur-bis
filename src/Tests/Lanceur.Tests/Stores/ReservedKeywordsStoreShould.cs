@@ -8,6 +8,7 @@ using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Tests.Tooling.ReservedAliases;
+using Lanceur.Tests.Tools.ReservedAliases;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

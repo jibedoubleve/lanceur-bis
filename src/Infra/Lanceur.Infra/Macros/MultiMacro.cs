@@ -35,8 +35,8 @@ public class MultiMacro : MacroQueryResult
     public MultiMacro(IExecutionService executionService, ISearchService searchService, int? delay = null)
     {
         ArgumentNullException.ThrowIfNull(executionService);
-        ArgumentNullException.ThrowIfNull(searchService);   
-        
+        ArgumentNullException.ThrowIfNull(searchService);
+
         _delay = delay ?? DefaultDelay;
         _executionService = executionService;
         _searchService = searchService;

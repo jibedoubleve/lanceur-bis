@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.Tests.Tooling.ReservedAliases;
 
-namespace Lanceur.Tests.Tooling.ReservedAliases;
+namespace Lanceur.Tests.Tools.ReservedAliases;
 
 [ReservedAlias(Names.Name1)]
 [Description("description")]
