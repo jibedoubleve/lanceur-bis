@@ -16,7 +16,7 @@ public class ExecutableTestAlias : MacroQueryResult
 
     #region Constructors
 
-    public ExecutableTestAlias(IServiceProvider serviceProvider)
+    public ExecutableTestAlias(IServiceProvider serviceProvider) : base(typeof(ExecutableTestAlias))
     {
         _serviceProvider = serviceProvider;
         Name = Guid.NewGuid().ToString()[..8];

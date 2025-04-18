@@ -19,7 +19,7 @@ public class ClipboardAsTextMacro : MacroQueryResult
 
     #region Constructors
 
-    public ClipboardAsTextMacro(IServiceProvider serviceProvider)
+    public ClipboardAsTextMacro(IServiceProvider serviceProvider) : base(typeof(ClipboardAsTextMacro))
     {
         _serviceProvider = serviceProvider;
         _clipboard = _serviceProvider.GetService<IClipboardService>();
