@@ -4,7 +4,7 @@ using Lanceur.Infra.Wildcards;
 using NSubstitute;
 using Xunit;
 
-namespace Lanceur.Tests.BusinessLogic;
+namespace Lanceur.Tests.Services;
 
 public class ClipboardServiceShould
 {

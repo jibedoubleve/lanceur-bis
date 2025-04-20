@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Accessibility;
 using AutoMapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -24,7 +25,7 @@ using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Lanceur.Tests.BusinessLogic;
+namespace Lanceur.Tests.Services;
 
 public class MacroServiceShould : TestBase
 {
@@ -275,6 +276,35 @@ public class MacroServiceShould : TestBase
         var query = new AliasQueryResult { FileName = $"@{macro}@" };
 
         query.IsMacro().Should().BeTrue();
+    }
+
+    [Fact]
+    public void HaveDefaultDescription()
+    {        QueryResult[] queryResults = [
+            new AliasQueryResult { Name = "macro_1", FileName = "@multi@" }, 
+            new AliasQueryResult { Name = "macro_2", FileName = "@multi@" }, 
+            new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }
+        ];
+
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
+                                                     .AddMockSingleton<IAliasRepository>()
+                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
+                                                     .AddSingleton<MacroService>()
+                                                     .BuildServiceProvider();
+
+        var output = serviceProvider.GetService<MacroService>()
+                                    .ExpandMacroAlias(queryResults)
+                                    .ToArray();
+
+        using (new AssertionScope())
+        {
+            output.GetDoubloons().Should().HaveCount(0);
+            foreach (var item in output)
+            {
+                item.Description.Should().NotBeNullOrWhiteSpace("default description should be provided");
+            }
+        }
     }
 
     #endregion
