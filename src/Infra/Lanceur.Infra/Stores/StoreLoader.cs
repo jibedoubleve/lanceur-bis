@@ -48,14 +48,14 @@ public class StoreLoader : IStoreLoader
         if (_settings is null) return;
 
         _settings.Reload();
-        var settingsOverrides = _settings.Application.Stores?.StoreOverrides ?? [];
+        var settingsOverrides = _settings.Application.Stores?.StoreShortcuts ?? [];
 
         // Get all unsaved overrides and add them to the settings
         var overrides
             = stores.Where(
                         store =>
                         {
-                            var storeOverrides = (_settings.Application.Stores?.StoreOverrides ?? []).ToArray();
+                            var storeOverrides = (_settings.Application.Stores?.StoreShortcuts ?? []).ToArray();
 
                             // If no store shortcut override is defined in the settings, simply check whether it can be overridden.
                             if (storeOverrides.Length == 0) return !store.StoreOrchestration.AlivePattern.IsNullOrWhiteSpace() && store.IsOverridable;
@@ -69,7 +69,7 @@ public class StoreLoader : IStoreLoader
                     .Where(storeOverride => settingsOverrides.All(x => x.StoreType != storeOverride.StoreType))
                     .ToList();
 
-        _settings.Application.Stores!.StoreOverrides = settingsOverrides.Concat(overrides);
+        _settings.Application.Stores!.StoreShortcuts = settingsOverrides.Concat(overrides).ToList();
         _settings.Save();
     }
 

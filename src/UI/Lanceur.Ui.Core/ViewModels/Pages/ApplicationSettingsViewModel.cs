@@ -53,6 +53,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _showResult;
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = [];
     private readonly IViewFactory _viewFactory;
+    private readonly IEnigma _enigma;
     [ObservableProperty] private string _windowBackdropStyle = "Mica";
 
     #endregion
@@ -65,7 +66,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IAppRestartService appRestartService,
         ISettingsFacade settings,
         LoggingLevelSwitch loggingLevelSwitch,
-        IViewFactory viewFactory
+        IViewFactory viewFactory,
+        IEnigma enigma
     )
     {
         ArgumentNullException.ThrowIfNull(interactionHub);
@@ -81,6 +83,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         _settings = settings;
         _loggingLevelSwitch = loggingLevelSwitch;
         _viewFactory = viewFactory;
+        _enigma = enigma;
 
         // Hotkey
         var hk = _settings.Application.HotKey;
@@ -130,9 +133,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Store section
         BookmarkSourceBrowser = Settings.Application.Stores.BookmarkSourceBrowser;
-        StoreShortcuts = new(Settings.Application.Stores.StoreOverrides);
+        StoreShortcuts = new(Settings.Application.Stores.StoreShortcuts);
 
-        // -- Everything Store
+        // Everything Store
         var adapter = new EverythingQueryAdapter(Settings.Application.Stores.EverythingQuerySuffix);
         ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
         ExcludeSystemFilesWithEverything = adapter.IsSystemFilesExcluded;
@@ -152,7 +155,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         var token = Settings.Application.Github.Token;
-        ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : Enigma.Decrypt(token);
+        ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : _enigma.Decrypt(token);
     }
 
     private void MapSettingsFromUiToDb()
@@ -167,9 +170,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Store section
         Settings.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
-        Settings.Application.Stores.StoreOverrides = StoreShortcuts.ToArray();
+        Settings.Application.Stores.StoreShortcuts = StoreShortcuts.ToArray();
 
-        // -- Everything Store
+        // Everything Store
         var query = new EverythingQueryBuilder();
         if (ExcludeHiddenFilesWithEverything) query.ExcludeHiddenFiles();
         if (ExcludeSystemFilesWithEverything) query.ExcludeSystemFiles();
@@ -192,7 +195,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Settings.Application.ResourceMonitor.RefreshRate = RefreshRate;
 
         // Miscellaneous
-        Settings.Application.Github.Token = ApiToken.IsNullOrWhiteSpace() ? string.Empty : Enigma.Encrypt(ApiToken);
+        Settings.Application.Github.Token = ApiToken.IsNullOrWhiteSpace() ? string.Empty : _enigma.Encrypt(ApiToken);
     }
 
     [RelayCommand]

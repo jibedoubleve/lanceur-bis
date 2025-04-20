@@ -13,7 +13,7 @@ public class DatabaseConfiguration
     /// <summary>
     ///     Gets or sets the caching configuration settings used across the application.
     /// </summary>
-    public CachingSession Caching { get; } = new();
+    public CachingSession Caching { get; set; } = new(30, 30);
 
     /// <summary>
     ///     Get or sets the configuration settings for the feature flags.
@@ -29,7 +29,7 @@ public class DatabaseConfiguration
         }
     ];
 
-    public GithubSection Github { get; } = new();
+    public GithubSection Github { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets the hotkey configuration for displaying the search window.
@@ -39,37 +39,37 @@ public class DatabaseConfiguration
     ///     The default hotkey configuration: ALTGR + Space.
     ///     The values 3 and 18 represent the key codes for the ALTGR and Space keys, respectively.
     /// </remarks>
-    public HotKeySection HotKey { get; } = new(3, 18);
+    public HotKeySection HotKey { get; set; } = new(3, 18);
 
     /// <summary>
     ///     Gets or sets miscellaneous configuration settings that do not fall into other categories.
     ///     These settings may include other application preferences not specifically handled elsewhere.
     /// </summary>
-    public ReconciliationSection Reconciliation { get; set; } = new();
+    public ReconciliationSection Reconciliation { get; set; } = new(6, 10);
 
     /// <summary>
     ///     Contains settings for the resource monitor.
     ///     This section includes configuration options related to system resource monitoring,
     ///     such as CPU, memory, and other performance metrics.
     /// </summary>
-    public ResourceMonitorSection ResourceMonitor { get; } = new();
+    public ResourceMonitorSection ResourceMonitor { get; set; } = new(10, 500);
 
     /// <summary>
     ///     Gets or sets the configuration settings for the search box.
     /// </summary>
-    public SearchBoxSection SearchBox { get; } = new();
+    public SearchBoxSection SearchBox { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets the configuration settings for the store section.
     ///     This includes preferences and metadata related to connected stores or sources.
     /// </summary>
-    public StoreSection Stores { get; } = new();
+    public StoreSection Stores { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets the configuration settings for the application's main window.
     ///     This includes dimensions, position, and other display-related preferences.
     /// </summary>
-    public WindowSection Window { get; } = new();
+    public WindowSection Window { get; set; } = new();
 
     #endregion
 }

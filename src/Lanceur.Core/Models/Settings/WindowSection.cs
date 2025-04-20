@@ -18,7 +18,7 @@ public class WindowSection
     /// <summary>
     ///     Gets or sets the position of the window when it is displayed on the screen.
     /// </summary>
-    public PositionSection Position { get; } = new() { Left = double.MaxValue, Top = double.MaxValue };
+    public PositionSection Position { get; set; } = new() { Left = double.MaxValue, Top = double.MaxValue };
 
     #endregion
 }

@@ -2,7 +2,6 @@
     x:Class="Lanceur.Ui.WPF.Views.Pages.ApplicationSettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:b="clr-namespace:Lanceur.Ui.WPF.Xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
@@ -395,7 +394,7 @@
                     <ui:CardControl.ToolTip>
                         Enter the API token from your GitHub account. It is used, among other things, to create new issues.
                     </ui:CardControl.ToolTip>
-                    <ui:PasswordBox b:PasswordBoxBinding.BoundPassword="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter your API token" />
+                    <ui:PasswordBox Password="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter your API token" />
                 </ui:CardControl>
 
                 <!--  Resource monitor settings  -->

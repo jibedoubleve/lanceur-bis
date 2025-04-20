@@ -5,15 +5,16 @@ public interface IGithubService
     #region Methods
 
     /// <summary>
-    ///     Create a new issue on github with only a descriptive title
+    ///     Creates a new issue on GitHub with the specified title.
     /// </summary>
-    /// <param name="title"></param>
-    Task CreateIssue(string title);
+    /// <param name="title">The title of the issue to create.</param>
+    /// <param name="token">The personal access token used for authentication with the GitHub API.</param>
+    Task CreateIssue(string title, string token);
 
     /// <summary>
-    ///     Returns the latest version released
+    ///     Retrieves the latest version tag from the GitHub repository's releases.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the latest version as a string.</returns>
     Task<string> GetLatestVersion();
 
     #endregion

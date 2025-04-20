@@ -9,7 +9,9 @@ public class GithubService : IGithubService
     #region Fields
 
     private readonly GitHubClient _client;
-    private readonly ISettingsFacade _settingsFacade;
+    private readonly IUserGlobalNotificationService _notificationService;
+    private readonly string _tag;
+    private const string GithubUrl = "https://github.com/jibedoubleve/lanceur-bis/issues/";
     private const string Owner = "jibedoubleve";
     private const string Repository = "lanceur-bis";
 
@@ -17,24 +19,26 @@ public class GithubService : IGithubService
 
     #region Constructors
 
-    public GithubService(ISettingsFacade settingsFacade)
+    public GithubService(ISettingsFacade settings, IUserGlobalNotificationService notificationService)
     {
-        _settingsFacade = settingsFacade;
+        _notificationService = notificationService;
         _client = new(new ProductHeaderValue("Lanceur"));
+        _tag = settings.Application.Github.Tag;
     }
 
     #endregion
 
     #region Methods
 
-    /// <inheritdoc />
-    public async Task CreateIssue(string title)
-    {
-        if (!_settingsFacade.Application.Github.HasToken) return;
+    private static string Url(int number) => $"{GithubUrl}{number}";
 
-        var issue =  new NewIssue(title);
-        _client.Credentials = new(_settingsFacade.Application.Github.Token);
-        await _client.Issue.Create(Owner, Repository, issue);
+    /// <inheritdoc />
+    public async Task CreateIssue(string title, string token)
+    {
+        var issue =  new NewIssue(title) { Labels = { _tag } };
+        _client.Credentials = new(token);
+        var number = (await _client.Issue.Create(Owner, Repository, issue)).Number;
+        _notificationService.InformationWithNavigation($"Created new Github issue n° {number}", Url(number));
     }
 
     /// <inheritdoc />

@@ -14,7 +14,7 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
 
     private DatabaseConfiguration _current;
 
-    private readonly JsonSerializerSettings _jsonSettings = new()  { ObjectCreationHandling = ObjectCreationHandling.Replace };
+    private readonly JsonSerializerSettings _jsonSettings = new() { ObjectCreationHandling = ObjectCreationHandling.Replace };
 
     #endregion
 

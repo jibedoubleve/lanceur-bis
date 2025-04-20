@@ -25,11 +25,11 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
 
     private static void Show(Level level, string message, [CallerMemberName] string? title = null)
     {
-        var uri = GetIconUri(level);
+        var icon = GetIconUri(level);
         new ToastContentBuilder()
             .AddText(title)
             .AddText(message)
-            .AddAppLogoOverride(uri.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
             .Show();
     }
 
@@ -37,7 +37,7 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     public void AskRestart()
     {
         const string msg = "To apply the changes, a restart of the application is required.";
-        var uri = GetIconUri(Level.Information);
+        var icon = GetIconUri(Level.Information);
         var btnRestart = new ToastButton().SetContent("Restart Lanceur")
                                           .AddArgument("Type", ToastNotificationArguments.ClickRestart);
 
@@ -45,7 +45,7 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             .AddText("Settings Updated")
             .AddText(msg)
             .AddButton(btnRestart)
-            .AddAppLogoOverride(uri.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
             .Show();
     }
 
@@ -53,7 +53,7 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     public void NotifyNewVersionAvailable(Version version)
     {
         var msg = $"A new version {version} is now available!";
-        var uri = GetIconUri(Level.Information);
+        var icon = GetIconUri(Level.Information);
         var btnCheckWebsite = new ToastButton().SetContent("Check the website")
                                                .AddArgument("Type", ToastNotificationArguments.VisitWebsite);
         var btnSkipVersion = new ToastButton().SetContent("Skip this version")
@@ -65,7 +65,7 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             .AddText(msg)
             .AddButton(btnCheckWebsite)
             .AddButton(btnSkipVersion)
-            .AddAppLogoOverride(uri.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
             .Show();
     }
 
@@ -73,7 +73,7 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     /// <inheritdoc />
     public void Error(string message, Exception ex)
     {
-        var uri = GetIconUri(Level.Error);
+        var icon = GetIconUri(Level.Error);
         var btnError = new ToastButton().SetContent("Show Error")
                                         .AddArgument("Type", ToastNotificationArguments.ClickShowError)
                                         .AddArgument("Message", message)
@@ -87,12 +87,28 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             .AddText(message)
             .AddButton(btnError)
             .AddButton(btnLogs)
-            .AddAppLogoOverride(uri.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
             .Show();
     }
 
     /// <inheritdoc />
     public void Information(string message) => Show(Level.Information, message);
+
+    public void InformationWithNavigation(string message, string url)
+    {
+        var icon = GetIconUri(Level.Information);
+
+        var btnNavigate = new ToastButton().SetContent("View Details")
+                                           .AddArgument("Type", ToastNotificationArguments.ClickNavigateIssue);
+
+        new ToastContentBuilder()
+            .AddText("Information")
+            .AddText(message)
+            .AddArgument("Url", url)
+            .AddButton(btnNavigate)
+            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .Show();
+    }
 
     /// <inheritdoc />
     public void Warning(string message) => Show(Level.Warning, message);

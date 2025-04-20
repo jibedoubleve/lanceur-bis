@@ -173,7 +173,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 // I select all the shortcuts directly in the database
                 const string sql = """
                                    select value ->> '$.AliasOverride' as AliasOverride
-                                   from settings, json_each(json_extract(s_value, '$.Stores.StoreOverrides'))
+                                   from settings, json_each(json_extract(s_value, '$.Stores.StoreShortcuts'))
                                    where s_key = 'json';
                                    """;
                 var results = db.WithConnection(c => c.Query<string>(sql))

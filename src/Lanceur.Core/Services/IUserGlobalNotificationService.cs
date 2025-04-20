@@ -23,6 +23,14 @@ public interface IUserGlobalNotificationService
     void Information(string message);
 
     /// <summary>
+    ///     Displays an informational message with a navigation button to a related URL.
+    ///     The button is labeled "View Details" and triggers navigation to the specified URL when clicked.
+    /// </summary>
+    /// <param name="message">The message to be displayed in the toast notification.</param>
+    /// <param name="url">The URL to navigate to when the user clicks the "View Details" button.</param>
+    void InformationWithNavigation(string message, string url);
+
+    /// <summary>
     ///     Displays a notification indicating that a new version of the application is available,
     ///     prompting the user to restart the application to apply the update.
     /// </summary>
@@ -47,19 +55,14 @@ public static class ToastNotificationArguments
     #region Fields
 
     /// <summary>
+    ///     Indicates that the user requested to navigate to the Github issue.
+    /// </summary>
+    public const string ClickNavigateIssue = nameof(ClickNavigateIssue);
+
+    /// <summary>
     ///     Indicates that the user requested an application restart
     /// </summary>
     public const string ClickRestart = nameof(ClickRestart);
-    
-    /// <summary>
-    ///     Indicates that the user requested a visit of the website
-    /// </summary>
-    public const string VisitWebsite = nameof(VisitWebsite);
-
-    /// <summary>
-    ///     Indicates that the user requested to skip the notification of this new version
-    /// </summary>
-    public const string SkipVersion = nameof(SkipVersion);
 
     /// <summary>
     ///     Indicates that the user requested to view detailed information about the error displayed in the toast notification.
@@ -70,6 +73,16 @@ public static class ToastNotificationArguments
     ///     Indicates that the user requested to open the directory containing the application's log files.
     /// </summary>
     public const string ClickShowLogs = nameof(ClickShowLogs);
+
+    /// <summary>
+    ///     Indicates that the user requested to skip the notification of this new version
+    /// </summary>
+    public const string SkipVersion = nameof(SkipVersion);
+
+    /// <summary>
+    ///     Indicates that the user requested a visit of the website
+    /// </summary>
+    public const string VisitWebsite = nameof(VisitWebsite);
 
     #endregion
 }
