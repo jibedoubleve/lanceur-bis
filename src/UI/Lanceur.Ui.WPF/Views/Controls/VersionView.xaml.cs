@@ -20,6 +20,7 @@ public partial class VersionView : UserControl
     {
         Version = currentVersion.Version.ToString();
         Commit = currentVersion.Commit;
+        Suffix = currentVersion.Suffix;
         InitializeComponent();
     }
 
@@ -29,7 +30,7 @@ public partial class VersionView : UserControl
 
     public string Commit { get; }
     public string Version { get; }
-
+    public string Suffix { get; set; }
     #endregion
 
     #region Methods
