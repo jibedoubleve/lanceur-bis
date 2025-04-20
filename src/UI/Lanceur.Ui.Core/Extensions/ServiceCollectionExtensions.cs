@@ -112,14 +112,13 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
-                         .AddSingleton<SQLiteUpdater>(
-                             sp => new(
-                                 sp.GetService<IDataStoreVersionService>(),
-                                 sp.GetService<ILoggerFactory>(),
-                                 sp.GetService<IDbConnection>(),
-                                 ScriptRepository.Asm,
-                                 ScriptRepository.DbScriptEmbeddedResourcePattern
-                             )
+                         .AddSingleton<SQLiteUpdater>(sp => new(
+                                                          sp.GetService<IDataStoreVersionService>(),
+                                                          sp.GetService<ILoggerFactory>(),
+                                                          sp.GetService<IDbConnection>(),
+                                                          ScriptRepository.Asm,
+                                                          ScriptRepository.DbScriptEmbeddedResourcePattern
+                                                      )
                          )
                          .AddTransient<IDataStoreVersionService, SQLiteVersionService>()
                          .AddTransient<IAliasValidationService, AliasValidationService>()
@@ -148,7 +147,8 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
-                         .AddSingleton<ICalculatorService, NCalcCalculatorService>();
+                         .AddSingleton<ICalculatorService, NCalcCalculatorService>()
+                         .AddSingleton<IEnigma, Enigma>();
 
         ConditionalExecution.Execute(
             serviceCollection,

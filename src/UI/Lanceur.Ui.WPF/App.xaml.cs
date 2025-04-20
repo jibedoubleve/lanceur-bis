@@ -36,8 +36,7 @@ public partial class App
 
     private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
                                                   .CreateDefaultBuilder()
-                                                  .ConfigureServices(
-                                                      (context, services) =>
+                                                  .ConfigureServices((context, services) =>
                                                       {
                                                           services.AddTrackedMemoryCache()
                                                                   .Register("View", "Lanceur.Ui.WPF")
@@ -51,8 +50,7 @@ public partial class App
                                                                   .AddLoggers(context);
                                                       }
                                                   )
-                                                  .ConfigureAppConfiguration(
-                                                      (context, config) =>
+                                                  .ConfigureAppConfiguration((context, config) =>
                                                       {
                                                           if (context.HostingEnvironment.IsDevelopment()) config.AddUserSecrets<App>();
                                                       }
@@ -109,6 +107,8 @@ public partial class App
                     settings.Application.Github.LastCheckedVersion = new(arguments["Version"]);
                     settings.Save();
                 },
+                // ---- Navigate to Url ----
+                ToastNotificationArguments.ClickNavigateIssue => () => Process.Start("explorer.exe", arguments["Url"]),
                 // ---- Default  ----
                 _ => () => Log.Warning("The argument '{Argument}' is not supported in the toast arguments. Are you using a button that has not been configured yet?", toastArgs.Argument)
             };
@@ -129,7 +129,7 @@ public partial class App
             () => { },
             SingleInstance.ReleaseMutex
         );
-        
+
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application has closed");
     }
@@ -155,16 +155,20 @@ public partial class App
             new((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R),
             hotKeyService.HotKey
         );
-        
+
         /* Only one instance allowed in prod...
          */
-        ConditionalExecution.ExecuteOnRelease(
-            () =>
+        ConditionalExecution.ExecuteOnRelease(() =>
             {
                 if (SingleInstance.WaitOne()) return;
 
                 const string msg = "The application is already running.";
-                MessageBox.Show(msg, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    msg,
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning
+                );
                 Environment.Exit(0);
             }
         );
@@ -174,7 +178,12 @@ public partial class App
         {
             // Should be only useful in debug mode as Mutex should avoid this situation...
             var errorMessage = $"The shortcut '{hk.Value.ToStringHotKey()}' is already registered.";
-            MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(
+                errorMessage,
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
             Current.Shutdown();
             return;
         }
@@ -185,14 +194,13 @@ public partial class App
 
         Host.Services.GetRequiredService<ILogger<App>>()!
             .LogInformation("Application started");
-        
+
         /* Check new Version
          */
         var settings = Host.Services.GetRequiredService<ISettingsFacade>()!;
         _ = Host.Services.GetRequiredService<IReleaseService>()
                 .HasUpdateAsync()
-                .ContinueWith(
-                    context =>
+                .ContinueWith(context =>
                     {
                         if (!context.Result.HasUpdate || settings.Application.Github.SnoozeVersionCheck) return;
 

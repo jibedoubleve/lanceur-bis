@@ -1,7 +1,9 @@
+using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
+using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
@@ -42,6 +44,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
 
         var serviceCollection = new ServiceCollection().AddView<TViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
+                                                       .AddSingleton<IEnigma, Enigma>()
                                                        .AddDatabase(connectionManager);
 
         var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
