@@ -1,6 +1,6 @@
 using Lanceur.SharedKernel.Extensions;
 
-namespace Lanceur.Infra.Constants;
+namespace Lanceur.Core.Constants;
 
 public static class Paths
 {
@@ -19,7 +19,8 @@ public static class Paths
     public static string RawLogFile { get; } = @"%appdata%\probel\lanceur2\logs\log\probel-lanceur..log".ExpandPath();
     public static string ReleasesUrl { get; } = $"{GithubUrl}/releases/latest";
     public static string Settings { get; } = @"%appdata%\probel\lanceur2\settings.json".ExpandPath();
-    public static string TelemetryUrl => "http://localhost:5341";
+    public static string TelemetryUrlLoki => "http://localhost:3100";
+    public static string TelemetryUrlSeq => "http://localhost:5341";
 
     #endregion
 }

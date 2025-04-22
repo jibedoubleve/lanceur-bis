@@ -1,7 +1,7 @@
-using Lanceur.Infra.Constants;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Lanceur.Core.Constants;
 
 namespace Lanceur.Infra.Win32.Images;
 

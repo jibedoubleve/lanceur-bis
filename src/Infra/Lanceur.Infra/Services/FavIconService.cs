@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Constants;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Web;
 

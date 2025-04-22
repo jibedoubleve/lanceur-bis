@@ -1,12 +1,13 @@
 ﻿namespace Lanceur.Core.Services;
 
-public interface IConfigurationService<TConfig>
+public interface IConfigurationService<out TConfig>
+    where TConfig : class, new()
 {
     #region Properties
 
     TConfig Current { get; }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -14,5 +15,5 @@ public interface IConfigurationService<TConfig>
 
     void Save();
 
-    #endregion Methods
+    #endregion
 }

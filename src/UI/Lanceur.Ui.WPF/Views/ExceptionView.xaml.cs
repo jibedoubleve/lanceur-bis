@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Constants;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
 using Wpf.Ui.Appearance;

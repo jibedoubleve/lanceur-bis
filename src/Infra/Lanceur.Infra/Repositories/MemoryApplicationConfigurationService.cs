@@ -31,7 +31,7 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
 
     #region Properties
 
-    public IApplicationSettings Current => Settings;
+    public ApplicationSettings Current => Settings;
 
     #endregion
 
