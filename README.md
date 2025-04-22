@@ -1,7 +1,7 @@
 # Lanceur Bis
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a8231644d844435eb9fd15110ea771d8)](https://app.codacy.com/gh/jibedoubleve/lanceur-bis?utm_source=github.com&utm_medium=referral&utm_content=jibedoubleve/lanceur-bus&utm_campaign=Badge_Grade) ![GitHub Repo stars](https://img.shields.io/github/stars/jibedoubleve/lanceur-bis) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-closed-raw/jibedoubleve/lanceur-bis) ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/jibedoubleve/lanceur-bis/on_push.yml) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jibedoubleve/lanceur-bis/master) ![License](https://img.shields.io/github/license/jibedoubleve/lanceur-bis)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a8231644d844435eb9fd15110ea771d8)](https://app.codacy.com/gh/jibedoubleve/lanceur-bis?utm_source=github.com&utm_medium=referral&utm_content=jibedoubleve/lanceur-bus&utm_campaign=Badge_Grade) ![GitHub Repo stars](https://img.shields.io/github/stars/jibedoubleve/lanceur-bis) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-closed-raw/jibedoubleve/lanceur-bis) ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/jibedoubleve/lanceur-bis/on_push.yml) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jibedoubleve/lanceur-bis/master) ![License](https://img.shields.io/github/license/jibedoubleve/lanceur-bis)
 
 > [!IMPORTANT]  
 > Looking for documentation? Here’s where to find it:  
