@@ -25,7 +25,7 @@ public class SettingsFacadeService : ISettingsFacade
     #region Properties
 
     public DatabaseConfiguration Application => _databaseConfigurationService.Current;
-    public IApplicationSettings Local => _applicationConfigurationService.Current;
+    public ApplicationSettings Local => _applicationConfigurationService.Current;
 
     #endregion Properties
 

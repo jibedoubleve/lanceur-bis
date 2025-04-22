@@ -3,11 +3,11 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
-using Lanceur.Infra.Constants;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.Infra.Win32.Services;
@@ -46,8 +46,8 @@ public partial class App
                                                                   .AddCommands()
                                                                   .AddMapping()
                                                                   .AddConfiguration()
-                                                                  .AddDatabaseServices()
-                                                                  .AddLoggers(context);
+                                                                  .AddDatabaseServices();
+                                                          services.AddLoggers(context, services.BuildServiceProvider());
                                                       }
                                                   )
                                                   .ConfigureAppConfiguration((context, config) =>

@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using Lanceur.Core;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
-using Lanceur.Infra.Constants;
 
 namespace Lanceur.Ui.WPF.ReservedKeywords;
 

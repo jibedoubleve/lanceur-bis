@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Constants;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;

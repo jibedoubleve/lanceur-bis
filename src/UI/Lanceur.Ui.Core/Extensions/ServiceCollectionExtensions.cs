@@ -2,14 +2,15 @@ using System.Data;
 using System.Data.SQLite;
 using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
+using Windows.Devices.Sensors;
 using Everything.Wrapper;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
-using Lanceur.Infra.Constants;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
@@ -35,6 +36,7 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Display;
+using Serilog.Sinks.Grafana.Loki;
 
 namespace Lanceur.Ui.Core.Extensions;
 
@@ -50,10 +52,11 @@ public static class ServiceCollectionExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddLoggers(this IServiceCollection serviceCollection, HostBuilderContext context)
+    public static void AddLoggers(this IServiceCollection serviceCollection, HostBuilderContext context, ServiceProvider serviceProvider)
     {
         var logEventLevel = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
         var levelSwitch = new LoggingLevelSwitch(logEventLevel);
+        var telemetry = serviceProvider.GetRequiredService<ISettingsFacade>().Local.Telemetry;
 
         serviceCollection.AddSingleton(levelSwitch);
 
@@ -67,32 +70,42 @@ public static class ServiceCollectionExtensions
             ConfigureLogForRelease
         );
 
-        Log.Logger = loggerCfg.CreateLogger();
-        serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true))
-                         .BuildServiceProvider();
-        Log.Logger.Information("Logger configured");
-        return serviceCollection;
+        serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
+        return;
 
         void ConfigureLogForDebug()
         {
-            // For now, only seq is configured in my development machine and not anymore in AWS.
-            var apiKey = context.Configuration["SEQ_LANCEUR_DEV"];
-            if (apiKey is null) throw new NotSupportedException("Api key not found. Create a environment variable 'SEQ_LANCEUR_DEV' with the api key");
-
-            loggerCfg.WriteTo.Seq(
-                Paths.TelemetryUrl,
-                apiKey: apiKey
-            );
+            if(telemetry.IsSeqEnabled)
+            {
+                // For now, only seq is configured in my development machine and not anymore in AWS.
+                var apiKey = context.Configuration["SEQ_LANCEUR"];
+                if (apiKey is null) throw new NotSupportedException("Api key not found. Create a environment variable 'SEQ_LANCEUR' with the api key");
+                loggerCfg.WriteTo.Seq(
+                    Paths.TelemetryUrlSeq,
+                    apiKey: apiKey
+                );
+            }
+            if(telemetry.IsLokiEnabled)
+            {
+                loggerCfg.WriteTo.GrafanaLoki(
+                    Paths.TelemetryUrlLoki,
+                    [new()  { Key = "app", Value = "lanceur-bis" }, new()  { Key = "env", Value = new Conditional<string>("dev", "prod") }]
+                );
+            }
         }
 
         void ConfigureLogForRelease()
         {
-            // Clef file, easier to import into SEQ
-            loggerCfg.WriteTo.File(
-                new CompactJsonFormatter(),
-                Paths.ClefLogFile,
-                rollingInterval: RollingInterval.Day
-            );
+            if(telemetry.IsClefEnabled)
+            {
+                // Clef file, easier to import into SEQ
+                loggerCfg.WriteTo.File(
+                    new CompactJsonFormatter(),
+                    Paths.ClefLogFile,
+                    rollingInterval: RollingInterval.Day
+                );
+            }
+            
             // Raw log file, easier to read
             loggerCfg.WriteTo.File(
                 new MessageTemplateTextFormatter("[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"),

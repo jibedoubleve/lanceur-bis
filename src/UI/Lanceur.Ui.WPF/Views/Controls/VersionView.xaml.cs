@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using Lanceur.Infra.Constants;
+using Lanceur.Core.Constants;
 using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Ui.WPF.Views.Controls;

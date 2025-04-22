@@ -3,4 +3,4 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Core.Repositories.Config;
 
-public interface IApplicationConfigurationService : IConfigurationService<IApplicationSettings> { }
+public interface IApplicationConfigurationService : IConfigurationService<ApplicationSettings> { }

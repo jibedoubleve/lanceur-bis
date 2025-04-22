@@ -7,7 +7,7 @@ public interface ISettingsFacade
     #region Properties
 
     DatabaseConfiguration Application { get; }
-    IApplicationSettings Local { get; }
+    ApplicationSettings Local { get; }
 
     #endregion
 

@@ -1,5 +1,4 @@
 ﻿using Lanceur.Core.Utils;
-using Lanceur.Infra.Constants;
 using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Ui.Core.Utils.ConnectionStrings;

@@ -1,6 +1,6 @@
-﻿using Lanceur.Core.Models.Settings;
+﻿using Lanceur.Core.Constants;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Constants;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;
@@ -13,7 +13,7 @@ public class JsonApplicationConfigurationService : IApplicationConfigurationServ
 
     private static readonly object Locker = new();
     private readonly string _filePath;
-    private IApplicationSettings _current;
+    private ApplicationSettings _current;
 
     #endregion Fields
 
@@ -29,7 +29,7 @@ public class JsonApplicationConfigurationService : IApplicationConfigurationServ
 
     #region Properties
 
-    public IApplicationSettings Current
+    public ApplicationSettings Current
     {
         get
         {
