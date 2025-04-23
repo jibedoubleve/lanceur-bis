@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.BusinessLogic;
+using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
@@ -19,6 +20,7 @@ public class ExecutionService : IExecutionService
     #region Fields
 
     private readonly IAliasRepository _aliasRepository;
+    private readonly ILuaManager _luaManager;
     private readonly ILogger<ExecutionService> _logger;
     private readonly IWildcardService _wildcardService;
 
@@ -29,12 +31,14 @@ public class ExecutionService : IExecutionService
     public ExecutionService(
         ILoggerFactory logFactory,
         IWildcardService wildcardService,
-        IAliasRepository aliasRepository
+        IAliasRepository aliasRepository,
+        ILuaManager luaManager
     )
     {
         _logger = logFactory.GetLogger<ExecutionService>();
         _wildcardService = wildcardService;
         _aliasRepository = aliasRepository;
+        _luaManager = luaManager;
     }
 
     #endregion
@@ -64,11 +68,11 @@ public class ExecutionService : IExecutionService
         return await ExecuteAsync(request);
     }
 
-    private void ExecuteLuaScript(ref AliasQueryResult query)
+    private ScriptResult ExecuteLuaScript(ref AliasQueryResult query)
     {
         using var _ = _logger.BeginSingleScope("Query", query);
 
-        var result = LuaManager.ExecuteScript(new()
+        var result = _luaManager.ExecuteScript(new()
         {
             Code = query.LuaScript ?? string.Empty, Context = new()
             {
@@ -82,6 +86,7 @@ public class ExecutionService : IExecutionService
         query.FileName = result.Context.FileName;
 
         _logger.LogInformation("Lua script executed on {AlisName}", query.Name);
+        return result;
     }
 
     private IEnumerable<QueryResult> ExecuteProcess(AliasQueryResult query)
@@ -91,7 +96,12 @@ public class ExecutionService : IExecutionService
         using var _ = _logger.WarnIfSlow(this);
 
         query.Parameters = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
-        ExecuteLuaScript(ref query);
+        var result = ExecuteLuaScript(ref query);
+        if (result.IsCancelled)
+        {
+            _logger.LogInformation("The Lua script has been cancelled. No execution of the alias will be done.");
+            return [];
+        }
 
         _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
         var psi = new ProcessStartInfo

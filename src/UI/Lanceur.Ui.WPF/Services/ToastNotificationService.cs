@@ -49,26 +49,6 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             .Show();
     }
 
-    /// <inheritdoc />
-    public void NotifyNewVersionAvailable(Version version)
-    {
-        var msg = $"A new version {version} is now available!";
-        var icon = GetIconUri(Level.Information);
-        var btnCheckWebsite = new ToastButton().SetContent("Check the website")
-                                               .AddArgument("Type", ToastNotificationArguments.VisitWebsite);
-        var btnSkipVersion = new ToastButton().SetContent("Skip this version")
-                                              .AddArgument("Type", ToastNotificationArguments.SkipVersion)
-                                              .AddArgument("Version", version.ToString());
-
-        new ToastContentBuilder()
-            .AddText("New version available")
-            .AddText(msg)
-            .AddButton(btnCheckWebsite)
-            .AddButton(btnSkipVersion)
-            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
-            .Show();
-    }
-
 
     /// <inheritdoc />
     public void Error(string message, Exception ex)
@@ -92,6 +72,18 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     }
 
     /// <inheritdoc />
+    public void Error(string message)
+    {
+        var icon = GetIconUri(Level.Error);
+
+        new ToastContentBuilder()
+            .AddText("Error")
+            .AddText(message)
+            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .Show();
+    }
+
+    /// <inheritdoc />
     public void Information(string message) => Show(Level.Information, message);
 
     public void InformationWithNavigation(string message, string url)
@@ -106,6 +98,26 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             .AddText(message)
             .AddArgument("Url", url)
             .AddButton(btnNavigate)
+            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .Show();
+    }
+
+    /// <inheritdoc />
+    public void NotifyNewVersionAvailable(Version version)
+    {
+        var msg = $"A new version {version} is now available!";
+        var icon = GetIconUri(Level.Information);
+        var btnCheckWebsite = new ToastButton().SetContent("Check the website")
+                                               .AddArgument("Type", ToastNotificationArguments.VisitWebsite);
+        var btnSkipVersion = new ToastButton().SetContent("Skip this version")
+                                              .AddArgument("Type", ToastNotificationArguments.SkipVersion)
+                                              .AddArgument("Version", version.ToString());
+
+        new ToastContentBuilder()
+            .AddText("New version available")
+            .AddText(msg)
+            .AddButton(btnCheckWebsite)
+            .AddButton(btnSkipVersion)
             .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
             .Show();
     }

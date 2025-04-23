@@ -2,7 +2,7 @@ namespace Lanceur.Tests.Tools.ViewModels;
 
 /// <summary>
 ///     Represents a dynamic alias used in SQL queries to retrieve a single field.
-///     The SQL query determines which field is mapped to the <see cref="Field" /> property.
+///     The SQL query determines which field is mapped to the <see cref="FieldValue" /> property.
 /// </summary>
 /// <typeparam name="T">The type of the dynamically mapped field.</typeparam>
 public record DynamicAlias<T>
@@ -13,7 +13,7 @@ public record DynamicAlias<T>
     ///     A generic field that stores a dynamically mapped value from the SQL query.
     ///     The SQL query defines which field is assigned to this property.
     /// </summary>
-    public required T Field { get; init; }
+    public required T FieldValue { get; init; }
 
     /// <summary>
     ///     The unique identifier of the alias.

@@ -17,6 +17,12 @@ public interface IUserGlobalNotificationService
     public void Error(string message, Exception ex);
 
     /// <summary>
+    ///     Displays a notification to inform the user of an error and provides additional details about the exception.
+    /// </summary>
+    /// <param name="message">The error message to be displayed in the notification.</param>
+    public void Error(string message);
+
+    /// <summary>
     ///     Displays a notification to inform the user with general information.
     /// </summary>
     /// <param name="message">The informational message to be displayed in the notification.</param>

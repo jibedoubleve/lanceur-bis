@@ -18,7 +18,7 @@ public partial class MainViewModel : ObservableObject
     #region Fields
 
     private readonly IExecutionService _executionService;
-    private readonly IInteractionHub _interactionHub;
+    private readonly IInteractionHubService _interactionHubService;
     private readonly ILogger<MainViewModel> _logger;
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
@@ -39,7 +39,7 @@ public partial class MainViewModel : ObservableObject
         ISearchService searchService,
         ISettingsFacade settingsFacade,
         IExecutionService executionService,
-        IInteractionHub interactionHub,
+        IInteractionHubService interactionHubService,
         IWatchdogBuilder watchdogBuilder
     )
     {
@@ -48,12 +48,12 @@ public partial class MainViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(settingsFacade);
         ArgumentNullException.ThrowIfNull(executionService);
         ArgumentNullException.ThrowIfNull(watchdogBuilder);
-        ArgumentNullException.ThrowIfNull(interactionHub);
+        ArgumentNullException.ThrowIfNull(interactionHubService);
 
         _logger = logger;
         _searchService = searchService;
         _executionService = executionService;
-        _interactionHub = interactionHub;
+        _interactionHubService = interactionHubService;
 
         //Settings
         _settingsFacade = settingsFacade;
@@ -108,7 +108,7 @@ public partial class MainViewModel : ObservableObject
             if (SelectedResult is null) return;
             if (SelectedResult.IsExecutionConfirmationRequired)
             {
-                var result = await _interactionHub.Interactions.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
+                var result = await _interactionHubService.Interactions.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
                 if (!result) return;
             }
 
@@ -123,7 +123,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occured while performing alias execution");
-            _interactionHub.GlobalNotifications.Error(
+            _interactionHubService.GlobalNotifications.Error(
                 $"An error occured while performing alias execution.{Environment.NewLine}Alias name '{SelectedResult?.Name ?? "<NULL>"}'",
                 ex
             );
@@ -181,7 +181,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occured while performing search");
-            _interactionHub.GlobalNotifications.Error("An error occured while performing search.", ex);
+            _interactionHubService.GlobalNotifications.Error("An error occured while performing search.", ex);
         }
     }
 
@@ -213,7 +213,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occured while performing search.");
-            _interactionHub.GlobalNotifications.Error("An error occured while performing search.", ex);
+            _interactionHubService.GlobalNotifications.Error("An error occured while performing search.", ex);
         }
     }
 

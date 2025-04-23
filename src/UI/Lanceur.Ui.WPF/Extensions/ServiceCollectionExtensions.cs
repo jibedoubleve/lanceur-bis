@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IUserNotificationService, UserNotificationService>()
                          .AddSingleton<IViewFactory, ViewFactory>()
                          .AddSingleton<IHotKeyService, HotKeyService>()
-                         .AddSingleton<IInteractionHub, InteractionHub>()
+                         .AddSingleton<IInteractionHubService, InteractionHubService>()
                          .AddSingleton<IReleaseService, ReleaseService>()
                          .AddSingleton(new AssemblySource
                          {

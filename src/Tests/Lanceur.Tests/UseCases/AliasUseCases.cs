@@ -57,7 +57,7 @@ public class AliasUseCases : TestBase
                                       .AddMockSingleton<IDatabaseConfigurationService>()
                                       .AddMockSingleton<IThumbnailService>()
                                       .AddMockSingleton<IUserNotificationService>()
-                                      .AddMockSingleton<IInteractionHub>()
+                                      .AddMockSingleton<IInteractionHubService>()
                                       .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                                       .AddMockSingleton<IExecutionService>(
                                           (_, i) =>
