@@ -30,7 +30,7 @@ public interface IUserInteractionService
     /// A task representing the asynchronous operation. The task result will be 
     /// a boolean value: <c>true</c> if the user selects "Yes", or <c>false</c> if the user selects "No".
     /// </returns>
-    Task<bool> AskUserYesNoAsync(object content, string yesText = "yes", string noText = "no", string title = "Question");
+    Task<bool> AskUserYesNoAsync(object content, string yesText = "Yes", string noText = "No", string title = "Question");
 
     /// <summary>
     /// Displays an interactive message box to the user, prompting for input.

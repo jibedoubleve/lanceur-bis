@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging.Messages;
 using Lanceur.Core.Models;
+using Lanceur.Ui.Core.Constants;
 
 namespace Lanceur.Ui.Core.Messages;
 
@@ -12,7 +13,7 @@ public class ChangeCoordinateMessage(Coordinate value) : ValueChangedMessage<Coo
 /*
  * MESSAGE BOX MESSAGES
  */
-public class QuestionRequestMessage(object content, string title = "Question", string yesTextMessage = "Yes", string noTextMessage = "No") : AsyncRequestMessage<bool>
+public class QuestionRequestMessage(object content, string title = "Question", string yesTextMessage = ButtonLabels.Yes, string noTextMessage = ButtonLabels.No) : AsyncRequestMessage<bool>
 {
     public string YesText { get; } = yesTextMessage;
     public string NoText { get; } = noTextMessage;

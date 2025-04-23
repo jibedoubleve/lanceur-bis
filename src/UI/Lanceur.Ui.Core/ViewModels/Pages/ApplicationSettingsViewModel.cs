@@ -12,6 +12,7 @@ using Lanceur.Infra.Stores.Everything;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
@@ -215,8 +216,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         var savedAliasOverride = storeShortcut.AliasOverride;
         var result = await _hub.Interactions.AskUserYesNoAsync(
             view,
-            "Apply",
-            "Cancel",
+            ButtonLabels.Apply,
+            ButtonLabels.Cancel,
             $"Edit shortcut for store '{storeName}'"
         );
 

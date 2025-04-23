@@ -1,6 +1,7 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Services;
+using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Messages;
 using ScottPlot.Interactivity;
 using MessageBox = Wpf.Ui.Controls.MessageBox;
@@ -13,7 +14,7 @@ public class UserInteractionService : IUserInteractionService
     #region Methods
 
     ///<inheritdoc />
-    public async Task<bool> AskAsync(string message, string title, string yes = "Yes", string no = "No")
+    public async Task<bool> AskAsync(string message, string title = "Question", string yes = ButtonLabels.Yes, string no = ButtonLabels.No)
     {
         var messageBox = new MessageBox { Title = title, Content = message, PrimaryButtonText = yes, CloseButtonText = no };
         var result = await messageBox.ShowDialogAsync();
@@ -21,20 +22,20 @@ public class UserInteractionService : IUserInteractionService
     }
 
     ///<inheritdoc />
-    public async Task<bool> AskUserYesNoAsync(object content, string yesTextMessage = "yes", string noTextMessage = "no", string title = "Question")
+    public async Task<bool> AskUserYesNoAsync(object content, string yesText = "Yes", string noText = "No", string title = "Question")
     {
         return await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
             new(
                 content,
                 title,
-                yesTextMessage,
-                noTextMessage
+                yesText,
+                noText
             )
         );
     }
 
     ///<inheritdoc />
-    public async Task<(bool IsConfirmed, object DataContext)> InteractAsync(object content, string yesText = "Apply", string noText = "Cancel", string title = "Interaction",  object? dataContext = null)
+    public async Task<(bool IsConfirmed, object DataContext)> InteractAsync(object content, string yesText = ButtonLabels.Apply, string noText = ButtonLabels.Cancel, string title = "Interaction",  object? dataContext = null)
     {
         if (content is FrameworkElement d)
         {
@@ -49,7 +50,7 @@ public class UserInteractionService : IUserInteractionService
     }
 
     ///<inheritdoc />
-    public async Task ShowAsync(string title, object content, string ok = "Close", string? cancel = null)
+    public async Task ShowAsync(string title, object content, string ok = ButtonLabels.Close, string? cancel = null)
     {
         MessageBox messageBox = cancel is null
             ? new() { Title = title, Content = content }
