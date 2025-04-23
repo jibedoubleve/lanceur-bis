@@ -7,6 +7,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
@@ -102,7 +103,7 @@ public partial class KeywordsViewModel : ObservableObject
         var result =  await _userInteraction.InteractAsync(
             _viewFactory.CreateView(viewModel),
             "Select",
-            "Cancel",
+            ButtonLabels.Cancel,
             "Select UWP application"
         );
         
@@ -117,8 +118,8 @@ public partial class KeywordsViewModel : ObservableObject
 
         var result = await _userInteraction.InteractAsync(
             view,
-            "Apply",
-            "Cancel",
+            ButtonLabels.Apply,
+            ButtonLabels.Cancel,
             "Add multiple parameters"
         );
         if (!result.IsConfirmed) return;
@@ -153,8 +154,8 @@ public partial class KeywordsViewModel : ObservableObject
 
         var result = await _userInteraction.InteractAsync(
             view,
-            "Apply",
-            "Cancel",
+            ButtonLabels.Apply,
+            ButtonLabels.Cancel,
             "Add parameter"
         );
         if (!result.IsConfirmed) return;
@@ -226,8 +227,8 @@ public partial class KeywordsViewModel : ObservableObject
 
         var result = await _userInteraction.AskUserYesNoAsync(
             view,
-            "Apply",
-            "Cancel",
+            ButtonLabels.Apply,
+            ButtonLabels.Cancel,
             "Edit parameter"
         );
         if (!result) return;

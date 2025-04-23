@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models;
@@ -7,6 +8,7 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Logging;
+using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Microsoft.Extensions.Logging;
@@ -94,8 +96,8 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         var answer = await _userInteraction.AskUserYesNoAsync(
             _viewFactory.CreateView(vm),
-            "Ok",
-            "Cancel",
+            ButtonLabels.Ok,
+            ButtonLabels.Cancel,
             "Threshold"
         );
         return answer
@@ -189,7 +191,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         var response = await _userInteraction.InteractAsync(
             content,
             "Update changes",
-            "Cancel",
+            ButtonLabels.Cancel,
             "Merge aliases",
             dataContext
         );
