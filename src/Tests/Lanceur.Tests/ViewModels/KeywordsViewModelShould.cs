@@ -19,6 +19,7 @@ using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Lanceur.Ui.Core.ViewModels.Pages;
+using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -44,28 +45,25 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AddMockSingleton<IDatabaseConfigurationService>()
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()
-                         .AddMockSingleton<IViewFactory>(
-                             (sp, i) => visitors?.VisitViewFactory?.Invoke(sp, i) ?? i
-                         )
+                         .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IPackagedAppSearchService>()
                          .AddMockSingleton<IThumbnailService>()
-                         .AddMockSingleton<IUserInteractionService>(
-                             (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
+                         .AddMockSingleton<IViewFactory>((sp, i) => visitors?.VisitViewFactory?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IUserNotificationService>(
-                             (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
+                         .AddMockSingleton<IUserInteractionService>((sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IInteractionHub>()
-                         .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
-                         .AddSingleton<IMemoryCache, MemoryCache>()
-                         .AddMockSingleton<IExecutionService>(
-                             (sp, i) =>
+                         .AddMockSingleton<IUserNotificationService>((sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
+                         )
+                         .AddMockSingleton<IExecutionService>((sp, i) =>
                              {
                                  i.ExecuteAsync(Arg.Any<ExecutionRequest>())
                                   .Returns(ExecutionResponse.NoResult);
                                  return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
                              }
-                         );
+                         )
+                         .AddSingleton<IInteractionHubService, InteractionHubService>()
+                         .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
+                         .AddSingleton<IMemoryCache, MemoryCache>();
         return serviceCollection;
     }
 
@@ -121,7 +119,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                                    select 
                                        a.id         as Id,
                                        an.name      as Name,
-                                       a.lua_script as Field
+                                       a.lua_script as FieldValue
                                    from 
                                        alias a
                                        inner join alias_name an on a.id = an.id_alias
@@ -130,8 +128,8 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                             .ToArray();
 
                 res.Length.Should().Be(1);
-                var alias = res.First();
-                alias.Field.Should().Be(script);
+                var alias = res[0];
+                alias.FieldValue.Should().Be(script);
             },
             SqlBuilder.Empty
         );
@@ -201,12 +199,12 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 // ASSERT
                 const string sql = """
                                    select 
-                                       a.Id as Id,
-                                   	    an.name as Name,
+                                       a.Id          as Id,
+                                   	    an.name      as Name,
                                    	    case
                                    		    when a.deleted_at is null then false
                                    		    else true
-                                   	    end as Field
+                                   	    end as FieldValue
                                    from alias a 
                                    inner join alias_name an on a.id = an.id_alias 
                                    """;
@@ -217,10 +215,10 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 {
                     result.Length.Should().BeGreaterThan(0);
 
-                    var alias = result.First();
+                    var alias = result[0];
                     alias.Id.Should().BeGreaterThan(0);
                     alias.Name.Should().Be(name);
-                    alias.Field.Should().BeTrue();
+                    alias.FieldValue.Should().BeTrue("the field 'deleted_at' has to indicate deletion");
                 }
             },
             SqlBuilder.Empty,
@@ -362,12 +360,11 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                                    	    case
                                    		    when a.deleted_at is null then false
                                    		    else true
-                                   	    end as Field
+                                   	    end as FieldValue
                                    from alias a 
-                                   inner join alias_name an on a.id = an.id_alias 
-                                   --where an.Name = @name;
+                                   inner join alias_name an on a.id = an.id_alias;
                                    """;
-                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[]) [name] }));
+                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql));
                 result = result.ToArray();
 
                 using (new AssertionScope())
@@ -375,11 +372,11 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                     // This is the warning saying the alias name is already used for a deleted alias
                     userNotificationService.Received().Warning(Arg.Any<string>(), Arg.Any<string>());
 
-                    result.Should().HaveCountGreaterThan(0);
+                    result.Should().HaveCount(1);
                     var alias = result.First();
                     alias.Id.Should().BeGreaterThan(0);
                     alias.Name.Should().Be(name);
-                    alias.Field.Should().BeTrue();
+                    alias.FieldValue.Should().BeTrue("because the alias has been deleted logically");
                 }
             },
             SqlBuilder.Empty,
@@ -483,7 +480,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                                    select 
                                        a.id         as Id,
                                        an.name      as Name,
-                                       a.lua_script as Field
+                                       a.lua_script as FieldValue
                                    from 
                                        alias a
                                        inner join alias_name an on a.id = an.id_alias
@@ -492,8 +489,8 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                             .ToArray();
 
                 res.Length.Should().Be(1);
-                var alias = res.First();
-                alias.Field.Should().Be(script2);
+                var alias = res[0];
+                alias.FieldValue.Should().Be(script2);
             },
             SqlBuilder.Empty
         );

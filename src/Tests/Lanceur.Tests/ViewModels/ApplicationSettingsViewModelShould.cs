@@ -48,7 +48,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                          .AddMockSingleton<IUserNotificationService>(
                              (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
-                         .AddSingleton<IInteractionHub, InteractionHub>()
+                         .AddSingleton<IInteractionHubService, InteractionHubService>()
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose));
         return serviceCollection;
     }

@@ -6,7 +6,14 @@ public class ScriptContext
 
     public static ScriptContext Empty => new();
     public string FileName { get; init; } = string.Empty;
+
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the script has been cancelled.
+    /// </summary>
+    public bool IsCancelled { get; set; }
+
     public string Parameters { get; init; } = string.Empty;
 
-    #endregion Properties
+    #endregion
 }

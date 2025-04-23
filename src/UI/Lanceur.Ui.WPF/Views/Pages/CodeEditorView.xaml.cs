@@ -22,15 +22,17 @@ public partial class CodeEditorView
 
     private readonly ILogger<CodeEditorView> _logger;
     private readonly IUserNotificationService _userNotificationService;
+    private readonly ILuaManager _luaManager;
 
     #endregion
 
     #region Constructors
 
-    public CodeEditorView(CodeEditorViewModel viewModel, ILogger<CodeEditorView> logger, IUserNotificationService userNotificationService)
+    public CodeEditorView(CodeEditorViewModel viewModel, ILogger<CodeEditorView> logger, IUserNotificationService userNotificationService, ILuaManager luaManager)
     {
         _logger = logger;
         _userNotificationService = userNotificationService;
+        _luaManager = luaManager;
         DataContext = ViewModel = viewModel;
         InitializeComponent();
     }
@@ -51,7 +53,7 @@ public partial class CodeEditorView
         GoBack();
     }
 
-    private void GoBack() => WeakReferenceMessenger.Default.Send(new NavigationMessage((ViewType: typeof(KeywordsView), DataContext: null)!));
+    private void GoBack() => WeakReferenceMessenger.Default.Send(new NavigationMessage((ViewType: typeof(KeywordsView), DataContext: ViewModel.PreviousViewModel)!));
 
     private void OnClickApply(object sender, RoutedEventArgs e) => ApplyScript();
 
@@ -98,7 +100,7 @@ public partial class CodeEditorView
         var inputParameters = TbParameters.Text.IsNullOrWhiteSpace() ? ViewModel.Alias.Parameters : TbParameters.Text;
         var inputFileName = TbFileName.Text.IsNullOrWhiteSpace() ? ViewModel.Alias.FileName : TbFileName.Text;
         var script = new Script { Code = LuaEditor.Text, Context = new() { Parameters = inputParameters, FileName = inputFileName } };
-        var result = LuaManager.ExecuteScript(script);
+        var result = _luaManager.ExecuteScript(script);
 
         if (result.Exception is not null)
         {
@@ -132,7 +134,7 @@ public partial class CodeEditorView
     {
         const string res = "Lanceur.Ui.WPF.SyntaxColouration.LUA-Mode.xml";
 
-        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res) ?? throw new NullReferenceException($"Cannot find resource '{res}'");
+        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res) ?? throw new NotSupportedException($"Cannot find resource '{res}'");
         using var reader = new XmlTextReader(stream);
         LuaEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
     }

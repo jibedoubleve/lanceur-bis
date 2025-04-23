@@ -6,14 +6,19 @@ public class ScriptResult : Script
 
     public Exception Exception { get; init; }
 
-    #endregion Properties
+    /// <summary>
+    ///     Gets a value indicating whether the script has been cancelled.
+    /// </summary>
+    public bool IsCancelled => Context.IsCancelled;
+
+    #endregion
 
     #region Methods
 
     public override string ToString() => $"""
-                                         File Name  : {Context.FileName}
-                                         Parameters : {Context.Parameters}
-                                         """;
+                                          File Name  : {Context.FileName}
+                                          Parameters : {Context.Parameters}
+                                          """;
 
-    #endregion Methods
+    #endregion
 }

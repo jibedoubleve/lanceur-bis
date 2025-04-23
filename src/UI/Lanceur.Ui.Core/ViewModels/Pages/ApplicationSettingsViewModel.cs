@@ -33,7 +33,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
     [ObservableProperty] private ObservableCollection<FeatureFlag> _featureFlags = [];
-    private readonly IInteractionHub _hub;
+    private readonly IInteractionHubService _hubService;
     [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     [ObservableProperty] private bool _isAdminModeEnabled;
     [ObservableProperty] private bool _isAlt;
@@ -62,7 +62,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     #region Constructors
 
     public ApplicationSettingsViewModel(
-        IInteractionHub interactionHub,
+        IInteractionHubService interactionHubService,
         ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
         ISettingsFacade settings,
@@ -71,7 +71,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IEnigma enigma
     )
     {
-        ArgumentNullException.ThrowIfNull(interactionHub);
+        ArgumentNullException.ThrowIfNull(interactionHubService);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appRestartService);
         ArgumentNullException.ThrowIfNull(settings);
@@ -79,7 +79,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(viewFactory);
 
 
-        _hub = interactionHub;
+        _hubService = interactionHubService;
         _logger = logger;
         _settings = settings;
         _loggingLevelSwitch = loggingLevelSwitch;
@@ -214,7 +214,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
                                      .Replace("Store", "");
 
         var savedAliasOverride = storeShortcut.AliasOverride;
-        var result = await _hub.Interactions.AskUserYesNoAsync(
+        var result = await _hubService.Interactions.AskUserYesNoAsync(
             view,
             ButtonLabels.Apply,
             ButtonLabels.Cancel,
@@ -255,7 +255,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;
         Settings.Save();
 
-        if (reboot.Any(r => r)) _hub.GlobalNotifications.AskRestart();
+        if (reboot.Any(r => r)) _hubService.GlobalNotifications.AskRestart();
     }
 
     #endregion

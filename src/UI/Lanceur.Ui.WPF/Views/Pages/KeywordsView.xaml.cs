@@ -43,6 +43,7 @@ public partial class KeywordsView
         if (ViewModel.SelectedAlias is null) return;
 
         var viewModel = (CodeEditorViewModel)_codeEditorView.DataContext;
+        viewModel.PreviousViewModel = (KeywordsViewModel)DataContext;
         viewModel.Alias = ViewModel.SelectedAlias!;
         var content = (ViewType: typeof(CodeEditorView), DataContext: viewModel);
         WeakReferenceMessenger.Default.Send<NavigationMessage>(new(content));

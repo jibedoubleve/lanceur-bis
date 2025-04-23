@@ -12,7 +12,6 @@ using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Microsoft.Extensions.Logging;
-using IUserNotificationService = Lanceur.Core.Services.IUserNotificationService;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
@@ -23,13 +22,12 @@ public partial class KeywordsViewModel : ObservableObject
 
     [ObservableProperty] private ObservableCollection<AliasQueryResult> _aliases = new();
     private readonly IAliasManagementService _aliasManagementService;
-    private IList<AliasQueryResult> _cachedAliases = [];
+    private List<AliasQueryResult> _cachedAliases = [];
+    private readonly IInteractionHubService _hubService;
     private readonly ILogger<KeywordsViewModel> _logger;
     private readonly IPackagedAppSearchService _packagedAppSearchService;
     private AliasQueryResult? _selectedAlias;
     private readonly IThumbnailService _thumbnailService;
-    private readonly IUserInteractionService _userInteraction;
-    private readonly IUserNotificationService _userNotificationService;
     [ObservableProperty] private ObservableCollection<PackagedApp> _uwpApps = new();
     private readonly IAliasValidationService _validationService;
     private readonly IViewFactory _viewFactory;
@@ -42,32 +40,29 @@ public partial class KeywordsViewModel : ObservableObject
         IAliasManagementService aliasManagementService,
         IThumbnailService thumbnailService,
         ILogger<KeywordsViewModel> logger,
-        IUserNotificationService userNotificationService,
+        IInteractionHubService hubService,
         IAliasValidationService validationService,
-        IUserInteractionService userInteraction,
         IViewFactory viewFactory,
         IPackagedAppSearchService packagedAppSearchService
     )
     {
         ArgumentNullException.ThrowIfNull(aliasManagementService);
-        ArgumentNullException.ThrowIfNull(userNotificationService);
         ArgumentNullException.ThrowIfNull(thumbnailService);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(validationService);
-        ArgumentNullException.ThrowIfNull(userInteraction);
         ArgumentNullException.ThrowIfNull(viewFactory);
         ArgumentNullException.ThrowIfNull(packagedAppSearchService);
+        ArgumentNullException.ThrowIfNull(hubService);
 
         WeakReferenceMessenger.Default.Register<AddAliasMessage>(this, (r, m) => ((KeywordsViewModel)r).OnCreateAlias(m));
 
-        _userNotificationService = userNotificationService;
         _validationService = validationService;
-        _userInteraction = userInteraction;
         _viewFactory = viewFactory;
         _packagedAppSearchService = packagedAppSearchService;
         _aliasManagementService = aliasManagementService;
         _thumbnailService = thumbnailService;
         _logger = logger;
+        _hubService = hubService;
     }
 
     #endregion
@@ -92,31 +87,11 @@ public partial class KeywordsViewModel : ObservableObject
     private bool CanExecuteCurrentAlias() => SelectedAlias != null;
 
     [RelayCommand]
-    private async Task OnSetPackagedApplication()
-    {
-        if(SelectedAlias is null) return;
-        
-        var viewModel = new UwpSelector
-        {
-            PackagedApps = await _packagedAppSearchService.GetInstalledUwpAppsAsync()
-        };
-        var result =  await _userInteraction.InteractAsync(
-            _viewFactory.CreateView(viewModel),
-            "Select",
-            ButtonLabels.Cancel,
-            "Select UWP application"
-        );
-        
-        if(!result.IsConfirmed) return;
-
-        SelectedAlias.FileName = viewModel.SelectedPackagedApp.AppUserModelId;
-    }
-    [RelayCommand]
     private async Task OnAddMultiParameters()
     {
         var view = _viewFactory.CreateView(new MultipleAdditionalParameterViewModel());
 
-        var result = await _userInteraction.InteractAsync(
+        var result = await _hubService.Interactions.InteractAsync(
             view,
             ButtonLabels.Apply,
             ButtonLabels.Cancel,
@@ -131,7 +106,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         if (!parseResult.Success)
         {
-            _userNotificationService.Warning("The parsing operation failed because the entered text is invalid and cannot be converted into parameters.");
+            _hubService.Notifications.Warning("The parsing operation failed because the entered text is invalid and cannot be converted into parameters.");
             return;
         }
 
@@ -152,7 +127,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         var view = _viewFactory.CreateView(parameter);
 
-        var result = await _userInteraction.InteractAsync(
+        var result = await _hubService.Interactions.InteractAsync(
             view,
             ButtonLabels.Apply,
             ButtonLabels.Cancel,
@@ -162,7 +137,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         var vm = result.DataContext as AdditionalParameter;
         SelectedAlias?.AdditionalParameters.Add(vm);
-        _userNotificationService.Success($"Parameter {parameter.Name} has been added. Don't forget to save to apply changes", "Updated.");
+        _hubService.Notifications.Success($"Parameter {parameter.Name} has been added. Don't forget to save to apply changes", "Updated.");
     }
 
     [RelayCommand]
@@ -190,33 +165,31 @@ public partial class KeywordsViewModel : ObservableObject
         if (SelectedAlias.Id == 0)
         {
             Aliases.Remove(SelectedAlias);
-            _userNotificationService.Success($"Abort creation of alias {aliasName}.", "Cancel creation.");
+            _hubService.Notifications.Success($"Abort creation of alias {aliasName}.", "Cancel creation.");
             return;
         }
 
-        var response = await _userInteraction.AskUserYesNoAsync($"Do you want to delete '{SelectedAlias.Name}'?");
+        var response = await _hubService.Interactions.AskUserYesNoAsync($"Do you want to delete '{SelectedAlias.Name}'?");
         if (!response) return;
 
         _logger.LogTrace("Deleting alias {AliasName}", aliasName);
         await Task.Run(() => _aliasManagementService.Delete(SelectedAlias));
         var toDelete = Aliases.Where(x => x.Id == SelectedAlias.Id).ToArray();
         foreach (var item in toDelete) Aliases.Remove(item);
-        _userNotificationService.Success($"Alias {aliasName} deleted.", "Item deleted.");
+        _hubService.Notifications.Success($"Alias {aliasName} deleted.", "Item deleted.");
     }
 
     [RelayCommand]
     private async Task OnDeleteParameter(AdditionalParameter parameter)
     {
-        var response = await _userInteraction.AskUserYesNoAsync(
+        var response = await _hubService.Interactions.AskUserYesNoAsync(
             $"The parameter '{parameter.Name}' will disappear from the screen and be permanently deleted only after you save your changes. Do you want to continue?"
         );
 
         if (!response) return;
 
         var toRemove = SelectedAlias?.AdditionalParameters
-                                    .Where(x => x.Id == parameter.Id)
-                                    .ToArray()
-                                    .SingleOrDefault();
+                                    .SingleOrDefault(x => x.Id == parameter.Id);
         SelectedAlias?.AdditionalParameters.Remove(toRemove);
     }
 
@@ -225,7 +198,7 @@ public partial class KeywordsViewModel : ObservableObject
     {
         var view = _viewFactory.CreateView(parameter);
 
-        var result = await _userInteraction.AskUserYesNoAsync(
+        var result = await _hubService.Interactions.AskUserYesNoAsync(
             view,
             ButtonLabels.Apply,
             ButtonLabels.Cancel,
@@ -233,14 +206,14 @@ public partial class KeywordsViewModel : ObservableObject
         );
         if (!result) return;
 
-        var param = SelectedAlias?.AdditionalParameters?.Where(x => x.Id == parameter.Id).SingleOrDefault();
+        var param = SelectedAlias?.AdditionalParameters?.SingleOrDefault(x => x.Id == parameter.Id);
         if (param is null)
         {
             _logger.LogWarning("Parameter to update is not found in current alias.");
             return;
         }
 
-        _userNotificationService.Success($"Modification has been done on {parameter.Name}. Don't forget to save to apply changes", "Updated.");
+        _hubService.Notifications.Success($"Modification has been done on {parameter.Name}. Don't forget to save to apply changes", "Updated.");
     }
 
     [RelayCommand]
@@ -253,6 +226,7 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnLoadAliases()
     {
+        var previous = SelectedAlias;
         var result = await Task.Run(() => _aliasManagementService.GetAll());
         _cachedAliases = result.ToList();
 
@@ -261,7 +235,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         if (newAlias is not null) Aliases.Add(newAlias);
         Aliases.AddRange(_cachedAliases);
-        SelectedAlias = Aliases.Reselect(SelectedAlias);
+        SelectedAlias = Aliases.Hydrate(previous);
 
         _thumbnailService.UpdateThumbnails(_cachedAliases);
         _logger.LogTrace("Loaded {Count} alias(es)", _cachedAliases.Count);
@@ -282,9 +256,9 @@ public partial class KeywordsViewModel : ObservableObject
         var result = _validationService.IsValid(SelectedAlias);
         if (!result.IsSuccess)
         {
-            _userNotificationService.Warning(result.ErrorContent, "Validation failed");
+            _hubService.Notifications.Warning(result.ErrorContent, "Validation failed");
             _logger.LogInformation("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
-            _userNotificationService.Warning($"Alias validation failed:\n{result.ErrorContent}");
+            _hubService.Notifications.Warning($"Alias validation failed:\n{result.ErrorContent}");
             return;
         }
 
@@ -294,7 +268,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         var alias = SelectedAlias;
         await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));
-        _userNotificationService.Success($"Alias {alias.Name} created.", "Item created.");
+        _hubService.Notifications.Success($"Alias {alias.Name} created.", "Item created.");
         await OnLoadAliases();
     }
 
@@ -313,6 +287,24 @@ public partial class KeywordsViewModel : ObservableObject
 
         _logger.LogTrace("Found {Count} alias(es) with criterion {Criterion}", aliases.Length, criterion);
         Aliases = new(aliases);
+    }
+
+    [RelayCommand]
+    private async Task OnSetPackagedApplication()
+    {
+        if (SelectedAlias is null) return;
+
+        var viewModel = new UwpSelector { PackagedApps = await _packagedAppSearchService.GetInstalledUwpAppsAsync() };
+        var result =  await _hubService.Interactions.InteractAsync(
+            _viewFactory.CreateView(viewModel),
+            "Select",
+            ButtonLabels.Cancel,
+            "Select UWP application"
+        );
+
+        if (!result.IsConfirmed) return;
+
+        SelectedAlias.FileName = viewModel.SelectedPackagedApp.AppUserModelId;
     }
 
     #endregion

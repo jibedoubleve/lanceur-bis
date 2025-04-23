@@ -48,6 +48,7 @@
 
         <Keywords color="Class">
             <Word>context</Word>
+            <Word>notification</Word>
         </Keywords>
 
         <Keywords color="ClassMembers">
