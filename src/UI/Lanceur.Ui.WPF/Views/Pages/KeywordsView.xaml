@@ -103,7 +103,8 @@
                         <StackPanel>
                             <!--  NAME  -->
                             <Label Margin="6,0,6,3" Target="{Binding ElementName=TbAliasName}">Names</Label>
-                            <TextBox Text="{Binding SelectedAlias.Synonyms, UpdateSourceTrigger=PropertyChanged}" CharacterCasing="Lower"/>
+                            <TextBox CharacterCasing="Lower"
+                                     Text="{Binding SelectedAlias.Synonyms, UpdateSourceTrigger=PropertyChanged}" />
                             <!--  NOTES  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbNotes}">Comments</Label>
                             <ui:TextBox x:Name="TbNotes"
@@ -129,10 +130,12 @@
                             </Grid>
                         </ui:CardExpander.Header>
                         <StackPanel>
+
                             <!--  FILE NAME  -->
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
@@ -161,23 +164,60 @@
                                     Content="{Binding ElementName=TbFilename, Path=(Validation.Errors)/ErrorContent}"
                                     FontSize="10"
                                     Foreground="Red" />
-                                <controls:ProcessFinderButton
+                                <ui:Button
                                     Grid.Row="1"
                                     Grid.Column="1"
-                                    Margin="5"
+                                    Width="{StaticResource DefaultIconSize}"
+                                    Height="{StaticResource DefaultIconSize}"
+                                    Background="Transparent"
+                                    Command="{Binding SetPackagedApplicationCommand}"
+                                    Icon="{ui:SymbolIcon Symbol=BoxSearch24}"
+                                    ToolTip="Select a UWP application"
+                                    Margin="5" />
+
+                                <controls:ProcessFinderButton
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Margin="6"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
                                     VerticalContentAlignment="Center"
                                     DockPanel.Dock="Right"
-                                    ProcessName="{Binding ElementName=TbFilename, Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}" 
-                                    FileDescription="{Binding ElementName=TbNotes, Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"/>
+                                    FileDescription="{Binding ElementName=TbNotes, Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                                    ProcessName="{Binding ElementName=TbFilename, Path=Text, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}" />
+
                             </Grid>
+
+                            <!--  UWP  -->
+                            <StackPanel>
+                                <Label Margin="6,0,6,3" Target="{Binding ElementName=TbUwp}">Uwp applications</Label>
+                                <ComboBox ItemsSource="{Binding UwpApps}" SelectedItem="{Binding CurrentPackagedApp}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image
+                                                    Width="{StaticResource DefaultIconSize}"
+                                                    Height="{StaticResource DefaultIconSize}"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center"
+                                                    Source="{Binding Logo}" />
+                                                <TextBlock
+                                                    Margin="15,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding DisplayName}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
                             <!--  PARAMETERS  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbParameters}">Parameters</Label>
                             <ui:TextBox
                                 x:Name="TbParameters"
                                 PlaceholderText="Parameters for the process..."
                                 Text="{Binding SelectedAlias.Parameters, UpdateSourceTrigger=PropertyChanged}" />
+
                             <!--  WORKING DIRECTORY  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbWorkingDirectory}">Working directory</Label>
                             <ui:TextBox x:Name="TbWorkingDirectory"
@@ -288,8 +328,10 @@
                                     <DataGridTemplateColumn Width="Auto" Header="Name">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <TextBlock Text="{Binding Name}" Margin="10,0,10,0"
-                                                           VerticalAlignment="Center" />
+                                                <TextBlock
+                                                    Margin="10,0,10,0"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Name}" />
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
@@ -297,8 +339,10 @@
                                     <DataGridTemplateColumn Width="*" Header="Parameter">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <TextBlock Text="{Binding Parameter}" Margin="10,0,10,0"
-                                                           VerticalAlignment="Center" />
+                                                <TextBlock
+                                                    Margin="10,0,10,0"
+                                                    VerticalAlignment="Center"
+                                                    Text="{Binding Parameter}" />
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
@@ -306,19 +350,23 @@
                                     <DataGridTemplateColumn Width="100" Header="Actions">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                                     <Button
+                                                        Margin="5"
+                                                        HorizontalAlignment="Center"
                                                         Command="{Binding ElementName=Self, Path=DataContext.DeleteParameterCommand}"
-                                                        HorizontalAlignment="Center" ToolTip="Delete this parameter"
-                                                        Margin="5" CommandParameter="{Binding .}">
+                                                        CommandParameter="{Binding .}"
+                                                        ToolTip="Delete this parameter">
                                                         <StackPanel Orientation="Horizontal">
                                                             <ui:SymbolIcon Symbol="Delete24" />
                                                         </StackPanel>
                                                     </Button>
                                                     <Button
+                                                        Margin="5"
+                                                        HorizontalAlignment="Center"
                                                         Command="{Binding ElementName=Self, Path=DataContext.EditParameterCommand}"
-                                                        HorizontalAlignment="Center" ToolTip="Edit this parameter"
-                                                        Margin="5" CommandParameter="{Binding .}">
+                                                        CommandParameter="{Binding .}"
+                                                        ToolTip="Edit this parameter">
                                                         <StackPanel Orientation="Horizontal">
                                                             <ui:SymbolIcon Symbol="Edit24" />
                                                         </StackPanel>

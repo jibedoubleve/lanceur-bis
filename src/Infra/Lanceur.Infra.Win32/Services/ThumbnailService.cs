@@ -64,7 +64,7 @@ public class ThumbnailService : IThumbnailService
         if (File.Exists(filePath)) { alias.Thumbnail = filePath; }
         else if (alias.IsPackagedApplication())
         {
-            var response = (await _packagedAppSearchService.GetByInstalledDirectory(alias.FileName))
+            var response = (await _packagedAppSearchService.GetByInstalledDirectoryAsync(alias.FileName))
                 .FirstOrDefault();
             if (response is not null)
             {
