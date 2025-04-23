@@ -18,6 +18,7 @@ public class ViewFactory : IViewFactory
         StoreShortcut vm                        => new StoreShortcutControl(vm),
         MultipleAdditionalParameterViewModel vm => new MultipleAdditionalParameterView(vm),
         NumericSelectorViewModel vm             => new NumericSelectorControl(vm),
+        UwpSelector vm                          => new UwpSelectorList(vm),
         _                                       => throw new NotSupportedException($"No control of type {viewModel.GetType().Name} is supported.")
     };
 

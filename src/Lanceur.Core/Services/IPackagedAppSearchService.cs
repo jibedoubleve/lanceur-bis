@@ -18,7 +18,7 @@ public interface IPackagedAppSearchService
     /// A task representing the asynchronous operation. The task result contains 
     /// an enumerable collection of packaged applications matching the specified criteria.
     /// </returns>
-    Task<IEnumerable<PackagedApp>> GetByInstalledDirectory(string fileName);
+    Task<IEnumerable<PackagedApp>> GetByInstalledDirectoryAsync(string fileName);
 
     /// <summary>
     /// Attempts to populate the specified <see cref="AliasQueryResult"/> with details
@@ -37,6 +37,15 @@ public interface IPackagedAppSearchService
     /// Thrown if <paramref name="queryResult"/> is null.
     /// </exception>
     Task<bool> TryResolveDetailsAsync(AliasQueryResult queryResult);
+
+    /// <summary>
+    /// Retrieves all packaged applications currently installed on the system.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains
+    /// an enumerable collection of all installed packaged applications.
+    /// </returns>
+    Task<IEnumerable<PackagedApp>> GetInstalledUwpAppsAsync();
 
     #endregion Methods
 }
