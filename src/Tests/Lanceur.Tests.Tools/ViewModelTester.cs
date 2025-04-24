@@ -29,7 +29,11 @@ public abstract class ViewModelTester<TViewModel> : TestBase
         using var connectionManager = GetConnectionManager(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
 
         var serviceCollection = new ServiceCollection().AddView<TViewModel>()
-                                                       .AddLogging(builder => builder.AddXUnit(OutputHelper))
+                                                       .AddLogging(builder =>
+                                                       {
+                                                           builder.AddXUnit(OutputHelper);
+                                                           builder.SetMinimumLevel(LogLevel.Trace);
+                                                       })
                                                        .AddDatabase(connectionManager);
 
         var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();

@@ -225,6 +225,48 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             visitors
         );
     }
+    
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    public async Task RefreshCacheWhenDeleteAliasLogically(int countToAdd)
+    {
+        var visitors = new ServiceVisitors
+        {
+            VisitUserInteractionService = (_, i) =>
+            {
+                // Configured to say yes when it'll be asked to delete the alias
+                i.AskUserYesNoAsync(Arg.Any<object>())
+                 .Returns(true);
+                return i;
+            }
+        };
+
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                // ARRANGE
+                const string name = "SomeTestName";
+                const string fileName = "SomeFileName";
+
+                // ACT
+                for (var i = 0; i < countToAdd; i++)
+                {
+                    await viewModel.CreateNewAlias(name, $"{fileName}_{i}");
+                }
+                await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null);
+                viewModel.SearchCommand.Execute(string.Empty);
+
+                // ASSERT
+                using (new AssertionScope())
+                {
+                    viewModel.Aliases.Should().HaveCount(countToAdd - 1, "because the alias has been deleted logically");
+                }
+            },
+            SqlBuilder.Empty,
+            visitors
+        );
+    }
 
     public static IEnumerable<object[]> FeedNotCrashWhenCreatingMultipleParametersWithEmptyTrailingLine()
     {
