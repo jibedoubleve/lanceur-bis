@@ -31,7 +31,7 @@ public partial class KeywordsViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<PackagedApp> _uwpApps = new();
     private readonly IAliasValidationService _validationService;
     private readonly IViewFactory _viewFactory;
-
+    [ObservableProperty] private string _criterion = string.Empty;
     #endregion
 
     #region Constructors
@@ -173,9 +173,18 @@ public partial class KeywordsViewModel : ObservableObject
         if (!response) return;
 
         _logger.LogTrace("Deleting alias {AliasName}", aliasName);
+        
+        // Delete from DB
         await Task.Run(() => _aliasManagementService.Delete(SelectedAlias));
+        
+        // Delete from UI
         var toDelete = Aliases.Where(x => x.Id == SelectedAlias.Id).ToArray();
-        foreach (var item in toDelete) Aliases.Remove(item);
+        
+        Criterion = string.Empty;
+        foreach (var item in toDelete) { _cachedAliases.Remove(item); }
+        Aliases = new(_cachedAliases);
+        SelectedAlias = Aliases.FirstOrDefault();
+        
         _hubService.Notifications.Success($"Alias {aliasName} deleted.", "Item deleted.");
     }
 
