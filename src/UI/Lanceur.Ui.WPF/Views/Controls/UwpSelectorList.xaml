@@ -15,7 +15,8 @@
         <ComboBox
             x:Name="CbUwp"
             ItemsSource="{Binding PackagedApps}"
-            SelectedItem="{Binding SelectedPackagedApp}">
+            SelectedItem="{Binding SelectedPackagedApp}"
+            SelectedIndex="0">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
