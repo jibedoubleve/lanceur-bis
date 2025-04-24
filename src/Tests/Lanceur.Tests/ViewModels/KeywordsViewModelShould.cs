@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
@@ -40,7 +41,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
-        serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>()
+        serviceCollection.AddSingleton<IMappingService, MappingService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddMockSingleton<IDatabaseConfigurationService>()
                          .AddSingleton<IAliasManagementService, AliasManagementService>()

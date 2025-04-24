@@ -3,6 +3,7 @@ using Bogus;
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -11,7 +12,6 @@ using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.SQL;
-using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -58,7 +58,7 @@ public class SQLiteAliasRepositoryShould : TestBase
     private static AliasSearchDbAction BuildAliasSearchDbAction()
     {
         var log = Substitute.For<ILoggerFactory>();
-        return new(log, new DbActionFactory(new AutoMapperMappingService(), log));
+        return new(log, new DbActionFactory(new MappingService(), log));
     }
 
     private static SQLiteAliasRepository BuildDataService(IDbConnection connection)
@@ -70,7 +70,7 @@ public class SQLiteAliasRepositoryShould : TestBase
             scope,
             log,
             conv,
-            new DbActionFactory(new AutoMapperMappingService(), log)
+            new DbActionFactory(new MappingService(), log)
         );
         return service;
     }

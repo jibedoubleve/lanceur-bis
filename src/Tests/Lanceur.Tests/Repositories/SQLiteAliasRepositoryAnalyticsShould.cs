@@ -1,3 +1,4 @@
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -6,7 +7,6 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
-using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -39,7 +39,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
             scope,
             log,
             conv,
-            new DbActionFactory(new AutoMapperMappingService(), log)
+            new DbActionFactory(new MappingService(), log)
         );
         return service;
     }

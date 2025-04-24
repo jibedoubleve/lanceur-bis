@@ -3,6 +3,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
@@ -17,7 +18,6 @@ using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
-using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
 using Microsoft.Extensions.Caching.Memory;
@@ -45,7 +45,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                          )
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                         .AddSingleton<IMappingService, AutoMapperMappingService>()
+                         .AddSingleton<IMappingService, MappingService>()
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<IMacroService, MacroService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()

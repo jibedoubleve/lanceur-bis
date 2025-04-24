@@ -1,5 +1,6 @@
 using Dapper;
 using FluentAssertions;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
@@ -8,7 +9,6 @@ using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.SQL;
-using Lanceur.Ui.Core.Utils;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
@@ -69,12 +69,12 @@ public class ThumbnailServiceShould : TestBase
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql, connectionString));
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
-        var conversionService = new AutoMapperMappingService();
+        var conversionService = new MappingService();
         var dbRepository = new SQLiteAliasRepository(
             connectionMgr,
             loggerFactory,
             conversionService,
-            new DbActionFactory(new AutoMapperMappingService(), loggerFactory)
+            new DbActionFactory(new MappingService(), loggerFactory)
         );
 
         var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();

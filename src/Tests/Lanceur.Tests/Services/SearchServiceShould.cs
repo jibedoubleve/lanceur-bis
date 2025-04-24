@@ -5,6 +5,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
@@ -21,7 +22,6 @@ using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
-using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -89,7 +89,7 @@ public class SearchServiceShould : TestBase
     public void NOT_HaveNullParameters()
     {
         // arrange
-        var converter = new AutoMapperMappingService();
+        var converter = new MappingService();
         using var db = BuildFreshDb(SqlCreateAlias);
         using var conn = new DbSingleConnectionManager(db);
 
@@ -97,7 +97,7 @@ public class SearchServiceShould : TestBase
             conn,
             _testLoggerFactory,
             converter,
-            new DbActionFactory(new AutoMapperMappingService(), _testLoggerFactory)
+            new DbActionFactory(new MappingService(), _testLoggerFactory)
         );
 
         // act
@@ -127,7 +127,7 @@ public class SearchServiceShould : TestBase
             connectionMgr,
             logger,
             converter,
-            new DbActionFactory(new AutoMapperMappingService(), logger)
+            new DbActionFactory(new MappingService(), logger)
         );
 
         OutputHelper.Act();
@@ -162,7 +162,7 @@ public class SearchServiceShould : TestBase
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton<IMacroService, MacroService>()
                                                      .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
-                                                     .AddSingleton<IMappingService, AutoMapperMappingService>()
+                                                     .AddSingleton<IMappingService, MappingService>()
                                                      .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
                                                      .AddSingleton<IDbConnection, SQLiteConnection>()
@@ -333,7 +333,7 @@ public class SearchServiceShould : TestBase
             connectionManager,
             logger,
             converter,
-            new DbActionFactory(new AutoMapperMappingService(), logger)
+            new DbActionFactory(new MappingService(), logger)
         );
 
         OutputHelper.Act();

@@ -6,6 +6,7 @@ using Everything.Wrapper;
 using Lanceur.Core.Constants;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -116,7 +117,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddMapping(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>();
+        serviceCollection.AddSingleton<IMappingService, MappingService>();
         return serviceCollection;
     }
 
@@ -141,7 +142,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
                          .AddTransient<IConnectionString, ConnectionString>()
-                         .AddTransient<IMappingService, AutoMapperMappingService>()
+                         .AddTransient<IMappingService, MappingService>()
                          .AddTransient<ISearchService, SearchService>()
                          .AddTransient<IStoreLoader, StoreLoader>()
                          .AddTransient<IMacroService, MacroService>()

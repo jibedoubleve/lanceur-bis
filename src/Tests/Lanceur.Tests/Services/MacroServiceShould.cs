@@ -1,14 +1,12 @@
 ﻿using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Accessibility;
-using AutoMapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -18,7 +16,6 @@ using Lanceur.Infra.Utils;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Macros;
-using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -159,6 +156,29 @@ public class MacroServiceShould : TestBase
     }
 
     [Fact]
+    public void HaveDefaultDescription()
+    {
+        QueryResult[] queryResults = [new AliasQueryResult { Name = "macro_1", FileName = "@multi@" }, new AliasQueryResult { Name = "macro_2", FileName = "@multi@" }, new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }];
+
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
+                                                     .AddMockSingleton<IAliasRepository>()
+                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
+                                                     .AddSingleton<MacroService>()
+                                                     .BuildServiceProvider();
+
+        var output = serviceProvider.GetService<MacroService>()
+                                    .ExpandMacroAlias(queryResults)
+                                    .ToArray();
+
+        using (new AssertionScope())
+        {
+            output.GetDoubloons().Should().HaveCount(0);
+            foreach (var item in output) item.Description.Should().NotBeNullOrWhiteSpace("default description should be provided");
+        }
+    }
+
+    [Fact]
     public void HaveDefaultMacro()
     {
         var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! })
@@ -243,11 +263,7 @@ public class MacroServiceShould : TestBase
     [Fact]
     public void NotHaveDoubloonsWhenMacroUsedMultipleTimes()
     {
-        QueryResult[] queryResults = [
-            new AliasQueryResult { Name = "macro_1", FileName = "@multi@" }, 
-            new AliasQueryResult { Name = "macro_2", FileName = "@multi@" }, 
-            new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }
-        ];
+        QueryResult[] queryResults = [new AliasQueryResult { Name = "macro_1", FileName = "@multi@" }, new AliasQueryResult { Name = "macro_2", FileName = "@multi@" }, new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }];
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
@@ -278,35 +294,6 @@ public class MacroServiceShould : TestBase
         query.IsMacro().Should().BeTrue();
     }
 
-    [Fact]
-    public void HaveDefaultDescription()
-    {        QueryResult[] queryResults = [
-            new AliasQueryResult { Name = "macro_1", FileName = "@multi@" }, 
-            new AliasQueryResult { Name = "macro_2", FileName = "@multi@" }, 
-            new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }
-        ];
-
-        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
-                                                     .AddMockSingleton<IAliasRepository>()
-                                                     .AddMockSingleton<ILoggerFactory>()
-                                                     .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
-                                                     .AddSingleton<MacroService>()
-                                                     .BuildServiceProvider();
-
-        var output = serviceProvider.GetService<MacroService>()
-                                    .ExpandMacroAlias(queryResults)
-                                    .ToArray();
-
-        using (new AssertionScope())
-        {
-            output.GetDoubloons().Should().HaveCount(0);
-            foreach (var item in output)
-            {
-                item.Description.Should().NotBeNullOrWhiteSpace("default description should be provided");
-            }
-        }
-    }
-
     #endregion
 
     #region Classes
@@ -329,21 +316,15 @@ public class MacroServiceShould : TestBase
 
         #region Methods
 
-        private static IMappingService GetConversionService()
-        {
-            var cfg = new MapperConfiguration(c => { c.CreateMap<AliasQueryResult, CompositeAliasQueryResult>(); });
-            return new AutoMapperMappingService();
-        }
-
         public static IAliasRepository GetDataService(IDbConnection db)
         {
             var log = Substitute.For<ILoggerFactory>();
-            var conv = GetConversionService();
+            var conv = new MappingService();
             var service = new SQLiteAliasRepository(
                 new DbSingleConnectionManager(db),
                 log,
                 conv,
-                new DbActionFactory(new AutoMapperMappingService(), log)
+                new DbActionFactory(new MappingService(), log)
             );
             return service;
         }

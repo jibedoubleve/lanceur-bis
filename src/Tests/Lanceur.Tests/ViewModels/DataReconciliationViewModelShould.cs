@@ -1,6 +1,7 @@
 using Dapper;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -38,7 +39,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                              stg => visitors?.VisitSettings?.Invoke(stg)
                          )
                          .AddMockSingleton<IViewFactory>()
-                         .AddSingleton<IMappingService, AutoMapperMappingService>()
+                         .AddSingleton<IMappingService, MappingService>()
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddMockSingleton<IDatabaseConfigurationService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
