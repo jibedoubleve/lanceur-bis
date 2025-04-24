@@ -1,9 +1,9 @@
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
-using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +24,7 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
-        serviceCollection.AddSingleton<IMappingService, AutoMapperMappingService>()
+        serviceCollection.AddSingleton<IMappingService, MappingService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddSingleton<IMemoryCache, MemoryCache>();
         return serviceCollection;

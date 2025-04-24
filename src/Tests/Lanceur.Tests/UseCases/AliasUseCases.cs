@@ -3,6 +3,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
@@ -50,7 +51,7 @@ public class AliasUseCases : TestBase
                                       .AddApplicationSettings()
                                       .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                       .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                      .AddSingleton<IMappingService, AutoMapperMappingService>()
+                                      .AddSingleton<IMappingService, MappingService>()
                                       .AddSingleton<ISearchService, SearchService>()
                                       .AddSingleton<IMacroService, MacroService>()
                                       .AddSingleton<IDbActionFactory, DbActionFactory>()
