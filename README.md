@@ -1,6 +1,6 @@
 # Lanceur Bis
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jibedoubleve_lanceur-bis&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jibedoubleve_lanceur-bis) [![GitHub Repo stars](https://img.shields.io/github/stars/jibedoubleve/lanceur-bis) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-closed-raw/jibedoubleve/lanceur-bis) ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/jibedoubleve/lanceur-bis/on_push.yml) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jibedoubleve/lanceur-bis/master) ![License](https://img.shields.io/github/license/jibedoubleve/lanceur-bis)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jibedoubleve_lanceur-bis&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jibedoubleve_lanceur-bis) ![GitHub Repo stars](https://img.shields.io/github/stars/jibedoubleve/lanceur-bis) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-closed-raw/jibedoubleve/lanceur-bis) ![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/jibedoubleve/lanceur-bis/on_push.yml) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jibedoubleve/lanceur-bis/master) ![License](https://img.shields.io/github/license/jibedoubleve/lanceur-bis)
 
 
 > [!IMPORTANT]  
