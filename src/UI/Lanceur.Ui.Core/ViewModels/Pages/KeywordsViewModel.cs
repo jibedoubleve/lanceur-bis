@@ -28,7 +28,6 @@ public partial class KeywordsViewModel : ObservableObject
     private readonly IPackagedAppSearchService _packagedAppSearchService;
     private AliasQueryResult? _selectedAlias;
     private readonly IThumbnailService _thumbnailService;
-    [ObservableProperty] private ObservableCollection<PackagedApp> _uwpApps = new();
     private readonly IAliasValidationService _validationService;
     private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _criterion = string.Empty;
@@ -226,13 +225,6 @@ public partial class KeywordsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OnListUwpApplication()
-    {
-        var apps = await _packagedAppSearchService.GetInstalledUwpAppsAsync();
-        UwpApps = new(apps);
-    }
-
-    [RelayCommand]
     private async Task OnLoadAliases()
     {
         var previous = SelectedAlias;
@@ -313,7 +305,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         if (!result.IsConfirmed) return;
 
-        SelectedAlias.FileName = viewModel.SelectedPackagedApp.AppUserModelId;
+        SelectedAlias.FileName = viewModel.SelectedPackagedApp?.AppUserModelId;
     }
 
     #endregion

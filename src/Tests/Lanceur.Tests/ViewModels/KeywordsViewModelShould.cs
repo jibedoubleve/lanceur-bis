@@ -244,7 +244,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         };
 
         await TestViewModelAsync(
-            async (viewModel, db) =>
+            async (viewModel, _) =>
             {
                 // ARRANGE
                 const string name = "SomeTestName";
@@ -263,6 +263,46 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 {
                     viewModel.Aliases.Should().HaveCount(countToAdd - 1, "because the alias has been deleted logically");
                 }
+            },
+            SqlBuilder.Empty,
+            visitors
+        );
+    }
+
+    [Fact]
+    public async Task NotCreateAliasWhenNoUwpAppIsSelectedAndFileNameIsEmpty()
+    {
+        var visitors = new ServiceVisitors
+        {
+            VisitUserInteractionService = (_, i) =>
+            {
+                // Configured to say yes when it'll be asked to delete the alias
+                i.InteractAsync(
+                     Arg.Any<object>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<object>()
+                 ).Returns((IsConfirmed: true, DataContext: null));
+                return i;
+            }
+        };
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                // ARRANGE
+                const string name = "SomeTestName";
+
+                // ACT
+                viewModel.PrepareAliasForCreation(name);
+                await viewModel.SetPackagedApplicationCommand.ExecuteAsync(null);
+                viewModel.SearchCommand.Execute(string.Empty);
+
+                // ASSERT
+                const string sql = "select count(*) from alias";
+                db.WithConnection(c => c.ExecuteScalar<int>(sql))
+                  .Should()
+                  .Be(0);
             },
             SqlBuilder.Empty,
             visitors

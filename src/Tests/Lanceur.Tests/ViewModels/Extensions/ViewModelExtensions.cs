@@ -9,6 +9,12 @@ public static class ViewModelExtensions
 
     public static async Task CreateNewAlias(this KeywordsViewModel viewModel, string name, string fileName = null, string luaScript = null)
     {
+        viewModel.PrepareAliasForCreation(name, fileName, luaScript);
+        await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null); // Save the changes
+    }
+
+    public static void PrepareAliasForCreation(this KeywordsViewModel viewModel, string name, string fileName = null, string luaScript = null)
+    {
         fileName ??= $"{Guid.NewGuid()}";
 
         // --- Create a new alias
@@ -18,8 +24,6 @@ public static class ViewModelExtensions
         viewModel.SelectedAlias!.Synonyms = name;
         viewModel.SelectedAlias!.FileName = fileName;
         viewModel.SelectedAlias!.LuaScript = luaScript;
-
-        await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null); // Save the changes
     }
 
     #endregion
