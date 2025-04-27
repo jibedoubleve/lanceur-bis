@@ -189,29 +189,6 @@
 
                             </Grid>
 
-                            <!--  UWP  -->
-                            <StackPanel>
-                                <Label Margin="6,0,6,3" Target="{Binding ElementName=TbUwp}">Uwp applications</Label>
-                                <ComboBox ItemsSource="{Binding UwpApps}" SelectedItem="{Binding CurrentPackagedApp}">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image
-                                                    Width="{StaticResource DefaultIconSize}"
-                                                    Height="{StaticResource DefaultIconSize}"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Center"
-                                                    Source="{Binding Logo}" />
-                                                <TextBlock
-                                                    Margin="15,0,0,0"
-                                                    VerticalAlignment="Center"
-                                                    Text="{Binding DisplayName}" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </StackPanel>
-
                             <!--  PARAMETERS  -->
                             <Label Margin="6,20,6,3" Target="{Binding ElementName=TbParameters}">Parameters</Label>
                             <ui:TextBox
