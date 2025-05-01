@@ -36,7 +36,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
         _bookmarksPath = configuration.Database.Format(path).ExpandPath();
         CacheKey = configuration.CacheKey;
         _memoryCache = memoryCache;
-        _logger.LogInformation("Using {Browser} based browser bookmarks path is '{Path}'", "Gecko", _bookmarksPath);
+        _logger.LogTrace("Using {Browser} based browser bookmarks path is {Path}", "Gecko", _bookmarksPath);
     }
 
     #endregion
@@ -83,7 +83,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
     {
         if (File.Exists(_bookmarksPath))
         {
-            _logger.LogTrace("Determined bookmarks path for Gecko-based engine: {BookmarksPath}", _bookmarksPath);
+            _logger.LogDebug("Determined bookmarks path for Gecko-based engine: {BookmarksPath}", _bookmarksPath);
             return true;
         }
 

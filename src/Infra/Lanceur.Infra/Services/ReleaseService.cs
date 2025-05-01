@@ -41,7 +41,7 @@ public class ReleaseService : IReleaseService
 
         if (!Version.TryParse(tag, out var version))
         {
-            _logger.LogWarning("The tag of the version ('{Tag}') is not a valid version number", tag);
+            _logger.LogWarning("The tag {Tag} is not a valid version number", tag);
             return (false, new());
         }
 

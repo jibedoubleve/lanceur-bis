@@ -461,8 +461,11 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         tx =>
         {
             var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
-            _logger.LogInformation("Removing {Length} alias(es) from database", list.Length);
-            foreach (var item in list) _dbActionFactory.AliasManagement.Remove(tx, item);
+            _logger.LogInformation("Hard remove of {Count} alias(es) from database", list.Length);
+            foreach (var item in list)
+            {
+                _dbActionFactory.AliasManagement.Remove(tx, item);
+            }
         }
     );
 
@@ -474,7 +477,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         tx =>
         {
             var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
-            _logger.LogInformation("Logically removing {Length} alias(es)", list.Length);
+            _logger.LogInformation("Logical remove of {Length} alias(es)", list.Length);
             _dbActionFactory.AliasManagement.LogicalRemove(tx, list);
         }
     );
@@ -563,13 +566,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         {
             if (alias is null)
             {
-                _logger.LogInformation("Impossible to set usage: alias is null");
+                _logger.LogWarning("Impossible to set usage: alias is null");
                 return;
             }
 
             if (alias.Name.IsNullOrEmpty())
             {
-                _logger.LogInformation("Impossible to set usage: alias name is empty. Alias: {@Alias}", alias);
+                _logger.LogWarning("Impossible to set usage: alias name is empty. Alias: {@Alias}", alias);
                 return;
             }
 

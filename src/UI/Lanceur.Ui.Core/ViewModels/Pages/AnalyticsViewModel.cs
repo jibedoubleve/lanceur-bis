@@ -138,7 +138,7 @@ public partial class AnalyticsViewModel : ObservableObject
     [RelayCommand]
     private void OnSelectYear(string year)
     {
-        _logger.LogTrace("Display history for year {Year}", year);
+        _logger.LogDebug("Display history for year {Year}", year);
 
         if (LastPlotContext?.IsTrendPlot() ?? false)
         {

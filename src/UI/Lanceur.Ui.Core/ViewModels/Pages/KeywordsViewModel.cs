@@ -152,7 +152,7 @@ public partial class KeywordsViewModel : ObservableObject
             ? AliasQueryResult.EmptyForCreation
             : new() { Name = names, Synonyms = names };
 
-        _logger.LogTrace("Creating new alias with name '{Name}'", names);
+        _logger.LogInformation("Creating new alias with name {Name}", names);
         Aliases.Insert(0, newAlias);
         SelectedAlias = Aliases[0];
     }
@@ -168,10 +168,10 @@ public partial class KeywordsViewModel : ObservableObject
             return;
         }
 
-        var response = await _hubService.Interactions.AskUserYesNoAsync($"Do you want to delete '{SelectedAlias.Name}'?");
+        var response = await _hubService.Interactions.AskUserYesNoAsync($"Do you want to delete {SelectedAlias.Name}?");
         if (!response) return;
 
-        _logger.LogTrace("Deleting alias {AliasName}", aliasName);
+        _logger.LogInformation("Deleting alias {AliasName}", aliasName);
         
         // Delete from DB
         await Task.Run(() => _aliasManagementService.Delete(SelectedAlias));
@@ -239,7 +239,7 @@ public partial class KeywordsViewModel : ObservableObject
         SelectedAlias = Aliases.Hydrate(previous);
 
         _thumbnailService.UpdateThumbnails(_cachedAliases);
-        _logger.LogTrace("Loaded {Count} alias(es)", _cachedAliases.Count);
+        _logger.LogDebug("Loaded {Count} alias(es)", _cachedAliases.Count);
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
@@ -248,7 +248,7 @@ public partial class KeywordsViewModel : ObservableObject
         if ((SelectedAlias?.Id ?? 0) == 0) return;
 
         SelectedAlias = await Task.Run(() => _aliasManagementService.Hydrate(SelectedAlias));
-        _logger.LogTrace("Loading alias {AliasName}", SelectedAlias.Name);
+        _logger.LogInformation("Loading alias {AliasName}", SelectedAlias.Name);
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
@@ -258,12 +258,12 @@ public partial class KeywordsViewModel : ObservableObject
         if (!result.IsSuccess)
         {
             _hubService.Notifications.Warning(result.ErrorContent, "Validation failed");
-            _logger.LogInformation("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
+            _logger.LogDebug("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
             _hubService.Notifications.Warning($"Alias validation failed:\n{result.ErrorContent}");
             return;
         }
 
-        _logger.LogTrace("Saving alias {AliasName}", SelectedAlias!.Name);
+        _logger.LogDebug("Saving alias {AliasName}", SelectedAlias!.Name);
 
         await _packagedAppSearchService.TryResolveDetailsAsync(SelectedAlias);
 

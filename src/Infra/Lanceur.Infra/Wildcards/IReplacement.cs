@@ -15,12 +15,12 @@ public interface IReplacement
 
     /// <summary>
     /// Replace off the occurence of <see cref="Wildcard"/> with
-    /// <paramref name="replacement"/> in the specified <paramref name="text"/>
+    /// <paramref name="replacement"/> in the specified <paramref name="newText"/>
     /// </summary>
-    /// <param name="text"></param>
+    /// <param name="newText"></param>
     /// <param name="replacement"></param>
     /// <returns></returns>
-    string Replace(string text, string replacement);
+    string Replace(string newText, string replacement);
 
     #endregion Methods
 }

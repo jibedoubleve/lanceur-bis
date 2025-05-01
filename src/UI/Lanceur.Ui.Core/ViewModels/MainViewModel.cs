@@ -111,8 +111,7 @@ public partial class MainViewModel : ObservableObject
                 var result = await _interactionHubService.Interactions.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
                 if (!result) return;
             }
-
-            _logger.LogTrace("Executing alias {AliasName}", SelectedResult?.Name ?? "<EMPTY>");
+            
             var response = await _executionService.ExecuteAsync(
                 new() { Query = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
             );
@@ -158,7 +157,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (SelectedResult is null) return;
 
-        _logger.LogTrace("Open directory of {Alias}", SelectedResult.Name);
+        _logger.LogInformation("Open directory of {Alias}", SelectedResult.Name);
         _executionService.OpenDirectoryAsync(SelectedResult);
     }
 

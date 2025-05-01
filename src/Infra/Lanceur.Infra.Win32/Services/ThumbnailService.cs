@@ -94,7 +94,7 @@ public class ThumbnailService : IThumbnailService
         // ----
         if (!alias.FileName.IsUrl())
         {
-            _logger.LogTrace("Skipping thumbnail for alias {Name} because '{FileName} is not an URL.", alias.Name, alias.FileName);
+            _logger.LogTrace("Skipping thumbnail for alias {Name} because {FileName} is not an URL.", alias.Name, alias.FileName);
             return;
         }
 

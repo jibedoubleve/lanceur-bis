@@ -110,7 +110,7 @@ public partial class App
                 // ---- Navigate to Url ----
                 ToastNotificationArguments.ClickNavigateIssue => () => Process.Start("explorer.exe", arguments["Url"]),
                 // ---- Default  ----
-                _ => () => Log.Warning("The argument '{Argument}' is not supported in the toast arguments. Are you using a button that has not been configured yet?", toastArgs.Argument)
+                _ => () => Log.Warning("The argument {Argument} is not supported in the toast arguments. Are you using a button that has not been configured yet?", toastArgs.Argument)
             };
 
             Current.Dispatcher.Invoke(

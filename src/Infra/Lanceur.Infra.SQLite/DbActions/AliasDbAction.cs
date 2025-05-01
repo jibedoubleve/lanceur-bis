@@ -15,6 +15,8 @@ public class AliasDbAction
 
     private readonly ILogger<AliasDbAction> _logger;
 
+    private const string MessageRemovedRows = "Removed {Count} row(s) from {Table}. Id: {IdAliases}";
+
     #endregion
 
     #region Constructors
@@ -31,7 +33,12 @@ public class AliasDbAction
 
         var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
-        _logger.LogInformation("Removed {Count} row(s) from alias. Id: {Idd}", cnt, idd);
+        _logger.LogDebug(
+            MessageRemovedRows,
+            cnt,
+            "alias",
+            idd
+        );
     }
 
     private void ClearAliasArgument(IDbTransaction tx, params long[] ids)
@@ -40,7 +47,12 @@ public class AliasDbAction
 
         var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
-        _logger.LogInformation("Removed {Count} row(s) from alias_argument. Id: {IdAliases}", cnt, idd);
+        _logger.LogDebug(
+            MessageRemovedRows,
+            cnt,
+            "alias_argument",
+            idd
+        );
     }
 
     private void ClearAliasName(IDbTransaction tx, params long[] ids)
@@ -49,7 +61,12 @@ public class AliasDbAction
 
         var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
-        _logger.LogInformation("Removed {RemovedCount} row(s) from alias_name. Id: {IdAliases}", cnt, idd);
+        _logger.LogDebug(
+            MessageRemovedRows,
+            cnt,
+            "alias_name",
+            idd
+        );
     }
 
     private void ClearAliasUsage(IDbTransaction tx, params long[] ids)
@@ -58,27 +75,48 @@ public class AliasDbAction
 
         var cnt = tx.Connection.ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
-        _logger.LogInformation("Removed {Count} row(s) from alias_usage. Id: {IdAliases}", cnt, idd);
+        _logger.LogDebug(
+            MessageRemovedRows,
+            cnt,
+            "alias_usage",
+            idd
+        );
     }
 
-    private void CreateAdditionalParameters(IDbTransaction tx, long idAlias, IEnumerable<AdditionalParameter> parameters)
+    private void CreateAdditionalParameters(
+        IDbTransaction tx,
+        long idAlias,
+        IEnumerable<AdditionalParameter> parameters
+    )
     {
         parameters = parameters.ToList();
         using var _ = _logger.BeginSingleScope("Parameters", parameters);
         const string sql1 = "delete from alias_argument where id_alias = @idAlias";
-        const string sql2 = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
+        const string sql2
+            = "insert into alias_argument (id_alias, argument, name) values(@idAlias, @parameter, @name);";
 
         // Remove existing additional alias parameters
         var deletedRowsCount = tx.Connection!.Execute(sql1, new { idAlias });
 
         // Create alias additional parameters
         var entities = parameters.ToEntity(idAlias).ToList();
-        var addedRowsCount = entities.Sum(
-            entity =>
-                tx.Connection.Execute(sql2, new { idAlias = entity.IdAlias, parameter = entity.Parameter, name = entity.Name })
+        var addedRowsCount = entities.Sum(entity =>
+                                              tx.Connection.Execute(
+                                                  sql2,
+                                                  new
+                                                  {
+                                                      idAlias = entity.IdAlias,
+                                                      parameter = entity.Parameter,
+                                                      name = entity.Name
+                                                  }
+                                              )
         );
 
-        if (deletedRowsCount > 0 && addedRowsCount == 0) _logger.LogWarning("Deleting {DeletedRowsCount} parameters while adding no new parameters", deletedRowsCount);
+        if (deletedRowsCount > 0 && addedRowsCount == 0)
+            _logger.LogWarning(
+                "Deleting {DeletedRowsCount} parameters while adding no new parameters",
+                deletedRowsCount
+            );
     }
 
     internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
@@ -137,7 +175,11 @@ public class AliasDbAction
     /// <param name="names">The list of names to find.</param>
     /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
     /// <returns>The exact match or <c>null</c> if not found.</returns>
-    internal IEnumerable<AliasQueryResult> GetByNames(IDbTransaction tx, IEnumerable<string> names, bool includeHidden = false)
+    internal IEnumerable<AliasQueryResult> GetByNames(
+        IDbTransaction tx,
+        IEnumerable<string> names,
+        bool includeHidden = false
+    )
     {
         const string sql = $"""
                             select

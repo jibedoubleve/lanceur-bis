@@ -8,7 +8,9 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -26,20 +28,22 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
     private void WithConfiguration(Action<IDatabaseConfigurationService> assert, string json = null)
     {
+        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
         var sql = $"insert into settings (s_key, s_value) values ('json', '{json}');";
 
         using var c = BuildFreshDb();
         c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteDatabaseConfigurationService(scope);
+        var settingRepository = new SQLiteDatabaseConfigurationService(scope, logger);
         using (new AssertionScope()) { assert(settingRepository); }
     }
 
     private void WithConfiguration(Action<DatabaseConfiguration> update, Action<DatabaseConfiguration> assert)
     {
+        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
         using var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteDatabaseConfigurationService(scope);
+        var settingRepository = new SQLiteDatabaseConfigurationService(scope, logger);
 
         update(settingRepository.Current);
 
@@ -250,7 +254,8 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settings = new SQLiteDatabaseConfigurationService(scope);
+        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
+        var settings = new SQLiteDatabaseConfigurationService(scope, logger);
 
         settings.Current.SearchBox.ShowAtStartup.Should().BeTrue();
     }
@@ -260,34 +265,39 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settings = new SQLiteDatabaseConfigurationService(scope);
+        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
+        var settings = new SQLiteDatabaseConfigurationService(scope, logger);
 
         settings.Current.SearchBox.ShowResult.Should().BeFalse();
     }
 
     [Theory]
     [MemberData(nameof(HaveUpdatedPropertyFeed))]
-    public void HaveUpdatedProperty(Action<DatabaseConfiguration> update, Action<DatabaseConfiguration> assert) => WithConfiguration(update, assert);
+    public void HaveUpdatedProperty(Action<DatabaseConfiguration> update, Action<DatabaseConfiguration> assert)
+        => WithConfiguration(update, assert);
 
     public static IEnumerable<object[]> HaveUpdatedPropertyFeed()
     {
-        yield return [
+        yield return
+        [
             new Action<DatabaseConfiguration>(cfg  =>  cfg.Caching.StoreCacheDuration = 99),
             new Action<DatabaseConfiguration>(cfg => cfg.Caching.StoreCacheDuration.Should().Be(99))
         ];
-        yield return [
+        yield return
+        [
             new Action<DatabaseConfiguration>(cfg  =>  cfg.Caching.ThumbnailCacheDuration = 99),
             new Action<DatabaseConfiguration>(cfg => cfg.Caching.ThumbnailCacheDuration.Should().Be(99))
-        ]; 
-        yield return [
+        ];
+        yield return
+        [
             new Action<DatabaseConfiguration>(cfg  =>  cfg.Github.Tag = "hello world"),
             new Action<DatabaseConfiguration>(cfg => cfg.Github.Tag.Should().Be("hello world"))
-        ]; 
-        yield return [
+        ];
+        yield return
+        [
             new Action<DatabaseConfiguration>(cfg  =>  cfg.Github.Tag = cfg.Github.Tag),
             new Action<DatabaseConfiguration>(cfg => cfg.Github.Tag.Should().Be("ungroomed"))
-        ]; 
-        
+        ];
     }
 
 

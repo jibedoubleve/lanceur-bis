@@ -8,6 +8,7 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
+using Lanceur.Ui.WPF.Helpers;
 using Microsoft.Extensions.Logging;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
@@ -138,13 +139,21 @@ public partial class SettingsView : INavigationWindow
     public void Navigate<T>(object? dataContext = null) where T : Page => PageNavigationView.Navigate(typeof(T), dataContext);
 
     /// <inheritdoc />
-    public bool Navigate(Type pageType) => PageNavigationView.Navigate(pageType);
+    public bool Navigate(Type pageType)
+    {
+        _logger.LogWarning(
+            "This navigation to {Page} is obsolete. Use {NewNavigator} instead",
+            pageType,
+            nameof(PageNavigator.NavigateToSettings)
+        );
+        return PageNavigationView.Navigate(pageType);
+    }
 
     /// <inheritdoc />
-    public void SetServiceProvider(IServiceProvider serviceProvider) => _logger.LogWarning("Method '{Method}' is not implemented", nameof(SetServiceProvider));
+    public void SetServiceProvider(IServiceProvider serviceProvider) => _logger.LogWarning("Method {Method} is not implemented", nameof(SetServiceProvider));
 
     /// <inheritdoc />
-    public void SetPageService(INavigationViewPageProvider navigationViewPageProvider) => _logger.LogWarning("Method '{Method}' is not implemented", nameof(SetServiceProvider));
+    public void SetPageService(INavigationViewPageProvider navigationViewPageProvider) => _logger.LogWarning("Method {Method} is not implemented", nameof(SetServiceProvider));
 
     /// <inheritdoc />
     public void ShowWindow() => Show();
