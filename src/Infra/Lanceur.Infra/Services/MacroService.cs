@@ -47,7 +47,7 @@ public class MacroService : MacroCachedService, IMacroService
 
         if (instance is not MacroQueryResult i)
         {
-            Logger.LogWarning("Cannot cast '{Instance}' into '{MacroQueryResult}'", instance.GetType(), typeof(MacroQueryResult));
+            Logger.LogWarning("Cannot cast {Instance} into {MacroQueryResult}", instance.GetType(), typeof(MacroQueryResult));
             return null;
         }
 

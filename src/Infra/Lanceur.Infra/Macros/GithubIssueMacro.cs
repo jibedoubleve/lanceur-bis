@@ -15,13 +15,14 @@ public class GithubIssueMacro : MacroQueryResult
 {
     #region Fields
 
+    private readonly IEnigma _enigma;
+
     private readonly IGithubService _githubService;
     private readonly ILogger<GithubIssueMacro> _logger;
     private readonly IUserGlobalNotificationService _notification;
 
     private readonly IServiceProvider _serviceProvider;
     private readonly ISettingsFacade _settings;
-    private readonly IEnigma _enigma;
 
     #endregion
 
@@ -65,7 +66,7 @@ public class GithubIssueMacro : MacroQueryResult
             return NoResult;
         }
 
-        _logger.LogDebug("Creating Github issue with cmdline: {Cmdline}", cmdline!.ToString());
+        _logger.LogInformation("Creating Github issue with cmdline: {Cmdline}", cmdline!.ToString());
         await _githubService.CreateIssue(cmdline.Parameters, _enigma.Decrypt(_settings.Application.Github.Token));
 
         return NoResult;

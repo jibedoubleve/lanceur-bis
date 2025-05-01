@@ -3,6 +3,7 @@ using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Extensions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite.Repositories;
@@ -14,13 +15,19 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
 
     private DatabaseConfiguration _current;
 
-    private readonly JsonSerializerSettings _jsonSettings = new() { ObjectCreationHandling = ObjectCreationHandling.Replace };
+    private readonly JsonSerializerSettings _jsonSettings
+        = new() { ObjectCreationHandling = ObjectCreationHandling.Replace };
+
+    private readonly ILogger<SQLiteDatabaseConfigurationService> _logger;
 
     #endregion
 
     #region Constructors
 
-    public SQLiteDatabaseConfigurationService(IDbConnectionManager manager) : base(manager) { }
+    public SQLiteDatabaseConfigurationService(
+        IDbConnectionManager manager,
+        ILogger<SQLiteDatabaseConfigurationService> logger
+    ) : base(manager) => _logger = logger;
 
     #endregion
 
@@ -54,10 +61,9 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
                            from settings
                            where s_key = 'json';
                            """;
-        var json = Db.WithConnection(
-            conn =>
-                conn.Query<string>(sql)
-                    .FirstOrDefault()
+        var json = Db.WithConnection(conn =>
+                                         conn.Query<string>(sql)
+                                             .FirstOrDefault()
         );
 
         _current = json.IsNullOrEmpty()
@@ -67,8 +73,7 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
 
     public void Save()
     {
-        Db.WithinTransaction(
-            tx =>
+        Db.WithinTransaction(tx =>
             {
                 const string sql = """
                                    insert into settings(s_key, s_value) values ('json', @json)
@@ -81,6 +86,7 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
                 tx.Connection!.Execute(sql, new { json });
             }
         );
+        _logger.LogTrace("Saved settings in database.");
     }
 
     #endregion

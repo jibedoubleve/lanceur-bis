@@ -40,7 +40,7 @@ public class QuitAlias : SelfExecutableQueryResult
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         Application.Current.Shutdown();
-        _logger.LogInformation("Quit the application from alias 'Quit'");
+        _logger.LogInformation("Quit the application from alias Quit");
 
         return NoResultAsync;
     }

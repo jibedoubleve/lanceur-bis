@@ -7,12 +7,12 @@ public interface IWildcardService
     /// <summary>
     /// Executes all the replacement actions.
     /// </summary>
-    /// <param name="text">The text in which the replacement will occur</param>
+    /// <param name="newText">The text in which the replacement will occur</param>
     /// <param name="replacement">The replacement text</param>
     /// <returns>
     /// The modified text after applying all replacements
     /// </returns>
-    string Replace(string text, string replacement);
+    string Replace(string newText, string replacement);
 
     /// <summary>
     /// Executes all the replacement actions, or returns the replacement text if the provided <paramref name="text"/> is null.

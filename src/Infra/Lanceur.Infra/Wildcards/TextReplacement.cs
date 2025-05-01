@@ -20,12 +20,12 @@ public class TextReplacement : IReplacement
     #region Methods
 
     /// <inheritdoc />
-    public string Replace(string text, string replacement)
+    public string Replace(string newText, string replacement)
     {
-        text ??= string.Empty;
+        newText ??= string.Empty;
         replacement ??= string.Empty;
 
-        return Regex.Replace(text, replacement);
+        return Regex.Replace(newText, replacement);
     }
 
     #endregion Methods

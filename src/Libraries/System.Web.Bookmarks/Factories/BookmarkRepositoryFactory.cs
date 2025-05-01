@@ -37,7 +37,6 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
 
     private IBookmarkRepository BuildBookmarkRepository(Browser browser)
     {
-        _logger.LogDebug("Returning bookmark repository for {Browser}", browser);
         IBookmarkRepository repository = browser switch
         {
             Browser.Chrome  => new BlinkBrowserBookmarks(_memoryCache,  _loggerFactory, BrowserConfigurationFactory.Chrome),
@@ -48,13 +47,11 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
         };
 
         PreviousBrowserCacheKey ??= repository.CacheKey;
-        if (PreviousBrowserCacheKey is not null 
-            && PreviousBrowserCacheKey != repository.CacheKey)
-        {
-            // Invalidate bookmarks cache when browser changed
-            _memoryCache.Remove(PreviousBrowserCacheKey!);
-            PreviousBrowserCacheKey = repository.CacheKey;
-        }
+        if (PreviousBrowserCacheKey is null || PreviousBrowserCacheKey == repository.CacheKey) return repository;
+
+        // Invalidate bookmarks cache when browser changed
+        _memoryCache.Remove(PreviousBrowserCacheKey!);
+        PreviousBrowserCacheKey = repository.CacheKey;
 
         return repository;
     }

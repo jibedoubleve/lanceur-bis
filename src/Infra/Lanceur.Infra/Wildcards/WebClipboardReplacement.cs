@@ -34,14 +34,14 @@ public class WebClipboardReplacement : IReplacement
     #region Methods
 
     /// <inheritdoc />
-    public string Replace(string text, string replacement)
+    public string Replace(string newText, string replacement)
     {
         var clipboard = _clipboard.RetrieveText() ?? string.Empty;
         clipboard = WebUtility.UrlEncode(clipboard).ToLower();
 
-        text ??= string.Empty;
+        newText ??= string.Empty;
 
-        return Regex.Replace(text, clipboard);
+        return Regex.Replace(newText, clipboard);
     }
 
     #endregion Methods
