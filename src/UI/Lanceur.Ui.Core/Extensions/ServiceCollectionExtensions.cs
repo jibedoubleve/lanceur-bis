@@ -73,6 +73,8 @@ public static class ServiceCollectionExtensions
         );
 
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
+        Log.Logger = loggerCfg.CreateLogger();
+        
         return;
 
         void ConfigureLogForDebug()
