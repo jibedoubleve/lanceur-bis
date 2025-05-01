@@ -59,7 +59,7 @@ public class MacroDbAction
                 var alias = aliases.FirstOrDefault(a => a.Name == name);
                 if (alias is null)
                 {
-                    _logger.LogWarning("Failed to create composite alias '{CompositeAlias}' because the alias '{AliasName}' " +
+                    _logger.LogWarning("Failed to create composite alias {CompositeAlias} because the alias {AliasName} " +
                                        "is missing or has been deleted. To resolve this, remove the invalid aliases " +
                                        "from the composite alias configuration.", item?.Name ?? "<NULL>", name);
 

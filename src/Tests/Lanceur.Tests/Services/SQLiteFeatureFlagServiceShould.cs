@@ -5,7 +5,9 @@ using Lanceur.Core.Models;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -29,8 +31,9 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         // arrange
         var conn = BuildFreshDb();
         var scope = new DbSingleConnectionManager(conn);
+        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
 
-        var settings = new SQLiteDatabaseConfigurationService(scope);
+        var settings = new SQLiteDatabaseConfigurationService(scope, logger);
         var featureFlag = new SQLiteFeatureFlagService(scope);
 
         settings.Current.FeatureFlags.Should().NotBeEmpty("application has feature flags");
@@ -53,7 +56,8 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         var conn = BuildFreshDb();
         
         var scope = new DbSingleConnectionManager(conn);
-        var settings = new SQLiteDatabaseConfigurationService(scope);
+        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
+        var settings = new SQLiteDatabaseConfigurationService(scope, logger);
 
         settings.Current.FeatureFlags.Should().NotBeEmpty("application has feature flags");
         settings.Current.FeatureFlags.ElementAt(0).Enabled.Should().BeTrue("this is the default value");

@@ -62,7 +62,7 @@ public class NCalcCalculatorService : ICalculatorService
         catch (Exception ex)
         {
             using  var _ = _logger.BeginSingleScope("Exception", ex);
-            _logger.LogInformation("Error occured while handling expression '{Expression}", expression);
+            _logger.LogInformation("Error occured while handling expression {Expression}", expression);
             return (true, ex.Message);
         }
     }

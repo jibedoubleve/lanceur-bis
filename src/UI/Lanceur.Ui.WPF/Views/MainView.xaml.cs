@@ -120,7 +120,7 @@ public partial class MainView
                 }
             );
 
-        _logger.LogTrace("Feature flag '{FeatureFlag}' Enabled: {Enabled}", Features.ResourceDisplay, enabled);
+        _logger.LogDebug("Feature flag {FeatureFlag} Enabled: {Enabled}", Features.ResourceDisplay, enabled);
         PanelCpu.Visibility
             = PanelMemory.Visibility
                 = enabled ? Visibility.Visible : Visibility.Collapsed;
@@ -144,14 +144,14 @@ public partial class MainView
     private void OnClickDarkTheme(object sender, RoutedEventArgs e)
     {
         var windowBackdropType = _settings.Application.Window.BackdropStyle.ToWindowBackdropType();
-        _logger.LogTrace("Change theme to {Theme} and backdrop type {BackdropType}", ApplicationTheme.Dark, windowBackdropType);
+        _logger.LogDebug("Change theme to {Theme} and backdrop type {BackdropType}", ApplicationTheme.Dark, windowBackdropType);
         ApplicationThemeManager.Apply(ApplicationTheme.Dark, windowBackdropType);
     }
 
     private void OnClickLightTheme(object sender, RoutedEventArgs e)
     {
         var windowBackdropType = _settings.Application.Window.BackdropStyle.ToWindowBackdropType();
-        _logger.LogTrace("Change theme to {Theme} and backdrop type {BackdropType}", ApplicationTheme.Light, windowBackdropType);
+        _logger.LogDebug("Change theme to {Theme} and backdrop type {BackdropType}", ApplicationTheme.Light, windowBackdropType);
         ApplicationThemeManager.Apply(ApplicationTheme.Light, windowBackdropType);
     }
 
@@ -187,7 +187,7 @@ public partial class MainView
 
         if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) return;
 
-        _logger.LogInformation("Save new coordinate ({Top},{Left})", Top, Left);
+        _logger.LogDebug("Save new coordinate ({Top},{Left})", Top, Left);
         coordinate.Top = Top;
         coordinate.Left = Left;
         _databaseConfig.Save();

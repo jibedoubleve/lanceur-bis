@@ -31,7 +31,7 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
         Path = configuration.Path;
         CacheKey = configuration.CacheKey;
         
-        _logger.LogInformation("Using {Browser} based browser bookmarks path is '{Path}'", "Chrome", Path);
+        _logger.LogTrace("Using {Browser} based browser bookmarks path is {Path}", "Chrome", Path);
     }
 
     #endregion
@@ -93,7 +93,7 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
             CacheEntryOptions.Default
         )!;
 
-        _logger.LogTrace("(Chromium) Getting bookmarks with filter '{Filter}' in path '{Path}'", filter ?? "<empty>", Path);
+        _logger.LogTrace("(Chromium) Getting bookmarks with filter '{Filter}' in path {Path}", filter ?? "<empty>", Path);
         return filter is null 
             ? bookmarks 
             : bookmarks.Where(e => e.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase));
@@ -103,7 +103,7 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
     {
         if (!File.Exists(Path))
         {
-            _logger.LogWarning("(Chromium) Cannot find bookmark at '{Path}'", Path);       
+            _logger.LogWarning("(Chromium) Cannot find bookmark at {Path}", Path);       
             return  "{}";
         }
 

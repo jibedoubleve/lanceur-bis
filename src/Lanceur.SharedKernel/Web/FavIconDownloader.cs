@@ -58,7 +58,7 @@ public class FavIconDownloader : IFavIconDownloader
             var bytes = await _client.GetByteArrayAsync(favIconUrl);
             if (bytes.Length == 0)
             {
-                _logger.LogInformation("Failed to save favicon to {Url} with {FavIconUrl}", favIconUrl, favIconUrl);
+                _logger.LogWarning("Failed to save favicon to {Url} with {FavIconUrl}", favIconUrl, favIconUrl);
                 return false;
             }
 
@@ -83,7 +83,7 @@ public class FavIconDownloader : IFavIconDownloader
     {
         if (_failedPaths.Contains(url.ToString()))
         {
-            _logger.LogInformation("'{Url}' is in the failed paths for favicon retrieving.", url);
+            _logger.LogTrace("{Url} is in the failed paths for favicon retrieving.", url);
             return false;
         }
 
@@ -107,7 +107,7 @@ public class FavIconDownloader : IFavIconDownloader
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(
+                _logger.LogTrace(
                     ex,
                     "Error while retrieving favicon for {Url} - {Manager}",
                     url,

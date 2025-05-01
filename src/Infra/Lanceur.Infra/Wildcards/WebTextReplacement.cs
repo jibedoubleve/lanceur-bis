@@ -21,13 +21,13 @@ public class WebTextReplacement : IReplacement
     #region Methods
 
     /// <inheritdoc />
-    public string Replace(string text, string replacement)
+    public string Replace(string newText, string replacement)
     {
         replacement ??= string.Empty;
-        text ??= string.Empty;
+        newText ??= string.Empty;
 
         var webParam = WebUtility.UrlEncode(replacement).ToLower();
-        return Regex.Replace(text, webParam);
+        return Regex.Replace(newText, webParam);
     }
 
     #endregion Methods

@@ -61,8 +61,6 @@ public class BookmarksStore : Store, IStoreService
     {
         var bookmarkSourceBrowser = _settings.Application.Stores.BookmarkSourceBrowser;
         var repository = _bookmarkRepositoryFactory.BuildBookmarkRepository(bookmarkSourceBrowser);
-        _logger.LogDebug("Bookmark source browser in configuration is {BookmarkSourceBrowser}", bookmarkSourceBrowser);
-        _logger.LogDebug("Query is {Query}", cmdline.ToString());
 
         if (!repository.IsBookmarkSourceAvailable()) return DisplayQueryResult.SingleFromResult("The bookmark source is not available!");
 
