@@ -43,7 +43,7 @@ public class IniFileQuery
         var path = _nodes.Where(n => n.Section == section && n.Property == "Default")
                          .Select(n => n.Value.Replace("/", "\\"))
                          .First();
-        _logger.LogTrace("Found default profile: {DefaultProfile}", path);
+        _logger.LogDebug("Found default profile: {DefaultProfile}", path);
         return path;
     }
 

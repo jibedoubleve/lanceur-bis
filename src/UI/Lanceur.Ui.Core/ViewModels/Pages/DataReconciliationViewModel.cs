@@ -250,7 +250,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         {
             _settingsFacade.Application.Reconciliation.InactivityThreshold = result.NumericValue;
             _settingsFacade.Save();
-            _logger.LogTrace("Inactivity threshold updated to {Months} months", result.NumericValue);
+            _logger.LogDebug("Inactivity threshold updated to {Months} months", result.NumericValue);
         }
 
         await OnShowInactiveAliases();
@@ -273,7 +273,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         {
             _settingsFacade.Application.Reconciliation.LowUsageThreshold = result.NumericValue;
             _settingsFacade.Save();
-            _logger.LogTrace("Low Usage threshold updated to {Count}", result.NumericValue);
+            _logger.LogDebug("Low Usage threshold updated to {Count}", result.NumericValue);
         }
 
         await OnShowRarelyUsedAliases();

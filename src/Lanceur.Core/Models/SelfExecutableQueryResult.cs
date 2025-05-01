@@ -2,23 +2,11 @@
 
 public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfExecutable
 {
-    #region Constructors
-
-    protected SelfExecutableQueryResult(string name, string description)
-    {
-        Name = name;
-        Description = description;
-    }
-
-    protected SelfExecutableQueryResult() { }
-
-    #endregion Constructors
-
     #region Properties
 
     public override string Icon => "WindowConsole20";
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -26,5 +14,5 @@ public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfEx
 
     public override string ToQuery() => $"{Name} {Parameters}".Trim();
 
-    #endregion Methods
+    #endregion
 }

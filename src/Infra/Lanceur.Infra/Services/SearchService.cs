@@ -107,7 +107,7 @@ public class SearchService : ISearchService
         }
 
         _logger.LogTrace(
-            "For the query '{Query}', {IdleCount} store(s) IDLE and {ActiveCount} store(s) ALIVE",
+            "For the query {Query}, {IdleCount} store(s) IDLE and {ActiveCount} store(s) ALIVE",
             query,
             Stores.Count() - tasks.Count,
             tasks.Count

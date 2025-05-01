@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Lanceur.Core.Services;
+﻿using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Wildcards;
 
@@ -8,31 +8,49 @@ public class ReplacementComposite : IReplacement, IWildcardService
 {
     #region Fields
 
+    private readonly ILogger<ReplacementComposite> _logger;
+
     private readonly IEnumerable<IReplacement> _replacements;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    public ReplacementComposite(IClipboardService clipboard) => _replacements = new List<IReplacement>() { new TextReplacement(), new WebTextReplacement(), new RawClipboardReplacement(clipboard), new WebClipboardReplacement(clipboard) };
+    public ReplacementComposite(IClipboardService clipboard, ILogger<ReplacementComposite> logger)
+    {
+        _logger = logger;
+        _replacements = new List<IReplacement>
+        {
+            new TextReplacement(),
+            new WebTextReplacement(),
+            new RawClipboardReplacement(clipboard),
+            new WebClipboardReplacement(clipboard)
+        };
+    }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     /// <inheritdoc />
     public string Wildcard => string.Empty;
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
-    /// <inheritdoc cref="IWildcardService"/>
-    public string Replace(string text, string withThis)
+    /// <inheritdoc cref="IWildcardService" />
+    public string Replace(string newText, string replacement)
     {
-        foreach (var replacement in _replacements) text = replacement.Replace(text, withThis);
+        _logger.LogTrace("Before wildcard replacement: {Text}", replacement);
+        
+        newText = _replacements.Aggregate(
+            newText, 
+            (current, text) => text.Replace(current, replacement)
+        );
 
-        return text;
+        _logger.LogTrace("After wildcard replacement: {Text}", newText);
+        return newText;
     }
 
     /// <inheritdoc />
@@ -40,5 +58,5 @@ public class ReplacementComposite : IReplacement, IWildcardService
         ? replacement
         : Replace(text, replacement);
 
-    #endregion Methods
+    #endregion
 }

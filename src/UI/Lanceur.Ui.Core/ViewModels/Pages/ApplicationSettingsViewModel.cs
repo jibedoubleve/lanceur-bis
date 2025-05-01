@@ -235,7 +235,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         string[] properties = [nameof(IsResourceMonitorEnabled), nameof(IsAdminModeEnabled)];
         if (properties.Contains(e.PropertyName)) return;
 
-        _logger.LogTrace("Property '{Property}' changed", e.PropertyName);
+        _logger.LogTrace("Property {Property} changed", e.PropertyName);
         OnSaveSettings();
     }
 

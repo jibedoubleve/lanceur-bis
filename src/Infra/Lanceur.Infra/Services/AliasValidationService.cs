@@ -53,7 +53,7 @@ public class AliasValidationService : IAliasValidationService
         var existing = _repository.GetExistingDeletedAliases(nameArray, idAlias)
                                   .ToArray();
         return existing.Length != 0
-            ? ValidationStatus.Invalid($"These names belong to a deleted alias: '{string.Join(", ", existing)}'. To use these names, restore the alias.")
+            ? ValidationStatus.Invalid($"These names belong to a deleted alias: {string.Join(", ", existing)}. To use these names, restore the alias.")
             : ValidationStatus.Valid();
     }
 
@@ -71,7 +71,7 @@ public class AliasValidationService : IAliasValidationService
         var existing = _repository.GetExistingAliases(nameArray, idAlias)
                                   .ToArray();
         return existing.Length != 0
-            ? ValidationStatus.Invalid($"These names are already in use for other aliases: '{string.Join(", ", existing)}'")
+            ? ValidationStatus.Invalid($"These names are already in use for other aliases: {string.Join(", ", existing)}")
             : ValidationStatus.Valid();
     }
 

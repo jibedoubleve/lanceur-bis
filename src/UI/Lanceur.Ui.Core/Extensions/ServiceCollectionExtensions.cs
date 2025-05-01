@@ -56,7 +56,7 @@ public static class ServiceCollectionExtensions
 
     public static void AddLoggers(this IServiceCollection serviceCollection, HostBuilderContext context, ServiceProvider serviceProvider)
     {
-        var logEventLevel = new Conditional<LogEventLevel>(LogEventLevel.Verbose, LogEventLevel.Information);
+        var logEventLevel = new Conditional<LogEventLevel>(LogEventLevel.Debug, LogEventLevel.Information);
         var levelSwitch = new LoggingLevelSwitch(logEventLevel);
         var telemetry = serviceProvider.GetRequiredService<ISettingsFacade>().Local.Telemetry;
 
@@ -74,7 +74,7 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
         Log.Logger = loggerCfg.CreateLogger();
-        
+
         return;
 
         void ConfigureLogForDebug()

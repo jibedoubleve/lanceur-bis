@@ -56,7 +56,7 @@ public class EverythingStore : Store, IStoreService
         if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
 
         var query = $"{cmdline.Parameters} {_settings.Application.Stores.EverythingQuerySuffix}";
-        _logger.LogTrace("Everything query '{Query}'", query);
+        _logger.LogTrace("Everything query: {Query}", query);
 
         var result =  _everythingApi.Search(query);
 

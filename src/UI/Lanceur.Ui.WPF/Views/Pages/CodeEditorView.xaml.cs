@@ -79,7 +79,7 @@ public partial class CodeEditorView
         TbFileName.Text = vm.Alias.FileName;
         TbParameters.Text = vm.Alias.Parameters;
 
-        _logger.LogTrace("{View} has loaded lua script for {Alias}", GetType().Name, vm.Alias.Name);
+        _logger.LogDebug("{View} has loaded lua script for {Alias}", GetType().Name, vm.Alias.Name);
     }
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)

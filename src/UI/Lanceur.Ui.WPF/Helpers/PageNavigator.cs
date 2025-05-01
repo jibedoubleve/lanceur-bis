@@ -31,10 +31,10 @@ public class PageNavigator
     {
         var windows = Application.Current.Windows.OfType<SettingsView>().ToArray();
         var view  = windows.Length != 0
-            ? windows.ElementAt(0)
+            ? windows[0]
             : _serviceProvider.GetService<SettingsView>()!;
         
-        _logger.LogTrace("Navigating to settings subview '{View}'", view.GetType().FullName);
+        _logger.LogDebug("Navigating to settings subview {View}", view.GetType().FullName);
         view.Show();
         view.Navigate<TView>();
         

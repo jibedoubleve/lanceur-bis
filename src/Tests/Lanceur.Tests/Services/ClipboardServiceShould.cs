@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Wildcards;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
@@ -40,8 +41,9 @@ public class ClipboardServiceShould
     public void ReplaceWithText(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
+        var logger = Substitute.For<ILogger<ReplacementComposite>>();
         clipboard.RetrieveText().Returns(param);
-        var mgr = new ReplacementComposite(clipboard);
+        var mgr = new ReplacementComposite(clipboard, logger);
 
         mgr.Replace(actual, param)
            .Should()
@@ -55,7 +57,8 @@ public class ClipboardServiceShould
     public void ReturnParametersAsExpected(string aliasParam, string userParam, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
-        var mgr = new ReplacementComposite(clipboard);
+        var logger = Substitute.For<ILogger<ReplacementComposite>>();
+        var mgr = new ReplacementComposite(clipboard, logger);
 
         mgr.ReplaceOrReplacementOnNull(aliasParam, userParam).Should().Be(expected);
     }
