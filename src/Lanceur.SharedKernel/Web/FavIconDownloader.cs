@@ -18,7 +18,7 @@ public class FavIconDownloader : IFavIconDownloader
 
     private readonly ILogger<FavIconDownloader> _logger;
 
-    private static readonly Dictionary<string, (bool IsManual, string Url)> FavIconManagers = new()
+    private static readonly Dictionary<string, (bool IsManual, string Url)> FaviconUrls = new()
     {
         ["DuckDuckGo"] = (IsManual: false, Url: "https://icons.duckduckgo.com/ip2/{0}.ico"),
         ["Google"] = (IsManual: false, Url: "https://www.google.com/s2/favicons?domain_url={0}"),
@@ -36,7 +36,7 @@ public class FavIconDownloader : IFavIconDownloader
 
     #region Methods
 
-    private string  RequestUrl(Uri url, KeyValuePair<string, (bool IsManual, string Url)> manager)
+    private string  GetFaviconUrl(Uri url, KeyValuePair<string, (bool IsManual, string Url)> manager)
     {
         var requestUrl = manager.Value.IsManual
             ? new Uri(url, manager.Value.Url).ToString()
@@ -79,7 +79,7 @@ public class FavIconDownloader : IFavIconDownloader
         return foundFavIcon;
     }
 
-    public async Task<bool> SaveToFileAsync(Uri url, string outputPath)
+    public async Task<bool> RetrieveAndSaveFavicon(Uri url, string outputPath)
     {
         if (_failedPaths.Contains(url.ToString()))
         {
@@ -87,15 +87,15 @@ public class FavIconDownloader : IFavIconDownloader
             return false;
         }
 
-        foreach (var manager in FavIconManagers)
+        foreach (var faviconUrl in FaviconUrls)
             try
             {
-                var requestUrl = RequestUrl(url, manager);
+                var requestUrl = GetFaviconUrl(url, faviconUrl);
                 var result = await _client.SendAsync(new(HttpMethod.Get, requestUrl));
 
                 _logger.LogTrace(
                     "Checking favicon with {FavIconManager} - Status: {Status} - Host: {Host}",
-                    manager.Key,
+                    faviconUrl.Key,
                     result.StatusCode,
                     url.Host
                 );
@@ -111,7 +111,7 @@ public class FavIconDownloader : IFavIconDownloader
                     ex,
                     "Error while retrieving favicon for {Url} - {Manager}",
                     url,
-                    manager.Value.Url
+                    faviconUrl.Value.Url
                 );
             }
 

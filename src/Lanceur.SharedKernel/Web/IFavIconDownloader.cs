@@ -15,7 +15,7 @@ public interface IFavIconDownloader
     /// <param name="url">The url of the website</param>
     /// <param name="outputPath">The path of the file to create.</param>
     /// <returns><c>True</c> if favicon was found at the specified address; otherwise <c>False</c></returns>
-    Task<bool> SaveToFileAsync(Uri url, string outputPath);
+    Task<bool> RetrieveAndSaveFavicon(Uri url, string outputPath);
 
     #endregion
 }

@@ -11,7 +11,7 @@ public interface IFavIconService
     /// If thumbnail exists, update the alias with the favicon information
     /// </summary>
     /// <param name="alias">The alias</param>
-    Task RetrieveFaviconAsync(AliasQueryResult alias);
+    Task UpdateFaviconAsync(AliasQueryResult alias);
 
     #endregion Methods
 }

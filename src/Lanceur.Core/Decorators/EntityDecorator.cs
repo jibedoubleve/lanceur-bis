@@ -30,7 +30,7 @@ public sealed class EntityDecorator<TEntity>
     /// <summary>
     /// Mark the contained <see cref="Entity"/> as to be updated in the database
     /// </summary>
-    public void Soil() => IsDirty = true;
+    public void MarkAsDirty() => IsDirty = true;
 
     #endregion Methods
 }

@@ -54,22 +54,44 @@ public class ThumbnailService : IThumbnailService
     {
         if (queryResult.Entity?.IsThumbnailDisabled ?? true) return;
         if (queryResult.Entity is not AliasQueryResult alias) return;
-        if (alias.FileName.IsNullOrEmpty()) return;
-        if (File.Exists(alias.Thumbnail))  return; 
+
+        if (alias.FileName.IsNullOrEmpty())
+        {
+            _logger.LogWarning("Skipping thumbnail for alias {Name} because FileName is null or empty.", alias.Name);
+            return;
+        }
+
+        if (File.Exists(alias.Thumbnail))
+        {
+            _logger.LogTrace("Alias {AliasName} already has a thumbnail", alias.Name);
+            return;
+        }
+
+        var filePath = alias.FileName.GetThumbnailPath();
+        if (File.Exists(filePath))
+        {
+            if (alias.Thumbnail == filePath) return; 
+
+            _logger.LogInformation("Thumbnail already exists for {AliasName} but not yet updated. (PackagedApp)", alias.Name);
+            alias.Thumbnail = filePath;
+            queryResult.MarkAsDirty();
+            return;
+        }
+
+        _logger.LogTrace("Loading thumbnail for {AliasName}...", alias.Name);
 
         // ----
         // Manage packaged applications
         // ----
-        var filePath = alias.FileName.GetThumbnailPath();
-        if (File.Exists(filePath)) { alias.Thumbnail = filePath; }
-        else if (alias.IsPackagedApplication())
+        if (alias.IsPackagedApplication())
         {
-            var response = (await _packagedAppSearchService.GetByInstalledDirectoryAsync(alias.FileName))
-                .FirstOrDefault();
+            var app = await _packagedAppSearchService.GetByInstalledDirectoryAsync(alias.FileName);
+            var response = app.FirstOrDefault();
+
             if (response is not null)
             {
                 alias.Thumbnail = response.Logo.LocalPath;
-                queryResult.Soil();
+                queryResult.MarkAsDirty();
             }
 
             alias.Thumbnail.CopyToImageRepository(alias.FileName);
@@ -85,7 +107,7 @@ public class ThumbnailService : IThumbnailService
             var file = new FileInfo(alias.FileName);
             imageSource.CopyToImageRepository(file.Name);
             alias.Thumbnail = file.Name.GetThumbnailPath();
-            queryResult.Soil();
+            queryResult.MarkAsDirty();
             return;
         }
 
@@ -94,7 +116,11 @@ public class ThumbnailService : IThumbnailService
         // ----
         if (!alias.FileName.IsUrl())
         {
-            _logger.LogTrace("Skipping thumbnail for alias {Name} because {FileName} is not an URL.", alias.Name, alias.FileName);
+            _logger.LogWarning(
+                "Skipping thumbnail for alias {Name} because {FileName} is not an URL.",
+                alias.Name,
+                alias.FileName
+            );
             return;
         }
 
@@ -105,11 +131,12 @@ public class ThumbnailService : IThumbnailService
         if (File.Exists(favicon))
         {
             alias.Thumbnail = favicon;
-            queryResult.Soil();
+            queryResult.MarkAsDirty();
             return;
         }
 
-        await _favIconService.RetrieveFaviconAsync(alias);
+        // Fire & forget...
+        _ = _favIconService.UpdateFaviconAsync(alias);
     }
 
     /// <summary>
@@ -134,8 +161,14 @@ public class ThumbnailService : IThumbnailService
                     .ContinueWith(
                         t =>
                         {
-                            _logger.LogWarning(t.Exception!, "An error occured when updating thumbnail: {Message}", t.Exception!.Message);
-                        }, TaskContinuationOptions.OnlyOnFaulted);
+                            _logger.LogWarning(
+                                t.Exception!,
+                                "An error occured when updating thumbnail: {Message}",
+                                t.Exception!.Message
+                            );
+                        },
+                        TaskContinuationOptions.OnlyOnFaulted
+                    );
             _logger.LogTrace("Fire and forget the refresh of thumbnails.");
         }
         catch (Exception ex) { _logger.LogWarning(ex, "An error occured during the refresh of the icons"); }
