@@ -45,9 +45,6 @@ public class CalculatorStore : Store, IStoreService
     #region Methods
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll() => QueryResult.NoResult;
-
-    /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
         using var time = _logger.WarnIfSlow(this);

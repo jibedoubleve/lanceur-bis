@@ -48,9 +48,6 @@ public class EverythingStore : Store, IStoreService
     #region Methods
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll() => QueryResult.NoResult;
-
-    /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
         if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");

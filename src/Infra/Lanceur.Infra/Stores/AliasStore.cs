@@ -43,8 +43,8 @@ public class AliasStore : Store, IStoreService
 
     #region Methods
 
-    /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll()
+    /// <inheritdoc cref="IStoreService.GetAll"/>
+    public override IEnumerable<QueryResult> GetAll()
     {
         using var _ = _logger.WarnIfSlow(this);
         var entries = _aliasRepository.GetAll();

@@ -45,18 +45,6 @@ public class BookmarksStore : Store, IStoreService
     #region Methods
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll()
-    {
-        var bookmarkSourceBrowser = _settings.Application.Stores.BookmarkSourceBrowser;
-        var repository = _bookmarkRepositoryFactory.BuildBookmarkRepository(bookmarkSourceBrowser);
-        if (!repository.IsBookmarkSourceAvailable()) return DisplayQueryResult.SingleFromResult("The bookmark source is not available!");
-
-        return repository.GetBookmarks()
-                         .Select(e => e.ToAliasQueryResult())
-                         .ToList();
-    }
-
-    /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
         var bookmarkSourceBrowser = _settings.Application.Stores.BookmarkSourceBrowser;

@@ -41,8 +41,8 @@ public class AdditionalParametersStore : Store, IStoreService
 
     #region Methods
 
-    /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll() => _aliasService.GetAllAliasWithAdditionalParameters();
+    /// <inheritdoc cref="IStoreService.GetAll"/>
+    public override IEnumerable<QueryResult> GetAll() => _aliasService.GetAllAliasWithAdditionalParameters();
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)

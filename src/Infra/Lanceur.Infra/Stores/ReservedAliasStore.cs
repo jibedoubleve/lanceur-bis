@@ -103,8 +103,8 @@ public class ReservedAliasStore : Store, IStoreService
         return orderedResult;
     }
 
-    /// <inheritdoc />
-    public IEnumerable<QueryResult> GetAll()
+    /// <inheritdoc cref="IStoreService.GetAll"/>
+    public override IEnumerable<QueryResult> GetAll()
     {
         if (_reservedAliases == null) LoadAliases();
         return _reservedAliases;
