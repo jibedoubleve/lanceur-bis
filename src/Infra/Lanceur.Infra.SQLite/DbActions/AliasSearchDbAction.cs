@@ -55,16 +55,17 @@ public class AliasSearchDbAction
                        alias a
                        left join alias_name             an on a.id       = an.id_alias                    
                        left join data_alias_synonyms_v  s on s.id_alias = a.id
+                   where
+                       
                    """;
         if (!name.IsNullOrEmpty())
             sql += """
-
-                   where
-                       an.Name like @name
+                      an.Name like @name
+                      and 
                    """;
         sql += """
-               
-               and a.hidden = 0
+               a.deleted_at is null
+                   and a.hidden = 0
                order by
                  a.exec_count desc,
                  an.name
@@ -103,6 +104,7 @@ public class AliasSearchDbAction
                             where
                                 an.Name || ':' || aa.name  like @name
                                 and a.hidden = 0
+                                and a.deleted_at is null
                             order by
                                 a.exec_count desc,
                                 an.name
