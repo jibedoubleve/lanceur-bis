@@ -47,22 +47,20 @@ public class SearchService : ISearchService
 
     #region Methods
 
-    private IEnumerable<QueryResult> SetupAndSort(QueryResult[] collection)
+    private IEnumerable<QueryResult> Sort(QueryResult[] collection)
     {
-        // Upgrade alias to executable macro and return the result
-        var results = collection?.Any() ?? false
+        collection ??= [];
+        // Upgrade alias to an executable macro and return the result
+        var results = collection.Length != 0
             ? _macroService.ExpandMacroAlias(collection).ToList()
             : [];
-
-        // Refresh the thumbnails
-        _thumbnailService.UpdateThumbnails(results);
 
         // Order the list and return the result
         var orderedResults = results.OrderByDescending(e => e.Count)
                                     .ThenBy(e => e.Name)
                                     .ToArray();
 
-        return collection?.Any() ?? false
+        return collection.Length != 0
             ? orderedResults
             : DisplayQueryResult.NoResultFound;
     }
@@ -76,8 +74,9 @@ public class SearchService : ISearchService
         var results = (await Task.WhenAll(tasks))
                       .SelectMany(x => x)
                       .ToArray();
-
-        return SetupAndSort(results);
+        
+        _thumbnailService.UpdateThumbnails(results);
+        return Sort(results);
     }
 
     /// <inheritdoc />
@@ -119,7 +118,8 @@ public class SearchService : ISearchService
         // Remember the query
         foreach (var result in results) result.Query = query;
 
-        var orderedResults = SetupAndSort(results).ToList();
+        _thumbnailService.UpdateThumbnails(results);
+        var orderedResults = Sort(results).ToList();
         
         // If there's an exact match, promote it to the top
         // of the list.
