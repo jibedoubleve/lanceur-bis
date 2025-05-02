@@ -84,14 +84,14 @@ public class SearchService : ISearchService
     {
         using var measurement = _logger.WarnIfSlow(this);
 
-        if (doesReturnAllIfEmpty && (query is null || query.IsEmpty)) return await GetAllAsync();
-        if (query is null || query.IsEmpty) return new List<QueryResult>();
+        if (doesReturnAllIfEmpty && query.IsEmpty()) return await GetAllAsync();
+        if (query.IsEmpty()) return new List<QueryResult>();
 
         //Get the alive stores
         var aliveStores = Stores.Where(service => _orchestrator.IsAlive(service, query))
                                 .ToArray();
 
-        // I've got a services that stunt all the others, then
+        // I've got a service that stunts all the others, then
         // I execute the search for this one only
         var tasks = new List<Task<IEnumerable<QueryResult>>>();
         if (aliveStores.Any(x => x.StoreOrchestration.IdleOthers))
@@ -121,8 +121,8 @@ public class SearchService : ISearchService
         _thumbnailService.UpdateThumbnails(results);
         var orderedResults = Sort(results).ToList();
         
-        // If there's an exact match, promote it to the top
-        // of the list.
+        // If there's an exact match, promote
+        // it to the top of the list.
         var match = orderedResults.FirstOrDefault(r => r.Name == query.Name);
         if (match is not null) orderedResults.Move(match, 0);
 
