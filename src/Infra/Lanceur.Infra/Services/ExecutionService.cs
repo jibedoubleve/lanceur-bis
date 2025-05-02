@@ -234,7 +234,7 @@ internal static class LoggerExtensions
 {
     #region Methods
 
-    public static void LogGrantedLevel(this ILogger logger, string fileName, string grantedLevel)
+    public static void LogGrantedLevel(this ILogger<ExecutionService> logger, string fileName, string grantedLevel)
         => logger.LogInformation("Run {FileName} as {GrantedLevel}", fileName, grantedLevel.ToUpper());
 
     #endregion
