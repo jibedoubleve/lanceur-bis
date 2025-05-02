@@ -91,7 +91,7 @@ public class ExecutionService : IExecutionService
         query.Parameters = result.Context.Parameters;
         query.FileName = result.Context.FileName;
 
-        _logger.LogInformation("Lua script executed on {AlisName}", query.Name);
+        _logger.LogInformation("Lua script executed on {AliasName}", query.Name);
         return result;
     }
 
@@ -101,12 +101,11 @@ public class ExecutionService : IExecutionService
 
         using var _ = _logger.WarnIfSlow(this);
 
-        query.Parameters = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters);
         var result = ExecuteLuaScript(ref query);
         if (result.IsCancelled)
         {
             _logger.LogInformation("The Lua script has been cancelled. No execution of the alias will be done.");
-            return [];
+            return QueryResult.NoResult;
         }
 
         _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
@@ -114,7 +113,7 @@ public class ExecutionService : IExecutionService
         {
             FileName = _wildcardService.Replace(query.FileName, query.Parameters),
             Verb = "open",
-            Arguments = query.Parameters,
+            Arguments = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters),
             UseShellExecute = true, // https://stackoverflow.com/a/5255335/389529
             WorkingDirectory = query.WorkingDirectory,
             WindowStyle = query.StartMode.AsWindowsStyle()
