@@ -12,7 +12,8 @@ public record Cmdline
         Name = (name ?? "").Trim();
         Parameters = (parameters ?? "").Trim();
 
-        if (Name.Contains(' ')) throw new ArgumentException("The name of a cmdline cannot contain whitespaces.", nameof(name));
+        if (Name.Contains(' '))
+            throw new ArgumentException("The name of a cmdline cannot contain whitespaces.", nameof(name));
     }
 
     #endregion
@@ -22,7 +23,7 @@ public record Cmdline
     public static Cmdline Empty => new(string.Empty, string.Empty);
 
     public bool HasParameters => !Parameters.IsNullOrEmpty();
-    public bool IsEmpty => Name.IsNullOrEmpty() && !HasParameters;
+
     public string Name { get; init; }
     public string Parameters { get; }
 
@@ -61,6 +62,20 @@ public record Cmdline
     }
 
     public override string ToString() => $"{Name ?? string.Empty} {Parameters ?? string.Empty}".Trim();
+
+    #endregion
+}
+
+public static class CmdLineExtension
+{
+    #region Methods
+
+    public static bool IsEmpty(this Cmdline cmdline)
+    {
+        if (cmdline is null) return true;
+
+        return cmdline.Name.IsNullOrEmpty() && !cmdline.HasParameters;
+    }
 
     #endregion
 }
