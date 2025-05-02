@@ -43,7 +43,9 @@ internal class GetAllAliasDbAction
                                 left join alias_name an            on a.id       = an.id_alias                    
                                 inner join alias_argument       aa on a.id       = aa.id_alias
                                 inner join data_alias_synonyms_v s on s.id_alias = a.id
-                            where a.hidden = 0
+                            where 
+                                a.hidden = 0
+                                and a.deleted_at is null
                             order by
                                 a.exec_count desc,
                                 an.name
