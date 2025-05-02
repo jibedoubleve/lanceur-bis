@@ -41,7 +41,7 @@ public class FavIconService : IFavIconService
 
     #region Methods
 
-    public async Task RetrieveFaviconAsync(AliasQueryResult alias)
+    public async Task UpdateFaviconAsync(AliasQueryResult alias)
     {
         var url = alias.FileName;
         if (url is null) return;
@@ -56,7 +56,7 @@ public class FavIconService : IFavIconService
         }
 
         var uriAuthority = uri.GetAuthority();
-        var success = await _favIconDownloader.SaveToFileAsync(uriAuthority, favIconPath);
+        var success = await _favIconDownloader.RetrieveAndSaveFavicon(uriAuthority, favIconPath);
         
         alias.Thumbnail = success ? favIconPath : null;
     }

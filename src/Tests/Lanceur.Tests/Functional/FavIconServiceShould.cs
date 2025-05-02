@@ -52,11 +52,11 @@ public class FavIconServiceShould
             repository
         );
         var alias = new AliasQueryResult { FileName = url };
-        await manager.RetrieveFaviconAsync(alias);
+        await manager.UpdateFaviconAsync(alias);
 
         // ASSERT
         await favIconDownloader.Received()
-                               .SaveToFileAsync(new(asExpected), Arg.Any<string>());
+                               .RetrieveAndSaveFavicon(new(asExpected), Arg.Any<string>());
     }
 
     #endregion
