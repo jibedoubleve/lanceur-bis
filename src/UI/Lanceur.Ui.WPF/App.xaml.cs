@@ -52,7 +52,8 @@ public partial class App
                                                   )
                                                   .ConfigureAppConfiguration((context, config) =>
                                                       {
-                                                          if (context.HostingEnvironment.IsDevelopment()) config.AddUserSecrets<App>();
+                                                          if (context.HostingEnvironment.IsDevelopment())
+                                                              config.AddUserSecrets<App>();
                                                       }
                                                   )
                                                   .Build();
@@ -96,7 +97,8 @@ public partial class App
                 },
                 ToastNotificationArguments.ClickShowLogs  => () => Process.Start("explorer.exe", Paths.LogRepository),
                 // ---- Restart application ----
-                ToastNotificationArguments.ClickRestart => () => Host.Services.GetRequiredService<IAppRestartService>().Restart(),
+                ToastNotificationArguments.ClickRestart => ()
+                    => Host.Services.GetRequiredService<IAppRestartService>().Restart(),
                 // ---- Visit Website ----
                 ToastNotificationArguments.VisitWebsite => () => Process.Start("explorer.exe", Paths.ReleasesUrl),
                 // ---- Skip current version ----
@@ -110,7 +112,10 @@ public partial class App
                 // ---- Navigate to Url ----
                 ToastNotificationArguments.ClickNavigateIssue => () => Process.Start("explorer.exe", arguments["Url"]),
                 // ---- Default  ----
-                _ => () => Log.Warning("The argument {Argument} is not supported in the toast arguments. Are you using a button that has not been configured yet?", toastArgs.Argument)
+                _ => () => Log.Warning(
+                    "The argument {Argument} is not supported in the toast arguments. Are you using a button that has not been configured yet?",
+                    toastArgs.Argument
+                )
             };
 
             Current.Dispatcher.Invoke(
@@ -192,10 +197,10 @@ public partial class App
          */
         if (mainView.ViewModel.ShowAtStartup) mainView.ShowOnStartup();
 
-        Host.Services.GetRequiredService<ILogger<App>>()!
-            .LogInformation("Application started");
+        var logger = Host.Services.GetRequiredService<ILogger<App>>()!;
+       logger.LogInformation("Application started");
 
-        /* Check new Version
+        /* Check if new Version
          */
         var settings = Host.Services.GetRequiredService<ISettingsFacade>()!;
         _ = Host.Services.GetRequiredService<IReleaseService>()
@@ -208,6 +213,10 @@ public partial class App
                         Host.Services.GetService<UpdateNotification>()!
                             .Notify(context.Result.Version);
                     }
+                )
+                .ContinueWith(
+                    context => { logger.LogWarning(context.Exception, "En error occured while checking update."); },
+                    TaskContinuationOptions.OnlyOnFaulted
                 );
     }
 
