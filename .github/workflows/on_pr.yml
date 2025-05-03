@@ -10,6 +10,7 @@ on:
       - ready_for_review
     branches: 
       - master
+      - develop
 jobs:
   build:
     name: Build and Test
