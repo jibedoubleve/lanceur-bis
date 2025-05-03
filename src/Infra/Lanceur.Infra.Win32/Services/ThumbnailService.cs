@@ -57,7 +57,7 @@ public class ThumbnailService : IThumbnailService
 
         if (alias.FileName.IsNullOrEmpty())
         {
-            _logger.LogWarning("Skipping thumbnail for alias {Name} because FileName is null or empty.", alias.Name);
+            _logger.LogTrace("Skipping thumbnail for alias {Name} because FileName is null or empty.", alias.Name);
             return;
         }
 
@@ -72,7 +72,7 @@ public class ThumbnailService : IThumbnailService
         {
             if (alias.Thumbnail == filePath) return; 
 
-            _logger.LogInformation("Thumbnail already exists for {AliasName} but not yet updated. (PackagedApp)", alias.Name);
+            _logger.LogTrace("Thumbnail already exists for {AliasName} but not yet updated. (PackagedApp)", alias.Name);
             alias.Thumbnail = filePath;
             queryResult.MarkAsDirty();
             return;
@@ -116,7 +116,7 @@ public class ThumbnailService : IThumbnailService
         // ----
         if (!alias.FileName.IsUrl())
         {
-            _logger.LogWarning(
+            _logger.LogTrace(
                 "Skipping thumbnail for alias {Name} because {FileName} is not an URL.",
                 alias.Name,
                 alias.FileName
