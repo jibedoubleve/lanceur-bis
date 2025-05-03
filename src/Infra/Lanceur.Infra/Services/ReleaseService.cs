@@ -31,7 +31,6 @@ public class ReleaseService : IReleaseService
     {
         var currentVersion = CurrentVersion.FromAssembly(Assembly.GetExecutingAssembly());
 
-
         var tag = await _githubService.GetLatestVersion();
         _logger.LogInformation(
             "Application version is {AppVersion}, latest released version is {Tag}",
