@@ -379,15 +379,12 @@
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Enable trace until the next restart" />
                     </ui:CardControl.Header>
-                    <ui:ToggleSwitch
-                        IsChecked="{Binding IsTraceEnabled}"
-                        OffContent="Trace disabled"
-                        OnContent="Trace enabled" />
+                    <StackPanel Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding LogLevels}" SelectedItem="{Binding SelectedLogLevel}"/>
+                    </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl
-                    Margin="5,0,5,12"
-                    Icon="{ui:SymbolIcon PersonKey20}">
+                <ui:CardControl Margin="5,0,5,12" Icon="{ui:SymbolIcon PersonKey20}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="GitHub API Token" />
                     </ui:CardControl.Header>
