@@ -29,6 +29,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
     [ObservableProperty] private int _cpuSmoothingIndex;
     [ObservableProperty] private string _dbPath = string.Empty;
+    private readonly IEnigma _enigma;
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
@@ -40,7 +41,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isCtrl;
     [ObservableProperty] private bool _isResourceMonitorEnabled;
     [ObservableProperty] private bool _isShift;
-    [ObservableProperty] private  bool _isTraceEnabled;
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
     private readonly ILogger<ApplicationSettingsViewModel> _logger;
@@ -48,13 +48,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private int _notificationDisplayDuration;
     [ObservableProperty] private int _refreshRate;
     [ObservableProperty] private double _searchDelay;
+    [ObservableProperty] private  LogEventLevel _selectedLogLevel;
     [ObservableProperty] private ISettingsFacade _settings;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = [];
     private readonly IViewFactory _viewFactory;
-    private readonly IEnigma _enigma;
     [ObservableProperty] private string _windowBackdropStyle = "Mica";
 
     #endregion
@@ -95,7 +95,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Key = hk.Key;
 
         // Logging
-        IsTraceEnabled = _loggingLevelSwitch.MinimumLevel == LogEventLevel.Verbose;
+        SelectedLogLevel = LogLevels.SingleOrDefault(e => e == _loggingLevelSwitch.MinimumLevel);
 
         // Miscellaneous
         MapSettingsFromDbToUi();
@@ -107,6 +107,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         foreach (var flag in FeatureFlags) flag.PropertyChanged += OnPropertyChanged;
         PropertyChanged += OnPropertyChanged;
     }
+
+    #endregion
+
+    #region Properties
+
+    public ObservableCollection<LogEventLevel> LogLevels
+        => [LogEventLevel.Information, LogEventLevel.Debug, LogEventLevel.Verbose];
 
     #endregion
 
@@ -252,7 +259,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         MapSettingsFromUiToDb();
 
-        _loggingLevelSwitch.MinimumLevel = IsTraceEnabled ? LogEventLevel.Verbose : LogEventLevel.Information;
+        _loggingLevelSwitch.MinimumLevel = SelectedLogLevel;
         Settings.Save();
 
         if (reboot.Any(r => r)) _hubService.GlobalNotifications.AskRestart();
