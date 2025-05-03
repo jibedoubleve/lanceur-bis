@@ -41,22 +41,11 @@
                         FontTypography="Body"
                         Style="{StaticResource LabelStyle}"
                         Text="Version:" />
-                    <ui:TextBlock
-                        FontTypography="BodyStrong"
-                        Style="{StaticResource ContentStyle}"
-                        Text="{Binding ElementName=Self, Path=Version, Mode=OneTime}" />
-                </StackPanel>
 
-                <!--  Suffix  -->
-                <StackPanel Orientation="Horizontal">
-                    <ui:TextBlock
-                        FontTypography="Body"
-                        Style="{StaticResource LabelStyle}"
-                        Text="Suffix:" />
-                    <ui:TextBlock
-                        FontTypography="BodyStrong"
-                        Style="{StaticResource ContentStyle}"
-                        Text="{Binding ElementName=Self, Path=Suffix, Mode=OneTime}" />
+                    <ui:TextBlock FontTypography="BodyStrong" Style="{StaticResource ContentStyle}">
+                        <Run Text="{Binding ElementName=Self, Path=Version, Mode=OneTime}" />
+                        <Run Text="{Binding ElementName=Self, Path=Suffix, Mode=OneTime}" />
+                    </ui:TextBlock>
                 </StackPanel>
 
                 <!--  Semver  -->
@@ -84,9 +73,7 @@
                         FontTypography="Body"
                         Style="{StaticResource LabelStyle}"
                         Text="Website:" />
-                    <ui:TextBlock
-                        Margin="5,0,5,0"
-                        FontTypography="Body">
+                    <ui:TextBlock Margin="5,0,5,0" FontTypography="Body">
                         <Hyperlink Click="OnClickWebsite">
                             HERE
                         </Hyperlink>
