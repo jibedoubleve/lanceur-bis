@@ -195,7 +195,10 @@ public partial class MainView
 
     private void OnPreviewKeyDown(object _, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape) HideWindow();
+        if (e.Key != Key.Escape) return;
+
+        e.Handled = true;
+        HideWindow();
     }
 
     private void OnResultSelectionChanged(object _, SelectionChangedEventArgs e)
