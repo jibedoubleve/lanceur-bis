@@ -20,7 +20,7 @@ public static class KeywordsViewModelExtensions
     ///     the first alias from the list is returned. Otherwise, returns the alias that matches both the ID and name,
     ///     with its properties updated using the source alias.
     /// </returns>
-    public static AliasQueryResult? Hydrate(this IList<AliasQueryResult> aliases, AliasQueryResult? src)
+    public static AliasQueryResult Hydrate(this IList<AliasQueryResult> aliases, AliasQueryResult? src)
     {
         var selected = aliases.Reselect(src)!;
         
@@ -32,7 +32,7 @@ public static class KeywordsViewModelExtensions
 
     /// <summary>
     ///     Creates a new instance of the <see cref="AdditionalParameter" /> class using the
-    ///     <see cref="SelectedAlias" /> from the provided <paramref name="keywordsViewModel" />.
+    ///     <see cref="KeywordsViewModel.SelectedAlias" /> from the provided <paramref name="keywordsViewModel" />.
     ///     This method pre-fills the object with the AliasId based on the selected alias if available.
     /// </summary>
     /// <param name="keywordsViewModel">
@@ -57,9 +57,9 @@ public static class KeywordsViewModelExtensions
     /// <param name="selectedAlias">The currently selected <see cref="AliasQueryResult" /> or null if no alias is selected.</param>
     /// <returns>
     ///     If <paramref name="selectedAlias" /> is null or has an invalid ID, returns the first alias from the list.
-    ///     Otherwise, returns the alias from the list that matches both the ID and name of the selected alias.
+    ///     Otherwise, returns the alias from the list that matches both the ID and the name of the selected alias.
     /// </returns>
-    public static AliasQueryResult? Reselect(this IList<AliasQueryResult> aliases, AliasQueryResult? selectedAlias)
+    private static AliasQueryResult? Reselect(this IList<AliasQueryResult> aliases, AliasQueryResult? selectedAlias)
     {
         if (aliases.Count == 0) return null;
 
