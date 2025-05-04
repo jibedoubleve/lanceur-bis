@@ -145,22 +145,6 @@ public partial class App
         Host.Start();
         RegisterToastNotifications();
 
-        /* Checks whether database update is needed...
-         */
-        var cs = Ioc.Default.GetService<IConnectionString>()!;
-        Ioc.Default.GetService<SQLiteUpdater>()!
-           .Update(cs.ToString());
-
-        /* Register HotKey to the application
-         */
-        var mainView = Host.Services.GetRequiredService<MainView>();
-        var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
-
-        var hk = new Conditional<HotKeySection>(
-            new((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R),
-            hotKeyService.HotKey
-        );
-
         /* Only one instance allowed in prod...
          */
         ConditionalExecution.ExecuteOnRelease(() =>
@@ -176,6 +160,22 @@ public partial class App
                 );
                 Environment.Exit(0);
             }
+        );
+
+        /* Checks whether a database update is needed...
+         */
+        var cs = Ioc.Default.GetService<IConnectionString>()!;
+        Ioc.Default.GetService<SQLiteUpdater>()!
+           .Update(cs.ToString());
+
+        /* Register HotKey to the application
+         */
+        var mainView = Host.Services.GetRequiredService<MainView>();
+        var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
+
+        var hk = new Conditional<HotKeySection>(
+            new((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R),
+            hotKeyService.HotKey
         );
 
         var success = hotKeyService.RegisterHandler(mainView.OnShowWindow, hk);
