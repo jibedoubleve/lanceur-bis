@@ -8,7 +8,7 @@ public class ExecutionResponse
 
     public static ExecutionResponse NoResult => new() { HasResult = false, Results = new List<QueryResult>() };
 
-    public bool HasResult { get; set; }
+    public bool HasResult { get; init; }
 
     public IEnumerable<QueryResult> Results { get; set; }
 
@@ -18,8 +18,12 @@ public class ExecutionResponse
 
     public static ExecutionResponse FromResults(IEnumerable<QueryResult> results)
     {
-        results = results?.ToArray() ?? Array.Empty<QueryResult>();
-        return new() { Results = results, HasResult = results.Any() };
+        results = results?.ToArray() ?? [];
+        return new()
+        {
+            Results = results, 
+            HasResult = results.Any() 
+        };
     }
 
     #endregion Methods

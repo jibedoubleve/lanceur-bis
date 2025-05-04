@@ -45,7 +45,7 @@ public class ExecutionService : IExecutionService
 
     #region Methods
 
-    private async Task<IEnumerable<QueryResult>> ExecuteAliasAsync(AliasQueryResult query)
+    private async Task ExecuteAliasAsync(AliasQueryResult query)
     {
         try
         {
@@ -55,9 +55,10 @@ public class ExecutionService : IExecutionService
                 await Task.Delay(query.Delay * 1000);
             }
 
-            return query.IsUwp()
-                ? ExecuteUwp(query)
-                : ExecuteProcess(query);
+            if (query.IsUwp())
+                ExecuteUwp(query);
+            else
+                ExecuteProcess(query);
         }
         catch (Exception ex)
         {
@@ -74,8 +75,11 @@ public class ExecutionService : IExecutionService
         return await ExecuteAsync(request);
     }
 
-    private ScriptResult ExecuteLuaScript(ref AliasQueryResult query)
+    private ScriptResult ExecuteLuaScript(AliasQueryResult query)
     {
+        if (query.LuaScript.IsNullOrWhiteSpace())
+            return new() { Context = new() { FileName = query.FileName, Parameters = query.Query.Parameters } };
+
         using var _ = _logger.BeginSingleScope("Query", query);
 
         var result = _luaManager.ExecuteScript(
@@ -88,25 +92,25 @@ public class ExecutionService : IExecutionService
         using var __ = _logger.BeginSingleScope("ScriptResult", result);
         if (result.Exception is not null) _logger.LogWarning(result.Exception, "The Lua script is on error");
 
-        query.Parameters = result.Context.Parameters;
-        query.FileName = result.Context.FileName;
-
         _logger.LogInformation("Lua script executed on {AliasName}", query.Name);
         return result;
     }
 
-    private IEnumerable<QueryResult> ExecuteProcess(AliasQueryResult query)
+    private void ExecuteProcess(AliasQueryResult query)
     {
-        if (query is null) return QueryResult.NoResult;
+        if (query is null) return;
 
         using var _ = _logger.WarnIfSlow(this);
 
-        var result = ExecuteLuaScript(ref query);
+        var result = ExecuteLuaScript(query);
         if (result.IsCancelled)
         {
             _logger.LogInformation("The Lua script has been cancelled. No execution of the alias will be done.");
-            return QueryResult.NoResult;
+            return;
         }
+
+        query.FileName = result.Context.FileName;
+        query.Parameters = result.Context.Parameters;
 
         _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
         var psi = new ProcessStartInfo
@@ -125,10 +129,10 @@ public class ExecutionService : IExecutionService
             _logger.LogGrantedLevel(query.FileName, "ADMIN");
         }
 
-        using (Process.Start(psi)) { return QueryResult.NoResult; }
+        using (Process.Start(psi));
     }
 
-    private IEnumerable<QueryResult> ExecuteUwp(AliasQueryResult query)
+    private void ExecuteUwp(AliasQueryResult query)
     {
         // https://stackoverflow.com/questions/42521332/launching-a-windows-10-store-app-from-c-sharp-executable
         var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
@@ -152,8 +156,6 @@ public class ExecutionService : IExecutionService
 
         _logger.LogInformation("Run packaged application {File}", file);
         Process.Start(psi);
-
-        return QueryResult.NoResult;
     }
 
     /// <inheritdoc />
@@ -182,9 +184,8 @@ public class ExecutionService : IExecutionService
         {
             case AliasQueryResult alias:
                 alias.IsElevated = request.ExecuteWithPrivilege;
-                return ExecutionResponse.FromResults(
-                    await ExecuteAliasAsync(alias)
-                );
+                await ExecuteAliasAsync(alias);
+                return ExecutionResponse.NoResult;
 
             case ISelfExecutable exec:
                 _logger.LogInformation("Executing self executable {Name}", name);
