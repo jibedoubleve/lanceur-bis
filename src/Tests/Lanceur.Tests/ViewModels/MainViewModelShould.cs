@@ -38,10 +38,12 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
 
     #region Methods
 
-    protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
+    protected override IServiceCollection ConfigureServices(
+        IServiceCollection serviceCollection,
+        ServiceVisitors visitors
+    )
     {
-        serviceCollection.AddApplicationSettings(
-                             stg => visitors?.VisitSettings?.Invoke(stg)
+        serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)
                          )
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
@@ -57,26 +59,24 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                          .AddSingleton<IMemoryCache, MemoryCache>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
-                         .AddMockSingleton<IExecutionService>(
-                             (sp, i) =>
+                         .AddMockSingleton<IExecutionService>((sp, i) =>
                              {
                                  i.ExecuteAsync(Arg.Any<ExecutionRequest>())
                                   .Returns(ExecutionResponse.NoResult);
                                  return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
                              }
                          )
-                         .AddMockSingleton<ISearchServiceOrchestrator>(
-                             (_, i) =>
+                         .AddMockSingleton<ISearchServiceOrchestrator>((_, i) =>
                              {
                                  i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
                                   .Returns(true);
                                  return i;
                              }
                          )
-                         .AddMockSingleton<IStoreLoader>(
-                             (sp, i) =>
+                         .AddMockSingleton<IStoreLoader>((sp, i) =>
                              {
-                                 i.Load().Returns([new AliasStore(sp), new ReservedAliasStore(sp), new CalculatorStore(sp)]);
+                                 i.Load()
+                                  .Returns([new AliasStore(sp), new ReservedAliasStore(sp), new CalculatorStore(sp)]);
                                  return i;
                              }
                          );
@@ -122,8 +122,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [InlineData("2 * 5", "10")]
     public async Task BeAbleToExecuteCalculation(string operation, string result)
     {
-        await TestViewModelAsync(
-            async (viewModel, _) =>
+        await TestViewModelAsync(async (viewModel, _) =>
             {
                 // ARRANGE
                 var alias = Substitute.For<ExecutableQueryResult>();
@@ -193,22 +192,23 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     }
 
     [Theory]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    public void ShowLastResultOrNotDependingOnConfiguration(bool expected, bool expected2)
+    [InlineData(new[] { true, false })]
+    [InlineData(new[] { false, true })]
+    public void ShowLastResultOrNotDependingOnConfiguration(bool[] callsOfShowLastQuery)
     {
         ISettingsFacade settings = null;
         var visitors = new ServiceVisitors { VisitSettings = s => settings = s };
         TestViewModel(
             (viewModel, _) =>
             {
-                using(new AssertionScope())
+                using (new AssertionScope())
                 {
-                    settings.Application.SearchBox.ShowLastQuery = expected;
-                    viewModel.ShowLastQuery.Should().Be(expected, "this is the first call");
-                    
-                    settings.Application.SearchBox.ShowLastQuery = expected2;
-                    viewModel.ShowLastQuery.Should().Be(expected2, "this is the second call");
+                    for (var i = 0; i < callsOfShowLastQuery.Length; i++)
+                    {
+                        settings.Application.SearchBox.ShowLastQuery = callsOfShowLastQuery[i];
+                        viewModel.ShowLastQuery.Should()
+                                 .Be(callsOfShowLastQuery[i], $"this is the call n° {i + 1} of the test");
+                    }
                 }
             },
             SqlBuilder.Empty,
