@@ -1,9 +1,9 @@
 using FluentAssertions;
 using Lanceur.Ui.Core.ViewModels.Pages;
 
-namespace Lanceur.Tests.ViewModels.Extensions;
+namespace Lanceur.Tests.Tools.Extensions;
 
-public static class ViewModelExtensions
+public static class KeywordsViewModelExtensions
 {
     #region Methods
 

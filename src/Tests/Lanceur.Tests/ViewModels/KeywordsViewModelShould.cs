@@ -14,7 +14,6 @@ using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
-using Lanceur.Tests.ViewModels.Extensions;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;

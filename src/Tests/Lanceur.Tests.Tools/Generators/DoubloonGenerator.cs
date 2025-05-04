@@ -1,7 +1,7 @@
 using System.Collections;
 using Lanceur.Tests.Tools.SQL;
 
-namespace Lanceur.Tests.ViewModels.Generators;
+namespace Lanceur.Tests.Tools.Generators;
 
 public class DoubloonGenerator : IEnumerable<object[]>
 {
