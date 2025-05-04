@@ -1,51 +1,133 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="Lanceur.Core.Models.Settings.AppConfig">
-    <Position X="4.25" Y="1" Width="1.5" />
+  <Class Name="Lanceur.Core.Models.Settings.CachingSession">
+    <Position X="13.25" Y="2" Width="2" />
+    <Members>
+      <Method Name="CachingSession" Hidden="true" />
+    </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAAKAAAAAAAAAAAAAAAAAAgAAAAAAAAAACAAAAgA=</HashCode>
-      <FileName>Models\Settings\AppConfig.cs</FileName>
+      <HashCode>AAQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Settings\CachingSession.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.DatabaseConfiguration" Collapsed="true">
+    <Position X="10.25" Y="6.5" Width="2" />
+    <AssociationLine Name="Stores" Type="Lanceur.Core.Models.Settings.StoreSection" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.688" Y="6.5" />
+        <Point X="10.688" Y="5.244" />
+        <Point X="9.75" Y="5.244" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="Window" Type="Lanceur.Core.Models.Settings.WindowSection" FixedFromPoint="true">
+      <Path>
+        <Point X="10.75" Y="7.062" />
+        <Point X="10.75" Y="9.25" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAIAAEAAAAAAAAAAAgAEAIAAAAgACQAAAAA=</HashCode>
+      <FileName>Models\Settings\DatabaseConfiguration.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
+      <Property Name="Caching" />
+      <Property Name="Github" />
       <Property Name="HotKey" />
-      <Property Name="Repository" />
+      <Property Name="Reconciliation" />
+      <Property Name="ResourceMonitor" />
+      <Property Name="SearchBox" />
+      <Property Name="Stores" />
       <Property Name="Window" />
     </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="FeatureFlags" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.GithubSection">
+    <Position X="7.75" Y="2" Width="1.75" />
+    <Members>
+      <Method Name="GithubSection" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAgAAAAAAAAAAAAAAAAAAAAAAAAAAABAAE=</HashCode>
+      <FileName>Models\Settings\GithubSection.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.Settings.HotKeySection">
-    <Position X="4.5" Y="5.25" Width="1.5" />
+    <Position X="13.25" Y="8.75" Width="1.5" />
     <Members>
+      <Method Name="GetHashCode" Hidden="true" />
       <Method Name="HotKeySection" Hidden="true" />
       <Method Name="ToString" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAQEAAAAMAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAQEAAAAEAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
       <FileName>Models\Settings\HotKeySection.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.Settings.PositionSection">
-    <Position X="1.25" Y="5" Width="1.5" />
+    <Position X="9.75" Y="11.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAIAAAACAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAACAAAAAAAAAA=</HashCode>
       <FileName>Models\Settings\PositionSection.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Lanceur.Core.Models.Settings.RepositorySection">
-    <Position X="6.5" Y="5.25" Width="1.5" />
+  <Class Name="Lanceur.Core.Models.Settings.ReconciliationSection">
+    <Position X="13.75" Y="6.25" Width="1.75" />
+    <Members>
+      <Method Name="ReconciliationSection" Hidden="true" />
+    </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
-      <FileName>Models\Settings\RepositorySection.cs</FileName>
+      <HashCode>QAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Settings\ReconciliationSection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.ResourceMonitorSection">
+    <Position X="3.5" Y="7" Width="2" />
+    <Members>
+      <Method Name="ResourceMonitorSection" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Settings\ResourceMonitorSection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.SearchBoxSection">
+    <Position X="6.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAEAAAAAAAAAAAAQAABAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Settings\SearchBoxSection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lanceur.Core.Models.Settings.StoreSection">
+    <Position X="7.75" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAIAAAAACAAAAAAAAAA=</HashCode>
+      <FileName>Models\Settings\StoreSection.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Lanceur.Core.Models.Settings.WindowSection">
-    <Position X="1.25" Y="2.75" Width="1.5" />
+    <Position X="9" Y="9.25" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAEAAAAAAgAAAAIQAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
       <FileName>Models\Settings\WindowSection.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Position" />
     </ShowAsAssociation>
+  </Class>
+  <Class Name="Lanceur.Core.Models.FeatureFlag">
+    <Position X="13.25" Y="3.75" Width="1.5" />
+    <Members>
+      <Field Name="_description" Hidden="true" />
+      <Field Name="_enabled" Hidden="true" />
+      <Field Name="_featureName" Hidden="true" />
+      <Field Name="_icon" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgAIAEAAAAAAAAAAAAACCQAAAAIAEAAAA=</HashCode>
+      <FileName>Models\FeatureFlag.cs</FileName>
+    </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

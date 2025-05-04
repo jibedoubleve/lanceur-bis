@@ -1,8 +1,9 @@
 using System.Collections.ObjectModel;
-using System.Windows.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -15,24 +16,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
-public enum ReportType
-{
-    None,
-    DoubloonAliases,
-    BrokenAliases,
-    UnannotatedAliases,
-    RestoreAlias,
-    UnusedAliases,
-    InactiveAliases,
-    RarelyUsedAliases
-}
-
 public partial class DataReconciliationViewModel : ObservableObject
 {
     #region Fields
 
     [ObservableProperty] private ObservableCollection<SelectableAliasQueryResult> _aliases = new();
     private ObservableCollection<SelectableAliasQueryResult> _buffer = new();
+    [ObservableProperty] private ReportConfiguration _currentReportConfiguration;
     private readonly ILogger<DataReconciliationViewModel> _logger;
     private readonly IReconciliationService _reconciliationService;
     [ObservableProperty] private ReportType _reportType = ReportType.None;
@@ -64,7 +54,16 @@ public partial class DataReconciliationViewModel : ObservableObject
         _reconciliationService = reconciliationService;
         _viewFactory = viewFactory;
         _settingsFacade = settingsFacade;
+        _currentReportConfiguration =
+            _settingsFacade.Application.Reconciliation.ReportsConfiguration
+                           .FirstOrDefault(e => e.ReportType == ReportType.RestoreAlias)!;
     }
+
+    #endregion
+
+    #region Properties
+
+    private ReconciliationSection Reconciliation => _settingsFacade.Application.Reconciliation;
 
     #endregion
 
@@ -81,9 +80,35 @@ public partial class DataReconciliationViewModel : ObservableObject
                1;
     }
 
+
+    private async Task<(bool IsSuccess, IEnumerable<ReportConfiguration>? Configuration)> GetReportConfiguration(
+        string label,
+        string tooltip,
+        IEnumerable<ReportConfiguration> configuration,
+        ReportType reportType = ReportType.None
+    )
+    {
+        var vm = new ReportConfigurationViewModel(configuration, label, tooltip, reportType);
+        var answer = await _userInteraction.AskUserYesNoAsync(
+            _viewFactory.CreateView(vm),
+            ButtonLabels.Ok,
+            ButtonLabels.Cancel,
+            "Configure reports"
+        );
+        return answer
+            ? (answer, vm.Configurations)
+            : (answer, null);
+    }
+
     private SelectableAliasQueryResult[] GetSelectedAliases() => Aliases.Where(e => e.IsSelected).ToArray();
 
-    private async Task<(bool IsSuccess, int NumericValue)> GetThreshold(string label, string toolTip, int minimum, int maximum, int numericValue)
+    private async Task<(bool IsSuccess, int NumericValue)> GetThreshold(
+        string label,
+        string toolTip,
+        int minimum,
+        int maximum,
+        int numericValue
+    )
     {
         var vm = new NumericSelectorViewModel
         {
@@ -101,17 +126,36 @@ public partial class DataReconciliationViewModel : ObservableObject
             "Threshold"
         );
         return answer
-            ? (true, (int)vm.NumericValue)
-            : (false, 0);
+            ? (answer, (int)vm.NumericValue)
+            : (answer, 0);
     }
 
     private bool HasSelection() => Aliases.Any(e => e.IsSelected);
+
+    [RelayCommand]
+    private async Task OnConfigureReport()
+    {
+        var result = await GetReportConfiguration(
+            "Reports",
+            "Configure the visibility of the columns in the report.",
+            Reconciliation.ReportsConfiguration,
+            ReportType
+        );
+
+        if (!result.IsSuccess) return;
+
+        _settingsFacade.Save();
+        await OnShowAsync(ReportType);
+    }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private async Task OnDelete()
     {
         var toDelete = GetSelectedAliases();
-        var response = await _userInteraction.AskUserYesNoAsync($"Do you want to delete the {toDelete.Length} selected aliases?");
+        var response
+            = await _userInteraction.AskUserYesNoAsync(
+                $"Do you want to delete the {toDelete.Length} selected aliases?"
+            );
         if (!response) return;
 
         await Task.Run(() => _repository.RemoveLogically(toDelete));
@@ -149,8 +193,11 @@ public partial class DataReconciliationViewModel : ObservableObject
             return;
         }
 
-        results = await Task.Run(
-            () => _buffer.Where(e => e.Name.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase))
+        results = await Task.Run(() => _buffer.Where(e => e.Name.StartsWith(
+                                                         filter,
+                                                         StringComparison.CurrentCultureIgnoreCase
+                                                     )
+                                 )
         );
         Aliases = new(results);
     }
@@ -158,7 +205,11 @@ public partial class DataReconciliationViewModel : ObservableObject
     [RelayCommand]
     private void OnMarkSameIdAsSelected(AliasQueryResult alias)
     {
-        if (alias == null) throw new ArgumentNullException(nameof(alias), "No alias was selected, did you forget to setup CommandParameter?");
+        if (alias == null)
+            throw new ArgumentNullException(
+                nameof(alias),
+                "No alias was selected, did you forget to setup CommandParameter?"
+            );
 
         var selected = Aliases.Where(e => e.Id == alias.Id);
         foreach (var item in selected) item.IsSelected = true;
@@ -173,10 +224,9 @@ public partial class DataReconciliationViewModel : ObservableObject
         if (selectedAliases.Count == 0) return;
 
 
-        var alias = await Task.Run(
-            () => _repository.GetById(
-                selectedAliases.FirstOrDefault()!.Id
-            )
+        var alias = await Task.Run(() => _repository.GetById(
+                                       selectedAliases.FirstOrDefault()!.Id
+                                   )
         );
         _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
         var parameters = _repository.GetAdditionalParameter(
@@ -199,8 +249,7 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         alias.Synonyms = dataContext.Synonyms;
 
-        await Task.Run(
-            () =>
+        await Task.Run(() =>
             {
                 _repository.SaveOrUpdate(ref alias);
                 _repository.Restore(alias);
@@ -222,7 +271,10 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         var selectedAliases = GetSelectedAliases();
 
-        var response = await _userInteraction.AskUserYesNoAsync($"Do you want to restore {selectedAliases.Length} selected aliases?");
+        var response
+            = await _userInteraction.AskUserYesNoAsync(
+                $"Do you want to restore {selectedAliases.Length} selected aliases?"
+            );
         if (!response) return;
 
         _repository.Restore(selectedAliases);
@@ -241,14 +293,14 @@ public partial class DataReconciliationViewModel : ObservableObject
             "The inactivity period refers to the number of months after which an alias is considered inactive.",
             0,
             12 * 30,
-            _settingsFacade.Application.Reconciliation.InactivityThreshold
+            Reconciliation.InactivityThreshold
         );
 
         if (!result.IsSuccess) return;
 
-        if (_settingsFacade.Application.Reconciliation.InactivityThreshold != result.NumericValue)
+        if (Reconciliation.InactivityThreshold != result.NumericValue)
         {
-            _settingsFacade.Application.Reconciliation.InactivityThreshold = result.NumericValue;
+            Reconciliation.InactivityThreshold = result.NumericValue;
             _settingsFacade.Save();
             _logger.LogDebug("Inactivity threshold updated to {Months} months", result.NumericValue);
         }
@@ -264,14 +316,14 @@ public partial class DataReconciliationViewModel : ObservableObject
             "The usage threshold refers to the number of accesses below which an alias is considered to have low usage.",
             0,
             int.MaxValue,
-            _settingsFacade.Application.Reconciliation.LowUsageThreshold
+            Reconciliation.LowUsageThreshold
         );
 
         if (!result.IsSuccess) return;
 
-        if (_settingsFacade.Application.Reconciliation.LowUsageThreshold != result.NumericValue)
+        if (Reconciliation.LowUsageThreshold != result.NumericValue)
         {
-            _settingsFacade.Application.Reconciliation.LowUsageThreshold = result.NumericValue;
+            Reconciliation.LowUsageThreshold = result.NumericValue;
             _settingsFacade.Save();
             _logger.LogDebug("Low Usage threshold updated to {Count}", result.NumericValue);
         }
@@ -279,55 +331,41 @@ public partial class DataReconciliationViewModel : ObservableObject
         await OnShowRarelyUsedAliases();
     }
 
-    [RelayCommand]
-    private async Task OnShowAliasesWithoutNotes() => await ShowAsync(
-        "Show aliases without comments",
-        ReportType.UnannotatedAliases,
-        _repository.GetAliasesWithoutNotes,
-        true
-    );
-
-    [RelayCommand] private async Task OnShowBrokenAliases() => await ShowAsync("Broken Aliases", ReportType.BrokenAliases, _repository.GetBrokenAliases);
-
-    [RelayCommand] private async Task OnShowDoubloons() => await ShowAsync("Doubloon Aliases", ReportType.DoubloonAliases, _repository.GetDoubloons);
 
     [RelayCommand]
-    private async Task OnShowInactiveAliases() => await ShowAsync(
-        "Show inactive aliases",
-        ReportType.InactiveAliases,
-        () =>  _repository.GetInactiveAliases(_settingsFacade.Application.Reconciliation.InactivityThreshold)
-    );
+    private async Task OnShowAliasesWithoutNotes() => await OnShowAsync(ReportType.UnannotatedAliases, true);
 
-    [RelayCommand]
-    private async Task OnShowRarelyUsedAliases() => await ShowAsync(
-        "Show rarely used aliases",
-        ReportType.RarelyUsedAliases,
-        () =>  _repository.GetRarelyUsedAliases(_settingsFacade.Application.Reconciliation.LowUsageThreshold)
-    );
-
-    [RelayCommand] private async Task OnShowRestoreAliases() => await ShowAsync("Show deleted aliases", ReportType.RestoreAlias, _repository.GetDeletedAlias);
-
-    [RelayCommand] private async Task OnShowUnusedAliases() => await ShowAsync("Unused Aliases", ReportType.UnusedAliases, _repository.GetUnusedAliases);
-
-    [RelayCommand(CanExecute = nameof(HasSelection))]
-    private async Task OnUpdateDescription()
-    {
-        var selectedAliases = GetSelectedAliases();
-
-        var response = await _userInteraction.AskUserYesNoAsync($"Do you want to update the description the {selectedAliases.Length} selected aliases?");
-        if (!response) return;
-
-        _repository.SaveOrUpdate(selectedAliases);
-        _userNotification.Success($"Updated {selectedAliases.Length} selected aliases");
-        _logger.LogInformation("Updated {Items} aliases", selectedAliases.Length);
-        await OnShowAliasesWithoutNotes();
-    }
-
-    private async Task ShowAsync(string title, ReportType reportType, Func<IEnumerable<SelectableAliasQueryResult>> refreshAliases, bool isDescriptionUpdated = false)
+    private async Task OnShowAsync(ReportType reportType, bool isDescriptionUpdated = false)
     {
         using var loading = _userNotification.TrackLoadingState();
-        Title = title;
+        Title = reportType switch
+        {
+            ReportType.DoubloonAliases    => "Doubloon Aliases",
+            ReportType.BrokenAliases      => "Broken Aliases",
+            ReportType.UnannotatedAliases => "Show aliases without comments",
+            ReportType.RestoreAlias       => "Show deleted aliases",
+            ReportType.UnusedAliases      => "Unused Aliases",
+            ReportType.InactiveAliases    => "Show inactive aliases",
+            ReportType.RarelyUsedAliases  => "Show rarely used aliases",
+            ReportType.None               => "No report selected",
+            _                             => throw new ArgumentOutOfRangeException($"Report '{reportType}' not found")
+        };
+
+        Func<IEnumerable<SelectableAliasQueryResult>> refreshAliases = reportType switch
+        {
+            ReportType.DoubloonAliases    => _repository.GetDoubloons,
+            ReportType.BrokenAliases      => _repository.GetBrokenAliases,
+            ReportType.UnannotatedAliases => _repository.GetAliasesWithoutNotes,
+            ReportType.RestoreAlias       => _repository.GetDeletedAlias,
+            ReportType.UnusedAliases      => _repository.GetUnusedAliases,
+            ReportType.InactiveAliases    => () =>  _repository.GetInactiveAliases(Reconciliation.InactivityThreshold),
+            ReportType.RarelyUsedAliases  => () =>  _repository.GetRarelyUsedAliases(Reconciliation.LowUsageThreshold),
+            _                             => throw new ArgumentOutOfRangeException($"Report '{reportType}' not found")
+        };
+
         ReportType = reportType;
+        CurrentReportConfiguration
+            = Reconciliation.ReportsConfiguration.FirstOrDefault(e => e.ReportType == reportType)!;
 
         var aliases = await Task.Run(refreshAliases);
         _buffer = new(aliases);
@@ -335,6 +373,34 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         if (isDescriptionUpdated) _ = _reconciliationService.ProposeDescriptionAsync(Aliases); // Fire & forget
         OnSelectionChanged();
+    }
+
+    [RelayCommand] private async Task OnShowBrokenAliases() => await OnShowAsync(ReportType.BrokenAliases);
+
+    [RelayCommand] private async Task OnShowDoubloons() => await OnShowAsync(ReportType.DoubloonAliases);
+
+    [RelayCommand] private async Task OnShowInactiveAliases() => await OnShowAsync(ReportType.InactiveAliases);
+
+    [RelayCommand] private async Task OnShowRarelyUsedAliases() => await OnShowAsync(ReportType.RarelyUsedAliases);
+
+    [RelayCommand] private async Task OnShowRestoreAliases() => await OnShowAsync(ReportType.RestoreAlias);
+
+    [RelayCommand] private async Task OnShowUnusedAliases() => await OnShowAsync(ReportType.UnusedAliases);
+
+    [RelayCommand(CanExecute = nameof(HasSelection))]
+    private async Task OnUpdateDescription()
+    {
+        var selectedAliases = GetSelectedAliases();
+
+        var response = await _userInteraction.AskUserYesNoAsync(
+            $"Do you want to update the description the {selectedAliases.Length} selected aliases?"
+        );
+        if (!response) return;
+
+        _repository.SaveOrUpdate(selectedAliases);
+        _userNotification.Success($"Updated {selectedAliases.Length} selected aliases");
+        _logger.LogInformation("Updated {Items} aliases", selectedAliases.Length);
+        await OnShowAliasesWithoutNotes();
     }
 
     #endregion

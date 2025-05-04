@@ -1,8 +1,9 @@
 using System.ComponentModel;
-using System.Windows;
+using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.ViewModels.Pages;
-using Wpf.Ui;
+using Lanceur.Ui.WPF.Helpers;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
@@ -11,15 +12,18 @@ public partial class DataReconciliationView
 {
     #region Fields
 
-    private readonly IContentDialogService _contentDialogService;
+    private readonly IEnumerable<ReportConfiguration> _reportConfigurations;
 
     #endregion
 
     #region Constructors
 
-    public DataReconciliationView(DataReconciliationViewModel viewModel, IContentDialogService contentDialogService)
+    public DataReconciliationView(
+        DataReconciliationViewModel viewModel,
+        ISettingsFacade settings
+    )
     {
-        _contentDialogService = contentDialogService;
+        _reportConfigurations = settings.Application.Reconciliation.ReportsConfiguration;
         DataContext = viewModel;
         viewModel.PropertyChanged += OnViewModelReportTypeChanged;
         InitializeComponent();
@@ -35,38 +39,40 @@ public partial class DataReconciliationView
 
     #region Methods
 
+    private void HandleColumnVisibility(string? propertyName)
+    {
+        if (propertyName != "CurrentReportConfiguration") return;
+
+        ColumnLastUsed.Visibility = new BoolToVisibility(
+            ViewModel.CurrentReportConfiguration.ColumnsVisibility.LastUsed
+        );
+        ColumnUsageCount.Visibility = new BoolToVisibility(
+            ViewModel.CurrentReportConfiguration.ColumnsVisibility.UsageCount
+        );
+        ColumnFileName.Visibility = new BoolToVisibility(
+            ViewModel.CurrentReportConfiguration.ColumnsVisibility.FileName
+        );
+        ColumnParameters.Visibility = new BoolToVisibility(
+            ViewModel.CurrentReportConfiguration.ColumnsVisibility.Parameters
+        );
+        ColumnProposedDescription.Visibility = new BoolToVisibility(
+            ViewModel.CurrentReportConfiguration.ColumnsVisibility.ProposedDescription
+        );
+    }
+
     private void OnViewModelReportTypeChanged(object? sender, PropertyChangedEventArgs e)
     {
+        HandleColumnVisibility(e.PropertyName);
         if (e.PropertyName != nameof(ViewModel.ReportType)) return;
 
-        switch (ViewModel)
-        {
-            case { ReportType: ReportType.UnannotatedAliases }:
-            case {ReportType: ReportType.RestoreAlias}:
-                ColumnProposedDescription.Visibility = Visibility.Collapsed;
-                ColumnLastUsed.Visibility = Visibility.Collapsed;
-                ColumnUsageCount.Visibility = Visibility.Collapsed;
-                ColumnParameters.Visibility = Visibility.Collapsed;
-                ColumnFileName.Visibility = Visibility.Visible;
-                break;
-            case {ReportType: ReportType.InactiveAliases}:
-                ColumnProposedDescription.Visibility = Visibility.Collapsed;
-                ColumnLastUsed.Visibility = Visibility.Visible;
-                ColumnUsageCount.Visibility = Visibility.Collapsed;
-                break;
-            case {ReportType: ReportType.RarelyUsedAliases}: 
-                ColumnProposedDescription.Visibility = Visibility.Collapsed;
-                ColumnLastUsed.Visibility = Visibility.Collapsed;
-                ColumnUsageCount.Visibility = Visibility.Visible;
-                break;
-            default:
-                ColumnProposedDescription.Visibility = Visibility.Collapsed;
-                ColumnLastUsed.Visibility = Visibility.Collapsed;
-                ColumnUsageCount.Visibility = Visibility.Collapsed;
-                ColumnParameters.Visibility = Visibility.Visible;
-                ColumnFileName.Visibility = Visibility.Visible;
-                break;
-        }
+        var cfg = _reportConfigurations.SingleOrDefault(r => r.ReportType == ViewModel.ReportType);
+        if (cfg is null) return;
+
+        ColumnProposedDescription.Visibility = new BoolToVisibility(cfg.ColumnsVisibility.ProposedDescription);
+        ColumnLastUsed.Visibility = new BoolToVisibility(cfg.ColumnsVisibility.LastUsed);
+        ColumnUsageCount.Visibility = new BoolToVisibility(cfg.ColumnsVisibility.UsageCount);
+        ColumnParameters.Visibility = new BoolToVisibility(cfg.ColumnsVisibility.Parameters);
+        ColumnFileName.Visibility = new BoolToVisibility(cfg.ColumnsVisibility.FileName);
     }
 
     #endregion

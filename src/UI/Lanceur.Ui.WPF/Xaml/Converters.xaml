@@ -17,6 +17,7 @@
     <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
     <conv:IntToKeyEnumConverter x:Key="IntToKeyEnumConverter" />
     <conv:ReportTypeToVisibilityConverter x:Key="ReportTypeToVisibilityConverter" />
+    <conv:ReportTypeToTextConverter x:Key="ReportTypeToTextConverter" />
     <conv:InvertPlotTypeToBooleanConverter x:Key="InvertPlotTypeToBooleanConverter" />
     <conv:InvertReportTypeToVisibilityConverter x:Key="InvertReportTypeToVisibilityConverter" />
     <conv:DivideByConverter x:Key="DivideByConverter" />
