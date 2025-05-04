@@ -39,15 +39,15 @@ public partial class App
                                                   .ConfigureServices((context, services) =>
                                                       {
                                                           services.AddTrackedMemoryCache()
-                                                                  .Register("View", "Lanceur.Ui.WPF")
-                                                                  .Register("ViewModel", "Lanceur.Ui.Core")
+                                                                  .RegisterView("Lanceur.Ui.WPF")
+                                                                  .RegisterViewModel("Lanceur.Ui.Core")
                                                                   .AddServices()
                                                                   .AddWpfServices()
                                                                   .AddCommands()
                                                                   .AddMapping()
                                                                   .AddConfiguration()
-                                                                  .AddDatabaseServices();
-                                                          services.AddLoggers(context, services.BuildServiceProvider());
+                                                                  .AddDatabaseServices()
+                                                                  .AddLoggers(context, services.BuildServiceProvider());
                                                       }
                                                   )
                                                   .ConfigureAppConfiguration((context, config) =>

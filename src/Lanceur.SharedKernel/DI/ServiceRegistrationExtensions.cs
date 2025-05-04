@@ -68,25 +68,37 @@ public static class ServiceRegistrationExtensions
 
         return serviceCollection;   
     }
-    
-    /// <summary>
-    /// Registers all types from the assembly identified by the specified assembly name whose names end with the specified suffix 
-    /// (e.g., "ViewModel") into the provided <see cref="IServiceCollection"/> for dependency injection.
-    /// 
-    /// Types decorated with the <see cref="SingletonAttribute"/> will be registered as singletons, while 
-    /// all other types matching the specified suffix will be registered with a transient lifetime.
-    /// </summary>
-    /// <param name="serviceCollection">
-    /// The <see cref="IServiceCollection"/> instance where the types will be registered.
-    /// </param>
-    /// <param name="suffix">
-    /// The suffix used to identify the types to register (e.g., "ViewModel").
-    /// </param>
-    /// <param name="asm">
-    /// The name of the assembly (e.g., "MyAssembly") from which types will be scanned for matching names.
-    /// </param>
-    /// <returns>
-    /// Returns the modified <see cref="IServiceCollection"/> to allow for method chaining (fluent interface).
-    /// </returns>
-    public static IServiceCollection Register(this IServiceCollection serviceCollection, string suffix, string asm) => serviceCollection.Register(suffix, Assembly.Load(asm));
+
+/// <summary>
+/// Convenience method that registers all types ending with "View" from the specified assembly
+/// into the dependency injection container. Registration respects the <see cref="SingletonAttribute"/>.
+/// </summary>
+/// <param name="serviceCollection">
+/// The <see cref="IServiceCollection"/> instance where the types will be registered.
+/// </param>
+/// <param name="asm">
+/// The name of the assembly from which types ending with "View" will be registered.
+/// </param>
+/// <returns>
+/// The modified <see cref="IServiceCollection"/> to support method chaining.
+/// </returns>
+public static IServiceCollection RegisterView(this IServiceCollection serviceCollection, string asm) 
+    => serviceCollection.Register("View", Assembly.Load(asm));
+
+/// <summary>
+/// Convenience method that registers all types ending with "ViewModel" from the specified assembly
+/// into the dependency injection container. Registration respects the <see cref="SingletonAttribute"/>.
+/// </summary>
+/// <param name="serviceCollection">
+/// The <see cref="IServiceCollection"/> instance where the types will be registered.
+/// </param>
+/// <param name="asm">
+/// The name of the assembly from which types ending with "ViewModel" will be registered.
+/// </param>
+/// <returns>
+/// The modified <see cref="IServiceCollection"/> to support method chaining.
+/// </returns>
+public static IServiceCollection RegisterViewModel(this IServiceCollection serviceCollection, string asm) 
+    => serviceCollection.Register("ViewModel", Assembly.Load(asm));
+
 }
