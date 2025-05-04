@@ -203,7 +203,7 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            if (_settingsFacade.Application.SearchBox.ShowResult)
+            if (_settingsFacade.Application.SearchBox.ShowResult && Query.IsNullOrWhiteSpace())
             {
                 var results = await Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true));
                 Results = new(results);
