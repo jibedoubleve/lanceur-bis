@@ -163,6 +163,45 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
         );
     }
 
+    [Fact]
+    public async Task NotShowAllResultWhenPreviousQuery()
+    {
+        var i = 0;
+        var sqlBuilder = new SqlBuilder().AppendAlias(++i)
+                                         .AppendAlias(++i)
+                                         .AppendAlias(++i)
+                                         .AppendAlias(++i);
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitSettings = s =>
+            {
+                s.Application.SearchBox.ShowLastQuery = true;
+                s.Application.SearchBox.ShowResult = true;
+            }
+        };
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                using (new AssertionScope())
+                {
+                    const int expectedCount = 1;
+                    viewModel.Query = "alias_1"; // default name is alias_{idAlias}
+                    await viewModel.SearchCommand.ExecuteAsync(null);
+                    viewModel.Results.Should().HaveCount(expectedCount);
+
+                    // Handle the option "Application.SearchBox.ShowResult" If sets ti "True" it means it should show
+                    // all the results (only if query is empty)
+                    await viewModel.DisplayResultsIfAllowed();
+                    
+                    viewModel.Results.Should().HaveCount(expectedCount);
+                }
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+
     [Theory]
     [InlineData(true, 1)]
     [InlineData(false, 0)]
