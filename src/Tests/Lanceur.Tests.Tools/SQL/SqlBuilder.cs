@@ -43,7 +43,8 @@ public class SqlBuilder
     /// </param>
     /// <param name="props">Additional properties to apply to the alias</param>
     /// <param name="cfg">
-    ///     A configurator that allows customization of the alias, including Usage, Additional Parameters, or Synonyms.
+    ///     A configurator that allows customisation of the alias, including Usage, Additional Parameters, or Synonyms.
+    ///     If the configurator is omitted, a default name will be provided to the alias based on this pattern: "alias_{idAlias}".
     /// </param>
     /// <returns>The updated <see cref="SqlBuilder" /> instance.</returns>
     public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, AliasProps? props = null, Action<AliasSqlBuilder>? cfg = null)
@@ -52,7 +53,9 @@ public class SqlBuilder
         _sql.AppendNewLine();
 
         var builder = new AliasSqlBuilder(idAlias, _sql);
-        cfg?.Invoke(builder);
+        
+        if (cfg is not null) { cfg.Invoke(builder); }
+        else { builder.WithSynonyms($"alias_{idAlias}"); }
         return this;
     }
 
