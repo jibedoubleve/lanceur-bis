@@ -43,11 +43,11 @@ public partial class DataReconciliationView
         {
             case { ReportType: ReportType.UnannotatedAliases }:
             case {ReportType: ReportType.RestoreAlias}:
-                ColumnParameters.Visibility = Visibility.Collapsed;
-                ColumnFileName.Visibility = Visibility.Collapsed;
                 ColumnProposedDescription.Visibility = Visibility.Collapsed;
                 ColumnLastUsed.Visibility = Visibility.Collapsed;
                 ColumnUsageCount.Visibility = Visibility.Collapsed;
+                ColumnParameters.Visibility = Visibility.Collapsed;
+                ColumnFileName.Visibility = Visibility.Visible;
                 break;
             case {ReportType: ReportType.InactiveAliases}:
                 ColumnProposedDescription.Visibility = Visibility.Collapsed;
@@ -60,11 +60,11 @@ public partial class DataReconciliationView
                 ColumnUsageCount.Visibility = Visibility.Visible;
                 break;
             default:
-                ColumnParameters.Visibility = Visibility.Visible;
-                ColumnFileName.Visibility = Visibility.Visible;
                 ColumnProposedDescription.Visibility = Visibility.Collapsed;
                 ColumnLastUsed.Visibility = Visibility.Collapsed;
                 ColumnUsageCount.Visibility = Visibility.Collapsed;
+                ColumnParameters.Visibility = Visibility.Visible;
+                ColumnFileName.Visibility = Visibility.Visible;
                 break;
         }
     }
