@@ -2,7 +2,6 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
-using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Views.Controls;
 
 namespace Lanceur.Ui.WPF.Helpers;
@@ -18,6 +17,7 @@ public class ViewFactory : IViewFactory
         StoreShortcut vm                        => new StoreShortcutControl(vm),
         MultipleAdditionalParameterViewModel vm => new MultipleAdditionalParameterView(vm),
         NumericSelectorViewModel vm             => new NumericSelectorControl(vm),
+        ReportConfigurationViewModel vm         => new ReportConfigurationView(vm),
         UwpSelector vm                          => new UwpSelectorList(vm),
         _                                       => throw new NotSupportedException($"No control of type {viewModel.GetType().Name} is supported.")
     };

@@ -6,10 +6,11 @@
     xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:pages="clr-namespace:Lanceur.Ui.WPF.Views.Pages"
     x:Name="Self"
     Title="DataReconciliationView"
     d:DesignHeight="800"
-    d:DesignWidth="1200"
+    d:DesignWidth="2000"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
@@ -138,6 +139,10 @@
                 Header="Set Usage threshold"
                 Icon="{ui:SymbolIcon ClipboardMonth24}"
                 Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=LowUsageSelector}" />
+            <MenuItem
+                Command="{Binding ConfigureReportCommand}"
+                Header="Configure reports"
+                Icon="{ui:SymbolIcon ContentSettings24}" />
         </Menu>
 
         <ui:TextBlock
@@ -154,7 +159,8 @@
             PlaceholderText="Filter aliases...">
             <interactivity:Interaction.Triggers>
                 <interactivity:EventTrigger EventName="TextChanged">
-                    <interactivity:InvokeCommandAction Command="{Binding FilterAliasCommand}" CommandParameter="{Binding ElementName=FilterBox, Path=Text}" />
+                    <interactivity:InvokeCommandAction Command="{Binding FilterAliasCommand}"
+                                                       CommandParameter="{Binding ElementName=FilterBox, Path=Text}" />
                 </interactivity:EventTrigger>
             </interactivity:Interaction.Triggers>
         </ui:TextBox>
@@ -179,11 +185,15 @@
                                     IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                     <interactivity:Interaction.Triggers>
                                         <interactivity:EventTrigger EventName="Checked">
-                                            <interactivity:InvokeCommandAction Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
-                                            <interactivity:InvokeCommandAction Command="{Binding ElementName=Self, Path=DataContext.MarkSameIdAsSelectedCommand}" CommandParameter="{Binding .}" />
+                                            <interactivity:InvokeCommandAction
+                                                Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
+                                            <interactivity:InvokeCommandAction
+                                                Command="{Binding ElementName=Self, Path=DataContext.MarkSameIdAsSelectedCommand}"
+                                                CommandParameter="{Binding .}" />
                                         </interactivity:EventTrigger>
                                         <interactivity:EventTrigger EventName="Unchecked">
-                                            <interactivity:InvokeCommandAction Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
+                                            <interactivity:InvokeCommandAction
+                                                Command="{Binding ElementName=Self, Path=DataContext.SelectionChangedCommand}" />
                                         </interactivity:EventTrigger>
                                     </interactivity:Interaction.Triggers>
                                 </CheckBox>
