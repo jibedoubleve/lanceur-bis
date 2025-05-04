@@ -7,13 +7,13 @@ public static class KeywordsViewModelExtensions
 {
     #region Methods
 
-    public static async Task CreateNewAlias(this KeywordsViewModel viewModel, string name, string fileName = null, string luaScript = null)
+    public static async Task CreateNewAlias(this KeywordsViewModel viewModel, string name, string? fileName = null, string? luaScript = null)
     {
         viewModel.PrepareAliasForCreation(name, fileName, luaScript);
         await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null); // Save the changes
     }
 
-    public static void PrepareAliasForCreation(this KeywordsViewModel viewModel, string name, string fileName = null, string luaScript = null)
+    public static void PrepareAliasForCreation(this KeywordsViewModel viewModel, string name, string? fileName = null, string? luaScript = null)
     {
         fileName ??= $"{Guid.NewGuid()}";
 
