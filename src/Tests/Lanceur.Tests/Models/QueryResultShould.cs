@@ -15,7 +15,7 @@ public class QueryResultShould
     [Fact]
     public void HaveEmptyQueryByDefault()
     {
-        var query = new TestQueryResult().Query;
+        var query = new TestQueryResult().OriginatingQuery;
         query.Should().NotBeNull();
     }
 

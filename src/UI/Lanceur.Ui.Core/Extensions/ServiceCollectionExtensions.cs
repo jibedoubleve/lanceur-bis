@@ -54,7 +54,11 @@ public static class ServiceCollectionExtensions
         return serviceCollection;
     }
 
-    public static void AddLoggers(this IServiceCollection serviceCollection, HostBuilderContext context, ServiceProvider serviceProvider)
+    public static void AddLoggers(
+        this IServiceCollection serviceCollection,
+        HostBuilderContext context,
+        ServiceProvider serviceProvider
+    )
     {
         var logEventLevel = new Conditional<LogEventLevel>(LogEventLevel.Debug, LogEventLevel.Information);
         var levelSwitch = new LoggingLevelSwitch(logEventLevel);
@@ -83,7 +87,10 @@ public static class ServiceCollectionExtensions
             {
                 // For now, only seq is configured in my development machine and not anymore in AWS.
                 var apiKey = context.Configuration["SEQ_LANCEUR"];
-                if (apiKey is null) throw new NotSupportedException("Api key not found. Create a environment variable 'SEQ_LANCEUR' with the api key");
+                if (apiKey is null)
+                    throw new NotSupportedException(
+                        "Api key not found. Create a environment variable 'SEQ_LANCEUR' with the api key"
+                    );
 
                 loggerCfg.WriteTo.Seq(
                     Paths.TelemetryUrlSeq,
@@ -94,7 +101,10 @@ public static class ServiceCollectionExtensions
             if (telemetry.IsLokiEnabled)
                 loggerCfg.WriteTo.GrafanaLoki(
                     Paths.TelemetryUrlLoki,
-                    [new()  { Key = "app", Value = "lanceur-bis" }, new()  { Key = "env", Value = new Conditional<string>("dev", "prod") }]
+                    [
+                        new()  { Key = "app", Value = "lanceur-bis" },
+                        new()  { Key = "env", Value = new Conditional<string>("dev", "prod") }
+                    ]
                 );
         }
 
@@ -140,7 +150,11 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IAliasManagementService, AliasManagementService>()
                          .AddTransient<IClipboardService, ClipboardService>()
                          .AddTransient<IAliasRepository, SQLiteAliasRepository>()
-                         .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))
+                         .AddTransient<IDbConnection, SQLiteConnection>(sp => new(
+                                                                            sp.GetService<IConnectionString>()!
+                                                                              .ToString()
+                                                                        )
+                         )
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
                          .AddTransient<IConnectionString, ConnectionString>()
@@ -162,6 +176,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
+                         .AddTransient<IProcessLauncher, ProcessLauncherLogger>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>();
