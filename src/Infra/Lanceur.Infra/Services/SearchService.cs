@@ -116,7 +116,7 @@ public class SearchService : ISearchService
 
 
         // Remember the query
-        foreach (var result in results) result.Query = query;
+        foreach (var result in results) result.OriginatingQuery = query;
 
         _thumbnailService.UpdateThumbnails(results);
         var orderedResults = Sort(results).ToList();

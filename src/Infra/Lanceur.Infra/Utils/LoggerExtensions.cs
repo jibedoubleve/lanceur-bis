@@ -1,6 +1,6 @@
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Utils;
 
@@ -8,7 +8,7 @@ public static class LoggerExtensions
 {
     #region Methods
 
-    public static IDisposable ScopeProcessStartInfo(this ILogger logger, ProcessStartInfo psi) => logger.BeginSingleScope(
+    public static IDisposable ScopeProcessStartInfo(this ILogger logger, ProcessContext psi) => logger.BeginSingleScope(
         "ProcessStartInfo",
         new
         {
@@ -21,5 +21,5 @@ public static class LoggerExtensions
         }
     );
 
-    #endregion Methods
+    #endregion
 }

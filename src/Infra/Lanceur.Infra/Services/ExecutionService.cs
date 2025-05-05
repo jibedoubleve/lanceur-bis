@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.BusinessLogic;
 using Lanceur.Core.LuaScripting;
@@ -22,6 +21,7 @@ public class ExecutionService : IExecutionService
     private readonly IAliasRepository _aliasRepository;
     private readonly ILogger<ExecutionService> _logger;
     private readonly ILuaManager _luaManager;
+    private readonly IProcessLauncher _process;
     private readonly IWildcardService _wildcardService;
 
     #endregion
@@ -32,13 +32,15 @@ public class ExecutionService : IExecutionService
         ILoggerFactory logFactory,
         IWildcardService wildcardService,
         IAliasRepository aliasRepository,
-        ILuaManager luaManager
+        ILuaManager luaManager,
+        IProcessLauncher processLauncher
     )
     {
         _logger = logFactory.GetLogger<ExecutionService>();
         _wildcardService = wildcardService;
         _aliasRepository = aliasRepository;
         _luaManager = luaManager;
+        _process = processLauncher;
     }
 
     #endregion
@@ -78,7 +80,10 @@ public class ExecutionService : IExecutionService
     private ScriptResult ExecuteLuaScript(AliasQueryResult query)
     {
         if (query.LuaScript.IsNullOrWhiteSpace())
-            return new() { Context = new() { FileName = query.FileName, Parameters = query.Query.Parameters } };
+            return new()
+            {
+                Context = new() { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
+            };
 
         using var _ = _logger.BeginSingleScope("Query", query);
 
@@ -113,14 +118,14 @@ public class ExecutionService : IExecutionService
         query.Parameters = result.Context.Parameters;
 
         _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
-        var psi = new ProcessStartInfo
+        var psi = new ProcessContext
         {
             FileName = _wildcardService.Replace(query.FileName, query.Parameters),
             Verb = "open",
-            Arguments = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.Query.Parameters),
+            Arguments = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.OriginatingQuery.Parameters),
             UseShellExecute = true, // https://stackoverflow.com/a/5255335/389529
             WorkingDirectory = query.WorkingDirectory,
-            WindowStyle = query.StartMode.AsWindowsStyle()
+            WindowStyle = query.StartMode
         };
         using var __ = _logger.ScopeProcessStartInfo(psi);
         if (query.IsElevated || query.RunAs == Constants.RunAs.Admin)
@@ -129,20 +134,19 @@ public class ExecutionService : IExecutionService
             _logger.LogGrantedLevel(query.FileName, "ADMIN");
         }
 
-        using (Process.Start(psi));
+        _process.Start(psi);
     }
 
     private void ExecuteUwp(AliasQueryResult query)
     {
         // https://stackoverflow.com/questions/42521332/launching-a-windows-10-store-app-from-c-sharp-executable
         var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
-        var psi = new ProcessStartInfo();
+        var psi = new ProcessContext();
 
         if (query.IsElevated)
         {
             psi.FileName = file;
-            //https://stackoverflow.com/a/23199505/389529
-            psi.UseShellExecute = true;
+            psi.UseShellExecute = true; //https://stackoverflow.com/a/23199505/389529
             psi.Verb = "runas";
             _logger.LogGrantedLevel(query.FileName, "ADMIN");
         }
@@ -155,7 +159,7 @@ public class ExecutionService : IExecutionService
         }
 
         _logger.LogInformation("Run packaged application {File}", file);
-        Process.Start(psi);
+        _process.Start(psi);
     }
 
     /// <inheritdoc />
@@ -191,7 +195,7 @@ public class ExecutionService : IExecutionService
                 _logger.LogInformation("Executing self executable {Name}", name);
                 exec.IsElevated = request.ExecuteWithPrivilege;
                 return ExecutionResponse.FromResults(
-                    await exec.ExecuteAsync(Cmdline.Parse(request.Query))
+                    await exec.ExecuteAsync(Cmdline.Parse(request.OriginatingQuery))
                 );
 
             default:
@@ -223,8 +227,8 @@ public class ExecutionService : IExecutionService
         if (!File.Exists(alias.FileName) && !Directory.Exists(alias.FileName)) return;
 
         var directory = Path.GetDirectoryName(alias.FileName);
-        if (directory is not null) Process.Start("explorer.exe", directory);
-        if (Directory.Exists(alias.FileName)) Process.Start("explorer.exe", alias.FileName);
+        if (directory is not null) _process.Open(directory);
+        if (Directory.Exists(alias.FileName)) _process.Open(alias.FileName);
     }
 
     #endregion

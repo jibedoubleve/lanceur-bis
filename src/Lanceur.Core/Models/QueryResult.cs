@@ -41,13 +41,13 @@ public abstract class QueryResult : ObservableModel
         set => SetField(ref _count, value);
     }
 
-    public virtual string DescriptionDisplay => Description;
-
     public string Description
     {
         get => _description;
         set => SetField(ref _description, value);
     }
+
+    public virtual string DescriptionDisplay => Description;
 
     /// <summary>
     ///     Fall back for <see cref="Thumbnail" />. This property is expected to
@@ -83,7 +83,10 @@ public abstract class QueryResult : ObservableModel
 
     public static IEnumerable<QueryResult> NoResult => new List<QueryResult>();
 
-    public Cmdline Query { get; set; } = Cmdline.Empty;
+    /// <summary>
+    ///     The original query that led to the generation of this result.
+    /// </summary>
+    public Cmdline OriginatingQuery { get; set; } = Cmdline.Empty;
 
     /// <summary>
     ///     Represents a thumbnail to display in the UI. Set to <c>null</c> to display the <see cref="Icon" /> instead.
