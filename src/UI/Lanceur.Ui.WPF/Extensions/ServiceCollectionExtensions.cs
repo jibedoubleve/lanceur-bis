@@ -4,7 +4,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Win32.Services;
-using Lanceur.SharedKernel.Utils;
+using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.Commands;
 using Lanceur.Ui.WPF.Helpers;
@@ -38,17 +38,14 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IHotKeyService, HotKeyService>()
                          .AddSingleton<IInteractionHubService, InteractionHubService>()
                          .AddSingleton<IReleaseService, ReleaseService>()
-                         .AddSingleton(new AssemblySource
-                         {
-                             ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)), 
-                             MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
-                         });
-
-        ConditionalExecution.Execute(
-            serviceCollection,
-            onPrd => onPrd.AddSingleton<IAppRestartService, AppRestartDummyService>(),
-            onDbg => onDbg.AddSingleton<IAppRestartService, AppRestartService>()
-        );
+                         .AddSingletonConditional<IAppRestartService, AppRestartDummyService, AppRestartService>()
+                         .AddSingleton(
+                             new AssemblySource
+                             {
+                                 ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)),
+                                 MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
+                             }
+                         );
 
         return serviceCollection;
     }

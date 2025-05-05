@@ -23,6 +23,7 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Caching;
+using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
 using Lanceur.Ui.Core.Services;
@@ -176,16 +177,11 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
-                         .AddTransient<IProcessLauncher, ProcessLauncherLogger>()
+                         .AddTransientConditional<IProcessLauncher, ProcessLauncherLogger, ProcessLauncherWin32>()
+                         .AddSingletonConditional<IApplicationConfigurationService, MemoryApplicationConfigurationService, JsonApplicationConfigurationService>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>();
-
-        ConditionalExecution.Execute(
-            serviceCollection,
-            s => s.AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>(),
-            s => s.AddSingleton<IApplicationConfigurationService, JsonApplicationConfigurationService>()
-        );
 
         return serviceCollection;
     }
