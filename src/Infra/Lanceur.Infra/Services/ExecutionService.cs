@@ -82,7 +82,7 @@ public class ExecutionService : IExecutionService
         if (query.LuaScript.IsNullOrWhiteSpace())
             return new()
             {
-                Context = new() { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
+                Context = new() { FileName = query.FileName, Parameters = query.Parameters }
             };
 
         using var _ = _logger.BeginSingleScope("Query", query);
