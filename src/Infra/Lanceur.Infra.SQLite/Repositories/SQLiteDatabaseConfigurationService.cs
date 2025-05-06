@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -46,6 +47,24 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
 
     #region Methods
 
+    /// <summary>
+    ///     HACK: If there's new feature flags added (in a new version of the application,
+    ///     add it here.
+    /// </summary>
+    private DatabaseConfiguration AddNewFeatureFlags(DatabaseConfiguration config)
+    {
+        if (config is null) return null;
+
+        var defaultFf = new DatabaseConfiguration().FeatureFlags; //Default featureFlags
+        var currentFf = new List<FeatureFlag>(config.FeatureFlags);
+
+        var newFf = defaultFf.Where(f => config.FeatureFlags.All(c => c.FeatureName != f.FeatureName));
+
+        currentFf.AddRange(newFf);
+        config.FeatureFlags = currentFf;
+        return config;
+    }
+
     public void Edit(Action<DatabaseConfiguration> edit)
     {
         var stg = Current;
@@ -66,9 +85,11 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
                                              .FirstOrDefault()
         );
 
-        _current = json.IsNullOrEmpty()
-            ? new()
-            : JsonConvert.DeserializeObject<DatabaseConfiguration>(json, _jsonSettings);
+        _current =  AddNewFeatureFlags(
+            json.IsNullOrEmpty()
+                ? new()
+                : JsonConvert.DeserializeObject<DatabaseConfiguration>(json, _jsonSettings)
+        );
     }
 
     public void Save()
