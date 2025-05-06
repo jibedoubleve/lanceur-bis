@@ -1,3 +1,4 @@
+using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -15,6 +16,7 @@ public class AdditionalParametersStore : Store, IStoreService
     #region Fields
 
     private readonly IAliasRepository _aliasService;
+    private readonly IFeatureFlagService _featureFlags;
     private readonly ILogger<AdditionalParametersStore> _logger;
 
     #endregion
@@ -25,6 +27,7 @@ public class AdditionalParametersStore : Store, IStoreService
     {
         _aliasService = serviceProvider.GetService<IAliasRepository>();
         _logger = serviceProvider.GetService<ILogger<AdditionalParametersStore>>();
+        _featureFlags = serviceProvider.GetService<IFeatureFlagService>();
     }
 
     #endregion
@@ -35,13 +38,15 @@ public class AdditionalParametersStore : Store, IStoreService
     public bool IsOverridable => false;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Shared(".*:.*");
+    public StoreOrchestration StoreOrchestration => _featureFlags.IsEnabled(Features.AdditionalParameterAlwaysActive)
+        ? StoreOrchestrationFactory.SharedAlwaysActive()
+        : StoreOrchestrationFactory.Shared(".*:.*");
 
     #endregion
 
     #region Methods
 
-    /// <inheritdoc cref="IStoreService.GetAll"/>
+    /// <inheritdoc cref="IStoreService.GetAll" />
     public override IEnumerable<QueryResult> GetAll() => _aliasService.GetAllAliasWithAdditionalParameters();
 
     /// <inheritdoc />
