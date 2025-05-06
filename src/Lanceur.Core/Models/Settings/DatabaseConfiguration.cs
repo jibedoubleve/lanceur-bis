@@ -26,6 +26,13 @@ public class DatabaseConfiguration
             Enabled = true,
             Description = "Show CPU and Memory Usage in Search Box",
             Icon = "Gauge24"
+        },
+        new()
+        {
+            FeatureName = Features.AdditionalParameterAlwaysActive,
+            Enabled = false,
+            Description = "Display additional parameter results without requiring ':' input",
+            Icon = "PanelSeparateWindow20"
         }
     ];
 
