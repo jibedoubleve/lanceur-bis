@@ -31,7 +31,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
     private SQLiteAliasRepository BuildRepository(IConnectionString connectionString = null)
     {
-        var connection = BuildFreshDb(connectionString: connectionString?.ToString());
+        var connection = BuildFreshDb(connectionString: connectionString);
         var scope = new DbSingleConnectionManager(connection);
         var log = Substitute.For<ILoggerFactory>();
         var conv = Substitute.For<IMappingService>();

@@ -64,4 +64,4 @@ public class SqlBuilder
     #endregion
 }
 
-public record AliasProps(Constants.RunAs? RunAs = null, Constants.StartMode? StartMode = null, DateTime? DeletedAt = null);
+public record AliasProps(Constants.RunAs? RunAs = null, Constants.StartMode? StartMode = null, DateTime? DeletedAt = null, int Count = 0);
