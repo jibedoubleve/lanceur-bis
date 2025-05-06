@@ -2,6 +2,7 @@
 using System.Data.SQLite;
 using System.SQLite.Updater;
 using Dapper;
+using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Extensions;
@@ -54,7 +55,10 @@ public abstract class TestBase
         return connection;
     }
 
-    protected IDbConnection BuildFreshDb(string? sql = null, string? connectionString = null)
+    protected IDbConnection BuildFreshDb(string? sql = null, IConnectionString? connectionString = null)
+        => BuildFreshDb(sql, connectionString?.ToString());
+
+    private IDbConnection BuildFreshDb(string? sql = null, string? connectionString = null)
     {
         var db = BuildConnection(connectionString);
         var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbeddedResourcePattern);

@@ -72,7 +72,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
                                 sub.synonyms as {nameof(SelectableAliasQueryResult.Synonyms)},
-                                a.icon       as {nameof(SelectableAliasQueryResult.Icon)}
+                                a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.exec_count as {nameof(SelectableAliasQueryResult.Count)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -109,12 +110,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     {
         const string sql = $"""
                             select 
-                                a.id        as {nameof(SelectableAliasQueryResult.Id)},
-                                a.notes     as {nameof(SelectableAliasQueryResult.Description)},
-                                a.file_name as {nameof(SelectableAliasQueryResult.FileName)},
-                                a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
-                                an.name     as {nameof(SelectableAliasQueryResult.Name)},
-                                a.icon      as {nameof(SelectableAliasQueryResult.Icon)}
+                                a.id         as {nameof(SelectableAliasQueryResult.Id)},
+                                a.notes      as {nameof(SelectableAliasQueryResult.Description)},
+                                a.file_name  as {nameof(SelectableAliasQueryResult.FileName)},
+                                a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
+                                an.name      as {nameof(SelectableAliasQueryResult.Name)},
+                                a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.exec_count as {nameof(SelectableAliasQueryResult.Count)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -144,12 +146,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     {
         const string sql = $"""
                             select 
-                                a.id        as {nameof(SelectableAliasQueryResult.Id)},
-                                a.notes     as {nameof(SelectableAliasQueryResult.Description)},
-                                a.file_name as {nameof(SelectableAliasQueryResult.FileName)},
-                                a.arguments as {nameof(SelectableAliasQueryResult.Parameters)},
-                                an.name     as {nameof(SelectableAliasQueryResult.Name)},
-                                a.icon      as {nameof(SelectableAliasQueryResult.Icon)}
+                                a.id         as {nameof(SelectableAliasQueryResult.Id)},
+                                a.notes      as {nameof(SelectableAliasQueryResult.Description)},
+                                a.file_name  as {nameof(SelectableAliasQueryResult.FileName)},
+                                a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
+                                an.name      as {nameof(SelectableAliasQueryResult.Name)},
+                                a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.exec_count as {nameof(SelectableAliasQueryResult.Count)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -170,7 +173,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 file_name as {nameof(SelectableAliasQueryResult.FileName)},
                                 arguments as {nameof(SelectableAliasQueryResult.Parameters)},
                                 name      as {nameof(SelectableAliasQueryResult.Name)},
-                                icon      as {nameof(SelectableAliasQueryResult.Icon)}
+                                icon      as {nameof(SelectableAliasQueryResult.Icon)},
+                                exec_count as {nameof(SelectableAliasQueryResult.Count)}
                             from
                                 data_doubloons_v
                             order by file_name
