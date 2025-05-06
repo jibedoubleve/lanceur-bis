@@ -65,8 +65,9 @@ public class ThumbnailServiceShould : TestBase
                                   .ToString();
 
         OutputHelper.WriteLine(sql);
-        var connectionString = ConnectionStringFactory.InMemory.ToString();
-        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql, connectionString));
+        var connectionMgr = new DbSingleConnectionManager(
+            BuildFreshDb(sql, ConnectionStringFactory.InMemory)
+        );
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
         var conversionService = new MappingService();

@@ -42,6 +42,9 @@ public class AliasSqlBuilder
         var argumentsDef = arguments == "null" ? "" : ", arguments"; 
         var argumentsVal = arguments == "null" ? "" : $", '{arguments}'";
         
+        var countDef = props?.Count == null ? "" : ", exec_count";
+        var countVal = props?.Count == null ? "" : $", {props.Count}";
+        
         var sql = $"""
                    insert into alias (
                        id 
@@ -49,14 +52,16 @@ public class AliasSqlBuilder
                        , start_mode
                        {fileNameDef}
                        {argumentsDef}
-                       {deletedAtDef}) 
-                   values (
+                       {deletedAtDef} 
+                       {countDef}
+                    )values (
                        {idAlias}
                        {runAs}
                        {startMode}
                        {fileNameVal}
                        {argumentsVal}
                        {deletedAtVal}
+                       {countVal}
                    );
                    """;
         return sql;

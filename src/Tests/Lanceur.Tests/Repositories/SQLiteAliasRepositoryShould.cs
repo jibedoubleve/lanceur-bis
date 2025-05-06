@@ -90,9 +90,8 @@ public class SQLiteAliasRepositoryShould : TestBase
                            insert into alias_name(id, name, id_alias) values (200, 'some_name_1', 1002);
                            insert into alias_name(id, name, id_alias) values (300, 'some_name_2', 1003);
                            """;
-
-        var connectionString = ConnectionStringFactory.InMemory;
-        var connection = BuildFreshDb(sql, connectionString.ToString());
+        
+        var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
         var c = new DbSingleConnectionManager(connection);
         var aliasAction = BuildAliasDbAction();
         var aliasSearch = BuildAliasSearchDbAction();
@@ -182,9 +181,8 @@ public class SQLiteAliasRepositoryShould : TestBase
                            insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
                            insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);
                            """;
-
-        var connectionString = ConnectionStringFactory.InMemory;
-        var connection = BuildFreshDb(sql, connectionString.ToString());
+        
+        var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
         var action = BuildAliasDbAction();
 
         var alias1 = BuildAlias();
@@ -193,8 +191,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        c.WithinTransaction(
-            tx =>
+        c.WithinTransaction(tx =>
             {
                 action.SaveOrUpdate(tx, ref alias1);
                 action.SaveOrUpdate(tx, ref alias2);
@@ -222,8 +219,7 @@ public class SQLiteAliasRepositoryShould : TestBase
     {
         // ARRANGE
         var aliasName = Guid.NewGuid().ToString();
-        var cs = ConnectionStringFactory.InMemory.ToString();
-        var connection = BuildFreshDb(connectionString: cs);
+        var connection = BuildFreshDb(connectionString: ConnectionStringFactory.InMemory);
         var action = BuildAliasDbAction();
         var db = new DbSingleConnectionManager(connection);
         QueryResult alias1 = new AliasQueryResult { Name = aliasName };
@@ -312,7 +308,7 @@ public class SQLiteAliasRepositoryShould : TestBase
 
         var sql = new SqlBuilder().AppendAlias(1, cfg: a => a.WithSynonyms("Alias")).ToString();
 
-        var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory.ToString());
+        var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
         var dbAction = BuildAliasDbAction(sb.GetService<ILoggerFactory>());
 
         var alias = new AliasQueryResult { Id = 1, Name = "Alias" };
@@ -370,8 +366,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var alias = BuildAlias();
 
         // ACT
-        c.WithinTransaction(
-            tx =>
+        c.WithinTransaction(tx =>
             {
                 action.SaveOrUpdate(tx, ref alias);
                 action.Remove(tx, alias);
