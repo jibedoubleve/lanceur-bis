@@ -120,7 +120,7 @@ public class ExecutionService : IExecutionService
         _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
         var psi = new ProcessContext
         {
-            FileName = _wildcardService.Replace(query.FileName, query.Parameters),
+            FileName = _wildcardService.Replace(query.FileName, query.OriginatingQuery.Parameters),
             Verb = "open",
             Arguments = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.OriginatingQuery.Parameters),
             UseShellExecute = true, // https://stackoverflow.com/a/5255335/389529
