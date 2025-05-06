@@ -28,8 +28,8 @@ public class AliasSqlBuilder
 
     public static string GenerateAliasSql(long idAlias, string? fileName, string? arguments, AliasProps? props)
     {
-        fileName ??= Guid.NewGuid().ToString();
-        arguments ??= Guid.NewGuid().ToString();
+        fileName ??= Guid.NewGuid().ToString()[..8];
+        arguments ??= Guid.NewGuid().ToString()[..8];
         var runAs = props?.RunAs == null ? ", 1" : props.RunAs.ToString(); 
         var startMode = props?.StartMode == null ? ", 1 " : props.StartMode.ToString();
         
@@ -84,9 +84,9 @@ public class AliasSqlBuilder
         return this;
     }
 
-    public AliasSqlBuilder WithSynonyms(params string[] synonyms)
+    public AliasSqlBuilder WithSynonyms(params string[]? synonyms)
     {
-        if (synonyms is null || synonyms.Length == 0) throw new ArgumentNullException(nameof(synonyms), "You should provide names for the alias");
+        if (synonyms is null || synonyms.Length == 0) synonyms = [Guid.NewGuid().ToString()[..8]];
 
         foreach (var synonym in synonyms)
         {

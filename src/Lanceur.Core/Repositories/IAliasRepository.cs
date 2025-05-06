@@ -95,6 +95,10 @@ public interface IAliasRepository
     /// <param name="names">A list of aliases to check for existence in the database.</param>
     /// <param name="idAlias">Id of the alias to validate</param>
     /// <returns>An IEnumerable containing the aliases that exist in both the provided list and the database.</returns>
+    /// <remarks>
+    ///     This is used for validation. You check before creating a new alias whether one (or more) of the names
+    ///     already exists in the database
+    /// </remarks>
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
 
     /// <summary>
@@ -130,20 +134,6 @@ public interface IAliasRepository
     /// </returns>
     IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months);
 
-    /// <summary>
-    ///     Retrieves aliases that have been used fewer times than the specified threshold.
-    ///     This method is useful for identifying aliases that are rarely accessed and may be considered for cleanup or review.
-    /// </summary>
-    /// <param name="threshold">
-    ///     The maximum number of times an alias can be used to be included in the result.
-    ///     Aliases with usage counts less than this value will be returned.
-    /// </param>
-    /// <returns>
-    ///     A collection of <see cref="SelectableAliasQueryResult" /> representing aliases
-    ///     with usage counts below the specified threshold.
-    /// </returns>
-    IEnumerable<SelectableAliasQueryResult> GetRarelyUsedAliases(int threshold);
-
 
     /// <summary>
     ///     Get list of all the aliases with count greater than 0
@@ -157,6 +147,20 @@ public interface IAliasRepository
     /// <param name="year">The year for which to retrieve alias usage statistics.</param>
     /// <returns>A collection of <see cref="UsageQueryResult" /> representing the most used aliases for the specified year.</returns>
     IEnumerable<UsageQueryResult> GetMostUsedAliasesByYear(int year);
+
+    /// <summary>
+    ///     Retrieves aliases that have been used fewer times than the specified threshold.
+    ///     This method is useful for identifying aliases that are rarely accessed and may be considered for cleanup or review.
+    /// </summary>
+    /// <param name="threshold">
+    ///     The maximum number of times an alias can be used to be included in the result.
+    ///     Aliases with usage counts less than this value will be returned.
+    /// </param>
+    /// <returns>
+    ///     A collection of <see cref="SelectableAliasQueryResult" /> representing aliases
+    ///     with usage counts below the specified threshold.
+    /// </returns>
+    IEnumerable<SelectableAliasQueryResult> GetRarelyUsedAliases(int threshold);
 
     /// <summary>
     ///     Retrieves the aliases that were not used at all.
