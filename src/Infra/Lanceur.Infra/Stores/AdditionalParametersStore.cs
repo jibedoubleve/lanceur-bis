@@ -38,9 +38,10 @@ public class AdditionalParametersStore : Store, IStoreService
     public bool IsOverridable => false;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => _featureFlags.IsEnabled(Features.AdditionalParameterAlwaysActive)
-        ? StoreOrchestrationFactory.SharedAlwaysActive()
-        : StoreOrchestrationFactory.Shared(".*:.*");
+    public StoreOrchestration StoreOrchestration
+        => _featureFlags?.IsEnabled(Features.AdditionalParameterAlwaysActive) ?? false
+            ? StoreOrchestrationFactory.SharedAlwaysActive()
+            : StoreOrchestrationFactory.Shared(".*:.*");
 
     #endregion
 

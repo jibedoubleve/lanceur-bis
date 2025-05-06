@@ -75,7 +75,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
             repository =>
             {
                 var settings = repository.Current;
-                settings.FeatureFlags.Should().HaveCount(2);
+                settings.FeatureFlags.Should().HaveCount(4);
 
                 settings.FeatureFlags.ElementAt(0).Enabled.Should().BeFalse();
                 settings.FeatureFlags.ElementAt(0).FeatureName.Should().Be("ShowSystemUsage1");
