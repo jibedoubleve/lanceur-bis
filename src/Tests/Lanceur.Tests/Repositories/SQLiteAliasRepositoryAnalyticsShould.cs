@@ -53,11 +53,13 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     {
         // arrange
         var i = 0;
+        const int count = 2;
         var date1 = DateTime.Now.AddDays(-1);
         var date2 = DateTime.Now.AddDays(-2);
 
         var sql = new SqlBuilder().AppendAlias(
                                       ++i,
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -66,6 +68,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -74,6 +77,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -82,6 +86,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -90,6 +95,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -124,12 +130,14 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     {
         // arrange
         var i = 0;
+        const int count = 2;
         var date1 = DateTime.Now.AddDays(-1);
         var date2 = DateTime.Now.AddDays(-2);
 
         var sql = new SqlBuilder().AppendAlias(
                                       ++i,
                                       $"{fileName}_{i}",
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -139,6 +147,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   .AppendAlias(
                                       ++i,
                                       $"{fileName}_{i}",
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -148,6 +157,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   .AppendAlias(
                                       ++i,
                                       $"{fileName}_{i}",
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -157,6 +167,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   .AppendAlias(
                                       ++i,
                                       $"{fileName}_{i}",
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -166,6 +177,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   .AppendAlias(
                                       ++i,
                                       $"{fileName}_{i}",
+                                      props: new() { Count = count },
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -194,13 +206,14 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     {
         // arrange
         var i = 0;
+        const int count = 2;
         var now = DateTime.Now.AddMinutes(-60);
         var date1 = now.AddDays(-1);
         var date2 = now.AddDays(-2);
 
         var sql = new SqlBuilder().AppendAlias(
                                       ++i,
-                                      props: new(DeletedAt: now),
+                                      props: new(DeletedAt: now, Count: count),
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -209,7 +222,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
-                                      props: new(DeletedAt: now),
+                                      props: new(DeletedAt: now, Count: count),
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -218,7 +231,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
-                                      props: new(DeletedAt: now),
+                                      props: new(DeletedAt: now, Count: count),
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -227,7 +240,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
-                                      props: new(DeletedAt: now),
+                                      props: new(DeletedAt: now, Count: count),
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -236,7 +249,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
-                                      props: new(DeletedAt: now),
+                                      props: new(DeletedAt: now, Count: count),
                                       cfg: a =>
                                       {
                                           a.WithUsage(date1, date2);
@@ -263,14 +276,40 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     {
         // arrange
         var i = 0;
+        const int count = 2;
         const string name = "is_a_doubloon";
-        var sql = new SqlBuilder().AppendAlias(++i, name, name)
-                                  .AppendAlias(++i, name, name)
-                                  .AppendAlias(++i, name, name)
-                                  .AppendAlias(++i, name, name)
-                                  .AppendAlias(++i, name, name)
+        var sql = new SqlBuilder().AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count }
+                                  )
                                   .ToString();
-        var service = BuildRepository(sql);
+        var service = BuildRepository(sql);;
 
         // act
         var aliases = service.GetDoubloons()
@@ -280,7 +319,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         using (new AssertionScope())
         {
             aliases.Should().HaveCount(i);
-            foreach (var alias in aliases) alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
+            foreach (var alias in aliases) alias.Count.Should().Be(count);
         }
     }
 
@@ -327,7 +366,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                       cfg: a =>
                                       {
                                           a.WithSynonyms();
-                                          a.WithUsage(date1, date2);
+                                          a.WithUsage(DateTime.Now);
                                       }
                                   )
                                   .AppendAlias(
@@ -370,11 +409,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(4);
-        }
+        aliases.Should().HaveCount(4);
     }
+
     [Fact]
     public void GetRarelyUsedAliases()
     {
@@ -382,12 +419,13 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var i = 0;
         var date1 = DateTime.Now.AddMonths(-10);
         var date2 = DateTime.Now.AddMonths(-20);
+        var date3 = DateTime.Now.AddMonths(-30);
         var sql = new SqlBuilder().AppendAlias(
                                       ++i,
                                       cfg: a =>
                                       {
                                           a.WithSynonyms();
-                                          a.WithUsage(date1, date2);
+                                          a.WithUsage(date1, date2, date3);
                                       }
                                   )
                                   .AppendAlias(
@@ -426,14 +464,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var service = BuildRepository(sql);
 
         // act
-        var aliases = service.GetRarelyUsedAliases(5)
+        var aliases = service.GetRarelyUsedAliases(3)
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(4);
-        }
+        aliases.Should().HaveCount(4);
     }
 
     [Fact]
