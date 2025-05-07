@@ -113,7 +113,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         using (new AssertionScope())
         {
             aliases.Should().HaveCount(i);
-            foreach (var alias in aliases) alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
+            foreach (var alias in aliases)
+            {
+                alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
+                alias.LastUsedAt.Should().Be(date1);
+            }
         }
     }
 
@@ -195,7 +199,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         using (new AssertionScope())
         {
             aliases.Should().HaveCount(i);
-            foreach (var alias in aliases) alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
+            foreach (var alias in aliases)
+            {
+                alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
+                alias.LastUsedAt.Should().Be(date1);
+            }
         }
     }
 
@@ -267,7 +275,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         using (new AssertionScope())
         {
             aliases.Should().HaveCount(i);
-            foreach (var alias in aliases) alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
+            foreach (var alias in aliases)
+            {
+                alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
+                alias.LastUsedAt.Should().Be(date1);
+            }
         }
     }
 
@@ -277,39 +289,69 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         // arrange
         var i = 0;
         const int count = 2;
+        
+        var date1 = DateTime.Now.AddDays(-1);
+        var date2 = DateTime.Now.AddDays(-2);
+        
         const string name = "is_a_doubloon";
         var sql = new SqlBuilder().AppendAlias(
                                       ++i,
                                       name,
                                       name,
-                                      new() { Count = count }
+                                      new() { Count = count },
+                                      cfg: a =>
+                                      {
+                                          a.WithSynonyms(name);
+                                          a.WithUsage(date1, date2);
+                                      }
                                   )
                                   .AppendAlias(
                                       ++i,
                                       name,
                                       name,
-                                      new() { Count = count }
+                                      new() { Count = count },
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                      
                                   )
                                   .AppendAlias(
                                       ++i,
                                       name,
                                       name,
-                                      new() { Count = count }
+                                      new() { Count = count },
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
                                   )
                                   .AppendAlias(
                                       ++i,
                                       name,
                                       name,
-                                      new() { Count = count }
+                                      new() { Count = count },
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
                                   )
                                   .AppendAlias(
                                       ++i,
                                       name,
                                       name,
-                                      new() { Count = count }
+                                      new() { Count = count },
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
                                   )
                                   .ToString();
-        var service = BuildRepository(sql);;
+        var service = BuildRepository(sql);
 
         // act
         var aliases = service.GetDoubloons()
@@ -319,7 +361,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         using (new AssertionScope())
         {
             aliases.Should().HaveCount(i);
-            foreach (var alias in aliases) alias.Count.Should().Be(count);
+            foreach (var alias in aliases)
+            {
+                alias.Count.Should().Be(count);
+                alias.LastUsedAt.Should().Be(date1);
+            }
         }
     }
 
@@ -476,11 +522,23 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     {
         // arrange
         var i = 0;
-        var sql = new SqlBuilder().AppendAlias(++i, cfg: a => a.WithSynonyms())
-                                  .AppendAlias(++i, cfg: a => a.WithSynonyms())
-                                  .AppendAlias(++i, cfg: a =>  a.WithSynonyms())
-                                  .AppendAlias(++i, cfg: a => a.WithSynonyms())
-                                  .AppendAlias(++i, cfg: a => a.WithSynonyms())
+        var date1 = DateTime.Now.AddDays(-1);
+        var date2 = DateTime.Now.AddDays(-2);
+        var sql = new SqlBuilder().AppendAlias(
+                                      ++i,
+                                      cfg: a => a.WithSynonyms())
+                                  .AppendAlias(
+                                      ++i,
+                                      cfg: a => a.WithSynonyms())
+                                  .AppendAlias(
+                                      ++i,
+                                      cfg: a => a.WithSynonyms())
+                                  .AppendAlias(
+                                      ++i,
+                                      cfg: a => a.WithSynonyms())
+                                  .AppendAlias(
+                                      ++i,
+                                      cfg: a => a.WithSynonyms())
                                   .ToString();
         var service = BuildRepository(sql);
 
@@ -492,7 +550,10 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         using (new AssertionScope())
         {
             aliases.Should().HaveCount(i);
-            foreach (var alias in aliases) alias.Count.Should().Be(0);
+            foreach (var alias in aliases)
+            {
+                alias.Count.Should().Be(0);
+            }
         }
     }
 
