@@ -5,8 +5,11 @@ using FluentAssertions.Execution;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
@@ -108,6 +111,58 @@ public class StoresOrchestrationShould
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
         regex.IsMatch(query).Should().BeTrue();
+    }
+    [Theory]
+    [InlineData("6+5", "11")]
+    [InlineData("(6+5)+1", "12")]
+    public async Task UnderstandCalculationWithOrchestration(string query, string expected)
+    {
+        var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                                                     .AddSingleton<AliasStore>()
+                                                     .AddLogging()
+                                                     .AddSingleton<CalculatorStore>()
+                                                     .AddSingleton<ICalculatorService, NCalcCalculatorService>()
+                                                     .AddSingleton<ISearchService, SearchService>()
+                                                     .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
+                                                     .AddMockSingleton<IThumbnailService>()
+                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddMockSingleton<IMacroService>((_, i) =>
+                                                     {
+                                                         i.ExpandMacroAlias(Arg.Any<QueryResult[]>())
+                                                          .Returns(callInfo => callInfo.Arg<QueryResult[]>());
+                                                         return i;
+                                                     })
+                                                     .AddMockSingleton<IAliasRepository>((_, i) =>
+                                                     {
+                                                         i.Search(Arg.Any<string>()).Returns([]);
+                                                         return i;
+                                                     })
+                                                     .AddMockSingleton<ISettingsFacade>((_, i) =>
+                                                     {
+                                                         i.Application.Returns(new DatabaseConfiguration());
+                                                         return i;
+                                                     })
+                                                     .AddMockSingleton<IStoreLoader>((sp, i) =>
+                                                     {
+                                                         IEnumerable<IStoreService> stores = new List<IStoreService>
+                                                         {
+                                                             sp.GetService<AliasStore>(),
+                                                             sp.GetService<CalculatorStore>(),
+                                                         };
+                                                         i.Load().Returns(stores);
+                                                         return i;
+                                                     })
+                                                     .BuildServiceProvider();
+        
+        var searchService = serviceProvider.GetService<ISearchService>();
+
+        var result = await searchService.SearchAsync(Cmdline.Parse(query));
+        result = result.ToArray();
+        using (new AssertionScope())
+        {
+            result.Should().HaveCount(1);
+            result.ElementAt(0).Name.Should().Be(expected);
+        }
     }
     [Theory]
     [InlineData("1+1", "2")]
