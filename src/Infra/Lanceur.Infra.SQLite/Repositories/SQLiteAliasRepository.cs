@@ -66,17 +66,19 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     {
         const string sql = $"""
                             select
-                                a.id         as {nameof(SelectableAliasQueryResult.Id)},
-                                a.notes      as {nameof(SelectableAliasQueryResult.Description)},
-                                a.file_name  as {nameof(SelectableAliasQueryResult.FileName)},
-                                a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
-                                an.name      as {nameof(SelectableAliasQueryResult.Name)},
-                                sub.synonyms as {nameof(SelectableAliasQueryResult.Synonyms)},
-                                a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
-                                a.exec_count as {nameof(SelectableAliasQueryResult.Count)}
+                                a.id          as {nameof(SelectableAliasQueryResult.Id)},
+                                a.notes       as {nameof(SelectableAliasQueryResult.Description)},
+                                a.file_name   as {nameof(SelectableAliasQueryResult.FileName)},
+                                a.arguments   as {nameof(SelectableAliasQueryResult.Parameters)},
+                                an.name       as {nameof(SelectableAliasQueryResult.Name)},
+                                sub.synonyms  as {nameof(SelectableAliasQueryResult.Synonyms)},
+                                a.icon        as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.exec_count  as {nameof(SelectableAliasQueryResult.Count)},
+                                lu.last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
+                                left join data_last_usage_v lu on a.id = lu.id_alias
                                 inner join (
                                     select 
                                         id_alias,
@@ -116,10 +118,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
                                 a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
-                                a.exec_count as {nameof(SelectableAliasQueryResult.Count)}
+                                a.exec_count as {nameof(SelectableAliasQueryResult.Count)},
+                                l.last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
+                            
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
+                                left join data_last_usage_v l on a.id = l.id_alias
                             where
                                 deleted_at is null
                                 and a.deleted_at is null
@@ -152,10 +157,12 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
                                 a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
-                                a.exec_count as {nameof(SelectableAliasQueryResult.Count)}
+                                a.exec_count as {nameof(SelectableAliasQueryResult.Count)},
+                                l.last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
+                                left join data_last_usage_v l on a.id = l.id_alias
                             where
                                 deleted_at is not null
                             order by an.name;
@@ -174,9 +181,11 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 arguments as {nameof(SelectableAliasQueryResult.Parameters)},
                                 name      as {nameof(SelectableAliasQueryResult.Name)},
                                 icon      as {nameof(SelectableAliasQueryResult.Icon)},
-                                exec_count as {nameof(SelectableAliasQueryResult.Count)}
+                                exec_count as {nameof(SelectableAliasQueryResult.Count)},
+                                last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                             from
-                                data_doubloons_v
+                                data_doubloons_v a
+                                left join data_last_usage_v b on a.id = b.id_alias
                             order by file_name
                             """;
         var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
@@ -334,12 +343,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     {
         const string sql = $"""
                            select
-                               id        as {nameof(SelectableAliasQueryResult.Id)},
-                               notes     as {nameof(SelectableAliasQueryResult.Description)},
-                               file_name as {nameof(SelectableAliasQueryResult.FileName)},
-                               arguments as {nameof(SelectableAliasQueryResult.Parameters)},
-                               name      as {nameof(SelectableAliasQueryResult.Name)},
-                               icon      as {nameof(SelectableAliasQueryResult.Icon)}
+                               id         as {nameof(SelectableAliasQueryResult.Id)},
+                               notes      as {nameof(SelectableAliasQueryResult.Description)},
+                               file_name  as {nameof(SelectableAliasQueryResult.FileName)},
+                               arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
+                               name       as {nameof(SelectableAliasQueryResult.Name)},
+                               icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                               last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                            from (
                                select 
                                    an.id_alias,
@@ -356,7 +366,9 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 ) t
                                    inner join alias_name an on an.id_alias = t.id_alias
                                group by t.id_alias
-                           ) tt inner join alias aa on aa.id = tt.id_alias
+                           ) tt 
+                               inner join alias aa on aa.id = tt.id_alias
+                               inner join data_last_usage_v l on aa.id = l.id_alias
                            order by name 
                            """;
         return Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql));
