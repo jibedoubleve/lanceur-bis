@@ -31,9 +31,8 @@ public class NCalcCalculatorService : ICalculatorService
 
     /// <inheritdoc />
     public string ValidationRegex => """
-                                     (?i)^\s*\(?\s*(?:\d+|acos|acosh|asin|asinh|atan|atanh|atan2|cbrt|ceiling|cos|cosh|exp|floor|fusedmultiplyadd|log|log2|log10|pow|sin|sincos|sinh|sqrt|tan|tanh|abs|bigmul|bitdecrement|bitincrement|copysign|divrem|clamp|ieeeremainder|ilogb|max|maxmagnitude|min|minmagnitude|reciprocalestimate|reciprocalsqrtestimate|round|sign|truncate|scaleb)\b
+                                     (?i)^\s*\(?\s*(?:\d+|Abs|Acos|Asin|Atan|Ceiling|Cos|Exp|Floor|IEEERemainder|Ln|Log|Log10|Max|Min|Pow|Round|Sign|Sin|Sqrt|Tan|Truncate|in|if|ifs)\b
                                      """;
-
     #endregion
 
     #region Methods
