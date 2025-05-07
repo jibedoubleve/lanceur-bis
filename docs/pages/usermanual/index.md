@@ -37,7 +37,7 @@ A command line follows this structure:
 - Everything after the first space is the **parameters**, which modify the behavior of the command.
 
 If the command starts with any of the following characters:  
-`$ & | @ # ( ) § ! { } - _ \ + * / = < > ; : %`  
+`$ & | @ # ) § ! { } - _ \ + * / = < > ; : %`  
 then the first character is considered the **command**, and the rest are the **parameters**.
 
 For example, if you have configured a Google search command as follows:
