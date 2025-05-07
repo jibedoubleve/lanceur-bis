@@ -35,14 +35,16 @@ public class CalculatorServiceShould
 
     public static IEnumerable<object[]> GetMathFunctions()
     {
-        var operations1 = typeof(Math).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                                      .Select(e => e.Name)
-                                      .Distinct()
-                                      .Select(operation => (object[]) [operation])
-                                      .ToArray();
-        var operations2 = operations1.Select(e => (object[]) [$"       {e[0]}"])
-                                     .ToArray();
-        return operations1.Concat(operations2);
+        IEnumerable<string> operations1 =
+        [
+            "Abs", "Acos", "Asin", "Atan", "Ceiling", "Cos", "Exp", "Floor", "IEEERemainder", "Ln", "Log", "Log10",
+            "Max", "Min", "Pow", "Round", "Sign", "Sin", "Sqrt", "Tan", "Truncate", "in", "if", "ifs"
+        ];
+        operations1 = operations1.ToArray();
+        var operations2 = operations1.Select(e => $"       {e}").ToArray();
+
+        return operations1.Concat(operations2)
+                          .Select(e => new object[] { e });
     }
 
     [Theory]
@@ -59,7 +61,7 @@ public class CalculatorServiceShould
         _output.WriteLine($"Expression: {operation}");
         regex.IsMatch(operation).Should().BeTrue("'operation' is valid");
     }
-    
+
     [Theory]
     [InlineData("6+5")]
     [InlineData("(4+4)+5")]
@@ -81,7 +83,9 @@ public class CalculatorServiceShould
     [InlineData("lkj")]
     public void ReturnResultOnError(string expression)
     {
-        var calculator = new NCalcCalculatorService(new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output));
+        var calculator = new NCalcCalculatorService(
+            new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output)
+        );
 
         using (new AssertionScope())
         {
@@ -100,7 +104,9 @@ public class CalculatorServiceShould
     [InlineData("(8+2) * 2 ", "20")]
     public void ReturnResultOnSuccess(string expression, string expected)
     {
-        var calculator = new NCalcCalculatorService(new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output));
+        var calculator = new NCalcCalculatorService(
+            new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output)
+        );
 
         using (new AssertionScope())
         {
