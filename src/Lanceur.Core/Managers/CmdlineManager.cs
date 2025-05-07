@@ -4,7 +4,7 @@ public static class CmdlineManager
 {
     #region Fields
 
-    private static readonly string[] SpecialNames = ["$", "&", "|", "@", "#", "(", ")", "§", "!", "{", "}", "_", "\\", "+", "-", "*", "/", "=", "<", ">", ",", ";", ":", "%", "?", "."];
+    private static readonly string[] SpecialNames = ["$", "&", "|", "@", "#", ")", "§", "!", "{", "}", "_", "\\", "+", "-", "*", "/", "=", "<", ">", ",", ";", ":", "%", "?", "."];
 
     #endregion
 

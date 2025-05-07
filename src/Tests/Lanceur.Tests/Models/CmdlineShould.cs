@@ -42,7 +42,6 @@ public class CmdlineShould
     [InlineData("|AAAA aa")]
     [InlineData("@AAAA aa")]
     [InlineData("#AAAA aa")]
-    [InlineData("(AAAA aa")]
     [InlineData(")AAAA aa")]
     [InlineData("§AAAA aa")]
     [InlineData("!AAAA aa")]
