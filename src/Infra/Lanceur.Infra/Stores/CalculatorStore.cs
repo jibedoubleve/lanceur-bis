@@ -27,7 +27,8 @@ public class CalculatorStore : Store, IStoreService
     public CalculatorStore(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         _logger = serviceProvider.GetService<ILogger<CalculatorStore>>();
-        _calculator = serviceProvider.GetService<ICalculatorService>();
+        _calculator = serviceProvider.GetService<ICalculatorService>()
+            ?? throw new NullReferenceException("ICalculatorService is null");
     }
 
     #endregion
