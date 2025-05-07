@@ -2,9 +2,7 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
-using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -15,7 +13,6 @@ public class CalculatorStore : Store, IStoreService
 {
     #region Fields
 
-    //private static readonly ICalculatorService Calculator = new CodingSebCalculatorService();
     private readonly ICalculatorService _calculator;
 
     private readonly ILogger<CalculatorStore> _logger;
