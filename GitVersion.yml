@@ -3,14 +3,14 @@ assembly-versioning-scheme: MajorMinorPatchTag
 branches:
 
   master:
-    increment: Minor
     tag: beta
+    # increment: Minor
 
   feature:
-    increment: Minor
     regex: ^release?[\/-]
+    # increment: Minor
 
-  feature:
-    increment: Minor
+  feature:    
     regex: ^issue?[\/-]
     tag: alpha-issue.{BranchName}
+    # increment: Minor
