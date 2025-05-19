@@ -5,9 +5,11 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
+using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Wildcards;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -197,6 +199,54 @@ public class ExecutionServiceShould
 
         try { await macro.ExecuteAsync(cmdline); }
         catch (Exception) { Assert.Fail("This should not throw an exception"); }
+    }
+
+    [Fact]
+    public async Task HandleLuaScriptWithParameters()
+    {
+        // arrange
+        const string queryParameters = "hello world";
+        const string originatingQuery = $"alias {queryParameters}";
+        
+        var cmdline = Cmdline.Parse(originatingQuery);
+        var processLauncher = Substitute.For<IProcessLauncher>();
+
+        var executionManager = new ExecutionService(
+            Substitute.For<ILoggerFactory>(),
+            new ReplacementComposite(
+                Substitute.For<IClipboardService>(),
+                Substitute.For<ILogger<ReplacementComposite>>()
+            ),
+            Substitute.For<IAliasRepository>(),
+            new LuaManager(Substitute.For<IUserGlobalNotificationService>()),
+            processLauncher
+        );
+        
+        
+        var request = new ExecutionRequest
+        {
+            OriginatingQuery = originatingQuery,
+            ExecuteWithPrivilege = false,
+            QueryResult = new AliasQueryResult
+            {
+                FileName = "alias",
+                LuaScript = """
+                            if context.Parameters == nil then
+                                context.Parameters = "wrongParameters"
+                            end
+                            return context
+                            """,
+                OriginatingQuery = cmdline
+            }
+        };
+        
+        // act
+        await executionManager.ExecuteAsync(request);
+        
+        // assert
+        processLauncher.Received().Start(
+            Arg.Is<ProcessContext>(psi => psi.Arguments == queryParameters)
+        );
     }
 
     #endregion
