@@ -91,7 +91,7 @@ public class ExecutionService : IExecutionService
             new()
             {
                 Code = query.LuaScript ?? string.Empty,
-                Context = new() { FileName = query.FileName, Parameters = query.Parameters }
+                Context = new() { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
             }
         );
         using var __ = _logger.BeginSingleScope("ScriptResult", result);
