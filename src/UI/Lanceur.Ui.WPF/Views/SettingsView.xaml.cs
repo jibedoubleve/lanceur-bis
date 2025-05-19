@@ -121,14 +121,7 @@ public partial class SettingsView : INavigationWindow
         if (e.Key == Key.Escape) Close();
     }
 
-    private void OnLoaded(object _, RoutedEventArgs e)
-    {
-        SystemThemeWatcher.Watch(
-            this,
-            _settings.Application.Window.BackdropStyle.ToWindowBackdropType(),
-            updateAccents: true
-        );
-    }
+    private void OnLoaded(object _, RoutedEventArgs e) => SystemThemeWatcher.Watch(this);
 
     /// <inheritdoc />
     public void CloseWindow() => Close();

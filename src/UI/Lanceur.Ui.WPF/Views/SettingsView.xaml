@@ -10,7 +10,7 @@
     Width="1920"
     Height="1080"
     ExtendsContentIntoTitleBar="True"
-    WindowBackdropType="{Binding WindowBackdropStyle}"
+    WindowBackdropType="Mica"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
     Closing="OnClosing"
