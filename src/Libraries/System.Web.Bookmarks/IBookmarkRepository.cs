@@ -48,5 +48,15 @@ public interface IBookmarkRepository
     /// </remarks>
     bool IsBookmarkSourceAvailable();
 
+    /// <summary>
+    ///     Clears the cached bookmarks.
+    /// </summary>
+    /// <remarks>
+    ///     This method should be called when the bookmark data has changed externally,
+    ///     and the cache needs to be invalidated to ensure fresh data is retrieved.
+    /// </remarks>
+    void InvalidateCache();
+
+
     #endregion
 }
