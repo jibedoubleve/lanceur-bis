@@ -20,7 +20,9 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly ILogger<SQLiteAliasRepository> _logger;
 
-    private static readonly Regex RegexSelectUrl = new(@"(www?|http?|https?|ftp):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(\.[a-zA-Z]{2,})?$");
+    private static readonly Regex RegexSelectUrl = new(
+        @"(www?|http?|https?|ftp):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(\.[a-zA-Z]{2,})?$"
+    );
 
     #endregion
 
@@ -95,17 +97,21 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
 
 
-        results = results.Where(e => !RegexSelectUrl.IsMatch(e.FileName)) // Excluding all aliases that serve as shortcuts for URLs
-                         .Where(e => !e.FileName.StartsWith("package:"))  // Excluding all packaged applications
-                         .ToArray();
+        results = results
+                  .Where(e => !RegexSelectUrl.IsMatch(e.FileName)
+                  ) // Excluding all aliases that serve as shortcuts for URLs
+                  .Where(e => !e.FileName.StartsWith("package:"))  // Excluding all packaged applications
+                  .ToArray();
         return _converter.ToSelectableQueryResult(results);
     }
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> GetAll() => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, isReturnAllIfEmpty: true));
+    public IEnumerable<AliasQueryResult> GetAll()
+        => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, isReturnAllIfEmpty: true));
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters() => Db.WithinTransaction(tx => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters(tx));
+    public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters()
+        => Db.WithinTransaction(tx => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters(tx));
 
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetBrokenAliases()
@@ -120,7 +126,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
                                 a.exec_count as {nameof(SelectableAliasQueryResult.Count)},
                                 l.last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
-                            
+
                             from 
                                 alias a
                                 inner join alias_name an on a.id = an.id_alias
@@ -144,7 +150,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public AliasQueryResult GetById(long id) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
+    public AliasQueryResult GetById(long id)
+        => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
 
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetDeletedAlias()
@@ -226,8 +233,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public Dictionary<string, (long Id, int Counter)> GetHiddenCounters() => Db.WithinTransaction(
-        tx =>
+    public Dictionary<string, (long Id, int Counter)> GetHiddenCounters() => Db.WithinTransaction(tx =>
         {
             const string sql = """
                                select 
@@ -253,39 +259,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months)
     {
-        if (months >= 12 * 30) months = 12 * 30; // 30 years max in the past...
-        var sql = $"""
-                           select 
-                               a.id_alias           as {nameof(SelectableAliasQueryResult.Id)},
-                               c.notes              as {nameof(SelectableAliasQueryResult.Description)},
-                               c.file_name          as {nameof(SelectableAliasQueryResult.FileName)},
-                               c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
-                               group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
-                               c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
-                               a.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)},
-                               e.count              as {nameof(SelectableAliasQueryResult.Count)}
-                           from 
-                               (select 
-                                   id_alias        as id_alias,
-                                   max(time_stamp) as last_used
-                               from 
-                                   alias_usage  
-                               group by id_alias)    a
-                               inner join alias_name b          on a.id_alias = b.id_alias
-                               inner join alias      c          on a.id_alias = c.id
-                               left join stat_usage_per_app_v e on a.id_alias = e.id_alias
-                           where 
-                                a.last_used < date('now', '-{months} months')
-                                and deleted_at is null
-                           group by a.id_alias
-                           order by last_used asc
-                           """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<SelectableAliasQueryResult> GetRarelyUsedAliases(int threshold)
-    {
+        const int threshold = 12 * 30; // 30 years max in the past...
+        if (months >= threshold) months = threshold;
         var sql = $"""
                    select 
                        a.id_alias           as {nameof(SelectableAliasQueryResult.Id)},
@@ -294,16 +269,23 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                        c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
                        group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
                        c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
-                       a.count              as {nameof(SelectableAliasQueryResult.Count)}
+                       a.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)},
+                       e.count              as {nameof(SelectableAliasQueryResult.Count)}
                    from 
-                       stat_usage_per_app_v a
-                       inner join alias_name b on a.id_alias = b.id_alias
-                       inner join alias c on c.id = a.id_alias
+                       (select 
+                           id_alias        as id_alias,
+                           max(time_stamp) as last_used
+                       from 
+                           alias_usage  
+                       group by id_alias)    a
+                       inner join alias_name b          on a.id_alias = b.id_alias
+                       inner join alias      c          on a.id_alias = c.id
+                       left join stat_usage_per_app_v e on a.id_alias = e.id_alias
                    where 
-                       count < {threshold}
-                       and c.deleted_at is null
-                   group by b.id_alias
-                   order by a.count desc
+                        a.last_used < date('now', '-{months} months')
+                        and deleted_at is null
+                   group by a.id_alias
+                   order by last_used asc
                    """;
         return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
     }
@@ -341,38 +323,63 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
+    public IEnumerable<SelectableAliasQueryResult> GetRarelyUsedAliases(int threshold)
+    {
+        var sql = $"""
+                   select 
+                       a.id_alias           as {nameof(SelectableAliasQueryResult.Id)},
+                       c.notes              as {nameof(SelectableAliasQueryResult.Description)},
+                       c.file_name          as {nameof(SelectableAliasQueryResult.FileName)},
+                       c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
+                       group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
+                       c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
+                       a.count              as {nameof(SelectableAliasQueryResult.Count)}
+                   from 
+                       stat_usage_per_app_v a
+                       inner join alias_name b on a.id_alias = b.id_alias
+                       inner join alias c on c.id = a.id_alias
+                   where 
+                       count < {threshold}
+                       and c.deleted_at is null
+                   group by b.id_alias
+                   order by a.count desc
+                   """;
+        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+    }
+
+    /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetUnusedAliases()
     {
         const string sql = $"""
-                           select
-                               id         as {nameof(SelectableAliasQueryResult.Id)},
-                               notes      as {nameof(SelectableAliasQueryResult.Description)},
-                               file_name  as {nameof(SelectableAliasQueryResult.FileName)},
-                               arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
-                               name       as {nameof(SelectableAliasQueryResult.Name)},
-                               icon       as {nameof(SelectableAliasQueryResult.Icon)},
-                               last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
-                           from (
-                               select 
-                                   an.id_alias,
-                                   group_concat(an.name, ', ') as name
-                               from (
-                                   select 
-                                       a.id  as id_alias        
-                                   from 
-                                       alias a
-                                       left join alias_usage b on a.id = b.id_alias
-                                   where 
-                                       b.id_alias is null
-                                       and a.deleted_at is null
-                                ) t
-                                   inner join alias_name an on an.id_alias = t.id_alias
-                               group by t.id_alias
-                           ) tt 
-                               inner join alias aa on aa.id = tt.id_alias
-                               inner join data_last_usage_v l on aa.id = l.id_alias
-                           order by name 
-                           """;
+                            select
+                                id         as {nameof(SelectableAliasQueryResult.Id)},
+                                notes      as {nameof(SelectableAliasQueryResult.Description)},
+                                file_name  as {nameof(SelectableAliasQueryResult.FileName)},
+                                arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
+                                name       as {nameof(SelectableAliasQueryResult.Name)},
+                                icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
+                            from (
+                                select 
+                                    an.id_alias,
+                                    group_concat(an.name, ', ') as name
+                                from (
+                                    select 
+                                        a.id  as id_alias        
+                                    from 
+                                        alias a
+                                        left join alias_usage b on a.id = b.id_alias
+                                    where 
+                                        b.id_alias is null
+                                        and a.deleted_at is null
+                                 ) t
+                                    inner join alias_name an on an.id_alias = t.id_alias
+                                group by t.id_alias
+                            ) tt 
+                                inner join alias aa on aa.id = tt.id_alias
+                                inner join data_last_usage_v l on aa.id = l.id_alias
+                            order by name 
+                            """;
         return Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql));
     }
 
@@ -418,10 +425,12 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                    where id_alias = @idAlias
                                    """;
         var (parameters, synonyms) =
-            Db.WithinTransaction(
-                tx =>
+            Db.WithinTransaction(tx =>
                 {
-                    var parameters = tx.Connection!.Query<AdditionalParameter>(sqlArguments, new { idAlias = alias.Id });
+                    var parameters = tx.Connection!.Query<AdditionalParameter>(
+                        sqlArguments,
+                        new { idAlias = alias.Id }
+                    );
                     var synonyms = tx.Connection!.Query<string>(sqlSynonyms, new { idAlias = alias.Id });
 
                     return (parameters, synonyms);
@@ -448,8 +457,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             	a.id;
                             """;
 
-        Db.WithinTransaction(
-            tx =>
+        Db.WithinTransaction(tx =>
             {
                 var item = tx.Connection!.Query<dynamic>(sql, new { name = alias.Name }).FirstOrDefault();
 
@@ -462,8 +470,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public void MergeHistory(IEnumerable<long> fromAliases, long toAlias) => Db.WithinTransaction(
-        tx =>
+    public void MergeHistory(IEnumerable<long> fromAliases, long toAlias) => Db.WithinTransaction(tx =>
         {
             const string sql = """
                                update alias_usage 
@@ -475,24 +482,20 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     );
 
     /// <inheritdoc />
-    public void Remove(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
-        tx =>
+    public void Remove(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx =>
         {
             var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
             _logger.LogInformation("Hard remove of {Count} alias(es) from database", list.Length);
-            foreach (var item in list)
-            {
-                _dbActionFactory.AliasManagement.Remove(tx, item);
-            }
+            foreach (var item in list) _dbActionFactory.AliasManagement.Remove(tx, item);
         }
     );
 
     /// <inheritdoc />
-    public void RemoveLogically(AliasQueryResult alias) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.LogicalRemove(tx, alias));
+    public void RemoveLogically(AliasQueryResult alias)
+        => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.LogicalRemove(tx, alias));
 
     /// <inheritdoc />
-    public void RemoveLogically(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
-        tx =>
+    public void RemoveLogically(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(tx =>
         {
             var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
             _logger.LogInformation("Logical remove of {Length} alias(es)", list.Length);
@@ -508,8 +511,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         const string delArguments = "delete from alias_argument where id_alias = @idAlias;";
         const string delAlias = "delete from alias where id = @idAlias;";
 
-        Db.WithinTransaction(
-            tx =>
+        Db.WithinTransaction(tx =>
             {
                 foreach (var idAlias in aliases.Select(e => e.Id).ToArray())
                 {
@@ -537,8 +539,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public void Restore(AliasQueryResult alias) => Db.WithinTransaction(
-        tx =>
+    public void Restore(AliasQueryResult alias) => Db.WithinTransaction(tx =>
         {
             const string sql = """"
                                update alias 
@@ -552,19 +553,29 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     );
 
     /// <inheritdoc />
-    public void SaveOrUpdate(ref AliasQueryResult alias) => Db.WithinTransaction((tx, current) =>  _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref current), alias);
+    public void SaveOrUpdate(ref AliasQueryResult alias) => Db.WithinTransaction(
+        (tx, current) =>  _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref current),
+        alias
+    );
 
     /// <inheritdoc />
-    public void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(_dbActionFactory.SaveManagement.SaveOrUpdate, aliases);
+    public void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases) => Db.WithinTransaction(
+        _dbActionFactory.SaveManagement.SaveOrUpdate,
+        aliases
+    );
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false) => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, name, isReturnAllIfEmpty));
+    public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false)
+        => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, name, isReturnAllIfEmpty));
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.SearchAliasWithAdditionalParameters(tx, criteria));
+    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => Db.WithinTransaction(tx
+        => _dbActionFactory.SearchManagement.SearchAliasWithAdditionalParameters(tx, criteria)
+    );
 
     /// <inheritdoc />
-    public ExistingNameResponse SelectNames(string[] names) => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.SelectNames(tx, names));
+    public ExistingNameResponse SelectNames(string[] names)
+        => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.SelectNames(tx, names));
 
     /// <inheritdoc />
     public void SetHiddenAliasUsage(QueryResult alias)
@@ -579,8 +590,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public void SetUsage(QueryResult alias) => Db.WithinTransaction(
-        tx =>
+    public void SetUsage(QueryResult alias) => Db.WithinTransaction(tx =>
         {
             if (alias is null)
             {
