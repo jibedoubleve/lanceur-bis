@@ -4,35 +4,36 @@ using Lanceur.Core.Services;
 namespace Lanceur.Infra.Wildcards;
 
 /// <summary>
-/// Replace with the text in the clipboard as it is.
-/// No work on the text is done
+///     Replace with the text in the clipboard as it is.
+///     No work on the text is done
 /// </summary>
-public class RawClipboardReplacement : IReplacement
+public partial class RawClipboardReplacement : IReplacement
 {
-    private static readonly Regex Regex = new(@"\$[rR]\$");
-
     #region Fields
 
     private readonly IClipboardService _clipboard;
+    private static readonly Regex Regex = GetRegex();
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public RawClipboardReplacement(IClipboardService clipboard) => _clipboard = clipboard;
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     /// <inheritdoc />
     public string Wildcard => Wildcards.RawClipboard;
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
-    /// <inheritdoc/>
+    [GeneratedRegex(@"\$[rR]\$")] private static partial Regex GetRegex();
+
+    /// <inheritdoc />
     public string Replace(string newText, string replacement)
     {
         var clipboard = _clipboard.RetrieveText() ?? string.Empty;
@@ -41,5 +42,5 @@ public class RawClipboardReplacement : IReplacement
         return Regex.Replace(newText, clipboard);
     }
 
-    #endregion Methods
+    #endregion
 }

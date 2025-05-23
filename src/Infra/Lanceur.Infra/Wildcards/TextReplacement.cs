@@ -2,22 +2,24 @@ using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.Wildcards;
 
-public class TextReplacement : IReplacement
+public partial class TextReplacement : IReplacement
 {
     #region Fields
 
-    private static readonly Regex Regex = new(@"\$[Ii]\$");
+    private static readonly Regex Regex = GetRegex();
 
-    #endregion Fields
+    #endregion
 
     #region Properties
 
     /// <inheritdoc />
     public string Wildcard => Wildcards.Text;
 
-    #endregion Properties
+    #endregion
 
     #region Methods
+
+    [GeneratedRegex(@"\$[Ii]\$")] private static partial Regex GetRegex();
 
     /// <inheritdoc />
     public string Replace(string newText, string replacement)
@@ -28,5 +30,5 @@ public class TextReplacement : IReplacement
         return Regex.Replace(newText, replacement);
     }
 
-    #endregion Methods
+    #endregion
 }
