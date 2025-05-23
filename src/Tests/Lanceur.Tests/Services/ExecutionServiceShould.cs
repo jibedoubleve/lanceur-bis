@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
-using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Requests;
@@ -9,16 +8,41 @@ using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Wildcards;
-using Lanceur.SharedKernel.Extensions;
-using Microsoft.Extensions.Logging;
+using Lanceur.Tests.Tools;
 using NSubstitute;
 using Xunit;
+using Xunit.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Tests.Services;
 
-public class ExecutionServiceShould
+public class ExecutionServiceShould : TestBase
 {
+    #region Constructors
+
+    public ExecutionServiceShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+
+    #endregion
+
     #region Methods
+
+    private ExecutionService CreateExecutionService(
+        IProcessLauncher processLauncher = null,
+        IClipboardService clipboardService = null
+    )
+    {
+        var executionService = new ExecutionService(
+            LoggerFactory,
+            new ReplacementComposite(
+                clipboardService ?? Substitute.For<IClipboardService>(),
+                LoggerFactory.CreateLogger<ReplacementComposite>()
+            ),
+            Substitute.For<IAliasRepository>(),
+            new LuaManager(Substitute.For<IUserGlobalNotificationService>()),
+            processLauncher ?? Substitute.For<IProcessLauncher>()
+        );
+        return executionService;
+    }
 
     [Theory]
     [InlineData("$C$", "hello world", "hello+world")]
@@ -36,41 +60,29 @@ public class ExecutionServiceShould
 
         var clipboard = Substitute.For<IClipboardService>();
         clipboard.RetrieveText().Returns(parameters);
-
-        var executionManager = new ExecutionService(
-            Substitute.For<ILoggerFactory>(),
-            new ReplacementComposite(
-                clipboard,
-                Substitute.For<ILogger<ReplacementComposite>>()
-            ),
-            Substitute.For<IAliasRepository>(),
-            Substitute.For<ILuaManager>(),
-            processLauncher
-        );
+        var executionService = CreateExecutionService(processLauncher, clipboard);
 
         var request = new ExecutionRequest
         {
             OriginatingQuery = originatingQuery,
-            ExecuteWithPrivilege = false,
             QueryResult = new AliasQueryResult
             {
-                FileName = actual, 
-                OriginatingQuery = cmdline
+                FileName = actual, OriginatingQuery = cmdline, Parameters = parameters,
             }
         };
 
         // act
-        await executionManager.ExecuteAsync(request);
+        await executionService.ExecuteAsync(request);
 
         // assert
         using (new AssertionScope()) { outputFileName.Should().Be(expected); }
     }
 
     [Theory]
-    [InlineData("$C$", "hello world", "hello+world")]
-    [InlineData("$R$", "un deux / \\ - <", "un deux / \\ - <")]
-    [InlineData("$I$", "un deux", "un deux")]
-    [InlineData("$W$", "hello world", "hello+world")]
+    [InlineData("--$C$", "hello world", "--hello+world")]
+    [InlineData("--$R$", "un deux / \\ - <", "--un deux / \\ - <")]
+    [InlineData("--$I$", "un deux", "--un deux")]
+    [InlineData("--$W$", "hello world", "--hello+world")]
     public async Task ExecuteAliasWithCorrectParametersReplacements(
         string parameters,
         string queryParameters,
@@ -87,31 +99,19 @@ public class ExecutionServiceShould
         var clipboard = Substitute.For<IClipboardService>();
         clipboard.RetrieveText().Returns(queryParameters);
 
-        var executionManager = new ExecutionService(
-            Substitute.For<ILoggerFactory>(),
-            new ReplacementComposite(
-                clipboard,
-                Substitute.For<ILogger<ReplacementComposite>>()
-            ),
-            Substitute.For<IAliasRepository>(),
-            Substitute.For<ILuaManager>(),
-            processLauncher
-        );
+        var executionService = CreateExecutionService(processLauncher, clipboard);
 
         var request = new ExecutionRequest
         {
             OriginatingQuery = originatingQuery,
-            ExecuteWithPrivilege = false,
             QueryResult = new AliasQueryResult
             {
-                FileName = "alias",
-                Parameters = parameters,
-                OriginatingQuery = cmdline
+                FileName = "alias", Parameters = parameters, OriginatingQuery = cmdline, 
             }
         };
 
         // act
-        await executionManager.ExecuteAsync(request);
+        await executionService.ExecuteAsync(request);
 
         // assert
         using (new AssertionScope()) { outputParameters.Should().Be(expectedParameters); }
@@ -120,7 +120,11 @@ public class ExecutionServiceShould
     [Theory]
     [InlineData("application.exe", "-c aa -b bb", "app")]
     [InlineData("application.exe", "-c aa -b bb", "app undeux trois")]
-    public async Task ExecuteAliasWithCorrectParametersWithoutReplacements(string fileName, string parameters, string originatingQuery)
+    public async Task ExecuteAliasWithCorrectParametersWithoutReplacements(
+        string fileName,
+        string parameters,
+        string originatingQuery
+    )
     {
         // arrange
         var outputFileName = string.Empty;
@@ -133,16 +137,7 @@ public class ExecutionServiceShould
             }
         );
         var cmdline = Cmdline.Parse(originatingQuery);
-        var executionManager = new ExecutionService(
-            Substitute.For<ILoggerFactory>(),
-            new ReplacementComposite(
-                Substitute.For<IClipboardService>(),
-                Substitute.For<ILogger<ReplacementComposite>>()
-            ),
-            Substitute.For<IAliasRepository>(),
-            Substitute.For<ILuaManager>(),
-            processLauncher
-        );
+        var executionService = CreateExecutionService(processLauncher);
 
         var request = new ExecutionRequest
         {
@@ -150,14 +145,12 @@ public class ExecutionServiceShould
             ExecuteWithPrivilege = false,
             QueryResult = new AliasQueryResult
             {
-                FileName = fileName, 
-                Parameters = parameters, 
-                OriginatingQuery = cmdline
+                FileName = fileName, Parameters = parameters, OriginatingQuery = cmdline
             }
         };
 
         // act
-        await executionManager.ExecuteAsync(request);
+        await executionService.ExecuteAsync(request);
 
         // assert
         using (new AssertionScope())
@@ -172,13 +165,7 @@ public class ExecutionServiceShould
     public async Task ExecuteMultiMacro(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
-        var executionManager = new ExecutionService(
-            Substitute.For<ILoggerFactory>(),
-            Substitute.For<IWildcardService>(),
-            Substitute.For<IAliasRepository>(),
-            Substitute.For<ILuaManager>(),
-            Substitute.For<IProcessLauncher>()
-        );
+        var executionService = CreateExecutionService();
 
         var macro = new MultiMacro(Substitute.For<IExecutionService>(), Substitute.For<ISearchService>(), 0);
         var request = new ExecutionRequest
@@ -186,18 +173,7 @@ public class ExecutionServiceShould
             OriginatingQuery = cmdline, ExecuteWithPrivilege = false, QueryResult = macro
         };
 
-        try { await executionManager.ExecuteAsync(request); }
-        catch (Exception) { Assert.Fail("This should not throw an exception"); }
-    }
-
-    [Theory]
-    [InlineData("ini", "thb@joplin@spotify")]
-    public async Task SelfExecuteMacroWithoutCrash(string cmd, string parameters)
-    {
-        var cmdline = new Cmdline(cmd, parameters);
-        var macro = new MultiMacro(Substitute.For<IExecutionService>(), Substitute.For<ISearchService>(), 0);
-
-        try { await macro.ExecuteAsync(cmdline); }
+        try { await executionService.ExecuteAsync(request); }
         catch (Exception) { Assert.Fail("This should not throw an exception"); }
     }
 
@@ -207,22 +183,11 @@ public class ExecutionServiceShould
         // arrange
         const string queryParameters = "hello world";
         const string originatingQuery = $"alias {queryParameters}";
-        
+
         var cmdline = Cmdline.Parse(originatingQuery);
         var processLauncher = Substitute.For<IProcessLauncher>();
+        var executionService = CreateExecutionService(processLauncher);
 
-        var executionManager = new ExecutionService(
-            Substitute.For<ILoggerFactory>(),
-            new ReplacementComposite(
-                Substitute.For<IClipboardService>(),
-                Substitute.For<ILogger<ReplacementComposite>>()
-            ),
-            Substitute.For<IAliasRepository>(),
-            new LuaManager(Substitute.For<IUserGlobalNotificationService>()),
-            processLauncher
-        );
-        
-        
         var request = new ExecutionRequest
         {
             OriginatingQuery = originatingQuery,
@@ -239,14 +204,15 @@ public class ExecutionServiceShould
                 OriginatingQuery = cmdline
             }
         };
-        
+
         // act
-        await executionManager.ExecuteAsync(request);
-        
+        await executionService.ExecuteAsync(request);
+
         // assert
-        processLauncher.Received().Start(
-            Arg.Is<ProcessContext>(psi => psi.Arguments == queryParameters)
-        );
+        processLauncher.Received()
+                       .Start(
+                           Arg.Is<ProcessContext>(psi => psi.Arguments == queryParameters)
+                       );
     }
 
     #endregion
