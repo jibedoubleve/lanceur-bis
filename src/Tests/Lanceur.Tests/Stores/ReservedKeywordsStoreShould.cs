@@ -1,20 +1,23 @@
-﻿using FluentAssertions;
-using Lanceur.Core.Models;
-using Lanceur.Core.Repositories;
-using Lanceur.Infra.Stores;
-using NSubstitute;
-using System.Reflection;
+﻿using System.Reflection;
+using System.Web.Bookmarks;
+using FluentAssertions;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
+using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling.ReservedAliases;
+using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.ReservedAliases;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Xunit;
 
-namespace Lanceur.Tests.BusinessLogic;
+namespace Lanceur.Tests.Stores;
 
 public class ReservedKeywordsStoreShould
 {
@@ -23,15 +26,23 @@ public class ReservedKeywordsStoreShould
     private static ReservedAliasStore GetStore(IAliasRepository aliasRepository, Type type = null)
     {
         type ??= typeof(NotExecutableTestAlias);
-        
+
         var reservedAliasStoreLogger = Substitute.For<ILogger<ReservedAliasStore>>();
-        var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
-                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                                                     .AddSingleton(Substitute.For<IDatabaseConfigurationService>())
-                                                     .AddSingleton(aliasRepository)
-                                                     .AddSingleton<ILoggerFactory, LoggerFactory>()
-                                                     .AddSingleton(reservedAliasStoreLogger)
-                                                     .BuildServiceProvider();
+        var serviceProvider = new ServiceCollection()
+                              .AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
+                              .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                              .AddSingleton(Substitute.For<IDatabaseConfigurationService>())
+                              .AddSingleton(aliasRepository)
+                              .AddSingleton<ILoggerFactory, LoggerFactory>()
+                              .AddSingleton(reservedAliasStoreLogger)
+                              .AddMockSingleton<IBookmarkRepositoryFactory>()
+                              .AddMockSingleton<ISettingsFacade>((_, i) =>
+                                  {
+                                      i.Application.Returns(new DatabaseConfiguration());
+                                      return i;
+                                  }
+                              )
+                              .BuildServiceProvider();
 
         var store = new ReservedAliasStore(serviceProvider);
         return store;
@@ -42,6 +53,7 @@ public class ReservedKeywordsStoreShould
     [InlineData("quit")]
     [InlineData("setup")]
     [InlineData("version")]
+    [InlineData("clrbm")]
     public void ReturnSpecifiedReservedAliasFromLanceur(string criterion)
     {
         var repository = Substitute.For<IAliasRepository>();
@@ -60,14 +72,18 @@ public class ReservedKeywordsStoreShould
         const int id = 12;
 
         var aliasRepository = Substitute.For<IAliasRepository>();
-        aliasRepository.GetHiddenCounters().Returns(new Dictionary<string, (long, int)> { { Names.Name1, (id, count) } });
+        aliasRepository.GetHiddenCounters()
+                       .Returns(new Dictionary<string, (long, int)> { { Names.Name1, (id, count) } });
 
 
-        var sp = new ServiceCollection().AddSingleton(new AssemblySource { ReservedKeywordSource = Assembly.GetAssembly(typeof(ExecutableTestAlias)) })
-                                        .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                                        .AddSingleton(aliasRepository)
-                                        .AddSingleton(Substitute.For<ILogger<ReservedAliasStore>>())
-                                        .BuildServiceProvider();
+        var sp = new ServiceCollection()
+                 .AddSingleton(
+                     new AssemblySource { ReservedKeywordSource = Assembly.GetAssembly(typeof(ExecutableTestAlias)) }
+                 )
+                 .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                 .AddSingleton(aliasRepository)
+                 .AddSingleton(Substitute.For<ILogger<ReservedAliasStore>>())
+                 .BuildServiceProvider();
 
         var store = new ReservedAliasStore(sp);
 
@@ -79,5 +95,6 @@ public class ReservedKeywordsStoreShould
         current.Count.Should().Be(count);
         current.Id.Should().Be(id);
     }
+
     #endregion
 }
