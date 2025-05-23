@@ -7,6 +7,8 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tools.SQL;
+using MartinCostello.Logging.XUnit;
+using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
 using Xunit.Abstractions;
 
@@ -15,6 +17,8 @@ namespace Lanceur.Tests.Tools;
 public abstract class TestBase
 {
     #region Fields
+
+    private ILoggerFactory? _loggerFactory;
 
     private const string InMemoryConnectionString = "Data Source =:memory:";
 
@@ -36,11 +40,47 @@ public abstract class TestBase
 
     private DbProfiler SqlProfiler { get;  }
 
+    protected ILoggerFactory LoggerFactory
+    {
+        get
+        {
+            if (_loggerFactory != null) return _loggerFactory;
+
+            var xunitLoggerOptions = new XUnitLoggerOptions();
+            _loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(
+                builder => builder
+                           .AddProvider(
+                               new
+                                   XUnitLoggerProvider(
+                                       OutputHelper,
+                                       xunitLoggerOptions
+                                   )
+                           )
+                           .SetMinimumLevel(
+                               LogLevel.Trace
+                           )
+            );
+
+            return _loggerFactory;
+        }
+    }
+
     protected ITestOutputHelper OutputHelper { get; }
 
     #endregion
 
     #region Methods
+
+    private IDbConnection BuildFreshDb(string? sql = null, string? connectionString = null)
+    {
+        var db = BuildConnection(connectionString);
+        var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbeddedResourcePattern);
+        updater.UpdateFromScratch();
+
+        if (!sql.IsNullOrEmpty()) db.Execute(sql!);
+
+        return db;
+    }
 
     protected IDbConnection BuildConnection(string? connectionString = null)
     {
@@ -57,17 +97,6 @@ public abstract class TestBase
 
     protected IDbConnection BuildFreshDb(string? sql = null, IConnectionString? connectionString = null)
         => BuildFreshDb(sql, connectionString?.ToString());
-
-    private IDbConnection BuildFreshDb(string? sql = null, string? connectionString = null)
-    {
-        var db = BuildConnection(connectionString);
-        var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbeddedResourcePattern);
-        updater.UpdateFromScratch();
-
-        if (!sql.IsNullOrEmpty()) db.Execute(sql!);
-
-        return db;
-    }
 
 
     protected static void CreateVersion(IDbConnection db, string version)

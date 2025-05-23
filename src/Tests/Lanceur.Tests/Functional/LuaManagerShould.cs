@@ -49,7 +49,9 @@ public class LuaManagerShould
     [Fact]
     public void NotCrashWhenScriptIsNull()
     {
-        var result = LuaManager.ExecuteScript(new() { Code = null, Context = new() { FileName = null, Parameters = null } });
+        var result = LuaManager.ExecuteScript(
+            new() { Code = null, Context = new() { FileName = null, Parameters = null } }
+        );
         using var _ = new AssertionScope();
         result.Should().NotBeNull();
         result.Context.FileName.Should().NotBeNull();
@@ -63,7 +65,9 @@ public class LuaManagerShould
         const string url = "https://random.url.com";
         const string luaScript = "this is a failing script";
 
-        var result = LuaManager.ExecuteScript(new() { Code = luaScript, Context = new() { FileName   = url, Parameters = "unhandled_case" } });
+        var result = LuaManager.ExecuteScript(
+            new() { Code = luaScript, Context = new() { FileName   = url, Parameters = "unhandled_case" } }
+        );
         using var _ = new AssertionScope();
         result.Should().NotBeNull();
         result.Exception.Should().NotBeNull();
@@ -80,7 +84,9 @@ public class LuaManagerShould
         const string parameters = "unhandled_case";
         const string luaScript = "return 145";
 
-        var result = LuaManager.ExecuteScript(new() { Code = luaScript, Context = new() { FileName   = url, Parameters = parameters } });
+        var result = LuaManager.ExecuteScript(
+            new() { Code = luaScript, Context = new() { FileName   = url, Parameters = parameters } }
+        );
         using var _ = new AssertionScope();
         result.Should().NotBeNull();
         result.Context.Should().NotBeNull();
