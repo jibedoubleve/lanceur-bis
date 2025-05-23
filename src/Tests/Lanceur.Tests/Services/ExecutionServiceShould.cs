@@ -9,10 +9,10 @@ using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 using Xunit.Abstractions;
-using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Tests.Services;
 
@@ -67,7 +67,7 @@ public class ExecutionServiceShould : TestBase
             OriginatingQuery = originatingQuery,
             QueryResult = new AliasQueryResult
             {
-                FileName = actual, OriginatingQuery = cmdline, Parameters = parameters,
+                FileName = actual, OriginatingQuery = cmdline, Parameters = parameters
             }
         };
 
@@ -106,7 +106,7 @@ public class ExecutionServiceShould : TestBase
             OriginatingQuery = originatingQuery,
             QueryResult = new AliasQueryResult
             {
-                FileName = "alias", Parameters = parameters, OriginatingQuery = cmdline, 
+                FileName = "alias", Parameters = parameters, OriginatingQuery = cmdline
             }
         };
 
@@ -231,31 +231,32 @@ public class ExecutionServiceShould : TestBase
     [InlineData("$I$")]
     [InlineData("$w$")]
     [InlineData("$W$")]
-    public async Task UpdateFileNameAfterScriptExecution(string fileNameSuffix)
+    public async Task UpdateFileNameAfterScriptExecution(string fileName)
     {
         // arrange
+        const string prefix = "prefix:";
+        fileName = $"{prefix}{fileName}";
+        
         const string numericParameters = "12";
-        const string updatedFileName = $"updated-{numericParameters}";
-        const string script =
-            $"""
-             if tonumber(context.Parameters) ~= nil then
-                 context.FileName = "{updatedFileName}"
-             end
+        const string updatedFileName = $"{prefix}updated-{numericParameters}";
+        const string script = $"""
+                               if tonumber(context.Parameters) ~= nil then
+                                   context.Parameters = "updated-" .. context.Parameters
+                               end
 
-             return context
-             """;
-        var originatingQuery = $"alias {numericParameters}";
+                               return context
+                               """;
+        const string originatingQuery = $"alias {numericParameters}";
 
-        var cmdline = Cmdline.Parse(originatingQuery);
         var processLauncher = Substitute.For<IProcessLauncher>();
         var executionService = CreateExecutionService(processLauncher);
-
+        var cmdline = Cmdline.Parse(originatingQuery);
         var request = new ExecutionRequest
         {
             OriginatingQuery = originatingQuery,
             QueryResult = new AliasQueryResult
             {
-                FileName = fileNameSuffix, LuaScript = script, OriginatingQuery = cmdline
+                FileName = fileName, LuaScript = script, OriginatingQuery = cmdline
             }
         };
 
