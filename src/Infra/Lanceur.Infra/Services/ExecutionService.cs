@@ -97,7 +97,10 @@ public class ExecutionService : IExecutionService
         using var __ = _logger.BeginSingleScope("ScriptResult", result);
         if (result.Exception is not null) _logger.LogWarning(result.Exception, "The Lua script is on error");
 
-        _logger.LogInformation("Lua script executed on {AliasName}", query.Name);
+        _logger.LogInformation(
+            "Lua script executed on {AliasName}",
+            query.Name.IsNullOrEmpty() ? "<EMPTY>" : query.Name
+        );
         return result;
     }
 
@@ -106,7 +109,12 @@ public class ExecutionService : IExecutionService
         if (query is null) return;
 
         using var _ = _logger.WarnIfSlow(this);
-
+        
+        // REPLACEMENT KEYS
+        query.FileName = _wildcardService.Replace(query.FileName, query.OriginatingQuery.Parameters);
+        query.Parameters = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.OriginatingQuery.Parameters);
+        
+        // LUA SCRIPT
         var result = ExecuteLuaScript(query);
         if (result.IsCancelled)
         {
@@ -120,9 +128,9 @@ public class ExecutionService : IExecutionService
         _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
         var psi = new ProcessContext
         {
-            FileName = _wildcardService.Replace(query.FileName, query.OriginatingQuery.Parameters),
+            FileName = query.FileName,
             Verb = "open",
-            Arguments = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.OriginatingQuery.Parameters),
+            Arguments = query.Parameters,
             UseShellExecute = true, // https://stackoverflow.com/a/5255335/389529
             WorkingDirectory = query.WorkingDirectory,
             WindowStyle = query.StartMode
@@ -170,11 +178,15 @@ public class ExecutionService : IExecutionService
             _logger.LogInformation("The execution request is null");
             return new()
             {
-                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"), HasResult = true
+                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"), 
+                HasResult = true
             };
         }
 
-        _logger.LogInformation("Executing alias {AliasName}", request.QueryResult.Name);
+        _logger.LogInformation(
+            "Executing alias {AliasName}",
+            request.QueryResult.Name.IsNullOrWhiteSpace() ? "<EMPTY>" : request.QueryResult.Name
+        );
         var name = request.QueryResult?.Name ?? "<EMPTY>";
         if (request.QueryResult is not IExecutable)
         {
@@ -195,7 +207,7 @@ public class ExecutionService : IExecutionService
                 _logger.LogInformation("Executing self executable {Name}", name);
                 exec.IsElevated = request.ExecuteWithPrivilege;
                 return ExecutionResponse.FromResults(
-                    await exec.ExecuteAsync(Cmdline.Parse(request.OriginatingQuery))
+                    await exec.ExecuteAsync(Cmdline.Parse(request.QueryResult.OriginatingQuery))
                 );
 
             default:
