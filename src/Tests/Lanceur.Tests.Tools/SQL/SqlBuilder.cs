@@ -44,18 +44,34 @@ public class SqlBuilder
     /// <param name="props">Additional properties to apply to the alias</param>
     /// <param name="cfg">
     ///     A configurator that allows customisation of the alias, including Usage, Additional Parameters, or Synonyms.
-    ///     If the configurator is omitted, a default name will be provided to the alias based on this pattern: "alias_{idAlias}".
+    ///     If the configurator is omitted, a default name will be provided to the alias based on this pattern:
+    ///     "alias_{idAlias}".
     /// </param>
     /// <returns>The updated <see cref="SqlBuilder" /> instance.</returns>
-    public SqlBuilder AppendAlias(long idAlias, string? fileName = null, string? arguments = null, AliasProps? props = null, Action<AliasSqlBuilder>? cfg = null)
+    public SqlBuilder AppendAlias(
+        long idAlias,
+        string? fileName = null,
+        string? arguments = null,
+        AliasProps? props = null,
+        Action<AliasSqlBuilder>? cfg = null
+    )
     {
-        _sql.Append(AliasSqlBuilder.GenerateAliasSql(idAlias, fileName, arguments, props));
+        _sql.Append(
+            AliasSqlBuilder.GenerateAliasSql(
+                idAlias,
+                fileName,
+                arguments,
+                props
+            )
+        );
         _sql.AppendNewLine();
 
         var builder = new AliasSqlBuilder(idAlias, _sql);
-        
-        if (cfg is not null) { cfg.Invoke(builder); }
-        else { builder.WithSynonyms($"alias_{idAlias}"); }
+
+        if (cfg is not null)
+            cfg.Invoke(builder);
+        else
+            builder.WithSynonyms($"alias_{idAlias}");
         return this;
     }
 
@@ -64,4 +80,10 @@ public class SqlBuilder
     #endregion
 }
 
-public record AliasProps(Constants.RunAs? RunAs = null, Constants.StartMode? StartMode = null, DateTime? DeletedAt = null, int Count = 0);
+public record AliasProps(
+    Constants.RunAs? RunAs = null,
+    Constants.StartMode? StartMode = null,
+    DateTime? DeletedAt = null,
+    int Count = 0,
+    string? LuaScript = null
+);
