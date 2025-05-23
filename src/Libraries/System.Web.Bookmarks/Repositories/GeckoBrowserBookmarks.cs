@@ -84,6 +84,9 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
     public IEnumerable<Bookmark> GetBookmarks(string filter)
         => FetchAll().Where(b => b.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase));
 
+    /// <inheritdoc />
+    public void InvalidateCache() => _memoryCache.Remove(CacheKey);
+
     ///<inheritdoc />
     public bool IsBookmarkSourceAvailable()
     {

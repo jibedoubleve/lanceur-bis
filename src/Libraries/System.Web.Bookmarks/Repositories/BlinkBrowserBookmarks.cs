@@ -126,6 +126,9 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
     /// <inheritdoc />
     public IEnumerable<Bookmark> GetBookmarks(string filter) => FetchAll(filter);
 
+    /// <inheritdoc />
+    public void InvalidateCache() => _memoryCache.Remove(CacheKey);
+
     public bool IsBookmarkSourceAvailable() => File.Exists(Path);
 
     #endregion
