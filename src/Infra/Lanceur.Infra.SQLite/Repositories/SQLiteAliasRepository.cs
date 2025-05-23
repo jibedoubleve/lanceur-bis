@@ -253,7 +253,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months)
     {
-        if (months >= 12 * 30) months = 12 * 10; // 30 years max in the past...
+        if (months >= 12 * 30) months = 12 * 30; // 30 years max in the past...
         var sql = $"""
                            select 
                                a.id_alias           as {nameof(SelectableAliasQueryResult.Id)},
@@ -262,7 +262,8 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
                                group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
                                c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
-                               a.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)}
+                               a.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)},
+                               e.count              as {nameof(SelectableAliasQueryResult.Count)}
                            from 
                                (select 
                                    id_alias        as id_alias,
@@ -270,8 +271,9 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                from 
                                    alias_usage  
                                group by id_alias)    a
-                               inner join alias_name b on a.id_alias = b.id_alias
-                               inner join alias      c on a.id_alias = c.id
+                               inner join alias_name b          on a.id_alias = b.id_alias
+                               inner join alias      c          on a.id_alias = c.id
+                               left join stat_usage_per_app_v e on a.id_alias = e.id_alias
                            where 
                                 a.last_used < date('now', '-{months} months')
                                 and deleted_at is null
