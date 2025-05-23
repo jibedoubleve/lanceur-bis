@@ -455,7 +455,14 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        aliases.Should().HaveCount(4);
+        using (new AssertionScope())
+        {
+            aliases.Should().HaveCount(4);
+            foreach (var alias in aliases)
+            {
+                alias.Count.Should().Be(2);
+            }
+        }
     }
 
     [Fact]
