@@ -45,6 +45,9 @@ public class AliasSqlBuilder
         var countDef = props?.Count == null ? "" : ", exec_count";
         var countVal = props?.Count == null ? "" : $", {props.Count}";
         
+        var luaScriptDef = props?.LuaScript == null ? "" : ", lua_script";
+        var luaScriptVal = props?.LuaScript == null ? "" : $", '{props.LuaScript}'";
+        
         var sql = $"""
                    insert into alias (
                        id 
@@ -54,6 +57,7 @@ public class AliasSqlBuilder
                        {argumentsDef}
                        {deletedAtDef} 
                        {countDef}
+                       {luaScriptDef}
                     )values (
                        {idAlias}
                        {runAs}
@@ -62,6 +66,7 @@ public class AliasSqlBuilder
                        {argumentsVal}
                        {deletedAtVal}
                        {countVal}
+                       {luaScriptVal}
                    );
                    """;
         return sql;

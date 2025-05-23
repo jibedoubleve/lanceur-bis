@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Mappers;
@@ -9,6 +10,7 @@ using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.SQL;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -361,6 +363,94 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         using (new AssertionScope())
         {
             aliases.Should().HaveCount(i);
+            foreach (var alias in aliases)
+            {
+                alias.Count.Should().Be(count);
+                alias.LastUsedAt.Should().Be(date1);
+            }
+        }
+    }
+    
+    [Fact]
+    public void GetDoubloonsWithLuaScript()
+    {
+        // arrange
+        var i = 0;
+        const int count = 2;
+        
+        var date1 = DateTime.Now.AddDays(-1);
+        var date2 = DateTime.Now.AddDays(-2);
+        
+        const string script1 = "return something";
+        
+        const string name = "is_a_doubloon";
+        var sql = new SqlBuilder().AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = script1},
+                                      cfg: a =>
+                                      {
+                                          a.WithSynonyms(name);
+                                          a.WithUsage(date1, date2);
+                                      }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = script1},
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                      
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = script1},
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = $"{Guid.NewGuid()}" },
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = $"{Guid.NewGuid()}" },
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                  )
+                                  .ToString();
+        var service = BuildRepository(sql);
+
+        // act
+        var aliases = service.GetDoubloons()
+                             .ToArray();
+
+        // assert
+        using (new AssertionScope())
+        {
+            aliases.Should().HaveCount(3);
             foreach (var alias in aliases)
             {
                 alias.Count.Should().Be(count);
