@@ -215,5 +215,105 @@ public class ExecutionServiceShould : TestBase
                        );
     }
 
+    [Theory]
+    [InlineData("ini", "thb@joplin@spotify")]
+    public async Task SelfExecuteMacroWithoutCrash(string cmd, string parameters)
+    {
+        var cmdline = new Cmdline(cmd, parameters);
+        var macro = new MultiMacro(Substitute.For<IExecutionService>(), Substitute.For<ISearchService>(), 0);
+
+        try { await macro.ExecuteAsync(cmdline); }
+        catch (Exception) { Assert.Fail("This should not throw an exception"); }
+    }
+
+    [Theory]
+    [InlineData("$i$")]
+    [InlineData("$I$")]
+    [InlineData("$w$")]
+    [InlineData("$W$")]
+    public async Task UpdateFileNameAfterScriptExecution(string fileNameSuffix)
+    {
+        // arrange
+        const string numericParameters = "12";
+        const string updatedFileName = $"updated-{numericParameters}";
+        const string script =
+            $"""
+             if tonumber(context.Parameters) ~= nil then
+                 context.FileName = "{updatedFileName}"
+             end
+
+             return context
+             """;
+        var originatingQuery = $"alias {numericParameters}";
+
+        var cmdline = Cmdline.Parse(originatingQuery);
+        var processLauncher = Substitute.For<IProcessLauncher>();
+        var executionService = CreateExecutionService(processLauncher);
+
+        var request = new ExecutionRequest
+        {
+            OriginatingQuery = originatingQuery,
+            QueryResult = new AliasQueryResult
+            {
+                FileName = fileNameSuffix, LuaScript = script, OriginatingQuery = cmdline
+            }
+        };
+
+        // act
+        await executionService.ExecuteAsync(request);
+
+        // assert
+        processLauncher.Received()
+                       .Start(
+                           Arg.Is<ProcessContext>(psi => psi.FileName == updatedFileName)
+                       );
+    }
+
+    [Theory]
+    [InlineData("$i$")]
+    [InlineData("$I$")]
+    [InlineData("$w$")]
+    [InlineData("$W$")]
+    public async Task UpdateParametersAfterScriptExecution(string queryParameter)
+    {
+        // arrange
+        const string numericParameters = "12";
+        const string updatedParameters = $"updated-{numericParameters}";
+        const string script =
+            $"""
+             if tonumber(context.Parameters) ~= nil then
+                 context.Parameters = "{updatedParameters}"
+             end
+
+             return context
+             """;
+        var originatingQuery = $"alias {numericParameters}";
+
+        var cmdline = Cmdline.Parse(originatingQuery);
+        var processLauncher = Substitute.For<IProcessLauncher>();
+        var executionService = CreateExecutionService(processLauncher);
+
+        var request = new ExecutionRequest
+        {
+            OriginatingQuery = originatingQuery,
+            QueryResult = new AliasQueryResult
+            {
+                FileName = "alias",
+                LuaScript = script,
+                OriginatingQuery = cmdline,
+                Parameters = queryParameter
+            }
+        };
+
+        // act
+        await executionService.ExecuteAsync(request);
+
+        // assert
+        processLauncher.Received()
+                       .Start(
+                           Arg.Is<ProcessContext>(psi => psi.Arguments == updatedParameters)
+                       );
+    }
+
     #endregion
 }

@@ -18,13 +18,51 @@ public class LuaManagerShould
 
     #region Methods
 
-    [Fact]
-    public void GetDefaultValueWhenReturnNullContext()
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("dev", "output_dev")]
+    [InlineData("test", "output_test")]
+    [InlineData("prod", "output_prod")]
+    public void GetExpectedParametersAfterScriptExecution(string parameter, string expectedParameter)
     {
         // arrange
         const string url = "https://random.url.com";
         const string luaScript = """
-                                 if context.Parameters == "dev" or context.Parameters == "int" then
+                                 if context.Parameters == "dev" then
+                                     context.Parameters = "output_dev"
+                                     return context
+                                 end
+                                 if context.Parameters == "test" then
+                                     context.Parameters = "output_test"
+                                     return context
+                                 end
+                                 if context.Parameters == "prod" then
+                                     context.Parameters = "output_prod"
+                                     return context
+                                 end
+                                 """;
+
+        var result = LuaManager.ExecuteScript(
+            new() { Code = luaScript, Context = new() { FileName = url, Parameters = parameter } }
+        );
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Context.FileName.Should().Be(url);
+            result.Context.Parameters.Should().Be(expectedParameter);
+        }
+    }
+    
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("dev", "output_dev")]
+    [InlineData("test", "output_test")]
+    [InlineData("prod", "output_prod")]
+    public void GetExpectedFileNameAfterScriptExecution(string parameter, string expectedFilename)
+    {
+        // arrange
+        const string luaScript = """
+                                 if context.Parameters == "dev" then
                                      context.FileName = "output_dev"
                                      return context
                                  end
@@ -38,12 +76,14 @@ public class LuaManagerShould
                                  end
                                  """;
 
-        var result = LuaManager.ExecuteScript(new() { Code = luaScript, Context = new() { FileName   = url, Parameters = "unhandled_case" } });
-        using var _ = new AssertionScope();
-        result.Should().NotBeNull();
-
-        result.Context.FileName.Should().Be(url);
-        result.Context.Parameters.Should().NotBeNullOrEmpty();
+        var result = LuaManager.ExecuteScript(
+            new() { Code = luaScript, Context = new() { FileName = "", Parameters = parameter } }
+        );
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.Context.FileName.Should().Be(expectedFilename);
+        }
     }
 
     [Fact]
