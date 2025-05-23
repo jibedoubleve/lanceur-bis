@@ -82,7 +82,7 @@ public class ExecutionService : IExecutionService
         if (query.LuaScript.IsNullOrWhiteSpace())
             return new()
             {
-                Context = new() { FileName = query.FileName, Parameters = query.Parameters }
+                Context = new() { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
             };
 
         using var _ = _logger.BeginSingleScope("Query", query);
@@ -110,10 +110,6 @@ public class ExecutionService : IExecutionService
 
         using var _ = _logger.WarnIfSlow(this);
         
-        // REPLACEMENT KEYS
-        query.FileName = _wildcardService.Replace(query.FileName, query.OriginatingQuery.Parameters);
-        query.Parameters = _wildcardService.ReplaceOrReplacementOnNull(query.Parameters, query.OriginatingQuery.Parameters);
-        
         // LUA SCRIPT
         var result = ExecuteLuaScript(query);
         if (result.IsCancelled)
@@ -121,16 +117,23 @@ public class ExecutionService : IExecutionService
             _logger.LogInformation("The Lua script has been cancelled. No execution of the alias will be done.");
             return;
         }
+        
+        var fileName = _wildcardService.Replace(
+            result.Context.FileName,
+            result.Context.Parameters
+        );
+        var parameters = _wildcardService.ReplaceOrReplacementOnNull(
+            query.Parameters, 
+            result.Context.Parameters
+        );
 
-        query.FileName = result.Context.FileName;
-        query.Parameters = result.Context.Parameters;
-
+        // EXECUTE PROCESS
         _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
         var psi = new ProcessContext
         {
-            FileName = query.FileName,
+            FileName = fileName,
             Verb = "open",
-            Arguments = query.Parameters,
+            Arguments = parameters,
             UseShellExecute = true, // https://stackoverflow.com/a/5255335/389529
             WorkingDirectory = query.WorkingDirectory,
             WindowStyle = query.StartMode
