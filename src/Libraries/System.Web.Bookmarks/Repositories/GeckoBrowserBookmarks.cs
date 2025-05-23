@@ -22,7 +22,11 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
 
     #region Constructors
 
-    public GeckoBrowserBookmarks(IMemoryCache memoryCache, ILoggerFactory loggerFactory, IGeckoBrowserConfiguration configuration)
+    public GeckoBrowserBookmarks(
+        IMemoryCache memoryCache,
+        ILoggerFactory loggerFactory,
+        IGeckoBrowserConfiguration configuration
+    )
     {
         ArgumentNullException.ThrowIfNull(memoryCache);
         ArgumentNullException.ThrowIfNull(configuration);
@@ -43,6 +47,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
 
     #region Properties
 
+    /// <inheritdoc />
     public string CacheKey { get;  }
 
     #endregion
@@ -76,7 +81,8 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
     public IEnumerable<Bookmark> GetBookmarks() => FetchAll();
 
     ///<inheritdoc />
-    public IEnumerable<Bookmark> GetBookmarks(string filter) => FetchAll().Where(b => b.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase));
+    public IEnumerable<Bookmark> GetBookmarks(string filter)
+        => FetchAll().Where(b => b.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase));
 
     ///<inheritdoc />
     public bool IsBookmarkSourceAvailable()

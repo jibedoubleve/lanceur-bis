@@ -139,12 +139,12 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(sp => new(
-                                                          sp.GetService<IDataStoreVersionService>(),
-                                                          sp.GetService<ILoggerFactory>(),
-                                                          sp.GetService<IDbConnection>(),
-                                                          ScriptRepository.Asm,
-                                                          ScriptRepository.DbScriptEmbeddedResourcePattern
-                                                      )
+                                 sp.GetService<IDataStoreVersionService>(),
+                                 sp.GetService<ILoggerFactory>(),
+                                 sp.GetService<IDbConnection>(),
+                                 ScriptRepository.Asm,
+                                 ScriptRepository.DbScriptEmbeddedResourcePattern
+                             )
                          )
                          .AddTransient<IDataStoreVersionService, SQLiteVersionService>()
                          .AddTransient<IAliasValidationService, AliasValidationService>()
@@ -152,9 +152,9 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IClipboardService, ClipboardService>()
                          .AddTransient<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp => new(
-                                                                            sp.GetService<IConnectionString>()!
-                                                                              .ToString()
-                                                                        )
+                                 sp.GetService<IConnectionString>()!
+                                   .ToString()
+                             )
                          )
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
@@ -178,7 +178,8 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
                          .AddTransientConditional<IProcessLauncher, ProcessLauncherLogger, ProcessLauncherWin32>()
-                         .AddSingletonConditional<IApplicationConfigurationService, MemoryApplicationConfigurationService, JsonApplicationConfigurationService>()
+                         .AddSingletonConditional<IApplicationConfigurationService,
+                             MemoryApplicationConfigurationService, JsonApplicationConfigurationService>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>();
