@@ -16,7 +16,7 @@ namespace Lanceur.Ui.WPF.ReservedKeywords;
 [Description("Centre Lanceur in the middle of the screen.")]
 public class CentreAlias : SelfExecutableQueryResult
 {
-    private readonly ILogger<CentreAlias>? _logger;
+    private readonly ILogger<CentreAlias> _logger;
     private readonly IDatabaseConfigurationService? _appConfig;
 
     #region Constructors
@@ -54,7 +54,7 @@ public class CentreAlias : SelfExecutableQueryResult
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         var coordinate = Application.Current.MainWindow!.GetCenterCoordinate();
-        _logger!.LogInformation(
+        _logger.LogInformation(
             "Put window at default position. (x: {X} - y: {Y})",
             coordinate.X,
             coordinate.Y
