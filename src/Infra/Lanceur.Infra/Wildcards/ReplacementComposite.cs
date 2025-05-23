@@ -43,14 +43,14 @@ public class ReplacementComposite : IReplacement, IWildcardService
     public string Replace(string newText, string replacement)
     {
         _logger.LogTrace("Before wildcard replacement: {Text}", replacement);
-        
-        newText = _replacements.Aggregate(
-            newText, 
+
+        var result = _replacements.Aggregate(
+            newText,
             (current, text) => text.Replace(current, replacement)
         );
 
         _logger.LogTrace("After wildcard replacement: {Text}", newText);
-        return newText;
+        return result;
     }
 
     /// <inheritdoc />

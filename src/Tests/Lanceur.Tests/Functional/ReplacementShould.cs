@@ -1,13 +1,22 @@
 ﻿using FluentAssertions;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Wildcards;
+using Lanceur.Tests.Tools;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Functional;
 
-public class ReplacementShould
+public class ReplacementShould : TestBase
 {
+    #region Constructors
+
+    public ReplacementShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+
+    #endregion
+
     #region Methods
 
     [Theory]
@@ -27,7 +36,83 @@ public class ReplacementShould
     [InlineData("Hello $R$", " ", "Hello  ")]
     [InlineData("Hello $R$", "", "Hello ")]
     [InlineData("Hello $R$", "`", "Hello `")]
-    //
+    [InlineData("$i$", "", "")]
+    [InlineData("$i$", null, "")]
+    [InlineData("Hello $i$", "world", "Hello world")]
+    [InlineData("Number $i$", "1", "Number 1")]
+    [InlineData("Hello $i$", " ", "Hello  ")]
+    [InlineData("Hello $i$", "", "Hello ")]
+    [InlineData("Hello $i$", "`", "Hello `")]
+    [InlineData("$I$", "", "")]
+    [InlineData("$I$", null, "")]
+    [InlineData("Hello $I$", "world", "Hello world")]
+    [InlineData("Number $I$", "1", "Number 1")]
+    [InlineData("Hello $I$", " ", "Hello  ")]
+    [InlineData("Hello $I$", "", "Hello ")]
+    [InlineData("Hello $I$", "`", "Hello `")]
+    [InlineData("$c$", "", "")]
+    [InlineData("$c$", null, "")]
+    [InlineData("$c$", "hello world", "hello+world")]
+    [InlineData("$c$", "number 1", "number+1")]
+    [InlineData("$c$", "hello ", "hello+")]
+    [InlineData("$c$", "hello", "hello")]
+    [InlineData("$c$", "hello `", "hello+%60")]
+    [InlineData("URL: $c$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
+    [InlineData("$C$", "", "")]
+    [InlineData("$C$", null, "")]
+    [InlineData("$C$", "hello world", "hello+world")]
+    [InlineData("$C$", "number 1", "number+1")]
+    [InlineData("$C$", "hello ", "hello+")]
+    [InlineData("$C$", "hello", "hello")]
+    [InlineData("$C$", "hello `", "hello+%60")]
+    [InlineData("URL: $C$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
+    [InlineData("$w$", "", "")]
+    [InlineData("$w$", null, "")]
+    [InlineData("$w$", "hello world", "hello+world")]
+    [InlineData("$w$", "number 1", "number+1")]
+    [InlineData("$w$", "hello ", "hello+")]
+    [InlineData("$w$", "hello", "hello")]
+    [InlineData("$w$", "hello `", "hello+%60")]
+    [InlineData("URL: $w$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
+    [InlineData("$W$", "", "")]
+    [InlineData("$W$", null, "")]
+    [InlineData("$W$", "hello world", "hello+world")]
+    [InlineData("$W$", "number 1", "number+1")]
+    [InlineData("$W$", "hello ", "hello+")]
+    [InlineData("$W$", "hello", "hello")]
+    [InlineData("$W$", "hello `", "hello+%60")]
+    [InlineData("URL: $W$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
+    [InlineData("$w$-$i$-$w$-$i$", "a", "a-a-a-a")]
+    [InlineData("$W$-$I$-$W$-$I$", "a", "a-a-a-a")]
+    public void ReplaceWithAll(string actual, string param, string expected)
+    {
+        var clipboard = Substitute.For<IClipboardService>();
+        clipboard.RetrieveText().Returns(param);
+
+        var rpl = new ReplacementComposite(clipboard, LoggerFactory.CreateLogger<ReplacementComposite>());
+
+        rpl.Replace(actual, param)
+           .Should()
+           .Be(expected);
+    }
+
+    [Theory]
+    [InlineData("$r$", "", "")]
+    [InlineData(null, "un deux", "")]
+    [InlineData("", "un deux", "")]
+    [InlineData("$r$", null, "")]
+    [InlineData("Hello $r$", "world", "Hello world")]
+    [InlineData("Number $r$", "1", "Number 1")]
+    [InlineData("Hello $r$", " ", "Hello  ")]
+    [InlineData("Hello $r$", "", "Hello ")]
+    [InlineData("Hello $r$", "`", "Hello `")]
+    [InlineData("$R$", "", "")]
+    [InlineData("$R$", null, "")]
+    [InlineData("Hello $R$", "world", "Hello world")]
+    [InlineData("Number $R$", "1", "Number 1")]
+    [InlineData("Hello $R$", " ", "Hello  ")]
+    [InlineData("Hello $R$", "", "Hello ")]
+    [InlineData("Hello $R$", "`", "Hello `")]
     public void ReplaceWithClipboardText(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
@@ -57,7 +142,6 @@ public class ReplacementShould
     [InlineData("Hello $I$", " ", "Hello  ")]
     [InlineData("Hello $I$", "", "Hello ")]
     [InlineData("Hello $I$", "`", "Hello `")]
-    //
     public void ReplaceWithText(string actual, string param, string expected)
     {
         var rpl = new TextReplacement();
@@ -86,7 +170,6 @@ public class ReplacementShould
     [InlineData("$C$", "hello", "hello")]
     [InlineData("$C$", "hello `", "hello+%60")]
     [InlineData("URL: $C$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
-    //
     public void ReplaceWithWebClipboardText(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
@@ -118,7 +201,6 @@ public class ReplacementShould
     [InlineData("$W$", "hello", "hello")]
     [InlineData("$W$", "hello `", "hello+%60")]
     [InlineData("URL: $W$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
-    //
     public void ReplaceWithWebText(string actual, string param, string expected)
     {
         var rpl = new WebTextReplacement();

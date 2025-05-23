@@ -3,22 +3,24 @@ using System.Text.RegularExpressions;
 
 namespace Lanceur.Infra.Wildcards;
 
-public class WebTextReplacement : IReplacement
+public partial class WebTextReplacement : IReplacement
 {
     #region Fields
 
-    private static readonly Regex Regex = new(@"\$[Ww]\$");
+    private static readonly Regex Regex = GetRegex();
 
-    #endregion Fields
+    #endregion
 
     #region Properties
 
     /// <inheritdoc />
     public string Wildcard => Wildcards.Url;
 
-    #endregion Properties
+    #endregion
 
     #region Methods
+
+    [GeneratedRegex(@"\$[Ww]\$")] private static partial Regex GetRegex();
 
     /// <inheritdoc />
     public string Replace(string newText, string replacement)
@@ -30,5 +32,5 @@ public class WebTextReplacement : IReplacement
         return Regex.Replace(newText, webParam);
     }
 
-    #endregion Methods
+    #endregion
 }
