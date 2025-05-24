@@ -245,6 +245,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     [ClassData(typeof(DoubloonGenerator))]
     public async Task FixDoubloons(SqlBuilder sqlBuilder)
     {
+        var ss = sqlBuilder.ToString();
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,

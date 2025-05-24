@@ -285,8 +285,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         }
     }
 
-    [Fact]
-    public void GetDoubloons()
+    [Theory]
+    [InlineData("filename", "some arguments")]
+    public void GetDoubloons(string filename, string arguments)
     {
         // arrange
         var i = 0;
@@ -298,19 +299,19 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         const string name = "is_a_doubloon";
         var sql = new SqlBuilder().AppendAlias(
                                       ++i,
-                                      name,
-                                      name,
+                                      filename,
+                                      arguments,
                                       new() { Count = count },
                                       cfg: a =>
                                       {
-                                          a.WithSynonyms(name);
                                           a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
                                       }
                                   )
                                   .AppendAlias(
                                       ++i,
-                                      name,
-                                      name,
+                                      filename,
+                                      arguments,
                                       new() { Count = count },
                                       cfg: a =>
                                       {
@@ -321,8 +322,8 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
-                                      name,
-                                      name,
+                                      filename,
+                                      arguments,
                                       new() { Count = count },
                                       cfg: a =>
                                       {
@@ -332,8 +333,8 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
-                                      name,
-                                      name,
+                                      filename,
+                                      arguments,
                                       new() { Count = count },
                                       cfg: a =>
                                       {
@@ -343,8 +344,8 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   )
                                   .AppendAlias(
                                       ++i,
-                                      name,
-                                      name,
+                                      filename,
+                                      arguments,
                                       new() { Count = count },
                                       cfg: a =>
                                       {
@@ -451,6 +452,94 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         using (new AssertionScope())
         {
             aliases.Should().HaveCount(3);
+            foreach (var alias in aliases)
+            {
+                alias.Count.Should().Be(count);
+                alias.LastUsedAt.Should().Be(date1);
+            }
+        }
+    }
+    
+    [Fact]
+    public void GetDoubloonsWithLuaScriptAndNullScript()
+    {
+        // arrange
+        var i = 0;
+        const int count = 2;
+        
+        var date1 = DateTime.Now.AddDays(-1);
+        var date2 = DateTime.Now.AddDays(-2);
+        
+        const string script1 = "return something";
+        
+        const string name = "is_a_doubloon";
+        var sql = new SqlBuilder().AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = null},
+                                      cfg: a =>
+                                      {
+                                          a.WithSynonyms(name);
+                                          a.WithUsage(date1, date2);
+                                      }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = script1},
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                      
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = script1},
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = $"{Guid.NewGuid()}" },
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                  )
+                                  .AppendAlias(
+                                      ++i,
+                                      name,
+                                      name,
+                                      new() { Count = count, LuaScript = $"{Guid.NewGuid()}" },
+                                      cfg: a =>
+                                      {
+                                          a.WithUsage(date1, date2);
+                                          a.WithSynonyms(name);
+                                      }
+                                  )
+                                  .ToString();
+        var service = BuildRepository(sql);
+
+        // act
+        var aliases = service.GetDoubloons()
+                             .ToArray();
+
+        // assert
+        using (new AssertionScope())
+        {
+            aliases.Should().HaveCount(2);
             foreach (var alias in aliases)
             {
                 alias.Count.Should().Be(count);
