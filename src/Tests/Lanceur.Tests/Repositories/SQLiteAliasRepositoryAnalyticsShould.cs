@@ -701,6 +701,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         // assert
         aliases.Should().HaveCount(4);
+        foreach (var alias in aliases)
+        {
+            alias.Count.Should().Be(2);
+            alias.LastUsedAt.Should().Be(date1);
+        }
     }
 
     [Fact]
