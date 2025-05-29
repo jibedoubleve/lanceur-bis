@@ -1,14 +1,19 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Execution;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Macros;
+using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
+using Lanceur.Tests.Tools.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
@@ -175,6 +180,51 @@ public class ExecutionServiceShould : TestBase
 
         try { await executionService.ExecuteAsync(request); }
         catch (Exception) { Assert.Fail("This should not throw an exception"); }
+    }
+    
+    [Theory]
+    [InlineData("issue", "with some text as paramters")]
+    public async Task ExecuteMacroWithParameters(string cmd, string parameters)
+    {
+        var cmdline = new Cmdline(cmd, parameters);
+        var executionService = CreateExecutionService();
+
+        var githubService = Substitute.For<IGithubService>();
+        var sp = new ServiceCollection().AddLoggingForTests<GithubIssueMacro>(OutputHelper)
+                                        .AddSingleton<ISettingsFacade, SettingsFacadeService>()
+                                        .AddMockSingleton<IApplicationConfigurationService>()
+                                        .AddMockSingleton<IDatabaseConfigurationService>((_, i) =>
+                                        {
+                                            var config = new DatabaseConfiguration
+                                            {
+                                                Github = { Token = $"{Guid.NewGuid()}" }
+                                            };
+                                            i.Current.Returns(config);
+                                            return i;
+                                        })
+                                        .AddSingleton(githubService)
+                                        .AddMockSingleton<IUserGlobalNotificationService>()
+                                        .AddMockSingleton<IEnigma>()
+                                        .BuildServiceProvider();
+
+        var macro = new GithubIssueMacro(sp);
+        var request = new ExecutionRequest
+        {
+            OriginatingQuery = cmdline, ExecuteWithPrivilege = false, QueryResult = macro
+        };
+
+        try
+        {
+            await executionService.ExecuteAsync(request); 
+            
+        }
+        catch (Exception) { Assert.Fail("This should not throw an exception"); }
+
+        await githubService.Received()
+                           .CreateIssue(
+                               Arg.Is<string>(s => s.Contains("some text as paramters")),
+                               Arg.Any<string>()
+                           );
     }
 
     [Fact]
