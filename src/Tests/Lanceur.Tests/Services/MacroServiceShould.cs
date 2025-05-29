@@ -7,6 +7,7 @@ using Lanceur.Core;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -49,7 +50,9 @@ public class MacroServiceShould : TestBase
         // ACT
         // ASSERT
         types.Length.Should().BeGreaterThan(0, "there are preconfigured macros");
-        var sp = new ServiceCollection().BuildServiceProvider();
+        var sp = new ServiceCollection().AddMockSingleton<IExecutionService>()
+                                        .AddMockSingleton<ISearchService>()
+                                        .BuildServiceProvider();
         using (new AssertionScope())
         {
             foreach (var type in types)
@@ -163,6 +166,8 @@ public class MacroServiceShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILoggerFactory>()
+                                                     .AddMockSingleton<IExecutionService>()
+                                                     .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
                                                      .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();
@@ -184,6 +189,8 @@ public class MacroServiceShould : TestBase
         var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! })
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddMockSingleton<ILogger<MacroService>>()
+                                                     .AddMockSingleton<IExecutionService>()
+                                                     .AddMockSingleton<ISearchService>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();
@@ -235,6 +242,8 @@ public class MacroServiceShould : TestBase
                               .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
                               .AddLogging()
                               .AddMockSingleton<IAliasRepository>()
+                              .AddMockSingleton<IExecutionService>()
+                              .AddMockSingleton<ISearchService>()
                               .BuildServiceProvider();
         var macroService = new MacroService(serviceProvider);
         macroService.MacroCount.Should().Be(4);
@@ -268,6 +277,8 @@ public class MacroServiceShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILoggerFactory>()
+                                                     .AddMockSingleton<IExecutionService>()
+                                                     .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
                                                      .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();

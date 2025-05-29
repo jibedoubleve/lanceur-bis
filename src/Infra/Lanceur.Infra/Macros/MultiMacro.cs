@@ -24,16 +24,16 @@ public class MultiMacro : MacroQueryResult
 
     #region Constructors
 
-    public MultiMacro(IServiceProvider serviceProvider, int? delay = null)
+    public MultiMacro(IServiceProvider serviceProvider)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
-        
+
         _serviceProvider = serviceProvider;
         _executionService = serviceProvider.GetService<IExecutionService>() ??
                             throw new NullReferenceException("IExecutionService is null");
         _searchService = serviceProvider.GetService<ISearchService>() ??
                          throw new NullReferenceException("ISearchService is null");
-        _delay = delay ?? DefaultDelay;
+        _delay = DefaultDelay;
     }
 
     [Obsolete("Use the ctor with IServiceProvider instead. This ctor will be removed in a future version.")]
