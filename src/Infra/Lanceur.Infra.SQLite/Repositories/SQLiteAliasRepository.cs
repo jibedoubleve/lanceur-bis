@@ -344,7 +344,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                       max(time_stamp) as last_used
                                   from
                                       alias_usage
-                                  group by id_alias) d
+                                  group by id_alias) d on d.id_alias = a.id_alias
                    where 
                        count < {threshold}
                        and c.deleted_at is null
