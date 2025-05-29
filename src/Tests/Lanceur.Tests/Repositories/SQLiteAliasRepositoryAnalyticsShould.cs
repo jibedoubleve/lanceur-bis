@@ -640,6 +640,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
             foreach (var alias in aliases)
             {
                 alias.Count.Should().Be(2);
+                alias.LastUsedAt.Should().Be(date1);
             }
         }
     }
@@ -713,8 +714,6 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     {
         // arrange
         var i = 0;
-        var date1 = DateTime.Now.AddDays(-1);
-        var date2 = DateTime.Now.AddDays(-2);
         var sql = new SqlBuilder().AppendAlias(
                                       ++i,
                                       cfg: a => a.WithSynonyms())
