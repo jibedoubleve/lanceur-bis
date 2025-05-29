@@ -31,12 +31,17 @@ public static class ServiceProviderExtensions
     public static IServiceCollection AddDatabase(this IServiceCollection serviceCollection, IDbConnectionManager connectionManager)
     {
         serviceCollection.AddSingleton<IAliasRepository, SQLiteAliasRepository>()
-                         .AddTransient<IDbConnection, SQLiteConnection>(sp => new(sp.GetService<IConnectionString>()!.ToString()))
+                         .AddTransient<IDbConnection, SQLiteConnection>(sp
+                             => new(sp.GetService<IConnectionString>()!.ToString())
+                         )
                          .AddSingleton(connectionManager);
         return serviceCollection;
     }
 
-    public static IServiceCollection AddLoggingForTests<T>(this IServiceCollection serviceCollection, ITestOutputHelper outputHelper) => serviceCollection.AddSingleton<ILogger<T>>(new TestOutputHelperDecoratorForMicrosoftLogging<T>(outputHelper));
+    public static IServiceCollection AddLoggingForTests<T>(
+        this IServiceCollection serviceCollection,
+        ITestOutputHelper outputHelper
+    ) => serviceCollection.AddSingleton<ILogger<T>>(new TestOutputHelperDecoratorForMicrosoftLogging<T>(outputHelper));
 
 
     /// <summary>
