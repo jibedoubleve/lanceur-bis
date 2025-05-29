@@ -333,11 +333,18 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                        c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
                        group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
                        c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
-                       a.count              as {nameof(SelectableAliasQueryResult.Count)}
+                       a.count              as {nameof(SelectableAliasQueryResult.Count)},
+                       d.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                    from 
                        stat_usage_per_app_v a
                        inner join alias_name b on a.id_alias = b.id_alias
                        inner join alias c on c.id = a.id_alias
+                       left join (select
+                                      id_alias        as id_alias,
+                                      max(time_stamp) as last_used
+                                  from
+                                      alias_usage
+                                  group by id_alias) d
                    where 
                        count < {threshold}
                        and c.deleted_at is null
