@@ -40,5 +40,6 @@
         <EmbeddedResource Include="SQL\script-2.4.2.sql" />
         <EmbeddedResource Include="SQL\script-2.4.3.sql" />
         <EmbeddedResource Include="SQL\script-2.4.4.sql" />
+        <EmbeddedResource Include="SQL\script-2.4.5.sql" />
     </ItemGroup>
 </Project>
