@@ -10,7 +10,7 @@ public class CounterToVisibilityConverter : IValueConverter
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is int counter) return counter == -1 ? Visibility.Collapsed : Visibility.Visible;
+        if (value is int counter) return counter <= -1 ? Visibility.Collapsed : Visibility.Visible;
 
         return Binding.DoNothing;
     }

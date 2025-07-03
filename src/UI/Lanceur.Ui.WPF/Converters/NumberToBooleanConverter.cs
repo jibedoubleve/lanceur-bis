@@ -11,12 +11,12 @@ public class NumberToBooleanConverter : IValueConverter
     {
         return value switch
         {
-            int i      => i > 0,
-            uint u     => u > 0,
-            decimal de => de > 0,
-            double d   => d > 0,
-            float f    => f > 0,
-            _          => Binding.DoNothing
+            int i     => i > 0,
+            uint u    => u > 0,
+            decimal l => l > 0,
+            double d  => d > 0,
+            float f   => f > 0,
+            _         => Binding.DoNothing
         };
     }
 
