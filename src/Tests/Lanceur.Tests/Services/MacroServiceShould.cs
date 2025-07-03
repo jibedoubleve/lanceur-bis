@@ -270,9 +270,55 @@ public class MacroServiceShould : TestBase
     }
 
     [Fact]
+    public void KeepIdAndCount()
+    {
+        // ARRANGE
+        const long expectedId = 952;
+        const int expectedCount = 259;
+        QueryResult[] queryResults =
+        [
+            new AliasQueryResult
+            {
+                Name = "macro_1",
+                FileName = "@multi@",
+                Id = expectedId,
+                Count = expectedCount
+            }
+        ];
+        
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
+                                                     .AddMockSingleton<IAliasRepository>()
+                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddMockSingleton<IExecutionService>()
+                                                     .AddMockSingleton<ISearchService>()
+                                                     .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
+                                                     .AddSingleton<MacroService>()
+                                                     .BuildServiceProvider();
+        
+        
+        // ACT
+        var output = serviceProvider.GetService<MacroService>()
+                                    .ExpandMacroAlias(queryResults)
+                                    .ToArray();
+        // ASSERT
+        using (new AssertionScope())
+        {
+            output.Should().HaveCount(1);
+            var macro = output.ElementAt(0);
+            
+            macro.Id.Should().Be(expectedId);
+            macro.Count.Should().Be(expectedCount);
+        }
+    }
+    [Fact]
     public void NotHaveDoubloonsWhenMacroUsedMultipleTimes()
     {
-        QueryResult[] queryResults = [new AliasQueryResult { Name = "macro_1", FileName = "@multi@" }, new AliasQueryResult { Name = "macro_2", FileName = "@multi@" }, new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }];
+        QueryResult[] queryResults =
+        [
+            new AliasQueryResult { Name = "macro_1", FileName = "@multi@" },
+            new AliasQueryResult { Name = "macro_2", FileName = "@multi@" },
+            new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }
+        ];
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
