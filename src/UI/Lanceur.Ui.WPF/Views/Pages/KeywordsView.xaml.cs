@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Messages;
@@ -7,7 +8,7 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 namespace Lanceur.Ui.WPF.Views.Pages;
 
 [Singleton]
-public partial class KeywordsView 
+public partial class KeywordsView
 {
     #region Fields
 
