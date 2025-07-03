@@ -548,13 +548,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     /// <inheritdoc />
     public void Restore(AliasQueryResult alias) => Db.WithinTransaction(tx =>
         {
-            const string sql = """"
+            const string sql = """
                                update alias 
                                set
                                     deleted_at = null,
                                     hidden     = 0
                                where id = @id
-                               """";
+                               """;
             tx.Connection!.Execute(sql, new { id = alias.Id });
         }
     );
