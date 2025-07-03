@@ -5,44 +5,71 @@ namespace Lanceur.Core.Models;
 
 public class ObservableModel : INotifyPropertyChanged
 {
-    #region Events
+    #region Fields
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    private bool _isDirty;
 
-    #endregion Events
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    ///     Gets a value indicating whether the object has been modified since its creation or the last reset.
+    /// </summary>
+    public bool IsDirty
+    {
+        get => _isDirty;
+        private set => SetField(ref _isDirty, value);
+    }
+
+    #endregion
 
     #region Methods
 
     /// <summary>
-    /// Raises the <see cref="PropertyChanged"/> event to notify subscribers that a property value has changed.
+    ///     Raises the <see cref="PropertyChanged" /> event to notify subscribers that a property value has changed.
     /// </summary>
     /// <param name="propertyName">
-    /// The name of the property that changed. Automatically supplied by the compiler if not explicitly provided.
+    ///     The name of the property that changed. Automatically supplied by the compiler if not explicitly provided.
     /// </param>
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new(propertyName));
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        => PropertyChanged?.Invoke(this, new(propertyName));
 
     /// <summary>
-    /// Updates the specified field with the provided value, triggers the <see cref="PropertyChanged"/> event 
-    /// if the value has changed, and returns a boolean indicating whether the update occurred.
+    ///     Updates the specified field with the provided value, triggers the <see cref="PropertyChanged" /> event
+    ///     if the value has changed, and returns a boolean indicating whether the update occurred.
     /// </summary>
     /// <typeparam name="T">The type of the field and value.</typeparam>
     /// <param name="field">A reference to the field being updated.</param>
     /// <param name="value">The new value to assign to the field.</param>
     /// <param name="propertyName">
-    /// The name of the property associated with the field. Automatically supplied by the compiler if not explicitly provided.
+    ///     The name of the property associated with the field. Automatically supplied by the compiler if not explicitly
+    ///     provided.
     /// </param>
     /// <returns>
-    /// <c>true</c> if the field was updated and the <see cref="PropertyChanged"/> event was raised; 
-    /// <c>false</c> if the field already contained the specified value.
+    ///     <c>true</c> if the field was updated and the <see cref="PropertyChanged" /> event was raised;
+    ///     <c>false</c> if the field already contained the specified value.
     /// </returns>
-    protected bool SetField<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
     {
-        if (EqualityComparer<T>.Default.Equals(storage, value)) { return false; }
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
 
-        storage = value;
+        field = value;
         OnPropertyChanged(propertyName);
+        if (propertyName != nameof(IsDirty)) IsDirty = true;
         return true;
     }
 
-    #endregion Methods
+    /// <summary>
+    ///     Resets the <see cref="IsDirty" /> flag, marking the object as unchanged.
+    /// </summary>
+    public void MarkUnchanged() => IsDirty = false;
+
+    #endregion
+
+    #region Events
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    #endregion Events
 }

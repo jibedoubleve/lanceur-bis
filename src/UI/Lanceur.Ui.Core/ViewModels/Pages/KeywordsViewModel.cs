@@ -260,6 +260,8 @@ public partial class KeywordsViewModel : ObservableObject
         if ((SelectedAlias?.Id ?? 0) == 0) return;
 
         SelectedAlias = await Task.Run(() => _aliasManagementService.Hydrate(SelectedAlias));
+        SelectedAlias.MarkUnchanged();
+        
         _logger.LogInformation("Loading alias {AliasName}", SelectedAlias.Name);
     }
 
