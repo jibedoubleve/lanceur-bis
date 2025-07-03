@@ -20,7 +20,7 @@ public partial class KeywordsViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private ObservableCollection<AliasQueryResult> _aliases = new();
+    [ObservableProperty] private ObservableCollection<AliasQueryResult> _aliases = [];
     private readonly IAliasManagementService _aliasManagementService;
     private List<AliasQueryResult> _cachedAliases = [];
     private readonly IInteractionHubService _hubService;
