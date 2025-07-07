@@ -239,7 +239,7 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnLoadAliases()
     {
-        var previous = SelectedAlias;
+        var selectedAlias = SelectedAlias; // Keep a ref alive
         var result = await Task.Run(() => _aliasManagementService.GetAll());
         _cachedAliases = result.ToList();
 
@@ -248,7 +248,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         if (newAlias is not null) Aliases.Add(newAlias);
         Aliases.AddRange(_cachedAliases);
-        SelectedAlias = Aliases.Hydrate(previous);
+        SelectedAlias = Aliases.Hydrate(selectedAlias);
 
         _thumbnailService.UpdateThumbnails(_cachedAliases);
         _logger.LogDebug("Loaded {Count} alias(es)", _cachedAliases.Count);
