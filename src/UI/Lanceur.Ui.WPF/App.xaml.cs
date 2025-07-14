@@ -41,6 +41,7 @@ public partial class App
                                                           services.AddTrackedMemoryCache()
                                                                   .RegisterView("Lanceur.Ui.WPF")
                                                                   .RegisterViewModel("Lanceur.Ui.Core")
+                                                                  .Register("Control", "Lanceur.Ui.WPF")
                                                                   .AddServices()
                                                                   .AddWpfServices()
                                                                   .AddCommands()
