@@ -1,9 +1,12 @@
 using System.Windows;
-using System.Windows.Controls;
-using CommunityToolkit.Mvvm.Messaging;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.DI;
-using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels.Pages;
+using Lanceur.Ui.WPF.Views.Controls;
+using Microsoft.Extensions.Logging;
+using Wpf.Ui;
+using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
@@ -12,7 +15,10 @@ public partial class KeywordsView
 {
     #region Fields
 
-    private readonly CodeEditorView _codeEditorView;
+    private readonly CodeEditorControl _codeEditorControl;
+    private readonly IContentDialogService _contentDialogService;
+    private readonly ILogger<KeywordsView> _logger;
+    private readonly IInteractionHubService _interactionHubService;
 
     #endregion
 
@@ -20,12 +26,17 @@ public partial class KeywordsView
 
     public KeywordsView(
         KeywordsViewModel viewModel,
-        CodeEditorView codeEditorView
-    )
+        CodeEditorControl codeEditorControl,
+        IContentDialogService contentDialogService,
+        ILogger<KeywordsView> logger,
+        IInteractionHubService  interactionHubService)
     {
-        _codeEditorView = codeEditorView;
-
+        _codeEditorControl = codeEditorControl;
+        _contentDialogService = contentDialogService;
+        _logger = logger;
+        _interactionHubService = interactionHubService;
         DataContext = ViewModel = viewModel;
+
         InitializeComponent();
     }
 
@@ -39,15 +50,33 @@ public partial class KeywordsView
 
     #region Methods
 
-    private void OnClickCodeEditor(object sender, RoutedEventArgs e)
+    private async void OnClickCodeEditor(object sender, RoutedEventArgs e)
     {
-        if (ViewModel.SelectedAlias is null) return;
+        try
+        {
+            if (ViewModel.SelectedAlias is null) return;
 
-        var viewModel = (CodeEditorViewModel)_codeEditorView.DataContext;
-        viewModel.PreviousViewModel = (KeywordsViewModel)DataContext;
-        viewModel.Alias = ViewModel.SelectedAlias!;
-        var content = (ViewType: typeof(CodeEditorView), DataContext: viewModel);
-        WeakReferenceMessenger.Default.Send<NavigationMessage>(new(content));
+            _codeEditorControl.Load(ViewModel.SelectedAlias);
+
+            var result = await _contentDialogService.ShowSimpleDialogAsync(
+                new()
+                {
+                    Title = "Edit Lua script",
+                    Content = _codeEditorControl,
+                    PrimaryButtonText = "Apply",
+                    CloseButtonText = "Cancel"
+                }
+            );
+
+            ViewModel.SelectedAlias.LuaScript = result == ContentDialogResult.Primary
+                ? _codeEditorControl.Apply()
+                : _codeEditorControl.Reset();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load the lua script editor: {ErrorMessage}", ex.Message);
+            _interactionHubService.Notifications.Warning($"Failed to load the lua script editor: {ex.Message}");
+        }
     }
 
     #endregion
