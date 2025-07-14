@@ -11,6 +11,7 @@ using Lanceur.Infra.Macros;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Wildcards;
+using Lanceur.SharedKernel.DI;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -172,7 +173,12 @@ public class ExecutionServiceShould : TestBase
         var cmdline = new Cmdline(cmd, parameters);
         var executionService = CreateExecutionService();
 
-        var macro = new MultiMacro(Substitute.For<IExecutionService>(), Substitute.For<ISearchService>(), 0);
+        var sp = new ServiceCollection()
+                 .AddMockSingleton<IExecutionService>()
+                 .AddMockSingleton<ISearchService>()
+                 .BuildServiceProvider();
+
+        var macro = new MultiMacro(sp);
         var request = new ExecutionRequest
         {
             OriginatingQuery = cmdline, ExecuteWithPrivilege = false, QueryResult = macro
@@ -270,7 +276,11 @@ public class ExecutionServiceShould : TestBase
     public async Task SelfExecuteMacroWithoutCrash(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
-        var macro = new MultiMacro(Substitute.For<IExecutionService>(), Substitute.For<ISearchService>(), 0);
+        var sp = new ServiceCollection()
+                 .AddMockSingleton<IExecutionService>()
+                 .AddMockSingleton<ISearchService>()
+                 .BuildServiceProvider();
+        var macro = new MultiMacro(sp);
 
         try { await macro.ExecuteAsync(cmdline); }
         catch (Exception) { Assert.Fail("This should not throw an exception"); }

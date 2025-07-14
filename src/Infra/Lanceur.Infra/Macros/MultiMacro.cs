@@ -36,17 +36,6 @@ public class MultiMacro : MacroQueryResult
         _delay = DefaultDelay;
     }
 
-    [Obsolete("Use the ctor with IServiceProvider instead. This ctor will be removed in a future version.")]
-    public MultiMacro(IExecutionService executionService, ISearchService searchService, int? delay = null)
-    {
-        ArgumentNullException.ThrowIfNull(executionService);
-        ArgumentNullException.ThrowIfNull(searchService);
-
-        _delay = delay ?? DefaultDelay;
-        _executionService = executionService;
-        _searchService = searchService;
-    }
-
     #endregion
 
     #region Methods
