@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.BusinessLogic;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.DI;
@@ -27,6 +28,7 @@ public partial class KeywordsViewModel : ObservableObject
     private readonly IInteractionHubService _hubService;
     private readonly ILogger<KeywordsViewModel> _logger;
     private readonly IPackagedAppSearchService _packagedAppSearchService;
+    private AliasQueryResult? _previousAlias;
     private AliasQueryResult? _selectedAlias;
     private readonly IThumbnailService _thumbnailService;
     private readonly IAliasValidationService _validationService;
@@ -252,6 +254,8 @@ public partial class KeywordsViewModel : ObservableObject
 
         _thumbnailService.UpdateThumbnails(_cachedAliases);
         _logger.LogDebug("Loaded {Count} alias(es)", _cachedAliases.Count);
+
+        SelectedAlias.MarkUnchanged();
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
@@ -259,31 +263,43 @@ public partial class KeywordsViewModel : ObservableObject
     {
         if ((SelectedAlias?.Id ?? 0) == 0) return;
 
+        if (await CanSaveChanges(_previousAlias))
+        {
+            await SaveAliasAsync(_previousAlias!);
+            return;
+        }
+
+        await ResetAlias(_previousAlias!);
+        _previousAlias = SelectedAlias;
         SelectedAlias = await Task.Run(() => _aliasManagementService.Hydrate(SelectedAlias));
         SelectedAlias.MarkUnchanged();
-        
+
         _logger.LogInformation("Loading alias {AliasName}", SelectedAlias.Name);
+
+        return;
+
+        async Task<bool> CanSaveChanges(AliasQueryResult? alias) => (alias?.IsDirty ?? false) &&
+                                                                    await _hubService.Interactions.AskAsync(
+                                                                        $"Do you want to save changes for '{alias.Name}'?"
+                                                                    );
+    }
+
+    private async Task ResetAlias(AliasQueryResult? alias)
+    {
+        if ((alias?.Id ?? 0) == 0) return;
+        
+        alias.Rehydrate(
+            _aliasManagementService.GetById(alias!.Id)
+        );
+        await _thumbnailService.UpdateThumbnailAsync(alias);
+        await Task.CompletedTask;
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
     private async Task OnSaveCurrentAliasAsync()
     {
-        var result = _validationService.IsValid(SelectedAlias);
-        if (!result.IsSuccess)
-        {
-            _hubService.Notifications.Warning(result.ErrorContent, "Validation failed");
-            _logger.LogDebug("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
-            _hubService.Notifications.Warning($"Alias validation failed:\n{result.ErrorContent}");
-            return;
-        }
-
-        _logger.LogDebug("Saving alias {AliasName}", SelectedAlias!.Name);
-
-        await _packagedAppSearchService.TryResolveDetailsAsync(SelectedAlias);
-
-        var alias = SelectedAlias;
-        await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));
-        _hubService.Notifications.Success($"Alias {alias.Name} created.", "Item created.");
+        SelectedAlias = await SaveAliasAsync(SelectedAlias);
+        _logger.LogDebug("Saved alias {AliasName}", SelectedAlias!.Name);
         await OnLoadAliases();
     }
 
@@ -297,7 +313,7 @@ public partial class KeywordsViewModel : ObservableObject
         }
 
         criterion = criterion.ToLower();
-        var aliases = _cachedAliases.Where(x => x.Name.ToLower().StartsWith(criterion))
+        var aliases = _cachedAliases.Where(x => x.Name.StartsWith(criterion, StringComparison.CurrentCultureIgnoreCase))
                                     .ToArray();
 
         _logger.LogTrace("Found {Count} alias(es) with criterion {Criterion}", aliases.Length, criterion);
@@ -320,6 +336,24 @@ public partial class KeywordsViewModel : ObservableObject
         if (!result.IsConfirmed) return;
 
         SelectedAlias.FileName = viewModel.SelectedPackagedApp?.AppUserModelId;
+    }
+
+    private async Task<AliasQueryResult?> SaveAliasAsync(AliasQueryResult? alias)
+    {
+        var result = _validationService.IsValid(SelectedAlias);
+        if (!result.IsSuccess)
+        {
+            _hubService.Notifications.Warning(result.ErrorContent, "Validation failed");
+            _logger.LogDebug("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
+            _hubService.Notifications.Warning($"Alias validation failed:\n{result.ErrorContent}");
+            return alias;
+        }
+
+        await _packagedAppSearchService.TryResolveDetailsAsync(alias);
+
+        await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));
+        _hubService.Notifications.Success($"Alias {alias!.Name} updated or created.", "Item updated or created.");
+        return alias;
     }
 
     #endregion

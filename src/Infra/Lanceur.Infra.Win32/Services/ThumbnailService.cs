@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Lanceur.Core.Decorators;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -43,17 +42,11 @@ public class ThumbnailService : IThumbnailService
 
     #region Methods
 
-    /// <summary>
-    ///     Updates the thumbnail for the provided query. This method handles different types of sources:
-    ///     executables, Windows Store applications, and URLs. It attempts to retrieve and assign the appropriate
-    ///     thumbnail or favicon based on the query information.
-    /// </summary>
-    /// <param name="queryResult">An object containing the necessary information to retrieve and update the thumbnail.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    private async Task UpdateThumbnailAsync(EntityDecorator<QueryResult> queryResult)
+    /// <inheritdoc />
+    public async Task UpdateThumbnailAsync(QueryResult queryResult)
     {
-        if (queryResult.Entity?.IsThumbnailDisabled ?? true) return;
-        if (queryResult.Entity is not AliasQueryResult alias) return;
+        if (queryResult.IsThumbnailDisabled) return;
+        if (queryResult is not AliasQueryResult alias) return;
 
         if (alias.FileName.IsNullOrEmpty())
         {
@@ -70,11 +63,11 @@ public class ThumbnailService : IThumbnailService
         var filePath = alias.FileName.GetThumbnailPath();
         if (File.Exists(filePath))
         {
-            if (alias.Thumbnail == filePath) return; 
+            if (alias.Thumbnail == filePath) return;
 
             _logger.LogTrace("Thumbnail already exists for {AliasName} but not yet updated. (PackagedApp)", alias.Name);
             alias.Thumbnail = filePath;
-            queryResult.MarkAsDirty();
+            queryResult.MarkChanged();
             return;
         }
 
@@ -91,7 +84,7 @@ public class ThumbnailService : IThumbnailService
             if (response is not null)
             {
                 alias.Thumbnail = response.Logo.LocalPath;
-                queryResult.MarkAsDirty();
+                queryResult.MarkChanged();
             }
 
             alias.Thumbnail.CopyToImageRepository(alias.FileName);
@@ -107,7 +100,7 @@ public class ThumbnailService : IThumbnailService
             var file = new FileInfo(alias.FileName);
             imageSource.CopyToImageRepository(file.Name);
             alias.Thumbnail = file.Name.GetThumbnailPath();
-            queryResult.MarkAsDirty();
+            queryResult.MarkChanged();
             return;
         }
 
@@ -131,7 +124,7 @@ public class ThumbnailService : IThumbnailService
         if (File.Exists(favicon))
         {
             alias.Thumbnail = favicon;
-            queryResult.MarkAsDirty();
+            queryResult.MarkChanged();
             return;
         }
 
@@ -145,17 +138,16 @@ public class ThumbnailService : IThumbnailService
     ///     Each time a thumbnail is found, the corresponding alias is updated. Because the alias is reactive, the UI will
     ///     automatically reflect these updates.
     /// </summary>
-    /// <param name="queryResults">The list of queries for which thumbnails need to be updated.</param>
-    public void UpdateThumbnails(IEnumerable<QueryResult> queryResults)
+    /// <param name="queries">The list of queries for which thumbnails need to be updated.</param>
+    public void UpdateThumbnails(IEnumerable<QueryResult> queries)
     {
-        queryResults = queryResults.ToArray();
-        var queries = EntityDecorator<QueryResult>.FromEnumerable(queryResults)
-                                                  .ToArray();
+        queries = queries.ToArray();
+
 
         using var m = _logger.WarnIfSlow(this);
         try
         {
-            _logger.LogTrace("Refreshing thumbnails for {Count} alias", queryResults.Count());
+            _logger.LogTrace("Refreshing thumbnails for {Count} alias", queries.Count());
             foreach (var query in queries)
                 UpdateThumbnailAsync(query) // Fire & forget thumbnail refresh
                     .ContinueWith(
