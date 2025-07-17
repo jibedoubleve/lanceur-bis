@@ -20,18 +20,32 @@ public class AliasManagementService : IAliasManagementService
 
     #region Methods
 
-    public IEnumerable<AliasQueryResult> GetAll() => _repository.GetAll()
-                                                                .Where(x => x.IsHidden == false)
-                                                                .OrderBy(x => x.Name);
+    public void Delete(AliasQueryResult alias) => _repository.RemoveLogically(alias);
+
+    public IEnumerable<AliasQueryResult> GetAll()
+    {
+        var results = _repository.GetAll()
+                                 .Where(x => x.IsHidden == false)
+                                 .OrderBy(x => x.Name)
+                                 .ToArray();
+        foreach (var result in results) result.MarkUnchanged();
+        return results;
+    }
+
+    public AliasQueryResult GetById(long id) => _repository.GetById(id);
 
     public AliasQueryResult Hydrate(AliasQueryResult queryResult)
     {
         _repository.HydrateAlias(queryResult);
+        queryResult.MarkUnchanged();
         return queryResult;
     }
 
-    public void Delete(AliasQueryResult alias) => _repository.RemoveLogically(alias);
-    public void SaveOrUpdate(ref AliasQueryResult alias) => _repository.SaveOrUpdate(ref alias); 
+    public void SaveOrUpdate(ref AliasQueryResult alias)
+    {
+        _repository.SaveOrUpdate(ref alias);
+        alias.MarkUnchanged();
+    }
 
     #endregion
 }

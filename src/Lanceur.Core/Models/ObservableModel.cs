@@ -65,6 +65,10 @@ public class ObservableModel : INotifyPropertyChanged
     /// </summary>
     public void MarkUnchanged() => IsDirty = false;
 
+    /// <summary>
+    ///     Sets the <see cref="IsDirty" /> flag, marking the object as changed.
+    /// </summary>
+    public void MarkChanged()=> IsDirty = true;
     #endregion
 
     #region Events
