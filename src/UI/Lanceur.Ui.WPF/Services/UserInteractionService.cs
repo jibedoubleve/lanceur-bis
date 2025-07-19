@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Services;
 using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Messages;
-using ScottPlot.Interactivity;
 using MessageBox = Wpf.Ui.Controls.MessageBox;
 using MessageBoxResult = Wpf.Ui.Controls.MessageBoxResult;
 
@@ -14,37 +13,63 @@ public class UserInteractionService : IUserInteractionService
     #region Methods
 
     ///<inheritdoc />
-    public async Task<bool> AskAsync(string message, string title = "Question", string yes = ButtonLabels.Yes, string no = ButtonLabels.No)
+    public async Task<bool> AskAsync(
+        string message,
+        string title = "Question",
+        string yes = ButtonLabels.Yes,
+        string no = ButtonLabels.No
+    )
     {
-        var messageBox = new MessageBox { Title = title, Content = message, PrimaryButtonText = yes, CloseButtonText = no };
+        var messageBox = new MessageBox
+        {
+            Title = title,
+            Content = message,
+            PrimaryButtonText = yes,
+            CloseButtonText = no
+        };
         var result = await messageBox.ShowDialogAsync();
         return result == MessageBoxResult.Primary;
     }
 
     ///<inheritdoc />
-    public async Task<bool> AskUserYesNoAsync(object content, string yesText = "Yes", string noText = "No", string title = "Question")
+    public async Task<bool> AskUserYesNoAsync(
+        object content,
+        string yesText = "Yes",
+        string noText = "No",
+        string title = "Question"
+    ) => await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
+        new(
+            content,
+            title,
+            yesText,
+            noText
+        )
+    );
+
+    ///<inheritdoc />
+    public async Task<(bool IsConfirmed, object DataContext)> InteractAsync(
+        object content,
+        string yesText = ButtonLabels.Apply,
+        string noText = ButtonLabels.Cancel,
+        string title = "Interaction",
+        object? dataContext = null
+    )
     {
-        return await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
+        if (content is FrameworkElement d)
+        {
+            if (dataContext is not null)
+                d.DataContext = dataContext;
+            else
+                dataContext = d.DataContext;
+        }
+
+        var isConfirmed = await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
             new(
                 content,
                 title,
                 yesText,
                 noText
             )
-        );
-    }
-
-    ///<inheritdoc />
-    public async Task<(bool IsConfirmed, object DataContext)> InteractAsync(object content, string yesText = ButtonLabels.Apply, string noText = ButtonLabels.Cancel, string title = "Interaction",  object? dataContext = null)
-    {
-        if (content is FrameworkElement d)
-        {
-            if(dataContext is not null)
-                d.DataContext = dataContext;
-            else dataContext = d.DataContext;
-        }
-        var isConfirmed = await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
-            new(content, title, yesText, noText)
         );
         return (IsConfirmed: isConfirmed, DataContext: dataContext)!;
     }
