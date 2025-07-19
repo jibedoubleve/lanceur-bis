@@ -141,11 +141,12 @@ public partial class KeywordsViewModel : ObservableObject
             "Add parameter"
         );
         if (!result.IsConfirmed) return;
-
-        var vm = result.DataContext as AdditionalParameter;
-        SelectedAlias?.AdditionalParameters.Add(vm);
+        if (result.DataContext is not AdditionalParameter param) return;
+        
+        SelectedAlias.AdditionalParameters.Add(param);
+        SelectedAlias.MarkChanged();
         _hubService.Notifications.Success(
-            $"Parameter {parameter.Name} has been added. Don't forget to save to apply changes",
+            $"Parameter {param.Name} has been added. Don't forget to save to apply changes",
             "Updated."
         );
     }
@@ -202,7 +203,8 @@ public partial class KeywordsViewModel : ObservableObject
     private async Task OnDeleteParameter(AdditionalParameter parameter)
     {
         var response = await _hubService.Interactions.AskUserYesNoAsync(
-            $"The parameter '{parameter.Name}' will disappear from the screen and be permanently deleted only after you save your changes. Do you want to continue?"
+            $"The parameter '{parameter.Name}' will disappear from the screen and be permanently deleted only after " +
+            $"you save your changes. Do you want to continue?"
         );
 
         if (!response) return;
