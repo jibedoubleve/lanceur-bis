@@ -111,7 +111,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                 sut.Should().NotBeNull();
                 await sut.Received().ExecuteAsync(Arg.Any<ExecutionRequest>());
             },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }
@@ -144,9 +144,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     public async Task BeAbleToSearchAliases()
     {
         // ARRANGE
-        var sqlBuilder = new SqlBuilder().AppendAlias(1, cfg: a => a.WithSynonyms("alias1", "alias_1"))
-                                         .AppendAlias(2, cfg: a => a.WithSynonyms("alias2", "alias_2"))
-                                         .AppendAlias(3, cfg: a => a.WithSynonyms("alias3", "alias_3"));
+        var sqlBuilder = new SqlGenerator().AppendAlias(1, a => a.WithSynonyms("alias1", "alias_1"))
+                                           .AppendAlias(2, a => a.WithSynonyms("alias2", "alias_2"))
+                                           .AppendAlias(3, a => a.WithSynonyms("alias3", "alias_3"));
 
 
         await TestViewModelAsync(
@@ -167,10 +167,10 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     public async Task NotShowAllResultWhenPreviousQuery()
     {
         var i = 0;
-        var sqlBuilder = new SqlBuilder().AppendAlias(++i)
-                                         .AppendAlias(++i)
-                                         .AppendAlias(++i)
-                                         .AppendAlias(++i);
+        var sqlBuilder = new SqlGenerator().AppendAlias(++i, a => a.WithSynonyms())
+                                           .AppendAlias(++i, a => a.WithSynonyms())
+                                           .AppendAlias(++i, a => a.WithSynonyms())
+                                           .AppendAlias(++i, a => a.WithSynonyms());
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
@@ -193,7 +193,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                     // Handle the option "Application.SearchBox.ShowResult" If sets ti "True" it means it should show
                     // all the results (only if query is empty)
                     await viewModel.DisplayResultsIfAllowed();
-                    
+
                     viewModel.Results.Should().HaveCount(expectedCount);
                 }
             },
@@ -207,9 +207,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [InlineData(false, 0)]
     public async Task ShowAllResultsOrNotDependingOnConfiguration(bool showAllResults, int count)
     {
-        var builder = new SqlBuilder().AppendAlias(1, cfg: a => a.WithSynonyms("alias1", "alias_1"))
-                                      .AppendAlias(2, cfg: a => a.WithSynonyms("alias2", "alias_2"))
-                                      .AppendAlias(3, cfg: a => a.WithSynonyms("alias3", "alias_3"));
+        var builder = new SqlGenerator().AppendAlias(1, a => a.WithSynonyms("alias1", "alias_1"))
+                                        .AppendAlias(2, a => a.WithSynonyms("alias2", "alias_2"))
+                                        .AppendAlias(3, a => a.WithSynonyms("alias3", "alias_3"));
 
         var visitors = new ServiceVisitors
         {
@@ -250,7 +250,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                     }
                 }
             },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }

@@ -20,13 +20,13 @@ public abstract class ViewModelTester<TViewModel> : TestBase
     #endregion
 
     #region Methods
-
+    
     protected abstract IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors? visitors);
 
-    protected async Task TestViewModelAsync(Func<TViewModel, IDbConnectionManager, Task> scope, SqlBuilder? sqlBuilder = null, ServiceVisitors? visitors = null)
+    protected async Task TestViewModelAsync(Func<TViewModel, IDbConnectionManager, Task> scope, ISqlGenerator? sqlBuilder = null, ServiceVisitors? visitors = null)
     {
         var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
-        using var connectionManager = GetConnectionManager(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
+        using var connectionManager = GetConnectionManager(sqlBuilder ?? new Sql(), connectionString.ToString());
 
         var serviceCollection = new ServiceCollection().AddView<TViewModel>()
                                                        .AddLogging(builder =>
@@ -41,10 +41,10 @@ public abstract class ViewModelTester<TViewModel> : TestBase
         await scope(viewModel, connectionManager);
     }
     
-    protected void TestViewModel(Action<TViewModel, IDbConnectionManager> scope, SqlBuilder? sqlBuilder = null, ServiceVisitors? visitors = null)
+    protected void TestViewModel(Action<TViewModel, IDbConnectionManager> scope, ISqlGenerator? sqlBuilder = null, ServiceVisitors? visitors = null)
     {
         var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
-        using var connectionManager = GetConnectionManager(sqlBuilder ?? SqlBuilder.Empty, connectionString.ToString());
+        using var connectionManager = GetConnectionManager(sqlBuilder ?? new Sql(), connectionString.ToString());
 
         var serviceCollection = new ServiceCollection().AddView<TViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))

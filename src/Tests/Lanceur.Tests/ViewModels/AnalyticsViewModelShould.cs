@@ -35,7 +35,7 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
     {
         TestViewModel(
             (viewModel, _) => viewModel.SelectYearCommand.Execute(null),
-            SqlBuilder.Empty
+            Sql.Empty
         );
     }
 

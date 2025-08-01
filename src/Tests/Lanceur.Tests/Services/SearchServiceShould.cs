@@ -51,18 +51,21 @@ public class SearchServiceShould : TestBase
 
     #region Constructors
 
-    public SearchServiceShould(ITestOutputHelper output) : base(output) => _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
+    public SearchServiceShould(ITestOutputHelper output) : base(output)
+        => _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
 
     #endregion
 
     #region Methods
 
-    private ServiceProvider BuildConfigureServices(IServiceCollection serviceCollection = null, ServiceVisitors visitors = null)
+    private ServiceProvider BuildConfigureServices(
+        IServiceCollection serviceCollection = null,
+        ServiceVisitors visitors = null
+    )
     {
         serviceCollection ??= new ServiceCollection();
         serviceCollection.AddMockSingleton<ILoggerFactory>()
-                         .AddApplicationSettings(
-                             stg => visitors?.VisitSettings?.Invoke(stg)
+                         .AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)
                          )
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton<AssemblySource>()
@@ -117,7 +120,7 @@ public class SearchServiceShould : TestBase
          * Check counter is still -1
          */
         OutputHelper.Arrange();
-        var sql = new SqlBuilder().AppendAlias(1,cfg: a => a.WithSynonyms("a", "b")).ToString();
+        var sql = new SqlGenerator().AppendAlias(1, a => a.WithSynonyms("a", "b")).Generate();
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         var converter = Substitute.For<IMappingService>();
@@ -158,7 +161,9 @@ public class SearchServiceShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<IThumbnailService>()
                                                      .AddLoggingForTests<StoreLoader>(OutputHelper)
                                                      .AddLoggingForTests<MacroService>(OutputHelper)
-                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                                                     .AddSingleton<IStoreOrchestrationFactory>(
+                                                         new StoreOrchestrationFactory()
+                                                     )
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton<IMacroService, MacroService>()
                                                      .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
@@ -169,10 +174,10 @@ public class SearchServiceShould : TestBase
                                                      .AddSingleton<SearchService>()
                                                      .AddSingleton<AssemblySource>()
                                                      .AddSingleton<IDbActionFactory, DbActionFactory>()
-                                                     .AddMockSingleton<IStoreLoader>(
-                                                         (serviceProvider, storeLoader) =>
+                                                     .AddMockSingleton<IStoreLoader>((serviceProvider, storeLoader) =>
                                                          {
-                                                             storeLoader.Load().Returns([new AliasStore(serviceProvider)]);
+                                                             storeLoader.Load()
+                                                                        .Returns([new AliasStore(serviceProvider)]);
                                                              return storeLoader;
                                                          }
                                                      )
@@ -228,7 +233,8 @@ public class SearchServiceShould : TestBase
 
         var serviceProvider = new ServiceCollection().AddDatabase(conn)
                                                      .AddLogging(builder => builder.AddXUnit(OutputHelper))
-                                                     .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+                                                     .AddSingleton<IStoreOrchestrationFactory,
+                                                         StoreOrchestrationFactory>()
                                                      .AddMockSingleton<ISettingsFacade>()
                                                      .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton(_testLoggerFactory)
@@ -237,16 +243,14 @@ public class SearchServiceShould : TestBase
                                                      .AddSingleton<ISearchService, SearchService>()
                                                      .AddSingleton<IDbActionFactory, DbActionFactory>()
                                                      .AddMockSingleton<IThumbnailService>()
-                                                     .AddMockSingleton<IStoreLoader>(
-                                                         (sp, _) =>
+                                                     .AddMockSingleton<IStoreLoader>((sp, _) =>
                                                          {
                                                              var stores = sp.GetService<IStoreLoader>();
                                                              stores.Load().Returns([new AliasStore(sp)]);
                                                              return stores;
                                                          }
                                                      )
-                                                     .AddMockSingleton<IMacroService>(
-                                                         (sp, macroManager) =>
+                                                     .AddMockSingleton<IMacroService>((sp, macroManager) =>
                                                          {
                                                              var results = sp.GetService<IAliasRepository>()
                                                                              .Search(criterion)
@@ -256,10 +260,12 @@ public class SearchServiceShould : TestBase
                                                              return macroManager;
                                                          }
                                                      )
-                                                     .AddMockSingleton<ISearchServiceOrchestrator>(
-                                                         (_, orchestrator) =>
+                                                     .AddMockSingleton<ISearchServiceOrchestrator>((_, orchestrator) =>
                                                          {
-                                                             orchestrator.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
+                                                             orchestrator.IsAlive(
+                                                                             Arg.Any<IStoreService>(),
+                                                                             Arg.Any<Cmdline>()
+                                                                         )
                                                                          .Returns(true);
                                                              return orchestrator;
                                                          }
@@ -286,10 +292,12 @@ public class SearchServiceShould : TestBase
                                                      .AddMockSingleton<IThumbnailService>()
                                                      .AddMockSingleton<IStoreLoader>()
                                                      .AddMockSingleton<ILoggerFactory>()
-                                                     .AddMockSingleton<ISearchServiceOrchestrator>(
-                                                         (_, orchestrator) =>
+                                                     .AddMockSingleton<ISearchServiceOrchestrator>((_, orchestrator) =>
                                                          {
-                                                             orchestrator.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
+                                                             orchestrator.IsAlive(
+                                                                             Arg.Any<IStoreService>(),
+                                                                             Arg.Any<Cmdline>()
+                                                                         )
                                                                          .Returns(true);
                                                              return orchestrator;
                                                          }
@@ -312,17 +320,17 @@ public class SearchServiceShould : TestBase
     public void SetUsageDoesNotResetAdditionalParameters()
     {
         OutputHelper.Arrange();
-        var sql = new SqlBuilder().AppendAlias(
-                                      1,
-                                      cfg: a =>
-                                      {
-                                          a.WithSynonyms("a");
-                                          a.WithArgument();
-                                          a.WithArgument();
-                                          a.WithArgument();
-                                      }
-                                  )
-                                  .ToString();
+        var sql = new SqlGenerator().AppendAlias(
+                                        1,
+                                     a =>
+                                     {
+                                         a.WithSynonyms("a")
+                                          .WithAdditionalParameters()
+                                          .WithAdditionalParameters()
+                                          .WithAdditionalParameters();
+                                     }
+                                    )
+                                    .Generate();
 
         var connectionManager = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
