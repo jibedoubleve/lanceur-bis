@@ -17,8 +17,8 @@ public partial class CodeEditorControl
     #region Fields
 
     private readonly ILuaManager _luaManager;
-    private readonly IUserNotificationService _userNotificationService;
     private string? _luaScriptCache;
+    private readonly IUserNotificationService _userNotificationService;
 
     #endregion
 
@@ -96,6 +96,8 @@ public partial class CodeEditorControl
         LuaEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
     }
 
+    public string Apply() => LuaEditor.Text;
+
     public void Load(AliasQueryResult alias)
     {
         ScriptOutput.Content
@@ -110,9 +112,7 @@ public partial class CodeEditorControl
         TbParameters.Text = alias?.Parameters ?? string.Empty;
     }
 
-    #endregion
-
-    public string Apply() => LuaEditor.Text;
-
     public string Reset() => _luaScriptCache ?? string.Empty;
+
+    #endregion
 }
