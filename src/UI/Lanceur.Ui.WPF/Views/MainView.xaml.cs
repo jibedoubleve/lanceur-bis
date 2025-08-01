@@ -109,7 +109,6 @@ public partial class MainView
                 _settings.Application.ResourceMonitor.RefreshRate.Milliseconds(),
                 t =>
                 {
-                    Debug.WriteLine($"Cpu: {t.CpuLoad} % - Memory: {t.MemoryLoad} %");
                     Application.Current.Dispatcher.Invoke(
                         () =>
                         {
