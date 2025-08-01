@@ -20,31 +20,20 @@ public abstract class ViewModelTester<TViewModel> : TestBase
     #endregion
 
     #region Methods
-    
-    protected abstract IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors? visitors);
 
-    protected async Task TestViewModelAsync(Func<TViewModel, IDbConnectionManager, Task> scope, ISqlGenerator? sqlBuilder = null, ServiceVisitors? visitors = null)
+    protected abstract IServiceCollection ConfigureServices(
+        IServiceCollection serviceCollection,
+        ServiceVisitors? visitors
+    );
+
+    protected void TestViewModel(
+        Action<TViewModel, IDbConnectionManager> scope,
+        ISqlGenerator? sqlBuilder = null,
+        ServiceVisitors? visitors = null
+    )
     {
         var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
-        using var connectionManager = GetConnectionManager(sqlBuilder ?? new Sql(), connectionString.ToString());
-
-        var serviceCollection = new ServiceCollection().AddView<TViewModel>()
-                                                       .AddLogging(builder =>
-                                                       {
-                                                           builder.AddXUnit(OutputHelper);
-                                                           builder.SetMinimumLevel(LogLevel.Trace);
-                                                       })
-                                                       .AddDatabase(connectionManager);
-
-        var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
-        var viewModel = serviceProvider.GetService<TViewModel>() !;
-        await scope(viewModel, connectionManager);
-    }
-    
-    protected void TestViewModel(Action<TViewModel, IDbConnectionManager> scope, ISqlGenerator? sqlBuilder = null, ServiceVisitors? visitors = null)
-    {
-        var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
-        using var connectionManager = GetConnectionManager(sqlBuilder ?? new Sql(), connectionString.ToString());
+        using var connectionManager = GetConnectionManager(sqlBuilder ?? Sql.Empty, connectionString.ToString());
 
         var serviceCollection = new ServiceCollection().AddView<TViewModel>()
                                                        .AddLogging(builder => builder.AddXUnit(OutputHelper))
@@ -54,6 +43,29 @@ public abstract class ViewModelTester<TViewModel> : TestBase
         var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
         var viewModel = serviceProvider.GetService<TViewModel>() !;
         scope(viewModel, connectionManager);
+    }
+
+    protected async Task TestViewModelAsync(
+        Func<TViewModel, IDbConnectionManager, Task> scope,
+        ISqlGenerator? sqlBuilder = null,
+        ServiceVisitors? visitors = null
+    )
+    {
+        var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
+        using var connectionManager = GetConnectionManager(sqlBuilder ?? Sql.Empty, connectionString.ToString());
+
+        var serviceCollection = new ServiceCollection().AddView<TViewModel>()
+                                                       .AddLogging(builder =>
+                                                           {
+                                                               builder.AddXUnit(OutputHelper);
+                                                               builder.SetMinimumLevel(LogLevel.Trace);
+                                                           }
+                                                       )
+                                                       .AddDatabase(connectionManager);
+
+        var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
+        var viewModel = serviceProvider.GetService<TViewModel>() !;
+        await scope(viewModel, connectionManager);
     }
 
     #endregion

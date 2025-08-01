@@ -57,7 +57,7 @@ public class ThumbnailServiceShould : TestBase
                                                   ("name_0", "argument_0"),
                                                   ("name_0", "argument_0")
                                               ))
-                                    .Generate();
+                                    .GenerateSql();
 
         OutputHelper.WriteLine(sql);
         var connectionMgr = new DbSingleConnectionManager(

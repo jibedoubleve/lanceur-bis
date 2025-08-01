@@ -4,7 +4,7 @@ public interface ISqlGenerator
 {
     #region Methods
 
-    string Generate();
+    string GenerateSql();
 
     #endregion
 }
