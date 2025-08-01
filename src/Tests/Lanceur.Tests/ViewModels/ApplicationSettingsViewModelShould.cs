@@ -79,7 +79,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 userInteractionService.Received(1)
                                       .AskRestart();
             },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }
@@ -113,7 +113,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 userInteractionService.Received()
                                       .AskRestart();
             },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }
@@ -182,7 +182,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 results.Should().HaveCount(2);
                 _ = results.Select(e => e.Should().Be(shortcut));
             },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }

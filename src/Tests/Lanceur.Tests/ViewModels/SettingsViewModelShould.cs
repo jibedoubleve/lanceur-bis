@@ -46,7 +46,7 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
                 var result = db.WithConnection(c => c.Query<string>(sql).SingleOrDefault());
                 result.Should().Be(expected());
             },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }

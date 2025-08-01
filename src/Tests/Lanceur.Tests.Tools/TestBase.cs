@@ -105,12 +105,12 @@ public abstract class TestBase
         db.Execute(sql);
     }
 
-    protected DbSingleConnectionManager GetConnectionManager(SqlBuilder builder, string? connectionString = null)
+    protected DbSingleConnectionManager GetConnectionManager(ISqlGenerator builder, string? connectionString = null)
     {
         DbSingleConnectionManager? connectionManager = null;
         try
         {
-            var database = BuildFreshDb(builder.ToString(), connectionString);
+            var database = BuildFreshDb(builder.Generate(), connectionString);
             connectionManager = new(database);
             return connectionManager;
         }

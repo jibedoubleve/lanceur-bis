@@ -29,40 +29,35 @@ public class ThumbnailServiceShould : TestBase
     public void RefreshThumbnailsWithoutRemovingAdditionalParameters()
     {
         // ARRANGE
-        var sql = new SqlBuilder().AppendAlias(
-                                      1,
-                                      "fileName1",
-                                      "some parameters 1",
-                                      cfg: alias =>
-                                      {
-                                          alias.WithSynonyms("a1", "a2", "a3")
-                                               .WithArgument("name_0", "argument_0")
-                                               .WithArgument("name_0", "argument_0");
-                                      }
-                                  )
-                                  .AppendAlias(
-                                      110,
-                                      "fileName2",
-                                      "some parameters 2",
-                                      cfg: alias =>
-                                      {
-                                          alias.WithSynonyms("aa1", "ab2", "ab3")
-                                           .WithArgument("name_0", "argument_0")
-                                           .WithArgument("name_0", "argument_0");
-                                      }
-                                  )
-                                  .AppendAlias(
-                                      120,
-                                      "fileName3",
-                                      "some parameters 3",
-                                      cfg: alias =>
-                                      {
-                                          alias.WithSynonyms("ac1", "ac2", "ac3")
-                                               .WithArgument("name_0", "argument_0")
-                                               .WithArgument("name_0", "argument_0");
-                                      }
-                                  )
-                                  .ToString();
+        var sql = new SqlGenerator().AppendAlias(
+                                        1,
+                                        a => a.WithFileName("fileName1")
+                                              .WithArguments("some parameters 1")
+                                              .WithSynonyms("a1", "a2", "a3")
+                                              .WithAdditionalParameters(
+                                                  ("name_0", "argument_0"),
+                                                  ("name_0", "argument_0")
+                                              ))
+                                    .AppendAlias(
+                                        110,
+                                        a => a.WithFileName("fileName2")
+                                              .WithArguments("some parameters 2")
+                                              .WithSynonyms("aa1", "ab2", "ab3")
+                                              .WithAdditionalParameters(
+                                                  ("name_0", "argument_0"),
+                                                  ("name_0", "argument_0")
+                                              )
+                                    )
+                                    .AppendAlias(
+                                        120,
+                                        a => a.WithFileName("fileName3")
+                                              .WithArguments("some parameters 3")
+                                              .WithSynonyms("ac1", "ac2", "ac3")
+                                              .WithAdditionalParameters(
+                                                  ("name_0", "argument_0"),
+                                                  ("name_0", "argument_0")
+                                              ))
+                                    .Generate();
 
         OutputHelper.WriteLine(sql);
         var connectionMgr = new DbSingleConnectionManager(

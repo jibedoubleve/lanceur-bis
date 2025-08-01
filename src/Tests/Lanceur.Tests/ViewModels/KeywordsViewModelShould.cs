@@ -38,7 +38,10 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
 
     #region Methods
 
-    protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
+    protected override IServiceCollection ConfigureServices(
+        IServiceCollection serviceCollection,
+        ServiceVisitors visitors
+    )
     {
         serviceCollection.AddSingleton<IMappingService, MappingService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
@@ -50,9 +53,11 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IViewFactory>((sp, i) => visitors?.VisitViewFactory?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IUserInteractionService>((sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
+                         .AddMockSingleton<IUserInteractionService>((sp, i)
+                             => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IUserNotificationService>((sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
+                         .AddMockSingleton<IUserNotificationService>((sp, i)
+                             => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IExecutionService>((sp, i) =>
                              {
@@ -70,10 +75,10 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [Fact]
     public async Task CreateAliasWithAddKeyword()
     {
-        var sqlBuilder = new SqlBuilder();
-        sqlBuilder.AppendAlias(1)
-                  .AppendAlias(2)
-                  .AppendAlias(3);
+        var sqlBuilder = new SqlGenerator();
+        sqlBuilder.AppendAlias(1, a => a.WithSynonyms())
+                  .AppendAlias(2, a => a.WithSynonyms())
+                  .AppendAlias(3, a => a.WithSynonyms());
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -131,17 +136,17 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 var alias = res[0];
                 alias.FieldValue.Should().Be(script);
             },
-            SqlBuilder.Empty
+            Sql.Empty
         );
     }
 
     [Fact]
     public async Task CreateAliasWorkOnSecondNavigation()
     {
-        var sqlBuilder = new SqlBuilder();
-        sqlBuilder.AppendAlias(1)
-                  .AppendAlias(2)
-                  .AppendAlias(3);
+        var sqlBuilder = new SqlGenerator()
+                         .AppendAlias(1, a => a.WithSynonyms())
+                         .AppendAlias(2, a => a.WithSynonyms())
+                         .AppendAlias(3, a => a.WithSynonyms());
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -221,89 +226,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                     alias.FieldValue.Should().BeTrue("the field 'deleted_at' has to indicate deletion");
                 }
             },
-            SqlBuilder.Empty,
-            visitors
-        );
-    }
-    
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    public async Task RefreshCacheWhenDeleteAliasLogically(int countToAdd)
-    {
-        var visitors = new ServiceVisitors
-        {
-            VisitUserInteractionService = (_, i) =>
-            {
-                // Configured to say yes when it'll be asked to delete the alias
-                i.AskUserYesNoAsync(Arg.Any<object>())
-                 .Returns(true);
-                return i;
-            }
-        };
-
-        await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
-                // ARRANGE
-                const string name = "SomeTestName";
-                const string fileName = "SomeFileName";
-
-                // ACT
-                for (var i = 0; i < countToAdd; i++)
-                {
-                    await viewModel.CreateNewAlias(name, $"{fileName}_{i}");
-                }
-                await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null);
-                viewModel.SearchCommand.Execute(string.Empty);
-
-                // ASSERT
-                using (new AssertionScope())
-                {
-                    viewModel.Aliases.Should().HaveCount(countToAdd - 1, "because the alias has been deleted logically");
-                }
-            },
-            SqlBuilder.Empty,
-            visitors
-        );
-    }
-
-    [Fact]
-    public async Task NotCreateAliasWhenNoUwpAppIsSelectedAndFileNameIsEmpty()
-    {
-        var visitors = new ServiceVisitors
-        {
-            VisitUserInteractionService = (_, i) =>
-            {
-                // Configured to say yes when it'll be asked to delete the alias
-                i.InteractAsync(
-                     Arg.Any<object>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<string>(),
-                     Arg.Any<object>()
-                 ).Returns((IsConfirmed: true, DataContext: null));
-                return i;
-            }
-        };
-        await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
-                // ARRANGE
-                const string name = "SomeTestName";
-
-                // ACT
-                viewModel.PrepareAliasForCreation(name);
-                await viewModel.SetPackagedApplicationCommand.ExecuteAsync(null);
-                viewModel.SearchCommand.Execute(string.Empty);
-
-                // ASSERT
-                const string sql = "select count(*) from alias";
-                db.WithConnection(c => c.ExecuteScalar<int>(sql))
-                  .Should()
-                  .Be(0);
-            },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }
@@ -370,7 +293,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 var count = db.WithConnection(c => c.ExecuteScalar(sql));
                 count.Should().Be(1);
             },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }
@@ -382,10 +305,10 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [InlineData(" ")]
     public async Task ListAllAliasOnEmptySearch(string criterion)
     {
-        var sqlBuilder = new SqlBuilder();
-        sqlBuilder.AppendAlias(1)
-                  .AppendAlias(2)
-                  .AppendAlias(3);
+        var sqlBuilder = new SqlGenerator()
+                         .AppendAlias(1, a => a.WithSynonyms())
+                         .AppendAlias(2, a => a.WithSynonyms())
+                         .AppendAlias(3, a => a.WithSynonyms());
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -461,7 +384,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                     alias.FieldValue.Should().BeTrue("because the alias has been deleted logically");
                 }
             },
-            SqlBuilder.Empty,
+            Sql.Empty,
             visitors
         );
     }
@@ -470,7 +393,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [MemberData(nameof(FeedNotCrashWhenCreatingMultipleParametersWithEmptyTrailingLine))]
     public async Task NotCrashWhenCreatingMultipleParametersWithEmptyTrailingLine(string additionalParameters)
     {
-        var sqlBuilder = SqlBuilder.Empty;
+        var sqlBuilder = Sql.Empty;
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
@@ -510,20 +433,61 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     }
 
     [Fact]
+    public async Task NotCreateAliasWhenNoUwpAppIsSelectedAndFileNameIsEmpty()
+    {
+        var visitors = new ServiceVisitors
+        {
+            VisitUserInteractionService = (_, i) =>
+            {
+                // Configured to say yes when it'll be asked to delete the alias
+                i.InteractAsync(
+                     Arg.Any<object>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<string>(),
+                     Arg.Any<object>()
+                 )
+                 .Returns((IsConfirmed: true, DataContext: null));
+                return i;
+            }
+        };
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                // ARRANGE
+                const string name = "SomeTestName";
+
+                // ACT
+                viewModel.PrepareAliasForCreation(name);
+                await viewModel.SetPackagedApplicationCommand.ExecuteAsync(null);
+                viewModel.SearchCommand.Execute(string.Empty);
+
+                // ASSERT
+                const string sql = "select count(*) from alias";
+                db.WithConnection(c => c.ExecuteScalar<int>(sql))
+                  .Should()
+                  .Be(0);
+            },
+            Sql.Empty,
+            visitors
+        );
+    }
+
+    [Fact]
     public async Task NotRecreateAliasOnLoad()
     {
-        var builder = new SqlBuilder().AppendAlias(
-                                          1,
-                                          "un",
-                                          "params un",
-                                          cfg: alias => alias.WithSynonyms("deux")
-                                      )
-                                      .AppendAlias(
-                                          2,
-                                          "deux",
-                                          "params deux",
-                                          cfg: alias => alias.WithSynonyms("trois")
-                                      );
+        var builder = new SqlGenerator().AppendAlias(
+                                            1,
+                                            a => a.WithFileName("un")
+                                                  .WithArguments("params un")
+                                                  .WithSynonyms("deux")
+                                        )
+                                        .AppendAlias(
+                                            2,
+                                            a => a.WithFileName("deux")
+                                                  .WithArguments("params deux")
+                                                  .WithSynonyms("trois")
+                                        );
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModelAsync(
             async (viewModel, _) =>
@@ -536,6 +500,46 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             },
             builder,
             visitor
+        );
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    public async Task RefreshCacheWhenDeleteAliasLogically(int countToAdd)
+    {
+        var visitors = new ServiceVisitors
+        {
+            VisitUserInteractionService = (_, i) =>
+            {
+                // Configured to say yes when it'll be asked to delete the alias
+                i.AskUserYesNoAsync(Arg.Any<object>())
+                 .Returns(true);
+                return i;
+            }
+        };
+
+        await TestViewModelAsync(
+            async (viewModel, _) =>
+            {
+                // ARRANGE
+                const string name = "SomeTestName";
+                const string fileName = "SomeFileName";
+
+                // ACT
+                for (var i = 0; i < countToAdd; i++) await viewModel.CreateNewAlias(name, $"{fileName}_{i}");
+                await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null);
+                viewModel.SearchCommand.Execute(string.Empty);
+
+                // ASSERT
+                using (new AssertionScope())
+                {
+                    viewModel.Aliases.Should()
+                             .HaveCount(countToAdd - 1, "because the alias has been deleted logically");
+                }
+            },
+            Sql.Empty,
+            visitors
         );
     }
 
@@ -574,7 +578,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 var alias = res[0];
                 alias.FieldValue.Should().Be(script2);
             },
-            SqlBuilder.Empty
+            Sql.Empty
         );
     }
 

@@ -4,7 +4,8 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Tests.Tools.SQL;
 
-public class SqlBuilder
+[Obsolete("Use the SqlGenerator class instead")]
+public class SqlBuilder : ISqlGenerator
 {
     #region Fields
 
@@ -18,12 +19,6 @@ public class SqlBuilder
     {
         if (initialSql is not null) _sql.Append(initialSql);
     }
-
-    #endregion
-
-    #region Properties
-
-    public static SqlBuilder Empty => new();
 
     #endregion
 
@@ -75,7 +70,7 @@ public class SqlBuilder
         return this;
     }
 
-    public override string ToString() => _sql.ToString();
+    public string Generate() => _sql.ToString();
 
     #endregion
 }
