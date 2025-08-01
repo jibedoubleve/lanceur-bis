@@ -12,7 +12,7 @@ public abstract class SqlGeneratorBase : ISqlGenerator
 
     #region Methods
 
-    public string Generate() => Sql.ToString();
+    public string GenerateSql() => Sql.ToString();
 
     #endregion
 }

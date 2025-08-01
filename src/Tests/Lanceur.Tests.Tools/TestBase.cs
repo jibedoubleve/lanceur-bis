@@ -110,7 +110,7 @@ public abstract class TestBase
         DbSingleConnectionManager? connectionManager = null;
         try
         {
-            var database = BuildFreshDb(builder.Generate(), connectionString);
+            var database = BuildFreshDb(builder.GenerateSql(), connectionString);
             connectionManager = new(database);
             return connectionManager;
         }

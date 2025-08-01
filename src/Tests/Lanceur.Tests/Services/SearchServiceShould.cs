@@ -120,7 +120,7 @@ public class SearchServiceShould : TestBase
          * Check counter is still -1
          */
         OutputHelper.Arrange();
-        var sql = new SqlGenerator().AppendAlias(1, a => a.WithSynonyms("a", "b")).Generate();
+        var sql = new SqlGenerator().AppendAlias(1, a => a.WithSynonyms("a", "b")).GenerateSql();
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         var converter = Substitute.For<IMappingService>();
@@ -330,7 +330,7 @@ public class SearchServiceShould : TestBase
                                           .WithAdditionalParameters();
                                      }
                                     )
-                                    .Generate();
+                                    .GenerateSql();
 
         var connectionManager = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);

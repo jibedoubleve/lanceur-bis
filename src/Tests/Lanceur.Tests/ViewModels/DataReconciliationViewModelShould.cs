@@ -611,7 +611,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         
         OutputHelper.WriteLine($"""
                                SQL script:
-                               {sqlBuilder.Generate()}
+                               {sqlBuilder.GenerateSql()}
                                """);
         
         await TestViewModelAsync(

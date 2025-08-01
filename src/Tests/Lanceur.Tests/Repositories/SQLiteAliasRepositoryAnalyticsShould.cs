@@ -87,7 +87,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                               .WithCount(count)
                                               .WithSynonyms()
                                     )
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -158,7 +158,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                               .WithCount(count)
                                               .WithSynonyms()
                                     )
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -224,7 +224,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                               .WithUsage(date1, date2)
                                               .WithSynonyms()
                                     )
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -295,7 +295,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                               .WithUsage(date1, date2)
                                               .WithSynonyms(name)
                                     )
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -373,7 +373,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                               .WithUsage(date1, date2)
                                               .WithSynonyms(name)
                                     )
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -450,7 +450,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                               .WithUsage(date1, date2)
                                               .WithSynonyms(name)
                                     )
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -479,7 +479,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                     .AppendAlias(++i, a => a.WithSynonyms("name_1"))
                                     .AppendAlias(++i, a => a.WithSynonyms("name_1"))
                                     .AppendAlias(++i, a => a.WithSynonyms("name_1"))
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -537,7 +537,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                             a.WithSynonyms()
                                              .WithUsage(date1, date2)
                                     )
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -594,7 +594,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                             a.WithSynonyms()
                                              .WithUsage(date1, date2)
                                     )
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act
@@ -620,7 +620,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                     .AppendAlias(++i, a => a.WithSynonyms())
                                     .AppendAlias(++i, a => a.WithSynonyms())
                                     .AppendAlias(++i, a => a.WithSynonyms())
-                                    .Generate();
+                                    .GenerateSql();
         var service = BuildRepository(sql);
 
         // act

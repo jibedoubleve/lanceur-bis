@@ -2,10 +2,24 @@ namespace Lanceur.Tests.Tools.SQL;
 
 public  class Sql : ISqlGenerator
 {
-    #region Methods
+    #region Constructors
+
+    /// <summary>
+    ///     Avoid call of the constructor. Use 'Empty instead"
+    /// </summary>
+    private Sql() { }
+
+    #endregion
+
+    #region Properties
 
     public static ISqlGenerator Empty => new Sql();
-    public string Generate() => "";
+
+    #endregion
+
+    #region Methods
+
+    public string GenerateSql() => "";
 
     #endregion
 }
