@@ -26,7 +26,7 @@ public abstract class TestBase
 
     #region Constructors
 
-    public TestBase(ITestOutputHelper outputHelper)
+    protected TestBase(ITestOutputHelper outputHelper)
     {
         SqlProfiler = new(outputHelper);
         OutputHelper = outputHelper;
