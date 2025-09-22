@@ -163,6 +163,20 @@ public class SqlAliasGenerator : SqlGeneratorBase
         return this;
     }
 
+    public SqlAliasGenerator WithUsage(params string[] dateString)
+    {
+        try
+        {
+            var dates = dateString.Select(DateTime.Parse).ToArray();
+            return WithUsage(dates);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidCastException(
+                "Impossible to cast a string into date when creating an alias execution date.", ex
+            );
+        }
+    }
     public SqlAliasGenerator WithUsage(params DateTime[] usage)
     {
         foreach (var date in usage)

@@ -76,9 +76,9 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     public async Task CreateAliasWithAddKeyword()
     {
         var sqlBuilder = new SqlGenerator();
-        sqlBuilder.AppendAlias(1, a => a.WithSynonyms())
-                  .AppendAlias(2, a => a.WithSynonyms())
-                  .AppendAlias(3, a => a.WithSynonyms());
+        sqlBuilder.AppendAlias(a => a.WithSynonyms())
+                  .AppendAlias(a => a.WithSynonyms())
+                  .AppendAlias(a => a.WithSynonyms());
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -144,9 +144,9 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     public async Task CreateAliasWorkOnSecondNavigation()
     {
         var sqlBuilder = new SqlGenerator()
-                         .AppendAlias(1, a => a.WithSynonyms())
-                         .AppendAlias(2, a => a.WithSynonyms())
-                         .AppendAlias(3, a => a.WithSynonyms());
+                         .AppendAlias(a => a.WithSynonyms())
+                         .AppendAlias(a => a.WithSynonyms())
+                         .AppendAlias(a => a.WithSynonyms());
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -306,9 +306,9 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     public async Task ListAllAliasOnEmptySearch(string criterion)
     {
         var sqlBuilder = new SqlGenerator()
-                         .AppendAlias(1, a => a.WithSynonyms())
-                         .AppendAlias(2, a => a.WithSynonyms())
-                         .AppendAlias(3, a => a.WithSynonyms());
+                         .AppendAlias(a => a.WithSynonyms())
+                         .AppendAlias(a => a.WithSynonyms())
+                         .AppendAlias(a => a.WithSynonyms());
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -476,17 +476,13 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [Fact]
     public async Task NotRecreateAliasOnLoad()
     {
-        var builder = new SqlGenerator().AppendAlias(
-                                            1,
-                                            a => a.WithFileName("un")
-                                                  .WithArguments("params un")
-                                                  .WithSynonyms("deux")
+        var builder = new SqlGenerator().AppendAlias(a => a.WithFileName("un")
+                                                           .WithArguments("params un")
+                                                           .WithSynonyms("deux")
                                         )
-                                        .AppendAlias(
-                                            2,
-                                            a => a.WithFileName("deux")
-                                                  .WithArguments("params deux")
-                                                  .WithSynonyms("trois")
+                                        .AppendAlias(a => a.WithFileName("deux")
+                                                           .WithArguments("params deux")
+                                                           .WithSynonyms("trois")
                                         );
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModelAsync(
