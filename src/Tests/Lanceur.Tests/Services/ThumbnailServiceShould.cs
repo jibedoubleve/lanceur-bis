@@ -29,34 +29,27 @@ public class ThumbnailServiceShould : TestBase
     public void RefreshThumbnailsWithoutRemovingAdditionalParameters()
     {
         // ARRANGE
-        var sql = new SqlGenerator().AppendAlias(
-                                        1,
-                                        a => a.WithFileName("fileName1")
-                                              .WithArguments("some parameters 1")
-                                              .WithSynonyms("a1", "a2", "a3")
-                                              .WithAdditionalParameters(
-                                                  ("name_0", "argument_0"),
-                                                  ("name_0", "argument_0")
-                                              ))
-                                    .AppendAlias(
-                                        110,
-                                        a => a.WithFileName("fileName2")
-                                              .WithArguments("some parameters 2")
-                                              .WithSynonyms("aa1", "ab2", "ab3")
-                                              .WithAdditionalParameters(
-                                                  ("name_0", "argument_0"),
-                                                  ("name_0", "argument_0")
-                                              )
+        var sql = new SqlGenerator().AppendAlias(a => a.WithFileName("fileName1")
+                                                       .WithArguments("some parameters 1")
+                                                       .WithSynonyms("a1", "a2", "a3")
+                                                       .WithAdditionalParameters(
+                                                           ("name_0", "argument_0"),
+                                                           ("name_0", "argument_0"))
                                     )
-                                    .AppendAlias(
-                                        120,
-                                        a => a.WithFileName("fileName3")
-                                              .WithArguments("some parameters 3")
-                                              .WithSynonyms("ac1", "ac2", "ac3")
-                                              .WithAdditionalParameters(
-                                                  ("name_0", "argument_0"),
-                                                  ("name_0", "argument_0")
-                                              ))
+                                    .AppendAlias(a => a.WithFileName("fileName2")
+                                                       .WithArguments("some parameters 2")
+                                                       .WithSynonyms("aa1", "ab2", "ab3")
+                                                       .WithAdditionalParameters(
+                                                           ("name_0", "argument_0"),
+                                                           ("name_0", "argument_0"))
+                                    )
+                                    .AppendAlias(a => a.WithFileName("fileName3")
+                                                       .WithArguments("some parameters 3")
+                                                       .WithSynonyms("ac1", "ac2", "ac3")
+                                                       .WithAdditionalParameters(
+                                                           ("name_0", "argument_0"),
+                                                           ("name_0", "argument_0"))
+                                    )
                                     .GenerateSql();
 
         OutputHelper.WriteLine(sql);

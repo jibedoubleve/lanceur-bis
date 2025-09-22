@@ -29,34 +29,32 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
     private static SqlGenerator BuildSqlBuilder()
     {
         return new SqlGenerator().AppendAlias(
-                                     1,
                                      a =>
                                      {
                                          a.WithSynonyms("a")
                                           .WithUsage(
-                                              DateTime.Parse("2025-01-01"),
-                                              DateTime.Parse("2025-02-01"),
-                                              DateTime.Parse("2025-03-01"),
-                                              DateTime.Parse("2021-03-01"),
-                                              DateTime.Parse("2022-03-01")
+                                              "2025-01-01",
+                                              "2025-02-01",
+                                              "2025-03-01",
+                                              "2021-03-01",
+                                              "2022-03-01"
                                           );
                                      }
                                  )
                                  .AppendAlias(
-                                     2,
                                      a =>
                                      {
                                          a.WithSynonyms("b")
                                           .WithUsage(
-                                              DateTime.Parse("2024-01-01"),
-                                              DateTime.Parse("2024-02-01"),
-                                              DateTime.Parse("2024-03-01"),
-                                              DateTime.Parse("2021-03-01"),
-                                              DateTime.Parse("2022-03-01")
+                                              "2024-01-01",
+                                              "2024-02-01",
+                                              "2024-03-01",
+                                              "2021-03-01",
+                                              "2022-03-01"
                                           );
                                      }
                                  )
-                                 .AppendAlias(3, a => a.WithSynonyms("c"));
+                                 .AppendAlias(a => a.WithSynonyms("c"));
     }
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)

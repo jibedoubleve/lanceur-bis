@@ -43,8 +43,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
         ServiceVisitors visitors
     )
     {
-        serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)
-                         )
+        serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                          .AddSingleton<IMappingService, MappingService>()
@@ -144,9 +143,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     public async Task BeAbleToSearchAliases()
     {
         // ARRANGE
-        var sqlBuilder = new SqlGenerator().AppendAlias(1, a => a.WithSynonyms("alias1", "alias_1"))
-                                           .AppendAlias(2, a => a.WithSynonyms("alias2", "alias_2"))
-                                           .AppendAlias(3, a => a.WithSynonyms("alias3", "alias_3"));
+        var sqlBuilder = new SqlGenerator().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+                                           .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
+                                           .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
 
 
         await TestViewModelAsync(
@@ -166,11 +165,10 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [Fact]
     public async Task NotShowAllResultWhenPreviousQuery()
     {
-        var i = 0;
-        var sqlBuilder = new SqlGenerator().AppendAlias(++i, a => a.WithSynonyms())
-                                           .AppendAlias(++i, a => a.WithSynonyms())
-                                           .AppendAlias(++i, a => a.WithSynonyms())
-                                           .AppendAlias(++i, a => a.WithSynonyms());
+        var sqlBuilder = new SqlGenerator().AppendAlias(a => a.WithSynonyms())
+                                           .AppendAlias(a => a.WithSynonyms())
+                                           .AppendAlias(a => a.WithSynonyms())
+                                           .AppendAlias(a => a.WithSynonyms());
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
@@ -207,9 +205,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [InlineData(false, 0)]
     public async Task ShowAllResultsOrNotDependingOnConfiguration(bool showAllResults, int count)
     {
-        var builder = new SqlGenerator().AppendAlias(1, a => a.WithSynonyms("alias1", "alias_1"))
-                                        .AppendAlias(2, a => a.WithSynonyms("alias2", "alias_2"))
-                                        .AppendAlias(3, a => a.WithSynonyms("alias3", "alias_3"));
+        var builder = new SqlGenerator().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+                                        .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
+                                        .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
 
         var visitors = new ServiceVisitors
         {
