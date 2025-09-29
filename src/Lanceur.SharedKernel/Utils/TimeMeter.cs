@@ -8,25 +8,32 @@ public static class TimeMeter
 {
     #region Methods
 
-    public static Measurement Measure(Action<TimeSpan> log) => new(log);
+    public static Measurement Measure(Action<TimeSpan> log) => new(log, null);
+
+    public static Measurement Measure(Type caller, ILogger logger, [CallerMemberName] string callerMemberName = null)
+    {
+        ArgumentNullException.ThrowIfNull(caller);
+        ArgumentNullException.ThrowIfNull(logger);
+
+        return new(LogStart, LogSplit);
+
+        void Log(TimeSpan ts, string type)
+        {
+            var template = "[{Source}] " + type + ": {Elapsed} sec.";
+
+            logger.LogDebug(
+                template,
+                $"{caller.FullName}.{callerMemberName ?? "<Unknown>"}",
+               Math.Round(ts.TotalMilliseconds, 3)
+            );
+        }
+
+        void LogStart(TimeSpan ts) => Log(ts, "Elapsed");
+        void LogSplit(TimeSpan ts) => Log(ts, "Split");
+    }
 
     public static Measurement Measure(object @this, ILogger logger, [CallerMemberName] string callerMemberName = null)
-    {
-        return new(Log);
+        => Measure(@this.GetType(), logger, callerMemberName);
 
-        void Log(TimeSpan ts) => logger.LogDebug(
-            "[{Type}.{SourceMethod}] Elapsed: {Elapsed} sec.",
-            @this.GetType().FullName,
-            callerMemberName,
-            ts.ToStringInSeconds()
-        );
-    }
-
-    public static Measurement MeasureTrace([CallerMemberName] string callerMemberName = null)
-    {
-        return new(Trace);
-
-        void Trace(TimeSpan ts) => System.Diagnostics.Trace.WriteLine($"==========> [{callerMemberName}] Elapsed: {ts.ToStringInSeconds()} sec.");
-    }
     #endregion
 }

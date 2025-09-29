@@ -12,7 +12,6 @@ using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.DI;
-using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Commands;
@@ -145,99 +144,91 @@ public partial class App
     {
         Ioc.Default.ConfigureServices(Host.Services);
         var logger = Host.Services.GetRequiredService<ILogger<App>>();
+        
+        logger.LogInformation("=============== STARTUP ===============");
 
-        using (TimeMeter.Measure(LogStartup))
-        {
-            Host.Start();
-            RegisterToastNotifications();
+        using var measure = TimeMeter.Measure(typeof(App), logger);
+        
+        Host.Start();
+        RegisterToastNotifications();
 
-            /* Only one instance allowed in prod...
-             */
-            ConditionalExecution.ExecuteOnRelease(() =>
-                {
-                    if (SingleInstance.WaitOne()) return;
-
-                    const string msg = "The application is already running.";
-                    MessageBox.Show(
-                        msg,
-                        "Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning
-                    );
-                    Environment.Exit(0);
-                }
-            );
-
-            /* Checks whether a database update is needed...
-             */
-            var cs = Ioc.Default.GetService<IConnectionString>()!;
-            Ioc.Default.GetService<SQLiteUpdater>()!
-               .Update(cs.ToString());
-
-            /* Register HotKey to the application
-             */
-            MainView mainView;
-            using (TimeMeter.Measure((Action<TimeSpan>)LogMainViewBuild))
+        /* Only one instance allowed in prod...
+         */
+        ConditionalExecution.ExecuteOnRelease(() =>
             {
-                mainView = Host.Services.GetRequiredService<MainView>();
-            }
+                if (SingleInstance.WaitOne()) return;
 
-            var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
-
-            var hk = new Conditional<HotKeySection>(
-                new((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R),
-                hotKeyService.HotKey
-            );
-
-            var success = hotKeyService.RegisterHandler(mainView.OnShowWindow, hk);
-            if (!success)
-            {
-                // Should be only useful in debug mode as Mutex should avoid this situation...
-                var errorMessage = $"The shortcut '{hk.Value.ToStringHotKey()}' is already registered.";
+                const string msg = "The application is already running.";
                 MessageBox.Show(
-                    errorMessage,
+                    msg,
                     "Error",
                     MessageBoxButton.OK,
-                    MessageBoxImage.Error
+                    MessageBoxImage.Warning
                 );
-                Current.Shutdown();
-                return;
+                Environment.Exit(0);
             }
+        );
 
-            /* Now all preliminary stuff is done, let's start the application
-             */
-            if (mainView.ViewModel.ShowAtStartup) mainView.ShowOnStartup();
+        /* Checks whether a database update is needed...
+         */
+        var cs = Ioc.Default.GetService<IConnectionString>()!;
+        Ioc.Default.GetService<SQLiteUpdater>()!
+           .Update(cs.ToString());
 
-            logger.LogInformation("Application started");
+        /* Register HotKey to the application
+         */
+        measure.Tick();
+        var mainView = Host.Services.GetRequiredService<MainView>();
+        measure.Tick();
 
-            /* Check if new Version
-             */
-            var settings = Host.Services.GetRequiredService<ISettingsFacade>()!;
-            _ = Host.Services.GetRequiredService<IReleaseService>()
-                    .HasUpdateAsync()
-                    .ContinueWith(context =>
-                        {
-                            if (!context.Result.HasUpdate || settings.Application.Github.SnoozeVersionCheck) return;
+        var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
 
-                            // A new version has been release, notify user...
-                            Host.Services.GetService<UpdateNotification>()!
-                                .Notify(context.Result.Version);
-                        }
-                    )
-                    .ContinueWith(
-                        context => { logger.LogWarning(context.Exception, "En error occured while checking update."); },
-                        TaskContinuationOptions.OnlyOnFaulted
-                    );
+        var hk = new Conditional<HotKeySection>(
+            new((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R),
+            hotKeyService.HotKey
+        );
+
+        var success = hotKeyService.RegisterHandler(mainView.OnShowWindow, hk);
+        if (!success)
+        {
+            // Should be only useful in debug mode as Mutex should avoid this situation...
+            var errorMessage = $"The shortcut '{hk.Value.ToStringHotKey()}' is already registered.";
+            MessageBox.Show(
+                errorMessage,
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
+            Current.Shutdown();
+            return;
         }
 
-        return;
+        /* Now all preliminary stuff is done, let's start the application
+         */
+        if (mainView.ViewModel.ShowAtStartup) mainView.ShowOnStartup();
 
-        void LogStartup(TimeSpan ts) => logger.LogInformation("Startup in {TimeSpan} sec", ts.ToStringInSeconds());
+        logger.LogInformation("Application started");
 
-        void LogMainViewBuild(TimeSpan ts) => logger.LogInformation(
-            "Main view configured in {ElapsedTime} sec",
-            ts.ToStringInSeconds()
-        );
+        /* Check if new Version
+         */
+        var settings = Host.Services.GetRequiredService<ISettingsFacade>()!;
+        _ = Host.Services.GetRequiredService<IReleaseService>()
+                .HasUpdateAsync()
+                .ContinueWith(
+                    context =>
+                    {
+                        if (!context.Result.HasUpdate || settings.Application.Github.SnoozeVersionCheck) return;
+
+                        // A new version has been release, notify user...
+                        Host.Services.GetService<UpdateNotification>()!
+                            .Notify(context.Result.Version);
+                    },
+                    TaskContinuationOptions.OnlyOnRanToCompletion
+                )
+                .ContinueWith(
+                    context => { logger.LogWarning(context.Exception, "En error occured while checking update."); },
+                    TaskContinuationOptions.OnlyOnFaulted
+                );
     }
 
     #endregion

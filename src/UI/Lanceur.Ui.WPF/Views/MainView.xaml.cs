@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -57,13 +56,15 @@ public partial class MainView
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewModel);
-        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(serviceProvider);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(hotKeyService);
         ArgumentNullException.ThrowIfNull(databaseConfig);
         ArgumentNullException.ThrowIfNull(computerInfoService);
         ArgumentNullException.ThrowIfNull(featureFlagService);
+
+        using var measure = TimeMeter.Measure(this, logger);
+
 
         _logger = logger;
         _serviceProvider = serviceProvider;
@@ -72,22 +73,16 @@ public partial class MainView
         _computerInfoService = computerInfoService;
         _featureFlagService = featureFlagService;
 
-        DataContext = viewModel;
         InitializeComponent();
+        DataContext = viewModel;
 
-        var messenger = WeakReferenceMessenger.Default;
-        messenger.Register<KeepAliveMessage>(
-            this,
-            (_, m) =>
-            {
-                if (m.Value)
-                    ShowWindow();
-                else
-                    HideWindow();
-            }
-        );
-        messenger.Register<ChangeCoordinateMessage>(this, (_, m) => SetWindowPosition(m.Value));
-        messenger.Register<SetQueryMessage>(this, (_, m) => SetQuery(m.Value));
+        Closed += (_, _) =>
+        {
+            var messenger = WeakReferenceMessenger.Default;
+            messenger.Unregister<KeepAliveMessage>(this);
+            messenger.Unregister<ChangeCoordinateMessage>(this);
+            messenger.Unregister<SetQueryMessage>(this);
+        };
     }
 
     #endregion
@@ -99,7 +94,7 @@ public partial class MainView
     #endregion
 
     #region Methods
-    
+
     private void HandleCpuAndMemoryUsage()
     {
         var enabled = _featureFlagService.IsEnabled(Features.ResourceDisplay);
@@ -108,8 +103,7 @@ public partial class MainView
                 _settings.Application.ResourceMonitor.RefreshRate.Milliseconds(),
                 t =>
                 {
-                    Application.Current.Dispatcher.Invoke(
-                        () =>
+                    Application.Current.Dispatcher.Invoke(() =>
                         {
                             CpuProgressBar.Value = t.CpuLoad;
                             MemoryProgressBar.Value = t.MemoryLoad;
@@ -142,19 +136,41 @@ public partial class MainView
     private void OnClickDarkTheme(object sender, RoutedEventArgs e)
     {
         var windowBackdropType = _settings.Application.Window.BackdropStyle.ToWindowBackdropType();
-        _logger.LogDebug("Change theme to {Theme} and backdrop type {BackdropType}", ApplicationTheme.Dark, windowBackdropType);
+        _logger.LogDebug(
+            "Change theme to {Theme} and backdrop type {BackdropType}",
+            ApplicationTheme.Dark,
+            windowBackdropType
+        );
         ApplicationThemeManager.Apply(ApplicationTheme.Dark, windowBackdropType);
     }
 
     private void OnClickLightTheme(object sender, RoutedEventArgs e)
     {
         var windowBackdropType = _settings.Application.Window.BackdropStyle.ToWindowBackdropType();
-        _logger.LogDebug("Change theme to {Theme} and backdrop type {BackdropType}", ApplicationTheme.Light, windowBackdropType);
+        _logger.LogDebug(
+            "Change theme to {Theme} and backdrop type {BackdropType}",
+            ApplicationTheme.Light,
+            windowBackdropType
+        );
         ApplicationThemeManager.Apply(ApplicationTheme.Light, windowBackdropType);
     }
 
     private void OnLoaded(object _, RoutedEventArgs e)
     {
+        var messenger = WeakReferenceMessenger.Default;
+        messenger.Register<KeepAliveMessage>(
+            this,
+            (_, m) =>
+            {
+                if (m.Value)
+                    ShowWindow();
+                else
+                    HideWindow();
+            }
+        );
+        messenger.Register<ChangeCoordinateMessage>(this, (_, m) => SetWindowPosition(m.Value));
+        messenger.Register<SetQueryMessage>(this, (_, m) => SetQuery(m.Value));
+
         SystemThemeWatcher.Watch(
             this,
             _settings.Application.Window.BackdropStyle.ToWindowBackdropType()
@@ -240,7 +256,10 @@ public partial class MainView
 
         if (this.IsInScreen()) return;
 
-        _logger.LogWarning("Window is out of screen {Coordinate}. Set it to default position at centre of the screen", this.ToCoordinate());
+        _logger.LogWarning(
+            "Window is out of screen {Coordinate}. Set it to default position at centre of the screen",
+            this.ToCoordinate()
+        );
         this.SetDefaultPosition();
     }
 
