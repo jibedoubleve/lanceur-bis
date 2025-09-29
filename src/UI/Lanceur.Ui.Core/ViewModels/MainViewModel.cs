@@ -108,10 +108,13 @@ public partial class MainViewModel : ObservableObject
             if (SelectedResult is null) return;
             if (SelectedResult.IsExecutionConfirmationRequired)
             {
-                var result = await _interactionHubService.Interactions.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
+                var result = await _interactionHubService.Interactions.AskAsync(
+                    $"Do you want to execute alias '{SelectedResult.Name}'?",
+                    "Execute"
+                );
                 if (!result) return;
             }
-            
+
             var response = await _executionService.ExecuteAsync(
                 new() { OriginatingQuery = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
             );

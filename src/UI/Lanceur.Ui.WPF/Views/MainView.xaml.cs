@@ -73,7 +73,6 @@ public partial class MainView
         _featureFlagService = featureFlagService;
 
         DataContext = viewModel;
-
         InitializeComponent();
 
         var messenger = WeakReferenceMessenger.Default;

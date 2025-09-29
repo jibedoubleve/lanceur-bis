@@ -59,7 +59,7 @@ public class ComputerInfoService : IComputerInfoService
     {
         IsMonitoring = true;
         _circularQueue.Clear();
-        
+
         while (true)
         {
             if (!IsMonitoring) break;

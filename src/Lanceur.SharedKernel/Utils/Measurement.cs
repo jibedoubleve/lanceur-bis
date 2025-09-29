@@ -7,7 +7,7 @@ public sealed class Measurement : IDisposable
     #region Fields
 
     private readonly Action<TimeSpan> _log;
-    private readonly Stopwatch _stopwatch;
+    private readonly long startTime;
 
     #endregion
 
@@ -16,8 +16,7 @@ public sealed class Measurement : IDisposable
     internal Measurement(Action<TimeSpan> log)
     {
         _log = log;
-        _stopwatch = new();
-        _stopwatch.Start();
+        startTime = Stopwatch.GetTimestamp();
     }
 
     #endregion
@@ -30,7 +29,7 @@ public sealed class Measurement : IDisposable
 
     #region Methods
 
-    public void Dispose() => _log?.Invoke(_stopwatch.Elapsed);
+    public void Dispose() => _log?.Invoke(Stopwatch.GetElapsedTime(startTime));
 
     #endregion
 }
