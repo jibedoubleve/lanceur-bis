@@ -99,7 +99,7 @@ public partial class MainView
     #endregion
 
     #region Methods
-
+    
     private void HandleCpuAndMemoryUsage()
     {
         var enabled = _featureFlagService.IsEnabled(Features.ResourceDisplay);

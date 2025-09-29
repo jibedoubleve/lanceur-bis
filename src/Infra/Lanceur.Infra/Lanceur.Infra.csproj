@@ -21,4 +21,10 @@
         <ProjectReference Include="..\..\Libraries\Everything.Wrapper\Everything.Wrapper.csproj" />
         <ProjectReference Include="..\..\Libraries\System.Web.Bookmarks\System.Web.Bookmarks.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Proxies\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Proxies\LoggingInterceptor.cs" />
+    </ItemGroup>
 </Project>

@@ -75,7 +75,6 @@ public class SearchService : ISearchService
                       .SelectMany(x => x)
                       .ToArray();
         
-        _thumbnailService.UpdateThumbnails(results);
         return Sort(results);
     }
 
@@ -116,8 +115,7 @@ public class SearchService : ISearchService
         
         // Remember the query
         foreach (var result in results) result.OriginatingQuery = query;
-
-        _thumbnailService.UpdateThumbnails(results);
+        
         var orderedResults = Sort(results).ToList();
         
         // If there's an exact match, promote

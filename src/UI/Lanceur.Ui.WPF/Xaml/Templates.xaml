@@ -2,10 +2,19 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:vm="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core">
+    xmlns:vm="clr-namespace:Lanceur.Core.Models;assembly=Lanceur.Core"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors">
     <!--  TEMPLATES  -->
     <DataTemplate x:Key="QueryResultTemplate" DataType="{x:Type vm:QueryResult}">
         <Border HorizontalAlignment="Stretch" Background="Transparent">
+            <b:Interaction.Triggers>
+                <!-- When the item becomes visible, load the thumbnail -->
+                <b:EventTrigger EventName="Loaded">
+                    <b:InvokeCommandAction
+                        Command="{Binding DataContext.LoadThumbnailCommand, ElementName=Result}"
+                        CommandParameter="{Binding}" />
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
             <DockPanel>
                 <Border
                     Width="{StaticResource DefaultIconContainerSize}"
