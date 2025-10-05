@@ -17,7 +17,9 @@
                             Height="{StaticResource DefaultIconSize}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Source="{Binding Thumbnail}"
+                            Source="{Binding Thumbnail,
+                                TargetNullValue={x:Null},
+                                FallbackValue={x:Null}}"
                             Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
                         <TextBlock
                             HorizontalAlignment="Center"
