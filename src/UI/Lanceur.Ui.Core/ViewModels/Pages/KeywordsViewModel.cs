@@ -27,7 +27,6 @@ public partial class KeywordsViewModel : ObservableObject
     private readonly ILogger<KeywordsViewModel> _logger;
     private readonly IPackagedAppSearchService _packagedAppSearchService;
     private AliasQueryResult? _selectedAlias;
-    private readonly IThumbnailService _thumbnailService;
     private readonly IAliasValidationService _validationService;
     private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _criterion = string.Empty;
@@ -59,7 +58,6 @@ public partial class KeywordsViewModel : ObservableObject
         _viewFactory = viewFactory;
         _packagedAppSearchService = packagedAppSearchService;
         _aliasManagementService = aliasManagementService;
-        _thumbnailService = thumbnailService;
         _logger = logger;
         _hubService = hubService;
     }
