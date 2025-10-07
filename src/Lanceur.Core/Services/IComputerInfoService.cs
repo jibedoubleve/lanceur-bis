@@ -18,7 +18,7 @@ public interface IComputerInfoService
     /// </summary>
     /// <param name="interval">Interval in milliseconds between each monitoring update.</param>
     /// <param name="callback">Callback function that receives the current CPU load, total memory, and available memory.</param>
-    Task StartMonitoring(TimeSpan interval, Action<(int CpuLoad, int MemoryLoad)> callback);
+    Task StartMonitoring(TimeSpan interval, Action<(double CpuLoad, double MemoryLoad)> callback);
 
     /// <summary>
     ///     Stops the system monitoring process.

@@ -16,7 +16,6 @@ public class SearchService : ISearchService
     private readonly IMacroService _macroService;
     private readonly ISearchServiceOrchestrator _orchestrator;
     private readonly IStoreLoader _storeLoader;
-    private readonly IThumbnailService _thumbnailService;
 
     #endregion
 
@@ -25,14 +24,12 @@ public class SearchService : ISearchService
     public SearchService(
         IStoreLoader storeLoader,
         IMacroService macroService,
-        IThumbnailService thumbnailService,
         ILoggerFactory loggerFactory,
         ISearchServiceOrchestrator orchestrator
     )
     {
         _storeLoader = storeLoader;
         _macroService = macroService;
-        _thumbnailService = thumbnailService;
         _orchestrator = orchestrator;
         _logger = loggerFactory.GetLogger<SearchService>();
     }
@@ -75,7 +72,6 @@ public class SearchService : ISearchService
                       .SelectMany(x => x)
                       .ToArray();
         
-        _thumbnailService.UpdateThumbnails(results);
         return Sort(results);
     }
 
@@ -116,8 +112,7 @@ public class SearchService : ISearchService
         
         // Remember the query
         foreach (var result in results) result.OriginatingQuery = query;
-
-        _thumbnailService.UpdateThumbnails(results);
+        
         var orderedResults = Sort(results).ToList();
         
         // If there's an exact match, promote

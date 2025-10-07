@@ -1,16 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-    <ItemGroup>
-        <Compile Remove="Utils\**" />
-        <EmbeddedResource Remove="Utils\**" />
-        <None Remove="Utils\**" />
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.1.35" />
-        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.*" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>3.6.0.1</AssemblyVersion>
+    <FileVersion>3.6.0.0</FileVersion>
+    <InformationalVersion>3.6.0-alpha-issue.961.1+29.Branch.issue-961.Sha.a9f5bbd27573075c52707cb1ed6b409decf5e41e</InformationalVersion>
+    <Version>3.6.0-alpha-issue961-0001</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Utils\**" />
+    <EmbeddedResource Remove="Utils\**" />
+    <None Remove="Utils\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.*" />
+  </ItemGroup>
 </Project>

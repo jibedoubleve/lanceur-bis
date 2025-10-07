@@ -81,8 +81,8 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
                            where s_key = 'json';
                            """;
         var json = Db.WithConnection(conn =>
-                                         conn.Query<string>(sql)
-                                             .FirstOrDefault()
+            conn.Query<string>(sql)
+                .FirstOrDefault()
         );
 
         _current =  AddNewFeatureFlags(

@@ -109,7 +109,7 @@ public class ExecutionService : IExecutionService
         if (query is null) return;
 
         using var _ = _logger.WarnIfSlow(this);
-        
+
         // LUA SCRIPT
         var result = ExecuteLuaScript(query);
         if (result.IsCancelled)
@@ -117,13 +117,13 @@ public class ExecutionService : IExecutionService
             _logger.LogInformation("The Lua script has been cancelled. No execution of the alias will be done.");
             return;
         }
-        
+
         var fileName = _wildcardService.Replace(
             result.Context.FileName,
             result.Context.Parameters
         );
         var parameters = _wildcardService.ReplaceOrReplacementOnNull(
-            query.Parameters, 
+            query.Parameters,
             result.Context.Parameters
         );
 
@@ -181,7 +181,7 @@ public class ExecutionService : IExecutionService
             _logger.LogInformation("The execution request is null");
             return new()
             {
-                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"), 
+                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"),
                 HasResult = true
             };
         }

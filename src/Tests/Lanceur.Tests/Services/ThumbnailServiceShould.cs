@@ -1,6 +1,7 @@
 using Dapper;
 using FluentAssertions;
 using Lanceur.Core.Mappers;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
@@ -70,15 +71,14 @@ public class ThumbnailServiceShould : TestBase
         var favIconManager = Substitute.For<IFavIconService>();
         var thumbnailService = new ThumbnailService(
             loggerFactory,
-            dbRepository,
             packagedAppSearchService,
             favIconManager
         );
 
-        var aliases = dbRepository.Search("a");
+        var aliases = dbRepository.Search("a1");
 
         // ACT
-        thumbnailService.UpdateThumbnails(aliases);
+        thumbnailService.UpdateThumbnail(aliases.First());
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection!.ExecuteScalar("select count(*) from alias_argument")!)

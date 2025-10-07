@@ -28,7 +28,7 @@ public class LightConnectionString : BaseConnectionString, IConnectionString
         if (_connectionString is not null) return _connectionString;
 
         var path = _dbPath.ExpandPath();
-        _connectionString = CSTRING_PATTERN.Format(path);
+        _connectionString = ConnectionStringPattern.Format(path);
 
         return _connectionString;
     }

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Windows.ApplicationModel.Calls.Background;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -19,6 +20,7 @@ public partial class MainViewModel : ObservableObject
 
     private readonly IExecutionService _executionService;
     private readonly IInteractionHubService _interactionHubService;
+    private readonly IThumbnailService _thumbnailService;
     private readonly ILogger<MainViewModel> _logger;
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
@@ -40,7 +42,8 @@ public partial class MainViewModel : ObservableObject
         ISettingsFacade settingsFacade,
         IExecutionService executionService,
         IInteractionHubService interactionHubService,
-        IWatchdogBuilder watchdogBuilder
+        IWatchdogBuilder watchdogBuilder,
+        IThumbnailService thumbnailService
     )
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -49,11 +52,13 @@ public partial class MainViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(executionService);
         ArgumentNullException.ThrowIfNull(watchdogBuilder);
         ArgumentNullException.ThrowIfNull(interactionHubService);
+        ArgumentNullException.ThrowIfNull(thumbnailService);
 
         _logger = logger;
         _searchService = searchService;
         _executionService = executionService;
         _interactionHubService = interactionHubService;
+        _thumbnailService = thumbnailService;
 
         //Settings
         _settingsFacade = settingsFacade;
@@ -65,6 +70,25 @@ public partial class MainViewModel : ObservableObject
                                    .Build();
     }
 
+    [RelayCommand]
+    private void OnLoadThumbnail(QueryResult? queryResult)
+    {
+        if (queryResult is null) return;
+
+        if (!queryResult.Thumbnail.IsNullOrEmpty())
+        {
+            return; /* Already loaded */
+        }
+
+        try
+        {
+            _thumbnailService.UpdateThumbnail(queryResult);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load thumbnail for alias id {IdAlias}", queryResult.Id);
+        }
+    }
     #endregion
 
     #region Properties
@@ -108,10 +132,13 @@ public partial class MainViewModel : ObservableObject
             if (SelectedResult is null) return;
             if (SelectedResult.IsExecutionConfirmationRequired)
             {
-                var result = await _interactionHubService.Interactions.AskAsync($"Do you want to execute alias '{SelectedResult.Name}'?", "Execute");
+                var result = await _interactionHubService.Interactions.AskAsync(
+                    $"Do you want to execute alias '{SelectedResult.Name}'?",
+                    "Execute"
+                );
                 if (!result) return;
             }
-            
+
             var response = await _executionService.ExecuteAsync(
                 new() { OriginatingQuery = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
             );

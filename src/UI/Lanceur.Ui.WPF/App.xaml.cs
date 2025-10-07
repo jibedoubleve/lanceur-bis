@@ -69,7 +69,7 @@ public partial class App
 
     #region Methods
 
-    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         var logger = Host.Services.GetRequiredService<ILogger<App>>();
         var notify = Host.Services.GetRequiredService<IUserGlobalNotificationService>();
@@ -143,6 +143,12 @@ public partial class App
     protected override void OnStartup(StartupEventArgs e)
     {
         Ioc.Default.ConfigureServices(Host.Services);
+        var logger = Host.Services.GetRequiredService<ILogger<App>>();
+        
+        logger.LogInformation("=============== STARTUP ===============");
+
+        using var measure = TimeMeter.Measure<App>(logger);
+        
         Host.Start();
         RegisterToastNotifications();
 
@@ -172,6 +178,7 @@ public partial class App
         /* Register HotKey to the application
          */
         var mainView = Host.Services.GetRequiredService<MainView>();
+
         var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
 
         var hk = new Conditional<HotKeySection>(
@@ -198,22 +205,21 @@ public partial class App
          */
         if (mainView.ViewModel.ShowAtStartup) mainView.ShowOnStartup();
 
-        var logger = Host.Services.GetRequiredService<ILogger<App>>()!;
-       logger.LogInformation("Application started");
-
         /* Check if new Version
          */
         var settings = Host.Services.GetRequiredService<ISettingsFacade>()!;
         _ = Host.Services.GetRequiredService<IReleaseService>()
                 .HasUpdateAsync()
-                .ContinueWith(context =>
+                .ContinueWith(
+                    context =>
                     {
                         if (!context.Result.HasUpdate || settings.Application.Github.SnoozeVersionCheck) return;
 
                         // A new version has been release, notify user...
                         Host.Services.GetService<UpdateNotification>()!
                             .Notify(context.Result.Version);
-                    }
+                    },
+                    TaskContinuationOptions.OnlyOnRanToCompletion
                 )
                 .ContinueWith(
                     context => { logger.LogWarning(context.Exception, "En error occured while checking update."); },
