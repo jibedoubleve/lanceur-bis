@@ -25,7 +25,7 @@ public class ComputerInfoService : IComputerInfoService
                 {
                     if (!IsMonitoring) break;
 
-                    var cpuLoadTask = SystemMetrics.GetCpuUsagePercentAsync(interval.Milliseconds);
+                    var cpuLoadTask = SystemMetrics.GetCpuUsagePercentAsync((int)interval.TotalMilliseconds);
                     var memoryLoad = SystemMetrics.GetMemoryUse();
                     var delay = Task.Delay(interval);
 

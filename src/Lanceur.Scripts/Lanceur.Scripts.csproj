@@ -1,46 +1,50 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-    <ItemGroup>
-        <EmbeddedResource Include="SQL\script-0.1.1.sql" />
-        <EmbeddedResource Include="SQL\script-0.1.sql" />
-        <EmbeddedResource Include="SQL\script-0.10.sql" />
-        <EmbeddedResource Include="SQL\script-0.11.sql" />
-        <EmbeddedResource Include="SQL\script-0.12.sql" />
-        <EmbeddedResource Include="SQL\script-0.13.sql" />
-        <EmbeddedResource Include="SQL\script-0.14.sql" />
-        <EmbeddedResource Include="SQL\script-0.14.1.sql" />
-        <EmbeddedResource Include="SQL\script-0.16.sql" />
-        <EmbeddedResource Include="SQL\script-0.2.sql" />
-        <EmbeddedResource Include="SQL\script-0.3.sql" />
-        <EmbeddedResource Include="SQL\script-0.4.1.sql" />
-        <EmbeddedResource Include="SQL\script-0.4.2.sql" />
-        <EmbeddedResource Include="SQL\script-0.4.3.sql" />
-        <EmbeddedResource Include="SQL\script-0.4.sql" />
-        <EmbeddedResource Include="SQL\script-0.5.sql" />
-        <EmbeddedResource Include="SQL\script-0.6.sql" />
-        <EmbeddedResource Include="SQL\script-0.7.sql" />
-        <EmbeddedResource Include="SQL\script-0.8.sql" />
-        <EmbeddedResource Include="SQL\script-0.9.sql" />
-        <EmbeddedResource Include="SQL\script-0.15.sql" />
-        <EmbeddedResource Include="SQL\script-1.0.0.sql" />
-        <EmbeddedResource Include="SQL\script-1.1.0.sql" />
-        <EmbeddedResource Include="SQL\script-1.1.1.sql" />
-        <EmbeddedResource Include="SQL\script-2.0.sql" />
-        <EmbeddedResource Include="SQL\script-2.1.sql" />
-        <EmbeddedResource Include="SQL\script-2.2.1.sql" />
-        <EmbeddedResource Include="SQL\script-2.2.2.sql" />
-        <EmbeddedResource Include="SQL\script-2.2.sql" />
-        <EmbeddedResource Include="SQL\script-2.3.0.sql" />
-        <EmbeddedResource Include="SQL\script-2.4.0.sql" />
-        <EmbeddedResource Include="SQL\script-2.4.1.sql" />
-        <EmbeddedResource Include="SQL\script-2.4.2.sql" />
-        <EmbeddedResource Include="SQL\script-2.4.3.sql" />
-        <EmbeddedResource Include="SQL\script-2.4.4.sql" />
-        <EmbeddedResource Include="SQL\script-2.4.5.sql" />
-        <EmbeddedResource Include="SQL\script-2.5.0.sql" />
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyVersion>3.6.0.1</AssemblyVersion>
+    <FileVersion>3.6.0.0</FileVersion>
+    <InformationalVersion>3.6.0-alpha-issue.961.1+29.Branch.issue-961.Sha.a9f5bbd27573075c52707cb1ed6b409decf5e41e</InformationalVersion>
+    <Version>3.6.0-alpha-issue961-0001</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SQL\script-0.1.1.sql" />
+    <EmbeddedResource Include="SQL\script-0.1.sql" />
+    <EmbeddedResource Include="SQL\script-0.10.sql" />
+    <EmbeddedResource Include="SQL\script-0.11.sql" />
+    <EmbeddedResource Include="SQL\script-0.12.sql" />
+    <EmbeddedResource Include="SQL\script-0.13.sql" />
+    <EmbeddedResource Include="SQL\script-0.14.sql" />
+    <EmbeddedResource Include="SQL\script-0.14.1.sql" />
+    <EmbeddedResource Include="SQL\script-0.16.sql" />
+    <EmbeddedResource Include="SQL\script-0.2.sql" />
+    <EmbeddedResource Include="SQL\script-0.3.sql" />
+    <EmbeddedResource Include="SQL\script-0.4.1.sql" />
+    <EmbeddedResource Include="SQL\script-0.4.2.sql" />
+    <EmbeddedResource Include="SQL\script-0.4.3.sql" />
+    <EmbeddedResource Include="SQL\script-0.4.sql" />
+    <EmbeddedResource Include="SQL\script-0.5.sql" />
+    <EmbeddedResource Include="SQL\script-0.6.sql" />
+    <EmbeddedResource Include="SQL\script-0.7.sql" />
+    <EmbeddedResource Include="SQL\script-0.8.sql" />
+    <EmbeddedResource Include="SQL\script-0.9.sql" />
+    <EmbeddedResource Include="SQL\script-0.15.sql" />
+    <EmbeddedResource Include="SQL\script-1.0.0.sql" />
+    <EmbeddedResource Include="SQL\script-1.1.0.sql" />
+    <EmbeddedResource Include="SQL\script-1.1.1.sql" />
+    <EmbeddedResource Include="SQL\script-2.0.sql" />
+    <EmbeddedResource Include="SQL\script-2.1.sql" />
+    <EmbeddedResource Include="SQL\script-2.2.1.sql" />
+    <EmbeddedResource Include="SQL\script-2.2.2.sql" />
+    <EmbeddedResource Include="SQL\script-2.2.sql" />
+    <EmbeddedResource Include="SQL\script-2.3.0.sql" />
+    <EmbeddedResource Include="SQL\script-2.4.0.sql" />
+    <EmbeddedResource Include="SQL\script-2.4.1.sql" />
+    <EmbeddedResource Include="SQL\script-2.4.2.sql" />
+    <EmbeddedResource Include="SQL\script-2.4.3.sql" />
+    <EmbeddedResource Include="SQL\script-2.4.4.sql" />
+    <EmbeddedResource Include="SQL\script-2.4.5.sql" />
+    <EmbeddedResource Include="SQL\script-2.5.0.sql" />
+  </ItemGroup>
 </Project>
