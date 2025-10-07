@@ -75,10 +75,10 @@ public class ThumbnailServiceShould : TestBase
             favIconManager
         );
 
-        var aliases = dbRepository.Search("a");
+        var aliases = dbRepository.Search("a1");
 
         // ACT
-        thumbnailService.UpdateThumbnails(aliases.ToArray<QueryResult>());
+        thumbnailService.UpdateThumbnail(aliases.First());
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection!.ExecuteScalar("select count(*) from alias_argument")!)

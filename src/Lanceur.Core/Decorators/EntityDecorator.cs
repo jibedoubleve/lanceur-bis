@@ -4,7 +4,7 @@ public sealed class EntityDecorator<TEntity>
 {
     #region Constructors
 
-    private EntityDecorator(TEntity entity) => Entity = entity;
+    public EntityDecorator(TEntity entity) => Entity = entity;
 
     #endregion
 
@@ -24,9 +24,6 @@ public sealed class EntityDecorator<TEntity>
     #endregion
 
     #region Methods
-
-    public static IEnumerable<EntityDecorator<TEntity>> FromEnumerable(IEnumerable<TEntity> results)
-        => results.Select(x => new EntityDecorator<TEntity>(x));
 
     /// <summary>
     ///     Mark the contained <see cref="Entity" /> as to be updated in the database

@@ -147,7 +147,7 @@ public partial class App
         
         logger.LogInformation("=============== STARTUP ===============");
 
-        using var measure = TimeMeter.Measure(typeof(App), logger);
+        using var measure = TimeMeter.Measure<App>(logger);
         
         Host.Start();
         RegisterToastNotifications();
@@ -177,9 +177,7 @@ public partial class App
 
         /* Register HotKey to the application
          */
-        measure.Tick();
         var mainView = Host.Services.GetRequiredService<MainView>();
-        measure.Tick();
 
         var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
 
@@ -206,8 +204,6 @@ public partial class App
         /* Now all preliminary stuff is done, let's start the application
          */
         if (mainView.ViewModel.ShowAtStartup) mainView.ShowOnStartup();
-
-        logger.LogInformation("Application started");
 
         /* Check if new Version
          */

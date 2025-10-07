@@ -29,7 +29,6 @@ public class ReleaseService : IReleaseService
     /// <inheritdoc />
     public async Task<(bool HasUpdate, Version Version)> HasUpdateAsync()
     {
-        using var measure = TimeMeter.Measure(this, _logger);
         var currentVersion = CurrentVersion.FromAssembly(Assembly.GetExecutingAssembly());
 
         var tag = await _githubService.GetLatestVersion();

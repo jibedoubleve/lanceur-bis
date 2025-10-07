@@ -66,7 +66,7 @@ public class ThumbnailService : IThumbnailService
         var filePath = alias.FileName.GetThumbnailPath();
         if (File.Exists(filePath))
         {
-            if (alias.Thumbnail == filePath) return; 
+            if (alias.Thumbnail == filePath) return;
 
             _logger.LogTrace("Thumbnail already exists for {AliasName} but not yet updated. (PackagedApp)", alias.Name);
             alias.Thumbnail = filePath;
@@ -141,30 +141,27 @@ public class ThumbnailService : IThumbnailService
     ///     Each time a thumbnail is found, the corresponding alias is updated. Because the alias is reactive, the UI will
     ///     automatically reflect these updates.
     /// </summary>
-    /// <param name="queryResults">The list of queries for which thumbnails need to be updated.</param>
-    public void UpdateThumbnails(params QueryResult[] queryResults)
+    /// <param name="queryResult">The list of queries for which thumbnails need to be updated.</param>
+    public void UpdateThumbnail(QueryResult queryResult)
     {
-        queryResults = queryResults.ToArray();
-        var queries = EntityDecorator<QueryResult>.FromEnumerable(queryResults)
-                                                  .ToArray();
+        var query = new EntityDecorator<QueryResult>(queryResult);
 
         using var m = _logger.WarnIfSlow(this);
         try
         {
-            _logger.LogTrace("Refreshing thumbnails for {Count} alias", queryResults.Count());
-            foreach (var query in queries)
-                UpdateThumbnailAsync(query) // Fire & forget thumbnail refresh
-                    .ContinueWith(
-                        t =>
-                        {
-                            _logger.LogWarning(
-                                t.Exception!,
-                                "An error occured when updating thumbnail: {Message}",
-                                t.Exception!.Message
-                            );
-                        },
-                        TaskContinuationOptions.OnlyOnFaulted
-                    );
+            _logger.LogTrace("Refreshing thumbnails for alias {AliasNAme}", queryResult.Name);
+            UpdateThumbnailAsync(query) // Fire & forget thumbnail refresh
+                .ContinueWith(
+                    t =>
+                    {
+                        _logger.LogWarning(
+                            t.Exception!,
+                            "An error occured when updating thumbnail: {Message}",
+                            t.Exception!.Message
+                        );
+                    },
+                    TaskContinuationOptions.OnlyOnFaulted
+                );
             _logger.LogTrace("Fire and forget the refresh of thumbnails.");
         }
         catch (Exception ex) { _logger.LogWarning(ex, "An error occured during the refresh of the icons"); }

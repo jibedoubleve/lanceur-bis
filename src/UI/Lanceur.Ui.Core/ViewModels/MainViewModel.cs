@@ -82,7 +82,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            _thumbnailService.UpdateThumbnails(queryResult);
+            _thumbnailService.UpdateThumbnail(queryResult);
         }
         catch{_logger.LogWarning("Failed to load thumbnail for alias id {IdAlias}", queryResult.Id);}
     }

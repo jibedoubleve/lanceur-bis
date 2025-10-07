@@ -6,10 +6,12 @@ public sealed class Measurement : IDisposable
 {
     #region Fields
 
+    private long _lastTick;
+
     private readonly Action<TimeSpan> _log;
     private readonly Action<TimeSpan> _splitLog;
     private readonly long _startTick;
-    private long _lastTick ;
+
     #endregion
 
     #region Constructors
@@ -34,11 +36,11 @@ public sealed class Measurement : IDisposable
 
     public void Dispose() => _log?.Invoke(Stopwatch.GetElapsedTime(_startTick));
 
-    #endregion
-
     public void Tick()
     {
         _splitLog?.Invoke(Stopwatch.GetElapsedTime(_lastTick));
         _lastTick = Stopwatch.GetTimestamp();
     }
+
+    #endregion
 }

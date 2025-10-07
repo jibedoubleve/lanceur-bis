@@ -181,7 +181,8 @@ public class ExecutionService : IExecutionService
             _logger.LogInformation("The execution request is null");
             return new()
             {
-                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"), HasResult = true
+                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"),
+                HasResult = true
             };
         }
 

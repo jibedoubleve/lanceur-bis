@@ -63,9 +63,6 @@ public partial class MainView
         ArgumentNullException.ThrowIfNull(computerInfoService);
         ArgumentNullException.ThrowIfNull(featureFlagService);
 
-        using var measure = TimeMeter.Measure(this, logger);
-
-
         _logger = logger;
         _serviceProvider = serviceProvider;
         _settings = settings;

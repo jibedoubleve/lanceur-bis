@@ -20,7 +20,7 @@ public partial class KeywordsViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private ObservableCollection<AliasQueryResult> _aliases = new();
+    [ObservableProperty] private ObservableCollection<AliasQueryResult> _aliases = [];
     private readonly IAliasManagementService _aliasManagementService;
     private List<AliasQueryResult> _cachedAliases = [];
     private readonly IInteractionHubService _hubService;
@@ -133,10 +133,14 @@ public partial class KeywordsViewModel : ObservableObject
             "Add parameter"
         );
         if (!result.IsConfirmed) return;
-
-        var vm = result.DataContext as AdditionalParameter;
-        SelectedAlias?.AdditionalParameters.Add(vm);
-        _hubService.Notifications.Success($"Parameter {parameter.Name} has been added. Don't forget to save to apply changes", "Updated.");
+        if (result.DataContext is not AdditionalParameter param) return;
+        
+        SelectedAlias.AdditionalParameters.Add(param);
+        SelectedAlias.MarkChanged();
+        _hubService.Notifications.Success(
+            $"Parameter {param.Name} has been added. Don't forget to save to apply changes",
+            "Updated."
+        );
     }
 
     [RelayCommand]

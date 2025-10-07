@@ -43,7 +43,7 @@ public class ComputerInfoService : IComputerInfoService
     #endregion
 }
 
-public static class SystemMetrics
+internal static class SystemMetrics
 {
     #region Methods
 
