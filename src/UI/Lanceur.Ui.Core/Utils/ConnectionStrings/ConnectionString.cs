@@ -39,7 +39,7 @@ public class ConnectionString : BaseConnectionString, IConnectionString
     {
         if (!File.Exists(_dbPath)) _logger.LogWarning("The path {DbPath} doesn't exist. A new database should be created!", _dbPath);
         var path = _dbPath.ExpandPath();
-        return CSTRING_PATTERN.Format(path);
+        return ConnectionStringPattern.Format(path);
     }
 
     #endregion Methods
