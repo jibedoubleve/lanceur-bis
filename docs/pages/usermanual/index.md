@@ -50,4 +50,4 @@ then to search for "_aeroplane_" in Google, you would type:
 
 `search aeroplane`.
 
-> The use of `$W$` is explained [HERE](keywords-macros-wildcards/).
+> The use of `$W$` is explained [HERE](keywords-macros-wildcards).
