@@ -21,6 +21,9 @@ jobs:
                   
       - name: Restore dotnet tools
         run: dotnet tool restore
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y        
         
       - name: Run the Cake script
         uses: cake-build/cake-action@v1
