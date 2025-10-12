@@ -41,8 +41,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     public DataReconciliationViewModel(
         IAliasRepository repository,
         ILogger<DataReconciliationViewModel> logger,
-        IUserInteractionService userInteraction,
-        IUserNotificationService userNotification,
+        IInteractionHubService interactions,
         IReconciliationService reconciliationService,
         IViewFactory viewFactory,
         ISettingsFacade settingsFacade,
@@ -51,8 +50,8 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         _repository = repository;
         _logger = logger;
-        _userInteraction = userInteraction;
-        _userNotification = userNotification;
+        _userInteraction = interactions.Interactions;
+        _userNotification = interactions.Notifications;
         _reconciliationService = reconciliationService;
         _viewFactory = viewFactory;
         _settingsFacade = settingsFacade;
