@@ -79,6 +79,33 @@ public partial class App
         Log.CloseAndFlush();
     }
 
+    private static (bool Success, HotKeySection Hotkey) RegisterHandler(
+        ILogger<App> logger,
+        IHotKeyService hotKeyService,
+        MainView mainView
+    )
+    {
+        var view = Ioc.Default.GetRequiredService<HotkeyBoxView>();
+        var dialogResult = view.ShowDialog();
+        var hotkey = new HotKeySection((int)view.ViewModel.ModifierKeys, view.ViewModel.Key);
+        if (!dialogResult.HasValue || !dialogResult.Value)
+        {
+            Current.Shutdown();
+            return (true, hotkey);
+        }
+
+        logger.LogInformation(
+            "Registering new HotKey {Modifiers} + {Key}",
+            view.ViewModel.ModifierKeys,
+            view.ViewModel.Key
+        );
+
+        return (
+            hotKeyService.RegisterHandler(mainView.OnShowWindow, hotkey),
+            hotkey
+        );
+    }
+
     private static void RegisterToastNotifications()
     {
         ToastNotificationManagerCompat.OnActivated += toastArgs =>
@@ -144,11 +171,11 @@ public partial class App
     {
         Ioc.Default.ConfigureServices(Host.Services);
         var logger = Host.Services.GetRequiredService<ILogger<App>>();
-        
+
         logger.LogInformation("=============== STARTUP ===============");
 
         using var measure = TimeMeter.Measure<App>(logger);
-        
+
         Host.Start();
         RegisterToastNotifications();
 
@@ -187,18 +214,19 @@ public partial class App
         );
 
         var success = hotKeyService.RegisterHandler(mainView.OnShowWindow, hk);
-        if (!success)
+        while (!success)
         {
+            (success, var hotkey) = RegisterHandler(logger, hotKeyService, mainView);
+            if (success) continue;
+
             // Should be only useful in debug mode as Mutex should avoid this situation...
-            var errorMessage = $"The shortcut '{hk.Value.ToStringHotKey()}' is already registered.";
+            var errorMessage = $"The shortcut '{hotkey.ToStringHotKey()}' is already registered.";
             MessageBox.Show(
                 errorMessage,
                 "Error",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error
             );
-            Current.Shutdown();
-            return;
         }
 
         /* Now all preliminary stuff is done, let's start the application
