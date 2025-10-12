@@ -47,6 +47,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddSingleton<IReconciliationService, ReconciliationService>()
                          .AddSingleton<IPackagedAppSearchService, PackagedAppSearchService>()
+                         .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IUserInteractionService>((sp, i)
                              => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
