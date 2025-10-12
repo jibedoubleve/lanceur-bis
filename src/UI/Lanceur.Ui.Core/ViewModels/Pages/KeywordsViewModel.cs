@@ -23,13 +23,15 @@ public partial class KeywordsViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<AliasQueryResult> _aliases = [];
     private readonly IAliasManagementService _aliasManagementService;
     private List<AliasQueryResult> _cachedAliases = [];
+    [ObservableProperty] private string _criterion = string.Empty;
     private readonly IInteractionHubService _hubService;
     private readonly ILogger<KeywordsViewModel> _logger;
     private readonly IPackagedAppSearchService _packagedAppSearchService;
     private AliasQueryResult? _selectedAlias;
+    private readonly IThumbnailService _thumbnailService;
     private readonly IAliasValidationService _validationService;
     private readonly IViewFactory _viewFactory;
-    [ObservableProperty] private string _criterion = string.Empty;
+
     #endregion
 
     #region Constructors
@@ -52,12 +54,16 @@ public partial class KeywordsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(packagedAppSearchService);
         ArgumentNullException.ThrowIfNull(hubService);
 
-        WeakReferenceMessenger.Default.Register<AddAliasMessage>(this, (r, m) => ((KeywordsViewModel)r).OnCreateAlias(m));
+        WeakReferenceMessenger.Default.Register<AddAliasMessage>(
+            this,
+            (r, m) => ((KeywordsViewModel)r).OnCreateAlias(m)
+        );
 
         _validationService = validationService;
         _viewFactory = viewFactory;
         _packagedAppSearchService = packagedAppSearchService;
         _aliasManagementService = aliasManagementService;
+        _thumbnailService = thumbnailService;
         _logger = logger;
         _hubService = hubService;
     }
@@ -103,7 +109,9 @@ public partial class KeywordsViewModel : ObservableObject
 
         if (!parseResult.Success)
         {
-            _hubService.Notifications.Warning("The parsing operation failed because the entered text is invalid and cannot be converted into parameters.");
+            _hubService.Notifications.Warning(
+                "The parsing operation failed because the entered text is invalid and cannot be converted into parameters."
+            );
             return;
         }
 
@@ -132,7 +140,7 @@ public partial class KeywordsViewModel : ObservableObject
         );
         if (!result.IsConfirmed) return;
         if (result.DataContext is not AdditionalParameter param) return;
-        
+
         SelectedAlias.AdditionalParameters.Add(param);
         SelectedAlias.MarkChanged();
         _hubService.Notifications.Success(
@@ -174,18 +182,18 @@ public partial class KeywordsViewModel : ObservableObject
         if (!response) return;
 
         _logger.LogInformation("Deleting alias {AliasName}", aliasName);
-        
+
         // Delete from DB
         await Task.Run(() => _aliasManagementService.Delete(SelectedAlias));
-        
+
         // Delete from UI
         var toDelete = Aliases.Where(x => x.Id == SelectedAlias.Id).ToArray();
-        
+
         Criterion = string.Empty;
-        foreach (var item in toDelete) { _cachedAliases.Remove(item); }
+        foreach (var item in toDelete) _cachedAliases.Remove(item);
         Aliases = new(_cachedAliases);
         SelectedAlias = Aliases.FirstOrDefault();
-        
+
         _hubService.Notifications.Success($"Alias {aliasName} deleted.", "Item deleted.");
     }
 
@@ -223,7 +231,10 @@ public partial class KeywordsViewModel : ObservableObject
             return;
         }
 
-        _hubService.Notifications.Success($"Modification has been done on {parameter.Name}. Don't forget to save to apply changes", "Updated.");
+        _hubService.Notifications.Success(
+            $"Modification has been done on {parameter.Name}. Don't forget to save to apply changes",
+            "Updated."
+        );
     }
 
     [RelayCommand]
@@ -239,7 +250,7 @@ public partial class KeywordsViewModel : ObservableObject
         if (newAlias is not null) Aliases.Add(newAlias);
         Aliases.AddRange(_cachedAliases);
         SelectedAlias = Aliases.Hydrate(previous);
-        
+
         _logger.LogDebug("Loaded {Count} alias(es)", _cachedAliases.Count);
     }
 
@@ -250,6 +261,20 @@ public partial class KeywordsViewModel : ObservableObject
 
         SelectedAlias = await Task.Run(() => _aliasManagementService.Hydrate(SelectedAlias));
         _logger.LogInformation("Loading alias {AliasName}", SelectedAlias.Name);
+    }
+
+    [RelayCommand]
+    private void OnLoadThumbnail(QueryResult? queryResult)
+    {
+        if (queryResult is null) return;
+
+        if (!queryResult.Thumbnail.IsNullOrEmpty()) return; /* Already loaded */
+
+        try { _thumbnailService.UpdateThumbnail(queryResult); }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load thumbnail for alias id {IdAlias}", queryResult.Id);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
