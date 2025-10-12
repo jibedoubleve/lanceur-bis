@@ -6,7 +6,7 @@
     xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:pages="clr-namespace:Lanceur.Ui.WPF.Views.Pages"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     x:Name="Self"
     Title="DataReconciliationView"
     d:DesignHeight="800"
@@ -166,6 +166,7 @@
         </ui:TextBox>
         <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Visible">
             <ui:DataGrid
+                x:Name="ReconciliationGrid"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
                 CanUserDeleteRows="False"
@@ -210,6 +211,14 @@
                                     Height="{StaticResource SmallIconContainerSize}"
                                     Background="{ui:ThemeResource AccentTextFillColorTertiaryBrush}"
                                     CornerRadius="8">
+                                    <b:Interaction.Triggers>
+                                        <!-- When the item becomes visible, load the thumbnail -->
+                                        <b:EventTrigger EventName="Loaded">
+                                            <b:InvokeCommandAction
+                                                Command="{Binding DataContext.LoadThumbnailCommand, ElementName=ReconciliationGrid}"
+                                                CommandParameter="{Binding}" />
+                                        </b:EventTrigger>
+                                    </b:Interaction.Triggers>
                                     <Grid>
                                         <Image
                                             Width="{StaticResource SmallIconSize}"

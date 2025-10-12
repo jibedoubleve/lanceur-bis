@@ -16,6 +16,7 @@ using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
+using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
@@ -47,6 +48,9 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddSingleton<IReconciliationService, ReconciliationService>()
                          .AddSingleton<IPackagedAppSearchService, PackagedAppSearchService>()
+                         .AddMockSingleton<IThumbnailService>()
+                         .AddSingleton<IInteractionHubService, InteractionHubService>()
+                         .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IUserInteractionService>((sp, i)
                              => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )

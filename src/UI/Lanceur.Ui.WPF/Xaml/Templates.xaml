@@ -72,6 +72,14 @@
 
     <DataTemplate x:Key="AliasSettingsTemplate" DataType="{x:Type vm:QueryResult}">
         <Border HorizontalAlignment="Stretch" Background="Transparent">
+            <b:Interaction.Triggers>
+                <!-- When the item becomes visible, load the thumbnail -->
+                <b:EventTrigger EventName="Loaded">
+                    <b:InvokeCommandAction
+                        Command="{Binding DataContext.LoadThumbnailCommand, ElementName=AliasList}"
+                        CommandParameter="{Binding}" />
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
             <DockPanel>
                 <Border
                     Width="{StaticResource SmallIconContainerSize}"
@@ -84,7 +92,9 @@
                             Height="{StaticResource SmallIconSize}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Source="{Binding Thumbnail}"
+                            Source="{Binding Thumbnail,
+                                TargetNullValue={x:Null},
+                                FallbackValue={x:Null}}"
                             Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
                         <ui:SymbolIcon
                             Width="{StaticResource SmallIconSize}"
