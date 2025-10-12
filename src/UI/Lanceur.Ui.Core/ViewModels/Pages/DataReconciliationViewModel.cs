@@ -28,6 +28,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     [ObservableProperty] private ReportType _reportType = ReportType.None;
     private readonly IAliasRepository _repository;
     private readonly ISettingsFacade _settingsFacade;
+    private readonly IThumbnailService _thumbnailService;
     [ObservableProperty] private string _title = string.Empty;
     private readonly IUserInteractionService _userInteraction;
     private readonly IUserNotificationService _userNotification;
@@ -44,7 +45,8 @@ public partial class DataReconciliationViewModel : ObservableObject
         IUserNotificationService userNotification,
         IReconciliationService reconciliationService,
         IViewFactory viewFactory,
-        ISettingsFacade settingsFacade
+        ISettingsFacade settingsFacade,
+        IThumbnailService thumbnailService
     )
     {
         _repository = repository;
@@ -54,6 +56,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         _reconciliationService = reconciliationService;
         _viewFactory = viewFactory;
         _settingsFacade = settingsFacade;
+        _thumbnailService = thumbnailService;
         _currentReportConfiguration =
             _settingsFacade.Application.Reconciliation.ReportsConfiguration
                            .FirstOrDefault(e => e.ReportType == ReportType.RestoreAlias)!;
@@ -88,7 +91,12 @@ public partial class DataReconciliationViewModel : ObservableObject
         ReportType reportType = ReportType.None
     )
     {
-        var vm = new ReportConfigurationViewModel(configuration, label, tooltip, reportType);
+        var vm = new ReportConfigurationViewModel(
+            configuration,
+            label,
+            tooltip,
+            reportType
+        );
         var answer = await _userInteraction.AskUserYesNoAsync(
             _viewFactory.CreateView(vm),
             ButtonLabels.Ok,
@@ -194,12 +202,26 @@ public partial class DataReconciliationViewModel : ObservableObject
         }
 
         results = await Task.Run(() => _buffer.Where(e => e.Name.StartsWith(
-                                                         filter,
-                                                         StringComparison.CurrentCultureIgnoreCase
-                                                     )
-                                 )
+                    filter,
+                    StringComparison.CurrentCultureIgnoreCase
+                )
+            )
         );
         Aliases = new(results);
+    }
+
+    [RelayCommand]
+    private void OnLoadThumbnail(QueryResult? queryResult)
+    {
+        if (queryResult is null) return;
+
+        if (!queryResult.Thumbnail.IsNullOrEmpty()) return; /* Already loaded */
+
+        try { _thumbnailService.UpdateThumbnail(queryResult); }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load thumbnail for alias id {IdAlias}", queryResult.Id);
+        }
     }
 
     [RelayCommand]
@@ -225,8 +247,8 @@ public partial class DataReconciliationViewModel : ObservableObject
 
 
         var alias = await Task.Run(() => _repository.GetById(
-                                       selectedAliases.FirstOrDefault()!.Id
-                                   )
+                selectedAliases.FirstOrDefault()!.Id
+            )
         );
         _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
         var parameters = _repository.GetAdditionalParameter(
