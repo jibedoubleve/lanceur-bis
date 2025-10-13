@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Input;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.ViewModels;
@@ -37,6 +38,11 @@ public partial class ExceptionView
     #region Methods
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();
+
+    private void OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape) Close();
+    }
 
     private void OnLoaded(object _, RoutedEventArgs e)
     {

@@ -15,6 +15,7 @@
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
     Loaded="OnLoaded"
+    KeyDown="OnKeyDown"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
