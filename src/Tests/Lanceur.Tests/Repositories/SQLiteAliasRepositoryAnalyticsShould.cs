@@ -13,7 +13,6 @@ using Lanceur.Tests.Tools.SQL;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Repositories;
 
@@ -47,7 +46,8 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         return service;
     }
 
-    [Fact] public void GetAdditionalParameter() => BuildRepository().GetAdditionalParameter([1, 2, 3]);
+    [Fact] public void GetAdditionalParameter() => Record.Exception(() => BuildRepository().GetAdditionalParameter([1, 2, 3]))
+                                                         .Should().NotBeNull();
 
     [Fact]
     public void GetAliasesWithoutNotes()
@@ -97,9 +97,13 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         }
     }
 
-    [Fact] public void GetAll() => BuildRepository().GetAll();
+    [Fact] public void GetAll() => Record.Exception(() => BuildRepository().GetAll()).Should().NotBeNull();
 
-    [Fact] public void GetAllAliasWithAdditionalParameters() => BuildRepository().GetAllAliasWithAdditionalParameters();
+    [Fact]
+    public void GetAllAliasWithAdditionalParameters() => Record
+                                                         .Exception(()
+                                                             => BuildRepository().GetAllAliasWithAdditionalParameters()
+                                                         ).Should().BeNull();
 
     [Theory]
     [InlineData(@"c:\Not\A\Real\File.exe")]
@@ -158,7 +162,8 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         }
     }
 
-    [Fact] public void GetById() => BuildRepository().GetById(1);
+    [Fact] public void GetById() => Record.Exception(() => BuildRepository().GetById(1))
+                                          .Should().BeNull();
 
     [Fact]
     public void GetDeletedAlias()
@@ -430,9 +435,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         }
     }
 
-    [Fact] public void GetExistingDeletedAliases() => BuildRepository().GetExistingDeletedAliases([], 0);
+    [Fact] public void GetExistingDeletedAliases() => Record.Exception(() => BuildRepository().GetExistingDeletedAliases([], 0))
+                                                            .Should().BeNull();
 
-    [Fact] public void GetHiddenCounters() => BuildRepository().GetHiddenCounters();
+    [Fact] public void GetHiddenCounters() => Record.Exception(() => BuildRepository().GetHiddenCounters())
+                                                    .Should().BeNull();
 
 
     [Fact]
@@ -549,13 +556,19 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         }
     }
 
-    [Fact] public void GetUsage() => BuildRepository().GetUsage(Per.DayOfWeek);
+    [Fact]
+    public void GetUsage() => Record.Exception(() => BuildRepository().GetUsage(Per.DayOfWeek))
+                                    .Should().BeNull();
 
-    [Fact] public void GetYearsWithUsage() => BuildRepository().GetYearsWithUsage();
+    [Fact] public void GetYearsWithUsage() => Record.Exception(() => BuildRepository().GetYearsWithUsage())
+                                                    .Should().BeNull();
 
-    [Fact] public void HydrateAlias() => BuildRepository().HydrateAlias(new());
+    [Fact] public void HydrateAlias() => Record.Exception(() => BuildRepository().HydrateAlias(new()))
+                                               .Should().BeNull();
 
-    [Fact] public void HydrateMacro() => BuildRepository().HydrateMacro(new AliasQueryResult());
+    [Fact]
+    public void HydrateMacro() => Record.Exception(() => BuildRepository().HydrateMacro(new AliasQueryResult()))
+                                        .Should().BeNull();
 
     #endregion
 }

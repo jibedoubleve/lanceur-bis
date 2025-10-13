@@ -10,7 +10,6 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 

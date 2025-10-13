@@ -10,7 +10,7 @@ using Lanceur.Tests.Tools.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace Lanceur.Tests.Tools.Extensions;
 
@@ -18,7 +18,10 @@ public static class ServiceProviderExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddApplicationSettings(this IServiceCollection serviceCollection, Action<ISettingsFacade>? setupAction = null)
+    public static IServiceCollection AddApplicationSettings(
+        this IServiceCollection serviceCollection,
+        Action<ISettingsFacade>? setupAction = null
+    )
     {
         var settings = Substitute.For<ISettingsFacade>();
         settings.Application.Returns(new NoCacheDatabaseConfiguration());
@@ -28,7 +31,10 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddDatabase(this IServiceCollection serviceCollection, IDbConnectionManager connectionManager)
+    public static IServiceCollection AddDatabase(
+        this IServiceCollection serviceCollection,
+        IDbConnectionManager connectionManager
+    )
     {
         serviceCollection.AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp
@@ -53,7 +59,10 @@ public static class ServiceProviderExtensions
     /// <param name="serviceCollection">The service collection to which the configured singleton is added.</param>
     /// <param name="configurator">A delegate used to configure the mocked instance of <typeparamref name="T" />.</param>
     /// <returns>The updated <see cref="IServiceCollection" /> containing the configured singleton service.</returns>
-    public static IServiceCollection AddMockSingleton<T>(this IServiceCollection serviceCollection, Func<IServiceProvider, T, T> configurator)
+    public static IServiceCollection AddMockSingleton<T>(
+        this IServiceCollection serviceCollection,
+        Func<IServiceProvider, T, T> configurator
+    )
         where T : class
     {
         var substitute = Substitute.For<T>();
@@ -66,22 +75,6 @@ public static class ServiceProviderExtensions
         where T : class
     {
         serviceCollection.AddSingleton(Substitute.For<T>());
-        return serviceCollection;
-    }
-
-    /// <summary>
-    ///     Configures the view and logging services within the service provider.
-    ///     Note that the logger is a mock implementation.
-    /// </summary>
-    /// <param name="serviceCollection">The service collection to which services are added.</param>
-    /// <typeparam name="T">The type representing the view component.</typeparam>
-    /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddView<T>(this IServiceCollection serviceCollection)
-        where T : class
-    {
-        serviceCollection.AddSingleton<T>();
-        serviceCollection.AddMockSingleton<ILogger<T>>();
-        serviceCollection.AddSingleton<ILoggerFactory, LoggerFactory>();
         return serviceCollection;
     }
 

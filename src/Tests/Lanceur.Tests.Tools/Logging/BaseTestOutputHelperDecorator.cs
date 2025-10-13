@@ -1,5 +1,5 @@
 ﻿using Lanceur.SharedKernel.Extensions;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace Lanceur.Tests.Tooling.Logging;
 
@@ -9,7 +9,7 @@ public class BaseTestOutputHelperDecorator
 
     private readonly ITestOutputHelper _output;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -19,7 +19,7 @@ public class BaseTestOutputHelperDecorator
         _output = output;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -32,5 +32,5 @@ public class BaseTestOutputHelperDecorator
 
     protected void Write(string message) => Write(null, message, Array.Empty<object>());
 
-    #endregion Methods
+    #endregion
 }

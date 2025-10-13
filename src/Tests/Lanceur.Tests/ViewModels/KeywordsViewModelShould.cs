@@ -24,7 +24,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 

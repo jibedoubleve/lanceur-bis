@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -8,7 +9,6 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
@@ -34,7 +34,11 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
     public void NotCrashWhenNoResultRetrievedFromDb()
     {
         TestViewModel(
-            (viewModel, _) => viewModel.SelectYearCommand.Execute(null),
+            (viewModel, _) =>
+            {
+                Record.Exception(() => viewModel.SelectYearCommand.Execute(null))
+                      .Should().BeNull();
+            },
             Sql.Empty
         );
     }

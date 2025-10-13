@@ -7,7 +7,6 @@ using Lanceur.SharedKernel.Logging;
 using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tools.Logging;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Services;
 

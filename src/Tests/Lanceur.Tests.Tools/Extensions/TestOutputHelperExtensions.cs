@@ -1,4 +1,5 @@
-using Xunit.Abstractions;
+
+using Xunit;
 
 namespace Lanceur.Tests.Tooling.Extensions;
 

@@ -27,7 +27,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.UseCases;
 
@@ -95,8 +94,8 @@ public class AliasUseCases : TestBase
                                           }
                                       )
                                       .AddMockSingleton<IPackagedAppSearchService>()
-                                      .AddView<KeywordsViewModel>()
-                                      .AddView<MainViewModel>()
+                                      .AddSingleton<KeywordsViewModel>()
+                                      .AddSingleton<MainViewModel>()
                                       .BuildServiceProvider();
     }
 
