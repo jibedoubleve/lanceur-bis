@@ -4,7 +4,6 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Services;
 

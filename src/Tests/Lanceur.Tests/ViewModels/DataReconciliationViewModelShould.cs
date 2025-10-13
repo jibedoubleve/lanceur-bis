@@ -20,7 +20,6 @@ using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
@@ -597,7 +596,13 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     public async Task ShowAliasesWithoutNotes()
     {
         await TestViewModelAsync(
-            async (viewModel, _) => await viewModel.ShowAliasesWithoutNotesCommand.ExecuteAsync(null),
+            async (viewModel, _) =>
+            {
+                var t = await Record.ExceptionAsync(async ()
+                    => await viewModel.ShowAliasesWithoutNotesCommand.ExecuteAsync(null)
+                );
+                t.Should().BeNull();
+            },
             Sql.Empty
         );
     }
@@ -606,7 +611,13 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     public async Task ShowBrokenAliasesAsync()
     {
         await TestViewModelAsync(
-            async (viewModel, _) => await viewModel.ShowBrokenAliasesCommand.ExecuteAsync(null),
+            async (viewModel, _) =>
+            {
+                var t = await Record.ExceptionAsync(async ()
+                    => await viewModel.ShowBrokenAliasesCommand.ExecuteAsync(null)
+                );
+                t.Should().BeNull();
+            },
             Sql.Empty
         );
     }
@@ -615,7 +626,13 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     public async Task ShowDoubloons()
     {
         await TestViewModelAsync(
-            async (viewModel, _) => await viewModel.ShowDoubloonsCommand.ExecuteAsync(null),
+            async (viewModel, _) =>
+            {
+                var t = await Record.ExceptionAsync(async () 
+                    => await viewModel.ShowDoubloonsCommand.ExecuteAsync(null)
+                );
+                t.Should().BeNull();
+            },
             Sql.Empty
         );
     }
@@ -739,8 +756,13 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
-                await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
-                await viewModel.ShowRarelyUsedAliasesCommand.ExecuteAsync(null);
+                var t = await Record.ExceptionAsync(async () =>
+                    {
+                        await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
+                        await viewModel.ShowRarelyUsedAliasesCommand.ExecuteAsync(null);
+                    }
+                );
+                t.Should().BeNull();
 
                 viewModel.Aliases.Should().HaveCount(1);
             },
@@ -753,7 +775,14 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     public async Task ShowRestoreAlias()
     {
         await TestViewModelAsync(
-            async (viewModel, _) =>  await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null),
+            async (viewModel, _) =>
+            {
+                var t = await Record.ExceptionAsync(async ()
+                    => await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null)
+                );
+                t.Should().BeNull();
+
+            },
             Sql.Empty
         );
     }

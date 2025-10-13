@@ -66,7 +66,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
         ISettingsFacade settings,
-        LoggingLevelSwitch loggingLevelSwitch,
+        LoggingLevelSwitch loggingLevelSwitch, //TODO: why Serilog leak here?
         IViewFactory viewFactory,
         IEnigma enigma
     )
@@ -234,7 +234,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             return;
         }
 
-        OnSaveSettings();
+        SaveSettings();
     }
 
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -243,11 +243,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (properties.Contains(e.PropertyName)) return;
 
         _logger.LogTrace("Property {Property} changed", e.PropertyName);
-        OnSaveSettings();
+        SaveSettings();
     }
 
-    [RelayCommand]
-    private void OnSaveSettings()
+    internal void SaveSettings()
     {
         var hk = Settings.Application.HotKey;
         var hash = (hk.ModifierKey, hk.Key).GetHashCode();
@@ -255,14 +254,21 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
 
-        List<bool> reboot = [hash != (hk.ModifierKey, hk.Key).GetHashCode(), Settings.Local.DbPath != DbPath];
+        List<bool> reboot = [
+            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
+            Settings.Local.DbPath != DbPath
+        ];
 
         MapSettingsFromUiToDb();
 
         _loggingLevelSwitch.MinimumLevel = SelectedLogLevel;
         Settings.Save();
 
-        if (reboot.Any(r => r)) _hubService.GlobalNotifications.AskRestart();
+        var needRestart = reboot.Any(r => r);
+        
+        _logger.LogTrace("Saved settings. Need restart {NeedRestart}", needRestart);
+        
+        if (needRestart) _hubService.GlobalNotifications.AskRestart();
     }
 
     #endregion

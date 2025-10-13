@@ -16,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
-using Xunit.Abstractions;
 using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Tests.Repositories;
