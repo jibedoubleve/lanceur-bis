@@ -3,10 +3,6 @@
     <TargetFramework>net8.0-windows10.0.19041</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyVersion>3.6.0.1</AssemblyVersion>
-    <FileVersion>3.6.0.0</FileVersion>
-    <InformationalVersion>3.6.0-alpha-issue.961.1+29.Branch.issue-961.Sha.a9f5bbd27573075c52707cb1ed6b409decf5e41e</InformationalVersion>
-    <Version>3.6.0-alpha-issue961-0001</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
