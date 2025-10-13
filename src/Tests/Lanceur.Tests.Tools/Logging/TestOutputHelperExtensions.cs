@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace Lanceur.Tests.Tools.Logging;
 

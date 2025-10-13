@@ -5,7 +5,6 @@ using Lanceur.Tests.Tools;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Functional;
 

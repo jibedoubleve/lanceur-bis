@@ -18,7 +18,6 @@ using NSubstitute;
 using Serilog.Core;
 using Serilog.Events;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
@@ -48,8 +47,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                          .AddMockSingleton<IUserNotificationService>(
                              (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
-                         .AddSingleton<IInteractionHubService, InteractionHubService>()
-                         .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose));
+                         .AddSingleton<IInteractionHubService, InteractionHubService>();
         return serviceCollection;
     }
 
@@ -70,10 +68,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
             (viewModel, _) =>
             {
                 // act
-                viewModel.SaveSettingsCommand.Execute(null);
-
                 viewModel.DbPath = Guid.NewGuid().ToString();
-                viewModel.SaveSettingsCommand.Execute(null);
 
                 // assert
                 userInteractionService.Received(1)
@@ -103,14 +98,14 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 // arrange
 
                 // act
-                viewModel.Settings.Application.SetHotKey(3, 18); // This is the default configuration
-                viewModel.SaveSettingsCommand.Execute(null);
-
-                viewModel.Settings.Application.SetHotKey(1, 1);
-                viewModel.SaveSettingsCommand.Execute(null);
+                viewModel.IsAlt = false;  // By default, is on true
+                viewModel.IsCtrl = false; // By default, is on true
+                viewModel.IsShift = true;
+                viewModel.IsWin = true;
+                viewModel.Key = 15;
 
                 // assert
-                userInteractionService.Received()
+                userInteractionService.Received(5)
                                       .AskRestart();
             },
             Sql.Empty,
@@ -167,7 +162,6 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 // act
                 StoreShortcut[] shortcuts = [new() { AliasOverride = shortcut }, new()  { AliasOverride = shortcut }];
                 viewModel.StoreShortcuts = new(shortcuts);
-                viewModel.SaveSettingsCommand.Execute(null);
 
                 // assert
                 // I select all the shortcuts directly in the database

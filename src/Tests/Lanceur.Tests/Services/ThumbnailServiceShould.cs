@@ -1,7 +1,6 @@
 using Dapper;
 using FluentAssertions;
 using Lanceur.Core.Mappers;
-using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
@@ -12,7 +11,6 @@ using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.SQL;
 using NSubstitute;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Services;
 

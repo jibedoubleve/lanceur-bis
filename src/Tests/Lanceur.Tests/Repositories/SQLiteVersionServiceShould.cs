@@ -6,7 +6,6 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tooling;
 using Lanceur.Tests.Tools;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.Repositories;
 

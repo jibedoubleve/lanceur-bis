@@ -2,7 +2,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SQLite;
 using StackExchange.Profiling.Data;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace Lanceur.Tests.Tools;
 

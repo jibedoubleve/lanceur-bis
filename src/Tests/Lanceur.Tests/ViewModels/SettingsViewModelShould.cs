@@ -16,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog.Core;
 using Serilog.Events;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Lanceur.Tests.ViewModels;
 
@@ -37,8 +36,13 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
         TestViewModel(
             (viewModel, db) =>
             {
+                // arrange
+                // The data is copied in the DB the first time the
+                // values are updated. Initial save will enure there's
+                // data to compare.
+                viewModel.SaveSettings();
+                
                 // act
-                viewModel.SaveSettingsCommand.Execute(null); //Force default values
                 act(viewModel);
 
                 // assert
@@ -74,39 +78,39 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
     }
 
     [Theory]
-    [InlineData(500, "500")]
-    [InlineData(123, "123")]
-    public void SaveOptionSearchDelay(double value, string expected) => AssertProperty(
+    [InlineData(500)]
+    [InlineData(123)]
+    public void SaveOptionSearchDelay(double value) => AssertProperty(
         viewModel => viewModel.SearchDelay = value,
         () => GetProperty("SearchBox.SearchDelay"),
-        () => expected
+        value.ToString
     );
 
     [Theory]
-    [InlineData(true, "1")]
-    [InlineData(false, "0")]
-    public void SaveOptionShowAtStartup(bool value, string expected) => AssertProperty(
+    [InlineData(true)]
+    [InlineData(false)]
+    public void SaveOptionShowAtStartup(bool value) => AssertProperty(
         viewModel => viewModel.ShowAtStartup = value,
         () => GetProperty("SearchBox.ShowAtStartup"),
-        () => expected
+        () => Convert.ToInt32(value).ToString()
     );
 
     [Theory]
-    [InlineData(true, "1")]
-    [InlineData(false, "0")]
-    public void SaveOptionShowLastQuery(bool value, string expected) => AssertProperty(
+    [InlineData(true)]
+    [InlineData(false)]
+    public void SaveOptionShowLastQuery(bool value) => AssertProperty(
         viewModel => viewModel.ShowLastQuery = value,
         () => GetProperty("SearchBox.ShowLastQuery"),
-        () => expected
+        () => Convert.ToInt32(value).ToString()
     );
 
     [Theory]
-    [InlineData(true, "1")]
-    [InlineData(false, "0")]
-    public void SaveOptionShowResult(bool value, string expected) =>  AssertProperty(
+    [InlineData(true)]
+    [InlineData(false)]
+    public void SaveOptionShowResult(bool value) =>  AssertProperty(
         viewModel => viewModel.ShowResult = value,
         () => GetProperty("SearchBox.ShowResult"),
-        () => expected
+        () => Convert.ToInt32(value).ToString()
     );
 
     [Theory]

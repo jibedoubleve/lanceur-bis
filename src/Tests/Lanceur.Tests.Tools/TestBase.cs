@@ -10,7 +10,7 @@ using Lanceur.Tests.Tools.SQL;
 using MartinCostello.Logging.XUnit;
 using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
-using Xunit.Abstractions;
+using Xunit;
 
 namespace Lanceur.Tests.Tools;
 
@@ -50,8 +50,7 @@ public abstract class TestBase
             _loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(
                 builder => builder
                            .AddProvider(
-                               new
-                                   XUnitLoggerProvider(
+                               new XUnitLoggerProvider(
                                        OutputHelper,
                                        xunitLoggerOptions
                                    )
