@@ -11,9 +11,9 @@
     d:DesignHeight="140"
     SizeToContent="WidthAndHeight"
     ExtendsContentIntoTitleBar="True"
-    WindowBackdropType="{Binding WindowBackdropStyle}"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
+    WindowBackdropType="Mica"
     Loaded="OnLoaded"
     KeyDown="OnKeyDown"
     mc:Ignorable="d">
@@ -29,13 +29,13 @@
             Height="30"
             DockPanel.Dock="Top" />
 
-        <ScrollViewer Grid.Row="1" 
-                      VerticalScrollBarVisibility="Auto" 
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Auto">
             <StackPanel>
                 <ui:CardExpander Margin="5,5,5,12"
-                             Icon="{ui:SymbolIcon TextCaseTitle20}"
-                             IsExpanded="true">
+                                 Icon="{ui:SymbolIcon TextCaseTitle20}"
+                                 IsExpanded="true">
 
                     <ui:CardExpander.Header>
                         <ui:TextBlock FontFamily="Body" Text="Error message" />
@@ -46,7 +46,7 @@
                     </StackPanel>
                 </ui:CardExpander>
                 <ui:CardExpander Margin="5,5,5,12"
-                             Icon="{ui:SymbolIcon DocumentBulletListMultiple20}">
+                                 Icon="{ui:SymbolIcon DocumentBulletListMultiple20}">
                     <ui:CardExpander.Header>
                         <TextBlock Text="Exception trace" />
                     </ui:CardExpander.Header>
