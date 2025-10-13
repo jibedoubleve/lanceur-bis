@@ -21,6 +21,12 @@ jobs:
       
       - name: Restore dotnet tools
         run: dotnet tool restore
-      
+
+      - name: Restore packages
+        run: dotnet restore
+
+      - name: Display outdated packages
+        run: dotnet list package --outdated
+        
       - name: Run the Cake script
         uses: cake-build/cake-action@v1
