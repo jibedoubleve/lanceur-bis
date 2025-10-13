@@ -19,6 +19,9 @@ jobs:
       - name: Get the sources
         uses: actions/checkout@v1
       
+      - name: Restore packages
+        run: dotnet restore
+      
       - name: Restore dotnet tools
         run: dotnet tool restore
 
