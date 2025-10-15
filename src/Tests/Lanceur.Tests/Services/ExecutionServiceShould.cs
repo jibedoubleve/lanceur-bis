@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using FluentAssertions.Execution;
+﻿using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
@@ -80,7 +79,7 @@ public class ExecutionServiceShould : TestBase
         await executionService.ExecuteAsync(request);
 
         // assert
-        using (new AssertionScope()) { outputFileName.Should().Be(expected); }
+        outputFileName.ShouldBe(expected);
     }
 
     [Theory]
@@ -119,7 +118,7 @@ public class ExecutionServiceShould : TestBase
         await executionService.ExecuteAsync(request);
 
         // assert
-        using (new AssertionScope()) { outputParameters.Should().Be(expectedParameters); }
+        outputParameters.ShouldBe(expectedParameters);
     }
 
     [Theory]
@@ -158,11 +157,10 @@ public class ExecutionServiceShould : TestBase
         await executionService.ExecuteAsync(request);
 
         // assert
-        using (new AssertionScope())
-        {
-            outputFileName.Should().Be(fileName);
-            outputParameters.Should().Be(parameters);
-        }
+        Assert.Multiple(
+            () => outputFileName.ShouldBe(fileName),
+            () => outputParameters.ShouldBe(parameters)
+        );
     }
 
     [Theory]

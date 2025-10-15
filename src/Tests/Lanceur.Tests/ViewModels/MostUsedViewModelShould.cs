@@ -1,5 +1,4 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -82,11 +81,8 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
                 await viewModel.RefreshAliasesCommand.ExecuteAsync(filter);
 
                 // assert
-                using (new AssertionScope())
-                {
-                    viewModel.Aliases.Should().HaveCount(2);
-                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(HistorySize);
-                }
+                viewModel.Aliases.Count.ShouldBe(2);
+                Assert.All(viewModel.Aliases, alias => alias.Count.ShouldBe(HistorySize));
             },
             sqlBuilder,
             visitor
@@ -110,11 +106,8 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
                 await viewModel.RefreshAliasesCommand.ExecuteAsync(null);
 
                 // assert 
-                using (new AssertionScope())
-                {
-                    viewModel.Aliases.Should().HaveCount(1);
-                    foreach (var alias in viewModel.Aliases) alias.Count.Should().Be(3);
-                }
+                viewModel.Aliases.Count.ShouldBe(1);
+                Assert.All(viewModel.Aliases, alias =>  alias.Count.ShouldBe(3));
             },
             sqlBuilder,
             visitors

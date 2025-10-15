@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Ui.Core.ViewModels.Pages;
 
 namespace Lanceur.Tests.Tools.Extensions;
@@ -20,7 +20,7 @@ public static class KeywordsViewModelExtensions
         // --- Create a new alias
         viewModel.CreateAliasCommand.Execute(null); // Prepare alias for creation
 
-        viewModel.SelectedAlias.Should().NotBeNull("it is just setup for creation");
+        viewModel.SelectedAlias.ShouldNotBeNull("it is just setup for creation");
         viewModel.SelectedAlias!.Synonyms = name;
         viewModel.SelectedAlias!.FileName = fileName;
         viewModel.SelectedAlias!.LuaScript = luaScript;

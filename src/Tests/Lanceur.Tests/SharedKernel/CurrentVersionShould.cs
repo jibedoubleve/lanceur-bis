@@ -1,5 +1,4 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.SharedKernel.Utils;
 using Xunit;
 
@@ -42,12 +41,11 @@ public class CurrentVersionShould
     {
         var v = CurrentVersion.FromFullVersion(fullVersion);
 
-        using(new AssertionScope())
-        {
-            v.Commit.Should().Be(commit);
-            v.Version.Should().Be(new(version));
-            v.Suffix.Should().Be(suffix);
-        }
+        Assert.Multiple(
+            () => v.Commit.ShouldBe(commit),
+            () => v.Version.ShouldBe(new(version)),
+            () => v.Suffix.ShouldBe(suffix)
+        );
     }
 
     #endregion

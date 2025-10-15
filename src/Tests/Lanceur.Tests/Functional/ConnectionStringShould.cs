@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using System.Text.RegularExpressions;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
@@ -25,7 +25,7 @@ public class ConnectionStringShould
         var dbPAth = new Regex(pattern).Match(cs.ToString()).Groups[1].Value;
 
         // ASSERT
-        dbPAth.Should().Be(file);
+        dbPAth.ShouldBe(file);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class ConnectionStringShould
         var action = () => cs.ToString();
 
         // Assert
-        action.Should().NotThrow();
+        action.ShouldNotThrow();
     }
 
     private string CreateTemporaryFile()
@@ -65,7 +65,7 @@ public class ConnectionStringShould
         var action = () => cs.ToString();
 
         // Assert
-        action.Should().NotThrow<InvalidDataException>();
+        action.ShouldNotThrow();
 
         //Teardown
         File.Delete(file);

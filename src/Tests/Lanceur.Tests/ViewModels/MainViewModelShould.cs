@@ -1,6 +1,5 @@
 using System.Reflection;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Mappers;
@@ -105,9 +104,14 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                 await viewModel.ExecuteCommand.ExecuteAsync(false); //RunAsAdmin: false
 
                 // ASSERT done in ServiceCollectionConfigurator
-                using var scope = new AssertionScope();
-                sut.Should().NotBeNull();
-                await sut.Received().ExecuteAsync(Arg.Any<ExecutionRequest>());
+                await Assert.MultipleAsync(
+                    () =>
+                    {
+                        sut.ShouldNotBeNull();
+                        return Task.CompletedTask;
+                    },
+                    () => sut.Received().ExecuteAsync(Arg.Any<ExecutionRequest>())
+                );
             },
             Sql.Empty,
             visitors
@@ -131,9 +135,10 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                 await viewModel.SearchCommand.ExecuteAsync(null);
 
                 // ASSERT done in ServiceCollectionConfigurator
-                using var scope = new AssertionScope();
-                viewModel.Results.Should().HaveCountGreaterThan(0);
-                viewModel.Results.ElementAt(0).Name.Should().Be(result);
+                Assert.Multiple(
+                    () => viewModel.Results.Count.ShouldBeGreaterThan(0),
+                    () => viewModel.Results.ElementAt(0).Name.ShouldBe(result)
+                );
             }
         );
     }
@@ -155,7 +160,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                 await viewModel.SearchCommand.ExecuteAsync(null);
 
                 // ASSERT
-                viewModel.Results.Count.Should().Be(6);
+                viewModel.Results.Count.ShouldBe(6);
             },
             sqlBuilder
         );
@@ -180,19 +185,18 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
-                using (new AssertionScope())
-                {
                     const int expectedCount = 1;
                     viewModel.Query = "alias_1"; // default name is alias_{idAlias}
-                    await viewModel.SearchCommand.ExecuteAsync(null);
-                    viewModel.Results.Should().HaveCount(expectedCount);
-
+                    
                     // Handle the option "Application.SearchBox.ShowResult" If sets ti "True" it means it should show
                     // all the results (only if query is empty)
                     await viewModel.DisplayResultsIfAllowed();
+                    await viewModel.SearchCommand.ExecuteAsync(null);
 
-                    viewModel.Results.Should().HaveCount(expectedCount);
-                }
+                    Assert.Multiple(
+                        () => viewModel.Results.Count.ShouldBe(expectedCount),
+                        () => viewModel.Results.Count.ShouldBe(expectedCount)
+                    );
             },
             sqlBuilder,
             visitors
@@ -220,7 +224,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
             async (viewModel, _) =>
             {
                 await viewModel.DisplayResultsIfAllowed();
-                viewModel.Results.Should().HaveCountGreaterOrEqualTo(count);
+                viewModel.Results.Count.ShouldBeGreaterThanOrEqualTo(count);
             },
             builder,
             visitors
@@ -237,15 +241,14 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
         TestViewModel(
             (viewModel, _) =>
             {
-                using (new AssertionScope())
-                {
-                    for (var i = 0; i < callsOfShowLastQuery.Length; i++)
+                Assert.All(
+                    callsOfShowLastQuery.Select((expected, i) => (expected, i)),
+                    t =>
                     {
-                        settings.Application.SearchBox.ShowLastQuery = callsOfShowLastQuery[i];
-                        viewModel.ShowLastQuery.Should()
-                                 .Be(callsOfShowLastQuery[i], $"this is the call n° {i + 1} of the test");
-                    }
-                }
+                        settings.Application.SearchBox.ShowLastQuery = t.expected;
+                        viewModel.ShowLastQuery.ShouldBe(t.expected, $"this is the call n° {t.i + 1} of the test");
+                    });
+
             },
             Sql.Empty,
             visitors

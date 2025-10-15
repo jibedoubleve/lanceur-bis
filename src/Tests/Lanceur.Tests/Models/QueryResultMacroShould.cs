@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using Lanceur.Core.Models;
 using Xunit;
 
@@ -17,14 +17,14 @@ public class QueryResultMacroShould
     {
         var item = new AliasQueryResult { FileName = $"@{name}@" };
 
-        item.IsComposite().Should().Be(expected);
+        item.IsComposite().ShouldBe(expected);
     }
 
     [Fact]
     public void BeMacroWhenSurroundedWithArobase()
     {
         var queryResult = new AliasQueryResult { FileName = "@name@" };
-        queryResult.IsMacro().Should().BeTrue();
+        queryResult.IsMacro().ShouldBeTrue();
     }
 
     [Theory]
@@ -39,7 +39,7 @@ public class QueryResultMacroShould
     public void NotBeMacroWhenNotSurroundedWithArobase(string name)
     {
         var queryResult = new AliasQueryResult { FileName = name };
-        queryResult.IsMacro().Should().BeFalse();
+        queryResult.IsMacro().ShouldBeFalse();
     }
 
     #endregion

@@ -1,6 +1,5 @@
 using Dapper;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
@@ -101,24 +100,16 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 // assert
                 db.WithConnection(c =>
                     {
-                        using (new AssertionScope())
-                        {
-                            c.ExecuteScalar("select count(*) from alias_usage where id_alias = 1")
-                             .Should()
-                             .Be(0, "usage should be cleared");
-
-                            c.ExecuteScalar("select count(*) from alias_name where id_alias = 1")
-                             .Should()
-                             .Be(0, "names should be cleared");
-
-                            c.ExecuteScalar("select count(*) from alias_argument where id_alias = 1")
-                             .Should()
-                             .Be(0, "arguments should be cleared");
-
-                            c.ExecuteScalar("select count(*) from alias where id = 1")
-                             .Should()
-                             .Be(0, "alias should be cleared");
-                        }
+                        Assert.Multiple(
+                            () => c.ExecuteScalar("select count(*) from alias_usage where id_alias = 1")
+                                   .ShouldBe(0, "usage should be cleared"),
+                            () => c.ExecuteScalar("select count(*) from alias_name where id_alias = 1")
+                                   .ShouldBe(0, "names should be cleared"),
+                            () => c.ExecuteScalar("select count(*) from alias_argument where id_alias = 1")
+                                   .ShouldBe(0, "arguments should be cleared"),
+                            () => c.ExecuteScalar("select count(*) from alias where id = 1")
+                                   .ShouldBe(0, "alias should be cleared")
+                        );
                     }
                 );
             },
@@ -166,7 +157,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
                 await viewModel.FilterAliasCommand.ExecuteAsync(filter);
 
-                viewModel.Aliases.Should().HaveCount(count);
+                viewModel.Aliases.Count.ShouldBe(count);
             },
             sqlBuilder,
             visitors
@@ -221,7 +212,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 await viewModel.ShowRarelyUsedAliasesCommand.ExecuteAsync(null);
                 await viewModel.FilterAliasCommand.ExecuteAsync(filter);
 
-                viewModel.Aliases.Should().HaveCount(count);
+                viewModel.Aliases.Count.ShouldBe(count);
             },
             sqlBuilder,
             visitors
@@ -256,7 +247,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 foreach (var item in viewModel.Aliases) item.IsSelected = true;
 
                 await viewModel.MergeCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(0);
+                viewModel.Aliases.Count.ShouldBe(0);
             },
             sqlBuilder,
             visitors
@@ -302,7 +293,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, _) =>
             {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(2);
+                viewModel.Aliases.Count.ShouldBe(2);
             },
             sqlBuilder,
             visitors
@@ -371,21 +362,15 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 await viewModel.MergeCommand.ExecuteAsync(null);
 
                 // assert
-                viewModel.Aliases.Should().HaveCount(0);
-                using (new AssertionScope())
-                {
+                viewModel.Aliases.Count.ShouldBe(0);
                     const string sql = "select name from alias_argument where id_alias = @IdAlias";
-                    var items = db.WithConnection(c => c.Query<string>(sql, new { IdAlias = 1 }));
-                    items.Should().HaveCount(4);
-
                     const string sql2 = "select name from alias_name where id_alias = @IdAlias";
-                    var items2 = db.WithConnection(c => c.Query<string>(sql2, new { IdAlias = 1 }));
-                    items2.Should().HaveCount(6);
-
                     const string sql3 = "select id from alias_usage where id_alias = @IdAlias";
-                    var items3 = db.WithConnection(c => c.Query<string>(sql3, new { IdAlias = 1 }));
-                    items3.Should().HaveCount(8);
-                }
+                    Assert.Multiple(
+                        () => db.WithConnection(c => c.Query<string>(sql, new { IdAlias = 1 })).Count().ShouldBe(4),
+                        () => db.WithConnection(c => c.Query<string>(sql2, new { IdAlias = 1 })).Count().ShouldBe(6),
+                        () => db.WithConnection(c => c.Query<string>(sql3, new { IdAlias = 1 })).Count().ShouldBe(8)
+                    );
             },
             sqlBuilder,
             visitors
@@ -434,24 +419,16 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 // assert
                 db.WithConnection(c =>
                     {
-                        using (new AssertionScope())
-                        {
-                            c.ExecuteScalar<long>("select count(*) from alias_usage where id_alias = 1")
-                             .Should()
-                             .BeGreaterThan(0, "usage should be cleared");
-
-                            c.ExecuteScalar<long>("select count(*) from alias_name where id_alias = 1")
-                             .Should()
-                             .BeGreaterThan(0, "names should be cleared");
-
-                            c.ExecuteScalar<long>("select count(*) from alias_argument where id_alias = 1")
-                             .Should()
-                             .BeGreaterThan(0, "arguments should be cleared");
-
-                            c.ExecuteScalar<long>("select count(*) from alias where id = 1")
-                             .Should()
-                             .BeGreaterThan(0, "alias should be cleared");
-                        }
+                        Assert.Multiple(
+                            () => c.ExecuteScalar<long>("select count(*) from alias_usage where id_alias = 1")
+                                   .ShouldBeGreaterThan(0, "usage should be cleared"),
+                            () => c.ExecuteScalar<long>("select count(*) from alias_name where id_alias = 1")
+                                   .ShouldBeGreaterThan(0, "names should be cleared"),
+                            () => c.ExecuteScalar<long>("select count(*) from alias_argument where id_alias = 1")
+                                   .ShouldBeGreaterThan(0, "arguments should be cleared"),
+                            () => c.ExecuteScalar<long>("select count(*) from alias where id = 1")
+                                   .ShouldBeGreaterThan(0, "alias should be cleared")
+                        );
                     }
                 );
             },
@@ -502,10 +479,10 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 foreach (var item in viewModel.Aliases) item.IsSelected = true;
 
                 await viewModel.MergeCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(0);
+                viewModel.Aliases.Count.ShouldBe(0);
 
                 const string sql = "select count(*) from alias where deleted_at is not null";
-                db.WithConnection(c => c.ExecuteScalar(sql)).Should().Be(0, "merging should undelete alias");
+                db.WithConnection(c => c.ExecuteScalar(sql)).ShouldBe(0, "merging should undelete alias");
             },
             sqlBuilder,
             visitors
@@ -537,7 +514,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, _) =>
             {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(doubloons);
+                viewModel.Aliases.Count.ShouldBe(doubloons);
             },
             sqlGenerator,
             visitors
@@ -585,7 +562,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, _) =>
             {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(3);
+                viewModel.Aliases.Count.ShouldBe(3);
             },
             sqlBuilder,
             visitors
@@ -601,7 +578,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 var t = await Record.ExceptionAsync(async ()
                     => await viewModel.ShowAliasesWithoutNotesCommand.ExecuteAsync(null)
                 );
-                t.Should().BeNull();
+                t.ShouldBeNull();
             },
             Sql.Empty
         );
@@ -616,7 +593,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 var t = await Record.ExceptionAsync(async ()
                     => await viewModel.ShowBrokenAliasesCommand.ExecuteAsync(null)
                 );
-                t.Should().BeNull();
+                t.ShouldBeNull();
             },
             Sql.Empty
         );
@@ -631,7 +608,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 var t = await Record.ExceptionAsync(async () 
                     => await viewModel.ShowDoubloonsCommand.ExecuteAsync(null)
                 );
-                t.Should().BeNull();
+                t.ShouldBeNull();
             },
             Sql.Empty
         );
@@ -686,7 +663,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
                 await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
 
-                viewModel.Aliases.Should().HaveCount(1);
+                viewModel.Aliases.Count.ShouldBe(1);
             },
             sqlBuilder,
             visitors
@@ -704,7 +681,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             {
                 await viewModel.ShowUnusedAliasesCommand.ExecuteAsync(null);
 
-                viewModel.Aliases.Should().HaveCount(3);
+                viewModel.Aliases.Count.ShouldBe(3);
             },
             sqlBuilder
         );
@@ -762,9 +739,9 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                         await viewModel.ShowRarelyUsedAliasesCommand.ExecuteAsync(null);
                     }
                 );
-                t.Should().BeNull();
+                t.ShouldBeNull();
 
-                viewModel.Aliases.Should().HaveCount(1);
+                viewModel.Aliases.Count.ShouldBe(1);
             },
             sqlBuilder,
             visitors
@@ -780,7 +757,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 var t = await Record.ExceptionAsync(async ()
                     => await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null)
                 );
-                t.Should().BeNull();
+                t.ShouldBeNull();
 
             },
             Sql.Empty

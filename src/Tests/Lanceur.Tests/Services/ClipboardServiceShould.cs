@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Wildcards;
 using Microsoft.Extensions.Logging;
@@ -46,8 +46,7 @@ public class ClipboardServiceShould
         var mgr = new ReplacementComposite(clipboard, logger);
 
         mgr.Replace(actual, param)
-           .Should()
-           .Be(expected);
+           .ShouldBe(expected);
     }
 
     [Theory]
@@ -60,7 +59,7 @@ public class ClipboardServiceShould
         var logger = Substitute.For<ILogger<ReplacementComposite>>();
         var mgr = new ReplacementComposite(clipboard, logger);
 
-        mgr.ReplaceOrReplacementOnNull(aliasParam, userParam).Should().Be(expected);
+        mgr.ReplaceOrReplacementOnNull(aliasParam, userParam).ShouldBe(expected);
     }
 
     #endregion

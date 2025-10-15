@@ -1,5 +1,4 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core.BusinessLogic;
 using Xunit;
 
@@ -44,12 +43,11 @@ public class TextToParameterParserShould
     {
         var parser = new TextToParameterParser();
         var result = parser.Parse(additionalParameters);
-        using (new AssertionScope())
-        {
-            result.Should().NotBeNull();
-            result.Success.Should().BeTrue();
-            result.Parameters.Count().Should().Be(parameterCount);
-        }
+        Assert.Multiple(
+            () => result.ShouldNotBeNull(),
+            () => result.Success.ShouldBeTrue(),
+            () => result.Parameters.Count().ShouldBe(parameterCount)
+        );
     }
 
     #endregion

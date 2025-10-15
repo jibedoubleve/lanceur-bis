@@ -1,5 +1,5 @@
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -173,8 +173,8 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 var results = db.WithConnection(c => c.Query<string>(sql))
                                 .ToArray();
 
-                results.Should().HaveCount(2);
-                _ = results.Select(e => e.Should().Be(shortcut));
+                results.Count().ShouldBe(2);
+                Assert.All(results, e => e.ShouldBe(shortcut));
             },
             Sql.Empty,
             visitors

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -37,7 +37,7 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
             (viewModel, _) =>
             {
                 Record.Exception(() => viewModel.SelectYearCommand.Execute(null))
-                      .Should().BeNull();
+                      .ShouldBeNull();
             },
             Sql.Empty
         );

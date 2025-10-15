@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
@@ -91,8 +91,7 @@ public class ReplacementShould : TestBase
         var rpl = new ReplacementComposite(clipboard, LoggerFactory.CreateLogger<ReplacementComposite>());
 
         rpl.Replace(actual, param)
-           .Should()
-           .Be(expected);
+           .ShouldBe(expected);
     }
 
     [Theory]
@@ -120,8 +119,7 @@ public class ReplacementShould : TestBase
         var rpl = new RawClipboardReplacement(clipboard);
 
         rpl.Replace(actual, null)
-           .Should()
-           .Be(expected);
+           .ShouldBe(expected);
     }
 
     [Theory]
@@ -146,8 +144,7 @@ public class ReplacementShould : TestBase
         var rpl = new TextReplacement();
 
         rpl.Replace(actual, param)
-           .Should()
-           .Be(expected);
+           .ShouldBe(expected);
     }
 
     [Theory]
@@ -177,8 +174,7 @@ public class ReplacementShould : TestBase
         var rpl = new WebClipboardReplacement(clipboard);
 
         rpl.Replace(actual, null)
-           .Should()
-           .Be(expected);
+           .ShouldBe(expected);
     }
 
     [Theory]
@@ -205,8 +201,7 @@ public class ReplacementShould : TestBase
         var rpl = new WebTextReplacement();
 
         rpl.Replace(actual, param)
-           .Should()
-           .Be(expected);
+           .ShouldBe(expected);
     }
 
     #endregion

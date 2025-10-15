@@ -1,8 +1,7 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 using Dapper;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Mappers;
@@ -84,7 +83,7 @@ public class SearchServiceShould : TestBase
     {
         var serviceProvider = BuildConfigureServices();
         var service = serviceProvider.GetService<SearchService>();
-        service.Stores.Should().HaveCountGreaterThan(4);
+        service.Stores.Count().ShouldBeGreaterThan(4);
     }
 
     [Fact]
@@ -107,7 +106,7 @@ public class SearchServiceShould : TestBase
         var parameters = results.Select(c => c.Parameters);
 
         //assert
-        parameters.Should().NotContain((string)null);
+        parameters.ShouldNotContain((string)null);
     }
 
     [Fact]
@@ -139,9 +138,7 @@ public class SearchServiceShould : TestBase
         OutputHelper.Assert();
         const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
 
-        connectionMgr.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount))
-                     .Should()
-                     .Be(0);
+        connectionMgr.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount)).ShouldBe(0);
     }
 
     [Fact]
@@ -187,11 +184,10 @@ public class SearchServiceShould : TestBase
         var result = (await service.SearchAsync(new("z"))).ToArray();
 
         // ASSERT
-        using (new AssertionScope())
-        {
-            result.Should().HaveCountGreaterThan(0);
-            result[0].Name.Should().Be("No result found");
-        }
+        Assert.Multiple(
+            () => result.Length.ShouldBeGreaterThan(0),
+            () => result[0].Name.ShouldBe("No result found")
+        );
     }
 
     [Fact]
@@ -276,12 +272,11 @@ public class SearchServiceShould : TestBase
         var result = (await searchService.SearchAsync(new(criterion))).ToArray();
 
         // ASSERT
-        using (new AssertionScope())
-        {
-            result.Should().HaveCount(2);
-            result.First().Name.Should().Be("u");
-            result.First().Id.Should().Be(4000);
-        }
+        Assert.Multiple(
+            () => result.Length.ShouldBe(2),
+            () => result.First().Name.ShouldBe("u"),
+            () => result.First().Id.ShouldBe(4000)
+        );
     }
 
     [Fact]
@@ -308,11 +303,10 @@ public class SearchServiceShould : TestBase
 
         var result = (await service.SearchAsync(query)).ToArray();
 
-        using (new AssertionScope())
-        {
-            result.Should().HaveCount(1);
-            result.ElementAt(0).IsResult.Should().BeFalse();
-        }
+        Assert.Multiple(
+            () => result.Length.ShouldBe(1),
+            () => result.ElementAt(0).IsResult.ShouldBeFalse()
+        );
     }
 
     [Fact]
@@ -347,8 +341,7 @@ public class SearchServiceShould : TestBase
         const string sqlCount = "select count(*) from alias_argument";
 
         connectionManager.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount))
-                         .Should()
-                         .Be(3);
+                         .ShouldBe(3);
     }
 
     #endregion

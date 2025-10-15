@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Infra.Stores.Everything;
 using Xunit;
 
@@ -13,7 +13,7 @@ public class EverythingQueryBuilderShould
     {
         const string query = $"!{EverythingModifiers.IncludeHiddenFilesSwitch}";
         var adapter = new EverythingQueryAdapter(query);
-        adapter.IsHiddenFilesExcluded.Should().BeTrue();
+        adapter.IsHiddenFilesExcluded.ShouldBeTrue();
     }
     
     [Fact]
@@ -21,7 +21,7 @@ public class EverythingQueryBuilderShould
     {
         const string query = EverythingModifiers.ExcludeFileInTrashBin;
         var adapter = new EverythingQueryAdapter(query);
-        adapter.IsFilesInTrashBinExcluded.Should().BeTrue();
+        adapter.IsFilesInTrashBinExcluded.ShouldBeTrue();
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public class EverythingQueryBuilderShould
     {
         const string query = $"!{EverythingModifiers.IncludeSystemFilesSwitch}";
         var adapter = new EverythingQueryAdapter(query);
-        adapter.IsSystemFilesExcluded.Should().BeTrue();
+        adapter.IsSystemFilesExcluded.ShouldBeTrue();
     }
     
     [Fact]
@@ -37,7 +37,7 @@ public class EverythingQueryBuilderShould
     {
         const string query = $"!{EverythingModifiers.OnlyExecFilesSwitch}";
         var adapter = new EverythingQueryAdapter(query);
-        adapter.SelectOnlyExecutable.Should().BeTrue();
+        adapter.SelectOnlyExecutable.ShouldBeTrue();
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class EverythingQueryBuilderShould
     {
         const string query = $"{EverythingModifiers.IncludeHiddenFilesSwitch}";
         var adapter = new EverythingQueryAdapter(query);
-        adapter.IsHiddenFilesExcluded.Should().BeFalse();
+        adapter.IsHiddenFilesExcluded.ShouldBeFalse();
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class EverythingQueryBuilderShould
     {
         const string query = $"{EverythingModifiers.IncludeSystemFilesSwitch}";
         var adapter = new EverythingQueryAdapter(query);
-        adapter.IsSystemFilesExcluded.Should().BeFalse();
+        adapter.IsSystemFilesExcluded.ShouldBeFalse();
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class EverythingQueryBuilderShould
                                                 .ExcludeHiddenFiles()
                                                 .OnlyExecFiles()
                                                 .BuildQuery();
-        query.Should().Be($"!{EverythingModifiers.IncludeSystemFilesSwitch} !{EverythingModifiers.IncludeHiddenFilesSwitch} {EverythingModifiers.OnlyExecFilesSwitch}");
+        query.ShouldBe($"!{EverythingModifiers.IncludeSystemFilesSwitch} !{EverythingModifiers.IncludeHiddenFilesSwitch} {EverythingModifiers.OnlyExecFilesSwitch}");
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class EverythingQueryBuilderShould
                                                 .ExcludeHiddenFiles()
                                                 .ExcludeHiddenFiles()
                                                 .BuildQuery();
-        query.Should().Be($"!{EverythingModifiers.IncludeHiddenFilesSwitch}");
+        query.ShouldBe($"!{EverythingModifiers.IncludeHiddenFilesSwitch}");
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class EverythingQueryBuilderShould
                                                 .OnlyExecFiles()
                                                 .OnlyExecFiles()
                                                 .BuildQuery();
-        query.Should().Be(EverythingModifiers.OnlyExecFilesSwitch);
+        query.ShouldBe(EverythingModifiers.OnlyExecFilesSwitch);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class EverythingQueryBuilderShould
                                                 .ExcludeSystemFiles()
                                                 .ExcludeSystemFiles()
                                                 .BuildQuery();
-        query.Should().Be($"!{EverythingModifiers.IncludeSystemFilesSwitch}");
+        query.ShouldBe($"!{EverythingModifiers.IncludeSystemFilesSwitch}");
     }
 
     #endregion

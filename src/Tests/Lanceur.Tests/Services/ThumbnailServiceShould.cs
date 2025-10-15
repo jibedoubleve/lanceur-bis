@@ -1,5 +1,5 @@
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -80,8 +80,7 @@ public class ThumbnailServiceShould : TestBase
 
         // ASSERT
         connectionMgr.WithinTransaction(tx => (long)tx.Connection!.ExecuteScalar("select count(*) from alias_argument")!)
-                     .Should()
-                     .Be(6);
+                     .ShouldBe(6);
     }
 
     #endregion

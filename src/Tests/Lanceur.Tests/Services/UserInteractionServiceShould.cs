@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.Messaging;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.WPF.Services;
 using Xunit;
@@ -28,7 +28,7 @@ public class UserInteractionServiceShould : IDisposable
         var response = await sut.InteractAsync(userControl);
 
         // ASSERT
-        response.DataContext.Should().Be(viewModel);
+        response.DataContext.ShouldBe(viewModel);
     }
 
     [WpfFact]
@@ -46,7 +46,7 @@ public class UserInteractionServiceShould : IDisposable
         var response = await sut.InteractAsync(userControl, dataContext: viewModel);
 
         // ASSERT
-        response.DataContext.Should().Be(viewModel);
+        response.DataContext.ShouldBe(viewModel);
     }
 
     #endregion

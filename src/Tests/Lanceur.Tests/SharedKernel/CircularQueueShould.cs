@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.SharedKernel.Utils;
 using Xunit;
 
@@ -24,7 +24,7 @@ public class CircularQueueShould
         foreach (var value in values)
         {
             sut.Enqueue(value.Key);
-            sut.Average().Should().Be(value.Value);
+            sut.Average().ShouldBe(value.Value);
         }
     }
 
@@ -37,7 +37,7 @@ public class CircularQueueShould
         for (var i = 0; i < 10; i++)
         {
             sut.Enqueue(i);
-            sut.Count.Should().BeLessOrEqualTo(max);
+            sut.Count.ShouldBeLessThanOrEqualTo(max);
         }
     }
 
@@ -48,10 +48,10 @@ public class CircularQueueShould
         sut.Enqueue(1);
         sut.Enqueue(2);
 
-        sut.Count.Should().Be(2);
+        sut.Count.ShouldBe(2);
 
         sut.Clear();
-        sut.Count.Should().Be(0);
+        sut.Count.ShouldBe(0);
     }
 
     #endregion

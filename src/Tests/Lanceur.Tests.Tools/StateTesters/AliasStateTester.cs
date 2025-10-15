@@ -1,5 +1,5 @@
 using Bogus;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel;
 using Xunit;
@@ -55,13 +55,13 @@ public class AliasStateTester
     {
         if (alias is null) Assert.Fail($"{nameof(alias)} should not be null for assertion.");
 
-        alias.FileName.Should().Be(FileName);
-        alias.LuaScript.Should().Be(LuaScript);
-        alias.Name.Should().Be(Name);
-        alias.DescriptionDisplay.Should().Be(Description);
-        alias.Parameters.Should().Be(Parameters);
-        alias.WorkingDirectory.Should().Be(WorkingDirectory);
-        alias.Description.Should().Be(Description);
+        alias.FileName.ShouldBe(FileName);
+        alias.LuaScript.ShouldBe(LuaScript);
+        alias.Name.ShouldBe(Name);
+        alias.DescriptionDisplay.ShouldBe(Description);
+        alias.Parameters.ShouldBe(Parameters);
+        alias.WorkingDirectory.ShouldBe(WorkingDirectory);
+        alias.Description.ShouldBe(Description);
     }
 
     public void UpdateValues(ref AliasQueryResult alias)

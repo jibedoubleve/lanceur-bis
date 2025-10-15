@@ -1,8 +1,7 @@
 ﻿using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
@@ -48,23 +47,20 @@ public class MacroServiceShould : TestBase
                         .ToArray();
         // ACT
         // ASSERT
-        types.Length.Should().BeGreaterThan(0, "there are preconfigured macros");
+        types.Length.ShouldBeGreaterThan(0, "there are preconfigured macros");
         var sp = new ServiceCollection().AddMockSingleton<IExecutionService>()
                                         .AddMockSingleton<ISearchService>()
                                         .BuildServiceProvider();
-        using (new AssertionScope())
-        {
-            foreach (var type in types)
+        Assert.All(
+            types,
+            type =>
             {
                 OutputHelper.WriteLine($"Checking '{type.FullName}'");
                 var sut = Activator.CreateInstance(type, sp);
-                sut.Should()
-                   .BeAssignableTo(typeof(SelfExecutableQueryResult));
-
-                sut.Should()
-                   .BeAssignableTo(typeof(MacroQueryResult));
+                sut.ShouldBeAssignableTo(typeof(SelfExecutableQueryResult));
+                sut.ShouldBeAssignableTo(typeof(MacroQueryResult));
             }
-        }
+        );
     }
 
     [Theory]
@@ -78,7 +74,7 @@ public class MacroServiceShould : TestBase
     {
         var alias = new AliasQueryResult { FileName = $"@{macro}@" };
 
-        alias.IsComposite().Should().Be(expected);
+        alias.IsComposite().ShouldBe(expected);
     }
 
     [Theory]
@@ -101,8 +97,8 @@ public class MacroServiceShould : TestBase
         var results = (await handler.ExecuteAsync(cmdline))
             .ToArray();
 
-        results.ElementAt(0).Name.Should().Be(name);
-        results.ElementAt(0).Description.Should().Be(parameters);
+        results.ElementAt(0).Name.ShouldBe(name);
+        results.ElementAt(0).Description.ShouldBe(parameters);
     }
 
     [Fact]
@@ -119,7 +115,7 @@ public class MacroServiceShould : TestBase
         var macro = new MultiMacroTest(serviceProvider);
         var result = macroMgr.ExpandMacroAlias(macro);
 
-        result.Should().BeAssignableTo<SelfExecutableQueryResult>();
+        result.ShouldBeAssignableTo<SelfExecutableQueryResult>();
     }
 
     [Fact]
@@ -134,7 +130,7 @@ public class MacroServiceShould : TestBase
         var results = service.Search("alias1");
 
         // Assert
-        (results.ElementAt(0) as CompositeAliasQueryResult).Should().NotBeNull();
+        (results.ElementAt(0) as CompositeAliasQueryResult).ShouldNotBeNull();
     }
 
     [Fact]
@@ -150,11 +146,10 @@ public class MacroServiceShould : TestBase
                              .ToArray();
 
         //Assert
-        using (new AssertionScope())
-        {
-            results.Should().HaveCount(1);
-            results.ElementAt(0).IsMacro().Should().BeTrue();
-        }
+        Assert.Multiple(
+            () => results.Length.ShouldBe(1),
+            () => results.ElementAt(0).IsMacro().ShouldBeTrue()
+        );
     }
 
     [Fact]
@@ -175,11 +170,13 @@ public class MacroServiceShould : TestBase
                                     .ExpandMacroAlias(queryResults)
                                     .ToArray();
 
-        using (new AssertionScope())
-        {
-            output.GetDoubloons().Should().HaveCount(0);
-            foreach (var item in output) item.Description.Should().NotBeNullOrWhiteSpace("default description should be provided");
-        }
+        Assert.Multiple(
+            () => output.GetDoubloons().Count().ShouldBe(0),
+            () => Assert.All(
+                output,
+                item => item.Description.ShouldNotBeNullOrWhiteSpace("Default description should be provided")
+            )
+        );
     }
 
     [Fact]
@@ -194,7 +191,7 @@ public class MacroServiceShould : TestBase
                                                      .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();
         var manager = serviceProvider.GetService<MacroService>();
-        manager.MacroCount.Should().BeGreaterThan(0);
+        manager.MacroCount.ShouldBeGreaterThan(0);
     }
 
     [Theory]
@@ -211,12 +208,11 @@ public class MacroServiceShould : TestBase
         var results = service.Search("alias1");
 
         // Assert
-        using (new AssertionScope())
-        {
-            var composite = results.ElementAt(0) as CompositeAliasQueryResult;
-            composite.Should().NotBeNull();
-            composite?.Aliases.ElementAt(index).Delay.Should().Be(delay);
-        }
+        var composite = results.ElementAt(0) as CompositeAliasQueryResult;
+        Assert.Multiple(
+            () => composite.ShouldNotBeNull(),
+            () => composite?.Aliases.ElementAt(index).Delay.ShouldBe(delay)
+        );
     }
 
     [Fact]
@@ -231,7 +227,7 @@ public class MacroServiceShould : TestBase
         var results = service.Search("alias1");
 
         //Assert
-        results.ElementAt(0).GetMacroName().Should().Be("MULTI");
+        results.ElementAt(0).GetMacroName().ShouldBe("MULTI");
     }
 
     [Fact]
@@ -245,7 +241,7 @@ public class MacroServiceShould : TestBase
                               .AddMockSingleton<ISearchService>()
                               .BuildServiceProvider();
         var macroService = new MacroService(serviceProvider);
-        macroService.MacroCount.Should().Be(4);
+        macroService.MacroCount.ShouldBe(4);
     }
 
     [Fact]
@@ -261,11 +257,10 @@ public class MacroServiceShould : TestBase
                              .ToArray();
 
         // Assert
-        using (new AssertionScope())
-        {
-            results.Should().HaveCount(1);
-            results.ElementAt(0).IsMacro().Should().BeFalse();
-        }
+        Assert.Multiple(
+            () => results.Length.ShouldBe(1),
+            () => results.ElementAt(0).IsMacro().ShouldBeFalse()
+        );
     }
 
     [Fact]
@@ -300,14 +295,13 @@ public class MacroServiceShould : TestBase
                                     .ExpandMacroAlias(queryResults)
                                     .ToArray();
         // ASSERT
-        using (new AssertionScope())
-        {
-            output.Should().HaveCount(1);
-            var macro = output.ElementAt(0);
-            
-            macro.Id.Should().Be(expectedId);
-            macro.Count.Should().Be(expectedCount);
-        }
+        output.Length.ShouldBe(1);
+        
+        var macro = output.ElementAt(0);
+        Assert.Multiple(
+            () => macro.Id.ShouldBe(expectedId),
+            () => macro.Count.ShouldBe(expectedCount)
+        );
     }
     [Fact]
     public void NotHaveDoubloonsWhenMacroUsedMultipleTimes()
@@ -332,11 +326,10 @@ public class MacroServiceShould : TestBase
                                     .ExpandMacroAlias(queryResults)
                                     .ToArray();
 
-        using (new AssertionScope())
-        {
-            output.GetDoubloons().Should().HaveCount(0);
-            output.Should().HaveCount(3);
-        }
+        Assert.Multiple(
+            () => output.GetDoubloons().Count().ShouldBe(0),
+            () => output.Length.ShouldBe(3)
+        );
     }
 
     [Theory]
@@ -347,7 +340,7 @@ public class MacroServiceShould : TestBase
     {
         var query = new AliasQueryResult { FileName = $"@{macro}@" };
 
-        query.IsMacro().Should().BeTrue();
+        query.IsMacro().ShouldBeTrue();
     }
 
     #endregion

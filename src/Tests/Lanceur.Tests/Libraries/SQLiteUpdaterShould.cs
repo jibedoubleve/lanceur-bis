@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.SQLite.Updater;
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Tests.Tools;
 using Xunit;
 
@@ -35,7 +35,7 @@ public class SQLiteUpdaterShould : TestBase
         updater.UpdateFrom(ver);
 
         var sql = "select count(*) from dummy_table;";
-        db.ExecuteScalar<int>(sql).Should().Be(2);
+        db.ExecuteScalar<int>(sql).ShouldBe(2);
     }
 
     #endregion Methods

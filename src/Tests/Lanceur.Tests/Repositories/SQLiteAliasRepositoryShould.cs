@@ -1,8 +1,7 @@
 ﻿using System.Data;
 using Bogus;
 using Dapper;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -98,25 +97,23 @@ public class SQLiteAliasRepositoryShould : TestBase
         // ACT & ASSERT
         // -- Find the alias
         var alias = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
-        using (new AssertionScope())
-        {
-            alias.Id.Should().Be(1001, "this is the id of the alias to find");
-            alias.Should().NotBeNull("the search matches one alias");
-        }
+        Assert.Multiple(
+            () => alias.Id.ShouldBe(1001, "this is the id of the alias to find"),
+            () => alias.ShouldNotBeNull("the search matches one alias")
+        );
 
         // -- Add new names to the alias and save it
         alias.Synonyms += ", noname_4, noname_5";
         var id = alias.Id;
         var outputId = c.WithinTransaction(tx => aliasAction.SaveOrUpdate(tx, ref alias));
-        outputId.Should().Be(id, "the alias has only be updated");
+        outputId.ShouldBe(id, "the alias has only be updated");
 
         // -- Retrieve back the alias and check the names
         var found = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
-        using (new AssertionScope())
-        {
-            found.Should().NotBeNull();
-            found.Synonyms.SplitCsv().Should().HaveCount(5);
-        }
+        Assert.Multiple(
+            () => found.ShouldNotBeNull(),
+            () => found.Synonyms.SplitCsv().Length.ShouldBe(5)
+        );
     }
 
     [Fact]
@@ -138,11 +135,10 @@ public class SQLiteAliasRepositoryShould : TestBase
         var found = c.WithinTransaction(tx => action.GetById(tx, 100));
 
         // ASSERT
-        using (new AssertionScope())
-        {
-            found.Should().NotBeNull();
-            found.Name.Should().Be("noname");
-        }
+        Assert.Multiple(
+            () => found.ShouldNotBeNull(),
+            () => found.Name.ShouldBe("noname")
+        );
     }
 
     [Fact]
@@ -164,7 +160,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var found = c.WithinTransaction(tx => action.GetById(tx, 1000));
 
         // ASSERT
-        using (new AssertionScope()) { found.Should().BeNull(); }
+        found.ShouldBeNull();
     }
 
     [Fact]
@@ -199,18 +195,16 @@ public class SQLiteAliasRepositoryShould : TestBase
         );
 
         //ASSERT
-        using (new AssertionScope())
-        {
-            alias1.Id.Should().Be(1004);
-            alias2.Id.Should().Be(1005);
-            alias3.Id.Should().Be(1006);
+        const string sql2 = "select count(*) from alias";
+        const string sql3 = "select count(*) from alias_name";
 
-            const string sql2 = "select count(*) from alias";
-            const string sql3 = "select count(*) from alias_name";
-
-            connection.ExecuteScalar<int>(sql2).Should().Be(6);
-            connection.ExecuteScalar<int>(sql3).Should().Be(6);
-        }
+        Assert.Multiple(
+            () => alias1.Id.ShouldBe(1004),
+            () => alias2.Id.ShouldBe(1005),
+            () => alias3.Id.ShouldBe(1006),
+            () => connection.ExecuteScalar<int>(sql2).ShouldBe(6),
+            () => connection.ExecuteScalar<int>(sql3).ShouldBe(6)
+        );
     }
 
     [Fact]
@@ -228,8 +222,8 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sut = db.WithinTransaction(tx => action.GetById(tx, alias1.Id));
 
         //ASSERT
-        sut.Should().NotBeNull();
-        sut.IsHidden.Should().Be(true);
+        sut.ShouldNotBeNull();
+        sut.IsHidden.ShouldBe(true);
     }
 
     [Fact]
@@ -263,18 +257,15 @@ public class SQLiteAliasRepositoryShould : TestBase
         service.SaveOrUpdate(ref alias3);
 
         //ASSERT
-        using (new AssertionScope())
-        {
             const string sql2 = "select count(*) from alias;";
             const string sql3 = "select count(*) from alias_name;";
-
-            alias1.Name.Should().Be(name1);
-            alias2.Name.Should().Be(name2);
-            alias3.Name.Should().Be(name3);
-
-            connection.ExecuteScalar<int>(sql2).Should().Be(6);
-            connection.ExecuteScalar<int>(sql3).Should().Be(6);
-        }
+            Assert.Multiple(
+                () => alias1.Name.ShouldBe(name1),
+                () => alias2.Name.ShouldBe(name2),
+                () => alias3.Name.ShouldBe(name3),
+                () => connection.ExecuteScalar<int>(sql2).ShouldBe(6),
+                () => connection.ExecuteScalar<int>(sql3).ShouldBe(6)
+            );
     }
 
     [Fact]
@@ -294,8 +285,8 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sut = service.GetById(alias1.Id);
 
         //ASSERT
-        sut.Should().NotBeNull();
-        sut.IsHidden.Should().Be(false);
+        sut.ShouldNotBeNull();
+        sut.IsHidden.ShouldBe(false);
     }
 
     [Fact]
@@ -318,7 +309,7 @@ public class SQLiteAliasRepositoryShould : TestBase
 
         // ASSERT
         const string sqlCount = "select count(*) from alias_argument";
-        connection.ExecuteScalar<int>(sqlCount).Should().Be(1);
+        connection.ExecuteScalar<int>(sqlCount).ShouldBe(1);
     }
 
     [Fact]
@@ -345,13 +336,12 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sut = connection.Query<AliasQueryResult>(sql, new { id = alias.Id })
                             .Single();
         // ASSERT
-        using (new AssertionScope())
-        {
-            sut.Should().NotBeNull();
-            sut.Id.Should().NotBe(0);
-            sut.Name.Should().Be(name);
-            sut.RunAs.Should().Be(RunAs.Admin);
-        }
+        Assert.Multiple(
+            () => sut.ShouldNotBeNull(),
+            () => sut.Id.ShouldNotBe(0),
+            () => sut.Name.ShouldBe(name),
+            () => sut.RunAs.ShouldBe(RunAs.Admin)
+        );
     }
 
     [Fact]
@@ -376,8 +366,8 @@ public class SQLiteAliasRepositoryShould : TestBase
         const string sql2 = "select count(*) from alias";
         const string sql3 = "select count(*) from alias_name";
 
-        connection.ExecuteScalar<int>(sql2).Should().Be(0);
-        connection.ExecuteScalar<int>(sql3).Should().Be(0);
+        connection.ExecuteScalar<int>(sql2).ShouldBe(0);
+        connection.ExecuteScalar<int>(sql3).ShouldBe(0);
     }
 
     [Fact]
@@ -401,9 +391,9 @@ public class SQLiteAliasRepositoryShould : TestBase
         const string sql2 = "select count(*) from alias where deleted_at is null";
         const string sql3 = "select count(*) from alias_name";
 
-        alias1.Id.Should().BeGreaterThan(0);
-        connection.ExecuteScalar<int>(sql2).Should().Be(2);
-        connection.ExecuteScalar<int>(sql3).Should().Be(3); // Logical deletion don't remove data: the names of the
+        alias1.Id.ShouldBeGreaterThan(0);
+        connection.ExecuteScalar<int>(sql2).ShouldBe(2);
+        connection.ExecuteScalar<int>(sql3).ShouldBe(3); // Logical deletion don't remove data: the names of the
         // deleted alias should remain in the database
     }
 
@@ -429,15 +419,13 @@ public class SQLiteAliasRepositoryShould : TestBase
         // ACT
         c.WithinTransaction(tx => action.Remove(tx, new()  { Id = 256 }));
 
-        using (new AssertionScope())
-        {
             // ASSERT
             const string sql2 = "select count(*) from alias where id = 256";
-            connection.ExecuteScalar<int>(sql2).Should().Be(0);
-
             const string sql3 = "select count(*) from alias_name where id_alias = 256";
-            connection.ExecuteScalar<int>(sql3).Should().Be(0);
-        }
+            Assert.Multiple(
+                () => connection.ExecuteScalar<int>(sql2).ShouldBe(0),
+                () => connection.ExecuteScalar<int>(sql3).ShouldBe(0)
+            );
     }
 
     [Fact]
@@ -463,12 +451,12 @@ public class SQLiteAliasRepositoryShould : TestBase
 
         // ASSERT
         const string sql2 = "select count(*) from alias where id = 256 and deleted_at is null";
-        connection.ExecuteScalar<int>(sql2).Should().Be(0);
+        connection.ExecuteScalar<int>(sql2).ShouldBe(0);
 
         const string sql3 = "select count(*) from alias_name where id_alias = 256";
         // The logical deletion don't remove data, the names should therefore
         // remain in the database
-        connection.ExecuteScalar<int>(sql3).Should().Be(1);
+        connection.ExecuteScalar<int>(sql3).ShouldBe(1);
     }
 
     [Fact]
@@ -488,12 +476,11 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sut = service.Search("admin").ToArray();
 
         // ASSERT
-        using (new AssertionScope())
-        {
-            sut.Should().NotBeEmpty();
-            sut.Should().HaveCount(1);
-            sut.ElementAt(0).RunAs.Should().Be(RunAs.Admin);
-        }
+        Assert.Multiple(
+            () => sut.ShouldNotBeEmpty(),
+            () => sut.Length.ShouldBe(1),
+            () => sut.ElementAt(0).RunAs.ShouldBe(RunAs.Admin)
+        );
     }
 
     #endregion

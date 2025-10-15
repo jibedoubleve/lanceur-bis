@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Constants;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
@@ -25,7 +25,7 @@ public class FeatureFlagShould : TestBase
 
         var settings = new SQLiteFeatureFlagService(scope);
 
-        settings.IsEnabled(Features.ResourceDisplay).Should().BeTrue();
+        settings.IsEnabled(Features.ResourceDisplay).ShouldBeTrue();
     }
 
     #endregion
