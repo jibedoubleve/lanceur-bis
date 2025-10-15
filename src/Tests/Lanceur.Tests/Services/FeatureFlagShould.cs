@@ -25,7 +25,7 @@ public class FeatureFlagShould : TestBase
 
         var settings = new SQLiteFeatureFlagService(scope);
 
-        settings.IsEnabled(Features.ResourceDisplay).Should().BeTrue();
+        settings.IsEnabled(Features.ResourceDisplay).ShouldBeTrue();
     }
 
     #endregion

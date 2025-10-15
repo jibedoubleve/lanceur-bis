@@ -42,8 +42,7 @@ public class SQLiteVersionServiceShould : TestBase
 
         var service = new SQLiteVersionService(db);
         service.IsUpToDate(goal)
-               .Should()
-               .BeFalse();
+               .ShouldBeFalse();
     }
 
     [Theory]
@@ -58,8 +57,7 @@ public class SQLiteVersionServiceShould : TestBase
         CreateVersion(db.GetConnection(), "1.0");
 
         var service = new SQLiteVersionService(db);
-        var action = () => service.IsUpToDate(version);
-        action.Should().Throw<ArgumentException>();
+        Should.Throw<ArgumentException>(() => service.IsUpToDate(version));
     }
 
     [Theory]
@@ -74,7 +72,7 @@ public class SQLiteVersionServiceShould : TestBase
         CreateVersion(db.GetConnection(), actual);
 
         var service = new SQLiteVersionService(db);
-        service.IsUpToDate(expected).Should().BeTrue();
+        service.IsUpToDate(expected).ShouldBeTrue();
     }
 
     [Theory]
@@ -90,7 +88,7 @@ public class SQLiteVersionServiceShould : TestBase
 
         var goalVersion = new Version(goal);
         var service = new SQLiteVersionService(db);
-        service.IsUpToDate(goalVersion).Should().BeTrue();
+        service.IsUpToDate(goalVersion).ShouldBeTrue();
     }
 
     [Theory]
@@ -108,7 +106,7 @@ public class SQLiteVersionServiceShould : TestBase
         var service = new SQLiteVersionService(db);
         var expected = new Version(version);
 
-        service.GetCurrentDbVersion().Should().Be(expected);
+        service.GetCurrentDbVersion().ShouldBe(expected);
     }
 
     [Theory]
@@ -124,7 +122,7 @@ public class SQLiteVersionServiceShould : TestBase
 
         var service = new SQLiteVersionService(db);
         service.SetCurrentDbVersion(version);
-        service.GetCurrentDbVersion().Should().Be(version);
+        service.GetCurrentDbVersion().ShouldBe(version);
     }
 
     [Theory]
@@ -140,8 +138,7 @@ public class SQLiteVersionServiceShould : TestBase
 
         var service = new SQLiteVersionService(db);
         service.IsUpToDate(goal)
-               .Should()
-               .BeTrue();
+               .ShouldBeTrue();
     }
 
     #endregion

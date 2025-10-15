@@ -18,7 +18,7 @@ public class CmdlineShould
         var left = Cmdline.Parse(cmd);
         var right = Cmdline.Parse(cmd);
 
-        (left == right).Should().BeTrue();
+        (left == right).ShouldBeTrue();
     }
 
     [Theory]
@@ -33,7 +33,7 @@ public class CmdlineShould
     {
         var line = new Cmdline(cmd, args);
 
-        line.Name.Should().Be(asExpected);
+        line.Name.ShouldBe(asExpected);
     }
 
     [Theory]
@@ -65,8 +65,7 @@ public class CmdlineShould
     public void HandleSpecialCmdCharacter(string cmdline)
     {
         Cmdline.Parse(cmdline)
-               .Name.Should()
-               .Be(cmdline[0].ToString());
+               .Name.ShouldBe(cmdline[0].ToString());
     }
 
     [Theory]
@@ -82,16 +81,16 @@ public class CmdlineShould
     {
         var line = Cmdline.Parse(actual);
 
-        line.Parameters.Should().Be(asExpected);
+        line.Parameters.ShouldBe(asExpected);
     }
 
-    [Fact] public void HaveEmptyNameByDefault() { Cmdline.Empty.Name.Should().BeEmpty(); }
+    [Fact] public void HaveEmptyNameByDefault() { Cmdline.Empty.Name.ShouldBeEmpty(); }
 
-    [Fact] public void HaveEmptyNameWhenCtorNull() { new Cmdline(null, null).Name.Should().BeEmpty(); }
+    [Fact] public void HaveEmptyNameWhenCtorNull() { new Cmdline(null, null).Name.ShouldBeEmpty(); }
 
-    [Fact] public void HaveEmptyParametersByDefault() { Cmdline.Empty.Parameters.Should().BeEmpty(); }
+    [Fact] public void HaveEmptyParametersByDefault() { Cmdline.Empty.Parameters.ShouldBeEmpty(); }
 
-    [Fact] public void HaveEmptyParametersWhenCtorNull() { new Cmdline(null, null).Parameters.Should().BeEmpty(); }
+    [Fact] public void HaveEmptyParametersWhenCtorNull() { new Cmdline(null, null).Parameters.ShouldBeEmpty(); }
 
     [Theory]
     [InlineData("cmd", "cmd")]
@@ -105,7 +104,7 @@ public class CmdlineShould
     {
         var line = Cmdline.Parse(actual);
 
-        line.Name.Should().Be(asExpected);
+        line.Name.ShouldBe(asExpected);
     }
 
     [Theory]
@@ -119,7 +118,7 @@ public class CmdlineShould
         var left = Cmdline.Parse(cmd1?.Trim());
         var right = Cmdline.Parse(cmd2?.Trim());
 
-        (left != right).Should().BeTrue();
+        (left != right).ShouldBeTrue();
     }
 
     [Theory]
@@ -136,8 +135,7 @@ public class CmdlineShould
     {
         Cmdline.Parse(cmdline)
                .Name
-               .Should()
-               .Be(expected);
+               .ShouldBe(expected);
     }
 
     [Fact]
@@ -145,8 +143,8 @@ public class CmdlineShould
     {
         var line = Cmdline.Parse(string.Empty);
 
-        line.Name.Should().BeEmpty();
-        line.Parameters.Should().BeEmpty();
+        line.Name.ShouldBeEmpty();
+        line.Parameters.ShouldBeEmpty();
     }
 
     [Fact]
@@ -154,8 +152,8 @@ public class CmdlineShould
     {
         var line = Cmdline.Parse(null);
 
-        line.Name.Should().BeEmpty();
-        line.Parameters.Should().BeEmpty();
+        line.Name.ShouldBeEmpty();
+        line.Parameters.ShouldBeEmpty();
     }
 
     [Theory]
@@ -166,8 +164,7 @@ public class CmdlineShould
     public void TrimLeadingAndTrailingWhitespace(string cmd)
     {
         Cmdline.Parse(cmd)
-               .Name.Should()
-               .Be(cmd.Trim());
+               .Name.ShouldBe(cmd.Trim());
     }
 
     #endregion

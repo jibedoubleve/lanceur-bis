@@ -37,7 +37,7 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
             (viewModel, _) =>
             {
                 Record.Exception(() => viewModel.SelectYearCommand.Execute(null))
-                      .Should().BeNull();
+                      .ShouldBeNull();
             },
             Sql.Empty
         );

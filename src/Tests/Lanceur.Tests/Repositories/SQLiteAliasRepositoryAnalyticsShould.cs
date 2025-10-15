@@ -46,7 +46,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     }
 
     [Fact] public void GetAdditionalParameter() => Record.Exception(() => BuildRepository().GetAdditionalParameter([1, 2, 3]))
-                                                         .Should().BeNull();
+                                                         .ShouldBeNull();
 
     [Fact]
     public void GetAliasesWithoutNotes()
@@ -84,25 +84,21 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var aliases = service.GetAliasesWithoutNotes()
                              .ToArray();
 
+        aliases.Length.ShouldBe(gen.IdSequence);
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(gen.IdSequence);
-            foreach (var alias in aliases)
-            {
-                alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
-                alias.LastUsedAt.Should().Be(date1);
-            }
-        }
+        Assert.Multiple(
+            () => Assert.All(aliases, a => a.Count.ShouldBe(2)),
+            () =>  Assert.All(aliases, a => a.LastUsedAt.ShouldBe(date1))
+        );
     }
 
-    [Fact] public void GetAll() => Record.Exception(() => BuildRepository().GetAll()).Should().BeNull();
+    [Fact] public void GetAll() => Record.Exception(() => BuildRepository().GetAll()).ShouldBeNull();
 
     [Fact]
     public void GetAllAliasWithAdditionalParameters() => Record
                                                          .Exception(()
                                                              => BuildRepository().GetAllAliasWithAdditionalParameters()
-                                                         ).Should().BeNull();
+                                                         ).ShouldBeNull();
 
     [Theory]
     [InlineData(@"c:\Not\A\Real\File.exe")]
@@ -150,19 +146,15 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(gen.IdSequence);
-            foreach (var alias in aliases)
-            {
-                alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
-                alias.LastUsedAt.Should().Be(date1);
-            }
-        }
+            aliases.Length.ShouldBe(gen.IdSequence);
+            Assert.Multiple(
+                () => Assert.All(aliases, a => a.Count.ShouldBe(count)),
+                () => Assert.All(aliases, a => a.LastUsedAt.ShouldBe(date1))
+            );
     }
 
     [Fact] public void GetById() => Record.Exception(() => BuildRepository().GetById(1))
-                                          .Should().BeNull();
+                                          .ShouldBeNull();
 
     [Fact]
     public void GetDeletedAlias()
@@ -207,15 +199,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(gen.IdSequence);
-            foreach (var alias in aliases)
-            {
-                alias.Count.Should().Be(2, $"alias {alias.Name} has usage");
-                alias.LastUsedAt.Should().Be(date1);
-            }
-        }
+            aliases.Length.ShouldBe(gen.IdSequence);
+            Assert.Multiple(
+                () => Assert.All(aliases, a => a.Count.ShouldBe(2)),
+                () => Assert.All(aliases, a => a.LastUsedAt.ShouldBe(date1))
+            );
     }
 
     [Theory]
@@ -268,15 +256,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(gen.IdSequence);
-            foreach (var alias in aliases)
-            {
-                alias.Count.Should().Be(count);
-                alias.LastUsedAt.Should().Be(date1);
-            }
-        }
+            aliases.Length.ShouldBe(gen.IdSequence);
+            Assert.Multiple(
+                () => Assert.All(aliases, a => a.Count.ShouldBe(count)),
+                () => Assert.All(aliases, a => a.LastUsedAt.ShouldBe(date1))
+            );
     }
 
     [Fact]
@@ -332,15 +316,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(3);
-            foreach (var alias in aliases)
-            {
-                alias.Count.Should().Be(count);
-                alias.LastUsedAt.Should().Be(date1);
-            }
-        }
+        aliases.Length.ShouldBe(3);
+        Assert.Multiple(
+            () => Assert.All(aliases, alias => alias.Count.ShouldBe(count)),
+            () => Assert.All(aliases, alias => alias.LastUsedAt.ShouldBe(date1))
+        );
     }
 
     [Fact]
@@ -398,15 +378,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(2);
-            foreach (var alias in aliases)
-            {
-                alias.Count.Should().Be(count);
-                alias.LastUsedAt.Should().Be(date1);
-            }
-        }
+        aliases.Length.ShouldBe(2);
+        Assert.Multiple(
+            () => Assert.All(aliases, alias => alias.Count.ShouldBe(count)),
+            () => Assert.All(aliases, alias => alias.LastUsedAt.ShouldBe(date1))
+        );
     }
 
     [Fact]
@@ -427,18 +403,17 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(4);
-            aliases[0].Should().Be(name);
-        }
+        Assert.Multiple(
+            () => aliases.Length.ShouldBe(4),
+            () => aliases[0].ShouldBe(name)
+        );
     }
 
     [Fact] public void GetExistingDeletedAliases() => Record.Exception(() => BuildRepository().GetExistingDeletedAliases([], 0))
-                                                            .Should().BeNull();
+                                                            .ShouldBeNull();
 
     [Fact] public void GetHiddenCounters() => Record.Exception(() => BuildRepository().GetHiddenCounters())
-                                                    .Should().BeNull();
+                                                    .ShouldBeNull();
 
 
     [Fact]
@@ -476,15 +451,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(4);
-            foreach (var alias in aliases)
-            {
-                alias.Count.Should().Be(2);
-                alias.LastUsedAt.Should().Be(date1);
-            }
-        }
+        aliases.Length.ShouldBe(4);
+        Assert.Multiple(
+            () => Assert.All(aliases, alias =>  alias.Count.ShouldBe(2)),
+            () => Assert.All(aliases, alias =>  alias.LastUsedAt.ShouldBe(date1))
+        );
     }
 
     [Fact]
@@ -522,11 +493,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        aliases.Should().HaveCount(4);
+        aliases.Length.ShouldBe(4);
         foreach (var alias in aliases)
         {
-            alias.Count.Should().Be(2);
-            alias.LastUsedAt.Should().Be(date1);
+            alias.Count.ShouldBe(2);
+            alias.LastUsedAt.ShouldBe(date1);
         }
     }
 
@@ -548,26 +519,23 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        using (new AssertionScope())
-        {
-            aliases.Should().HaveCount(gen.IdSequence);
-            foreach (var alias in aliases) alias.Count.Should().Be(0);
-        }
+        aliases.Length.ShouldBe(gen.IdSequence);
+        Assert.All(aliases, alias => alias.Count.ShouldBe(0));
     }
 
     [Fact]
     public void GetUsage() => Record.Exception(() => BuildRepository().GetUsage(Per.DayOfWeek))
-                                    .Should().BeNull();
+                                    .ShouldBeNull();
 
     [Fact] public void GetYearsWithUsage() => Record.Exception(() => BuildRepository().GetYearsWithUsage())
-                                                    .Should().BeNull();
+                                                    .ShouldBeNull();
 
     [Fact] public void HydrateAlias() => Record.Exception(() => BuildRepository().HydrateAlias(new()))
-                                               .Should().BeNull();
+                                               .ShouldBeNull();
 
     [Fact]
     public void HydrateMacro() => Record.Exception(() => BuildRepository().HydrateMacro(new AliasQueryResult()))
-                                        .Should().BeNull();
+                                        .ShouldBeNull();
 
     #endregion
 }

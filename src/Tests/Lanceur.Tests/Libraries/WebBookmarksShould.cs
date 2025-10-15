@@ -37,7 +37,7 @@ public class WebBookmarksShould
         var repository = serviceProvider.GetService<IBookmarkRepository>();
 
         // ACT & ASSERT
-        repository.GetBookmarks().Should().BeEmpty();
+        repository.GetBookmarks().ShouldBeEmpty();
     }
     
     [Fact]
@@ -52,7 +52,7 @@ public class WebBookmarksShould
         var repository = serviceProvider.GetService<IBookmarkRepository>();
 
         // ACT & ASSERT
-        repository.GetBookmarks().Should().BeEmpty();
+        repository.GetBookmarks().ShouldBeEmpty();
     }
 
     #endregion

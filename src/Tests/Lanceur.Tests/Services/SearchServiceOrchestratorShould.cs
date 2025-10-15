@@ -27,8 +27,7 @@ public class SearchServiceOrchestratorShould
         var converter = new StoreOrchestrationToStringConverter();
 
         converter.ConvertBack(input, null!, null, null!)
-                 .Should()
-                 .Be(output);
+                 .ShouldBe(output);
     }
     
     [Theory]
@@ -40,8 +39,7 @@ public class SearchServiceOrchestratorShould
         var converter = new StoreOrchestrationToStringConverter();
 
         converter.Convert(input, null!, null, null!)
-                 .Should()
-                 .Be(output);
+                 .ShouldBe(output);
     }
 
     [Theory]
@@ -74,8 +72,7 @@ public class SearchServiceOrchestratorShould
 
         // act
         orchestrator.IsAlive(storeService, Cmdline.Parse(cmd))
-                    .Should()
-                    .Be(expected);
+                    .ShouldBe(expected);
     }
 
     #endregion

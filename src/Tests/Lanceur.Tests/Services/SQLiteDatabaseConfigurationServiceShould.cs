@@ -33,7 +33,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
         var settingRepository = new SQLiteDatabaseConfigurationService(scope, logger);
-        using (new AssertionScope()) { assert(settingRepository); }
+        assert(settingRepository);
     }
 
     private void WithConfiguration(Action<DatabaseConfiguration> update, Action<DatabaseConfiguration> assert)
@@ -48,7 +48,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         settingRepository.Save();
         settingRepository.Load();
 
-        using (new AssertionScope()) { assert(settingRepository.Current); }
+        assert(settingRepository.Current);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
         var value = stg.Current.DbPath;
 
-        value.Should().Be(Paths.DefaultDb);
+        value.ShouldBe(Paths.DefaultDb);
     }
 
     [Fact]
@@ -73,17 +73,17 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
             repository =>
             {
                 var settings = repository.Current;
-                settings.FeatureFlags.Should().HaveCount(4);
+                settings.FeatureFlags.Count().ShouldBe(4);
 
-                settings.FeatureFlags.ElementAt(0).Enabled.Should().BeFalse();
-                settings.FeatureFlags.ElementAt(0).FeatureName.Should().Be("ShowSystemUsage1");
-                settings.FeatureFlags.ElementAt(0).Icon.Should().Be("Gauge241");
-                settings.FeatureFlags.ElementAt(0).Description.Should().Be("Show CPU");
+                settings.FeatureFlags.ElementAt(0).Enabled.ShouldBeFalse();
+                settings.FeatureFlags.ElementAt(0).FeatureName.ShouldBe("ShowSystemUsage1");
+                settings.FeatureFlags.ElementAt(0).Icon.ShouldBe("Gauge241");
+                settings.FeatureFlags.ElementAt(0).Description.ShouldBe("Show CPU");
 
-                settings.FeatureFlags.ElementAt(1).Enabled.Should().BeTrue();
-                settings.FeatureFlags.ElementAt(1).FeatureName.Should().Be("AdminMode1");
-                settings.FeatureFlags.ElementAt(1).Icon.Should().Be("ShieldKeyhole241");
-                settings.FeatureFlags.ElementAt(1).Description.Should().Be("Enables administrator");
+                settings.FeatureFlags.ElementAt(1).Enabled.ShouldBeTrue();
+                settings.FeatureFlags.ElementAt(1).FeatureName.ShouldBe("AdminMode1");
+                settings.FeatureFlags.ElementAt(1).Icon.ShouldBe("ShieldKeyhole241");
+                settings.FeatureFlags.ElementAt(1).Description.ShouldBe("Enables administrator");
             },
             json
         );
@@ -101,7 +101,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
         var actual = stg.Current.DbPath;
 
-        actual.Should().Be(expected);
+        actual.ShouldBe(expected);
     }
 
     [Fact]
@@ -171,53 +171,53 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         WithConfiguration(
             assert =>
             {
-                assert.Current.Caching.StoreCacheDuration.Should().Be(11);
-                assert.Current.Caching.ThumbnailCacheDuration.Should().Be(12);
+                assert.Current.Caching.StoreCacheDuration.ShouldBe(11);
+                assert.Current.Caching.ThumbnailCacheDuration.ShouldBe(12);
                 if (assert.Current.FeatureFlags.Any())
                 {
                     var ff = assert.Current.FeatureFlags.ElementAt(0);
-                    ff.Description.Should().Be("aaabbcc");
-                    ff.Enabled.Should().Be(true);
-                    ff.FeatureName.Should().Be("xxyyzz");
-                    ff.Icon.Should().Be("ggg");
+                    ff.Description.ShouldBe("aaabbcc");
+                    ff.Enabled.ShouldBe(true);
+                    ff.FeatureName.ShouldBe("xxyyzz");
+                    ff.Icon.ShouldBe("ggg");
                 }
                 else { Assert.Fail("No feature flags"); }
 
-                assert.Current.Github.LastCheckedVersion.Should().Be(new("1.2.3"));
-                assert.Current.Github.SnoozeVersionCheck.Should().Be(true);
-                assert.Current.Github.Token.Should().Be("123456789");
+                assert.Current.Github.LastCheckedVersion.ShouldBe(new("1.2.3"));
+                assert.Current.Github.SnoozeVersionCheck.ShouldBe(true);
+                assert.Current.Github.Token.ShouldBe("123456789");
 
-                assert.Current.HotKey.Key.Should().Be(55);
-                assert.Current.HotKey.ModifierKey.Should().Be(56);
+                assert.Current.HotKey.Key.ShouldBe(55);
+                assert.Current.HotKey.ModifierKey.ShouldBe(56);
 
-                assert.Current.Reconciliation.InactivityThreshold.Should().Be(99);
-                assert.Current.Reconciliation.LowUsageThreshold.Should().Be(98);
+                assert.Current.Reconciliation.InactivityThreshold.ShouldBe(99);
+                assert.Current.Reconciliation.LowUsageThreshold.ShouldBe(98);
 
-                assert.Current.ResourceMonitor.CpuSmoothingIndex.Should().Be(66);
-                assert.Current.ResourceMonitor.RefreshRate.Should().Be(77);
+                assert.Current.ResourceMonitor.CpuSmoothingIndex.ShouldBe(66);
+                assert.Current.ResourceMonitor.RefreshRate.ShouldBe(77);
 
-                assert.Current.SearchBox.SearchDelay.Should().Be(11.99);
-                assert.Current.SearchBox.ShowAtStartup.Should().Be(false);
-                assert.Current.SearchBox.ShowLastQuery.Should().Be(false);
-                assert.Current.SearchBox.ShowResult.Should().Be(true);
+                assert.Current.SearchBox.SearchDelay.ShouldBe(11.99);
+                assert.Current.SearchBox.ShowAtStartup.ShouldBe(false);
+                assert.Current.SearchBox.ShowLastQuery.ShouldBe(false);
+                assert.Current.SearchBox.ShowResult.ShouldBe(true);
 
-                assert.Current.Stores.BookmarkSourceBrowser.Should().Be("Edge");
-                assert.Current.Stores.EverythingQuerySuffix.Should().Be("eee");
+                assert.Current.Stores.BookmarkSourceBrowser.ShouldBe("Edge");
+                assert.Current.Stores.EverythingQuerySuffix.ShouldBe("eee");
 
                 if (assert.Current.Stores.StoreShortcuts.Count() == 2)
                 {
-                    assert.Current.Stores.StoreShortcuts.ElementAt(0).AliasOverride.Should().Be("987654");
-                    assert.Current.Stores.StoreShortcuts.ElementAt(0).StoreType.Should().Be("LISBS");
+                    assert.Current.Stores.StoreShortcuts.ElementAt(0).AliasOverride.ShouldBe("987654");
+                    assert.Current.Stores.StoreShortcuts.ElementAt(0).StoreType.ShouldBe("LISBS");
 
-                    assert.Current.Stores.StoreShortcuts.ElementAt(1).AliasOverride.Should().Be("123456");
-                    assert.Current.Stores.StoreShortcuts.ElementAt(1).StoreType.Should().Be("LISES");
+                    assert.Current.Stores.StoreShortcuts.ElementAt(1).AliasOverride.ShouldBe("123456");
+                    assert.Current.Stores.StoreShortcuts.ElementAt(1).StoreType.ShouldBe("LISES");
                 }
                 else { Assert.Fail("No store StoreShortcuts"); }
 
-                assert.Current.Window.BackdropStyle.Should().Be("Micass");
-                assert.Current.Window.NotificationDisplayDuration.Should().Be(11);
-                assert.Current.Window.Position.Left.Should().Be(1.23456);
-                assert.Current.Window.Position.Top.Should().Be(2.45678);
+                assert.Current.Window.BackdropStyle.ShouldBe("Micass");
+                assert.Current.Window.NotificationDisplayDuration.ShouldBe(11);
+                assert.Current.Window.Position.Left.ShouldBe(1.23456);
+                assert.Current.Window.Position.Top.ShouldBe(2.45678);
             },
             json
         );
@@ -229,8 +229,8 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         WithConfiguration(repository =>
             {
                 var settings = repository.Current;
-                settings.HotKey.ModifierKey.Should().Be(3);
-                settings.HotKey.Key.Should().Be(18);
+                settings.HotKey.ModifierKey.ShouldBe(3);
+                settings.HotKey.Key.ShouldBe(18);
             }
         );
     }
@@ -241,8 +241,8 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         WithConfiguration(repository =>
             {
                 var settings = repository.Current;
-                settings.Window.Position.Left.Should().Be(double.MaxValue);
-                settings.Window.Position.Top.Should().Be(double.MaxValue);
+                settings.Window.Position.Left.ShouldBe(double.MaxValue);
+                settings.Window.Position.Top.ShouldBe(double.MaxValue);
             }
         );
     }
@@ -255,7 +255,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
         var settings = new SQLiteDatabaseConfigurationService(scope, logger);
 
-        settings.Current.SearchBox.ShowAtStartup.Should().BeTrue();
+        settings.Current.SearchBox.ShowAtStartup.ShouldBeTrue();
     }
 
     [Fact]
@@ -266,7 +266,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
         var settings = new SQLiteDatabaseConfigurationService(scope, logger);
 
-        settings.Current.SearchBox.ShowResult.Should().BeFalse();
+        settings.Current.SearchBox.ShowResult.ShouldBeFalse();
     }
 
     [Theory]
@@ -279,22 +279,22 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         yield return
         [
             new Action<DatabaseConfiguration>(cfg  =>  cfg.Caching.StoreCacheDuration = 99),
-            new Action<DatabaseConfiguration>(cfg => cfg.Caching.StoreCacheDuration.Should().Be(99))
+            new Action<DatabaseConfiguration>(cfg => cfg.Caching.StoreCacheDuration.ShouldBe(99))
         ];
         yield return
         [
             new Action<DatabaseConfiguration>(cfg  =>  cfg.Caching.ThumbnailCacheDuration = 99),
-            new Action<DatabaseConfiguration>(cfg => cfg.Caching.ThumbnailCacheDuration.Should().Be(99))
+            new Action<DatabaseConfiguration>(cfg => cfg.Caching.ThumbnailCacheDuration.ShouldBe(99))
         ];
         yield return
         [
             new Action<DatabaseConfiguration>(cfg  =>  cfg.Github.Tag = "hello world"),
-            new Action<DatabaseConfiguration>(cfg => cfg.Github.Tag.Should().Be("hello world"))
+            new Action<DatabaseConfiguration>(cfg => cfg.Github.Tag.ShouldBe("hello world"))
         ];
         yield return
         [
             new Action<DatabaseConfiguration>(cfg  =>  cfg.Github.Tag = cfg.Github.Tag),
-            new Action<DatabaseConfiguration>(cfg => cfg.Github.Tag.Should().Be("ungroomed"))
+            new Action<DatabaseConfiguration>(cfg => cfg.Github.Tag.ShouldBe("ungroomed"))
         ];
     }
 
@@ -310,8 +310,8 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 settings.SetHotKey(key, modifierKey);
 
                 repository.Save();
-                settings.HotKey.ModifierKey.Should().Be(modifierKey);
-                settings.HotKey.Key.Should().Be(key);
+                settings.HotKey.ModifierKey.ShouldBe(modifierKey);
+                settings.HotKey.Key.ShouldBe(key);
             }
         );
     }
@@ -327,7 +327,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         var asThisJson = JsonConvert.SerializeObject(stg.Current);
         var json = File.ReadAllText(file);
 
-        json.Should().Be(asThisJson);
+        json.ShouldBe(asThisJson);
     }
 
     [Theory]
@@ -343,8 +343,8 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 repository.Save();
 
                 var loaded = repository.Current;
-                loaded.Window.Position.Left.Should().Be(left);
-                loaded.Window.Position.Top.Should().Be(top);
+                loaded.Window.Position.Left.ShouldBe(left);
+                loaded.Window.Position.Top.ShouldBe(top);
             }
         );
     }

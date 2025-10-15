@@ -24,8 +24,7 @@ public class FavIconServiceShould
     {
         var thisUri = new Uri(expected);
         new Uri(url).GetFavicons()
-                    .Should()
-                    .Contain(thisUri);
+                    .ShouldContain(thisUri);
     }
 
     [Theory]

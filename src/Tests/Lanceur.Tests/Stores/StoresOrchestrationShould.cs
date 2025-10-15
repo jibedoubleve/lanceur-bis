@@ -63,7 +63,7 @@ public class StoresOrchestrationShould
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeTrue();
+        regex.IsMatch(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -84,7 +84,7 @@ public class StoresOrchestrationShould
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeTrue();
+        regex.IsMatch(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -108,7 +108,7 @@ public class StoresOrchestrationShould
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeTrue();
+        regex.IsMatch(query).ShouldBeTrue();
     }
     [Theory]
     [InlineData("6+5", "11")]
@@ -156,11 +156,10 @@ public class StoresOrchestrationShould
 
         var result = await searchService.SearchAsync(Cmdline.Parse(query));
         result = result.ToArray();
-        using (new AssertionScope())
-        {
-            result.Should().HaveCount(1);
-            result.ElementAt(0).Name.Should().Be(expected);
-        }
+        Assert.Multiple(
+            () => result.Count().ShouldBe(1),
+            () => result.ElementAt(0).Name.ShouldBe(expected)
+        );
     }
     [Theory]
     [InlineData("1+1", "2")]
@@ -181,19 +180,15 @@ public class StoresOrchestrationShould
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>();
 
-        // ASSERT
-        using(new AssertionScope())
-        {
             var regex = new Regex(store.StoreOrchestration.AlivePattern);
-            regex.IsMatch(query).Should().BeTrue();
+            var results = store.Search(Cmdline.Parse(query)).ToList();
             
-            var results = store.Search(Cmdline.Parse(query))
-                               .ToList();
-            results.Should().HaveCountGreaterThan(0);
-            
-            results.ElementAt(0).Name
-                   .Should().Be(result);
-        }
+            // ASSERT
+            Assert.Multiple(
+                () => regex.IsMatch(query).ShouldBeTrue(),
+                () => results.Count.ShouldBeGreaterThan(0),
+                () => results.ElementAt(0).Name.ShouldBe(result)
+            );
     }
 
     [Theory]
@@ -215,7 +210,7 @@ public class StoresOrchestrationShould
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeTrue();
+        regex.IsMatch(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -237,7 +232,7 @@ public class StoresOrchestrationShould
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeTrue();
+        regex.IsMatch(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -265,7 +260,7 @@ public class StoresOrchestrationShould
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeFalse();
+        regex.IsMatch(query).ShouldBeFalse();
     }
 
 
@@ -287,7 +282,7 @@ public class StoresOrchestrationShould
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeFalse();
+        regex.IsMatch(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -308,7 +303,7 @@ public class StoresOrchestrationShould
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).Should().BeFalse();
+        regex.IsMatch(query).ShouldBeFalse();
     }
 
     #endregion

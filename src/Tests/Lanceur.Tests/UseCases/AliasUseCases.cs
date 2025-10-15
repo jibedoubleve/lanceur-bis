@@ -130,17 +130,16 @@ public class AliasUseCases : TestBase
         mainViewModel.Query = stateTester.Name;
         await mainViewModel.SearchCommand.ExecuteAsync(null);
 
-        using (new AssertionScope())
-        {
-            mainViewModel.Results.Should().NotBeNull();
-            mainViewModel.Results!.Count.Should().BeGreaterThan(0);
-            var current = mainViewModel.Results![0];
+        var current = mainViewModel.Results![0];
+        mainViewModel.Results!.Count.ShouldBeGreaterThan(0);
 
-            OutputHelper.WriteLine($"Type of first element in results is '{current.GetType()}'");
-            OutputHelper.WriteLine($"{JsonConvert.SerializeObject(current, Formatting.Indented)}");
-            
-            stateTester.AssertValues(current as AliasQueryResult);
-        }
+        OutputHelper.WriteLine($"Type of first element in results is '{current.GetType()}'");
+        OutputHelper.WriteLine($"{JsonConvert.SerializeObject(current, Formatting.Indented)}");
+        
+        Assert.Multiple(
+            () => mainViewModel.Results.ShouldNotBeNull(),
+            () => stateTester.AssertValues(current as AliasQueryResult)
+        );
 
         /********************************/
         OutputHelper.Title("3: Update the alias and save it");
@@ -159,11 +158,10 @@ public class AliasUseCases : TestBase
         mainViewModel.Query = stateTester.Name;
         await mainViewModel.SearchCommand.ExecuteAsync(null);
 
-        using (new AssertionScope())
-        {
-            mainViewModel.SelectedResult.Should().NotBeNull();
-            stateTester2.AssertValues(keywordsViewModel.SelectedAlias);
-        }
+        Assert.Multiple(
+            () => mainViewModel.SelectedResult.ShouldNotBeNull(),
+            () => stateTester2.AssertValues(keywordsViewModel.SelectedAlias)
+        );
     }
 
     #endregion

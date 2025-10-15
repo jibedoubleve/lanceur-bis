@@ -23,8 +23,7 @@ public class ConverterShould
                      null,
                      CultureInfo.CurrentCulture
                  )
-                 .Should()
-                 .BeEquivalentTo(output);
+                 .ShouldBeEquivalentTo(output);
     }
 
     #endregion

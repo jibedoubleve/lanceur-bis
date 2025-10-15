@@ -35,15 +35,15 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         var settings = new SQLiteDatabaseConfigurationService(scope, logger);
         var featureFlag = new SQLiteFeatureFlagService(scope);
 
-        settings.Current.FeatureFlags.Should().NotBeEmpty("application has feature flags");
-        settings.Current.FeatureFlags.ElementAt(0).Enabled.Should().BeTrue("this is the default value");
+        settings.Current.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
+        settings.Current.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");
 
         // act
         settings.Current.FeatureFlags.ElementAt(0).Enabled = value;
         settings.Save();
 
         // assert
-        featureFlag.IsEnabled(Features.ResourceDisplay).Should().Be(value);
+        featureFlag.IsEnabled(Features.ResourceDisplay).ShouldBe(value);
     }
 
     [Theory]
@@ -58,8 +58,8 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
         var settings = new SQLiteDatabaseConfigurationService(scope, logger);
 
-        settings.Current.FeatureFlags.Should().NotBeEmpty("application has feature flags");
-        settings.Current.FeatureFlags.ElementAt(0).Enabled.Should().BeTrue("this is the default value");
+        settings.Current.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
+        settings.Current.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");
         
         // act
         settings.Current.FeatureFlags.ElementAt(0).Enabled = value;
@@ -68,7 +68,7 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         // assert
         settings.Current.FeatureFlags
                 .Single(e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.InvariantCultureIgnoreCase))
-                .Enabled.Should().Be(value, "the new value changed");
+                .Enabled.ShouldBe(value, "the new value changed");
 
         const string sql = """
                            select s_value ->> '$.FeatureFlags' as FeatureFlag
@@ -79,9 +79,9 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         var flags = JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json);
         
         var flag = flags.SingleOrDefault(e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.InvariantCultureIgnoreCase));
-        flag.Should().NotBeNull();
-        flag!.FeatureName.Should().Be(Features.ResourceDisplay);
-        flag.Enabled.Should().Be(value);
+        flag.ShouldNotBeNull();
+        flag!.FeatureName.ShouldBe(Features.ResourceDisplay);
+        flag.Enabled.ShouldBe(value);
         
         
         

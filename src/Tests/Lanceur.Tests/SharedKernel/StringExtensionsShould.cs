@@ -24,49 +24,49 @@ public class StringExtensionsShould
     public void ReturnFalseOnEmtyUsingNullOrWhiteSpace()
     {
         var s = string.Empty;
-        s.Should().BeNullOrEmpty();
+        s.ShouldBeNullOrEmpty();
     }
 
     [Fact]
     public void ReturnFalseOnEmtyWhenUsingNullOrEmpty()
     {
         var s = string.Empty;
-        s.Should().BeNullOrEmpty();
+        s.ShouldBeNullOrEmpty();
     }
 
     [Theory, InlineData("tostring", "tostring"), InlineData("tostring", "TOSTRING"), InlineData("tostring", "ToString"), InlineData("", ""), InlineData(null, null)]
-    public void ReturnLowerString(string expected, string actual) { actual.ToLowerString().Should().Be(expected); }
+    public void ReturnLowerString(string expected, string actual) { actual.ToLowerString().ShouldBe(expected); }
 
     [Theory, InlineData("firstvalue", EnumValues.FirstValue), InlineData("secondvalue", EnumValues.SecondValue), InlineData("thirdvalue", EnumValues.ThirdValue), InlineData("fourthvalue", EnumValues.FourthValue)]
-    public void ReturnLowerStringFromEnum(string expected, EnumValues actual) { actual.ToLowerString().Should().Be(expected); }
+    public void ReturnLowerStringFromEnum(string expected, EnumValues actual) { actual.ToLowerString().ShouldBe(expected); }
 
     [Fact]
     public void ReturnTrueOnEmptyUsingNullOrWhiteSpace()
     {
         var s = string.Empty;
 
-        s.Should().BeNullOrWhiteSpace();
+        s.ShouldBeNullOrWhiteSpace();
     }
 
     [Fact]
     public void ReturnTrueOnNullUsingNullOrEmpty()
     {
         string s = null;
-        s.Should().BeNullOrEmpty();
+        s.ShouldBeNullOrEmpty();
     }
 
     [Fact]
     public void ReturnTrueOnNullUsingNullOrWhiteSpace()
     {
         string s = null;
-        s.Should().BeNullOrWhiteSpace();
+        s.ShouldBeNullOrWhiteSpace();
     }
 
     [Theory, InlineData("un"), InlineData("deux")]
-    public void ReturnTrueOnTextUsingNullOrEmpty(string value) { value.Should().NotBeNullOrEmpty(); }
+    public void ReturnTrueOnTextUsingNullOrEmpty(string value) { value.ShouldNotBeNullOrEmpty(); }
 
     [Theory, InlineData("un"), InlineData("deux")]
-    public void ReturnTrueOnTextUsingNullOrWhiteSpace(string value) { value.Should().NotBeNullOrWhiteSpace(); }
+    public void ReturnTrueOnTextUsingNullOrWhiteSpace(string value) { value.ShouldNotBeNullOrWhiteSpace(); }
 
     #endregion Methods
 }

@@ -93,12 +93,11 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 await viewModel.SaveCurrentAliasCommand.ExecuteAsync(cmdline);
 
                 // ASSERT
-                using (new AssertionScope())
-                {
-                    viewModel.SelectedAlias.Should().NotBeNull();
-                    viewModel.Aliases.Should().HaveCount(4);
-                    viewModel.SelectedAlias!.Name.Should().Be(parameters);
-                }
+                Assert.Multiple(
+                    () => viewModel.SelectedAlias.ShouldNotBeNull(),
+                    () => viewModel.Aliases.Count.ShouldBe(4),
+                    () => viewModel.SelectedAlias!.Name.ShouldBe(parameters)
+                );
             },
             sqlBuilder
         );
@@ -130,9 +129,9 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 var res = db.WithConnection(c => c.Query<DynamicAlias<string>>(sql))
                             .ToArray();
 
-                res.Length.Should().Be(1);
+                res.Length.ShouldBe(1);
                 var alias = res[0];
-                alias.FieldValue.Should().Be(script);
+                alias.FieldValue.ShouldBe(script);
             },
             Sql.Empty
         );
@@ -160,15 +159,13 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
 
                 // ASSERT
-                using (new AssertionScope())
-                {
-                    viewModel.SelectedAlias.Should().NotBeNull();
-                    viewModel.Aliases.Should().HaveCount(4);
-
-                    viewModel.SelectedAlias!.Id.Should().Be(0);
-                    viewModel.SelectedAlias!.Name.Should().Be(parameters);
-                    viewModel.SelectedAlias!.Synonyms.Should().Be(parameters);
-                }
+                Assert.Multiple(
+                    () => viewModel.SelectedAlias.ShouldNotBeNull(),
+                    () => viewModel.Aliases.Count.ShouldBe(4),
+                    () => viewModel.SelectedAlias!.Id.ShouldBe(0),
+                    () => viewModel.SelectedAlias!.Name.ShouldBe(parameters),
+                    () => viewModel.SelectedAlias!.Synonyms.ShouldBe(parameters)
+                );
             },
             sqlBuilder
         );
@@ -214,15 +211,12 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[]) [name] }))
                                .ToArray();
 
-                using (new AssertionScope())
-                {
-                    result.Length.Should().BeGreaterThan(0);
-
-                    var alias = result[0];
-                    alias.Id.Should().BeGreaterThan(0);
-                    alias.Name.Should().Be(name);
-                    alias.FieldValue.Should().BeTrue("the field 'deleted_at' has to indicate deletion");
-                }
+                Assert.Multiple(
+                    () => result.Length.ShouldBeGreaterThan(0),
+                    () => result[0].Id.ShouldBeGreaterThan(0),
+                    () => result[0].Name.ShouldBe(name),
+                    () => result[0].FieldValue.ShouldBeTrue("the field 'deleted_at' has to indicate deletion")
+                );
             },
             Sql.Empty,
             visitors
@@ -289,7 +283,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 // ASSERT
                 const string sql = "select count(*) from alias_argument";
                 var count = db.WithConnection(c => c.ExecuteScalar(sql));
-                count.Should().Be(1);
+                count.ShouldBe(1);
             },
             Sql.Empty,
             visitors
@@ -317,7 +311,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 viewModel.SearchCommand.Execute(criterion);
 
                 // ASSERT
-                viewModel.Aliases.Should().HaveCount(3);
+                viewModel.Aliases.Count.ShouldBe(3);
             },
             sqlBuilder
         );
@@ -370,17 +364,14 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql));
                 result = result.ToArray();
 
-                using (new AssertionScope())
-                {
+                Assert.Multiple(
                     // This is the warning saying the alias name is already used for a deleted alias
-                    userNotificationService.Received().Warning(Arg.Any<string>(), Arg.Any<string>());
-
-                    result.Should().HaveCount(1);
-                    var alias = result.First();
-                    alias.Id.Should().BeGreaterThan(0);
-                    alias.Name.Should().Be(name);
-                    alias.FieldValue.Should().BeTrue("because the alias has been deleted logically");
-                }
+                    () => userNotificationService.Received().Warning(Arg.Any<string>(), Arg.Any<string>()),
+                    () => result.Count().ShouldBe(1),
+                    () => result.First().Id.ShouldBeGreaterThan(0),
+                    () => result.First().Name.ShouldBe(name),
+                    () => result.First().FieldValue.ShouldBeTrue("because the alias has been deleted logically")
+                );
             },
             Sql.Empty,
             visitors
@@ -423,7 +414,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 // ASSERT
                 const string sql = "select count(*) from alias_argument";
                 var count = db.WithConnection(c => c.ExecuteScalar(sql));
-                count.Should().Be(2);
+                count.ShouldBe(2);
             },
             sqlBuilder,
             visitors
@@ -463,8 +454,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 // ASSERT
                 const string sql = "select count(*) from alias";
                 db.WithConnection(c => c.ExecuteScalar<int>(sql))
-                  .Should()
-                  .Be(0);
+                  .ShouldBe(0);
             },
             Sql.Empty,
             visitors
@@ -487,10 +477,10 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             async (viewModel, _) =>
             {
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(2);
+                viewModel.Aliases.Count.ShouldBe(2);
 
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
-                viewModel.Aliases.Should().HaveCount(2);
+                viewModel.Aliases.Count.ShouldBe(2);
             },
             builder,
             visitor
@@ -526,11 +516,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 viewModel.SearchCommand.Execute(string.Empty);
 
                 // ASSERT
-                using (new AssertionScope())
-                {
-                    viewModel.Aliases.Should()
-                             .HaveCount(countToAdd - 1, "because the alias has been deleted logically");
-                }
+                viewModel.Aliases.Count.ShouldBe(countToAdd - 1, "because the alias has been deleted logically");
             },
             Sql.Empty,
             visitors
@@ -551,7 +537,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 // ACT
                 await viewModel.CreateNewAlias(name, luaScript: script);
 
-                viewModel.SelectedAlias.Should().NotBeNull("it is already selected for update");
+                viewModel.SelectedAlias.ShouldNotBeNull("it is already selected for update");
                 viewModel.SelectedAlias!.LuaScript = script2;
                 await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null);
 
@@ -568,9 +554,9 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 var res = db.WithConnection(c => c.Query<DynamicAlias<string>>(sql))
                             .ToArray();
 
-                res.Length.Should().Be(1);
+                res.Length.ShouldBe(1);
                 var alias = res[0];
-                alias.FieldValue.Should().Be(script2);
+                alias.FieldValue.ShouldBe(script2);
             },
             Sql.Empty
         );

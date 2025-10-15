@@ -28,7 +28,7 @@ public class UserInteractionServiceShould : IDisposable
         var response = await sut.InteractAsync(userControl);
 
         // ASSERT
-        response.DataContext.Should().Be(viewModel);
+        response.DataContext.ShouldBe(viewModel);
     }
 
     [WpfFact]
@@ -46,7 +46,7 @@ public class UserInteractionServiceShould : IDisposable
         var response = await sut.InteractAsync(userControl, dataContext: viewModel);
 
         // ASSERT
-        response.DataContext.Should().Be(viewModel);
+        response.DataContext.ShouldBe(viewModel);
     }
 
     #endregion

@@ -9,13 +9,13 @@ public class QueryResultShould
 {
     #region Methods
 
-    [Fact] public void HaveEmptyNameByDefault() => new TestQueryResult().Name.Should().BeEmpty();
+    [Fact] public void HaveEmptyNameByDefault() => new TestQueryResult().Name.ShouldBeEmpty();
 
     [Fact]
     public void HaveEmptyQueryByDefault()
     {
         var query = new TestQueryResult().OriginatingQuery;
-        query.Should().NotBeNull();
+        query.ShouldNotBeNull();
     }
 
     [Theory]
@@ -28,10 +28,10 @@ public class QueryResultShould
         var queryResult = new AliasQueryResult { Description = description, FileName = fileName };
 
         // ACT && ASSERT
-        queryResult.DescriptionDisplay.Should().Be(expected);
+        queryResult.DescriptionDisplay.ShouldBe(expected);
     }
 
-    [Fact] public void HaveNullDescriptionByDefault() { new TestQueryResult().Description.Should().BeNull(); }
+    [Fact] public void HaveNullDescriptionByDefault() { new TestQueryResult().Description.ShouldBeNull(); }
 
     [Theory]
     [InlineData("un, deux,trois,quatre,cinq", 5)]
@@ -47,15 +47,14 @@ public class QueryResultShould
         var names = queryResult.Synonyms.SplitCsv();
 
         // ASSERT
-        using (new AssertionScope())
-        {
-            names.Should().HaveCount(count);
-            _ = names.Select(x => x.Should().NotStartWith(" "));
-            _ = names.Select(x => x.Should().NotEndWith(" "));
-        }
+        Assert.Multiple(
+            () =>  names.Length.ShouldBe(count),
+            () =>  Assert.All(names, x => x.ShouldNotStartWith(" ")),
+            () =>  Assert.All(names, x => x.ShouldNotEndWith(" "))
+        );
     }
 
-    [Fact] public void HaveZeroCountByDefault() { new TestQueryResult().Count.Should().Be(0); }
+    [Fact] public void HaveZeroCountByDefault() { new TestQueryResult().Count.ShouldBe(0); }
 
     #endregion
 

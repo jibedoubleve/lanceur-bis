@@ -30,8 +30,7 @@ public class ScriptManagerShould
 
         scripts.After(ver)
                .Count()
-               .Should()
-               .Be(expectedCount);
+               .ShouldBe(expectedCount);
     }
 
     [Fact]
@@ -39,7 +38,9 @@ public class ScriptManagerShould
     {
         var manager = new ScriptManager(Asm, Pattern);
 
-        manager.ListResources().Should().HaveCount(Count);
+        manager.ListResources()
+               .Count()
+               .ShouldBe(Count);
     }
 
     [Fact]
@@ -47,7 +48,7 @@ public class ScriptManagerShould
     {
         var manager = new ScriptManager(Asm, Pattern);
 
-        manager.GetResource("Lanceur.Tests.Libraries.Scripts.script-0.1.sql").Should().NotBeNull();
+        manager.GetResource("Lanceur.Tests.Libraries.Scripts.script-0.1.sql").ShouldNotBeNull();
     }
 
     [Fact]
@@ -55,14 +56,14 @@ public class ScriptManagerShould
     {
         var manager = new ScriptManager(Asm, Pattern);
 
-        foreach (var script in manager.GetScripts()) script.Should().NotBeNullOrEmpty();
+        foreach (var script in manager.GetScripts()) script.ShouldNotBeNullOrEmpty();
     }
 
     [Fact]
     public void ReturnDictionaryOfResources()
     {
         var manager = new ScriptManager(Asm, Pattern);
-        manager.GetResources().Should().HaveCount(Count);
+        manager.GetResources().Count.ShouldBe(Count);
     }
 
     [Fact]
@@ -71,14 +72,14 @@ public class ScriptManagerShould
         var version = new Version(0, 2, 1);
         var manager = new ScriptManager(Asm, Pattern);
 
-        manager.GetScripts().MaxVersion().Should().Be(version);
+        manager.GetScripts().MaxVersion().ShouldBe(version);
     }
 
     [Fact]
     public void ReturnPackOfScripts()
     {
         var manager = new ScriptManager(Asm, Pattern);
-        manager.GetScripts().Should().HaveCount(Count);
+        manager.GetScripts().Count().ShouldBe(Count);
     }
 
     [Theory]
@@ -92,7 +93,7 @@ public class ScriptManagerShould
 
         var scripts = manager.GetScripts();
 
-        scripts[ver].Should().NotBeNull();
+        scripts[ver].ShouldNotBeNull();
     }
 
     [Theory]
@@ -104,7 +105,7 @@ public class ScriptManagerShould
         var dico = new Dictionary<Version, string> { { new("1.0.0"), "" }, { new("1.0.1"), "" }, { new("1.1.1"), "" } };
         var scripts = new ScriptCollection(dico);
 
-        scripts.After(new(version)).Should().HaveCount(count);
+        scripts.After(new(version)).Count().ShouldBe(count);
     }
 
     #endregion

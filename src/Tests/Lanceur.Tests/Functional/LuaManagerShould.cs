@@ -44,12 +44,11 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = luaScript, Context = new() { FileName = url, Parameters = parameter } }
         );
-        using (new AssertionScope())
-        {
-            result.Should().NotBeNull();
-            result.Context.FileName.Should().Be(url);
-            result.Context.Parameters.Should().Be(expectedParameter);
-        }
+        Assert.Multiple(
+            () =>  result.ShouldNotBeNull(),
+            () =>  result.Context.FileName.ShouldBe(url),
+            () =>  result.Context.Parameters.ShouldBe(expectedParameter)
+        );
     }
     
     [Theory]
@@ -78,11 +77,10 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = luaScript, Context = new() { FileName = "", Parameters = parameter } }
         );
-        using (new AssertionScope())
-        {
-            result.Should().NotBeNull();
-            result.Context.FileName.Should().Be(expectedFilename);
-        }
+        Assert.Multiple(
+          ()=>  result.ShouldNotBeNull(),
+          ()=>  result.Context.FileName.ShouldBe(expectedFilename)
+        );
     }
 
     [Fact]
@@ -91,10 +89,11 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = null, Context = new() { FileName = null, Parameters = null } }
         );
-        using var _ = new AssertionScope();
-        result.Should().NotBeNull();
-        result.Context.FileName.Should().NotBeNull();
-        result.Context.Parameters.Should().NotBeNull();
+        Assert.Multiple(
+            () => result.ShouldNotBeNull(),
+            () => result.Context.FileName.ShouldNotBeNull(),
+            () => result.Context.Parameters.ShouldNotBeNull()
+        );
     }
 
     [Fact]
@@ -107,12 +106,12 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = luaScript, Context = new() { FileName   = url, Parameters = "unhandled_case" } }
         );
-        using var _ = new AssertionScope();
-        result.Should().NotBeNull();
-        result.Exception.Should().NotBeNull();
-
-        result.Context.FileName.Should().BeEmpty();
-        result.Context.Parameters.Should().BeEmpty();
+        Assert.Multiple(
+            () => result.ShouldNotBeNull(),
+            () => result.Exception.ShouldNotBeNull(),
+            () => result.Context.FileName.ShouldBeEmpty(),
+            () => result.Context.Parameters.ShouldBeEmpty()
+        );
     }
 
     [Fact]
@@ -126,11 +125,12 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = luaScript, Context = new() { FileName   = url, Parameters = parameters } }
         );
-        using var _ = new AssertionScope();
-        result.Should().NotBeNull();
-        result.Context.Should().NotBeNull();
-        result.Context.FileName.Should().Be(url);
-        result.Context.Parameters.Should().Be(parameters);
+        Assert.Multiple(
+            () => result.ShouldNotBeNull(),
+            () => result.Context.ShouldNotBeNull(),
+            () => result.Context.FileName.ShouldBe(url),
+            () => result.Context.Parameters.ShouldBe(parameters)
+        );
     }
 
     #endregion

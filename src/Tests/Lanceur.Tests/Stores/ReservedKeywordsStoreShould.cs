@@ -60,9 +60,7 @@ public class ReservedKeywordsStoreShould
         var store = GetStore(repository, typeof(MainView));
         var query = new Cmdline(criterion);
 
-        store.Search(query)
-             .Should()
-             .HaveCount(1);
+        store.Search(query).Count().ShouldBe(1);
     }
 
     [Fact]
@@ -90,10 +88,10 @@ public class ReservedKeywordsStoreShould
         var result = store.Search(Cmdline.Empty)
                           .ToArray();
 
-        result.Should().HaveCount(1);
+        result.Length.ShouldBe(1);
         var current = result.First();
-        current.Count.Should().Be(count);
-        current.Id.Should().Be(id);
+        current.Count.ShouldBe(count);
+        current.Id.ShouldBe(id);
     }
 
     #endregion

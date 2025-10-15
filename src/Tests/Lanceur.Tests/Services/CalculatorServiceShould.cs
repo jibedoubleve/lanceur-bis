@@ -57,7 +57,7 @@ public class CalculatorServiceShould
         var regex = new Regex(calculator!.ValidationRegex);
 
         _output.WriteLine($"Expression: {operation}");
-        regex.IsMatch(operation).Should().BeTrue("'operation' is valid");
+        regex.IsMatch(operation).ShouldBeTrue("'operation' is valid");
     }
 
     [Theory]
@@ -74,7 +74,7 @@ public class CalculatorServiceShould
         var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
         var regex = new Regex(calculator!.ValidationRegex);
-        regex.IsMatch(expression).Should().BeTrue();
+        regex.IsMatch(expression).ShouldBeTrue();
     }
 
     [Theory]
@@ -85,11 +85,10 @@ public class CalculatorServiceShould
             new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output)
         );
 
-        using (new AssertionScope())
-        {
-            calculator.Evaluate(expression).IsError.Should().BeTrue();
-            calculator.Evaluate(expression).Result.Should().NotBeNull();
-        }
+        Assert.Multiple(
+            () => calculator.Evaluate(expression).IsError.ShouldBeTrue(),
+            () => calculator.Evaluate(expression).Result.ShouldNotBeNull()
+        );
     }
 
     [Theory]
@@ -106,12 +105,11 @@ public class CalculatorServiceShould
             new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output)
         );
 
-        using (new AssertionScope())
-        {
-            var result = calculator.Evaluate(expression);
-            result.IsError.Should().BeFalse();
-            result.Result.Should().Be(expected);
-        }
+        var result = calculator.Evaluate(expression);
+        Assert.Multiple(
+            () => result.IsError.ShouldBeFalse(),
+            () => result.Result.ShouldBe(expected)
+        );
     }
 
     #endregion
