@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using FluentAssertions.Execution;
+﻿using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel.Extensions;
 using Xunit;

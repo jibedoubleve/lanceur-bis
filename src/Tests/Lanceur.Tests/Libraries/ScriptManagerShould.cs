@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using System.SQLite.Updater;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Libraries;

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using System.Web.Bookmarks;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;

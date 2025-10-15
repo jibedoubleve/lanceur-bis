@@ -1,8 +1,7 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 using Dapper;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Mappers;

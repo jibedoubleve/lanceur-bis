@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using Everything.Wrapper;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;

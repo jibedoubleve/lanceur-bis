@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;

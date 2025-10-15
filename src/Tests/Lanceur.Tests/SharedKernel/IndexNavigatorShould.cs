@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using Lanceur.SharedKernel.Extensions;
 using NSubstitute.Core;
 using Xunit;

@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Constants;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;

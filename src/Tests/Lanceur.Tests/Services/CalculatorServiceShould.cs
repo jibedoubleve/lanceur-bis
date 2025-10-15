@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Logging;
 using Lanceur.Tests.Tooling.Logging;

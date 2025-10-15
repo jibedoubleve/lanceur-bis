@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tooling;

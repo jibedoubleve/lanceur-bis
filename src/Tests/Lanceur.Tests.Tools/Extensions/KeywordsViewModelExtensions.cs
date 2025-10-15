@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Ui.Core.ViewModels.Pages;
 
 namespace Lanceur.Tests.Tools.Extensions;

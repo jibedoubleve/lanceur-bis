@@ -1,6 +1,5 @@
 ﻿using Dapper;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;

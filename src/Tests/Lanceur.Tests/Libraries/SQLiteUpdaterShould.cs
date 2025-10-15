@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.SQLite.Updater;
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Tests.Tools;
 using Xunit;
 

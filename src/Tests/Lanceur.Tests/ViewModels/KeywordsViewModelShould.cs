@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;

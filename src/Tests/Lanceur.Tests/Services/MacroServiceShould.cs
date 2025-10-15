@@ -1,8 +1,7 @@
 ﻿using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;

@@ -1,5 +1,4 @@
-using FluentAssertions;
-using FluentAssertions.Execution;
+using Shouldly;
 using Lanceur.Core.BusinessLogic;
 using Xunit;
 

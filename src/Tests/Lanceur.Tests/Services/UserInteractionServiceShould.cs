@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.Messaging;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.WPF.Services;
 using Xunit;

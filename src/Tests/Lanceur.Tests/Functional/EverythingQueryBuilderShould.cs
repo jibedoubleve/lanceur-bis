@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Infra.Stores.Everything;
 using Xunit;
 

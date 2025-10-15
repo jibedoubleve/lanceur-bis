@@ -1,5 +1,5 @@
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Infra.SQLite.DataAccess;

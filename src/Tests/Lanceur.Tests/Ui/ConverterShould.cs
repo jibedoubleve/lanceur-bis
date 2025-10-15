@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Globalization;
 using System.Windows.Data;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Infra.Stores;
 using Lanceur.Ui.WPF.Converters;
 using Xunit;

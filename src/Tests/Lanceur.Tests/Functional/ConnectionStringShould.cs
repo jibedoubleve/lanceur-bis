@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using System.Text.RegularExpressions;
 using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;

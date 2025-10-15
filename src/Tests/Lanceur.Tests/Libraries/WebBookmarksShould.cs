@@ -1,7 +1,7 @@
 using System.Web.Bookmarks;
 using System.Web.Bookmarks.Repositories;
 using System.Web.Bookmarks.RepositoryConfiguration;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

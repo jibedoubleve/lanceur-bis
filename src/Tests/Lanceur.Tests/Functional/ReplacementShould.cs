@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;

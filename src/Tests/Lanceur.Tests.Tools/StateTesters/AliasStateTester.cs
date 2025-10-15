@@ -1,5 +1,5 @@
 using Bogus;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel;
 using Xunit;

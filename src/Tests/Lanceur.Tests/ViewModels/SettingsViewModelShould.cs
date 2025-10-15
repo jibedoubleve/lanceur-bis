@@ -1,5 +1,5 @@
 using Dapper;
-using FluentAssertions;
+using Shouldly;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
