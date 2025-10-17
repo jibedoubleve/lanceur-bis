@@ -272,10 +272,10 @@ public class SearchServiceShould : TestBase
         var result = (await searchService.SearchAsync(new(criterion))).ToArray();
 
         // ASSERT
-        Assert.Multiple(
-            () => result.Length.ShouldBe(2),
-            () => result.First().Name.ShouldBe("u"),
-            () => result.First().Id.ShouldBe(4000)
+        result.ShouldSatisfyAllConditions(
+            r => r.Length.ShouldBe(2),
+            r => r.First().Name.ShouldBe("u"),
+            r => r.First().Id.ShouldBe(4000)
         );
     }
 
@@ -303,9 +303,9 @@ public class SearchServiceShould : TestBase
 
         var result = (await service.SearchAsync(query)).ToArray();
 
-        Assert.Multiple(
-            () => result.Length.ShouldBe(1),
-            () => result.ElementAt(0).IsResult.ShouldBeFalse()
+        result.ShouldSatisfyAllConditions(
+            r => r.Length.ShouldBe(1),
+            r => r.ElementAt(0).IsResult.ShouldBeFalse()
         );
     }
 

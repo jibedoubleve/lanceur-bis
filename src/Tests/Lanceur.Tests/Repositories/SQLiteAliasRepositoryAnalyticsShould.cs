@@ -86,9 +86,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         aliases.Length.ShouldBe(gen.IdSequence);
         // assert
-        Assert.Multiple(
-            () => Assert.All(aliases, a => a.Count.ShouldBe(2)),
-            () =>  Assert.All(aliases, a => a.LastUsedAt.ShouldBe(date1))
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, a => a.Count.ShouldBe(2)),
+            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
         );
     }
 
@@ -147,9 +147,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         // assert
             aliases.Length.ShouldBe(gen.IdSequence);
-            Assert.Multiple(
-                () => Assert.All(aliases, a => a.Count.ShouldBe(count)),
-                () => Assert.All(aliases, a => a.LastUsedAt.ShouldBe(date1))
+            aliases.ShouldSatisfyAllConditions(
+                col => Assert.All(col, a => a.Count.ShouldBe(count)),
+                col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
             );
     }
 
@@ -200,9 +200,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         // assert
             aliases.Length.ShouldBe(gen.IdSequence);
-            Assert.Multiple(
-                () => Assert.All(aliases, a => a.Count.ShouldBe(2)),
-                () => Assert.All(aliases, a => a.LastUsedAt.ShouldBe(date1))
+            aliases.ShouldSatisfyAllConditions(
+                col => Assert.All(col, a => a.Count.ShouldBe(2)),
+                col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
             );
     }
 
@@ -257,9 +257,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         // assert
             aliases.Length.ShouldBe(gen.IdSequence);
-            Assert.Multiple(
-                () => Assert.All(aliases, a => a.Count.ShouldBe(count)),
-                () => Assert.All(aliases, a => a.LastUsedAt.ShouldBe(date1))
+            aliases.ShouldSatisfyAllConditions(
+                col => Assert.All(col, a => a.Count.ShouldBe(count)),
+                col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
             );
     }
 
@@ -317,9 +317,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         // assert
         aliases.Length.ShouldBe(3);
-        Assert.Multiple(
-            () => Assert.All(aliases, alias => alias.Count.ShouldBe(count)),
-            () => Assert.All(aliases, alias => alias.LastUsedAt.ShouldBe(date1))
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, alias => alias.Count.ShouldBe(count)),
+            col => Assert.All(col, alias => alias.LastUsedAt.ShouldBe(date1))
         );
     }
 
@@ -379,9 +379,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         // assert
         aliases.Length.ShouldBe(2);
-        Assert.Multiple(
-            () => Assert.All(aliases, alias => alias.Count.ShouldBe(count)),
-            () => Assert.All(aliases, alias => alias.LastUsedAt.ShouldBe(date1))
+        aliases.ShouldSatisfyAllConditions(
+            a => Assert.All(a, alias => alias.Count.ShouldBe(count)),
+            a => Assert.All(a, alias => alias.LastUsedAt.ShouldBe(date1))
         );
     }
 
@@ -403,9 +403,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-        Assert.Multiple(
-            () => aliases.Length.ShouldBe(4),
-            () => aliases[0].ShouldBe(name)
+        aliases.ShouldSatisfyAllConditions(
+            a => a.Length.ShouldBe(4),
+            a => a[0].ShouldBe(name)
         );
     }
 
@@ -452,9 +452,9 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         // assert
         aliases.Length.ShouldBe(4);
-        Assert.Multiple(
-            () => Assert.All(aliases, alias =>  alias.Count.ShouldBe(2)),
-            () => Assert.All(aliases, alias =>  alias.LastUsedAt.ShouldBe(date1))
+        aliases.ShouldSatisfyAllConditions(
+            a => Assert.All(a, alias =>  alias.Count.ShouldBe(2)),
+            a => Assert.All(a, alias =>  alias.LastUsedAt.ShouldBe(date1))
         );
     }
 

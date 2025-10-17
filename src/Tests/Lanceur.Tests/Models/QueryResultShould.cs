@@ -47,10 +47,10 @@ public class QueryResultShould
         var names = queryResult.Synonyms.SplitCsv();
 
         // ASSERT
-        Assert.Multiple(
-            () =>  names.Length.ShouldBe(count),
-            () =>  Assert.All(names, x => x.ShouldNotStartWith(" ")),
-            () =>  Assert.All(names, x => x.ShouldNotEndWith(" "))
+        names.ShouldSatisfyAllConditions(
+            n =>  n.Length.ShouldBe(count),
+            n =>  Assert.All(n, x => x.ShouldNotStartWith(" ")),
+            n =>  Assert.All(n, x => x.ShouldNotEndWith(" "))
         );
     }
 

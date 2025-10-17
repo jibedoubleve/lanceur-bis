@@ -85,9 +85,9 @@ public class CalculatorServiceShould
             new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output)
         );
 
-        Assert.Multiple(
-            () => calculator.Evaluate(expression).IsError.ShouldBeTrue(),
-            () => calculator.Evaluate(expression).Result.ShouldNotBeNull()
+        calculator.ShouldSatisfyAllConditions(
+            c => c.Evaluate(expression).IsError.ShouldBeTrue(),
+            c => c.Evaluate(expression).Result.ShouldNotBeNull()
         );
     }
 
@@ -106,9 +106,9 @@ public class CalculatorServiceShould
         );
 
         var result = calculator.Evaluate(expression);
-        Assert.Multiple(
-            () => result.IsError.ShouldBeFalse(),
-            () => result.Result.ShouldBe(expected)
+        result.ShouldSatisfyAllConditions(
+            r => r.IsError.ShouldBeFalse(),
+            r => r.Result.ShouldBe(expected)
         );
     }
 

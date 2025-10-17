@@ -97,9 +97,9 @@ public class SQLiteAliasRepositoryShould : TestBase
         // ACT & ASSERT
         // -- Find the alias
         var alias = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
-        Assert.Multiple(
-            () => alias.Id.ShouldBe(1001, "this is the id of the alias to find"),
-            () => alias.ShouldNotBeNull("the search matches one alias")
+        alias.ShouldSatisfyAllConditions(
+            a => a.Id.ShouldBe(1001, "this is the id of the alias to find"),
+            a => a.ShouldNotBeNull("the search matches one alias")
         );
 
         // -- Add new names to the alias and save it
@@ -110,9 +110,9 @@ public class SQLiteAliasRepositoryShould : TestBase
 
         // -- Retrieve back the alias and check the names
         var found = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
-        Assert.Multiple(
-            () => found.ShouldNotBeNull(),
-            () => found.Synonyms.SplitCsv().Length.ShouldBe(5)
+        found.ShouldSatisfyAllConditions(
+            f => f.ShouldNotBeNull(),
+            f => f.Synonyms.SplitCsv().Length.ShouldBe(5)
         );
     }
 
@@ -135,9 +135,9 @@ public class SQLiteAliasRepositoryShould : TestBase
         var found = c.WithinTransaction(tx => action.GetById(tx, 100));
 
         // ASSERT
-        Assert.Multiple(
-            () => found.ShouldNotBeNull(),
-            () => found.Name.ShouldBe("noname")
+        found.ShouldSatisfyAllConditions(
+            f => f.ShouldNotBeNull(),
+            f => f.Name.ShouldBe("noname")
         );
     }
 
@@ -336,11 +336,11 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sut = connection.Query<AliasQueryResult>(sql, new { id = alias.Id })
                             .Single();
         // ASSERT
-        Assert.Multiple(
-            () => sut.ShouldNotBeNull(),
-            () => sut.Id.ShouldNotBe(0),
-            () => sut.Name.ShouldBe(name),
-            () => sut.RunAs.ShouldBe(RunAs.Admin)
+        sut.ShouldSatisfyAllConditions(
+            s => s.ShouldNotBeNull(),
+            s => s.Id.ShouldNotBe(0),
+            s => s.Name.ShouldBe(name),
+            s => s.RunAs.ShouldBe(RunAs.Admin)
         );
     }
 
@@ -422,9 +422,9 @@ public class SQLiteAliasRepositoryShould : TestBase
             // ASSERT
             const string sql2 = "select count(*) from alias where id = 256";
             const string sql3 = "select count(*) from alias_name where id_alias = 256";
-            Assert.Multiple(
-                () => connection.ExecuteScalar<int>(sql2).ShouldBe(0),
-                () => connection.ExecuteScalar<int>(sql3).ShouldBe(0)
+            connection.ShouldSatisfyAllConditions(
+                co => co.ExecuteScalar<int>(sql2).ShouldBe(0),
+                co => co.ExecuteScalar<int>(sql3).ShouldBe(0)
             );
     }
 
@@ -476,10 +476,10 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sut = service.Search("admin").ToArray();
 
         // ASSERT
-        Assert.Multiple(
-            () => sut.ShouldNotBeEmpty(),
-            () => sut.Length.ShouldBe(1),
-            () => sut.ElementAt(0).RunAs.ShouldBe(RunAs.Admin)
+        sut.ShouldSatisfyAllConditions(
+            s => s.ShouldNotBeEmpty(),
+            s => s.Length.ShouldBe(1),
+            s => s.ElementAt(0).RunAs.ShouldBe(RunAs.Admin)
         );
     }
 

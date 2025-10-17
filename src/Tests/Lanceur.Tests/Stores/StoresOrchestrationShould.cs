@@ -156,9 +156,9 @@ public class StoresOrchestrationShould
 
         var result = await searchService.SearchAsync(Cmdline.Parse(query));
         result = result.ToArray();
-        Assert.Multiple(
-            () => result.Count().ShouldBe(1),
-            () => result.ElementAt(0).Name.ShouldBe(expected)
+        result.ShouldSatisfyAllConditions(
+            r => r.Count().ShouldBe(1),
+            r => r.ElementAt(0).Name.ShouldBe(expected)
         );
     }
     [Theory]
@@ -186,8 +186,10 @@ public class StoresOrchestrationShould
             // ASSERT
             Assert.Multiple(
                 () => regex.IsMatch(query).ShouldBeTrue(),
-                () => results.Count.ShouldBeGreaterThan(0),
-                () => results.ElementAt(0).Name.ShouldBe(result)
+                () => results.ShouldSatisfyAllConditions(
+                    r => r.Count.ShouldBeGreaterThan(0),
+                    r => r.ElementAt(0).Name.ShouldBe(result)
+                )
             );
     }
 

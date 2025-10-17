@@ -146,9 +146,9 @@ public class MacroServiceShould : TestBase
                              .ToArray();
 
         //Assert
-        Assert.Multiple(
-            () => results.Length.ShouldBe(1),
-            () => results.ElementAt(0).IsMacro().ShouldBeTrue()
+        results.ShouldSatisfyAllConditions(
+            r => r.Length.ShouldBe(1),
+            r => r.ElementAt(0).IsMacro().ShouldBeTrue()
         );
     }
 
@@ -209,7 +209,7 @@ public class MacroServiceShould : TestBase
 
         // Assert
         var composite = results.ElementAt(0) as CompositeAliasQueryResult;
-        Assert.Multiple(
+        composite.ShouldSatisfyAllConditions(
             () => composite.ShouldNotBeNull(),
             () => composite?.Aliases.ElementAt(index).Delay.ShouldBe(delay)
         );
@@ -257,9 +257,9 @@ public class MacroServiceShould : TestBase
                              .ToArray();
 
         // Assert
-        Assert.Multiple(
-            () => results.Length.ShouldBe(1),
-            () => results.ElementAt(0).IsMacro().ShouldBeFalse()
+        results.ShouldSatisfyAllConditions(
+            r => r.Length.ShouldBe(1),
+            r => r.ElementAt(0).IsMacro().ShouldBeFalse()
         );
     }
 
@@ -298,9 +298,9 @@ public class MacroServiceShould : TestBase
         output.Length.ShouldBe(1);
         
         var macro = output.ElementAt(0);
-        Assert.Multiple(
-            () => macro.Id.ShouldBe(expectedId),
-            () => macro.Count.ShouldBe(expectedCount)
+        macro.ShouldSatisfyAllConditions(
+            m => m.Id.ShouldBe(expectedId),
+            m => m.Count.ShouldBe(expectedCount)
         );
     }
     [Fact]
@@ -326,9 +326,9 @@ public class MacroServiceShould : TestBase
                                     .ExpandMacroAlias(queryResults)
                                     .ToArray();
 
-        Assert.Multiple(
-            () => output.GetDoubloons().Count().ShouldBe(0),
-            () => output.Length.ShouldBe(3)
+        output.ShouldSatisfyAllConditions(
+            o => o.GetDoubloons().Count().ShouldBe(0),
+            o => o.Length.ShouldBe(3)
         );
     }
 

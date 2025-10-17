@@ -43,7 +43,7 @@ public class TextToParameterParserShould
     {
         var parser = new TextToParameterParser();
         var result = parser.Parse(additionalParameters);
-        Assert.Multiple(
+        result.ShouldSatisfyAllConditions(
             () => result.ShouldNotBeNull(),
             () => result.Success.ShouldBeTrue(),
             () => result.Parameters.Count().ShouldBe(parameterCount)
