@@ -39,13 +39,12 @@ public class CurrentVersionShould
     [MemberData(nameof(FeedCreateCurrentVersionFromFullVersion))]
     public void CreateCurrentVersionFromFullVersion(string fullVersion, string version, string suffix, string commit)
     {
-        var v = CurrentVersion.FromFullVersion(fullVersion);
-
-        Assert.Multiple(
-            () => v.Commit.ShouldBe(commit),
-            () => v.Version.ShouldBe(new(version)),
-            () => v.Suffix.ShouldBe(suffix)
-        );
+        CurrentVersion.FromFullVersion(fullVersion)
+                      .ShouldSatisfyAllConditions(
+                          v => v.Commit.ShouldBe(commit),
+                          v => v.Version.ShouldBe(new(version)),
+                          v => v.Suffix.ShouldBe(suffix)
+                      );
     }
 
     #endregion

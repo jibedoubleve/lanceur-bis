@@ -93,10 +93,10 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 await viewModel.SaveCurrentAliasCommand.ExecuteAsync(cmdline);
 
                 // ASSERT
-                Assert.Multiple(
-                    () => viewModel.SelectedAlias.ShouldNotBeNull(),
-                    () => viewModel.Aliases.Count.ShouldBe(4),
-                    () => viewModel.SelectedAlias!.Name.ShouldBe(parameters)
+                viewModel.ShouldSatisfyAllConditions(
+                    vm => vm.SelectedAlias.ShouldNotBeNull(),
+                    vm => vm.Aliases.Count.ShouldBe(4),
+                    vm => vm.SelectedAlias!.Name.ShouldBe(parameters)
                 );
             },
             sqlBuilder
@@ -159,12 +159,12 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
 
                 // ASSERT
-                Assert.Multiple(
-                    () => viewModel.SelectedAlias.ShouldNotBeNull(),
-                    () => viewModel.Aliases.Count.ShouldBe(4),
-                    () => viewModel.SelectedAlias!.Id.ShouldBe(0),
-                    () => viewModel.SelectedAlias!.Name.ShouldBe(parameters),
-                    () => viewModel.SelectedAlias!.Synonyms.ShouldBe(parameters)
+                viewModel.ShouldSatisfyAllConditions(
+                    vm => vm.SelectedAlias.ShouldNotBeNull(),
+                    vm => vm.Aliases.Count.ShouldBe(4),
+                    vm => vm.SelectedAlias!.Id.ShouldBe(0),
+                    vm => vm.SelectedAlias!.Name.ShouldBe(parameters),
+                    vm => vm.SelectedAlias!.Synonyms.ShouldBe(parameters)
                 );
             },
             sqlBuilder
@@ -211,11 +211,11 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[]) [name] }))
                                .ToArray();
 
-                Assert.Multiple(
-                    () => result.Length.ShouldBeGreaterThan(0),
-                    () => result[0].Id.ShouldBeGreaterThan(0),
-                    () => result[0].Name.ShouldBe(name),
-                    () => result[0].FieldValue.ShouldBeTrue("the field 'deleted_at' has to indicate deletion")
+                result.ShouldSatisfyAllConditions(
+                    r => r.Length.ShouldBeGreaterThan(0),
+                    r => r[0].Id.ShouldBeGreaterThan(0),
+                    r => r[0].Name.ShouldBe(name),
+                    r => r[0].FieldValue.ShouldBeTrue("the field 'deleted_at' has to indicate deletion")
                 );
             },
             Sql.Empty,
@@ -365,12 +365,14 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 result = result.ToArray();
 
                 Assert.Multiple(
+                    () => result.ShouldSatisfyAllConditions(
+                        r => r.Count().ShouldBe(1),
+                        r => r.First().Id.ShouldBeGreaterThan(0),
+                        r => r.First().Name.ShouldBe(name),
+                        r => r.First().FieldValue.ShouldBeTrue("because the alias has been deleted logically")
+                    ),
                     // This is the warning saying the alias name is already used for a deleted alias
-                    () => userNotificationService.Received().Warning(Arg.Any<string>(), Arg.Any<string>()),
-                    () => result.Count().ShouldBe(1),
-                    () => result.First().Id.ShouldBeGreaterThan(0),
-                    () => result.First().Name.ShouldBe(name),
-                    () => result.First().FieldValue.ShouldBeTrue("because the alias has been deleted logically")
+                    () => userNotificationService.Received().Warning(Arg.Any<string>(), Arg.Any<string>())
                 );
             },
             Sql.Empty,

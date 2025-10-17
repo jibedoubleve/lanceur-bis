@@ -44,10 +44,10 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = luaScript, Context = new() { FileName = url, Parameters = parameter } }
         );
-        Assert.Multiple(
-            () =>  result.ShouldNotBeNull(),
-            () =>  result.Context.FileName.ShouldBe(url),
-            () =>  result.Context.Parameters.ShouldBe(expectedParameter)
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldBe(url),
+            r => r.Context.Parameters.ShouldBe(expectedParameter)
         );
     }
     
@@ -77,9 +77,9 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = luaScript, Context = new() { FileName = "", Parameters = parameter } }
         );
-        Assert.Multiple(
-          ()=>  result.ShouldNotBeNull(),
-          ()=>  result.Context.FileName.ShouldBe(expectedFilename)
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldBe(expectedFilename)
         );
     }
 
@@ -89,10 +89,10 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = null, Context = new() { FileName = null, Parameters = null } }
         );
-        Assert.Multiple(
-            () => result.ShouldNotBeNull(),
-            () => result.Context.FileName.ShouldNotBeNull(),
-            () => result.Context.Parameters.ShouldNotBeNull()
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldNotBeNull(),
+            r => r.Context.Parameters.ShouldNotBeNull()
         );
     }
 
@@ -106,11 +106,11 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = luaScript, Context = new() { FileName   = url, Parameters = "unhandled_case" } }
         );
-        Assert.Multiple(
-            () => result.ShouldNotBeNull(),
-            () => result.Exception.ShouldNotBeNull(),
-            () => result.Context.FileName.ShouldBeEmpty(),
-            () => result.Context.Parameters.ShouldBeEmpty()
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Exception.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldBeEmpty(),
+            r => r.Context.Parameters.ShouldBeEmpty()
         );
     }
 
@@ -125,11 +125,11 @@ public class LuaManagerShould
         var result = LuaManager.ExecuteScript(
             new() { Code = luaScript, Context = new() { FileName   = url, Parameters = parameters } }
         );
-        Assert.Multiple(
-            () => result.ShouldNotBeNull(),
-            () => result.Context.ShouldNotBeNull(),
-            () => result.Context.FileName.ShouldBe(url),
-            () => result.Context.Parameters.ShouldBe(parameters)
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Context.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldBe(url),
+            r => r.Context.Parameters.ShouldBe(parameters)
         );
     }
 

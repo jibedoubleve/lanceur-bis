@@ -98,16 +98,16 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 await viewModel.DeletePermanentlyCommand.ExecuteAsync(null);
 
                 // assert
-                db.WithConnection(c =>
+                db.WithConnection(connection =>
                     {
-                        Assert.Multiple(
-                            () => c.ExecuteScalar("select count(*) from alias_usage where id_alias = 1")
+                        connection.ShouldSatisfyAllConditions(
+                            c => c.ExecuteScalar("select count(*) from alias_usage where id_alias = 1")
                                    .ShouldBe(0, "usage should be cleared"),
-                            () => c.ExecuteScalar("select count(*) from alias_name where id_alias = 1")
+                            c => c.ExecuteScalar("select count(*) from alias_name where id_alias = 1")
                                    .ShouldBe(0, "names should be cleared"),
-                            () => c.ExecuteScalar("select count(*) from alias_argument where id_alias = 1")
+                            c => c.ExecuteScalar("select count(*) from alias_argument where id_alias = 1")
                                    .ShouldBe(0, "arguments should be cleared"),
-                            () => c.ExecuteScalar("select count(*) from alias where id = 1")
+                            c => c.ExecuteScalar("select count(*) from alias where id = 1")
                                    .ShouldBe(0, "alias should be cleared")
                         );
                     }
@@ -366,10 +366,10 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                     const string sql = "select name from alias_argument where id_alias = @IdAlias";
                     const string sql2 = "select name from alias_name where id_alias = @IdAlias";
                     const string sql3 = "select id from alias_usage where id_alias = @IdAlias";
-                    Assert.Multiple(
-                        () => db.WithConnection(c => c.Query<string>(sql, new { IdAlias = 1 })).Count().ShouldBe(4),
-                        () => db.WithConnection(c => c.Query<string>(sql2, new { IdAlias = 1 })).Count().ShouldBe(6),
-                        () => db.WithConnection(c => c.Query<string>(sql3, new { IdAlias = 1 })).Count().ShouldBe(8)
+                    db.ShouldSatisfyAllConditions(
+                        d => d.WithConnection(c => c.Query<string>(sql, new { IdAlias = 1 })).Count().ShouldBe(4),
+                        d => d.WithConnection(c => c.Query<string>(sql2, new { IdAlias = 1 })).Count().ShouldBe(6),
+                        d => d.WithConnection(c => c.Query<string>(sql3, new { IdAlias = 1 })).Count().ShouldBe(8)
                     );
             },
             sqlBuilder,
@@ -417,17 +417,17 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 await viewModel.DeletePermanentlyCommand.ExecuteAsync(null);
 
                 // assert
-                db.WithConnection(c =>
+                db.WithConnection(connection =>
                     {
-                        Assert.Multiple(
-                            () => c.ExecuteScalar<long>("select count(*) from alias_usage where id_alias = 1")
-                                   .ShouldBeGreaterThan(0, "usage should be cleared"),
-                            () => c.ExecuteScalar<long>("select count(*) from alias_name where id_alias = 1")
-                                   .ShouldBeGreaterThan(0, "names should be cleared"),
-                            () => c.ExecuteScalar<long>("select count(*) from alias_argument where id_alias = 1")
-                                   .ShouldBeGreaterThan(0, "arguments should be cleared"),
-                            () => c.ExecuteScalar<long>("select count(*) from alias where id = 1")
-                                   .ShouldBeGreaterThan(0, "alias should be cleared")
+                        connection.ShouldSatisfyAllConditions(
+                            c => c.ExecuteScalar<long>("select count(*) from alias_usage where id_alias = 1")
+                                  .ShouldBeGreaterThan(0, "usage should be cleared"),
+                            c => c.ExecuteScalar<long>("select count(*) from alias_name where id_alias = 1")
+                                  .ShouldBeGreaterThan(0, "names should be cleared"),
+                            c => c.ExecuteScalar<long>("select count(*) from alias_argument where id_alias = 1")
+                                  .ShouldBeGreaterThan(0, "arguments should be cleared"),
+                            c => c.ExecuteScalar<long>("select count(*) from alias where id = 1")
+                                  .ShouldBeGreaterThan(0, "alias should be cleared")
                         );
                     }
                 );

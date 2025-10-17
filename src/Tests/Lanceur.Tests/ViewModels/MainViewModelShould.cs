@@ -135,9 +135,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                 await viewModel.SearchCommand.ExecuteAsync(null);
 
                 // ASSERT done in ServiceCollectionConfigurator
-                Assert.Multiple(
-                    () => viewModel.Results.Count.ShouldBeGreaterThan(0),
-                    () => viewModel.Results.ElementAt(0).Name.ShouldBe(result)
+                viewModel.ShouldSatisfyAllConditions(
+                    vm => vm.Results.Count.ShouldBeGreaterThan(0),
+                    vm => vm.Results.ElementAt(0).Name.ShouldBe(result)
                 );
             }
         );
@@ -193,9 +193,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                     await viewModel.DisplayResultsIfAllowed();
                     await viewModel.SearchCommand.ExecuteAsync(null);
 
-                    Assert.Multiple(
-                        () => viewModel.Results.Count.ShouldBe(expectedCount),
-                        () => viewModel.Results.Count.ShouldBe(expectedCount)
+                    viewModel.ShouldSatisfyAllConditions(
+                        vm => vm.Results.Count.ShouldBe(expectedCount),
+                        vm => vm.Results.Count.ShouldBe(expectedCount)
                     );
             },
             sqlBuilder,
