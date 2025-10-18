@@ -10,4 +10,4 @@ jobs:
       - name: Get the sources
         uses: actions/checkout@v1
       - name: Run the Cake script
-        uses: cake-build/cake-action@v1
+        uses: cake-build/cake-action@v3

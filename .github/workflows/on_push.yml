@@ -32,7 +32,7 @@ jobs:
         run: choco install innosetup -y        
         
       - name: Run the Cake script
-        uses: cake-build/cake-action@v1
+        uses: cake-build/cake-action@v3
         env: 
           CAKE_PUBLIC_GITHUB_TOKEN: ${{secrets.CAKE_PUBLIC_GITHUB_TOKEN}}
           CAKE_PUBLIC_GITHUB_USERNAME: ${{secrets.CAKE_PUBLIC_GITHUB_USERNAME}}
