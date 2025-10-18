@@ -210,7 +210,7 @@ public class ExecutionService : IExecutionService
                 _logger.LogInformation("Executing self executable {Name}", name);
                 exec.IsElevated = request.ExecuteWithPrivilege;
                 return ExecutionResponse.FromResults(
-                    await exec.ExecuteAsync(Cmdline.Parse(request.OriginatingQuery))
+                    await exec.ExecuteAsync(Cmdline.Parse(request.QueryResult.OriginatingQuery))
                 );
 
             default:
@@ -228,7 +228,7 @@ public class ExecutionService : IExecutionService
         foreach (var queryResult in queryResults)
         {
             currentDelay += delay;
-            _ = ExecuteAsync(new() { QueryResult = queryResult }, currentDelay);
+            _ = ExecuteAsync(new(queryResult), currentDelay);
         }
 
         return ExecutionResponse.NoResult;

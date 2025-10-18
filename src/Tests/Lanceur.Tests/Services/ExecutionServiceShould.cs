@@ -67,14 +67,10 @@ public class ExecutionServiceShould : TestBase
         clipboard.RetrieveText().Returns(parameters);
         var executionService = CreateExecutionService(processLauncher, clipboard);
 
-        var request = new ExecutionRequest
-        {
-            OriginatingQuery = originatingQuery,
-            QueryResult = new AliasQueryResult
-            {
-                FileName = actual, OriginatingQuery = cmdline, Parameters = parameters
-            }
-        };
+        var request = new ExecutionRequest(
+            new AliasQueryResult { FileName = actual, OriginatingQuery = cmdline, Parameters = parameters },
+            Cmdline.Parse(originatingQuery)
+        );
 
         // act
         await executionService.ExecuteAsync(request);
@@ -106,14 +102,10 @@ public class ExecutionServiceShould : TestBase
 
         var executionService = CreateExecutionService(processLauncher, clipboard);
 
-        var request = new ExecutionRequest
-        {
-            OriginatingQuery = originatingQuery,
-            QueryResult = new AliasQueryResult
-            {
-                FileName = "alias", Parameters = parameters, OriginatingQuery = cmdline
-            }
-        };
+        var request = new ExecutionRequest(
+            new AliasQueryResult { FileName = "alias", Parameters = parameters },
+            cmdline
+        );
 
         // act
         await executionService.ExecuteAsync(request);
@@ -144,15 +136,11 @@ public class ExecutionServiceShould : TestBase
         var cmdline = Cmdline.Parse(originatingQuery);
         var executionService = CreateExecutionService(processLauncher);
 
-        var request = new ExecutionRequest
-        {
-            OriginatingQuery = originatingQuery,
-            ExecuteWithPrivilege = false,
-            QueryResult = new AliasQueryResult
-            {
-                FileName = fileName, Parameters = parameters, OriginatingQuery = cmdline
-            }
-        };
+        var request = new ExecutionRequest(
+            new AliasQueryResult { FileName = fileName, Parameters = parameters, OriginatingQuery = cmdline },
+            Cmdline.Parse(originatingQuery),
+            false
+        );
 
         // act
         await executionService.ExecuteAsync(request);
@@ -178,10 +166,7 @@ public class ExecutionServiceShould : TestBase
                  .BuildServiceProvider();
 
         var macro = new MultiMacro(sp);
-        var request = new ExecutionRequest
-        {
-            OriginatingQuery = cmdline, ExecuteWithPrivilege = false, QueryResult = macro
-        };
+        var request = new ExecutionRequest(macro, cmdline, false);
 
         try { await executionService.ExecuteAsync(request); }
         catch (Exception) { Assert.Fail("This should not throw an exception"); }
@@ -213,10 +198,7 @@ public class ExecutionServiceShould : TestBase
                                         .BuildServiceProvider();
 
         var macro = new GithubIssueMacro(sp);
-        var request = new ExecutionRequest
-        {
-            OriginatingQuery = cmdline, ExecuteWithPrivilege = false, QueryResult = macro
-        };
+        var request = new ExecutionRequest(macro, cmdline, false);
 
         try
         {
@@ -238,16 +220,12 @@ public class ExecutionServiceShould : TestBase
         // arrange
         const string queryParameters = "hello world";
         const string originatingQuery = $"alias {queryParameters}";
-
-        var cmdline = Cmdline.Parse(originatingQuery);
+        
         var processLauncher = Substitute.For<IProcessLauncher>();
         var executionService = CreateExecutionService(processLauncher);
 
-        var request = new ExecutionRequest
-        {
-            OriginatingQuery = originatingQuery,
-            ExecuteWithPrivilege = false,
-            QueryResult = new AliasQueryResult
+        var request = new ExecutionRequest(
+            new AliasQueryResult
             {
                 FileName = "alias",
                 LuaScript = """
@@ -255,10 +233,11 @@ public class ExecutionServiceShould : TestBase
                                 context.Parameters = "wrongParameters"
                             end
                             return context
-                            """,
-                OriginatingQuery = cmdline
-            }
-        };
+                            """
+            },
+            Cmdline.Parse(originatingQuery),
+            false
+        );
 
         // act
         await executionService.ExecuteAsync(request);
@@ -310,14 +289,10 @@ public class ExecutionServiceShould : TestBase
         var processLauncher = Substitute.For<IProcessLauncher>();
         var executionService = CreateExecutionService(processLauncher);
         var cmdline = Cmdline.Parse(originatingQuery);
-        var request = new ExecutionRequest
-        {
-            OriginatingQuery = originatingQuery,
-            QueryResult = new AliasQueryResult
-            {
-                FileName = fileName, LuaScript = script, OriginatingQuery = cmdline
-            }
-        };
+        var request = new ExecutionRequest(
+            new AliasQueryResult { FileName = fileName, LuaScript = script, OriginatingQuery = cmdline },
+            cmdline
+        );
 
         // act
         await executionService.ExecuteAsync(request);
@@ -353,17 +328,16 @@ public class ExecutionServiceShould : TestBase
         var processLauncher = Substitute.For<IProcessLauncher>();
         var executionService = CreateExecutionService(processLauncher);
 
-        var request = new ExecutionRequest
-        {
-            OriginatingQuery = originatingQuery,
-            QueryResult = new AliasQueryResult
+        var request = new ExecutionRequest(
+            new AliasQueryResult
             {
                 FileName = "alias",
                 LuaScript = script,
                 OriginatingQuery = cmdline,
                 Parameters = queryParameter
-            }
-        };
+            },
+            cmdline
+        );
 
         // act
         await executionService.ExecuteAsync(request);

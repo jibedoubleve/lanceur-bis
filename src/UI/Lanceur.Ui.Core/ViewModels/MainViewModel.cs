@@ -121,7 +121,7 @@ public partial class MainViewModel : ObservableObject
             }
 
             var response = await _executionService.ExecuteAsync(
-                new() { OriginatingQuery = Query, QueryResult = SelectedResult, ExecuteWithPrivilege = runAsAdmin }
+                new(SelectedResult, Cmdline.Parse(Query), runAsAdmin)
             );
 
             WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));

@@ -42,14 +42,17 @@ public class ReplacementComposite : IReplacement, IWildcardService
     /// <inheritdoc cref="IWildcardService" />
     public string Replace(string newText, string replacement)
     {
-        _logger.LogTrace("Before wildcard replacement: {Text}", replacement);
-
         var result = _replacements.Aggregate(
             newText,
             (current, text) => text.Replace(current, replacement)
         );
 
-        _logger.LogTrace("After wildcard replacement: {Text}", newText);
+        _logger.LogTrace(
+            "Replace text {Text} with {Replacement}. Replacement result: {Result}",
+            newText,
+            replacement.IsNullOrEmpty() ? replacement : "<EMPTY>",
+            result
+        );
         return result;
     }
 
