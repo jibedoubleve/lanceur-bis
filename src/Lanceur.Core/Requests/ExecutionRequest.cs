@@ -4,17 +4,24 @@ namespace Lanceur.Core.Requests;
 
 public record ExecutionRequest
 {
+    #region Constructors
+
+    public ExecutionRequest(QueryResult queryResult) : this(queryResult, queryResult.OriginatingQuery) { }
+
+    public ExecutionRequest(QueryResult queryResult, Cmdline originatingQuery, bool executeWithPrivilege = false)
+    {
+        QueryResult = queryResult;
+        queryResult.OriginatingQuery = originatingQuery;
+        ExecuteWithPrivilege = executeWithPrivilege;
+    }
+
+    #endregion
+
     #region Properties
 
-    public bool ExecuteWithPrivilege { get; init; }
+    public bool ExecuteWithPrivilege { get; }
 
-    /// <summary>
-    ///     The original query that led to the generation of this result.
-    /// </summary>
-    //TODO: check whether it is doubloon with QueryResult.OriginatingQuery
-    public string OriginatingQuery { get; init; }
-
-    public QueryResult QueryResult { get; init; }
+    public QueryResult QueryResult { get;  }
 
     #endregion
 }
