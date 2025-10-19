@@ -1,11 +1,33 @@
 using System.Diagnostics;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Mappers;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
 public class ProcessLauncherWin32 : IProcessLauncher
 {
+    #region Fields
+
+    private readonly ILogger<ProcessLauncherWin32> _logger;
+
+    private readonly IUserGlobalNotificationService _notificationService;
+
+    #endregion
+
+    #region Constructors
+
+    public ProcessLauncherWin32(
+        IUserGlobalNotificationService notificationService,
+        ILogger<ProcessLauncherWin32> logger
+    )
+    {
+        _notificationService = notificationService;
+        _logger = logger;
+    }
+
+    #endregion
+
     #region Methods
 
     /// <inheritdoc />
@@ -14,8 +36,23 @@ public class ProcessLauncherWin32 : IProcessLauncher
     /// <inheritdoc />
     public void Start(ProcessContext context)
     {
-        Process.Start(
-            context.ToProcessStartInfo()
+        var process = new Process { StartInfo = context.ToProcessStartInfo(), EnableRaisingEvents = true };
+
+        if (!process.Start()) _logger.LogInformation("Process {ProcessName} failed to start.", context.FileName);
+
+        _ = Task.Run(() =>
+            {
+                try
+                {
+                    _notificationService.StartBusyIndicator();
+                    process.WaitForInputIdle(5_000);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogInformation(ex, "Process {ProcessName} failed to start.", context.FileName);
+                }
+                finally { _notificationService.StopBusyIndicator(); }
+            }
         );
     }
 

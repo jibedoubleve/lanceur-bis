@@ -1,14 +1,35 @@
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Windows.Threading;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.Ui.WPF.Helpers;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Lanceur.Ui.WPF.Services;
 
 public class ToastUserNotificationService : IUserGlobalNotificationService
 {
+    #region Fields
+
+    private readonly LazyLoadedSynchronizationContext _dispatcher;
+    private readonly ILogger<ToastUserNotificationService> _logger;
+
+    #endregion
+
+    #region Constructors
+
+    public ToastUserNotificationService(LazyLoadedSynchronizationContext dispatcher, ILogger<ToastUserNotificationService> logger)
+    {
+        _dispatcher = dispatcher;
+        _logger = logger;
+    }
+
+    #endregion
+
     #region Methods
 
     private static string GetIconUri(Level level)
@@ -48,7 +69,6 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
             .Show();
     }
-
 
     /// <inheritdoc />
     public void Error(string message, Exception ex)
@@ -123,9 +143,25 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     }
 
     /// <inheritdoc />
+    public void StartBusyIndicator()
+    {
+        _logger.LogTrace("Starting Busy Indicator");
+        _dispatcher.Current.Post(_ => Mouse.OverrideCursor = Cursors.AppStarting, null);
+    }
+
+    /// <inheritdoc />
+    public void StopBusyIndicator()
+    {
+        _logger.LogTrace("Stopping Busy Indicator");
+        _dispatcher.Current.Post(_ => Mouse.OverrideCursor = null, null);
+        
+    }
+
+    /// <inheritdoc />
     public void Warning(string message) => Show(Level.Warning, message);
 
     #endregion
+
 
     #region Enums
 
