@@ -2,14 +2,33 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Lanceur.Ui.WPF.Services;
 
 public class ToastUserNotificationService : IUserGlobalNotificationService
 {
+    #region Fields
+
+    private readonly SynchronizationContext _dispatcher;
+    private readonly ILogger<ToastUserNotificationService> _logger;
+
+    #endregion
+
+    #region Constructors
+
+    public ToastUserNotificationService(SynchronizationContext dispatcher, ILogger<ToastUserNotificationService> logger)
+    {
+        _dispatcher = dispatcher;
+        _logger = logger;
+    }
+
+    #endregion
+
     #region Methods
 
     private static string GetIconUri(Level level)
@@ -123,16 +142,25 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     }
 
     /// <inheritdoc />
-    public void StartBusyIndicator() => Mouse.OverrideCursor = Cursors.AppStarting;
-    
+    public void StartBusyIndicator()
+    {
+        _logger.LogTrace("Starting Busy Indicator");
+        _dispatcher.Post(_ => Mouse.OverrideCursor = Cursors.AppStarting, null);
+    }
+
     /// <inheritdoc />
-    public void StopBusyIndicator() => Mouse.OverrideCursor = null;
+    public void StopBusyIndicator()
+    {
+        _logger.LogTrace("Stopping Busy Indicator");
+        _dispatcher.Post(_ => Mouse.OverrideCursor = null, null);
+        
+    }
 
     /// <inheritdoc />
     public void Warning(string message) => Show(Level.Warning, message);
 
     #endregion
-    
+
 
     #region Enums
 
