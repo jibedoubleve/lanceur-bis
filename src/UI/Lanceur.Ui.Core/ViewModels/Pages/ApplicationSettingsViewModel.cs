@@ -15,8 +15,6 @@ using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.Logging;
-using Serilog.Core;
-using Serilog.Events;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
@@ -44,11 +42,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
     private readonly ILogger<ApplicationSettingsViewModel> _logger;
-    private readonly LoggingLevelSwitch _loggingLevelSwitch;
     [ObservableProperty] private int _notificationDisplayDuration;
     [ObservableProperty] private int _refreshRate;
     [ObservableProperty] private double _searchDelay;
-    [ObservableProperty] private  LogEventLevel _selectedLogLevel;
+    [ObservableProperty] private  LogLevel _selectedLogLevel;
     [ObservableProperty] private ISettingsFacade _settings;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
@@ -66,7 +63,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
         ISettingsFacade settings,
-        LoggingLevelSwitch loggingLevelSwitch, //TODO: why Serilog leak here?
         IViewFactory viewFactory,
         IEnigma enigma
     )
@@ -75,14 +71,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(appRestartService);
         ArgumentNullException.ThrowIfNull(settings);
-        ArgumentNullException.ThrowIfNull(loggingLevelSwitch);
         ArgumentNullException.ThrowIfNull(viewFactory);
 
 
         _hubService = interactionHubService;
         _logger = logger;
         _settings = settings;
-        _loggingLevelSwitch = loggingLevelSwitch;
         _viewFactory = viewFactory;
         _enigma = enigma;
 
@@ -95,7 +89,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Key = hk.Key;
 
         // Logging
-        SelectedLogLevel = LogLevels.SingleOrDefault(e => e == _loggingLevelSwitch.MinimumLevel);
+        SelectedLogLevel = _settings.Local.MinimumLogLevel; 
 
         // Miscellaneous
         MapSettingsFromDbToUi();
@@ -112,8 +106,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     #region Properties
 
-    public ObservableCollection<LogEventLevel> LogLevels
-        => [LogEventLevel.Information, LogEventLevel.Debug, LogEventLevel.Verbose];
+    public static ObservableCollection<LogLevel> LogLevels => [LogLevel.Information, LogLevel.Debug, LogLevel.Critical];
 
     #endregion
 
@@ -256,12 +249,12 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         List<bool> reboot = [
             hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
-            Settings.Local.DbPath != DbPath
+            Settings.Local.DbPath != DbPath,
+            Settings.Local.MinimumLogLevel != SelectedLogLevel
         ];
 
         MapSettingsFromUiToDb();
-
-        _loggingLevelSwitch.MinimumLevel = SelectedLogLevel;
+        Settings.Local.MinimumLogLevel = SelectedLogLevel;
         Settings.Save();
 
         var needRestart = reboot.Any(r => r);

@@ -61,7 +61,11 @@ public static class ServiceCollectionExtensions
         ServiceProvider serviceProvider
     )
     {
-        var logEventLevel = new Conditional<LogEventLevel>(LogEventLevel.Debug, LogEventLevel.Information);
+        var settingsFacadeService = serviceProvider.GetRequiredService<SettingsFacadeService>();
+        var logEventLevel = new Conditional<LogEventLevel>(
+            LogEventLevel.Debug,
+            settingsFacadeService.GetMinimumLogLevel()
+        );
         var levelSwitch = new LoggingLevelSwitch(logEventLevel);
         var telemetry = serviceProvider.GetRequiredService<ISettingsFacade>().Local.Telemetry;
 
