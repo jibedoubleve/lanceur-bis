@@ -76,7 +76,8 @@
                             Margin="0,0,5,0"
                             Content="Shift"
                             IsChecked="{Binding IsShift}" />
-                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}" SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
+                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}"
+                                  SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
                     </StackPanel>
                 </ui:CardControl>
 
@@ -84,7 +85,8 @@
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Glass Effect" />
                     </ui:CardControl.Header>
-                    <ComboBox ItemsSource="{StaticResource WindowBackdropStyles}" SelectedItem="{Binding WindowBackdropStyle}" />
+                    <ComboBox ItemsSource="{StaticResource WindowBackdropStyles}"
+                              SelectedItem="{Binding WindowBackdropStyle}" />
 
                 </ui:CardControl>
 
@@ -136,7 +138,8 @@
 
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Search24}">
                     <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body" Text="Should the last query be shown when the search opens?" />
+                        <ui:TextBlock FontTypography="Body"
+                                      Text="Should the last query be shown when the search opens?" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:ToggleSwitch
@@ -180,7 +183,8 @@
                         <ui:TextBlock FontTypography="Body" Text="Source of the bookmarks" />
                     </ui:CardControl.Header>
                     <StackPanel>
-                        <ComboBox ItemsSource="{StaticResource Browsers}" SelectedItem="{Binding BookmarkSourceBrowser}" />
+                        <ComboBox ItemsSource="{StaticResource Browsers}"
+                                  SelectedItem="{Binding BookmarkSourceBrowser}" />
                     </StackPanel>
                 </ui:CardControl>
 
@@ -203,7 +207,8 @@
                     <StackPanel>
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body" Text="Should hidden files be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body"
+                                              Text="Should hidden files be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -215,7 +220,8 @@
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ShieldKeyhole24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body" Text="Should system files be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body"
+                                              Text="Should system files be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -227,7 +233,8 @@
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Run24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body" Text="Should only executable files be included in the results?" />
+                                <ui:TextBlock FontTypography="Body"
+                                              Text="Should only executable files be included in the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -239,7 +246,8 @@
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Delete24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body" Text="Should files in the Recycle Bin be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body"
+                                              Text="Should files in the Recycle Bin be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -377,10 +385,13 @@
 
                 <ui:CardControl Margin="5,0,5,12" Icon="{ui:SymbolIcon NoteBookError24}">
                     <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body" Text="Enable trace until the next restart" />
+                        <ui:TextBlock FontTypography="Body" Text="Minimum Log Detail" />
                     </ui:CardControl.Header>
+                    <ui:CardControl.ToolTip>
+                        Choose the lowest level of messages to include in the logs. More detailed levels show extra information, while higher levels show only warnings or errors.
+                    </ui:CardControl.ToolTip>
                     <StackPanel Orientation="Horizontal">
-                        <ComboBox ItemsSource="{Binding LogLevels}" SelectedItem="{Binding SelectedLogLevel}"/>
+                        <ComboBox ItemsSource="{Binding LogLevels}" SelectedItem="{Binding SelectedLogLevel}" />
                     </StackPanel>
                 </ui:CardControl>
 
@@ -391,7 +402,8 @@
                     <ui:CardControl.ToolTip>
                         Enter the API token from your GitHub account. It is used, among other things, to create new issues.
                     </ui:CardControl.ToolTip>
-                    <ui:PasswordBox Password="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter your API token" />
+                    <ui:PasswordBox Password="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    PlaceholderText="Enter your API token" />
                 </ui:CardControl>
 
                 <!--  Resource monitor settings  -->
