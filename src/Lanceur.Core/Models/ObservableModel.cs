@@ -69,7 +69,6 @@ public class ObservableModel : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
         if (ExcludedProperties.Contains(propertyName)) return false;
 
-        Trace.WriteLine($"Changing property {propertyName} to {value}");
         IsDirty = true;
         return true;
     }
