@@ -19,7 +19,9 @@ public static class SettingsFacadeServiceExtension
             LogLevel.Error       => LogEventLevel.Error,
             LogLevel.Critical    => LogEventLevel.Fatal,
             LogLevel.None        => LogEventLevel.Information,
-            _                    => throw new ArgumentOutOfRangeException()
+            _                    => throw new ArgumentOutOfRangeException(
+                $"The log level '{src.Local.MinimumLogLevel}' is not supported."
+            )
         };
     }
 
