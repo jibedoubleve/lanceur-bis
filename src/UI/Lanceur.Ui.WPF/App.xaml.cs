@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -201,6 +202,10 @@ public partial class App
                 Environment.Exit(0);
             }
         );
+        
+        /* Display application version in the logs
+         */
+        logger.LogVersion(Assembly.GetExecutingAssembly());
 
         /* Checks whether a database update is needed...
          */
