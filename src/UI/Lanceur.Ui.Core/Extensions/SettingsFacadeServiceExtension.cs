@@ -1,4 +1,4 @@
-using Lanceur.Infra.Repositories;
+using Lanceur.Core.Repositories.Config;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
 
@@ -8,7 +8,7 @@ public static class SettingsFacadeServiceExtension
 {
     #region Methods
 
-    public static LogEventLevel GetMinimumLogLevel(this SettingsFacadeService src)
+    public static LogEventLevel GetMinimumLogLevel(this ISettingsFacade src)
     {
         return src.Local.MinimumLogLevel switch
         {

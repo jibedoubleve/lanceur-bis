@@ -106,7 +106,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     #region Properties
 
-    public static ObservableCollection<LogLevel> LogLevels => [LogLevel.Information, LogLevel.Debug, LogLevel.Critical];
+    public static ObservableCollection<LogLevel> LogLevels => [LogLevel.Trace, LogLevel.Debug, LogLevel.Information];
 
     #endregion
 

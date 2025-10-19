@@ -61,7 +61,7 @@ public static class ServiceCollectionExtensions
         ServiceProvider serviceProvider
     )
     {
-        var settingsFacadeService = serviceProvider.GetRequiredService<SettingsFacadeService>();
+        var settingsFacadeService = serviceProvider.GetRequiredService<ISettingsFacade>();
         var logEventLevel = new Conditional<LogEventLevel>(
             LogEventLevel.Debug,
             settingsFacadeService.GetMinimumLogLevel()
