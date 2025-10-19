@@ -54,11 +54,6 @@ public partial class KeywordsViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(packagedAppSearchService);
         ArgumentNullException.ThrowIfNull(hubService);
 
-        WeakReferenceMessenger.Default.Register<AddAliasMessage>(
-            this,
-            (r, m) => ((KeywordsViewModel)r).OnCreateAlias(m)
-        );
-
         _validationService = validationService;
         _viewFactory = viewFactory;
         _packagedAppSearchService = packagedAppSearchService;
@@ -66,6 +61,30 @@ public partial class KeywordsViewModel : ObservableObject
         _thumbnailService = thumbnailService;
         _logger = logger;
         _hubService = hubService;
+
+        WeakReferenceMessenger.Default.Register<AddAliasMessage>(
+            this,
+            (r, m) => ((KeywordsViewModel)r).OnCreateAlias(m)
+        );
+        WeakReferenceMessenger.Default.Register<SaveAliasMessage>(
+            this,
+            async void (r, m) =>
+            {
+                try
+                {
+                    if (m.Value.Id <= 0) return;
+
+                    var viewModel = (KeywordsViewModel)r;
+                    await viewModel.SaveAliasAsync(m.Value);
+                    _logger.LogInformation("Update alias {Name}", m.Value.Name ?? "<EMPTY>");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to save current alias {Name}", m.Value.Name ?? "<EMPTY>");
+                    _hubService.Notifications.Warning($"Failed to save current alias '{m.Value.Name}'");
+                }
+            }
+        );
     }
 
     #endregion
@@ -77,6 +96,16 @@ public partial class KeywordsViewModel : ObservableObject
         get => _selectedAlias;
         set
         {
+            if (_selectedAlias?.IsDirty ?? false)
+            {
+                // Some changes are pending...
+                var response = _hubService.Interactions.AskAsync(
+                    $"Do you want to save the changes for alias '{SelectedAlias!.Name}'?"
+                );
+                if (response.Result) { WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new(SelectedAlias!)); }
+            }
+
+            value?.MarkUnchanged(); // Newly selected means no changed to be saved...
             SetProperty(ref _selectedAlias, value);
             SaveCurrentAliasCommand.NotifyCanExecuteChanged();
             DeleteCurrentAliasCommand.NotifyCanExecuteChanged();
@@ -200,15 +229,16 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnDeleteParameter(AdditionalParameter parameter)
     {
-        var response = await _hubService.Interactions.AskUserYesNoAsync(
+        var confirmed = await _hubService.Interactions.AskUserYesNoAsync(
             $"The parameter '{parameter.Name}' will disappear from the screen and be permanently deleted only after you save your changes. Do you want to continue?"
         );
 
-        if (!response) return;
+        if (!confirmed) return;
 
         var toRemove = SelectedAlias?.AdditionalParameters
                                     .SingleOrDefault(x => x.Id == parameter.Id);
         SelectedAlias?.AdditionalParameters.Remove(toRemove);
+        SelectedAlias?.MarkChanged();
     }
 
     [RelayCommand]
@@ -280,22 +310,7 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
     private async Task OnSaveCurrentAliasAsync()
     {
-        var result = _validationService.IsValid(SelectedAlias);
-        if (!result.IsSuccess)
-        {
-            _hubService.Notifications.Warning(result.ErrorContent, "Validation failed");
-            _logger.LogDebug("Validation failed for {AliasName}: {Errors}", SelectedAlias!.Name, result.ErrorContent);
-            _hubService.Notifications.Warning($"Alias validation failed:\n{result.ErrorContent}");
-            return;
-        }
-
-        _logger.LogDebug("Saving alias {AliasName}", SelectedAlias!.Name);
-
-        await _packagedAppSearchService.TryResolveDetailsAsync(SelectedAlias);
-
-        var alias = SelectedAlias;
-        await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));
-        _hubService.Notifications.Success($"Alias {alias.Name} created.", "Item created.");
+        await SaveAliasAsync(SelectedAlias!);
         await OnLoadAliases();
     }
 
@@ -332,6 +347,26 @@ public partial class KeywordsViewModel : ObservableObject
         if (!result.IsConfirmed) return;
 
         SelectedAlias.FileName = viewModel.SelectedPackagedApp?.AppUserModelId;
+    }
+
+    public async Task SaveAliasAsync(AliasQueryResult queryResult)
+    {
+        var result = _validationService.IsValid(queryResult);
+        if (!result.IsSuccess)
+        {
+            _hubService.Notifications.Warning(result.ErrorContent, "Validation failed");
+            _logger.LogDebug("Validation failed for {AliasName}: {Errors}", queryResult!.Name, result.ErrorContent);
+            _hubService.Notifications.Warning($"Alias validation failed:\n{result.ErrorContent}");
+            return;
+        }
+
+        _logger.LogDebug("Saving alias {AliasName}", queryResult!.Name);
+
+        await _packagedAppSearchService.TryResolveDetailsAsync(queryResult);
+
+        var alias = queryResult;
+        await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));
+        _hubService.Notifications.Success($"Alias '{alias.Name}' updated.", "Alias saved.");
     }
 
     #endregion

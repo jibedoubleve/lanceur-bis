@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace Lanceur.Core.Models;
@@ -8,6 +9,16 @@ public class ObservableModel : INotifyPropertyChanged
     #region Fields
 
     private bool _isDirty;
+
+    /// <summary>
+    ///     Properties that do not affect the dirty state when modified.
+    ///     For example, changing <see cref="Count" /> on a clean item keeps it clean.
+    /// </summary>
+    private static readonly IEnumerable<string> ExcludedProperties = [
+        nameof(IsDirty),
+        nameof(AliasQueryResult.Thumbnail),
+        nameof(AliasQueryResult.Count)
+    ];
 
     #endregion
 
@@ -56,19 +67,23 @@ public class ObservableModel : INotifyPropertyChanged
 
         field = value;
         OnPropertyChanged(propertyName);
-        if (propertyName != nameof(IsDirty)) IsDirty = true;
+        if (ExcludedProperties.Contains(propertyName)) return false;
+
+        Trace.WriteLine($"Changing property {propertyName} to {value}");
+        IsDirty = true;
         return true;
     }
+
+    /// <summary>
+    ///     Sets the <see cref="IsDirty" /> flag, marking the object as changed.
+    /// </summary>
+    public void MarkChanged() => IsDirty = true;
 
     /// <summary>
     ///     Resets the <see cref="IsDirty" /> flag, marking the object as unchanged.
     /// </summary>
     public void MarkUnchanged() => IsDirty = false;
 
-    /// <summary>
-    ///     Sets the <see cref="IsDirty" /> flag, marking the object as changed.
-    /// </summary>
-    public void MarkChanged()=> IsDirty = true;
     #endregion
 
     #region Events
