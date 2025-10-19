@@ -72,9 +72,14 @@ public partial class KeywordsViewModel : ObservableObject
             {
                 try
                 {
-                    if (m.Value.Id <= 0) return;
-
                     var viewModel = (KeywordsViewModel)r;
+                    
+                    // Some changes are pending...
+                    var confirmed = await _hubService.Interactions.AskAsync(
+                        $"Do you want to save the changes for alias '{SelectedAlias!.Name}'?"
+                    );
+                    if (!confirmed) return;
+
                     await viewModel.SaveAliasAsync(m.Value);
                     _logger.LogInformation("Update alias {Name}", m.Value.Name ?? "<EMPTY>");
                 }
@@ -98,11 +103,7 @@ public partial class KeywordsViewModel : ObservableObject
         {
             if (_selectedAlias?.IsDirty ?? false)
             {
-                // Some changes are pending...
-                var response = _hubService.Interactions.AskAsync(
-                    $"Do you want to save the changes for alias '{SelectedAlias!.Name}'?"
-                );
-                if (response.Result) { WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new(SelectedAlias!)); }
+                WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new(SelectedAlias!));
             }
 
             value?.MarkUnchanged(); // Newly selected means no changed to be saved...
