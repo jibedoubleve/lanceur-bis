@@ -8,6 +8,8 @@ public class KeepAliveMessage(bool value) : ValueChangedMessage<bool>(value);
 
 public class SetQueryMessage(string value) : ValueChangedMessage<string>(value);
 
+public class SaveAliasMessage(AliasQueryResult alias) : ValueChangedMessage<AliasQueryResult>(alias);
+
 public class ChangeCoordinateMessage(Coordinate value) : ValueChangedMessage<Coordinate>(value);
 
 /*
