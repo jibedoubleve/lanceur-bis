@@ -1,6 +1,7 @@
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -48,7 +49,6 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
             .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
             .Show();
     }
-
 
     /// <inheritdoc />
     public void Error(string message, Exception ex)
@@ -123,9 +123,16 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     }
 
     /// <inheritdoc />
+    public void StartBusyIndicator() => Mouse.OverrideCursor = Cursors.AppStarting;
+    
+    /// <inheritdoc />
+    public void StopBusyIndicator() => Mouse.OverrideCursor = null;
+
+    /// <inheritdoc />
     public void Warning(string message) => Show(Level.Warning, message);
 
     #endregion
+    
 
     #region Enums
 

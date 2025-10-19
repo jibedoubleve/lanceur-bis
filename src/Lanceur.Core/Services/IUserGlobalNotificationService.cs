@@ -14,13 +14,13 @@ public interface IUserGlobalNotificationService
     /// </summary>
     /// <param name="message">The error message to be displayed in the notification.</param>
     /// <param name="ex">The exception object containing detailed information about the error.</param>
-    public void Error(string message, Exception ex);
+    void Error(string message, Exception ex);
 
     /// <summary>
     ///     Displays a notification to inform the user of an error and provides additional details about the exception.
     /// </summary>
     /// <param name="message">The error message to be displayed in the notification.</param>
-    public void Error(string message);
+    void Error(string message);
 
     /// <summary>
     ///     Displays a notification to inform the user with general information.
@@ -42,6 +42,16 @@ public interface IUserGlobalNotificationService
     /// </summary>
     /// <param name="version">The new version that is available.</param>
     void NotifyNewVersionAvailable(Version version);
+
+    /// <summary>
+    ///     Starts displaying a visual indicator to inform the user that a background operation is in progress.
+    /// </summary>
+    void StartBusyIndicator();
+
+    /// <summary>
+    ///     Stops displaying the busy indicator, signaling that the background operation has completed.
+    /// </summary>
+    void StopBusyIndicator();
 
     /// <summary>
     ///     Displays a notification to warn the user about a potential issue.
