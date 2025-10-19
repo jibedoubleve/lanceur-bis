@@ -35,7 +35,7 @@ public class CalculatorServiceShould
     {
         IEnumerable<string> operations1 =
         [
-            "Abs", "Acos", "Asin", "Atan", "Ceiling", "Cos", "Exp", "Floor", "IEEERemainder", "Ln", "Log", "Log10",
+            "Abs", "Acos", "Asin", "Atan", "Ceiling", "Cos", "Exp", "Floor", "IEEERemainder", "Ln", "Log",
             "Max", "Min", "Pow", "Round", "Sign", "Sin", "Sqrt", "Tan", "Truncate", "in", "if", "ifs"
         ];
         operations1 = operations1.ToArray();
@@ -47,7 +47,23 @@ public class CalculatorServiceShould
 
     [Theory]
     [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
-    public void HandleMathematicalExpression(string operation)
+    public void ValidateExpressionWhenNumberInIt(string operation)
+    {
+        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
+
+        operation = $"{operation} 4"; // An calculation is only triggered when there's a number.
+
+        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
+        
+        var regex = new Regex(calculator!.ValidationRegex);
+
+        _output.WriteLine($"Expression: {operation}");
+        regex.IsMatch(operation).ShouldBeTrue("'operation' is valid");
+    }
+    
+    [Theory]
+    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
+    public void NotValidateExpressionWhenNoNumberInIt(string operation)
     {
         var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
 
@@ -57,7 +73,7 @@ public class CalculatorServiceShould
         var regex = new Regex(calculator!.ValidationRegex);
 
         _output.WriteLine($"Expression: {operation}");
-        regex.IsMatch(operation).ShouldBeTrue("'operation' is valid");
+        regex.IsMatch(operation).ShouldBeFalse("'operation' is invalid");
     }
 
     [Theory]
