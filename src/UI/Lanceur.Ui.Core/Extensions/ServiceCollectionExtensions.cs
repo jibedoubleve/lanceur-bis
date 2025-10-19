@@ -150,7 +150,6 @@ public static class ServiceCollectionExtensions
                                  ScriptRepository.DbScriptEmbeddedResourcePattern
                              )
                          )
-                         .AddSingleton(SynchronizationContext.Current ?? throw new ArgumentNullException(nameof(SynchronizationContext.Current)))
                          .AddTransient<IDataStoreVersionService, SQLiteVersionService>()
                          .AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()

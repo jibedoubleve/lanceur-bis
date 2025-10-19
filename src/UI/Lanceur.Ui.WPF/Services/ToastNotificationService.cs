@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.Ui.WPF.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Uwp.Notifications;
 
@@ -14,14 +15,14 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
 {
     #region Fields
 
-    private readonly SynchronizationContext _dispatcher;
+    private readonly LazyLoadedSynchronizationContext _dispatcher;
     private readonly ILogger<ToastUserNotificationService> _logger;
 
     #endregion
 
     #region Constructors
 
-    public ToastUserNotificationService(SynchronizationContext dispatcher, ILogger<ToastUserNotificationService> logger)
+    public ToastUserNotificationService(LazyLoadedSynchronizationContext dispatcher, ILogger<ToastUserNotificationService> logger)
     {
         _dispatcher = dispatcher;
         _logger = logger;
@@ -145,14 +146,14 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     public void StartBusyIndicator()
     {
         _logger.LogTrace("Starting Busy Indicator");
-        _dispatcher.Post(_ => Mouse.OverrideCursor = Cursors.AppStarting, null);
+        _dispatcher.Current.Post(_ => Mouse.OverrideCursor = Cursors.AppStarting, null);
     }
 
     /// <inheritdoc />
     public void StopBusyIndicator()
     {
         _logger.LogTrace("Stopping Busy Indicator");
-        _dispatcher.Post(_ => Mouse.OverrideCursor = null, null);
+        _dispatcher.Current.Post(_ => Mouse.OverrideCursor = null, null);
         
     }
 
