@@ -90,6 +90,16 @@ public class ThumbnailService : IThumbnailService
                 queryResult.MarkAsDirty();
             }
 
+            if (alias.FileName.IsNullOrEmpty())
+            {
+                _logger.LogWarning(
+                    "Alias {Name}, doesn't have file name configured (null value).\nAlias:\n{Json}",
+                    alias.Name,
+                    alias.ToJson()
+                );
+                return;
+            }
+
             alias.Thumbnail.CopyToImageRepository(alias.FileName);
             return;
         }

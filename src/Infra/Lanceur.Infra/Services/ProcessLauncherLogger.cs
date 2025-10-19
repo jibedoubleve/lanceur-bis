@@ -1,4 +1,5 @@
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
@@ -24,8 +25,8 @@ public class ProcessLauncherLogger : IProcessLauncher
 
     /// <inheritdoc />
     public void Start(ProcessContext context) => _logger.LogInformation(
-        "Executing process with context: {@ProcessContext}",
-        context
+        "Executing process with context: {ProcessContext}",
+        context.ToJson()
     );
 
     #endregion
