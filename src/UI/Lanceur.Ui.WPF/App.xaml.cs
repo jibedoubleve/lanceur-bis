@@ -67,6 +67,12 @@ public partial class App
 
     #endregion
 
+    #region Properties
+
+    public static SynchronizationContext? UiContext { get; private set; }
+
+    #endregion
+
     #region Methods
 
     private static void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -253,6 +259,9 @@ public partial class App
                     context => { logger.LogWarning(context.Exception, "En error occured while checking update."); },
                     TaskContinuationOptions.OnlyOnFaulted
                 );
+
+        base.OnStartup(e);
+        UiContext = SynchronizationContext.Current!;
     }
 
     #endregion

@@ -11,7 +11,7 @@ public class LazyLoadedSynchronizationContext
     /// <returns>The application's synchronization context.</returns>
     /// <exception cref="NullReferenceException">Thrown if the synchronization context is not yet available.</exception>
     public SynchronizationContext Current 
-        => SynchronizationContext.Current 
+        => App.UiContext 
            ?? throw new NullReferenceException("SynchronizationContext.Current is null.");
 
     #endregion
