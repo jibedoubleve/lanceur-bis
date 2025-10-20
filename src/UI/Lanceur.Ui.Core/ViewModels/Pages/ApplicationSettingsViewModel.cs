@@ -4,7 +4,6 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -245,7 +244,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         var hk = Configuration.Application.HotKey;
         var hash = (hk.ModifierKey, hk.Key).GetHashCode();
 
-        Configuration.Application.SetHotKey(GetHotKey(), Key);
+        hk.ModifierKey = GetHotKey();
+        hk.Key = Key;
 
         List<bool> reboot = [
             hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
