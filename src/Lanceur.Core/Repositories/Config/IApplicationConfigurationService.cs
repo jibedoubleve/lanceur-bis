@@ -1,6 +1,6 @@
-﻿using Lanceur.Core.Configuration;
+﻿using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Services;
 
 namespace Lanceur.Core.Repositories.Config;
 
-public interface IApplicationConfigurationService : IConfigurationService<ApplicationSettings> { }
+public interface IApplicationConfigurationService : IConfigurationService<ApplicationConfiguration> { }

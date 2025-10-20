@@ -1,4 +1,3 @@
-using System.Windows.Media.Animation;
 using Shouldly;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;

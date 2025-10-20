@@ -1,4 +1,4 @@
-﻿using Lanceur.Core.Configuration;
+﻿using Lanceur.Core.Configuration.Configurations;
 
 namespace Lanceur.Core.Repositories.Config;
 
@@ -7,7 +7,7 @@ public interface ISettingsFacade
     #region Properties
 
     DatabaseConfiguration Application { get; }
-    ApplicationSettings Local { get; }
+    ApplicationConfiguration Local { get; }
 
     #endregion
 

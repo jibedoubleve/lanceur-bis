@@ -15,8 +15,6 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using Serilog.Core;
-using Serilog.Events;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels;

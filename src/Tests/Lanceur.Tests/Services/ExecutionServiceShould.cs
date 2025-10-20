@@ -1,4 +1,4 @@
-﻿using Lanceur.Core.Configuration;
+﻿using Lanceur.Core.Configuration.Configurations;
 using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -10,7 +10,6 @@ using Lanceur.Infra.Macros;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Wildcards;
-using Lanceur.SharedKernel.DI;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Ui.Core.Extensions;

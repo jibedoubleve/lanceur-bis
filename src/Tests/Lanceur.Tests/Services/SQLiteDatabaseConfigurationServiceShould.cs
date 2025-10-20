@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Configurations;
 using Shouldly;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;

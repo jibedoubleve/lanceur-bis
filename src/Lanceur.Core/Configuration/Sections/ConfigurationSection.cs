@@ -1,7 +1,7 @@
 using System.Reflection;
 using Lanceur.Core.Repositories.Config;
 
-namespace Lanceur.Core.Configuration;
+namespace Lanceur.Core.Configuration.Sections;
 
 public class ConfigurationSection<T> : IWriteableSection<T>
     where T : class

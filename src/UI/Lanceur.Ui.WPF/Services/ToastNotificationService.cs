@@ -2,7 +2,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.WPF.Helpers;

@@ -1,11 +1,10 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Logging;

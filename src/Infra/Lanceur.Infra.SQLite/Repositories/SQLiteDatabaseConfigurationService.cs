@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.SQLite.DataAccess;

@@ -1,4 +1,4 @@
-namespace Lanceur.Core.Configuration;
+namespace Lanceur.Core.Configuration.Sections;
 
 public interface IWriteableSection<out T> : ISection<T>
 {

@@ -1,12 +1,13 @@
-﻿using Lanceur.Core.Constants;
+﻿using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Constants;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Core.Configuration;
+namespace Lanceur.Core.Configuration.Configurations;
 
 /// <summary>
 ///     Represents the configuration settings for the application.
 /// </summary>
-public class ApplicationSettings
+public class ApplicationConfiguration
 {
     #region Properties
 

@@ -7,7 +7,6 @@ using Humanizer;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
-using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Helpers;
 using Microsoft.Extensions.Logging;
 using Wpf.Ui;

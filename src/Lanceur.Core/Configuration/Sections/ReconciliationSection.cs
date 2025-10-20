@@ -1,7 +1,7 @@
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Configuration;
+namespace Lanceur.Core.Configuration.Sections;
 
 /// <summary>
 ///     Represents configuration settings used by the reconciliation tools.

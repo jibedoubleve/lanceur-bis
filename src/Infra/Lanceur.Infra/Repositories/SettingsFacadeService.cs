@@ -1,4 +1,4 @@
-﻿using Lanceur.Core.Configuration;
+﻿using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Repositories.Config;
 
 namespace Lanceur.Infra.Repositories;
@@ -25,7 +25,7 @@ public class SettingsFacadeService : ISettingsFacade
     #region Properties
 
     public DatabaseConfiguration Application => _databaseConfigurationService.Current;
-    public ApplicationSettings Local => _applicationConfigurationService.Current;
+    public ApplicationConfiguration Local => _applicationConfigurationService.Current;
 
     #endregion Properties
 

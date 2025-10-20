@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.ViewModels.Pages;

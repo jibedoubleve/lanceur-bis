@@ -4,6 +4,7 @@ using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
 using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;

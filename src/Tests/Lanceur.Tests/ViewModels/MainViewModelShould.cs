@@ -1,7 +1,7 @@
 using System.Reflection;
 using Shouldly;
 using Lanceur.Core;
-using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;

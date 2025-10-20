@@ -1,7 +1,8 @@
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Configuration;
+namespace Lanceur.Core.Configuration.Configurations;
 
 /// <summary>
 ///     Represents the configuration settings for the application.
@@ -78,19 +79,6 @@ public class DatabaseConfiguration
     ///     This includes dimensions, position, and other display-related preferences.
     /// </summary>
     public WindowSection Window { get; set; } = new();
-
-    #endregion
-}
-
-public static class DatabaseConfigurationExtensions
-{
-    #region Methods
-
-    public static void SetHotKey(this DatabaseConfiguration databaseConfiguration, int key, int modifierKey)
-    {
-        databaseConfiguration.HotKey.Key = key;
-        databaseConfiguration.HotKey.ModifierKey = modifierKey;
-    }
 
     #endregion
 }

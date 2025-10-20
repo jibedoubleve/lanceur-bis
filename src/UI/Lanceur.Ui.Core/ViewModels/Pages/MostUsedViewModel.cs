@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 

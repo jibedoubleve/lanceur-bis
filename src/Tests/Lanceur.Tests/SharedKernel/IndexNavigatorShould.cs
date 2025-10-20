@@ -1,6 +1,5 @@
 ﻿using Shouldly;
 using Lanceur.SharedKernel.Extensions;
-using NSubstitute.Core;
 using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;

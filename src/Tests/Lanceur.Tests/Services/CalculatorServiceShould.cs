@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Shouldly;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Logging;

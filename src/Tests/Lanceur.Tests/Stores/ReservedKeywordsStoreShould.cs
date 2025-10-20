@@ -2,7 +2,7 @@
 using System.Web.Bookmarks;
 using Shouldly;
 using Lanceur.Core;
-using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;

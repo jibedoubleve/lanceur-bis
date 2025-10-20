@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 
 namespace Lanceur.Ui.Core.ViewModels;
 

@@ -1,5 +1,5 @@
 using System.Windows;
-using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Models;
 
 namespace Lanceur.Ui.WPF.Helpers;
