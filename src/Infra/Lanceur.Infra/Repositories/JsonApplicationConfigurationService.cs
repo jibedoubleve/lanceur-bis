@@ -1,5 +1,5 @@
-﻿using Lanceur.Core.Constants;
-using Lanceur.Core.Models.Settings;
+﻿using Lanceur.Core.Configuration;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Extensions;

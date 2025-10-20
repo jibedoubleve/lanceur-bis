@@ -1,6 +1,7 @@
 using Lanceur.Core.Constants;
+using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Models.Settings;
+namespace Lanceur.Core.Configuration;
 
 /// <summary>
 ///     Represents the configuration settings for the application.

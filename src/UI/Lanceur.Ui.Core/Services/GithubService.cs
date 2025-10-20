@@ -1,5 +1,4 @@
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Octokit;

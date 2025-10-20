@@ -1,6 +1,6 @@
 using System.Data;
 using System.Data.SQLite;
-using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Utils;

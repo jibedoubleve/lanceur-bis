@@ -1,6 +1,6 @@
 ﻿using Shouldly;
 using System.Text.RegularExpressions;
-using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Microsoft.Extensions.Logging;

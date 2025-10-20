@@ -1,7 +1,7 @@
 ﻿using Lanceur.Core.Constants;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Core.Models.Settings;
+namespace Lanceur.Core.Configuration;
 
 /// <summary>
 ///     Represents the configuration settings for the application.

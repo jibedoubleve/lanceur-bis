@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using Lanceur.Core.Constants;
-using Lanceur.Core.Models.Settings;
 
 namespace Lanceur.Ui.WPF.Converters;
 

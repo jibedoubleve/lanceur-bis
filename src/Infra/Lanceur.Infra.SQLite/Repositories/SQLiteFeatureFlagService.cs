@@ -1,6 +1,6 @@
 using Dapper;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;

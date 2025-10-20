@@ -1,10 +1,10 @@
 using System.Reflection;
 using Shouldly;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;

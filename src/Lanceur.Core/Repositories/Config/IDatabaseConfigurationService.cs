@@ -1,4 +1,4 @@
-﻿using Lanceur.Core.Models.Settings;
+﻿using Lanceur.Core.Configuration;
 using Lanceur.Core.Services;
 
 namespace Lanceur.Core.Repositories.Config;

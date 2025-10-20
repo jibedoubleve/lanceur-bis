@@ -2,7 +2,6 @@ using Everything.Wrapper;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Extensions;

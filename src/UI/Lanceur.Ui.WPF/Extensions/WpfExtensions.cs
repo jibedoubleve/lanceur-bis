@@ -1,5 +1,5 @@
 using System.Windows.Input;
-using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Configuration;
 
 namespace Lanceur.Ui.WPF.Extensions;
 

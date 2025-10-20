@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Caching.Memory;
-
-namespace Lanceur.Core.Models.Settings;
+namespace Lanceur.Core.Configuration;
 
 public static class GithubSectionExtensions
 {

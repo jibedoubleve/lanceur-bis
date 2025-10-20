@@ -1,4 +1,4 @@
-namespace Lanceur.Core.Models.Settings;
+namespace Lanceur.Core.Configuration;
 
 /// <summary>
 ///     Represents a section of the store configuration, providing properties

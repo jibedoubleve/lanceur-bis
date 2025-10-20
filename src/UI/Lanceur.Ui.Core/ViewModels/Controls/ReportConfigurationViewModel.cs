@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Constants;
-using Lanceur.Core.Models.Settings;
 
 namespace Lanceur.Ui.Core.ViewModels.Controls;
 

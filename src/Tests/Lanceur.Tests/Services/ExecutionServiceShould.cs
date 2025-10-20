@@ -1,6 +1,6 @@
-﻿using Shouldly;
+﻿using Lanceur.Core.Configuration;
+using Shouldly;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;

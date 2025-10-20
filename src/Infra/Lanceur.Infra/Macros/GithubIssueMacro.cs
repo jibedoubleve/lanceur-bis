@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Microsoft.Extensions.DependencyInjection;

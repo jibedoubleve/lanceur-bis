@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Humanizer;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;

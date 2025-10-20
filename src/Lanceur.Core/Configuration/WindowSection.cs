@@ -1,4 +1,4 @@
-﻿namespace Lanceur.Core.Models.Settings;
+﻿namespace Lanceur.Core.Configuration;
 
 public class WindowSection
 {

@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;

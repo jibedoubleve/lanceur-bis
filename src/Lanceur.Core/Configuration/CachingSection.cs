@@ -1,4 +1,4 @@
-namespace Lanceur.Core.Models.Settings;
+namespace Lanceur.Core.Configuration;
 
 /// <summary>
 ///     Represents the caching configuration settings for the application.
