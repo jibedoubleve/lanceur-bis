@@ -17,10 +17,20 @@ public static class SQLiteSingleConnectionManagerExtensions
 /// </summary>
 public sealed class DbSingleConnectionManager : IDbConnectionManager
 {
+    #region Fields
+
+    private static readonly object _monitor = new();
+
+    #endregion
+
     #region Constructors
 
     public DbSingleConnectionManager(IDbConnection connection) => Connection =
-        connection ?? throw new ArgumentNullException(nameof(connection), "Cannot create a connection scope with an empty connection (NULL).");
+        connection ??
+        throw new ArgumentNullException(
+            nameof(connection),
+            "Cannot create a connection scope with an empty connection (NULL)."
+        );
 
     #endregion
 
@@ -37,22 +47,27 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
     {
-        if (Connection.State != ConnectionState.Open) Connection.Open();
-        return action(Connection);
+        lock (_monitor)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+            return action(Connection);
+        }
     }
 
     /// <inheritdoc />
     public void WithConnection(Action<IDbConnection> action)
     {
-        if (Connection.State != ConnectionState.Open) Connection.Open();
-        action(Connection);
+        lock (_monitor)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+            action(Connection);
+        }
     }
 
     /// <inheritdoc />
     public void WithinTransaction(Action<IDbTransaction> action)
     {
-        WithinTransaction(
-            tx =>
+        WithinTransaction(tx =>
             {
                 action(tx);
                 return default(object);
@@ -63,53 +78,62 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)
     {
-        if (Connection.State != ConnectionState.Open) Connection.Open();
-        using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
-        try
+        lock (_monitor)
         {
-            var result = action(tx);
-            tx.Commit();
-            return result;
-        }
-        catch
-        {
-            tx.Rollback();
-            throw;
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+            using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
+            try
+            {
+                var result = action(tx);
+                tx.Commit();
+                return result;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
         }
     }
 
     /// <inheritdoc />
     public TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext,  TContext> action, TContext context)
     {
-        if (Connection.State != ConnectionState.Open) Connection.Open();
-        using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
-        try
+        lock (_monitor)
         {
-            var result = action(tx, context);
-            tx.Commit();
-            return result;
-        }
-        catch
-        {
-            tx.Rollback();
-            throw;
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+            using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
+            try
+            {
+                var result = action(tx, context);
+                tx.Commit();
+                return result;
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
         }
     }
 
     /// <inheritdoc />
     public void WithinTransaction<TContext>(Action<IDbTransaction, TContext> action, TContext context)
     {
-        if (Connection.State != ConnectionState.Open) Connection.Open();
-        using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
-        try
+        lock (_monitor)
         {
-            action(tx, context);
-            tx.Commit();
-        }
-        catch
-        {
-            tx.Rollback();
-            throw;
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+            using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
+            try
+            {
+                action(tx, context);
+                tx.Commit();
+            }
+            catch
+            {
+                tx.Rollback();
+                throw;
+            }
         }
     }
 
