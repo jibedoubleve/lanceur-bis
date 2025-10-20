@@ -1,6 +1,8 @@
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
+using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Models.Settings;
+namespace Lanceur.Core.Configuration.Configurations;
 
 /// <summary>
 ///     Represents the configuration settings for the application.
@@ -13,7 +15,7 @@ public class DatabaseConfiguration
     /// <summary>
     ///     Gets or sets the caching configuration settings used across the application.
     /// </summary>
-    public CachingSession Caching { get; set; } = new(30, 30);
+    public CachingSection Caching { get; set; } = new(30, 30);
 
     /// <summary>
     ///     Get or sets the configuration settings for the feature flags.
@@ -77,19 +79,6 @@ public class DatabaseConfiguration
     ///     This includes dimensions, position, and other display-related preferences.
     /// </summary>
     public WindowSection Window { get; set; } = new();
-
-    #endregion
-}
-
-public static class DatabaseConfigurationExtensions
-{
-    #region Methods
-
-    public static void SetHotKey(this DatabaseConfiguration databaseConfiguration, int key, int modifierKey)
-    {
-        databaseConfiguration.HotKey.Key = key;
-        databaseConfiguration.HotKey.ModifierKey = modifierKey;
-    }
 
     #endregion
 }

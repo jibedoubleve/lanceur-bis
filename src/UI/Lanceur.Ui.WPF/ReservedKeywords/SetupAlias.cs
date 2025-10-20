@@ -2,7 +2,6 @@
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Ui.WPF.Helpers;
-using Lanceur.Ui.WPF.ReservedKeywords;
 using Lanceur.Ui.WPF.Views.Pages;
 
 namespace Lanceur.ReservedKeywords;

@@ -1,6 +1,6 @@
 ﻿using Shouldly;
 using System.Text.RegularExpressions;
-using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Microsoft.Extensions.Logging;
@@ -33,7 +33,7 @@ public class ConnectionStringShould
     {
         // Arrange
         var config = Substitute.For<IApplicationConfigurationService>();
-        config.Current.Returns(new ApplicationSettings { DbPath = "lkj" }); 
+        config.Current.Returns(new ApplicationConfiguration { DbPath = "lkj" }); 
         var logger = Substitute.For<ILogger<ConnectionString>>();
         var cs = new ConnectionString(config, logger);
 
@@ -57,7 +57,7 @@ public class ConnectionStringShould
         // Arrange
         var file = CreateTemporaryFile();
         var config = Substitute.For<IApplicationConfigurationService>();
-        config.Current.Returns(new ApplicationSettings { DbPath = file });
+        config.Current.Returns(new ApplicationConfiguration { DbPath = file });
         var logger = Substitute.For<ILogger<ConnectionString>>();
         var cs = new ConnectionString(config, logger);
 

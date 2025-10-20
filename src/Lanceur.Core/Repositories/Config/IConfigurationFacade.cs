@@ -1,13 +1,13 @@
-﻿using Lanceur.Core.Models.Settings;
+﻿using Lanceur.Core.Configuration.Configurations;
 
 namespace Lanceur.Core.Repositories.Config;
 
-public interface ISettingsFacade
+public interface IConfigurationFacade
 {
     #region Properties
 
     DatabaseConfiguration Application { get; }
-    ApplicationSettings Local { get; }
+    ApplicationConfiguration Local { get; }
 
     #endregion
 
@@ -24,4 +24,9 @@ public interface ISettingsFacade
     void Save();
 
     #endregion
+
+    /// <summary>
+    ///     Occurs when the configuration is reloaded or modified
+    /// </summary>
+    event EventHandler Updated;
 }

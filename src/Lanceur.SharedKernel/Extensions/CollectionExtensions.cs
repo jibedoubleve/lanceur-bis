@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace Lanceur.SharedKernel.Extensions;
+﻿namespace Lanceur.SharedKernel.Extensions;
 
 public static class CollectionExtensions
 {

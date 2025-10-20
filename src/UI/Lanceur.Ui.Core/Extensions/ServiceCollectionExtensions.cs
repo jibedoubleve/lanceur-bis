@@ -3,6 +3,8 @@ using System.Data.SQLite;
 using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
@@ -47,13 +49,14 @@ public static class ServiceCollectionExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>();
-        serviceCollection.AddTransient<ISettingsFacade, SettingsFacadeService>();
-        serviceCollection.AddTransient<IGithubService, GithubService>();
-        return serviceCollection;
-    }
+    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection) 
+        => serviceCollection.AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
+                            .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
+                            .AddTransient<IGithubService, GithubService>();
+
+    public static IServiceCollection AddConfigurationSections(this IServiceCollection serviceCollection)
+        => serviceCollection.AddSingleton(typeof(ISection<>), typeof(ConfigurationSection<>))
+                            .AddSingleton(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
 
     public static void AddLoggers(
         this IServiceCollection serviceCollection,
@@ -61,13 +64,13 @@ public static class ServiceCollectionExtensions
         ServiceProvider serviceProvider
     )
     {
-        var settingsFacadeService = serviceProvider.GetRequiredService<ISettingsFacade>();
+        var configurationFacadeService = serviceProvider.GetRequiredService<IConfigurationFacade>();
         var logEventLevel = new Conditional<LogEventLevel>(
             LogEventLevel.Debug,
-            settingsFacadeService.GetMinimumLogLevel()
+            configurationFacadeService.GetMinimumLogLevel()
         );
         var levelSwitch = new LoggingLevelSwitch(logEventLevel);
-        var telemetry = serviceProvider.GetRequiredService<ISettingsFacade>().Local.Telemetry;
+        var telemetry = serviceProvider.GetRequiredService<IConfigurationFacade>().Local.Telemetry;
 
         serviceCollection.AddSingleton(levelSwitch);
 
@@ -140,7 +143,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+        serviceCollection.AddConfigurationSections()
+                         .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(sp => new(
                                  sp.GetService<IDataStoreVersionService>(),
@@ -187,6 +191,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>();
+
 
         return serviceCollection;
     }

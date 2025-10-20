@@ -4,8 +4,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
@@ -139,7 +139,7 @@ public partial class App
                 // ---- Skip current version ----
                 ToastNotificationArguments.SkipVersion => () =>
                 {
-                    var settings = Host.Services.GetRequiredService<ISettingsFacade>();
+                    var settings = Host.Services.GetRequiredService<IConfigurationFacade>();
                     settings.Application.Github.SnoozeVersionCheck = true;
                     settings.Application.Github.LastCheckedVersion = new(arguments["Version"]);
                     settings.Save();
@@ -246,7 +246,7 @@ public partial class App
 
         /* Check if new Version
          */
-        var settings = Host.Services.GetRequiredService<ISettingsFacade>()!;
+        var settings = Host.Services.GetRequiredService<IConfigurationFacade>()!;
         _ = Host.Services.GetRequiredService<IReleaseService>()
                 .HasUpdateAsync()
                 .ContinueWith(

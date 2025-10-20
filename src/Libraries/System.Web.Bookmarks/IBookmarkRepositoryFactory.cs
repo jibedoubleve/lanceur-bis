@@ -1,5 +1,3 @@
-using System.Web.Bookmarks.Domain;
-
 namespace System.Web.Bookmarks;
 
 public interface IBookmarkRepositoryFactory

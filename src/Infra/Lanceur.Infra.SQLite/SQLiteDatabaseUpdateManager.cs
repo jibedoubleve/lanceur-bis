@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Data.SQLite;
 using System.Reflection;
 using System.SQLite.Updater;
 using Lanceur.Core.Services;

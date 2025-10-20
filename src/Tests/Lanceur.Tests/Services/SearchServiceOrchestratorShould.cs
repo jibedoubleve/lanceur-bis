@@ -1,11 +1,14 @@
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections;
 using Shouldly;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Converters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -57,18 +60,19 @@ public class SearchServiceOrchestratorShould
         // arrange
         var sp = new ServiceCollection()
                  .AddLogging(builder => builder.AddXUnit())
-                 .AddMockSingleton<ISettingsFacade>(
+                 .AddMockSingleton<IConfigurationFacade>(
                      (_, i) =>
                      {
                          i.Application.Returns(new DatabaseConfiguration());
                          return i;
                      }
                  )
+                 .AddConfigurationSections()
                  .BuildServiceProvider();
         var storeService = Substitute.For<IStoreService>();
         storeService.StoreOrchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));
 
-        var orchestrator = new SearchServiceOrchestrator(sp.GetService<ILoggerFactory>(), sp.GetService<ISettingsFacade>());
+        var orchestrator = new SearchServiceOrchestrator(sp.GetService<ILoggerFactory>(), sp.GetSection<StoreSection>());
 
         // act
         orchestrator.IsAlive(storeService, Cmdline.Parse(cmd))

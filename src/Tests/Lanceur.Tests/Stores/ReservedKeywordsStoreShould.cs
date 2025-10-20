@@ -2,9 +2,9 @@
 using System.Web.Bookmarks;
 using Shouldly;
 using Lanceur.Core;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Stores;
@@ -36,7 +36,7 @@ public class ReservedKeywordsStoreShould
                               .AddSingleton<ILoggerFactory, LoggerFactory>()
                               .AddSingleton(reservedAliasStoreLogger)
                               .AddMockSingleton<IBookmarkRepositoryFactory>()
-                              .AddMockSingleton<ISettingsFacade>((_, i) =>
+                              .AddMockSingleton<IConfigurationFacade>((_, i) =>
                                   {
                                       i.Application.Returns(new DatabaseConfiguration());
                                       return i;

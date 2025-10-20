@@ -37,7 +37,7 @@ public partial class MainView
     private readonly IFeatureFlagService _featureFlagService;
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly ISettingsFacade _settings;
+    private readonly IConfigurationFacade _configuration;
 
     #endregion
 
@@ -47,7 +47,7 @@ public partial class MainView
         MainViewModel viewModel,
         ILogger<MainView> logger,
         IServiceProvider serviceProvider,
-        ISettingsFacade settings,
+        IConfigurationFacade configuration,
         IHotKeyService hotKeyService,
         IDatabaseConfigurationService databaseConfig,
         IComputerInfoService computerInfoService,
@@ -57,7 +57,7 @@ public partial class MainView
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewModel);
         ArgumentNullException.ThrowIfNull(serviceProvider);
-        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(hotKeyService);
         ArgumentNullException.ThrowIfNull(databaseConfig);
         ArgumentNullException.ThrowIfNull(computerInfoService);
@@ -65,7 +65,7 @@ public partial class MainView
 
         _logger = logger;
         _serviceProvider = serviceProvider;
-        _settings = settings;
+        _configuration = configuration;
         _databaseConfig = databaseConfig;
         _computerInfoService = computerInfoService;
         _featureFlagService = featureFlagService;
@@ -97,7 +97,7 @@ public partial class MainView
         var enabled = _featureFlagService.IsEnabled(Features.ResourceDisplay);
         if (enabled)
             _ = _computerInfoService.StartMonitoring(
-                _settings.Application.ResourceMonitor.RefreshRate.Milliseconds(),
+                _configuration.Application.ResourceMonitor.RefreshRate.Milliseconds(),
                 t =>
                 {
                     Application.Current.Dispatcher.Invoke(() =>
@@ -132,7 +132,7 @@ public partial class MainView
 
     private void OnClickDarkTheme(object sender, RoutedEventArgs e)
     {
-        var windowBackdropType = _settings.Application.Window.BackdropStyle.ToWindowBackdropType();
+        var windowBackdropType = _configuration.Application.Window.BackdropStyle.ToWindowBackdropType();
         _logger.LogDebug(
             "Change theme to {Theme} and backdrop type {BackdropType}",
             ApplicationTheme.Dark,
@@ -143,7 +143,7 @@ public partial class MainView
 
     private void OnClickLightTheme(object sender, RoutedEventArgs e)
     {
-        var windowBackdropType = _settings.Application.Window.BackdropStyle.ToWindowBackdropType();
+        var windowBackdropType = _configuration.Application.Window.BackdropStyle.ToWindowBackdropType();
         _logger.LogDebug(
             "Change theme to {Theme} and backdrop type {BackdropType}",
             ApplicationTheme.Light,
@@ -170,7 +170,7 @@ public partial class MainView
 
         SystemThemeWatcher.Watch(
             this,
-            _settings.Application.Window.BackdropStyle.ToWindowBackdropType()
+            _configuration.Application.Window.BackdropStyle.ToWindowBackdropType()
         );
 
         SetWindowPosition();
@@ -267,7 +267,7 @@ public partial class MainView
         // HACK: Settings take effect only after closing the window.  
         // When changing settings, the previous ones persist until the window is hidden at least once.  
         // This ensures the window is cleared immediately if settings are updated.  
-        if (!_settings.Application.SearchBox.ShowLastQuery) ViewModel.Clear();
+        if (!_configuration.Application.SearchBox.ShowLastQuery) ViewModel.Clear();
 
         ViewModel.RefreshSettings();
 

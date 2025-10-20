@@ -1,5 +1,5 @@
 using System.Windows.Input;
-using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Repositories.Config;
 using Microsoft.Extensions.Logging;
 using NHotkey;

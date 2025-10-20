@@ -16,7 +16,7 @@ public partial class ExceptionView
 {
     #region Fields
 
-    private readonly ISettingsFacade _settings;
+    private readonly IConfigurationFacade _configuration;
 
     #endregion
 
@@ -24,13 +24,13 @@ public partial class ExceptionView
 
     public ExceptionView(
         ExceptionViewModel viewModel,
-        ISettingsFacade settings
+        IConfigurationFacade configuration
     )
     {
         DataContext = viewModel;
 
         InitializeComponent();
-        _settings = settings;
+        _configuration = configuration;
     }
 
     #endregion
@@ -48,7 +48,7 @@ public partial class ExceptionView
     {
         SystemThemeWatcher.Watch(
             this,
-            _settings.Application.Window.BackdropStyle.ToWindowBackdropType()
+            _configuration.Application.Window.BackdropStyle.ToWindowBackdropType()
         );
     }
 

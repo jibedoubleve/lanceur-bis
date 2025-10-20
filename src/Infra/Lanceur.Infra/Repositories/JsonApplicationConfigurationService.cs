@@ -1,7 +1,6 @@
-﻿using Lanceur.Core.Constants;
-using Lanceur.Core.Models.Settings;
+﻿using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;
 
@@ -13,7 +12,7 @@ public class JsonApplicationConfigurationService : IApplicationConfigurationServ
 
     private static readonly object Locker = new();
     private readonly string _filePath;
-    private ApplicationSettings _current;
+    private ApplicationConfiguration _current;
 
     #endregion Fields
 
@@ -29,7 +28,7 @@ public class JsonApplicationConfigurationService : IApplicationConfigurationServ
 
     #region Properties
 
-    public ApplicationSettings Current
+    public ApplicationConfiguration Current
     {
         get
         {
@@ -58,14 +57,14 @@ public class JsonApplicationConfigurationService : IApplicationConfigurationServ
     {
         lock (Locker)
         {
-            ApplicationSettings jsonSettings = null;
+            ApplicationConfiguration jsonConfiguration = null;
             if (File.Exists(_filePath))
             {
                 var output = File.ReadAllText(_filePath);
-                jsonSettings = JsonConvert.DeserializeObject<ApplicationSettings>(output);
+                jsonConfiguration = JsonConvert.DeserializeObject<ApplicationConfiguration>(output);
             }
 
-            _current = jsonSettings ?? new ApplicationSettings();
+            _current = jsonConfiguration ?? new ApplicationConfiguration();
         }
     }
 

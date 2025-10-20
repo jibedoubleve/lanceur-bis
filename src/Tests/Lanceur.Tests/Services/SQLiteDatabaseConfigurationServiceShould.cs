@@ -1,7 +1,7 @@
 ﻿using Dapper;
+using Lanceur.Core.Configuration.Configurations;
 using Shouldly;
 using Lanceur.Core.Constants;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;

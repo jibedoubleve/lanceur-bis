@@ -8,7 +8,7 @@ public static class SettingsFacadeServiceExtension
 {
     #region Methods
 
-    public static LogEventLevel GetMinimumLogLevel(this ISettingsFacade src)
+    public static LogEventLevel GetMinimumLogLevel(this IConfigurationFacade src)
     {
         return src.Local.MinimumLogLevel switch
         {

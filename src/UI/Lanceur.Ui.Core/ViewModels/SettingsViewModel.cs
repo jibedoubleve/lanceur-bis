@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 
 namespace Lanceur.Ui.Core.ViewModels;
 
@@ -13,7 +14,7 @@ public partial class SettingsViewModel : ObservableObject
 
     #region Constructors
 
-    public SettingsViewModel(ISettingsFacade settingsFacade) => WindowBackdropStyle = settingsFacade.Application.Window.BackdropStyle;
+    public SettingsViewModel(ISection<WindowSection> settings) => WindowBackdropStyle = settings.Value.BackdropStyle;
 
     #endregion
 }

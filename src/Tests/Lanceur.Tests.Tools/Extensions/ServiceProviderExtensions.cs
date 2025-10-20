@@ -1,6 +1,6 @@
 using System.Data;
 using System.Data.SQLite;
-using Lanceur.Core.Models.Settings;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Utils;
@@ -20,10 +20,10 @@ public static class ServiceProviderExtensions
 
     public static IServiceCollection AddApplicationSettings(
         this IServiceCollection serviceCollection,
-        Action<ISettingsFacade>? setupAction = null
+        Action<IConfigurationFacade>? setupAction = null
     )
     {
-        var settings = Substitute.For<ISettingsFacade>();
+        var settings = Substitute.For<IConfigurationFacade>();
         settings.Application.Returns(new NoCacheDatabaseConfiguration());
 
         serviceCollection.AddSingleton(settings);

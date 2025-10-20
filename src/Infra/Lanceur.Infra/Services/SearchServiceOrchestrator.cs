@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
@@ -9,22 +10,18 @@ namespace Lanceur.Infra.Services;
 
 public class SearchServiceOrchestrator : ISearchServiceOrchestrator
 {
-    private readonly ISettingsFacade _settingsFacade;
-
     #region Fields
 
-    private readonly ILogger<SearchServiceOrchestrator> _log;
-
-    private readonly Dictionary<string, IStoreService> _stores = new();
+    private readonly ISection<StoreSection> _settings;
 
     #endregion
 
     #region Constructors
 
-    public SearchServiceOrchestrator(ILoggerFactory factory, ISettingsFacade settingsFacade)
+    public SearchServiceOrchestrator(ILoggerFactory factory, ISection<StoreSection> settings)
     {
-        _settingsFacade = settingsFacade;
-        _log = factory.GetLogger<SearchServiceOrchestrator>();
+        _settings = settings;
+        factory.GetLogger<SearchServiceOrchestrator>();
     }
 
     #endregion
@@ -36,10 +33,10 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
     {
         if (storeService is null) return false;
 
-        var storeOverride = _settingsFacade.Application.Stores.StoreShortcuts
-                                           .FirstOrDefault(x => x.StoreType == storeService.GetType().ToString());
+        var storeOverride = _settings.Value.StoreShortcuts
+                                     .FirstOrDefault(x => x.StoreType == storeService.GetType().ToString());
         var regex = new Regex(storeOverride?.AliasOverride ?? storeService.StoreOrchestration.AlivePattern);
-        
+
         var isAlive = regex.IsMatch(query.Name);
         return isAlive;
     }

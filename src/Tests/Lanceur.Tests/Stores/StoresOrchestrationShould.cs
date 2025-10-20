@@ -2,9 +2,9 @@ using System.Text.RegularExpressions;
 using Everything.Wrapper;
 using Shouldly;
 using Lanceur.Core;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -12,6 +12,7 @@ using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -115,7 +116,8 @@ public class StoresOrchestrationShould
     [InlineData("(6+5)+1", "12")]
     public async Task UnderstandCalculationWithOrchestration(string query, string expected)
     {
-        var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+        var serviceProvider = new ServiceCollection().AddConfigurationSections()
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton<AliasStore>()
                                                      .AddLogging()
                                                      .AddSingleton<CalculatorStore>()
@@ -135,7 +137,7 @@ public class StoresOrchestrationShould
                                                          i.Search(Arg.Any<string>()).Returns([]);
                                                          return i;
                                                      })
-                                                     .AddMockSingleton<ISettingsFacade>((_, i) =>
+                                                     .AddMockSingleton<IConfigurationFacade>((_, i) =>
                                                      {
                                                          i.Application.Returns(new DatabaseConfiguration());
                                                          return i;

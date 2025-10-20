@@ -1,6 +1,5 @@
-﻿using Lanceur.Core.Models.Settings;
+﻿using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Infra.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Repositories;
@@ -11,7 +10,7 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
 
     private readonly ILogger<MemoryApplicationConfigurationService> _logger;
 
-    private static readonly ApplicationSettings Settings;
+    private static readonly ApplicationConfiguration Configuration;
 
     #endregion
 
@@ -22,7 +21,7 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         var path = Path.Combine(desktop, "debug.sqlite");
 
-        Settings = new() { DbPath = path };
+        Configuration = new() { DbPath = path };
     }
 
     public MemoryApplicationConfigurationService(ILogger<MemoryApplicationConfigurationService> logger) => _logger = logger;
@@ -31,7 +30,7 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
 
     #region Properties
 
-    public ApplicationSettings Current => Settings;
+    public ApplicationConfiguration Current => Configuration;
 
     #endregion
 
@@ -45,7 +44,7 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
     public void Save()
     {
         /*Does nothing, settings is already in memory*/
-        _logger.LogWarning("This is a mock service for development purposes. It simulates saving the settings. Debug database: {Settings}", Settings.DbPath);
+        _logger.LogWarning("This is a mock service for development purposes. It simulates saving the settings. Debug database: {Settings}", Configuration.DbPath);
     }
 
     #endregion

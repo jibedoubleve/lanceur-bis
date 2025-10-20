@@ -1,5 +1,4 @@
 using Lanceur.Core.Services;
-using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.WPF.Commands;

@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,7 +22,7 @@ public class GithubIssueMacro : MacroQueryResult
     private readonly IUserGlobalNotificationService _notification;
 
     private readonly IServiceProvider _serviceProvider;
-    private readonly ISettingsFacade _settings;
+    private readonly ISection<GithubSection> _settings;
 
     #endregion
 
@@ -32,10 +32,10 @@ public class GithubIssueMacro : MacroQueryResult
     {
         _serviceProvider = serviceProvider;
         _logger = _serviceProvider.GetService<ILogger<GithubIssueMacro>>();
-        _settings = _serviceProvider.GetService<ISettingsFacade>();
         _githubService = _serviceProvider.GetService<IGithubService>();
         _notification = serviceProvider.GetService<IUserGlobalNotificationService>();
         _enigma = serviceProvider.GetService<IEnigma>();
+        _settings = _serviceProvider.GetSection<GithubSection>();
     }
 
     #endregion
@@ -58,7 +58,7 @@ public class GithubIssueMacro : MacroQueryResult
             return NoResult;
         }
 
-        if (!_settings.Application.Github.HasToken())
+        if (!_settings.Value.HasToken())
         {
             const string msg = "Cannot create an issue on github, no token is set.";
             _logger.LogInformation(msg);
@@ -67,7 +67,7 @@ public class GithubIssueMacro : MacroQueryResult
         }
 
         _logger.LogInformation("Creating Github issue with cmdline: {Cmdline}", cmdline!.ToString());
-        await _githubService.CreateIssue(cmdline.Parameters, _enigma.Decrypt(_settings.Application.Github.Token));
+        await _githubService.CreateIssue(cmdline.Parameters, _enigma.Decrypt(_settings.Value.Token));
 
         return NoResult;
     }

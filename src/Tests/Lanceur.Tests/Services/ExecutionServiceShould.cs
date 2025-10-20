@@ -1,6 +1,6 @@
-﻿using Shouldly;
+﻿using Lanceur.Core.Configuration.Configurations;
+using Shouldly;
 using Lanceur.Core.Models;
-using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
@@ -10,9 +10,9 @@ using Lanceur.Infra.Macros;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Wildcards;
-using Lanceur.SharedKernel.DI;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -178,8 +178,9 @@ public class ExecutionServiceShould : TestBase
         var executionService = CreateExecutionService();
 
         var githubService = Substitute.For<IGithubService>();
-        var sp = new ServiceCollection().AddLoggingForTests<GithubIssueMacro>(OutputHelper)
-                                        .AddSingleton<ISettingsFacade, SettingsFacadeService>()
+        var sp = new ServiceCollection().AddConfigurationSections()
+                                        .AddLoggingForTests<GithubIssueMacro>(OutputHelper)
+                                        .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                                         .AddMockSingleton<IApplicationConfigurationService>()
                                         .AddMockSingleton<IDatabaseConfigurationService>((_, i) =>
                                         {

@@ -1,5 +1,4 @@
 ﻿using Lanceur.Ui.Core.ViewModels.Controls;
-using Lanceur.Ui.Core.ViewModels.Pages;
 
 namespace Lanceur.Ui.WPF.Views.Controls;
 

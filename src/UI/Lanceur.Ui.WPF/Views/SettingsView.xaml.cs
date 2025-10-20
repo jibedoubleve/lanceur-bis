@@ -7,7 +7,6 @@ using Humanizer;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
-using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.Helpers;
 using Microsoft.Extensions.Logging;
 using Wpf.Ui;
@@ -24,7 +23,7 @@ public partial class SettingsView : INavigationWindow
 
     private readonly IContentDialogService _contentDialogService;
     private readonly ILogger<SettingsView> _logger;
-    private readonly ISettingsFacade _settings;
+    private readonly IConfigurationFacade _configuration;
     private readonly ISnackbarService _snackbarService;
 
     #endregion
@@ -37,7 +36,7 @@ public partial class SettingsView : INavigationWindow
         ISnackbarService snackbarService,
         IServiceProvider serviceProvider,
         ILogger<SettingsView> logger,
-        ISettingsFacade settings
+        IConfigurationFacade configuration
     )
     {
         ArgumentNullException.ThrowIfNull(contentDialogService);
@@ -52,7 +51,7 @@ public partial class SettingsView : INavigationWindow
         _contentDialogService = contentDialogService;
         _snackbarService = snackbarService;
         _logger = logger;
-        _settings = settings;
+        _configuration = configuration;
         contentDialogService.SetDialogHost(ContentPresenterForDialogs);
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
 
@@ -106,7 +105,7 @@ public partial class SettingsView : INavigationWindow
             message.Value.Message,
             MapAppearance(message.Value.Level),
             MapIcon(message.Value.Level),
-           _settings.Application.Window.NotificationDisplayDuration.Seconds()
+           _configuration.Application.Window.NotificationDisplayDuration.Seconds()
         );
     }
 

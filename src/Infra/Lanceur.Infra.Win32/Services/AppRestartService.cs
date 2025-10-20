@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
-using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Infra.Win32.Services;
 

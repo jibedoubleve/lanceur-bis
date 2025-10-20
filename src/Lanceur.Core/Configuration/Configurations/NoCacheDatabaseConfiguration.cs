@@ -1,4 +1,4 @@
-namespace Lanceur.Core.Models.Settings;
+namespace Lanceur.Core.Configuration.Configurations;
 
 /// <summary>
 ///     Represents the configuration settings for the application with no cache as default..

@@ -1,4 +1,4 @@
-namespace Lanceur.Core.Models.Settings;
+namespace Lanceur.Core.Configuration.Sections;
 
 public class ResourceMonitorSection
 {
