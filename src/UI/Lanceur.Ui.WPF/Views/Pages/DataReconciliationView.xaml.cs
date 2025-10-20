@@ -20,10 +20,10 @@ public partial class DataReconciliationView
 
     public DataReconciliationView(
         DataReconciliationViewModel viewModel,
-        ISettingsFacade settings
+        IConfigurationFacade configuration
     )
     {
-        _reportConfigurations = settings.Application.Reconciliation.ReportsConfiguration;
+        _reportConfigurations = configuration.Application.Reconciliation.ReportsConfiguration;
         DataContext = viewModel;
         viewModel.PropertyChanged += OnViewModelReportTypeChanged;
         InitializeComponent();

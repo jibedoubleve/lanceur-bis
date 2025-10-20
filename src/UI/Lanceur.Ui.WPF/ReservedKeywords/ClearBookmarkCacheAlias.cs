@@ -17,7 +17,7 @@ public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
     private readonly IBookmarkRepository _bookmarks;
 
     private readonly ILogger<ClearBookmarkCacheAlias> _logger;
-    private readonly ISettingsFacade _settings;
+    private readonly IConfigurationFacade _configuration;
 
     #endregion
 
@@ -36,11 +36,11 @@ public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
                   "Bookmark repository is not configured in the service provider"
               );
 
-        _settings = serviceProvider.GetService<ISettingsFacade>() ??
+        _configuration = serviceProvider.GetService<IConfigurationFacade>() ??
                     throw new NullReferenceException("Settings facade is not configured in the service provider");
 
         _bookmarks = bookmarkRepositoryFactory.BuildBookmarkRepository(
-            _settings.Application.Stores.BookmarkSourceBrowser
+            _configuration.Application.Stores.BookmarkSourceBrowser
         );
         _logger = factory.CreateLogger<ClearBookmarkCacheAlias>();
     }
@@ -59,7 +59,7 @@ public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
     {
         _logger.LogInformation(
             "Clearing bookmarks cache for {Browser}",
-            _settings.Application.Stores.BookmarkSourceBrowser
+            _configuration.Application.Stores.BookmarkSourceBrowser
         );
 
         _bookmarks.InvalidateCache();

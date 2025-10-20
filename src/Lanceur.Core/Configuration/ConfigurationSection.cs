@@ -11,16 +11,16 @@ public class ConfigurationSection<T> : IWriteableSection<T>
 
     private T _cachedSection  ;
 
-    private readonly ISettingsFacade _settings;
+    private readonly IConfigurationFacade _configuration;
 
     #endregion
 
     #region Constructors
 
-    public ConfigurationSection(ISettingsFacade settings)
+    public ConfigurationSection(IConfigurationFacade configuration)
     {
-        _settings = settings;
-        _settings.Updated += (_, _) => _cachedSection = RebuildSection();
+        _configuration = configuration;
+        _configuration.Updated += (_, _) => _cachedSection = RebuildSection();
     }
 
     #endregion
@@ -42,7 +42,7 @@ public class ConfigurationSection<T> : IWriteableSection<T>
 
     private T RebuildSection()
     {
-        var app = _settings.Application;
+        var app = _configuration.Application;
         return app.GetType()
                   .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                   .Where(p => typeof(T).IsAssignableFrom(p.PropertyType))
@@ -50,9 +50,9 @@ public class ConfigurationSection<T> : IWriteableSection<T>
                   .SingleOrDefault();
     }
 
-    public void Reload() => _settings.Reload();
+    public void Reload() => _configuration.Reload();
 
-    public void Save() => _settings.Save();
+    public void Save() => _configuration.Save();
 
     #endregion
 }

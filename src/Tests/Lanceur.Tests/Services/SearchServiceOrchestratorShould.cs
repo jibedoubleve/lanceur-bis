@@ -60,7 +60,7 @@ public class SearchServiceOrchestratorShould
         // arrange
         var sp = new ServiceCollection()
                  .AddLogging(builder => builder.AddXUnit())
-                 .AddMockSingleton<ISettingsFacade>(
+                 .AddMockSingleton<IConfigurationFacade>(
                      (_, i) =>
                      {
                          i.Application.Returns(new DatabaseConfiguration());

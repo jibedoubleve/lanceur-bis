@@ -180,7 +180,7 @@ public class ExecutionServiceShould : TestBase
         var githubService = Substitute.For<IGithubService>();
         var sp = new ServiceCollection().AddConfigurationSections()
                                         .AddLoggingForTests<GithubIssueMacro>(OutputHelper)
-                                        .AddSingleton<ISettingsFacade, SettingsFacadeService>()
+                                        .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                                         .AddMockSingleton<IApplicationConfigurationService>()
                                         .AddMockSingleton<IDatabaseConfigurationService>((_, i) =>
                                         {

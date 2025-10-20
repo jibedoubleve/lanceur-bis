@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Repositories.Config;
 
-public interface ISettingsFacade
+public interface IConfigurationFacade
 {
     #region Properties
 

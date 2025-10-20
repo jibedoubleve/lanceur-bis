@@ -3,7 +3,7 @@ using Lanceur.Core.Repositories.Config;
 
 namespace Lanceur.Infra.Repositories;
 
-public class SettingsFacadeService : ISettingsFacade
+public class ConfigurationFacadeService : IConfigurationFacade
 {
     #region Fields
 
@@ -15,7 +15,7 @@ public class SettingsFacadeService : ISettingsFacade
 
     #region Constructors
 
-    public SettingsFacadeService(
+    public ConfigurationFacadeService(
         IApplicationConfigurationService applicationConfigurationService,
         IDatabaseConfigurationService databaseConfigurationService
     )

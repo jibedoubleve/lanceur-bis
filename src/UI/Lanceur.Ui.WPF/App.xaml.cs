@@ -139,7 +139,7 @@ public partial class App
                 // ---- Skip current version ----
                 ToastNotificationArguments.SkipVersion => () =>
                 {
-                    var settings = Host.Services.GetRequiredService<ISettingsFacade>();
+                    var settings = Host.Services.GetRequiredService<IConfigurationFacade>();
                     settings.Application.Github.SnoozeVersionCheck = true;
                     settings.Application.Github.LastCheckedVersion = new(arguments["Version"]);
                     settings.Save();
@@ -246,7 +246,7 @@ public partial class App
 
         /* Check if new Version
          */
-        var settings = Host.Services.GetRequiredService<ISettingsFacade>()!;
+        var settings = Host.Services.GetRequiredService<IConfigurationFacade>()!;
         _ = Host.Services.GetRequiredService<IReleaseService>()
                 .HasUpdateAsync()
                 .ContinueWith(

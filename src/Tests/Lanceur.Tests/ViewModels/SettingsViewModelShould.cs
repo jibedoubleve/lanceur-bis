@@ -65,7 +65,7 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
     {
         serviceCollection.AddLoggingForTests<ApplicationSettingsViewModel>(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
-                         .AddSingleton<ISettingsFacade, SettingsFacadeService>()
+                         .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                          .AddSingleton<IInteractionHubService, InteractionHubService>()
                          .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()

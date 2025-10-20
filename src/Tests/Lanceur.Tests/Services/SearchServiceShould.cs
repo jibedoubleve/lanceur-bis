@@ -232,7 +232,7 @@ public class SearchServiceShould : TestBase
                                                      .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                                      .AddSingleton<IStoreOrchestrationFactory,
                                                          StoreOrchestrationFactory>()
-                                                     .AddMockSingleton<ISettingsFacade>()
+                                                     .AddMockSingleton<IConfigurationFacade>()
                                                      .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton(_testLoggerFactory)
                                                      .AddSingleton(converter)

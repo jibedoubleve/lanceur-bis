@@ -46,7 +46,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private int _refreshRate;
     [ObservableProperty] private double _searchDelay;
     [ObservableProperty] private  LogLevel _selectedLogLevel;
-    [ObservableProperty] private ISettingsFacade _settings;
+    [ObservableProperty] private IConfigurationFacade _configuration;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
@@ -62,26 +62,26 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IInteractionHubService interactionHubService,
         ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
-        ISettingsFacade settings,
+        IConfigurationFacade configuration,
         IViewFactory viewFactory,
         IEnigma enigma
     )
     {
         ArgumentNullException.ThrowIfNull(interactionHubService);
-        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(appRestartService);
-        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(viewFactory);
 
 
         _hubService = interactionHubService;
         _logger = logger;
-        _settings = settings;
+        _configuration = configuration;
         _viewFactory = viewFactory;
         _enigma = enigma;
 
         // Hotkey
-        var hk = _settings.Application.HotKey;
+        var hk = _configuration.Application.HotKey;
         IsCtrl = hk.ModifierKey.IsFlagSet((int)ModifierKeys.Control);
         IsAlt = hk.ModifierKey.IsFlagSet((int)ModifierKeys.Alt);
         IsWin = hk.ModifierKey.IsFlagSet((int)ModifierKeys.Windows);
@@ -89,11 +89,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Key = hk.Key;
 
         // Logging
-        SelectedLogLevel = _settings.Local.MinimumLogLevel; 
+        SelectedLogLevel = _configuration.Local.MinimumLogLevel; 
 
         // Miscellaneous
         MapSettingsFromDbToUi();
-        IsResourceMonitorEnabled = Settings.Application.FeatureFlags.Any(
+        IsResourceMonitorEnabled = Configuration.Application.FeatureFlags.Any(
             e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.OrdinalIgnoreCase) && e.Enabled
         );
 
@@ -124,54 +124,54 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     private void MapSettingsFromDbToUi()
     {
-        DbPath = Settings.Local.DbPath;
+        DbPath = Configuration.Local.DbPath;
 
         // Search box section
-        SearchDelay = Settings.Application.SearchBox.SearchDelay;
-        ShowResult = Settings.Application.SearchBox.ShowResult;
-        ShowAtStartup = Settings.Application.SearchBox.ShowAtStartup;
-        ShowLastQuery = Settings.Application.SearchBox.ShowLastQuery;
+        SearchDelay = Configuration.Application.SearchBox.SearchDelay;
+        ShowResult = Configuration.Application.SearchBox.ShowResult;
+        ShowAtStartup = Configuration.Application.SearchBox.ShowAtStartup;
+        ShowLastQuery = Configuration.Application.SearchBox.ShowLastQuery;
 
         // Store section
-        BookmarkSourceBrowser = Settings.Application.Stores.BookmarkSourceBrowser;
-        StoreShortcuts = new(Settings.Application.Stores.StoreShortcuts);
+        BookmarkSourceBrowser = Configuration.Application.Stores.BookmarkSourceBrowser;
+        StoreShortcuts = new(Configuration.Application.Stores.StoreShortcuts);
 
         // Everything Store
-        var adapter = new EverythingQueryAdapter(Settings.Application.Stores.EverythingQuerySuffix);
+        var adapter = new EverythingQueryAdapter(Configuration.Application.Stores.EverythingQuerySuffix);
         ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
         ExcludeSystemFilesWithEverything = adapter.IsSystemFilesExcluded;
         IncludeOnlyExecFilesWithEverything = adapter.SelectOnlyExecutable;
         ExcludeFilesInBinWithEverything = adapter.IsFilesInTrashBinExcluded;
 
         // Window section
-        NotificationDisplayDuration = Settings.Application.Window.NotificationDisplayDuration;
-        WindowBackdropStyle = Settings.Application.Window.BackdropStyle;
+        NotificationDisplayDuration = Configuration.Application.Window.NotificationDisplayDuration;
+        WindowBackdropStyle = Configuration.Application.Window.BackdropStyle;
 
         // Feature flags
-        FeatureFlags = new(Settings.Application.FeatureFlags);
+        FeatureFlags = new(Configuration.Application.FeatureFlags);
 
         // Resource Monitor
-        CpuSmoothingIndex = Settings.Application.ResourceMonitor.CpuSmoothingIndex;
-        RefreshRate = Settings.Application.ResourceMonitor.RefreshRate;
+        CpuSmoothingIndex = Configuration.Application.ResourceMonitor.CpuSmoothingIndex;
+        RefreshRate = Configuration.Application.ResourceMonitor.RefreshRate;
 
         // Miscellaneous
-        var token = Settings.Application.Github.Token;
+        var token = Configuration.Application.Github.Token;
         ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : _enigma.Decrypt(token);
     }
 
     private void MapSettingsFromUiToDb()
     {
-        Settings.Local.DbPath = DbPath;
+        Configuration.Local.DbPath = DbPath;
 
         // Search box section
-        Settings.Application.SearchBox.SearchDelay = SearchDelay;
-        Settings.Application.SearchBox.ShowResult = ShowResult;
-        Settings.Application.SearchBox.ShowAtStartup = ShowAtStartup;
-        Settings.Application.SearchBox.ShowLastQuery = ShowLastQuery;
+        Configuration.Application.SearchBox.SearchDelay = SearchDelay;
+        Configuration.Application.SearchBox.ShowResult = ShowResult;
+        Configuration.Application.SearchBox.ShowAtStartup = ShowAtStartup;
+        Configuration.Application.SearchBox.ShowLastQuery = ShowLastQuery;
 
         // Store section
-        Settings.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
-        Settings.Application.Stores.StoreShortcuts = StoreShortcuts.ToArray();
+        Configuration.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
+        Configuration.Application.Stores.StoreShortcuts = StoreShortcuts.ToArray();
 
         // Everything Store
         var query = new EverythingQueryBuilder();
@@ -179,24 +179,24 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (ExcludeSystemFilesWithEverything) query.ExcludeSystemFiles();
         if (IncludeOnlyExecFilesWithEverything) query.OnlyExecFiles();
         if (ExcludeFilesInBinWithEverything) query.ExcludeFilesInBin();
-        Settings.Application.Stores.EverythingQuerySuffix = query.BuildQuery();
+        Configuration.Application.Stores.EverythingQuerySuffix = query.BuildQuery();
 
         // Window section
-        Settings.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
-        Settings.Application.Window.BackdropStyle = WindowBackdropStyle;
+        Configuration.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
+        Configuration.Application.Window.BackdropStyle = WindowBackdropStyle;
 
         // Feature flags
-        Settings.Application.FeatureFlags = FeatureFlags;
+        Configuration.Application.FeatureFlags = FeatureFlags;
         IsResourceMonitorEnabled = FeatureFlags.Any(
             e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.OrdinalIgnoreCase) && e.Enabled
         );
 
         // Resource Monitor
-        Settings.Application.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
-        Settings.Application.ResourceMonitor.RefreshRate = RefreshRate;
+        Configuration.Application.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
+        Configuration.Application.ResourceMonitor.RefreshRate = RefreshRate;
 
         // Miscellaneous
-        Settings.Application.Github.Token = ApiToken.IsNullOrWhiteSpace() ? string.Empty : _enigma.Encrypt(ApiToken);
+        Configuration.Application.Github.Token = ApiToken.IsNullOrWhiteSpace() ? string.Empty : _enigma.Encrypt(ApiToken);
     }
 
     [RelayCommand]
@@ -241,7 +241,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     internal void SaveSettings()
     {
-        var hk = Settings.Application.HotKey;
+        var hk = Configuration.Application.HotKey;
         var hash = (hk.ModifierKey, hk.Key).GetHashCode();
 
         hk.ModifierKey = GetHotKey();
@@ -249,13 +249,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         List<bool> reboot = [
             hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
-            Settings.Local.DbPath != DbPath,
-            Settings.Local.MinimumLogLevel != SelectedLogLevel
+            Configuration.Local.DbPath != DbPath,
+            Configuration.Local.MinimumLogLevel != SelectedLogLevel
         ];
 
         MapSettingsFromUiToDb();
-        Settings.Local.MinimumLogLevel = SelectedLogLevel;
-        Settings.Save();
+        Configuration.Local.MinimumLogLevel = SelectedLogLevel;
+        Configuration.Save();
 
         var needRestart = reboot.Any(r => r);
         

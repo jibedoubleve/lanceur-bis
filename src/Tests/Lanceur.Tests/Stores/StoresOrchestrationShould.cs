@@ -137,7 +137,7 @@ public class StoresOrchestrationShould
                                                          i.Search(Arg.Any<string>()).Returns([]);
                                                          return i;
                                                      })
-                                                     .AddMockSingleton<ISettingsFacade>((_, i) =>
+                                                     .AddMockSingleton<IConfigurationFacade>((_, i) =>
                                                      {
                                                          i.Application.Returns(new DatabaseConfiguration());
                                                          return i;

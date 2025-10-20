@@ -236,8 +236,8 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [InlineData(new[] { false, true })]
     public void ShowLastResultOrNotDependingOnConfiguration(bool[] callsOfShowLastQuery)
     {
-        ISettingsFacade settings = null;
-        var visitors = new ServiceVisitors { VisitSettings = s => settings = s };
+        IConfigurationFacade configuration = null;
+        var visitors = new ServiceVisitors { VisitSettings = s => configuration = s };
         TestViewModel(
             (viewModel, _) =>
             {
@@ -245,7 +245,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                     callsOfShowLastQuery.Select((expected, i) => (expected, i)),
                     t =>
                     {
-                        settings.Application.SearchBox.ShowLastQuery = t.expected;
+                        configuration.Application.SearchBox.ShowLastQuery = t.expected;
                         viewModel.ShowLastQuery.ShouldBe(t.expected, $"this is the call n° {t.i + 1} of the test");
                     });
 

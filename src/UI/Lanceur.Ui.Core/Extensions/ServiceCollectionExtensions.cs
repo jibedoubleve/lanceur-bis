@@ -51,7 +51,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection) 
         => serviceCollection.AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
-                            .AddSingleton<ISettingsFacade, SettingsFacadeService>()
+                            .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                             .AddTransient<IGithubService, GithubService>();
 
     public static IServiceCollection AddConfigurationSections(this IServiceCollection serviceCollection)
@@ -64,13 +64,13 @@ public static class ServiceCollectionExtensions
         ServiceProvider serviceProvider
     )
     {
-        var settingsFacadeService = serviceProvider.GetRequiredService<ISettingsFacade>();
+        var settingsFacadeService = serviceProvider.GetRequiredService<IConfigurationFacade>();
         var logEventLevel = new Conditional<LogEventLevel>(
             LogEventLevel.Debug,
             settingsFacadeService.GetMinimumLogLevel()
         );
         var levelSwitch = new LoggingLevelSwitch(logEventLevel);
-        var telemetry = serviceProvider.GetRequiredService<ISettingsFacade>().Local.Telemetry;
+        var telemetry = serviceProvider.GetRequiredService<IConfigurationFacade>().Local.Telemetry;
 
         serviceCollection.AddSingleton(levelSwitch);
 

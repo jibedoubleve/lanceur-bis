@@ -32,7 +32,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
         serviceCollection.AddMockSingleton<IAppRestartService>()
-                         .AddSingleton<ISettingsFacade, SettingsFacadeService>()
+                         .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                          .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
                          .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
                          .AddMockSingleton<IViewFactory>()
