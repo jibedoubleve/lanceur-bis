@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Models.Settings;
@@ -27,7 +28,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     private readonly IReconciliationService _reconciliationService;
     [ObservableProperty] private ReportType _reportType = ReportType.None;
     private readonly IAliasRepository _repository;
-    private readonly ISettingsFacade _settingsFacade;
+    private readonly IWriteableSection<ReconciliationSection> _settingsFacade;
     private readonly IThumbnailService _thumbnailService;
     [ObservableProperty] private string _title = string.Empty;
     private readonly IUserInteractionService _userInteraction;
@@ -44,7 +45,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         IInteractionHubService interactions,
         IReconciliationService reconciliationService,
         IViewFactory viewFactory,
-        ISettingsFacade settingsFacade,
+        IWriteableSection<ReconciliationSection> settingsFacade,
         IThumbnailService thumbnailService
     )
     {
@@ -57,7 +58,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         _settingsFacade = settingsFacade;
         _thumbnailService = thumbnailService;
         _currentReportConfiguration =
-            _settingsFacade.Application.Reconciliation.ReportsConfiguration
+            _settingsFacade.Value.ReportsConfiguration
                            .FirstOrDefault(e => e.ReportType == ReportType.RestoreAlias)!;
     }
 
@@ -65,7 +66,7 @@ public partial class DataReconciliationViewModel : ObservableObject
 
     #region Properties
 
-    private ReconciliationSection Reconciliation => _settingsFacade.Application.Reconciliation;
+    private ReconciliationSection Reconciliation => _settingsFacade.Value;
 
     #endregion
 

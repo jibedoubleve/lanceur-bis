@@ -3,6 +3,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
+using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -35,7 +36,8 @@ public abstract class ViewModelTester<TViewModel> : TestBase
             var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
             connectionManager = GetConnectionManager(sqlBuilder ?? Sql.Empty, connectionString.ToString());
 
-            var serviceCollection = new ServiceCollection().AddSingleton<TViewModel>()
+            var serviceCollection = new ServiceCollection().AddSettingSections()
+                                                           .AddSingleton<TViewModel>()
                                                            .AddLogging(builder =>
                                                                builder.AddXUnit(OutputHelper)
                                                                       .SetMinimumLevel(LogLevel.Trace))

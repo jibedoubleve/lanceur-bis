@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Constants;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
@@ -140,7 +141,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+        serviceCollection.AddSettingSections()
+                         .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(sp => new(
                                  sp.GetService<IDataStoreVersionService>(),
@@ -188,9 +190,17 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>();
 
+
         return serviceCollection;
     }
 
+    public static IServiceCollection AddSettingSections(this IServiceCollection serviceCollection)
+    {
+
+        serviceCollection.AddTransient(typeof(ISection<>), typeof(ConfigurationSection<>))
+                         .AddTransient(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
+        return serviceCollection;
+    }
     public static IServiceCollection AddTrackedMemoryCache(this IServiceCollection services)
     {
         services.AddMemoryCache();

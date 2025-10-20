@@ -3,7 +3,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Models;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
@@ -24,7 +26,8 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
     private readonly ISearchService _searchService;
     [ObservableProperty] private QueryResult? _selectedResult;
-    private readonly ISettingsFacade _settingsFacade;
+    private readonly ISection<WindowSection> _stgWindow;
+    private readonly IWriteableSection<SearchBoxSection> _stgSearchBox;
     [ObservableProperty] private string? _suggestion;
     private readonly IThumbnailService _thumbnailService;
     private readonly IWatchdog _watchdog;
@@ -38,7 +41,8 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(
         ILogger<MainViewModel> logger,
         ISearchService searchService,
-        ISettingsFacade settingsFacade,
+        ISection<WindowSection> stgWindow,
+        IWriteableSection<SearchBoxSection> stgSearchBox,
         IExecutionService executionService,
         IInteractionHubService interactionHubService,
         IWatchdogBuilder watchdogBuilder,
@@ -47,7 +51,8 @@ public partial class MainViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(searchService);
-        ArgumentNullException.ThrowIfNull(settingsFacade);
+        ArgumentNullException.ThrowIfNull(stgWindow);
+        ArgumentNullException.ThrowIfNull(stgSearchBox);
         ArgumentNullException.ThrowIfNull(executionService);
         ArgumentNullException.ThrowIfNull(watchdogBuilder);
         ArgumentNullException.ThrowIfNull(interactionHubService);
@@ -60,12 +65,13 @@ public partial class MainViewModel : ObservableObject
         _thumbnailService = thumbnailService;
 
         //Settings
-        _settingsFacade = settingsFacade;
-        WindowBackdropStyle = settingsFacade.Application.Window.BackdropStyle;
+        _stgWindow = stgWindow;
+        _stgSearchBox = stgSearchBox;
+        WindowBackdropStyle = stgWindow.Value.BackdropStyle;
 
         // Configuration
         _watchdog = watchdogBuilder.WithAction(SearchAsync)
-                                   .WithInterval(settingsFacade.Application.SearchBox.SearchDelay.Milliseconds())
+                                   .WithInterval(_stgSearchBox.Value.SearchDelay.Milliseconds())
                                    .Build();
     }
 
@@ -73,11 +79,11 @@ public partial class MainViewModel : ObservableObject
 
     #region Properties
 
-    private bool DoesReturnAllIfEmpty => _settingsFacade.Application.SearchBox.ShowResult;
+    private bool DoesReturnAllIfEmpty => _stgSearchBox.Value.ShowResult;
 
-    public bool ShowAtStartup => _settingsFacade.Application.SearchBox.ShowAtStartup;
+    public bool ShowAtStartup => _stgSearchBox.Value.ShowAtStartup;
 
-    public bool ShowLastQuery => _settingsFacade.Application.SearchBox.ShowLastQuery;
+    public bool ShowLastQuery => _stgSearchBox.Value.ShowLastQuery;
 
     #endregion
 
@@ -225,7 +231,7 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            if (_settingsFacade.Application.SearchBox.ShowResult && Query.IsNullOrWhiteSpace())
+            if (_stgSearchBox.Value.ShowResult && Query.IsNullOrWhiteSpace())
             {
                 var results = await Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true));
                 Results = new(results);
@@ -240,9 +246,9 @@ public partial class MainViewModel : ObservableObject
 
     public void RefreshSettings()
     {
-        _settingsFacade.Reload();
-        WindowBackdropStyle = _settingsFacade.Application.Window.BackdropStyle;
-        _watchdog.ResetDelay(_settingsFacade.Application.SearchBox.SearchDelay);
+        _stgSearchBox.Reload();
+        WindowBackdropStyle = _stgWindow.Value.BackdropStyle;
+        _watchdog.ResetDelay(_stgSearchBox.Value.SearchDelay);
     }
 
     #endregion

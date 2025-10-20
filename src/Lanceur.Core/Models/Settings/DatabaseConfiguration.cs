@@ -13,7 +13,7 @@ public class DatabaseConfiguration
     /// <summary>
     ///     Gets or sets the caching configuration settings used across the application.
     /// </summary>
-    public CachingSession Caching { get; set; } = new(30, 30);
+    public CachingSection Caching { get; set; } = new(30, 30);
 
     /// <summary>
     ///     Get or sets the configuration settings for the feature flags.

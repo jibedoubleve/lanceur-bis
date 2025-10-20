@@ -13,6 +13,7 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.SharedKernel.DI;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -178,7 +179,8 @@ public class ExecutionServiceShould : TestBase
         var executionService = CreateExecutionService();
 
         var githubService = Substitute.For<IGithubService>();
-        var sp = new ServiceCollection().AddLoggingForTests<GithubIssueMacro>(OutputHelper)
+        var sp = new ServiceCollection().AddSettingSections()
+                                        .AddLoggingForTests<GithubIssueMacro>(OutputHelper)
                                         .AddSingleton<ISettingsFacade, SettingsFacadeService>()
                                         .AddMockSingleton<IApplicationConfigurationService>()
                                         .AddMockSingleton<IDatabaseConfigurationService>((_, i) =>

@@ -21,6 +21,7 @@ using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
+using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -62,7 +63,8 @@ public class SearchServiceShould : TestBase
     )
     {
         serviceCollection ??= new ServiceCollection();
-        serviceCollection.AddMockSingleton<ILoggerFactory>()
+        serviceCollection.AddSettingSections()
+                         .AddMockSingleton<ILoggerFactory>()
                          .AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)
                          )
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())

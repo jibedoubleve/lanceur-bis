@@ -3,9 +3,9 @@ namespace Lanceur.Core.Models.Settings;
 /// <summary>
 ///     Represents the caching configuration settings for the application.
 /// </summary>
-public class CachingSession
+public class CachingSection
 {
-    public CachingSession(int storeCacheDuration, int thumbnailCacheDuration)
+    public CachingSection(int storeCacheDuration, int thumbnailCacheDuration)
     {
         StoreCacheDuration = storeCacheDuration;
         ThumbnailCacheDuration = thumbnailCacheDuration;

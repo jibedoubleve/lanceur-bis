@@ -17,6 +17,7 @@ using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.StateTesters;
+using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
@@ -44,7 +45,8 @@ public class AliasUseCases : TestBase
         var connectionString = ConnectionStringFactory.InMemory;
         var db = GetConnectionManager(Sql.Empty, connectionString.ToString());
 
-        return new ServiceCollection().AddLogging(builder => builder.AddXUnit(OutputHelper))
+        return new ServiceCollection().AddSettingSections()
+                                      .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                       .AddDatabase(db)
                                       .AddApplicationSettings()
                                       .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())

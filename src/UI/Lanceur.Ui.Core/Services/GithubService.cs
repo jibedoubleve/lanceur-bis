@@ -1,3 +1,5 @@
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Octokit;
@@ -19,11 +21,11 @@ public class GithubService : IGithubService
 
     #region Constructors
 
-    public GithubService(ISettingsFacade settings, IUserGlobalNotificationService notificationService)
+    public GithubService(ISection<GithubSection> settings, IUserGlobalNotificationService notificationService)
     {
         _notificationService = notificationService;
         _client = new(new ProductHeaderValue("Lanceur"));
-        _tag = settings.Application.Github.Tag;
+        _tag = settings.Value.Tag;
     }
 
     #endregion

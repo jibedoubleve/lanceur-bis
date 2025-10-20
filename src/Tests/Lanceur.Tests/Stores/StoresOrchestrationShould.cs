@@ -12,6 +12,7 @@ using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -115,7 +116,8 @@ public class StoresOrchestrationShould
     [InlineData("(6+5)+1", "12")]
     public async Task UnderstandCalculationWithOrchestration(string query, string expected)
     {
-        var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+        var serviceProvider = new ServiceCollection().AddSettingSections()
+                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton<AliasStore>()
                                                      .AddLogging()
                                                      .AddSingleton<CalculatorStore>()

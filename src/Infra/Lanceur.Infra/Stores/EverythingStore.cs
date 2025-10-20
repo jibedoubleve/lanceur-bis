@@ -1,7 +1,8 @@
 using Everything.Wrapper;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Models.Settings;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Extensions;
@@ -18,7 +19,7 @@ public class EverythingStore : Store, IStoreService
 
     private readonly IEverythingApi _everythingApi;
     private readonly ILogger<EverythingStore> _logger;
-    private readonly ISettingsFacade _settings;
+    private readonly ISection<StoreSection> _settings;
 
     private const string SearchAlias = ":";
 
@@ -30,7 +31,7 @@ public class EverythingStore : Store, IStoreService
     {
         _logger = serviceProvider.GetService<ILogger<EverythingStore>>();
         _everythingApi = serviceProvider.GetService<IEverythingApi>();
-        _settings = serviceProvider.GetService<ISettingsFacade>();
+        _settings = serviceProvider.GetSection<StoreSection>();
     }
 
     #endregion
@@ -52,7 +53,7 @@ public class EverythingStore : Store, IStoreService
     {
         if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
 
-        var query = $"{cmdline.Parameters} {_settings.Application.Stores.EverythingQuerySuffix}";
+        var query = $"{cmdline.Parameters} {_settings.Value.EverythingQuerySuffix}";
         _logger.LogTrace("Everything query: {Query}", query);
 
         var result =  _everythingApi.Search(query);

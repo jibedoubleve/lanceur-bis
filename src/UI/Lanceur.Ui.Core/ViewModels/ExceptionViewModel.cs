@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Models.Settings;
 
 namespace Lanceur.Ui.Core.ViewModels;
 
@@ -13,7 +14,7 @@ public partial class ExceptionViewModel : ObservableObject
 
     #region Constructors
 
-    public ExceptionViewModel(ISettingsFacade settingsFacade) => WindowBackdropStyle = settingsFacade.Application.Window.BackdropStyle;
+    public ExceptionViewModel(ISection<WindowSection> settings) => WindowBackdropStyle = settings.Value.BackdropStyle;
 
     #endregion
 }
