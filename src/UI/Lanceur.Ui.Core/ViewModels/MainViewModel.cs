@@ -40,12 +40,12 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(
         ILogger<MainViewModel> logger,
         ISearchService searchService,
-        ISection<WindowSection> stgWindow,
-        IWriteableSection<SearchBoxSection> stgSearchBox,
         IExecutionService executionService,
         IInteractionHubService interactionHubService,
         IWatchdogBuilder watchdogBuilder,
-        IThumbnailService thumbnailService
+        IThumbnailService thumbnailService,
+        ISection<WindowSection> stgWindow,
+        IWriteableSection<SearchBoxSection> stgSearchBox
     )
     {
         ArgumentNullException.ThrowIfNull(logger);

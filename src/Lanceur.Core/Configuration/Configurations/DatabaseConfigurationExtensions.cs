@@ -4,11 +4,8 @@ public static class DatabaseConfigurationExtensions
 {
     #region Methods
 
-    public static void SetHotKey(this DatabaseConfiguration databaseConfiguration, int key, int modifierKey)
-    {
-        databaseConfiguration.HotKey.Key = key;
-        databaseConfiguration.HotKey.ModifierKey = modifierKey;
-    }
+    public static void SetHotKey(this DatabaseConfiguration databaseConfiguration, int key, int modifierKey) 
+        => databaseConfiguration.HotKey = new(modifierKey, key);
 
     #endregion
 }

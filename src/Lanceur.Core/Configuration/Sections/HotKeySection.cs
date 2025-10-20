@@ -14,20 +14,27 @@ public class HotKeySection
 
     #region Properties
 
+    /// <remarks>
+    ///     Setter is used for serialization
+    /// </remarks>
+    public int Key { get; }
 
     /// <remarks>
     ///     Setter is used for serialization
     /// </remarks>
-    public int Key { get;  set; }
-
-    /// <remarks>
-    ///     Setter is used for serialization
-    /// </remarks>
-    public int ModifierKey { get;  set; }
+    public int ModifierKey { get; }
 
     #endregion
 
     #region Methods
+
+    /// <inheritdoc />
+    public override bool Equals(object obj)
+    {
+        if (obj is not HotKeySection hks) return false;
+
+        return hks.GetHashCode() == GetHashCode();
+    }
 
     /// <inheritdoc />
     public override int GetHashCode() => (Key, ModifierKey).GetHashCode();
