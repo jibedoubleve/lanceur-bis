@@ -36,7 +36,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
             var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
             connectionManager = GetConnectionManager(sqlBuilder ?? Sql.Empty, connectionString.ToString());
 
-            var serviceCollection = new ServiceCollection().AddSettingSections()
+            var serviceCollection = new ServiceCollection().AddConfigurationSections()
                                                            .AddSingleton<TViewModel>()
                                                            .AddLogging(builder =>
                                                                builder.AddXUnit(OutputHelper)

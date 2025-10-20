@@ -67,7 +67,7 @@ public class SearchServiceOrchestratorShould
                          return i;
                      }
                  )
-                 .AddSettingSections()
+                 .AddConfigurationSections()
                  .BuildServiceProvider();
         var storeService = Substitute.For<IStoreService>();
         storeService.StoreOrchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));

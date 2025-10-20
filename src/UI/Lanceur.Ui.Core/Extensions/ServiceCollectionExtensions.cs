@@ -49,13 +49,14 @@ public static class ServiceCollectionExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>();
-        serviceCollection.AddTransient<ISettingsFacade, SettingsFacadeService>();
-        serviceCollection.AddTransient<IGithubService, GithubService>();
-        return serviceCollection;
-    }
+    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection) 
+        => serviceCollection.AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
+                            .AddSingleton<ISettingsFacade, SettingsFacadeService>()
+                            .AddTransient<IGithubService, GithubService>();
+
+    public static IServiceCollection AddConfigurationSections(this IServiceCollection serviceCollection)
+        => serviceCollection.AddSingleton(typeof(ISection<>), typeof(ConfigurationSection<>))
+                            .AddSingleton(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
 
     public static void AddLoggers(
         this IServiceCollection serviceCollection,
@@ -142,7 +143,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSettingSections()
+        serviceCollection.AddConfigurationSections()
                          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(sp => new(
@@ -195,13 +196,6 @@ public static class ServiceCollectionExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddSettingSections(this IServiceCollection serviceCollection)
-    {
-
-        serviceCollection.AddTransient(typeof(ISection<>), typeof(ConfigurationSection<>))
-                         .AddTransient(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
-        return serviceCollection;
-    }
     public static IServiceCollection AddTrackedMemoryCache(this IServiceCollection services)
     {
         services.AddMemoryCache();

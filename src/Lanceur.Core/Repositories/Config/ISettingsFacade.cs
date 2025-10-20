@@ -24,4 +24,9 @@ public interface ISettingsFacade
     void Save();
 
     #endregion
+
+    /// <summary>
+    ///     Occurs when the configuration is reloaded or modified
+    /// </summary>
+    event EventHandler Updated;
 }

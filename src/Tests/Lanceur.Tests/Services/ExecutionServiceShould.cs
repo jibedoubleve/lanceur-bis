@@ -178,7 +178,7 @@ public class ExecutionServiceShould : TestBase
         var executionService = CreateExecutionService();
 
         var githubService = Substitute.For<IGithubService>();
-        var sp = new ServiceCollection().AddSettingSections()
+        var sp = new ServiceCollection().AddConfigurationSections()
                                         .AddLoggingForTests<GithubIssueMacro>(OutputHelper)
                                         .AddSingleton<ISettingsFacade, SettingsFacadeService>()
                                         .AddMockSingleton<IApplicationConfigurationService>()

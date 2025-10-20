@@ -63,7 +63,7 @@ public class SearchServiceShould : TestBase
     )
     {
         serviceCollection ??= new ServiceCollection();
-        serviceCollection.AddSettingSections()
+        serviceCollection.AddConfigurationSections()
                          .AddMockSingleton<ILoggerFactory>()
                          .AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)
                          )

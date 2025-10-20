@@ -45,7 +45,7 @@ public class AliasUseCases : TestBase
         var connectionString = ConnectionStringFactory.InMemory;
         var db = GetConnectionManager(Sql.Empty, connectionString.ToString());
 
-        return new ServiceCollection().AddSettingSections()
+        return new ServiceCollection().AddConfigurationSections()
                                       .AddLogging(builder => builder.AddXUnit(OutputHelper))
                                       .AddDatabase(db)
                                       .AddApplicationSettings()

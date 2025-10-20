@@ -116,7 +116,7 @@ public class StoresOrchestrationShould
     [InlineData("(6+5)+1", "12")]
     public async Task UnderstandCalculationWithOrchestration(string query, string expected)
     {
-        var serviceProvider = new ServiceCollection().AddSettingSections()
+        var serviceProvider = new ServiceCollection().AddConfigurationSections()
                                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton<AliasStore>()
                                                      .AddLogging()
