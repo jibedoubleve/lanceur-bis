@@ -1,7 +1,6 @@
 using System.Reflection;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Repositories.Config;
-using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Core.Configuration;
 
@@ -18,7 +17,7 @@ public class ConfigurationSection<T> : IWriteableSection<T>
 
     #region Constructors
 
-    public ConfigurationSection(ISettingsFacade settings, ILogger<ConfigurationSection<T>> logger)
+    public ConfigurationSection(ISettingsFacade settings)
     {
         _settings = settings;
         _settings.Updated += (_, _) => _cachedSection = RebuildSection();
