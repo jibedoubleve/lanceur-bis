@@ -45,6 +45,7 @@ public class ConfigurationFacadeService : IConfigurationFacade
     {
         _applicationConfigurationService.Load();
         _databaseConfigurationService.Load();
+        OnUpdated();
     }
 
     /// <inheritdoc />
