@@ -53,8 +53,8 @@ public class ConfigurationFacadeService : IConfigurationFacade
         _applicationConfigurationService.Save();
         _databaseConfigurationService.Save();
 
-        OnUpdated();
         Reload();
+        OnUpdated();
     }
 
     #endregion
