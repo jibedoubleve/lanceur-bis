@@ -41,7 +41,7 @@ public class ThumbnailShould
         action.ShouldNotThrow();
     }
 
-    [Theory]
+    [StaTheory]
     [MemberData(nameof(NotFailWhenCopyingImageSourceThumbnailSource))]
     public void NotFailWhenCopyingImageSourceThumbnail(ImageSource thumbnail, string destinationPath)
     {
