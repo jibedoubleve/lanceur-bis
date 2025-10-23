@@ -100,7 +100,7 @@ public class ThumbnailService : IThumbnailService
                 return;
             }
 
-            alias.Thumbnail.CopyToImageRepository(alias.FileName);
+            alias.Thumbnail.CopyToImageRepository(alias.FileName); 
             return;
         }
 
