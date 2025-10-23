@@ -4,19 +4,20 @@ using Bogus.Platform;
 using Dapper;
 using Lanceur.Core;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Core.Requests;
-using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
+using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Macros;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils.Watchdogs;
@@ -74,13 +75,13 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                          .AddSingleton<IMemoryCache, MemoryCache>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
-                         .AddMockSingleton<IExecutionService>((sp, i) =>
-                             {
-                                 i.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                                  .Returns(ExecutionResponse.NoResult);
-                                 return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
-                             }
+                         .AddSingleton<IWildcardService, ReplacementComposite>()
+                         .AddMockSingleton<ILuaManager>()
+                         .AddMockSingleton<IClipboardService>()
+                         .AddMockSingleton<IProcessLauncher>((sp, i) 
+                             => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
+                         .AddSingleton<IExecutionService, ExecutionService>()
                          .AddMockSingleton<ISearchServiceOrchestrator>((_, i) =>
                              {
                                  i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
@@ -101,10 +102,10 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [Fact]
     public async Task BeAbleToExecuteAliases()
     {
-        IExecutionService sut = null;
+        IProcessLauncher sut = null;
         var visitors = new ServiceVisitors
         {
-            VisitExecutionManager = (_, i) =>
+            VisitProcessLauncher = (_, i) =>
             {
                 sut = i;
                 return i;
@@ -114,7 +115,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
             async (viewModel, _) =>
             {
                 // ARRANGE
-                var alias = Substitute.For<ExecutableQueryResult>();
+                var alias = new AliasQueryResult();
                 viewModel.Results.Add(alias);
 
                 // ACT
@@ -122,13 +123,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                 await viewModel.ExecuteCommand.ExecuteAsync(false); //RunAsAdmin: false
 
                 // ASSERT done in ServiceCollectionConfigurator
-                await Assert.MultipleAsync(
-                    () =>
-                    {
-                        sut.ShouldNotBeNull();
-                        return Task.CompletedTask;
-                    },
-                    () => sut.Received().ExecuteAsync(Arg.Any<ExecutionRequest>())
+                Assert.Multiple(
+                    () => sut.ShouldNotBeNull(),
+                    () => sut.Received().Start(Arg.Any<ProcessContext>())
                 );
             },
             Sql.Empty,

@@ -14,7 +14,7 @@ public class ServiceVisitors
     #region Properties
 
     public IConnectionString? OverridenConnectionString { get; init; }
-    public Func<IServiceProvider, IExecutionService, IExecutionService>? VisitExecutionManager { get; init; }
+    public Func<IServiceProvider, IProcessLauncher, IProcessLauncher>? VisitProcessLauncher { get; init; }
     public Func<IServiceProvider, IUserGlobalNotificationService, IUserGlobalNotificationService>? VisitGlobalUserInteractionService { get; init; }
     public Action<IConfigurationFacade>? VisitSettings { get; init; }
     public Func<IServiceProvider, IUserInteractionService, IUserInteractionService>? VisitUserInteractionService { get; init; }

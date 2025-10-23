@@ -57,12 +57,8 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AddMockSingleton<IUserNotificationService>((sp, i)
                              => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IExecutionService>((sp, i) =>
-                             {
-                                 i.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                                  .Returns(ExecutionResponse.NoResult);
-                                 return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
-                             }
+                         .AddMockSingleton<IProcessLauncher>((sp, i) 
+                             => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IInteractionHubService, InteractionHubService>()
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
