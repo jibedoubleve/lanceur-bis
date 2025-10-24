@@ -73,7 +73,7 @@ public partial class KeywordsViewModel : ObservableObject
                 try
                 {
                     var viewModel = (KeywordsViewModel)r;
-                    
+
                     // Some changes are pending...
                     var confirmed = await _hubService.Interactions.AskAsync(
                         $"Do you want to save the changes for alias '{SelectedAlias!.Name}'?"
@@ -102,9 +102,7 @@ public partial class KeywordsViewModel : ObservableObject
         set
         {
             if (_selectedAlias?.IsDirty ?? false)
-            {
                 WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new(SelectedAlias!));
-            }
 
             value?.MarkUnchanged(); // Newly selected means no changed to be saved...
             SetProperty(ref _selectedAlias, value);
@@ -236,10 +234,23 @@ public partial class KeywordsViewModel : ObservableObject
 
         if (!confirmed) return;
 
-        var toRemove = SelectedAlias?.AdditionalParameters
-                                    .SingleOrDefault(x => x.Id == parameter.Id);
-        SelectedAlias?.AdditionalParameters.Remove(toRemove);
-        SelectedAlias?.MarkChanged();
+        var parameters = SelectedAlias?.AdditionalParameters
+                                      .FirstOrDefault(x => x.Id != 0 && x.Id == parameter.Id);
+        if (parameters is not null) // Id exists
+        {
+            SelectedAlias?.AdditionalParameters.Remove(parameters);
+            SelectedAlias?.MarkChanged();
+        }
+        else // Id doesn't exist, this means it is only in the UI and not the DB
+        {
+            var toRemove = SelectedAlias?.AdditionalParameters
+                                        .FirstOrDefault(x => x.Id == 0 && x.Name == parameter.Name);
+            if (toRemove is not null)
+            {
+                SelectedAlias?.AdditionalParameters.Remove(toRemove);
+                SelectedAlias?.MarkChanged();
+            }
+        }
     }
 
     [RelayCommand]
