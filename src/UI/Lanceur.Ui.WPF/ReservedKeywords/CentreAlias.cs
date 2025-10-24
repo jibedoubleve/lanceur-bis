@@ -30,10 +30,10 @@ public class CentreAlias : SelfExecutableQueryResult
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
         var factory = serviceProvider.GetService<ILoggerFactory>() ??
-                      throw new NullReferenceException("Logger factory is ont configured in the service provider");
+                      throw new InvalidOperationException($"{nameof(ILoggerFactory)} is not configured in the service provider");
         _logger = factory.CreateLogger<CentreAlias>();
         _appConfig = serviceProvider.GetService<IDatabaseConfigurationService>() ??
-                     throw new NullReferenceException(nameof(_appConfig));
+                     throw new InvalidOperationException($"{nameof(IDatabaseConfigurationService)} is not configured in the service provider");
     }
 
     #endregion

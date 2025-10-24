@@ -35,7 +35,7 @@ public class ProcessLauncherLogger : IProcessLauncher
     public async Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline)
     {
         _logger.LogInformation("Execute self executable: {Json}", executable.ToJson());
-        return await Task.FromResult(new List<QueryResult>());
+        return await executable.ExecuteAsync(cmdline);
     }
 
     #endregion

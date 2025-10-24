@@ -176,7 +176,6 @@ public class ExecutionServiceShould : TestBase
     public async Task ExecuteMacroWithParameters(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
-        //var executionService = CreateExecutionService();
 
         var githubService = Substitute.For<IGithubService>();
         var sp = new ServiceCollection().AddConfigurationSections()
