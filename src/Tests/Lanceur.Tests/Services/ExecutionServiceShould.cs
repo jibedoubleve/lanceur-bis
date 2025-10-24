@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.LuaScripting;
 using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -171,11 +172,10 @@ public class ExecutionServiceShould : TestBase
     }
     
     [Theory]
-    [InlineData("issue", "with some text as paramters")]
+    [InlineData("issue", "with some text as parameters")]
     public async Task ExecuteMacroWithParameters(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
-        var executionService = CreateExecutionService();
 
         var githubService = Substitute.For<IGithubService>();
         var sp = new ServiceCollection().AddConfigurationSections()
@@ -191,6 +191,16 @@ public class ExecutionServiceShould : TestBase
                                             i.Current.Returns(config);
                                             return i;
                                         })
+                                        .AddLogging(builder =>
+                                            builder.AddXUnit(OutputHelper)
+                                                   .SetMinimumLevel(LogLevel.Trace))
+                                        .AddMockSingleton<IAliasRepository>()
+                                        .AddMockSingleton<ILuaManager>()
+                                        .AddSingleton<IWildcardService, ReplacementComposite>()
+                                        .AddSingleton<IExecutionService, ExecutionService>()
+                                        .AddSingleton<ReplacementComposite>()
+                                        .AddMockSingleton<IClipboardService>()
+                                        .AddTransient<IProcessLauncher, ProcessLauncherWin32>()
                                         .AddSingleton(githubService)
                                         .AddMockSingleton<IUserGlobalNotificationService>()
                                         .AddMockSingleton<IEnigma>()
@@ -201,14 +211,14 @@ public class ExecutionServiceShould : TestBase
 
         try
         {
+            var executionService = sp.GetService<IExecutionService>();
             await executionService.ExecuteAsync(request); 
-            
         }
-        catch (Exception) { Assert.Fail("This should not throw an exception"); }
+        catch (Exception ex) { Assert.Fail($"This should not throw an exception {ex.Message}"); }
 
         await githubService.Received()
                            .CreateIssue(
-                               Arg.Is<string>(s => s.Contains("some text as paramters")),
+                               Arg.Is<string>(s => s.Contains("some text as parameters")),
                                Arg.Any<string>()
                            );
     }

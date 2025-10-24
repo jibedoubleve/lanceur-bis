@@ -1,5 +1,6 @@
 using System.Data;
 using Dapper;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Sqlite.Entities;
@@ -121,8 +122,9 @@ public class AliasDbAction
 
     internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
     {
-        if (alias is not AliasQueryResult queryResult) return;
+        if (alias is not ExecutableQueryResult exec) return;
 
+        var queryResult = exec.ToAliasQueryResult();
         queryResult.IsHidden = true;
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
@@ -342,7 +344,11 @@ public class AliasDbAction
         tx.Connection.Execute(sqlDelete, new { id });
 
         // Add the updated synonyms 
-        var csv = alias.Synonyms.SplitCsv();
+        var names = alias.Synonyms 
+                    ?? alias.Name 
+                    ?? throw new ArgumentException("The alias to create has no name");
+        
+        var csv = names.SplitCsv();
         const string sqlSynonyms = "insert into alias_name (id_alias, name) values (@id, @name)";
         foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
 

@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Lanceur.Core;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Mappers;
 using Microsoft.Extensions.Logging;
@@ -55,6 +57,10 @@ public class ProcessLauncherWin32 : IProcessLauncher
             }
         );
     }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline)
+        => await  executable.ExecuteAsync(cmdline);
 
     #endregion
 }

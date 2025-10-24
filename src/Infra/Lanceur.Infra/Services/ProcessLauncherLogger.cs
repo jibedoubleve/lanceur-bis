@@ -1,3 +1,5 @@
+using Lanceur.Core;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
@@ -28,6 +30,13 @@ public class ProcessLauncherLogger : IProcessLauncher
         "Executing process with context: {ProcessContext}",
         context.ToJson()
     );
+    
+    /// <inheritdoc />
+    public async Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline)
+    {
+        _logger.LogInformation("Execute self executable: {Json}", executable.ToJson());
+        return await executable.ExecuteAsync(cmdline);
+    }
 
     #endregion
 }

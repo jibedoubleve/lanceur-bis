@@ -1,3 +1,6 @@
+using Lanceur.Core.Models;
+using Lanceur.Core.Responses;
+
 namespace Lanceur.Core.Services;
 
 public interface IProcessLauncher
@@ -23,6 +26,21 @@ public interface IProcessLauncher
     ///     required to start the process. Must not be null.
     /// </param>
     void Start(ProcessContext context);
+    
+    /// <summary>
+    ///     Starts the process defined by the specified <see cref="ISelfExecutable" /> instance,
+    ///     using the provided <see cref="Cmdline" /> as execution parameters.
+    /// </summary>
+    /// <param name="executable">
+    ///     The <see cref="ISelfExecutable" /> instance representing the process to start.
+    ///     Must not be null.
+    /// </param>
+    /// <param name="cmdline">
+    ///     The <see cref="Cmdline" /> instance containing the command-line parameters
+    ///     to use for the process execution. Must not be null.
+    /// </param>
+    Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline);
+
 
     #endregion
 }

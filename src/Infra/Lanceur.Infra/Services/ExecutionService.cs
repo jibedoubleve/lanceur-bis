@@ -210,7 +210,7 @@ public class ExecutionService : IExecutionService
                 _logger.LogInformation("Executing self executable {Name}", name);
                 exec.IsElevated = request.ExecuteWithPrivilege;
                 return ExecutionResponse.FromResults(
-                    await exec.ExecuteAsync(Cmdline.Parse(request.QueryResult.OriginatingQuery))
+                    await _process.Start(exec, Cmdline.Parse(request.QueryResult.OriginatingQuery))
                 );
 
             default:

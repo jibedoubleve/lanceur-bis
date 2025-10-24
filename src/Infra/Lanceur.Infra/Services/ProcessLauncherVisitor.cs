@@ -1,3 +1,5 @@
+using Lanceur.Core;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Services;
@@ -31,6 +33,10 @@ public class ProcessLauncherVisitor : IProcessLauncher
 
     /// <inheritdoc />
     public void Start(ProcessContext context) => _processContextVisitor?.Invoke(context);
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline) 
+        => await Task.FromResult(new List<QueryResult>());
 
     #endregion
 }

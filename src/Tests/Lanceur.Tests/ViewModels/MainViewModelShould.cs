@@ -1,27 +1,33 @@
 using System.Reflection;
-using Shouldly;
+using System.Web.Bookmarks;
+using Bogus.Platform;
+using Dapper;
 using Lanceur.Core;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Core.Requests;
-using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
+using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Macros;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
+using Lanceur.Ui.WPF.ReservedKeywords;
+using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
@@ -36,6 +42,14 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
 
     #region Methods
 
+    private static IEnumerable<object[]> GetKeywords()
+    {
+        var keywords = typeof(QuitAlias).Assembly.GetTypes()
+                                        .Where(t => t.GetCustomAttribute<ReservedAliasAttribute>() is not null)
+                                        .Select(t => t.GetCustomAttribute<ReservedAliasAttribute>()!.Name);
+        foreach (var type in keywords) yield return new[] { type };
+    }
+
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
         ServiceVisitors visitors
@@ -43,7 +57,12 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     {
         serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                         .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
+                         .AddSingleton(new AssemblySource
+                         {
+                             MacroSource = Assembly.GetExecutingAssembly(), 
+                             ReservedKeywordSource = typeof(MainView).GetAssembly()
+                         })
+                         .AddMockSingleton<IBookmarkRepositoryFactory>()
                          .AddSingleton<IMappingService, MappingService>()
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<IMacroService, MacroService>()
@@ -56,13 +75,13 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                          .AddSingleton<IMemoryCache, MemoryCache>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
-                         .AddMockSingleton<IExecutionService>((sp, i) =>
-                             {
-                                 i.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                                  .Returns(ExecutionResponse.NoResult);
-                                 return visitors?.VisitExecutionManager?.Invoke(sp, i) ?? i;
-                             }
+                         .AddSingleton<IWildcardService, ReplacementComposite>()
+                         .AddMockSingleton<ILuaManager>()
+                         .AddMockSingleton<IClipboardService>()
+                         .AddMockSingleton<IProcessLauncher>((sp, i) 
+                             => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
+                         .AddSingleton<IExecutionService, ExecutionService>()
                          .AddMockSingleton<ISearchServiceOrchestrator>((_, i) =>
                              {
                                  i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
@@ -83,10 +102,10 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [Fact]
     public async Task BeAbleToExecuteAliases()
     {
-        IExecutionService sut = null;
+        IProcessLauncher sut = null;
         var visitors = new ServiceVisitors
         {
-            VisitExecutionManager = (_, i) =>
+            VisitProcessLauncher = (_, i) =>
             {
                 sut = i;
                 return i;
@@ -96,7 +115,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
             async (viewModel, _) =>
             {
                 // ARRANGE
-                var alias = Substitute.For<ExecutableQueryResult>();
+                var alias = new AliasQueryResult();
                 viewModel.Results.Add(alias);
 
                 // ACT
@@ -104,13 +123,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                 await viewModel.ExecuteCommand.ExecuteAsync(false); //RunAsAdmin: false
 
                 // ASSERT done in ServiceCollectionConfigurator
-                await Assert.MultipleAsync(
-                    () =>
-                    {
-                        sut.ShouldNotBeNull();
-                        return Task.CompletedTask;
-                    },
-                    () => sut.Received().ExecuteAsync(Arg.Any<ExecutionRequest>())
+                Assert.Multiple(
+                    () => sut.ShouldNotBeNull(),
+                    () => sut.Received().Start(Arg.Any<ProcessContext>())
                 );
             },
             Sql.Empty,
@@ -185,21 +200,46 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
-                    const int expectedCount = 1;
-                    viewModel.Query = "alias_1"; // default name is alias_{idAlias}
-                    
-                    // Handle the option "Application.SearchBox.ShowResult" If sets ti "True" it means it should show
-                    // all the results (only if query is empty)
-                    await viewModel.DisplayResultsIfAllowed();
-                    await viewModel.SearchCommand.ExecuteAsync(null);
+                const int expectedCount = 1;
+                viewModel.Query = "alias_1"; // default name is alias_{idAlias}
 
-                    viewModel.ShouldSatisfyAllConditions(
-                        vm => vm.Results.Count.ShouldBe(expectedCount),
-                        vm => vm.Results.Count.ShouldBe(expectedCount)
-                    );
+                // Handle the option "Application.SearchBox.ShowResult" If sets ti "True" it means it should show
+                // all the results (only if query is empty)
+                await viewModel.DisplayResultsIfAllowed();
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                viewModel.ShouldSatisfyAllConditions(
+                    vm => vm.Results.Count.ShouldBe(expectedCount),
+                    vm => vm.Results.Count.ShouldBe(expectedCount)
+                );
             },
             sqlBuilder,
             visitors
+        );
+    }
+
+    [Theory]
+    [MemberData(nameof(GetKeywords))]
+    public async Task ShouldIncrementUsageOfKeyword(string keyword)
+    {
+        await TestViewModelAsync(async (viewModel, db) =>
+            {
+                // Arrange
+                
+                // Act
+                viewModel.Query = keyword;
+                await viewModel.SearchCommand.ExecuteAsync(null);
+                
+                viewModel.SelectedResult = viewModel.Results.FirstOrDefault();
+                await viewModel.ExecuteCommand.ExecuteAsync(false);
+                
+                // Assert
+                viewModel.SelectedResult.ShouldNotBeNull();
+                viewModel.SelectedResult.Name.ShouldNotBeNull();
+                
+                const string sql = "select count(*) from alias_usage";
+                db.WithConnection(c => c.ExecuteScalar(sql).ShouldBe(1, customMessage: $"We should find the usage of the keyword {keyword}"));
+            }
         );
     }
 

@@ -16,8 +16,12 @@ namespace Lanceur.Ui.WPF.ReservedKeywords;
 [Description("Centre Lanceur in the middle of the screen.")]
 public class CentreAlias : SelfExecutableQueryResult
 {
-    private readonly ILogger<CentreAlias> _logger;
+    #region Fields
+
     private readonly IDatabaseConfigurationService? _appConfig;
+    private readonly ILogger<CentreAlias> _logger;
+
+    #endregion
 
     #region Constructors
 
@@ -25,9 +29,11 @@ public class CentreAlias : SelfExecutableQueryResult
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
-        var factory = serviceProvider.GetService<ILoggerFactory>() ?? throw new NullReferenceException("Logger factory is ont configured in the service provider");
+        var factory = serviceProvider.GetService<ILoggerFactory>() ??
+                      throw new InvalidOperationException($"{nameof(ILoggerFactory)} is not configured in the service provider");
         _logger = factory.CreateLogger<CentreAlias>();
-        _appConfig = serviceProvider.GetService<IDatabaseConfigurationService>() ?? throw new NullReferenceException(nameof(_appConfig));
+        _appConfig = serviceProvider.GetService<IDatabaseConfigurationService>() ??
+                     throw new InvalidOperationException($"{nameof(IDatabaseConfigurationService)} is not configured in the service provider");
     }
 
     #endregion
@@ -42,8 +48,7 @@ public class CentreAlias : SelfExecutableQueryResult
 
     private void Save(Coordinate coordinate)
     {
-        _appConfig!.Edit(
-            s =>
+        _appConfig!.Edit(s =>
             {
                 s.Window.Position.Left = coordinate.X;
                 s.Window.Position.Top = coordinate.Y;
