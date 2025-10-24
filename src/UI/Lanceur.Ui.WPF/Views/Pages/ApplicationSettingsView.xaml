@@ -55,7 +55,8 @@
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Window" />
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Keyboard24}">
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Keyboard24}"
+                                ToolTipService.ToolTip="Defines the keyboard shortcut used to open the search interface and start searching aliases. Choose a key combination that does not conflict with system or application shortcuts.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Hot key" />
                     </ui:CardControl.Header>
@@ -82,6 +83,24 @@
                 </ui:CardControl>
 
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Color24}">
+                    <ui:CardControl.ToolTip>
+                        <ToolTip HasDropShadow="True" MaxWidth="360" Placement="Mouse">
+                            <StackPanel>
+                                <TextBlock Text="Glass Effect" FontWeight="Bold" Margin="0,0,0,4" />
+                                <TextBlock Text="Determines the visual material applied to the app background."
+                                           TextWrapping="Wrap" Margin="0,0,0,8" />
+
+                                <TextBlock Text="• Mica — Subtle transparency with depth." TextWrapping="Wrap"
+                                           Margin="0,0,0,2" />
+                                <TextBlock Text="• Acrylic — Stronger blur and transparency for a dynamic look."
+                                           TextWrapping="Wrap" Margin="0,0,0,2" />
+                                <TextBlock Text="• Tab — Applies the effect only to tab surfaces." TextWrapping="Wrap"
+                                           Margin="0,0,0,2" />
+                                <TextBlock Text="• None — Disables all visual effects." TextWrapping="Wrap"
+                                           Margin="0,0,0,2" />
+                            </StackPanel>
+                        </ToolTip>
+                    </ui:CardControl.ToolTip>
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Glass Effect" />
                     </ui:CardControl.Header>
