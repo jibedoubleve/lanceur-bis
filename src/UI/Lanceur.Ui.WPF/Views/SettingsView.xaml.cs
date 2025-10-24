@@ -5,6 +5,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.SharedKernel.DI;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Helpers;
@@ -17,6 +18,7 @@ using Wpf.Ui.Extensions;
 
 namespace Lanceur.Ui.WPF.Views;
 
+[Singleton]
 public partial class SettingsView : INavigationWindow
 {
     #region Fields
