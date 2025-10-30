@@ -2,11 +2,11 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
-public partial class MostUsedView
+public partial class UsageCalendarView
 {
-     #region Constructors
+    #region Constructors
 
-    public MostUsedView(MostUsedViewModel viewModel)
+    public UsageCalendarView(UsageCalendarViewModel viewModel)
     {
         DataContext = viewModel;
         InitializeComponent();

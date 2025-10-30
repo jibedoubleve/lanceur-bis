@@ -328,4 +328,11 @@ public interface IAliasRepository
     void SetUsage(QueryResult alias);
 
     #endregion
+
+    /// <summary>
+    /// Get the alias usage for the specified day
+    /// </summary>
+    /// <param name="selectedDay"></param>
+    /// <returns>The list of the usage for the specified day</returns>
+    IEnumerable<AliasUsageItem> GetUsageFor(DateTime selectedDay);
 }

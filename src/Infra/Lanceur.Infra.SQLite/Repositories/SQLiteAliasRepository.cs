@@ -405,6 +405,26 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         };
     }
 
+    /// <inheritdoc />
+    public IEnumerable<AliasUsageItem> GetUsageFor(DateTime selectedDay)
+    {
+        const string sql = """
+                           select
+                               a.id        as Id,
+                               sy.synonyms as Name,
+                               time_stamp  as Timestamp,
+                               a.file_name as FileName,
+                               a.Icon      as Icon
+                           from 
+                               alias_usage au
+                               left join data_alias_synonyms_v sy on sy.id_alias = au.id_alias
+                               inner join alias a on a.id = au.id_alias
+                           where date(time_stamp) = date(@selectedDay)
+                           order by au.time_stamp
+                           """;
+        return Db.WithConnection(c => c.Query<AliasUsageItem>(sql, new { selectedDay }));
+    }
+
 
     /// <inheritdoc />
     public IEnumerable<int> GetYearsWithUsage()
