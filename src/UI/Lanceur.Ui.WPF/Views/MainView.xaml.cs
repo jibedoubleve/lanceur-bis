@@ -20,7 +20,6 @@ using Microsoft.Extensions.Logging;
 using NHotkey;
 using Wpf.Ui.Appearance;
 using ListViewItem = System.Windows.Controls.ListViewItem;
-using MenuItem = System.Windows.Controls.MenuItem;
 
 namespace Lanceur.Ui.WPF.Views;
 
@@ -32,12 +31,12 @@ public partial class MainView
     #region Fields
 
     private readonly IComputerInfoService _computerInfoService;
+    private readonly IConfigurationFacade _configuration;
 
     private readonly IDatabaseConfigurationService _databaseConfig;
     private readonly IFeatureFlagService _featureFlagService;
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IConfigurationFacade _configuration;
 
     #endregion
 
@@ -113,6 +112,12 @@ public partial class MainView
         PanelCpu.Visibility
             = PanelMemory.Visibility
                 = enabled ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void HandleSettingButton()
+    {
+        var enabled = _featureFlagService.IsEnabled(Features.ShowSettingButton);
+        SettingButton.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 
     /// <remarks>
@@ -274,6 +279,8 @@ public partial class MainView
         _ = ViewModel.DisplayResultsIfAllowed();
 
         HandleCpuAndMemoryUsage();
+        HandleSettingButton();
+        
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();
 
