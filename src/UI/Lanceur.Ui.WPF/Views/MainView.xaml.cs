@@ -220,9 +220,9 @@ public partial class MainView
 
     private void OnSettingsClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not MenuItem menuItem) return;
+        if (sender is not FrameworkElement frameworkElement) return;
 
-        switch (menuItem.Tag)
+        switch (frameworkElement.Tag)
         {
             case "showquery": ShowWindow(); break;
 
