@@ -13,13 +13,18 @@ public class KeyToDirectionConverter : IValueConverter
     {
         if (value is not KeyEventArgs keyEventArgs) return Binding.DoNothing;
 
-        var direction = keyEventArgs.Key switch
+        var modifiers = Keyboard.Modifiers;
+        var direction = (keyEventArgs.Key, modifiers) switch
         {
-            Key.Up       => Direction.Up,
-            Key.Down     => Direction.Down,
-            Key.PageUp   => Direction.PageUp,
-            Key.PageDown => Direction.PageDown,
-            _            => Direction.None
+            (Key.J, ModifierKeys.Control)  => Direction.Down,
+            (Key.L, ModifierKeys.Control)  => Direction.PageDown,
+            (Key.K, ModifierKeys.Control)  => Direction.Up,
+            (Key.H, ModifierKeys.Control)  => Direction.PageUp,
+            (Key.Up, _)       => Direction.Up,
+            (Key.Down, _)     => Direction.Down,
+            (Key.PageUp, _)   => Direction.PageUp,
+            (Key.PageDown, _) => Direction.PageDown,
+            _                 => Direction.None
         };
 
         /*
