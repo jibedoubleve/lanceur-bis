@@ -6,6 +6,7 @@ public static class Features
 
     public const string ResourceDisplay = "ShowSystemUsage";
     public const string AdditionalParameterAlwaysActive = "AdditionalParameterAlwaysActive";
+    public const string ShowSettingButton = "ShowSettingButton";
 
     #endregion
 }

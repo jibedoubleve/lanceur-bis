@@ -141,29 +141,43 @@
                 Margin="5,6,5,2"
                 Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}" />
 
-
             <Grid Grid.Row="3"
                   Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}"
                   Margin="0,0,15,6">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <DockPanel LastChildFill="True" Grid.Column="0" x:Name="PanelCpu">
+                <ui:Button Padding="0"
+                           ToolTip="Open settings..."
+                           Margin="10 0 5 0"
+                           Click="OnSettingsClick"
+                           x:Name="SettingButton"
+                           Tag="settings"
+                           HorizontalContentAlignment="Stretch"
+                           VerticalContentAlignment="Stretch"
+                           Background="Transparent">
+                    <ui:SymbolIcon Symbol="Settings24"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch" />
+                </ui:Button>
+
+                <DockPanel LastChildFill="True" Grid.Column="1" x:Name="PanelCpu">
                     <ui:TextBlock Text="CPU" Margin="15,0,10,0" FontTypography="Caption" HorizontalAlignment="Right"
                                   Width="30" />
                     <ProgressBar x:Name="CpuProgressBar" Maximum="100" Margin="0,0,5,0" Height="6" />
                 </DockPanel>
 
-                <DockPanel LastChildFill="True" Grid.Column="1" x:Name="PanelMemory">
+                <DockPanel LastChildFill="True" Grid.Column="2" x:Name="PanelMemory" VerticalAlignment="Center">
                     <ui:TextBlock Text="Memory" Margin="15,0,5,0" FontTypography="Caption" HorizontalAlignment="Right"
                                   Width="46" />
                     <ProgressBar x:Name="MemoryProgressBar" Minimum="0" Maximum="100" Margin="0,0,10,0" Height="6" />
                 </DockPanel>
 
-                <StackPanel Grid.Column="2"
+                <StackPanel Grid.Column="3"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Orientation="Horizontal">

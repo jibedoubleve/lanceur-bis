@@ -13,6 +13,7 @@ using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.DI;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.Core.Constants;
+using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -38,6 +39,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isAlt;
     [ObservableProperty] private bool _isCtrl;
     [ObservableProperty] private bool _isResourceMonitorEnabled;
+    [ObservableProperty] private bool _isSettingsButtonEnabled;
     [ObservableProperty] private bool _isShift;
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
@@ -93,9 +95,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         MapSettingsFromDbToUi();
-        IsResourceMonitorEnabled = Configuration.Application.FeatureFlags.Any(
-            e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.OrdinalIgnoreCase) && e.Enabled
-        );
+        var featureFlags = Configuration.Application.FeatureFlags.ToArray();
+        IsResourceMonitorEnabled = featureFlags.IsFeatureFlagEnabled(Features.ResourceDisplay);
+        IsSettingsButtonEnabled = featureFlags.IsFeatureFlagEnabled(Features.ShowSettingButton);
 
         // Setup behaviour on property changed
         foreach (var flag in FeatureFlags) flag.PropertyChanged += OnPropertyChanged;
@@ -187,9 +189,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Feature flags
         Configuration.Application.FeatureFlags = FeatureFlags;
-        IsResourceMonitorEnabled = FeatureFlags.Any(
-            e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.OrdinalIgnoreCase) && e.Enabled
-        );
+        IsResourceMonitorEnabled = FeatureFlags.IsFeatureFlagEnabled(Features.ResourceDisplay);
 
         // Resource Monitor
         Configuration.Application.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
