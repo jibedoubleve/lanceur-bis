@@ -44,6 +44,10 @@
                     Content="Most used"
                     Icon="{ui:SymbolIcon TextWordCount24}"
                     TargetPageType="{x:Type pages:MostUsedView}" />
+                <ui:NavigationViewItem
+                    Content="Daily History"
+                    Icon="{ui:SymbolIcon CalendarArrowCounterclockwise24}"
+                    TargetPageType="{x:Type pages:UsageCalendarView}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem

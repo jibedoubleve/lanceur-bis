@@ -8,7 +8,7 @@ public interface IMappingService
 
     CompositeAliasQueryResult ToAliasQueryResultComposite(AliasQueryResult source, IEnumerable<AliasQueryResult> subaliases);
 
-    IEnumerable<QueryResult> ToQueryResult(IEnumerable<string> enumerable);
+    AliasQueryResult ToAliasQueryResult(AliasUsageItem source);
 
     IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<AliasQueryResult> source);
 

@@ -20,13 +20,8 @@ public partial class MappingService : IMappingService
     public CompositeAliasQueryResult ToAliasQueryResultComposite(AliasQueryResult source, IEnumerable<AliasQueryResult> subaliases) => ToCompositeAliasQueryResult(source, subaliases);
 
     /// <inheritdoc />
-    public  IEnumerable<QueryResult> ToQueryResult(IEnumerable<string> enumerable)
-    {
-        enumerable = enumerable?.ToList() ?? [];
-        return enumerable.Any()
-            ? enumerable.Select(ToQueryResult)
-            : [];
-    }
+    [MapperRequiredMapping(RequiredMappingStrategy.None)]
+    public partial AliasQueryResult ToAliasQueryResult(AliasUsageItem source);
 
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(IEnumerable<AliasQueryResult> source) => source.Select(ToSelectableAliasQueryResult);

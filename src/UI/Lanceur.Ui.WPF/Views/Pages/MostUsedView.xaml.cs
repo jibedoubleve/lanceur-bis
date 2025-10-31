@@ -4,7 +4,7 @@ namespace Lanceur.Ui.WPF.Views.Pages;
 
 public partial class MostUsedView
 {
-    #region Constructors
+     #region Constructors
 
     public MostUsedView(MostUsedViewModel viewModel)
     {

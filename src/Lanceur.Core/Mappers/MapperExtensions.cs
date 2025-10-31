@@ -12,5 +12,8 @@ public static class MapperExtensions
     public static AliasQueryResult ToAliasQueryResult(this ExecutableQueryResult src)
         => new AliasQueryResultMapper().Map(src);
 
+    public static AliasQueryResult ToAliasQueryResult(this AliasUsageItem src)
+        => new MappingService().ToAliasQueryResult(src);
+
     #endregion
 }

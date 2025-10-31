@@ -1,5 +1,6 @@
 ﻿namespace Lanceur.Core.Models;
 
+//TODO: Rename this class into AliasUsage
 public class UsageQueryResult
 {
     #region Properties
