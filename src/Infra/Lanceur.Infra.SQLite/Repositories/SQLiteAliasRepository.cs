@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
 using Dapper;
 using Lanceur.Core.Models;
@@ -154,6 +155,20 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
 
     /// <inheritdoc />
+    public IEnumerable<DateTime> GetDaysWithHistory(DateTime day)
+    {
+        const string sql = """
+                           select 
+                              date(time_stamp) as day
+                           from alias_usage
+                           where  strftime('%m-%Y', time_stamp) = strftime('%m-%Y', @date)
+                           group by strftime('%d-%m-%Y', time_stamp)
+                           order by strftime('%Y-%m-%d', time_stamp);
+                           """;
+        return Db.WithConnection(c => c.Query<DateTime>(sql, new { date = day.Date }));
+    }
+
+    /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetDeletedAlias()
     {
         const string sql = $"""
@@ -230,6 +245,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 and id_alias != @idAlias
                             """;
         return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
+    }
+
+    /// <inheritdoc />
+    public DateTime? GetFirstHistory()
+    {
+        const string sql = "select date(min(time_stamp)) from alias_usage";
+        return Db.WithConnection(c => c.Query<DateTime>(sql).FirstOrDefault());
     }
 
     /// <inheritdoc />
@@ -403,6 +425,26 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             Per.Year      => action.PerYear(year),
             _             => throw new NotSupportedException($"Cannot retrieve the usage at the '{per}' level")
         };
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<AliasUsageItem> GetUsageFor(DateTime selectedDay)
+    {
+        const string sql = """
+                           select
+                               a.id        as Id,
+                               sy.synonyms as Name,
+                               time_stamp  as Timestamp,
+                               a.file_name as FileName,
+                               a.Icon      as Icon
+                           from 
+                               alias_usage au
+                               left join data_alias_synonyms_v sy on sy.id_alias = au.id_alias
+                               inner join alias a on a.id = au.id_alias
+                           where date(time_stamp) = date(@selectedDay)
+                           order by au.time_stamp
+                           """;
+        return Db.WithConnection(c => c.Query<AliasUsageItem>(sql, new { selectedDay }));
     }
 
 
