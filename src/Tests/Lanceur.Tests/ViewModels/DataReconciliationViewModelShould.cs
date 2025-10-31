@@ -663,7 +663,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
                 await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
 
-                viewModel.Aliases.Count.ShouldBe(1);
+                viewModel.Aliases.Count.ShouldBe(2);
             },
             sqlBuilder,
             visitors

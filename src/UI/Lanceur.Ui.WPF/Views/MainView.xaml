@@ -17,10 +17,10 @@
     BorderThickness=".25"
     FocusManager.FocusedElement="{Binding ElementName=QueryTextBox}"
     Loaded="OnLoaded"
-    LostKeyboardFocus="OnLostKeyboardFocus"
     MouseDown="OnMouseDown"
     MouseUp="OnMouseUp"
     PreviewKeyDown="OnPreviewKeyDown"
+    Deactivated="OnDeactivated"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     SizeToContent="Height"
@@ -151,8 +151,8 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <ui:Button Padding="0"
-                           ToolTip="Open settings..."
+                <ui:Button ToolTip="Open settings..."
+                           BorderThickness="0"
                            Margin="10 0 5 0"
                            Click="OnSettingsClick"
                            x:Name="SettingButton"
@@ -160,12 +160,19 @@
                            HorizontalContentAlignment="Stretch"
                            VerticalContentAlignment="Stretch"
                            Background="Transparent">
-                    <ui:SymbolIcon Symbol="Settings24"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch" />
+                    <DockPanel LastChildFill="True">
+                        <ui:SymbolIcon Symbol="Settings24"
+                                       DockPanel.Dock="Left"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch" />
+                        <TextBlock Text="Settings"
+                                   Margin="5 0 0 0"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </DockPanel>
                 </ui:Button>
 
-                <DockPanel LastChildFill="True" Grid.Column="1" x:Name="PanelCpu">
+                <DockPanel LastChildFill="True" Grid.Column="1" x:Name="PanelCpu" VerticalAlignment="Center">
                     <ui:TextBlock Text="CPU" Margin="15,0,10,0" FontTypography="Caption" HorizontalAlignment="Right"
                                   Width="30" />
                     <ProgressBar x:Name="CpuProgressBar" Maximum="100" Margin="0,0,5,0" Height="6" />
@@ -173,7 +180,7 @@
 
                 <DockPanel LastChildFill="True" Grid.Column="2" x:Name="PanelMemory" VerticalAlignment="Center">
                     <ui:TextBlock Text="Memory" Margin="15,0,5,0" FontTypography="Caption" HorizontalAlignment="Right"
-                                  Width="46" />
+                                  Width="46" VerticalAlignment="Center" />
                     <ProgressBar x:Name="MemoryProgressBar" Minimum="0" Maximum="100" Margin="0,0,10,0" Height="6" />
                 </DockPanel>
 
