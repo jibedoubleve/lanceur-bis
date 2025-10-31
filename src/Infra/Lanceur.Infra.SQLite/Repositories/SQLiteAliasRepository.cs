@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
 using Dapper;
 using Lanceur.Core.Models;
@@ -154,6 +155,20 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
 
     /// <inheritdoc />
+    public IEnumerable<DateTime> GetDaysWithHistory(DateTime day)
+    {
+        const string sql = """
+                           select 
+                              date(time_stamp) as day
+                           from alias_usage
+                           where  strftime('%m-%Y', time_stamp) = strftime('%m-%Y', @date)
+                           group by strftime('%d-%m-%Y', time_stamp)
+                           order by strftime('%Y-%m-%d', time_stamp);
+                           """;
+        return Db.WithConnection(c => c.Query<DateTime>(sql, new { date = day.Date }));
+    }
+
+    /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetDeletedAlias()
     {
         const string sql = $"""
@@ -230,6 +245,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 and id_alias != @idAlias
                             """;
         return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
+    }
+
+    /// <inheritdoc />
+    public DateTime? GetFirstHistory()
+    {
+        const string sql = "select date(min(time_stamp)) from alias_usage";
+        return Db.WithConnection(c => c.Query<DateTime>(sql).FirstOrDefault());
     }
 
     /// <inheritdoc />

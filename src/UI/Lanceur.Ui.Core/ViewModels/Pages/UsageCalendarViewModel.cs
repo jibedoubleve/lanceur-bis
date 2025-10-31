@@ -1,12 +1,13 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Microsoft.Extensions.Logging;
 using Lanceur.SharedKernel.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
@@ -15,12 +16,15 @@ public partial class UsageCalendarViewModel : ObservableObject
     #region Fields
 
     private readonly IAliasRepository _aliasRepository;
-
+    [ObservableProperty] private DateTime _displayDateEnd;
+    [ObservableProperty] private DateTime _displayDateStart;
     [ObservableProperty] private ObservableCollection<AliasUsageItem> _history = [];
 
     private readonly ILogger<UsageCalendarViewModel> _logger;
-    [ObservableProperty] private string _selectedDay;
+    [ObservableProperty] private string _displayDateTitle = DateTime.Today.ToString(DatePattern, CultureInfo.InvariantCulture);
     private readonly IThumbnailService _thumbnailService;
+
+    private const string DatePattern = "dddd dd MMMM yyyy";
 
     #endregion
 
@@ -42,11 +46,20 @@ public partial class UsageCalendarViewModel : ObservableObject
     #region Methods
 
     [RelayCommand]
+    private async Task OnLoadAsync()
+    {
+        var date = await Task.Run(() => _aliasRepository.GetFirstHistory());
+        DisplayDateStart = date ??  DateTime.Today;
+        DisplayDateEnd = DateTime.Today;
+        DisplayDateTitle = DateTime.Today.ToString(DatePattern, CultureInfo.InvariantCulture);
+    }
+
+    [RelayCommand]
     private async Task OnLoadHistory(DateTime selectedDay)
     {
         var history = await Task.Run(() => _aliasRepository.GetUsageFor(selectedDay));
 
-        SelectedDay = selectedDay.ToString("dddd dd MMMM yyyy");
+        DisplayDateTitle = selectedDay.ToString(DatePattern, CultureInfo.InvariantCulture);
         History = new(history);
     }
 
@@ -63,15 +76,18 @@ public partial class UsageCalendarViewModel : ObservableObject
         {
             _thumbnailService.UpdateThumbnail(queryResult);
             foreach (var item in History)
-            {
-                if(item.Id == usageItem.Id) { item.Thumbnail = queryResult.Thumbnail; }
-            }
+                if (item.Id == usageItem.Id)
+                    item.Thumbnail = queryResult.Thumbnail;
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to load thumbnail for alias id {IdAlias}", queryResult.Id);
         }
     }
+
+    public IEnumerable<DateTime> GetHistoryOfMonth(DateTime? selectedDay) => selectedDay is not null
+        ? _aliasRepository.GetDaysWithHistory(selectedDay.Value)
+        : [];
 
     #endregion
 }

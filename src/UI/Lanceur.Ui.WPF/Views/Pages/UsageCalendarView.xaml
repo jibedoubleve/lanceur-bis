@@ -19,26 +19,54 @@
             <interactivity:InvokeCommandAction Command="{Binding LoadUsageCommand}"
                                                CommandParameter="{x:Static sys:DateTime.Today}" />
         </interactivity:EventTrigger>
+        <interactivity:EventTrigger EventName="Loaded">
+            <interactivity:InvokeCommandAction Command="{Binding LoadCommand}" />
+        </interactivity:EventTrigger>
     </interactivity:Interaction.Triggers>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Calendar HorizontalAlignment="Left">
-            <interactivity:Interaction.Behaviors>
-                <b:CalendarSelectedDateBehaviour Command="{Binding LoadHistoryCommand}" />
-            </interactivity:Interaction.Behaviors>
-        </Calendar>
+        <StackPanel HorizontalAlignment="Center"
+                    Margin="40 40 40 40">
+            <Calendar HorizontalAlignment="Left" x:Name="UsageCalendar" 
+                      DisplayDateStart="{Binding DisplayDateStart}"
+                      DisplayDateEnd="{Binding DisplayDateEnd}"
+                      DisplayDate="{Binding DisplayDate}">
+                <interactivity:Interaction.Behaviors>
+                    <b:CalendarSelectedDateBehaviour Command="{Binding LoadHistoryCommand}" />
+                </interactivity:Interaction.Behaviors>
+                <Calendar.Style>
+                    <Style TargetType="Calendar" BasedOn="{StaticResource DefaultCalendarStyle}">
+                        <Setter Property="CalendarDayButtonStyle">
+                            <Setter.Value>
+                                <Style TargetType="CalendarDayButton"
+                                       BasedOn="{StaticResource DefaultCalendarDayButtonStyle}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsBlackedOut" Value="True">
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Calendar.Style>
+            </Calendar>
+        </StackPanel>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <ui:TextBlock Text="{Binding SelectedDay, Mode=OneWay}"
-                          Margin="15,5,5,15"
-                          FontTypography="Title" />
-            <DataGrid Grid.Row="1" ItemsSource="{Binding History}" 
+
+            <ui:TextBlock Margin="10,40,0,40"
+                          FontTypography="Title">
+                <Run Text="History of" />
+                <Run Text="{Binding DisplayDateTitle, Mode=OneWay}" />
+            </ui:TextBlock>
+            <DataGrid Grid.Row="1" ItemsSource="{Binding History}"
                       AutoGenerateColumns="False"
                       CanUserAddRows="False"
                       CanUserDeleteRows="False"

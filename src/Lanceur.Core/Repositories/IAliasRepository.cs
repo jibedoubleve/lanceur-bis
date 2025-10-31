@@ -74,6 +74,17 @@ public interface IAliasRepository
     AliasQueryResult GetById(long id);
 
     /// <summary>
+    ///     Returns all dates within the month of the specified day that contain historical records.
+    /// </summary>
+    /// <param name="day">
+    ///     The reference day used to determine the target month.
+    /// </param>
+    /// <returns>
+    ///     An <see cref="IEnumerable{DateTime}" /> representing all days in the month that have associated history.
+    /// </returns>
+    IEnumerable<DateTime> GetDaysWithHistory(DateTime day);
+
+    /// <summary>
     ///     Retrieves a collection of aliases that have been logically deleted.
     ///     Logical deletion means the aliases are marked as deleted in the system
     ///     but are not permanently removed from the database.
@@ -99,7 +110,7 @@ public interface IAliasRepository
     ///     This is used for validation. You check before creating a new alias whether one (or more) of the names
     ///     already exists in the database
     /// </remarks>
-    public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
+    IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias);
 
     /// <summary>
     ///     Retrieves aliases from the provided list that exist in the database and are marked as logically deleted.
@@ -111,6 +122,16 @@ public interface IAliasRepository
     ///     and marked as logically deleted in the database.
     /// </returns>
     IEnumerable<string> GetExistingDeletedAliases(IEnumerable<string> aliasesToCheck, long idAlias);
+
+    /// <summary>
+    ///     Retrieves the date of the earliest entry in the history,
+    ///     or returns <c>null</c> if the history contains no entries.
+    /// </summary>
+    /// <returns>
+    ///     The date of the first history entry, or <c>null</c> if none exist.
+    /// </returns>
+    DateTime? GetFirstHistory();
+
 
     /// <summary>
     ///     Retrieves counters for hidden but non-deleted aliases.
@@ -168,7 +189,7 @@ public interface IAliasRepository
     /// <returns>
     ///     A collection of <see cref="SelectableAliasQueryResult" /> representing aliases that were not used.
     /// </returns>
-    public IEnumerable<SelectableAliasQueryResult> GetUnusedAliases();
+    IEnumerable<SelectableAliasQueryResult> GetUnusedAliases();
 
     /// <summary>
     ///     Returns usage trends. The result is meant to be dislayed as a chart
@@ -180,6 +201,13 @@ public interface IAliasRepository
     /// </param>
     /// <returns>Points of the chart</returns>
     IEnumerable<DataPoint<DateTime, double>> GetUsage(Per per, int? year = null);
+
+    /// <summary>
+    ///     Get the alias usage for the specified day
+    /// </summary>
+    /// <param name="selectedDay"></param>
+    /// <returns>The list of the usage for the specified day</returns>
+    IEnumerable<AliasUsageItem> GetUsageFor(DateTime selectedDay);
 
     /// <summary>
     ///     Retrieves all unique years where usage data is recorded.
@@ -303,7 +331,7 @@ public interface IAliasRepository
     /// </summary>
     /// <param name="names">The names to find in the database</param>
     /// <returns></returns>
-    public ExistingNameResponse SelectNames(string[] names);
+    ExistingNameResponse SelectNames(string[] names);
 
     /// <summary>
     ///     Searches for a hidden alias with the specified name. and, if exists, set the usage into the specified QueryResult's
@@ -328,11 +356,4 @@ public interface IAliasRepository
     void SetUsage(QueryResult alias);
 
     #endregion
-
-    /// <summary>
-    /// Get the alias usage for the specified day
-    /// </summary>
-    /// <param name="selectedDay"></param>
-    /// <returns>The list of the usage for the specified day</returns>
-    IEnumerable<AliasUsageItem> GetUsageFor(DateTime selectedDay);
 }
