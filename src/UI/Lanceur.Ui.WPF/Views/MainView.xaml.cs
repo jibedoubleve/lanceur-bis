@@ -8,7 +8,6 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Extensions;
-using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
@@ -19,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NHotkey;
 using Wpf.Ui.Appearance;
-using ListViewItem = System.Windows.Controls.ListViewItem;
 
 namespace Lanceur.Ui.WPF.Views;
 
@@ -157,6 +155,8 @@ public partial class MainView
         ApplicationThemeManager.Apply(ApplicationTheme.Light, windowBackdropType);
     }
 
+    private void OnDeactivated(object? sender, EventArgs e) => Hide();
+
     private void OnLoaded(object _, RoutedEventArgs e)
     {
         var messenger = WeakReferenceMessenger.Default;
@@ -180,16 +180,6 @@ public partial class MainView
 
         SetWindowPosition();
         ShowWindow();
-    }
-
-    private void OnLostKeyboardFocus(object _, RoutedEventArgs e)
-    {
-        /* This is how I handle a click on a result. I don't hide the window immediately;
-         * I let the 'ExecuteCommand' run, which will handle hiding the window itself.
-         */
-        if (e is KeyboardFocusChangedEventArgs { NewFocus: ListViewItem }) return;
-
-        ConditionalExecution.ExecuteOnRelease(HideWindow);
     }
 
     private void OnMouseDown(object _, MouseButtonEventArgs e)
@@ -280,7 +270,7 @@ public partial class MainView
 
         HandleCpuAndMemoryUsage();
         HandleSettingButton();
-        
+
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();
 
