@@ -155,7 +155,7 @@ public partial class MainView
         ApplicationThemeManager.Apply(ApplicationTheme.Light, windowBackdropType);
     }
 
-    private void OnDeactivated(object? sender, EventArgs e) => Hide();
+    private void OnDeactivated(object? sender, EventArgs e) => HideWindow();
 
     private void OnLoaded(object _, RoutedEventArgs e)
     {
