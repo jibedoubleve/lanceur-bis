@@ -24,7 +24,5 @@ public static class MapperExtensions
         this IEnumerable<AliasQueryResult> src
     ) => new MappingService().ToSelectableQueryResult(src);
 
-    public static SelectableAliasQueryResult ToSelectableAliasQueryResult(this AliasQueryResult src)
-        => new MappingService().ToSelectableAliasQueryResult(src);
     #endregion
 }
