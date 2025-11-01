@@ -25,9 +25,6 @@ jobs:
       - name: Restore packages
         run: dotnet restore
 
-      - name: Display outdated packages
-        run: dotnet list package --outdated
-
       - name: Install Inno Setup
         run: choco install innosetup -y        
         
