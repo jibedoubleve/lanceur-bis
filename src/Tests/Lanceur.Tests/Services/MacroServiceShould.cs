@@ -15,11 +15,13 @@ using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Utils;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.Macros;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Lanceur.Tests.Services;
 
@@ -85,7 +87,7 @@ public class MacroServiceShould : TestBase
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddLoggerFactory(OutputHelper)
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                      .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();
@@ -106,7 +108,7 @@ public class MacroServiceShould : TestBase
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILogger<MacroService>>()
-                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddLoggerFactory(OutputHelper)
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                      .AddSingleton<MacroService>()
                                                      .AddSingleton<MultiMacroTest>()
@@ -124,7 +126,7 @@ public class MacroServiceShould : TestBase
         // Arrange
         const string sql = Cfg.SqlForAliases;
         using var db = BuildFreshDb(sql);
-        var service = Cfg.GetDataService(db);
+        var service = Cfg.GetDataService(db, OutputHelper);
 
         // Act
         var results = service.Search("alias1");
@@ -139,7 +141,7 @@ public class MacroServiceShould : TestBase
         // Arrange
         const string sql = Cfg.SqlForAliases;
         using var db = BuildFreshDb(sql);
-        var service = Cfg.GetDataService(db);
+        var service = Cfg.GetDataService(db, OutputHelper);
 
         //Act
         var results = service.Search("alias1")
@@ -159,7 +161,7 @@ public class MacroServiceShould : TestBase
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddLoggerFactory(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
@@ -202,7 +204,7 @@ public class MacroServiceShould : TestBase
         // Arrange
         const string sql = Cfg.SqlForAliases;
         using var db = BuildFreshDb(sql);
-        var service = Cfg.GetDataService(db);
+        var service = Cfg.GetDataService(db, OutputHelper);
 
         // Act
         var results = service.Search("alias1");
@@ -221,7 +223,7 @@ public class MacroServiceShould : TestBase
         // Arrange
         const string sql = Cfg.SqlForAliases;
         using var db = BuildFreshDb(sql);
-        var service = Cfg.GetDataService(db);
+        var service = Cfg.GetDataService(db, OutputHelper);
 
         //Act
         var results = service.Search("alias1");
@@ -250,7 +252,7 @@ public class MacroServiceShould : TestBase
         // Arrange
         const string sql = Cfg.SqlForAliases;
         using var db = BuildFreshDb(sql);
-        var service = Cfg.GetDataService(db);
+        var service = Cfg.GetDataService(db, OutputHelper);
 
         // Act
         var results = service.Search("alias2")
@@ -282,7 +284,7 @@ public class MacroServiceShould : TestBase
         
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddLoggerFactory(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
@@ -315,7 +317,7 @@ public class MacroServiceShould : TestBase
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddLoggerFactory(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
@@ -365,9 +367,9 @@ public class MacroServiceShould : TestBase
 
         #region Methods
 
-        public static IAliasRepository GetDataService(IDbConnection db)
+        public static IAliasRepository GetDataService(IDbConnection db, ITestOutputHelper output)
         {
-            var log = Substitute.For<ILoggerFactory>();
+            var log = new MicrosoftLoggingLoggerFactory(output);
             var service = new SQLiteAliasRepository(
                 new DbSingleConnectionManager(db),
                 log,

@@ -1,8 +1,7 @@
-﻿using Lanceur.Tests.Tools.Logging;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Xunit;
 
-namespace Lanceur.Tests.Tooling.Logging;
+namespace Lanceur.Tests.Tools.Logging;
 
 public class MicrosoftLoggingLoggerFactory : ILoggerFactory
 {

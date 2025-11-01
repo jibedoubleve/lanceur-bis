@@ -6,6 +6,7 @@ using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
 using MartinCostello.Logging.XUnit;
 using Microsoft.Extensions.Logging;
@@ -120,5 +121,7 @@ public abstract class TestBase
         }
     }
 
+    protected ILogger<T> CreateLogger<T>() => new TestOutputHelperDecoratorForMicrosoftLogging<T>(OutputHelper);
+    protected ILoggerFactory CreateLoggerFactory() => new MicrosoftLoggingLoggerFactory(OutputHelper);
     #endregion
 }

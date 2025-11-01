@@ -33,7 +33,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     {
         var connection = BuildFreshDb(sql, connectionString);
         var scope = new DbSingleConnectionManager(connection);
-        var log = Substitute.For<ILoggerFactory>();
+        var log = CreateLoggerFactory();
         var service = new SQLiteAliasRepository(
             scope,
             log,

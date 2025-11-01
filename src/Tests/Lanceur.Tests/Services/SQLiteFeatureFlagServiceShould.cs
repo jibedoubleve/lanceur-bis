@@ -30,7 +30,7 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         // arrange
         var conn = BuildFreshDb();
         var scope = new DbSingleConnectionManager(conn);
-        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
+        var logger = CreateLogger<SQLiteDatabaseConfigurationService>();
 
         var settings = new SQLiteDatabaseConfigurationService(scope, logger);
         var featureFlag = new SQLiteFeatureFlagService(scope);
@@ -55,7 +55,7 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         var conn = BuildFreshDb();
         
         var scope = new DbSingleConnectionManager(conn);
-        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
+        var logger = CreateLogger<SQLiteDatabaseConfigurationService>();
         var settings = new SQLiteDatabaseConfigurationService(scope, logger);
 
         settings.Current.FeatureFlags.ShouldNotBeEmpty("application has feature flags");

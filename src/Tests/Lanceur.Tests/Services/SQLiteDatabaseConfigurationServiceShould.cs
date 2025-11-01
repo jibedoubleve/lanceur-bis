@@ -1,15 +1,16 @@
 ﻿using Dapper;
 using Lanceur.Core.Configuration.Configurations;
-using Shouldly;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
+using Lanceur.Tests.Tools.Logging;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Services;
@@ -26,22 +27,20 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
     private void WithConfiguration(Action<IDatabaseConfigurationService> assert, string json = null)
     {
-        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
         var sql = $"insert into settings (s_key, s_value) values ('json', '{json}');";
 
         using var c = BuildFreshDb();
         c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteDatabaseConfigurationService(scope, logger);
+        var settingRepository = new SQLiteDatabaseConfigurationService(scope, CreateLogger<SQLiteDatabaseConfigurationService>());
         assert(settingRepository);
     }
 
     private void WithConfiguration(Action<DatabaseConfiguration> update, Action<DatabaseConfiguration> assert)
     {
-        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
         using var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteDatabaseConfigurationService(scope, logger);
+        var settingRepository = new SQLiteDatabaseConfigurationService(scope, CreateLogger<SQLiteDatabaseConfigurationService>());
 
         update(settingRepository.Current);
 
@@ -252,8 +251,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
-        var settings = new SQLiteDatabaseConfigurationService(scope, logger);
+        var settings = new SQLiteDatabaseConfigurationService(scope, CreateLogger<SQLiteDatabaseConfigurationService>());
 
         settings.Current.SearchBox.ShowAtStartup.ShouldBeTrue();
     }
@@ -263,7 +261,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var logger = Substitute.For<ILogger<SQLiteDatabaseConfigurationService>>();
+        var logger = CreateLogger<SQLiteDatabaseConfigurationService>();
         var settings = new SQLiteDatabaseConfigurationService(scope, logger);
 
         settings.Current.SearchBox.ShowResult.ShouldBeFalse();

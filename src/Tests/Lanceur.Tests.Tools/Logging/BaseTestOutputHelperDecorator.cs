@@ -1,7 +1,7 @@
 ﻿using Lanceur.SharedKernel.Extensions;
 using Xunit;
 
-namespace Lanceur.Tests.Tooling.Logging;
+namespace Lanceur.Tests.Tools.Logging;
 
 public class BaseTestOutputHelperDecorator
 {

@@ -1,13 +1,12 @@
 using Dapper;
 using Shouldly;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Win32.Services;
-using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tools;
+using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
 using NSubstitute;
 using Xunit;
