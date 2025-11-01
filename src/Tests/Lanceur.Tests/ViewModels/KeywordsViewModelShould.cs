@@ -41,8 +41,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         ServiceVisitors visitors
     )
     {
-        serviceCollection.AddSingleton<IMappingService, MappingService>()
-                         .AddSingleton<IDbActionFactory, DbActionFactory>()
+        serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddMockSingleton<IDatabaseConfigurationService>()
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()

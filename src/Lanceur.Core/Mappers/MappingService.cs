@@ -5,19 +5,14 @@ using Riok.Mapperly.Abstractions;
 namespace Lanceur.Core.Mappers;
 
 [Mapper]
-public partial class MappingService : IMappingService
+public partial class MappingService
 {
     #region Methods
 
-    private partial CompositeAliasQueryResult ToCompositeAliasQueryResult(AliasQueryResult source, IEnumerable<AliasQueryResult> aliases);
-
-    private static DisplayQueryResult ToQueryResult(string source) => new($"@{source}@", "This is a macro", "LinkVariant");
+    public partial CompositeAliasQueryResult ToCompositeAliasQueryResult(AliasQueryResult source, IEnumerable<AliasQueryResult> aliases);
 
     [MapperIgnoreTarget(nameof(SelectableAliasQueryResult.IsSelected))]
-    private partial SelectableAliasQueryResult ToSelectableAliasQueryResult(AliasQueryResult source);
-
-    /// <inheritdoc />
-    public CompositeAliasQueryResult ToAliasQueryResultComposite(AliasQueryResult source, IEnumerable<AliasQueryResult> subaliases) => ToCompositeAliasQueryResult(source, subaliases);
+    public partial SelectableAliasQueryResult ToSelectableAliasQueryResult(AliasQueryResult source);
 
     /// <inheritdoc />
     [MapperRequiredMapping(RequiredMappingStrategy.None)]

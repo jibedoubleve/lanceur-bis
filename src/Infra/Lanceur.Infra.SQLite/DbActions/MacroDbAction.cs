@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
@@ -11,20 +12,16 @@ public class MacroDbAction
 {
     #region Fields
 
-    private readonly IMappingService _converter;
     private readonly IDbActionFactory _dbActionFactory;
     private readonly ILogger _logger;
-    private readonly ILoggerFactory _loggerFactory;
 
     #endregion
 
     #region Constructors
 
-    internal MacroDbAction(ILoggerFactory loggerFactory, IMappingService converter, IDbActionFactory dbActionFactory)
+    internal MacroDbAction(ILoggerFactory loggerFactory, IDbActionFactory dbActionFactory)
     {
-        _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<MacroDbAction>();
-        _converter = converter;
         _dbActionFactory = dbActionFactory;
     }
 
@@ -72,7 +69,7 @@ public class MacroDbAction
                 delay = 1;
             }
 
-        var result = _converter.ToAliasQueryResultComposite(item, subAliases);
+        var result = item.ToAliasQueryResultComposite(subAliases);
         return result;
     }
 

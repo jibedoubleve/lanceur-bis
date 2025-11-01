@@ -368,12 +368,10 @@ public class MacroServiceShould : TestBase
         public static IAliasRepository GetDataService(IDbConnection db)
         {
             var log = Substitute.For<ILoggerFactory>();
-            var conv = new MappingService();
             var service = new SQLiteAliasRepository(
                 new DbSingleConnectionManager(db),
                 log,
-                conv,
-                new DbActionFactory(new MappingService(), log)
+                new DbActionFactory(log)
             );
             return service;
         }

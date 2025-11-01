@@ -24,8 +24,7 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
-        serviceCollection.AddSingleton<IMappingService, MappingService>()
-                         .AddSingleton<IDbActionFactory, DbActionFactory>()
+        serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddSingleton<IMemoryCache, MemoryCache>();
         return serviceCollection;
     }

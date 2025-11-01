@@ -1,9 +1,8 @@
-using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
 using Dapper;
+using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.SharedKernel.Extensions;
@@ -16,7 +15,6 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 {
     #region Fields
 
-    private readonly IMappingService _converter;
     private readonly IDbActionFactory _dbActionFactory;
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly ILogger<SQLiteAliasRepository> _logger;
@@ -32,15 +30,12 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public SQLiteAliasRepository(
         IDbConnectionManager manager,
         ILoggerFactory logFactory,
-        IMappingService converter,
         IDbActionFactory dbActionFactory
     ) : base(manager)
     {
         ArgumentNullException.ThrowIfNull(logFactory);
-        ArgumentNullException.ThrowIfNull(converter);
 
         _logger = logFactory.GetLogger<SQLiteAliasRepository>();
-        _converter = converter;
         _getAllAliasDbAction = new(manager);
         _dbActionFactory = dbActionFactory;
     }
@@ -103,7 +98,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                   ) // Excluding all aliases that serve as shortcuts for URLs
                   .Where(e => !e.FileName.StartsWith("package:"))  // Excluding all packaged applications
                   .ToArray();
-        return _converter.ToSelectableQueryResult(results);
+        return results.ToSelectableQueryResult();
     }
 
     /// <inheritdoc />
@@ -211,7 +206,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             order by file_name
                             """;
         var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
-        var r = _converter.ToSelectableQueryResult(results);
+        var r = results.ToSelectableQueryResult();
         return r;
     }
 
@@ -282,7 +277,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months, DateTime? startThreshold = null)
     {
         var nowDate = startThreshold ?? DateTime.Today;
-        
+
         const int threshold = 12 * 30; // 30 years max in the past...
         if (months >= threshold) months = threshold;
         var sql = $"""
