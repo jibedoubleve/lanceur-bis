@@ -63,7 +63,7 @@ public class SearchServiceShould : TestBase
     {
         serviceCollection ??= new ServiceCollection();
         serviceCollection.AddConfigurationSections()
-                         .AddLoggerFactory(OutputHelper)
+                         .AddLoggerFactoryForTests(OutputHelper)
                          .AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton<AssemblySource>()
@@ -278,7 +278,7 @@ public class SearchServiceShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroService>()
                                                      .AddMockSingleton<IThumbnailService>()
                                                      .AddMockSingleton<IStoreLoader>()
-                                                     .AddLoggerFactory(OutputHelper)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddMockSingleton<ISearchServiceOrchestrator>((_, orchestrator) =>
                                                          {
                                                              orchestrator.IsAlive(

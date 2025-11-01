@@ -87,7 +87,7 @@ public class MacroServiceShould : TestBase
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddLoggerFactory(OutputHelper)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                      .AddSingleton<MacroService>()
                                                      .BuildServiceProvider();
@@ -108,7 +108,7 @@ public class MacroServiceShould : TestBase
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILogger<MacroService>>()
-                                                     .AddLoggerFactory(OutputHelper)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                                                      .AddSingleton<MacroService>()
                                                      .AddSingleton<MultiMacroTest>()
@@ -161,7 +161,7 @@ public class MacroServiceShould : TestBase
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddLoggerFactory(OutputHelper)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
@@ -284,7 +284,7 @@ public class MacroServiceShould : TestBase
         
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddLoggerFactory(OutputHelper)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
@@ -317,7 +317,7 @@ public class MacroServiceShould : TestBase
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddLoggerFactory(OutputHelper)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })

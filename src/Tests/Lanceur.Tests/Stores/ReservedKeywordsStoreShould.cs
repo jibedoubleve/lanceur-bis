@@ -46,7 +46,7 @@ public class ReservedKeywordsStoreShould
                               .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                               .AddSingleton(Substitute.For<IDatabaseConfigurationService>())
                               .AddSingleton(aliasRepository)
-                              .AddLoggerFactory(_output)
+                              .AddLoggerFactoryForTests(_output)
                               .AddSingleton(reservedAliasStoreLogger)
                               .AddMockSingleton<IBookmarkRepositoryFactory>()
                               .AddMockSingleton<IConfigurationFacade>((_, i) =>

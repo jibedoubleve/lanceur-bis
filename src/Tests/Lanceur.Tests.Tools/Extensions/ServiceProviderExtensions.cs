@@ -44,7 +44,7 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddLoggerFactory(
+    public static IServiceCollection AddLoggerFactoryForTests(
         this IServiceCollection serviceCollection,
         ITestOutputHelper outputHelper
     )
