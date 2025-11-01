@@ -29,6 +29,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     private readonly IWriteableSection<ReconciliationSection> _settingsFacade;
     private readonly IThumbnailService _thumbnailService;
     [ObservableProperty] private string _title = string.Empty;
+    private DateTime? _today;
     private readonly IUserInteractionService _userInteraction;
     private readonly IUserNotificationService _userNotification;
     private readonly IViewFactory _viewFactory;
@@ -378,9 +379,10 @@ public partial class DataReconciliationViewModel : ObservableObject
             ReportType.UnannotatedAliases => _repository.GetAliasesWithoutNotes,
             ReportType.RestoreAlias       => _repository.GetDeletedAlias,
             ReportType.UnusedAliases      => _repository.GetUnusedAliases,
-            ReportType.InactiveAliases    => () =>  _repository.GetInactiveAliases(Reconciliation.InactivityThreshold),
-            ReportType.RarelyUsedAliases  => () =>  _repository.GetRarelyUsedAliases(Reconciliation.LowUsageThreshold),
-            _                             => throw new ArgumentOutOfRangeException($"Report '{reportType}' not found")
+            ReportType.InactiveAliases    => ()
+                => _repository.GetInactiveAliases(Reconciliation.InactivityThreshold, _today),
+            ReportType.RarelyUsedAliases => () => _repository.GetRarelyUsedAliases(Reconciliation.LowUsageThreshold),
+            _                            => throw new ArgumentOutOfRangeException($"Report '{reportType}' not found")
         };
 
         ReportType = reportType;
@@ -422,6 +424,17 @@ public partial class DataReconciliationViewModel : ObservableObject
         _logger.LogInformation("Updated {Items} aliases", selectedAliases.Length);
         await OnShowAliasesWithoutNotes();
     }
+
+    /// <summary>
+    ///     Overrides the current date used by the ViewModel.
+    ///     Intended for testing scenarios to simulate different "today" values
+    ///     and verify inactivity chart behaviour.
+    /// </summary>
+    /// <param name="today">
+    ///     Optional custom date to use as the current day.
+    ///     If null, restores the default system date.
+    /// </param>
+    public void OverrideToday(DateTime? today = null) => _today = today;
 
     #endregion
 }
