@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Web.Bookmarks;
-using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Managers;
@@ -10,30 +9,44 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling.ReservedAliases;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.ReservedAliases;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Stores;
 
 public class ReservedKeywordsStoreShould
 {
+    #region Fields
+
+    private readonly ITestOutputHelper _output;
+
+    #endregion
+
+    #region Constructors
+
+    public ReservedKeywordsStoreShould(ITestOutputHelper output) => _output = output;
+
+    #endregion
+
     #region Methods
 
-    private static ReservedAliasStore GetStore(IAliasRepository aliasRepository, Type type = null)
+    private ReservedAliasStore GetStore(IAliasRepository aliasRepository, Type type = null)
     {
         type ??= typeof(NotExecutableTestAlias);
 
-        var reservedAliasStoreLogger = Substitute.For<ILogger<ReservedAliasStore>>();
+        var reservedAliasStoreLogger = new TestOutputHelperDecoratorForMicrosoftLogging<ReservedAliasStore>(_output);
         var serviceProvider = new ServiceCollection()
                               .AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
                               .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                               .AddSingleton(Substitute.For<IDatabaseConfigurationService>())
                               .AddSingleton(aliasRepository)
-                              .AddSingleton<ILoggerFactory, LoggerFactory>()
+                              .AddLoggerFactoryForTests(_output)
                               .AddSingleton(reservedAliasStoreLogger)
                               .AddMockSingleton<IBookmarkRepositoryFactory>()
                               .AddMockSingleton<IConfigurationFacade>((_, i) =>
@@ -80,7 +93,7 @@ public class ReservedKeywordsStoreShould
                  )
                  .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                  .AddSingleton(aliasRepository)
-                 .AddSingleton(Substitute.For<ILogger<ReservedAliasStore>>())
+                 .AddSingleton(new TestOutputHelperDecoratorForMicrosoftLogging<ReservedAliasStore>(_output))
                  .BuildServiceProvider();
 
         var store = new ReservedAliasStore(sp);

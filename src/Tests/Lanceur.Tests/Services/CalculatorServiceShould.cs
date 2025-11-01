@@ -2,7 +2,6 @@
 using Shouldly;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Logging;
-using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tools.Logging;
 using Xunit;
 

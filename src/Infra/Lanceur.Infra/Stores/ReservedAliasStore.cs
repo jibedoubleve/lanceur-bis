@@ -7,6 +7,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +41,8 @@ public class ReservedAliasStore : Store, IStoreService
         _serviceProvider = serviceProvider;
         _assembly = serviceProvider.GetService<AssemblySource>()?.ReservedKeywordSource ?? throw new NullReferenceException("The AssemblySource is not set in the DI container.");
         _aliasRepository = serviceProvider.GetService<IAliasRepository>();
-        _logger = serviceProvider.GetService<ILogger<ReservedAliasStore>>();
+        _logger = serviceProvider.GetService<ILoggerFactory>()
+                                 .GetLogger<ReservedAliasStore>();
     }
 
     #endregion

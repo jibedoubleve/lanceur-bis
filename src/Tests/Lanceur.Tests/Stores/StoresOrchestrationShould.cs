@@ -12,11 +12,13 @@ using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Logging;
 using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
+using Xunit.v3;
 
 namespace Lanceur.Tests.Stores;
 
@@ -38,7 +40,7 @@ public class StoresOrchestrationShould
 
     private static IAliasRepository AliasRepository => Substitute.For<IAliasRepository>();
 
-    private static ILoggerFactory LoggerFactory => Substitute.For<ILoggerFactory>();
+    private ILoggerFactory LoggerFactory => new MicrosoftLoggingLoggerFactory(_outputHelper);
 
     #endregion
 
@@ -125,7 +127,7 @@ public class StoresOrchestrationShould
                                                      .AddSingleton<ISearchService, SearchService>()
                                                      .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                                                      .AddMockSingleton<IThumbnailService>()
-                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddLoggerFactoryForTests(_outputHelper)
                                                      .AddMockSingleton<IMacroService>((_, i) =>
                                                      {
                                                          i.ExpandMacroAlias(Arg.Any<QueryResult[]>())

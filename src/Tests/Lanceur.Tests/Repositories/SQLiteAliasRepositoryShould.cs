@@ -10,6 +10,7 @@ using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tools;
+using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -45,24 +46,24 @@ public class SQLiteAliasRepositoryShould : TestBase
             Icon = faker.Image.PlaceholderUrl(150, 150)
         };
     }
-
-    private static AliasDbAction BuildAliasDbAction(ILoggerFactory loggerFactory = null)
+    
+    private AliasDbAction BuildAliasDbAction(ILoggerFactory loggerFactory = null)
     {
-        var log = loggerFactory ?? Substitute.For<ILoggerFactory>();
+        var log = loggerFactory ?? CreateLoggerFactory();
         var action = new AliasDbAction(log);
         return action;
     }
 
-    private static AliasSearchDbAction BuildAliasSearchDbAction()
+    private AliasSearchDbAction BuildAliasSearchDbAction()
     {
-        var log = Substitute.For<ILoggerFactory>();
+        var log = CreateLoggerFactory();
         return new(log, new DbActionFactory(log));
     }
 
-    private static SQLiteAliasRepository BuildDataService(IDbConnection connection)
+    private SQLiteAliasRepository BuildDataService(IDbConnection connection)
     {
         var scope = new DbSingleConnectionManager(connection);
-        var log = Substitute.For<ILoggerFactory>();
+        var log = CreateLoggerFactory();
         var service = new SQLiteAliasRepository(
             scope,
             log,

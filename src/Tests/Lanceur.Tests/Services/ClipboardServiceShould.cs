@@ -1,14 +1,29 @@
-﻿using Shouldly;
-using Lanceur.Core.Services;
+﻿using Lanceur.Core.Services;
 using Lanceur.Infra.Wildcards;
+using Lanceur.Tests.Tools.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Services;
 
 public class ClipboardServiceShould
 {
+    #region Fields
+
+    private readonly ITestOutputHelper _output;
+
+    #endregion
+
+    #region Constructors
+
+    public ClipboardServiceShould(ITestOutputHelper output) => _output = output;
+
+    private ILogger<ReplacementComposite> CreateLogger()
+        => new TestOutputHelperDecoratorForMicrosoftLogging<ReplacementComposite>(_output);
+    #endregion
+
     #region Methods
 
     [Theory]
@@ -41,9 +56,8 @@ public class ClipboardServiceShould
     public void ReplaceWithText(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
-        var logger = Substitute.For<ILogger<ReplacementComposite>>();
         clipboard.RetrieveText().Returns(param);
-        var mgr = new ReplacementComposite(clipboard, logger);
+        var mgr = new ReplacementComposite(clipboard, CreateLogger());
 
         mgr.Replace(actual, param)
            .ShouldBe(expected);
@@ -56,8 +70,7 @@ public class ClipboardServiceShould
     public void ReturnParametersAsExpected(string aliasParam, string userParam, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
-        var logger = Substitute.For<ILogger<ReplacementComposite>>();
-        var mgr = new ReplacementComposite(clipboard, logger);
+        var mgr = new ReplacementComposite(clipboard, CreateLogger());
 
         mgr.ReplaceOrReplacementOnNull(aliasParam, userParam).ShouldBe(expected);
     }

@@ -15,7 +15,6 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
-using Lanceur.Tests.Tooling.Logging;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
@@ -64,9 +63,8 @@ public class SearchServiceShould : TestBase
     {
         serviceCollection ??= new ServiceCollection();
         serviceCollection.AddConfigurationSections()
-                         .AddMockSingleton<ILoggerFactory>()
-                         .AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)
-                         )
+                         .AddLoggerFactoryForTests(OutputHelper)
+                         .AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton<AssemblySource>()
                          .AddSingleton<IStoreLoader, StoreLoader>()
@@ -280,7 +278,7 @@ public class SearchServiceShould : TestBase
         var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroService>()
                                                      .AddMockSingleton<IThumbnailService>()
                                                      .AddMockSingleton<IStoreLoader>()
-                                                     .AddMockSingleton<ILoggerFactory>()
+                                                     .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddMockSingleton<ISearchServiceOrchestrator>((_, orchestrator) =>
                                                          {
                                                              orchestrator.IsAlive(
