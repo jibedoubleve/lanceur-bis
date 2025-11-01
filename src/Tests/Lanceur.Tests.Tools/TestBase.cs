@@ -48,17 +48,16 @@ public abstract class TestBase
             if (_loggerFactory != null) return _loggerFactory;
 
             var xunitLoggerOptions = new XUnitLoggerOptions();
-            _loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(
-                builder => builder
-                           .AddProvider(
-                               new XUnitLoggerProvider(
-                                       OutputHelper,
-                                       xunitLoggerOptions
-                                   )
-                           )
-                           .SetMinimumLevel(
-                               LogLevel.Trace
-                           )
+            _loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder
+                                                                                          .AddProvider(
+                                                                                              new XUnitLoggerProvider(
+                                                                                                  OutputHelper,
+                                                                                                  xunitLoggerOptions
+                                                                                              )
+                                                                                          )
+                                                                                          .SetMinimumLevel(
+                                                                                              LogLevel.Trace
+                                                                                          )
             );
 
             return _loggerFactory;
@@ -98,6 +97,9 @@ public abstract class TestBase
     protected IDbConnection BuildFreshDb(string? sql = null, IConnectionString? connectionString = null)
         => BuildFreshDb(sql, connectionString?.ToString());
 
+    protected ILogger<T> CreateLogger<T>() => new TestOutputHelperDecoratorForMicrosoftLogging<T>(OutputHelper);
+    protected ILoggerFactory CreateLoggerFactory() => new MicrosoftLoggingLoggerFactory(OutputHelper);
+
 
     protected static void CreateVersion(IDbConnection db, string version)
     {
@@ -121,7 +123,5 @@ public abstract class TestBase
         }
     }
 
-    protected ILogger<T> CreateLogger<T>() => new TestOutputHelperDecoratorForMicrosoftLogging<T>(OutputHelper);
-    protected ILoggerFactory CreateLoggerFactory() => new MicrosoftLoggingLoggerFactory(OutputHelper);
     #endregion
 }
