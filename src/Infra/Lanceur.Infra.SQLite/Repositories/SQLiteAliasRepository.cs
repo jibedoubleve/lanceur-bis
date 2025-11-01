@@ -279,8 +279,10 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     );
 
     /// <inheritdoc />
-    public IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months)
+    public IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months, DateTime? startThreshold = null)
     {
+        var nowDate = startThreshold ?? DateTime.Today;
+        
         const int threshold = 12 * 30; // 30 years max in the past...
         if (months >= threshold) months = threshold;
         var sql = $"""
@@ -304,12 +306,12 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                        inner join alias      c          on a.id_alias = c.id
                        left join stat_usage_per_app_v e on a.id_alias = e.id_alias
                    where 
-                        a.last_used < date('now', '-{months} months')
+                        a.last_used < date(@nowDate, '-{months} months')
                         and deleted_at is null
                    group by a.id_alias
                    order by last_used asc
                    """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql, new { nowDate }));
     }
 
     /// <inheritdoc />

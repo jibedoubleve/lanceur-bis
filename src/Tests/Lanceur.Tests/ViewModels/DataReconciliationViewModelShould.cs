@@ -1,5 +1,4 @@
 using Dapper;
-using Shouldly;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
@@ -18,6 +17,7 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
@@ -31,6 +31,14 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     #endregion
 
     #region Methods
+
+    private static IEnumerable<object[]> ShowInactiveAliasesSource()
+    {
+        yield return [new DateOnly(2020, 11, 01), new DateOnly(2020, 10, 15)];
+        yield return [new DateOnly(2020, 11, 15), new DateOnly(2020, 10, 1)];
+        yield return [new DateOnly(2020, 10, 31), new DateOnly(2020, 10, 1)];
+        yield return [new DateOnly(2020, 10, 10), new DateOnly(2020, 09, 20)];
+    }
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
@@ -102,13 +110,13 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                     {
                         connection.ShouldSatisfyAllConditions(
                             c => c.ExecuteScalar("select count(*) from alias_usage where id_alias = 1")
-                                   .ShouldBe(0, "usage should be cleared"),
+                                  .ShouldBe(0, "usage should be cleared"),
                             c => c.ExecuteScalar("select count(*) from alias_name where id_alias = 1")
-                                   .ShouldBe(0, "names should be cleared"),
+                                  .ShouldBe(0, "names should be cleared"),
                             c => c.ExecuteScalar("select count(*) from alias_argument where id_alias = 1")
-                                   .ShouldBe(0, "arguments should be cleared"),
+                                  .ShouldBe(0, "arguments should be cleared"),
                             c => c.ExecuteScalar("select count(*) from alias where id = 1")
-                                   .ShouldBe(0, "alias should be cleared")
+                                  .ShouldBe(0, "alias should be cleared")
                         );
                     }
                 );
@@ -363,14 +371,14 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
 
                 // assert
                 viewModel.Aliases.Count.ShouldBe(0);
-                    const string sql = "select name from alias_argument where id_alias = @IdAlias";
-                    const string sql2 = "select name from alias_name where id_alias = @IdAlias";
-                    const string sql3 = "select id from alias_usage where id_alias = @IdAlias";
-                    db.ShouldSatisfyAllConditions(
-                        d => d.WithConnection(c => c.Query<string>(sql, new { IdAlias = 1 })).Count().ShouldBe(4),
-                        d => d.WithConnection(c => c.Query<string>(sql2, new { IdAlias = 1 })).Count().ShouldBe(6),
-                        d => d.WithConnection(c => c.Query<string>(sql3, new { IdAlias = 1 })).Count().ShouldBe(8)
-                    );
+                const string sql = "select name from alias_argument where id_alias = @IdAlias";
+                const string sql2 = "select name from alias_name where id_alias = @IdAlias";
+                const string sql3 = "select id from alias_usage where id_alias = @IdAlias";
+                db.ShouldSatisfyAllConditions(
+                    d => d.WithConnection(c => c.Query<string>(sql, new { IdAlias = 1 })).Count().ShouldBe(4),
+                    d => d.WithConnection(c => c.Query<string>(sql2, new { IdAlias = 1 })).Count().ShouldBe(6),
+                    d => d.WithConnection(c => c.Query<string>(sql3, new { IdAlias = 1 })).Count().ShouldBe(8)
+                );
             },
             sqlBuilder,
             visitors
@@ -552,12 +560,14 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                                                                   ("params2", "params two")
                                                               )
                                            );
-        
-        OutputHelper.WriteLine($"""
-                               SQL script:
-                               {sqlBuilder.GenerateSql()}
-                               """);
-        
+
+        OutputHelper.WriteLine(
+            $"""
+             SQL script:
+             {sqlBuilder.GenerateSql()}
+             """
+        );
+
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -605,7 +615,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
-                var t = await Record.ExceptionAsync(async () 
+                var t = await Record.ExceptionAsync(async ()
                     => await viewModel.ShowDoubloonsCommand.ExecuteAsync(null)
                 );
                 t.ShouldBeNull();
@@ -614,9 +624,13 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         );
     }
 
-    [Fact]
-    public async Task ShowInactiveAliases()
+    [Theory]
+    [MemberData(nameof(ShowInactiveAliasesSource))]
+    public async Task ShowInactiveAliases(DateOnly lastUsage, DateOnly today)
     {
+        var todayDate = today.ToDateTime(TimeOnly.MinValue);
+        var lastUsageDate = lastUsage.ToDateTime(TimeOnly.MinValue);
+
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
@@ -635,35 +649,37 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         };
         var sqlBuilder = new SqlGenerator().AppendAlias(a => a.WithSynonyms("A")
                                                               .WithUsage(
-                                                                  DateTime.Now.AddMonths(-1), // Recent usage
-                                                                  DateTime.Now.AddMonths(-100)
+                                                                  lastUsageDate.AddMonths(-1), // Recent usage
+                                                                  lastUsageDate.AddMonths(-100)
                                                               )
                                            )
                                            .AppendAlias(a => a.WithSynonyms("B")
                                                               .WithUsage(
-                                                                  DateTime.Now.AddMonths(-100),
-                                                                  DateTime.Now.AddMonths(-110),
-                                                                  DateTime.Now.AddMonths(-120)
+                                                                  lastUsageDate.AddMonths(-100),
+                                                                  lastUsageDate.AddMonths(-110),
+                                                                  lastUsageDate.AddMonths(-120)
                                                               )
                                            )
                                            .AppendAlias(a => a.WithSynonyms("C")
                                                               .WithUsage(
-                                                                  DateTime.Now,
-                                                                  DateTime.Now.AddMonths(-1), // Recent usage
-                                                                  DateTime.Now.AddMonths(-120),
-                                                                  DateTime.Now.AddMonths(-121),
-                                                                  DateTime.Now.AddMonths(-122),
-                                                                  DateTime.Now.AddMonths(-123),
-                                                                  DateTime.Now.AddMonths(-124)
+                                                                  lastUsageDate,
+                                                                  lastUsageDate.AddMonths(-1), // Recent usage
+                                                                  lastUsageDate.AddMonths(-120),
+                                                                  lastUsageDate.AddMonths(-121),
+                                                                  lastUsageDate.AddMonths(-122),
+                                                                  lastUsageDate.AddMonths(-123),
+                                                                  lastUsageDate.AddMonths(-124)
                                                               )
                                            );
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
+                viewModel.OverrideToday(todayDate);
                 await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
                 await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
 
-                viewModel.Aliases.Count.ShouldBe(2);
+                //Only alias B is not used since a long time...
+                viewModel.Aliases.Count.ShouldBe(1);
             },
             sqlBuilder,
             visitors
@@ -758,7 +774,6 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                     => await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null)
                 );
                 t.ShouldBeNull();
-
             },
             Sql.Empty
         );
