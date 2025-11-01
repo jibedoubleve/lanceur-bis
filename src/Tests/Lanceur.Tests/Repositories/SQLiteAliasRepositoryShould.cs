@@ -56,19 +56,17 @@ public class SQLiteAliasRepositoryShould : TestBase
     private static AliasSearchDbAction BuildAliasSearchDbAction()
     {
         var log = Substitute.For<ILoggerFactory>();
-        return new(log, new DbActionFactory(new MappingService(), log));
+        return new(log, new DbActionFactory(log));
     }
 
     private static SQLiteAliasRepository BuildDataService(IDbConnection connection)
     {
         var scope = new DbSingleConnectionManager(connection);
         var log = Substitute.For<ILoggerFactory>();
-        var conv = Substitute.For<IMappingService>();
         var service = new SQLiteAliasRepository(
             scope,
             log,
-            conv,
-            new DbActionFactory(new MappingService(), log)
+            new DbActionFactory(log)
         );
         return service;
     }

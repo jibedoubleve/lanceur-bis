@@ -135,12 +135,6 @@ public static class ServiceCollectionExtensions
         }
     }
 
-    public static IServiceCollection AddMapping(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<IMappingService, MappingService>();
-        return serviceCollection;
-    }
-
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddConfigurationSections()
@@ -167,7 +161,6 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
                          .AddTransient<IConnectionString, ConnectionString>()
-                         .AddTransient<IMappingService, MappingService>()
                          .AddTransient<ISearchService, SearchService>()
                          .AddTransient<IStoreLoader, StoreLoader>()
                          .AddTransient<IMacroService, MacroService>()

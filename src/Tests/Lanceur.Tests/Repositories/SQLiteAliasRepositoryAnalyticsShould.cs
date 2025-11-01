@@ -34,12 +34,10 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var connection = BuildFreshDb(sql, connectionString);
         var scope = new DbSingleConnectionManager(connection);
         var log = Substitute.For<ILoggerFactory>();
-        var mappingService = new MappingService();
         var service = new SQLiteAliasRepository(
             scope,
             log,
-            mappingService,
-            new DbActionFactory(mappingService, log)
+            new DbActionFactory(log)
         );
         return service;
     }

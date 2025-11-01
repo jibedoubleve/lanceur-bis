@@ -92,15 +92,13 @@ public class SearchServiceShould : TestBase
     public void NOT_HaveNullParameters()
     {
         // arrange
-        var converter = new MappingService();
         using var db = BuildFreshDb(SqlCreateAlias);
         using var conn = new DbSingleConnectionManager(db);
 
         var repository = new SQLiteAliasRepository(
             conn,
             _testLoggerFactory,
-            converter,
-            new DbActionFactory(new MappingService(), _testLoggerFactory)
+            new DbActionFactory(_testLoggerFactory)
         );
 
         // act
@@ -123,14 +121,12 @@ public class SearchServiceShould : TestBase
         var sql = new SqlGenerator().AppendAlias(a => a.WithSynonyms("a", "b")).GenerateSql();
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-        var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
 
         var repository = new SQLiteAliasRepository(
             connectionMgr,
             logger,
-            converter,
-            new DbActionFactory(new MappingService(), logger)
+            new DbActionFactory(logger)
         );
 
         OutputHelper.Act();
@@ -165,7 +161,6 @@ public class SearchServiceShould : TestBase
                                                      .AddSingleton<ILoggerFactory, LoggerFactory>()
                                                      .AddSingleton<IMacroService, MacroService>()
                                                      .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
-                                                     .AddSingleton<IMappingService, MappingService>()
                                                      .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
                                                      .AddSingleton<IDbConnection, SQLiteConnection>()
@@ -196,7 +191,6 @@ public class SearchServiceShould : TestBase
     public async Task ReturnResultWithExactMatchOnTop()
     {
         var dt = DateTime.Now;
-        var converter = Substitute.For<IMappingService>();
         var sql = $"""
                    insert into alias (id, file_name, arguments) values (1000, 'un', '@alias2@@alias3');
                    insert into alias_name (id, id_alias, name) values (1001, 1000, 'un');
@@ -235,7 +229,6 @@ public class SearchServiceShould : TestBase
                                                      .AddMockSingleton<IConfigurationFacade>()
                                                      .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                                                      .AddSingleton(_testLoggerFactory)
-                                                     .AddSingleton(converter)
                                                      .AddSingleton(Substitute.For<IStoreLoader>())
                                                      .AddSingleton<ISearchService, SearchService>()
                                                      .AddSingleton<IDbActionFactory, DbActionFactory>()
@@ -326,14 +319,12 @@ public class SearchServiceShould : TestBase
 
         var connectionManager = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-        var converter = Substitute.For<IMappingService>();
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
 
         var repository = new SQLiteAliasRepository(
             connectionManager,
             logger,
-            converter,
-            new DbActionFactory(new MappingService(), logger)
+            new DbActionFactory(logger)
         );
 
         OutputHelper.Act();

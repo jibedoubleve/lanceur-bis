@@ -48,7 +48,6 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)
                          )
                          .AddMockSingleton<IViewFactory>()
-                         .AddSingleton<IMappingService, MappingService>()
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddMockSingleton<IDatabaseConfigurationService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()

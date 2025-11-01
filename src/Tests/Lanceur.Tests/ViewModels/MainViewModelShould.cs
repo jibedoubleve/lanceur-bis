@@ -63,7 +63,6 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                              ReservedKeywordSource = typeof(MainView).GetAssembly()
                          })
                          .AddMockSingleton<IBookmarkRepositoryFactory>()
-                         .AddSingleton<IMappingService, MappingService>()
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<IMacroService, MacroService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()

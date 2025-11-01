@@ -46,7 +46,6 @@ public partial class App
                                                                   .AddServices()
                                                                   .AddWpfServices()
                                                                   .AddCommands()
-                                                                  .AddMapping()
                                                                   .AddConfiguration()
                                                                   .AddDatabaseServices()
                                                                   .AddLoggers(context, services.BuildServiceProvider());

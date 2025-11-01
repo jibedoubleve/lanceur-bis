@@ -15,5 +15,14 @@ public static class MapperExtensions
     public static AliasQueryResult ToAliasQueryResult(this AliasUsageItem src)
         => new MappingService().ToAliasQueryResult(src);
 
+    public static CompositeAliasQueryResult ToAliasQueryResultComposite(
+        this AliasQueryResult src,
+        IEnumerable<AliasQueryResult> aliases
+    ) => new MappingService().ToCompositeAliasQueryResult(src, aliases);
+
+    public static IEnumerable<SelectableAliasQueryResult> ToSelectableQueryResult(
+        this IEnumerable<AliasQueryResult> src
+    ) => new MappingService().ToSelectableQueryResult(src);
+
     #endregion
 }

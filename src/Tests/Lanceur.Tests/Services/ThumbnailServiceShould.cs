@@ -57,12 +57,10 @@ public class ThumbnailServiceShould : TestBase
         );
         var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
-        var conversionService = new MappingService();
         var dbRepository = new SQLiteAliasRepository(
             connectionMgr,
             loggerFactory,
-            conversionService,
-            new DbActionFactory(new MappingService(), loggerFactory)
+            new DbActionFactory(loggerFactory)
         );
 
         var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();

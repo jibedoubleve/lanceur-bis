@@ -51,7 +51,6 @@ public class AliasUseCases : TestBase
                                       .AddApplicationSettings()
                                       .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                       .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                      .AddSingleton<IMappingService, MappingService>()
                                       .AddSingleton<ISearchService, SearchService>()
                                       .AddSingleton<IMacroService, MacroService>()
                                       .AddSingleton<IDbActionFactory, DbActionFactory>()
