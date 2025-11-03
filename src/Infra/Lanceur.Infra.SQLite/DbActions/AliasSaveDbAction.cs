@@ -31,7 +31,6 @@ public class AliasSaveDbAction
     {
         ArgumentNullException.ThrowIfNull(alias);
         ArgumentNullException.ThrowIfNull(alias.Synonyms);
-        ArgumentNullException.ThrowIfNull(alias.Id);
 
         alias.SanitizeSynonyms();
        
