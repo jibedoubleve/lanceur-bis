@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />
     <!-- This version should be pinned as FluentAssertion 8.0 onwards is not free anymore-->
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
