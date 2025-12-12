@@ -285,8 +285,12 @@ public partial class MainView
 
     public void OnShowWindow(object? _, HotkeyEventArgs? e)
     {
-        ShowWindow();
-        if (e is not null) e.Handled = true;
+        if (Visibility == Visibility.Visible)
+            HideWindow();
+        else
+            ShowWindow();
+
+        e?.Handled = true;
     }
 
     /// <summary>
