@@ -6,7 +6,8 @@ using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.WPF.Helpers;
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
 
 namespace Lanceur.Ui.WPF.Services;
 
@@ -20,6 +21,14 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     #endregion
 
     #region Constructors
+
+    private static AppNotificationManager Notifier { get; } = AppNotificationManager.Default;
+
+    static ToastUserNotificationService()
+    {
+        //Notifier.SetAppId("Probel.Lanceur");
+        Notifier.Register(); // must be called once per process before Show
+    }
 
     public ToastUserNotificationService(LazyLoadedSynchronizationContext dispatcher, ILogger<ToastUserNotificationService> logger)
     {
@@ -45,49 +54,51 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
 
     private static void Show(Level level, string message, [CallerMemberName] string? title = null)
     {
-        var icon = GetIconUri(level);
-        new ToastContentBuilder()
+         var icon = GetIconUri(level);
+        var notification = new AppNotificationBuilder()
             .AddText(title)
             .AddText(message)
-            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
-            .Show();
+            .SetHeroImage(icon.ToUriRelative())
+            .BuildNotification();
+        Notifier.Show(notification);
+        
     }
 
     /// <inheritdoc />
     public void AskRestart()
     {
-        const string msg = "To apply the changes, a restart of the application is required.";
+        const string message = "To apply the changes, a restart of the application is required.";
         var icon = GetIconUri(Level.Information);
-        var btnRestart = new ToastButton().SetContent("Restart Lanceur")
-                                          .AddArgument("Type", ToastNotificationArguments.ClickRestart);
+        var btnRestart = new AppNotificationButton("Restart Lanceur")
+            .AddArgument("Type", ToastNotificationArguments.ClickRestart);
 
-        new ToastContentBuilder()
+        new AppNotificationBuilder()
             .AddText("Settings Updated")
-            .AddText(msg)
+            .AddText(message)
             .AddButton(btnRestart)
-            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
-            .Show();
+            .SetHeroImage(icon.ToUriRelative())
+            .BuildNotification();
     }
 
     /// <inheritdoc />
     public void Error(string message, Exception ex)
     {
         var icon = GetIconUri(Level.Error);
-        var btnError = new ToastButton().SetContent("Show Error")
-                                        .AddArgument("Type", ToastNotificationArguments.ClickShowError)
-                                        .AddArgument("Message", message)
-                                        .AddArgument("StackTrace", ex.ToString());
+        var btnError = new AppNotificationButton("Show Error")
+                       .AddArgument("Type", ToastNotificationArguments.ClickShowError)
+                       .AddArgument("Message", message)
+                       .AddArgument("StackTrace", ex.ToString());
 
-        var btnLogs = new ToastButton().SetContent("Show Logs")
-                                       .AddArgument("Type", ToastNotificationArguments.ClickShowLogs);
+        var btnLogs = new AppNotificationButton("Show Logs")
+            .AddArgument("Type", ToastNotificationArguments.ClickShowLogs);
 
-        new ToastContentBuilder()
+        new AppNotificationBuilder()
             .AddText("Error")
             .AddText(message)
             .AddButton(btnError)
             .AddButton(btnLogs)
-            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
-            .Show();
+            .SetHeroImage(icon.ToUriRelative())
+            .BuildNotification();
     }
 
     /// <inheritdoc />
@@ -95,11 +106,11 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     {
         var icon = GetIconUri(Level.Error);
 
-        new ToastContentBuilder()
+        new AppNotificationBuilder()
             .AddText("Error")
             .AddText(message)
-            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
-            .Show();
+            .SetHeroImage(icon.ToUriRelative())
+            .BuildNotification();
     }
 
     /// <inheritdoc />
@@ -109,16 +120,16 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     {
         var icon = GetIconUri(Level.Information);
 
-        var btnNavigate = new ToastButton().SetContent("View Details")
-                                           .AddArgument("Type", ToastNotificationArguments.ClickNavigateIssue);
+        var btnNavigate = new AppNotificationButton("View Details")
+            .AddArgument("Type", ToastNotificationArguments.ClickNavigateIssue);
 
-        new ToastContentBuilder()
+        new AppNotificationBuilder()
             .AddText("Information")
             .AddText(message)
             .AddArgument("Url", url)
             .AddButton(btnNavigate)
-            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
-            .Show();
+            //.AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .BuildNotification();
     }
 
     /// <inheritdoc />
@@ -126,19 +137,19 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     {
         var msg = $"A new version {version} is now available!";
         var icon = GetIconUri(Level.Information);
-        var btnCheckWebsite = new ToastButton().SetContent("Check the website")
-                                               .AddArgument("Type", ToastNotificationArguments.VisitWebsite);
-        var btnSkipVersion = new ToastButton().SetContent("Skip this version")
-                                              .AddArgument("Type", ToastNotificationArguments.SkipVersion)
-                                              .AddArgument("Version", version.ToString());
+        var btnCheckWebsite = new AppNotificationButton("Check the website")
+            .AddArgument("Type", ToastNotificationArguments.VisitWebsite);
+        var btnSkipVersion = new AppNotificationButton("Skip this version")
+                             .AddArgument("Type", ToastNotificationArguments.SkipVersion)
+                             .AddArgument("Version", version.ToString());
 
-        new ToastContentBuilder()
+        new AppNotificationBuilder()
             .AddText("New version available")
             .AddText(msg)
             .AddButton(btnCheckWebsite)
             .AddButton(btnSkipVersion)
-            .AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
-            .Show();
+            //.AddAppLogoOverride(icon.ToUriRelative(), ToastGenericAppLogoCrop.Circle)
+            .BuildNotification();
     }
 
     /// <inheritdoc />

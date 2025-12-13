@@ -23,7 +23,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Serilog;
 
 namespace Lanceur.Ui.WPF;
@@ -114,55 +113,55 @@ public partial class App
 
     private static void RegisterToastNotifications()
     {
-        ToastNotificationManagerCompat.OnActivated += toastArgs =>
-        {
-            var arguments = ToastArguments.Parse(toastArgs.Argument);
-            if (arguments.Count == 0) return;
-
-            Action action = arguments["Type"] switch
-            {
-                // ---- Show logs on error ----
-                ToastNotificationArguments.ClickShowError => () =>
-                {
-                    var view = Host.Services.GetService<ExceptionView>()!;
-                    view.ExceptionMessage.Text = arguments["Message"];
-                    view.ExceptionTrace.Text = arguments["StackTrace"];
-                    view.Show();
-                },
-                ToastNotificationArguments.ClickShowLogs  => () => Process.Start("explorer.exe", Paths.LogRepository),
-                // ---- Restart application ----
-                ToastNotificationArguments.ClickRestart => ()
-                    => Host.Services.GetRequiredService<IAppRestartService>().Restart(),
-                // ---- Visit Website ----
-                ToastNotificationArguments.VisitWebsite => () => Process.Start("explorer.exe", Paths.ReleasesUrl),
-                // ---- Skip current version ----
-                ToastNotificationArguments.SkipVersion => () =>
-                {
-                    var settings = Host.Services.GetRequiredService<IConfigurationFacade>();
-                    settings.Application.Github.SnoozeVersionCheck = true;
-                    settings.Application.Github.LastCheckedVersion = new(arguments["Version"]);
-                    settings.Save();
-                },
-                // ---- Navigate to Url ----
-                ToastNotificationArguments.ClickNavigateIssue => () => Process.Start("explorer.exe", arguments["Url"]),
-                // ---- Default  ----
-                _ => () => Log.Warning(
-                    "The argument {Argument} is not supported in the toast arguments. Are you using a button that has not been configured yet?",
-                    toastArgs.Argument
-                )
-            };
-
-            Current.Dispatcher.Invoke(
-                delegate { action.Invoke(); }
-            );
-        };
+        //TODO: remove this comments and don't forget to reimplement the behaviours
+        // because now, the toast doen't have any behaviour!!!
+        
+        // ToastNotificationManagerCompat.OnActivated += toastArgs =>
+        // {
+        //     var arguments = ToastArguments.Parse(toastArgs.Argument);
+        //     if (arguments.Count == 0) return;
+        //
+        //     Action action = arguments["Type"] switch
+        //     {
+        //         // ---- Show logs on error ----
+        //         ToastNotificationArguments.ClickShowError => () =>
+        //         {
+        //             var view = Host.Services.GetService<ExceptionView>()!;
+        //             view.ExceptionMessage.Text = arguments["Message"];
+        //             view.ExceptionTrace.Text = arguments["StackTrace"];
+        //             view.Show();
+        //         },
+        //         ToastNotificationArguments.ClickShowLogs  => () => Process.Start("explorer.exe", Paths.LogRepository),
+        //         // ---- Restart application ----
+        //         ToastNotificationArguments.ClickRestart => ()
+        //             => Host.Services.GetRequiredService<IAppRestartService>().Restart(),
+        //         // ---- Visit Website ----
+        //         ToastNotificationArguments.VisitWebsite => () => Process.Start("explorer.exe", Paths.ReleasesUrl),
+        //         // ---- Skip current version ----
+        //         ToastNotificationArguments.SkipVersion => () =>
+        //         {
+        //             var settings = Host.Services.GetRequiredService<IConfigurationFacade>();
+        //             settings.Application.Github.SnoozeVersionCheck = true;
+        //             settings.Application.Github.LastCheckedVersion = new(arguments["Version"]);
+        //             settings.Save();
+        //         },
+        //         // ---- Navigate to Url ----
+        //         ToastNotificationArguments.ClickNavigateIssue => () => Process.Start("explorer.exe", arguments["Url"]),
+        //         // ---- Default  ----
+        //         _ => () => Log.Warning(
+        //             "The argument {Argument} is not supported in the toast arguments. Are you using a button that has not been configured yet?",
+        //             toastArgs.Argument
+        //         )
+        //     };
+        //
+        //     Current.Dispatcher.Invoke(
+        //         delegate { action.Invoke(); }
+        //     );
+        // };
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
-        // Remove all persisting notifications...
-        ToastNotificationManagerCompat.Uninstall();
-
         // Release mutex to allow app to start again...
         ConditionalExecution.Execute(
             () => { },
