@@ -3,6 +3,7 @@
     <TargetFramework>net9.0-windows10.0.19041</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>      
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />

@@ -9,7 +9,7 @@
     x:Name="Self"
     Title="ApplicationSettings"
     d:Height="2800"
-    d:Width="1800"
+    d:Width="800"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
@@ -116,6 +116,22 @@
                     <StackPanel Orientation="Horizontal">
                         <ui:ToggleSwitch
                             IsChecked="{Binding ShowAtStartup}"
+                            OffContent="No"
+                            OnContent="Yes" />
+                    </StackPanel>
+                </ui:CardControl>
+
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Shortcut shows search; repeat hides" />
+                    </ui:CardControl.Header>
+                    <ui:CardControl.ToolTip>
+                        Shows the search box when the shortcut is used. Using the shortcut again hides it.
+                        Repeating the shortcut alternates between showing and hiding the search box.
+                    </ui:CardControl.ToolTip>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ToggleSwitch
+                            IsChecked="{Binding ToggleVisibility}"
                             OffContent="No"
                             OnContent="Yes" />
                     </StackPanel>

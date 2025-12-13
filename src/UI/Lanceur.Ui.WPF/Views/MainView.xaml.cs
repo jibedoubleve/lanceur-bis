@@ -106,7 +106,6 @@ public partial class MainView
                 }
             );
 
-        _logger.LogDebug("Feature flag {FeatureFlag} Enabled: {Enabled}", Features.ResourceDisplay, enabled);
         PanelCpu.Visibility
             = PanelMemory.Visibility
                 = enabled ? Visibility.Visible : Visibility.Collapsed;
@@ -285,8 +284,13 @@ public partial class MainView
 
     public void OnShowWindow(object? _, HotkeyEventArgs? e)
     {
-        ShowWindow();
-        if (e is not null) e.Handled = true;
+        if (_configuration.Application.SearchBox.ToggleVisibility
+            && Visibility == Visibility.Visible)
+            HideWindow();
+        else
+            ShowWindow();
+
+        e?.Handled = true;
     }
 
     /// <summary>

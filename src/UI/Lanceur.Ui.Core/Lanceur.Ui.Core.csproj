@@ -3,7 +3,7 @@
     <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <LangVersion>12</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
     <ItemGroup>
         <InternalsVisibleTo Include="Lanceur.Tests" />

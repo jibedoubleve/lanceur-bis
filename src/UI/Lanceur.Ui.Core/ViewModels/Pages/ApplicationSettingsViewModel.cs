@@ -27,6 +27,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private string _apiToken = string.Empty;
     [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
     [ObservableProperty] private int _cpuSmoothingIndex;
+    [ObservableProperty] private bool _toggleVisibility;
     [ObservableProperty] private string _dbPath = string.Empty;
     private readonly IEnigma _enigma;
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
@@ -133,6 +134,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ShowResult = Configuration.Application.SearchBox.ShowResult;
         ShowAtStartup = Configuration.Application.SearchBox.ShowAtStartup;
         ShowLastQuery = Configuration.Application.SearchBox.ShowLastQuery;
+        ToggleVisibility = Configuration.Application.SearchBox.ToggleVisibility;
 
         // Store section
         BookmarkSourceBrowser = Configuration.Application.Stores.BookmarkSourceBrowser;
@@ -170,6 +172,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Configuration.Application.SearchBox.ShowResult = ShowResult;
         Configuration.Application.SearchBox.ShowAtStartup = ShowAtStartup;
         Configuration.Application.SearchBox.ShowLastQuery = ShowLastQuery;
+        Configuration.Application.SearchBox.ToggleVisibility = ToggleVisibility;
 
         // Store section
         Configuration.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
