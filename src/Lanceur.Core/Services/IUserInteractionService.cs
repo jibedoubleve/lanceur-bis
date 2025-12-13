@@ -14,8 +14,7 @@ public interface IUserInteractionService
     /// <param name="ok">The text for the primary button. Defaults to "OK".</param>
     /// <param name="cancel">The text for the optional secondary button. Defaults to null (no secondary button displayed).</param>
     /// <returns>A task that completes when the MessageBox is dismissed.</returns>
-
-    Task ShowAsync(string title, object content, string ok = "Close", string? cancel = null);
+    Task ShowAsync(string title, object content, string ok = "Close");
 
     /// <summary>
     /// Asynchronously displays a modal dialog that prompts the user with a Yes/No question.
