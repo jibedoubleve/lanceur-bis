@@ -106,7 +106,6 @@ public partial class MainView
                 }
             );
 
-        _logger.LogDebug("Feature flag {FeatureFlag} Enabled: {Enabled}", Features.ResourceDisplay, enabled);
         PanelCpu.Visibility
             = PanelMemory.Visibility
                 = enabled ? Visibility.Visible : Visibility.Collapsed;
