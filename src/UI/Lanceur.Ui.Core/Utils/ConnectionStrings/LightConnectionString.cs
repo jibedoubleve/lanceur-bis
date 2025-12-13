@@ -7,31 +7,31 @@ public class LightConnectionString : BaseConnectionString, IConnectionString
 {
     #region Fields
 
-    private static string? _connectionString;
+    private readonly string _connectionString;
 
-    private readonly string _dbPath;
-
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    private LightConnectionString(string dbPath) => _dbPath = dbPath;
+    private LightConnectionString(string dbPath)
+    {
+        ArgumentNullException.ThrowIfNull(dbPath);
+        if (!Path.Exists(dbPath))
+            throw new InvalidDataException(
+                "The path of the SQLite database does not exist or is invalid."
+            );
 
-    #endregion Constructors
+        var path = dbPath.ExpandPath();
+        _connectionString = ConnectionStringPattern.Format(path);
+    }
+
+    #endregion
 
     #region Methods
 
     public static LightConnectionString FromFile(string dbPath) => new(dbPath);
 
-    public override string ToString()
-    {
-        if (_connectionString is not null) return _connectionString;
+    public override string ToString() => _connectionString;
 
-        var path = _dbPath.ExpandPath();
-        _connectionString = ConnectionStringPattern.Format(path);
-
-        return _connectionString;
-    }
-
-    #endregion Methods
+    #endregion
 }

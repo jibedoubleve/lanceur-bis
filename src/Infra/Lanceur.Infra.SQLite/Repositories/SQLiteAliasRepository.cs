@@ -211,7 +211,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public IEnumerable<string> GetExistingAliases(IEnumerable<string> aliasesToCheck, long idAlias)
+    public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias)
     {
         const string  sql = """
                             select an.name
@@ -223,7 +223,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 and a.deleted_at is null
                                 and an.id_alias != @idAlias
                             """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
+        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = names, idAlias }));
     }
 
     /// <inheritdoc />

@@ -10,7 +10,6 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
 {
     #region Fields
 
-    private readonly ILogger<BookmarkRepositoryFactory> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IMemoryCache _memoryCache;
 
@@ -22,7 +21,6 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
     {
         _memoryCache = memoryCache;
         _loggerFactory = loggerFactory;
-        _logger = loggerFactory.CreateLogger<BookmarkRepositoryFactory>();
     }
 
     #endregion

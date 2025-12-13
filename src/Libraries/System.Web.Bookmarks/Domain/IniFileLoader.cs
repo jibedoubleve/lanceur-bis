@@ -8,8 +8,6 @@ public partial class IniFileLoader
 {
     #region Fields
 
-    private readonly ILogger<IniFileLoader> _logger;
-
     private readonly ILoggerFactory _loggerFactory;
 
     #endregion
@@ -18,7 +16,7 @@ public partial class IniFileLoader
 
     public IniFileLoader(ILoggerFactory loggerFactory)
     {
-        _logger = loggerFactory.CreateLogger<IniFileLoader>();
+        loggerFactory.CreateLogger<IniFileLoader>();
         _loggerFactory = loggerFactory;
     }
 

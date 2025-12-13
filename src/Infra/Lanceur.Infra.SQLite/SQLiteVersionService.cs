@@ -25,7 +25,7 @@ public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionServi
             : new Version(version);
     }
 
-    public bool IsUpToDate(Version goalVersion)
+    public bool IsUpToDate(Version expectedVersion)
     {
         var version = Db.WithinTransaction(tx => tx.Connection!.Query<string>(Sql.GetDbVersion).FirstOrDefault());
 
@@ -33,7 +33,7 @@ public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionServi
             ? new()
             : new Version(version);
 
-        return goalVersion <= currentVersion;
+        return expectedVersion <= currentVersion;
     }
 
     public bool IsUpToDate(string expectedVersion) => IsUpToDate(new Version(expectedVersion));

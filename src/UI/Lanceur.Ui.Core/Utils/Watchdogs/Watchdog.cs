@@ -34,5 +34,5 @@ public class Watchdog : IWatchdog
     }
 
     /// <inheritdoc />
-    public void ResetDelay(double interval) => _timer.Interval = interval.Milliseconds();
+    public void ResetDelay(double searchDelay) => _timer.Interval = searchDelay.Milliseconds();
 }
