@@ -33,6 +33,7 @@ public class AliasSaveDbAction
         ArgumentNullException.ThrowIfNull(alias.Synonyms);
 
         alias.SanitizeSynonyms();
+        alias.SanitizeFileName();
        
         using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
 
