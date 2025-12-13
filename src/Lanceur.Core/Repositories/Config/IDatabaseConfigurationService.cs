@@ -14,8 +14,8 @@ public interface IDatabaseConfigurationService : IConfigurationService<DatabaseC
     /// <summary>
     ///     Applies modifications to the database configuration.
     /// </summary>
-    /// <param name="action">A delegate that defines the modifications to be applied.</param>
-    void Edit(Action<DatabaseConfiguration> action);
+    /// <param name="edit">A delegate that defines the modifications to be applied.</param>
+    void Edit(Action<DatabaseConfiguration> edit);
 
     #endregion
 }

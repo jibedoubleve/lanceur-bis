@@ -23,9 +23,10 @@ public static class CoordinateHelper
     {
         ArgumentNullException.ThrowIfNull(position);
         ArgumentNullException.ThrowIfNull(window);
+        const float epsilon = 0.001f; // Handling imprecision of numbers
 
-        return position.Top == window.Top &&
-               position.Left == window.Left;
+        return Math.Abs(position.Top - window.Top) < epsilon &&
+               Math.Abs(position.Left - window.Left) < epsilon;
     }
 
     public static Coordinate ToCoordinate(this PositionSection position) => new(position.Left, position.Top);

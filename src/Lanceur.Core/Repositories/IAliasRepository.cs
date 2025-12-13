@@ -150,13 +150,13 @@ public interface IAliasRepository
     ///     The number of months of inactivity used to determine whether an alias is inactive.
     ///     Values greater than 360 are capped at 360.
     /// </param>
-    /// <param name="nowThreshold">
+    /// <param name="startThreshold">
     ///     The reference date used to calculate the duration since the last usage. If null, date of today is used.
     /// </param>
     /// <returns>
     ///     A collection of <see cref="SelectableAliasQueryResult" /> objects representing inactive aliases.
     /// </returns>
-    IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months, DateTime? nowThreshold = null);
+    IEnumerable<SelectableAliasQueryResult> GetInactiveAliases(int months, DateTime? startThreshold = null);
 
     /// <summary>
     ///     Get list of all the aliases with count greater than 0
@@ -313,13 +313,13 @@ public interface IAliasRepository
     /// <summary>
     ///     Searches for all aliases that match the specified criteria.
     /// </summary>
-    /// <param name="criteria">The criteria used to search for aliases.</param>
+    /// <param name="name">The criteria used to search for aliases.</param>
     /// <param name="isReturnAllIfEmpty">
-    ///     Specifies the behavior when <paramref name="criteria" /> is null or empty:
+    ///     Specifies the behavior when <paramref name="name" /> is null or empty:
     ///     if <c>true</c>, all aliases are returned; if <c>false</c>, no results are returned.
     /// </param>
     /// <returns>A collection of aliases that match the search criteria.</returns>
-    IEnumerable<AliasQueryResult> Search(string criteria, bool isReturnAllIfEmpty = false);
+    IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false);
 
     /// <summary>
     ///     Search all the alias with additional parameters that correspond to the criterion
