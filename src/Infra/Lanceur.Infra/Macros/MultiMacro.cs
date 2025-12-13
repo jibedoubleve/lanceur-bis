@@ -30,9 +30,9 @@ public class MultiMacro : MacroQueryResult
 
         _serviceProvider = serviceProvider;
         _executionService = serviceProvider.GetService<IExecutionService>() ??
-                            throw new NullReferenceException("IExecutionService is null");
+                            throw new InvalidOperationException("IExecutionService is not registered");
         _searchService = serviceProvider.GetService<ISearchService>() ??
-                         throw new NullReferenceException("ISearchService is null");
+                         throw new InvalidOperationException("ISearchService is not registered");
         _delay = DefaultDelay;
     }
 

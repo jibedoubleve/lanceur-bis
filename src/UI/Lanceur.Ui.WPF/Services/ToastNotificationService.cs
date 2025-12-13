@@ -14,14 +14,14 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
 {
     #region Fields
 
-    private readonly LazyLoadedSynchronizationContext _dispatcher;
+    private readonly LazyLoadedSynchronisationContext _dispatcher;
     private readonly ILogger<ToastUserNotificationService> _logger;
 
     #endregion
 
     #region Constructors
 
-    public ToastUserNotificationService(LazyLoadedSynchronizationContext dispatcher, ILogger<ToastUserNotificationService> logger)
+    public ToastUserNotificationService(LazyLoadedSynchronisationContext dispatcher, ILogger<ToastUserNotificationService> logger)
     {
         _dispatcher = dispatcher;
         _logger = logger;

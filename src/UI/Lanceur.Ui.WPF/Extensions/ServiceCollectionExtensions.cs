@@ -38,7 +38,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IHotKeyService, HotKeyService>()
                          .AddSingleton<IInteractionHubService, InteractionHubService>()
                          .AddSingleton<IReleaseService, ReleaseService>()
-                         .AddTransient<LazyLoadedSynchronizationContext>()
+                         .AddTransient<LazyLoadedSynchronisationContext>()
                          .AddSingletonConditional<IAppRestartService, AppRestartDummyService, AppRestartService>()
                          .AddSingleton(
                              new AssemblySource
