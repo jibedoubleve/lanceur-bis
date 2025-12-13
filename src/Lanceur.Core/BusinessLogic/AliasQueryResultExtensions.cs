@@ -24,6 +24,15 @@ public static class AliasQueryResultExtensions
         alias.Synonyms = items;
     }
 
+    /// <summary>
+    /// Clears all the useless quotes in the filename
+    /// </summary>
+    /// <param name="alias">The <see cref="AliasQueryResult"/> to sanitize</param>
+    public static void SanitizeFileName(this AliasQueryResult alias)
+    {
+        alias.FileName = alias.FileName.Replace("\"", string.Empty);
+    }
+
     public static IEnumerable<AliasQueryResult> CloneFromSynonyms(this AliasQueryResult alias)
     {
         var names = alias.Synonyms.SplitCsv();

@@ -361,7 +361,7 @@ public partial class KeywordsViewModel : ObservableObject
         SelectedAlias.FileName = viewModel.SelectedPackagedApp?.AppUserModelId;
     }
 
-    public async Task SaveAliasAsync(AliasQueryResult queryResult)
+    private async Task SaveAliasAsync(AliasQueryResult queryResult)
     {
         var result = _validationService.IsValid(queryResult);
         if (!result.IsSuccess)
