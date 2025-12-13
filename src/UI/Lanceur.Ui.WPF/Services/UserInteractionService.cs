@@ -26,7 +26,7 @@ public class UserInteractionService : IUserInteractionService
             Title = title,
             Content = message,
             PrimaryButtonText = yes,
-            CloseButtonText = no,
+            CloseButtonText = no
         };
         
         messageBox.Loaded += (_, _) =>
