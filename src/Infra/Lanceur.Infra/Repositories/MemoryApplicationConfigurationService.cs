@@ -19,7 +19,7 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
     static MemoryApplicationConfigurationService()
     {
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        var path = Path.Combine(desktop, "debug.sqlite");
+        var path = Path.Combine(desktop, @"lanceur\debug.sqlite");
 
         Configuration = new() { DbPath = path };
     }
