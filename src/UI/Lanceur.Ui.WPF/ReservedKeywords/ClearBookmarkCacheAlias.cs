@@ -28,16 +28,16 @@ public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
         ArgumentNullException.ThrowIfNull(serviceProvider);
 
         var factory = serviceProvider.GetService<ILoggerFactory>() ??
-                      throw new NullReferenceException("Logger factory is ont configured in the service provider");
+                      throw new InvalidOperationException("Logger factory is ont configured in the service provider");
 
         var bookmarkRepositoryFactory
             = serviceProvider.GetService<IBookmarkRepositoryFactory>() ??
-              throw new NullReferenceException(
+              throw new InvalidOperationException(
                   "Bookmark repository is not configured in the service provider"
               );
 
         _configuration = serviceProvider.GetService<IConfigurationFacade>() ??
-                    throw new NullReferenceException("Settings facade is not configured in the service provider");
+                    throw new InvalidOperationException("Settings facade is not configured in the service provider");
 
         _bookmarks = bookmarkRepositoryFactory.BuildBookmarkRepository(
             _configuration.Application.Stores.BookmarkSourceBrowser
