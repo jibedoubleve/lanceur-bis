@@ -285,7 +285,8 @@ public partial class MainView
 
     public void OnShowWindow(object? _, HotkeyEventArgs? e)
     {
-        if (Visibility == Visibility.Visible)
+        if (_configuration.Application.SearchBox.ToggleVisibility
+            && Visibility == Visibility.Visible)
             HideWindow();
         else
             ShowWindow();
