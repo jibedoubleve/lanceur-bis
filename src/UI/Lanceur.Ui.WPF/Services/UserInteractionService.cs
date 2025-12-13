@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Services;
 using Lanceur.Ui.Core.Constants;
@@ -27,6 +28,13 @@ public class UserInteractionService : IUserInteractionService
             PrimaryButtonText = yes,
             CloseButtonText = no
         };
+        
+        messageBox.Loaded += (_, _) =>
+        {
+            messageBox.Activate();
+            Keyboard.Focus(messageBox);
+        };
+        
         var result = await messageBox.ShowDialogAsync();
         return result == MessageBoxResult.Primary;
     }
@@ -75,11 +83,23 @@ public class UserInteractionService : IUserInteractionService
     }
 
     ///<inheritdoc />
-    public async Task ShowAsync(string title, object content, string ok = ButtonLabels.Close, string? cancel = null)
+    public async Task ShowAsync(string title, object content, string ok = ButtonLabels.Close)
     {
-        MessageBox messageBox = cancel is null
-            ? new() { Title = title, Content = content }
-            : new() { Title = title, Content = content, PrimaryButtonText = ok };
+        var messageBox
+            = new MessageBox
+            {
+                Title = title, 
+                Content = content,
+                ShowActivated = true,
+                IsCloseButtonEnabled = true
+            };
+        
+        messageBox.Loaded += (_, _) =>
+        {
+            messageBox.Activate();
+            Keyboard.Focus(messageBox);
+        };
+        
         await messageBox.ShowDialogAsync();
     }
 
