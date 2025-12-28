@@ -34,7 +34,7 @@ var target          = Argument("target", "Default");
 var configuration   = Argument("configuration", "Release").ToLower();
 var verbosity       = Argument("verbosity", Verbosity.Minimal);
 
-var binDirectory    = $"./src/UI/Lanceur.Ui.WPF/bin/{configuration}/net10.0-windows10.0.19041.0/";
+var binDirectory    = $"./src/UI/Lanceur.Ui.WPF/bin/{configuration}/net9.0-windows10.0.19041.0/";
 var setupIconFile   = $"./src/UI/Lanceur.Ui.WPF/Assets/appIcon.ico";
 var publishDir      = "./Publish";
 var inno_setup      = "./setup.iss";
