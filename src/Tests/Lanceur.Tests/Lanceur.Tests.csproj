@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>
@@ -19,14 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />
-
-    <!-- Force the use of System.Drawing.Common to avoid usage of 
-         deprecated version 4.7.0 caused by Microsoft.Toolkit.Uwp.Notifications.
-        This is a sign we should go sooner or later towards Microsoft.WindowsAppSDK
-        Cf. issue https://github.com/jibedoubleve/lanceur-bis/issues/1149
-    -->
-    <PackageReference Include="System.Drawing.Common" Version="8.0.22" />
-      
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="MiniProfiler.Shared" Version="4.5.4" />
     <PackageReference Include="NSubstitute" Version="5.3.0" />
