@@ -8,11 +8,9 @@ using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Stores;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Repositories;
@@ -20,7 +18,6 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Scripts;
@@ -162,7 +159,6 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
                          .AddTransient<IConnectionString, ConnectionString>()
                          .AddTransient<ISearchService, SearchService>()
-                         .AddTransient<IStoreLoader, StoreLoader>()
                          .AddTransient<IMacroService, MacroService>()
                          .AddTransient<ILoggerFactory, LoggerFactory>()
                          .AddTransient<IThumbnailService, ThumbnailService>()

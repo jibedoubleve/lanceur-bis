@@ -5,11 +5,16 @@ namespace Lanceur.Core.Configuration.Sections;
 /// </summary>
 public class CachingSection
 {
+    #region Constructors
+
     public CachingSection(int storeCacheDuration, int thumbnailCacheDuration)
     {
         StoreCacheDuration = storeCacheDuration;
         ThumbnailCacheDuration = thumbnailCacheDuration;
     }
+
+    #endregion
+
     #region Properties
 
     /// <summary>

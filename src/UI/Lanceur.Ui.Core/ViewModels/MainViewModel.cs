@@ -26,7 +26,7 @@ public partial class MainViewModel : ObservableObject
     private readonly ISearchService _searchService;
     [ObservableProperty] private QueryResult? _selectedResult;
     private readonly ISection<WindowSection> _stgWindow;
-    private readonly IWriteableSection<SearchBoxSection> _stgSearchBox;
+    private readonly ISection<SearchBoxSection> _stgSearchBox;
     [ObservableProperty] private string? _suggestion;
     private readonly IThumbnailService _thumbnailService;
     private readonly IWatchdog _watchdog;
@@ -41,7 +41,7 @@ public partial class MainViewModel : ObservableObject
         ILogger<MainViewModel> logger,
         ISearchService searchService,
         ISection<WindowSection> stgWindow,
-        IWriteableSection<SearchBoxSection> stgSearchBox,
+        ISection<SearchBoxSection> stgSearchBox,
         IExecutionService executionService,
         IInteractionHubService interactionHubService,
         IWatchdogBuilder watchdogBuilder,

@@ -5,7 +5,6 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.SharedKernel.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
@@ -23,11 +22,16 @@ public class AdditionalParametersStore : Store, IStoreService
 
     #region Constructors
 
-    public AdditionalParametersStore(IServiceProvider serviceProvider) : base(serviceProvider)
+    public AdditionalParametersStore(
+        IStoreOrchestrationFactory orchestrationFactory,
+        IAliasRepository aliasService,
+        ILogger<AdditionalParametersStore> logger,
+        IFeatureFlagService featureFlags
+    ) : base(orchestrationFactory)
     {
-        _aliasService = serviceProvider.GetService<IAliasRepository>();
-        _logger = serviceProvider.GetService<ILogger<AdditionalParametersStore>>();
-        _featureFlags = serviceProvider.GetService<IFeatureFlagService>();
+        _aliasService = aliasService;
+        _logger = logger;
+        _featureFlags = featureFlags;
     }
 
     #endregion

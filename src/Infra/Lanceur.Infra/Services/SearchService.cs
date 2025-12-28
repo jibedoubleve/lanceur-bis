@@ -1,8 +1,6 @@
 ﻿using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Core.Stores;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
@@ -15,30 +13,29 @@ public class SearchService : ISearchService
     private readonly ILogger<SearchService> _logger;
     private readonly IMacroService _macroService;
     private readonly ISearchServiceOrchestrator _orchestrator;
-    private readonly IStoreLoader _storeLoader;
+    private readonly IEnumerable<IStoreService> _storeServices;
 
     #endregion
 
     #region Constructors
 
     public SearchService(
-        IStoreLoader storeLoader,
+        IEnumerable<IStoreService> storeServices,
         IMacroService macroService,
-        ILoggerFactory loggerFactory,
+        ILogger<SearchService> logger,
         ISearchServiceOrchestrator orchestrator
     )
     {
-        _storeLoader = storeLoader;
+        ArgumentNullException.ThrowIfNull(storeServices);
+
+        _storeServices = storeServices.ToList();
+        if (!_storeServices.Any())
+            throw new ArgumentException($"There are no store activated for the search service");
+
         _macroService = macroService;
         _orchestrator = orchestrator;
-        _logger = loggerFactory.GetLogger<SearchService>();
+        _logger = logger;
     }
-
-    #endregion
-
-    #region Properties
-
-    public IEnumerable<IStoreService> Stores => _storeLoader.Load();
 
     #endregion
 
@@ -67,11 +64,11 @@ public class SearchService : ISearchService
     {
         using var measurement = _logger.WarnIfSlow(this);
 
-        var tasks = Stores.Select(store => Task.Run(store.GetAll));
+        var tasks = _storeServices.Select(store => Task.Run(store.GetAll));
         var results = (await Task.WhenAll(tasks))
                       .SelectMany(x => x)
                       .ToArray();
-        
+
         return Sort(results);
     }
 
@@ -84,8 +81,8 @@ public class SearchService : ISearchService
         if (query.IsEmpty()) return new List<QueryResult>();
 
         //Get the alive stores
-        var aliveStores = Stores.Where(service => _orchestrator.IsAlive(service, query))
-                                .ToArray();
+        var aliveStores = _storeServices.Where(service => _orchestrator.IsAlive(service, query))
+                                        .ToArray();
 
         // I've got a service that stunts all the others, then
         // I execute the search for this one only
@@ -104,17 +101,17 @@ public class SearchService : ISearchService
         _logger.LogTrace(
             "For the query {Query}, {IdleCount} store(s) IDLE and {ActiveCount} store(s) ALIVE",
             query,
-            Stores.Count() - tasks.Count,
+            _storeServices.Count() - tasks.Count,
             tasks.Count
         );
 
         var results = (await Task.WhenAll(tasks)).SelectMany(x => x).ToArray();
-        
+
         // Remember the query
         foreach (var result in results) result.OriginatingQuery = query;
-        
+
         var orderedResults = Sort(results).ToList();
-        
+
         // If there's an exact match, promote
         // it to the top of the list.
         var match = orderedResults.FirstOrDefault(r => r.Name == query.Name);

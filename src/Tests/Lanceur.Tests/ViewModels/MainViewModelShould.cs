@@ -6,18 +6,15 @@ using Lanceur.Core;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
-using Lanceur.Tests.Tools.Macros;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils.Watchdogs;
@@ -26,6 +23,7 @@ using Lanceur.Ui.WPF.ReservedKeywords;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -47,7 +45,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
         var keywords = typeof(QuitAlias).Assembly.GetTypes()
                                         .Where(t => t.GetCustomAttribute<ReservedAliasAttribute>() is not null)
                                         .Select(t => t.GetCustomAttribute<ReservedAliasAttribute>()!.Name);
-        foreach (var type in keywords) yield return new[] { type };
+        foreach (var type in keywords) yield return [type];
     }
 
     protected override IServiceCollection ConfigureServices(
@@ -57,11 +55,13 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     {
         serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                         .AddSingleton(new AssemblySource
-                         {
-                             MacroSource = Assembly.GetExecutingAssembly(), 
-                             ReservedKeywordSource = typeof(MainView).GetAssembly()
-                         })
+                         .AddSingleton(
+                             new AssemblySource
+                             {
+                                 MacroSource = Assembly.GetExecutingAssembly(),
+                                 ReservedKeywordSource = typeof(MainView).GetAssembly()
+                             }
+                         )
                          .AddMockSingleton<IBookmarkRepositoryFactory>()
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<IMacroService, MacroService>()
@@ -77,7 +77,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                          .AddSingleton<IWildcardService, ReplacementComposite>()
                          .AddMockSingleton<ILuaManager>()
                          .AddMockSingleton<IClipboardService>()
-                         .AddMockSingleton<IProcessLauncher>((sp, i) 
+                         .AddMockSingleton<IProcessLauncher>((sp, i)
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IExecutionService, ExecutionService>()
@@ -87,15 +87,12 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                                   .Returns(true);
                                  return i;
                              }
-                         )
-                         .AddMockSingleton<IStoreLoader>((sp, i) =>
-                             {
-                                 i.Load()
-                                  .Returns([new AliasStore(sp), new ReservedAliasStore(sp), new CalculatorStore(sp)]);
-                                 return i;
-                             }
                          );
-        return serviceCollection;
+            serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
+            serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, ReservedAliasStore>());
+            serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, CalculatorStore>());
+
+            return serviceCollection;
     }
 
     [Fact]
@@ -243,13 +240,13 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     }
 
     [Theory]
-    [InlineData(true, 1)]
-    [InlineData(false, 0)]
-    public async Task ShowAllResultsOrNotDependingOnConfiguration(bool showAllResults, int count)
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ShowAllResultsOrNotDependingOnConfiguration(bool showAllResults)
     {
-        var builder = new SqlGenerator().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
-                                        .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
-                                        .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
+        var sqlBuilder = new SqlGenerator().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+                                         .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
+                                         .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
 
         var visitors = new ServiceVisitors
         {
@@ -263,9 +260,12 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
             async (viewModel, _) =>
             {
                 await viewModel.DisplayResultsIfAllowed();
-                viewModel.Results.Count.ShouldBeGreaterThanOrEqualTo(count);
+                /* If showAllResults is true, then more than one result is expected user displays the search box results
+                 * Otherwise, when showAllResults is false, then zero result are displayed in the search box results
+                 */
+                showAllResults.ShouldBe(viewModel.Results.Count > 0);
             },
-            builder,
+            sqlBuilder,
             visitors
         );
     }

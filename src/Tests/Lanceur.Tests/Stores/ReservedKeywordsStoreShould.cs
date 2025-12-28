@@ -40,14 +40,13 @@ public class ReservedKeywordsStoreShould
     {
         type ??= typeof(NotExecutableTestAlias);
 
-        var reservedAliasStoreLogger = new TestOutputHelperDecoratorForMicrosoftLogging<ReservedAliasStore>(_output);
         var serviceProvider = new ServiceCollection()
                               .AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
                               .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                               .AddSingleton(Substitute.For<IDatabaseConfigurationService>())
                               .AddSingleton(aliasRepository)
+                              .AddTestOutputHelper(_output)
                               .AddLoggerFactoryForTests(_output)
-                              .AddSingleton(reservedAliasStoreLogger)
                               .AddMockSingleton<IBookmarkRepositoryFactory>()
                               .AddMockSingleton<IConfigurationFacade>((_, i) =>
                                   {
@@ -55,9 +54,10 @@ public class ReservedKeywordsStoreShould
                                       return i;
                                   }
                               )
+                              .AddSingleton<ReservedAliasStore>()
                               .BuildServiceProvider();
 
-        var store = new ReservedAliasStore(serviceProvider);
+        var store = serviceProvider.GetService<ReservedAliasStore>();
         return store;
     }
 
@@ -94,9 +94,11 @@ public class ReservedKeywordsStoreShould
                  .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                  .AddSingleton(aliasRepository)
                  .AddSingleton(new TestOutputHelperDecoratorForMicrosoftLogging<ReservedAliasStore>(_output))
+                 .AddSingleton<ReservedAliasStore>()
+                 .AddTestOutputHelper(_output)
                  .BuildServiceProvider();
 
-        var store = new ReservedAliasStore(sp);
+        var store = sp.GetService<ReservedAliasStore>();
 
         var result = store.Search(Cmdline.Empty)
                           .ToArray();

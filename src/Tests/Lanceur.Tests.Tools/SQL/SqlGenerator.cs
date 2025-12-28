@@ -5,24 +5,29 @@ public class SqlGenerator : SqlGeneratorBase
     #region Properties
 
     /// <summary>
-    /// Tracks the last identifier assigned to an alias.
-    /// A value of 0 means that no alias has been created yet.
+    ///     Tracks the last identifier assigned to an alias.
+    ///     A value of 0 means that no alias has been created yet.
     /// </summary>
     public int IdSequence  { get; private set; }
+
+    /// <summary>
+    ///     Represents an empty generator, that's no sql will be generated from this instance
+    /// </summary>
+    public static SqlGenerator Empty { get; } = new();
 
     #endregion
 
     #region Methods
 
     /// <summary>
-    /// Creates a new alias and applies the given configuration action to it.
-    /// The alias is assigned a unique identifier from an internal counter.
+    ///     Creates a new alias and applies the given configuration action to it.
+    ///     The alias is assigned a unique identifier from an internal counter.
     /// </summary>
     /// <param name="generator">
-    /// A delegate used to configure the newly created <see cref="SqlAliasGenerator"/>.
+    ///     A delegate used to configure the newly created <see cref="SqlAliasGenerator" />.
     /// </param>
     /// <returns>
-    /// The current <see cref="SqlGenerator"/> instance, allowing method chaining.
+    ///     The current <see cref="SqlGenerator" /> instance, allowing method chaining.
     /// </returns>
     public SqlGenerator AppendAlias(Action<SqlAliasGenerator> generator)
     {

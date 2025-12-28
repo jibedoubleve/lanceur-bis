@@ -72,7 +72,9 @@ public class SearchServiceOrchestratorShould
         var storeService = Substitute.For<IStoreService>();
         storeService.StoreOrchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));
 
-        var orchestrator = new SearchServiceOrchestrator(sp.GetService<ILoggerFactory>(), sp.GetSection<StoreSection>());
+        var orchestrator = new SearchServiceOrchestrator(
+            sp.GetSection<StoreSection>()
+        );
 
         // act
         orchestrator.IsAlive(storeService, Cmdline.Parse(cmd))
