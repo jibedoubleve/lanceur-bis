@@ -1,4 +1,4 @@
-namespace Lanceur.SharedKernel.DI;
+namespace Lanceur.SharedKernel.IoC;
 
 /// <summary>
 ///     Attribute to mark a class for Dependency Injection (DI) as a singleton.

@@ -2,7 +2,7 @@ using System.Reflection;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Lanceur.SharedKernel.DI;
+namespace Lanceur.SharedKernel.IoC;
 
 /// <summary>
 ///     Provides extension methods for the <see cref="IServiceCollection" /> interface to facilitate the registration

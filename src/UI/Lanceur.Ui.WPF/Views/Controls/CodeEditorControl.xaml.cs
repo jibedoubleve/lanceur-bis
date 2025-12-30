@@ -7,7 +7,7 @@ using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.DI;
+using Lanceur.SharedKernel.IoC;
 
 namespace Lanceur.Ui.WPF.Views.Controls;
 

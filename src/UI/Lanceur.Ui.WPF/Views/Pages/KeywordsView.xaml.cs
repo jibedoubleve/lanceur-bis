@@ -1,6 +1,6 @@
 using System.Windows;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.DI;
+using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Views.Controls;
 using Microsoft.Extensions.Logging;

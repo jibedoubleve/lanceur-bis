@@ -22,7 +22,7 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Caching;
-using Lanceur.SharedKernel.DI;
+using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.SharedKernel.Web;
 using Lanceur.Ui.Core.Services;

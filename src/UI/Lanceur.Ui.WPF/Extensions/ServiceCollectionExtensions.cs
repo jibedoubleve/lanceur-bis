@@ -4,7 +4,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Win32.Services;
-using Lanceur.SharedKernel.DI;
+using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.Commands;
 using Lanceur.Ui.WPF.Helpers;
