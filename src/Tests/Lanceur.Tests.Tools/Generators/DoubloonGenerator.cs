@@ -16,9 +16,9 @@ public class DoubloonGenerator : IEnumerable<object[]>
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private static ISqlGenerator WithDifferentSynonyms()
+    private static ISqlBuilder WithDifferentSynonyms()
     {
-        return new SqlGenerator()
+        return new SqlBuilder()
                .AppendAlias(a => a.WithFileName(FileName)
                                   .WithSynonyms("a1", "a2", "a3")
                                   .WithAdditionalParameters(
@@ -35,9 +35,9 @@ public class DoubloonGenerator : IEnumerable<object[]>
                );
     }
 
-    private static ISqlGenerator WithSynonymsDoubloons()
+    private static ISqlBuilder WithSynonymsDoubloons()
     {
-        return new SqlGenerator()
+        return new SqlBuilder()
                .AppendAlias(a => a.WithFileName(FileName)
                                   .WithArguments(Arguments)
                                   .WithSynonyms("a1", "a2", "a3")

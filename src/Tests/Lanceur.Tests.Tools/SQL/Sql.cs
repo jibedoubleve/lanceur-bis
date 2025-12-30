@@ -1,6 +1,6 @@
 namespace Lanceur.Tests.Tools.SQL;
 
-public  class Sql : ISqlGenerator
+public  class Sql : ISqlBuilder
 {
     #region Constructors
 
@@ -13,13 +13,13 @@ public  class Sql : ISqlGenerator
 
     #region Properties
 
-    public static ISqlGenerator Empty => new Sql();
+    public static ISqlBuilder Empty => new Sql();
 
     #endregion
 
     #region Methods
 
-    public string GenerateSql() => "";
+    public string ToSql() => "";
 
     #endregion
 }

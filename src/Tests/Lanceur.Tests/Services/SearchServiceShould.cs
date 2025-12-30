@@ -122,7 +122,10 @@ public class SearchServiceShould : TestBase
          * Check counter is still -1
          */
         OutputHelper.Arrange();
-        var sql = new SqlGenerator().AppendAlias(a => a.WithSynonyms("a", "b")).GenerateSql();
+        var sql = new SqlBuilder()
+                  .AppendAlias(a => a.WithSynonyms("a", "b"))
+                  .ToSql();
+        
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
@@ -192,7 +195,7 @@ public class SearchServiceShould : TestBase
     public async Task ReturnResultWithExactMatchOnTop()
     {
         var dt = DateTime.Now;
-        var sql = new SqlGenerator()
+        var sql = new SqlBuilder()
                   .AppendAlias(a => a.WithSynonyms("un")
                                      .WithArguments("@alias2@@alias3")
                                      .WithFileName("un")
@@ -213,7 +216,7 @@ public class SearchServiceShould : TestBase
                                      .WithFileName("u")
                                      .WithUsage(dt.AddMinutes(1), dt.AddMinutes(1), dt.AddMinutes(1))
                   )
-                  .GenerateSql();
+                  .ToSql();
 
         // ARRANGE
         using var db = BuildFreshDb(sql);
@@ -292,14 +295,14 @@ public class SearchServiceShould : TestBase
     public void SetUsageDoesNotResetAdditionalParameters()
     {
         OutputHelper.Arrange();
-        var sql = new SqlGenerator().AppendAlias(a =>
+        var sql = new SqlBuilder().AppendAlias(a =>
                                     {
                                         a.WithSynonyms("a")
                                          .WithAdditionalParameters()
                                          .WithAdditionalParameters()
                                          .WithAdditionalParameters();
                                     })
-                                    .GenerateSql();
+                                    .ToSql();
 
         var connectionManager = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);

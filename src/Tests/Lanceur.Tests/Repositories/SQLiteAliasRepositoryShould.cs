@@ -295,7 +295,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var sb = new ServiceCollection().AddLogging(b => b.AddXUnit(OutputHelper))
                                         .BuildServiceProvider();
 
-        var sql = new SqlGenerator().AppendAlias(a => a.WithSynonyms("Alias")).GenerateSql();
+        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("Alias")).ToSql();
 
         var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
         var dbAction = BuildAliasDbAction(sb.GetService<ILoggerFactory>());

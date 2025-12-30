@@ -158,9 +158,9 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     public async Task BeAbleToSearchAliases()
     {
         // ARRANGE
-        var sqlBuilder = new SqlGenerator().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
-                                           .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
-                                           .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+                                         .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
+                                         .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
 
 
         await TestViewModelAsync(
@@ -180,7 +180,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [Fact]
     public async Task NotShowAllResultWhenPreviousQuery()
     {
-        var sqlBuilder = new SqlGenerator().AppendAlias(a => a.WithSynonyms())
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms())
                                            .AppendAlias(a => a.WithSynonyms())
                                            .AppendAlias(a => a.WithSynonyms())
                                            .AppendAlias(a => a.WithSynonyms());
@@ -244,7 +244,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
     [InlineData(false)]
     public async Task ShowAllResultsOrNotDependingOnConfiguration(bool showAllResults)
     {
-        var sqlBuilder = new SqlGenerator().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
                                          .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
                                          .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
 

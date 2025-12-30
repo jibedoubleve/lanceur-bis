@@ -53,7 +53,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var date1 = DateTime.Now.AddDays(-1);
         var date2 = DateTime.Now.AddDays(-2);
 
-        var gen = new SqlGenerator();
+        var gen = new SqlBuilder();
         var sql = gen.AppendAlias(a => a.WithUsage(date1, date2)
                                         .WithCount(count)
                                         .WithSynonyms()
@@ -74,7 +74,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                         .WithCount(count)
                                         .WithSynonyms()
                      )
-                     .GenerateSql();
+                     .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -109,7 +109,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var date1 = DateTime.Now.AddDays(-1);
         var date2 = DateTime.Now.AddDays(-2);
 
-        var gen = new SqlGenerator();
+        var gen = new SqlBuilder();
         var sql = gen.AppendAlias(a => a.WithUsage(date1, date2)
                                                        .WithFileName($"{fileName}_{gen.IdSequence}")
                                                        .WithCount(count)
@@ -135,7 +135,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                                        .WithCount(count)
                                                        .WithSynonyms()
                                     )
-                                    .GenerateSql();
+                                    .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -162,7 +162,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var date1 = now.AddDays(-1);
         var date2 = now.AddDays(-2);
 
-        var gen = new SqlGenerator();
+        var gen = new SqlBuilder();
         var sql = gen.AppendAlias(a => a.WithDeletedAt(now)
                                         .WithCount(count)
                                         .WithUsage(date1, date2)
@@ -188,7 +188,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                                        .WithUsage(date1, date2)
                                                        .WithSynonyms()
                                     )
-                                    .GenerateSql();
+                                    .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -214,7 +214,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var date2 = DateTime.Now.AddDays(-2);
 
         const string name = "is_a_doubloon";
-        var gen = new SqlGenerator();
+        var gen = new SqlBuilder();
         var sql = gen.AppendAlias(a => a.WithFileName(filename)
                                         .WithArguments(arguments)
                                         .WithCount(count)
@@ -245,7 +245,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                                        .WithUsage(date1, date2)
                                                        .WithSynonyms(name)
                                     )
-                                    .GenerateSql();
+                                    .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -272,7 +272,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         const string script1 = "return something";
 
         const string name = "is_a_doubloon";
-        var gen = new SqlGenerator();
+        var gen = new SqlBuilder();
         var sql = gen.AppendAlias(a => a.WithFileName(name)
                                         .WithArguments(name)
                                         .WithCount(count)
@@ -305,7 +305,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                        .WithUsage(date1, date2)
                                        .WithSynonyms(name)
                                     )
-                    .GenerateSql();
+                    .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -332,7 +332,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         const string script1 = "return something";
 
         const string name = "is_a_doubloon";
-        var sql = new SqlGenerator().AppendAlias(a => a.WithFileName(name)
+        var sql = new SqlBuilder().AppendAlias(a => a.WithFileName(name)
                                                        .WithArguments(name)
                                                        .WithCount(count)
                                                        .WithLuaScript(null)
@@ -367,7 +367,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                                        .WithUsage(date1, date2)
                                                        .WithSynonyms(name)
                                     )
-                                    .GenerateSql();
+                                    .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -386,12 +386,12 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     public void GetExistingAliases()
     {
         // arrange
-        var sql = new SqlGenerator().AppendAlias(a => a.WithSynonyms("name_1"))
+        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("name_1"))
                                     .AppendAlias(a => a.WithSynonyms("name_1"))
                                     .AppendAlias(a => a.WithSynonyms("name_1"))
                                     .AppendAlias(a => a.WithSynonyms("name_1"))
                                     .AppendAlias(a => a.WithSynonyms("name_1"))
-                                    .GenerateSql();
+                                    .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -419,7 +419,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         // arrange
         var date1 = DateTime.Now.AddMonths(-10);
         var date2 = DateTime.Now.AddMonths(-20);
-        var sql = new SqlGenerator().AppendAlias(a =>
+        var sql = new SqlBuilder().AppendAlias(a =>
                                         a.WithSynonyms()
                                          .WithUsage(DateTime.Now)
                                     )
@@ -440,7 +440,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                             a.WithSynonyms()
                                              .WithUsage(date1, date2)
                                     )
-                                    .GenerateSql();
+                                    .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -462,7 +462,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var date1 = DateTime.Now.AddMonths(-10);
         var date2 = DateTime.Now.AddMonths(-20);
         var date3 = DateTime.Now.AddMonths(-30);
-        var sql = new SqlGenerator().AppendAlias(a =>
+        var sql = new SqlBuilder().AppendAlias(a =>
                                         a.WithSynonyms()
                                          .WithUsage(date1, date2, date3)
                                     )
@@ -482,7 +482,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                         a.WithSynonyms()
                                          .WithUsage(date1, date2)
                                     )
-                                    .GenerateSql();
+                                    .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -502,13 +502,13 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     public void GetUnusedAliases()
     {
         // arrange
-        var gen = new SqlGenerator();
+        var gen = new SqlBuilder();
         var sql = gen.AppendAlias(a => a.WithSynonyms())
                                     .AppendAlias(a => a.WithSynonyms())
                                     .AppendAlias(a => a.WithSynonyms())
                                     .AppendAlias(a => a.WithSynonyms())
                                     .AppendAlias(a => a.WithSynonyms())
-                                    .GenerateSql();
+                                    .ToSql();
         var service = BuildRepository(sql);
 
         // act

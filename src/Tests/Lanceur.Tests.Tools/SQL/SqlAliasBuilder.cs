@@ -5,7 +5,7 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Tests.Tools.SQL;
 
-public class SqlAliasGenerator : SqlGeneratorBase
+public class SqlAliasBuilder : SqlBuilderBase
 {
     #region Fields
 
@@ -15,14 +15,14 @@ public class SqlAliasGenerator : SqlGeneratorBase
 
     #region Constructors
 
-    internal SqlAliasGenerator(long idAlias, StringBuilder builder)
+    internal SqlAliasBuilder(long idAlias, StringBuilder builder)
     {
         _idAlias = idAlias;
         Sql = builder;
         AppendAlias();
     }
 
-    private  SqlAliasGenerator() { }
+    private  SqlAliasBuilder() { }
 
     #endregion
 
@@ -41,7 +41,7 @@ public class SqlAliasGenerator : SqlGeneratorBase
         Sql.AppendLine(sql.Format(_idAlias, RandomString));
     }
 
-    public SqlAliasGenerator WithAdditionalParameters(params (string Name, string Argument)[] parameters)
+    public SqlAliasBuilder WithAdditionalParameters(params (string Name, string Argument)[] parameters)
     {
         if (parameters.Length == 0) parameters = [($"{RandomString}", $"{RandomString}")];
         foreach (var parameter in parameters)
@@ -59,28 +59,21 @@ public class SqlAliasGenerator : SqlGeneratorBase
         return this;
     }
 
-    public SqlAliasGenerator WithArguments(string arguments)
+    public SqlAliasBuilder WithArguments(string arguments)
     {
         const string sql = "update alias set arguments = '{0}' where id = {1};";
         Sql.AppendLine(sql.Format(arguments, _idAlias));
         return this;
     }
 
-    public SqlAliasGenerator WithConfirmationRequiredActivated()
-    {
-        const string sql = "update alias set  confirmation_required = {1} where id = {0};";
-        Sql.AppendLine(sql.Format(_idAlias, 1));
-        return this;
-    }
-
-    public SqlAliasGenerator WithCount(int count)
+    public SqlAliasBuilder WithCount(int count)
     {
         const string sql = "update alias set exec_count = {0} where id = {1};";
         Sql.AppendLine(sql.Format(count, _idAlias));
         return this;
     }
 
-    public SqlAliasGenerator WithDeletedAt(DateTime date)
+    public SqlAliasBuilder WithDeletedAt(DateTime date)
     {
         const string sql = "update alias set deleted_at = '{0}' where id = {1};";
         Sql.AppendLine(
@@ -92,28 +85,28 @@ public class SqlAliasGenerator : SqlGeneratorBase
         return this;
     }
 
-    public SqlAliasGenerator WithFileName(string fileName)
+    public SqlAliasBuilder WithFileName(string fileName)
     {
         const string sql = "update alias set file_name = '{0}' where id = {1};";
         Sql.AppendLine(sql.Format(fileName, _idAlias));
         return this;
     }
 
-    public SqlAliasGenerator WithHiddenFlag()
+    public SqlAliasBuilder WithHiddenFlag()
     {
         const string sql = "update alias set  hidden = {1} where id = {0};";
         Sql.AppendLine(sql.Format(_idAlias, 1));
         return this;
     }
 
-    public SqlAliasGenerator WithIcon(string icon)
+    public SqlAliasBuilder WithIcon(string icon)
     {
         const string sql = "update alias set icon = '{1}' where id = {0};";
         Sql.AppendLine(sql.Format(_idAlias, icon));
         return this;
     }
 
-    public SqlAliasGenerator WithLuaScript(string? script)
+    public SqlAliasBuilder WithLuaScript(string? script)
     {
         script = script is null ? "null" : $"'{script}'";
         const string sql = "update alias set lua_script = {0} where id = {1};";
@@ -121,34 +114,34 @@ public class SqlAliasGenerator : SqlGeneratorBase
         return this;
     }
 
-    public SqlAliasGenerator WithNotes(string notes)
+    public SqlAliasBuilder WithNotes(string notes)
     {
         const string sql = "update alias set notes = '{1}' where id = {0};";
         Sql.AppendLine(sql.Format(_idAlias, notes));
         return this;
     }
 
-    public SqlAliasGenerator WithRandomFileName()
+    public SqlAliasBuilder WithRandomFileName()
     {
         WithFileName(Guid.NewGuid().ToString());
         return this;
     }
 
-    public SqlAliasGenerator WithRunAs(Constants.RunAs runAs)
+    public SqlAliasBuilder WithRunAs(Constants.RunAs runAs)
     {
         const string sql = "update alias set run_as = '{1}' where id = {0};";
         Sql.AppendLine(sql.Format(_idAlias, runAs));
         return this;
     }
 
-    public SqlAliasGenerator WithStartMode(Constants.StartMode startMode)
+    public SqlAliasBuilder WithStartMode(Constants.StartMode startMode)
     {
         const string sql = "update alias set start_mode = '{1}' where id = {0};";
         Sql.AppendLine(sql.Format(_idAlias, startMode));
         return this;
     }
 
-    public SqlAliasGenerator WithSynonyms(params string[] names)
+    public SqlAliasBuilder WithSynonyms(params string[] names)
     {
         const string sql = "insert into alias_name (name, id_alias) values ('{0}', {1});";
 
@@ -163,7 +156,7 @@ public class SqlAliasGenerator : SqlGeneratorBase
         return this;
     }
 
-    public SqlAliasGenerator WithUsage(params string[] dateString)
+    public SqlAliasBuilder WithUsage(params string[] dateString)
     {
         try
         {
@@ -177,7 +170,7 @@ public class SqlAliasGenerator : SqlGeneratorBase
             );
         }
     }
-    public SqlAliasGenerator WithUsage(params DateTime[] usage)
+    public SqlAliasBuilder WithUsage(params DateTime[] usage)
     {
         foreach (var date in usage)
         {
@@ -188,7 +181,7 @@ public class SqlAliasGenerator : SqlGeneratorBase
         return this;
     }
 
-    public SqlAliasGenerator WithWorkingDir(string workingDirectory)
+    public SqlAliasBuilder WithWorkingDir(string workingDirectory)
     {
         const string sql = "update alias set working_dir = '{1}' where id = {0};";
         Sql.AppendLine(sql.Format(_idAlias, workingDirectory));

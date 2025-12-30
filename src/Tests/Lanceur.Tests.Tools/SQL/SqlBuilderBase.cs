@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Lanceur.Tests.Tools.SQL;
 
-public abstract class SqlGeneratorBase : ISqlGenerator
+public abstract class SqlBuilderBase : ISqlBuilder
 {
     #region Fields
 
@@ -12,7 +12,7 @@ public abstract class SqlGeneratorBase : ISqlGenerator
 
     #region Methods
 
-    public string GenerateSql() => Sql.ToString();
+    public string ToSql() => Sql.ToString();
 
     #endregion
 }

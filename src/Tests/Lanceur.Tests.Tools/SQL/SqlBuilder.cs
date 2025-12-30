@@ -1,6 +1,6 @@
 namespace Lanceur.Tests.Tools.SQL;
 
-public class SqlGenerator : SqlGeneratorBase
+public class SqlBuilder : SqlBuilderBase
 {
     #region Properties
 
@@ -13,7 +13,7 @@ public class SqlGenerator : SqlGeneratorBase
     /// <summary>
     ///     Represents an empty generator, that's no sql will be generated from this instance
     /// </summary>
-    public static SqlGenerator Empty { get; } = new();
+    public static SqlBuilder Empty { get; } = new();
 
     #endregion
 
@@ -24,12 +24,12 @@ public class SqlGenerator : SqlGeneratorBase
     ///     The alias is assigned a unique identifier from an internal counter.
     /// </summary>
     /// <param name="generator">
-    ///     A delegate used to configure the newly created <see cref="SqlAliasGenerator" />.
+    ///     A delegate used to configure the newly created <see cref="SqlAliasBuilder" />.
     /// </param>
     /// <returns>
-    ///     The current <see cref="SqlGenerator" /> instance, allowing method chaining.
+    ///     The current <see cref="SqlBuilder" /> instance, allowing method chaining.
     /// </returns>
-    public SqlGenerator AppendAlias(Action<SqlAliasGenerator> generator)
+    public SqlBuilder AppendAlias(Action<SqlAliasBuilder> generator)
     {
         generator(new(++IdSequence, Sql));
         return this;

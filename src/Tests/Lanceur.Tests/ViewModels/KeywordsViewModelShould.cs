@@ -68,7 +68,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [Fact]
     public async Task CreateAliasWithAddKeyword()
     {
-        var sqlBuilder = new SqlGenerator();
+        var sqlBuilder = new SqlBuilder();
         sqlBuilder.AppendAlias(a => a.WithSynonyms())
                   .AppendAlias(a => a.WithSynonyms())
                   .AppendAlias(a => a.WithSynonyms());
@@ -135,7 +135,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [Fact]
     public async Task CreateAliasWorkOnSecondNavigation()
     {
-        var sqlBuilder = new SqlGenerator()
+        var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms())
                          .AppendAlias(a => a.WithSynonyms())
                          .AppendAlias(a => a.WithSynonyms());
@@ -292,7 +292,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [InlineData(" ")]
     public async Task ListAllAliasOnEmptySearch(string criterion)
     {
-        var sqlBuilder = new SqlGenerator()
+        var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms())
                          .AppendAlias(a => a.WithSynonyms())
                          .AppendAlias(a => a.WithSynonyms());
@@ -461,14 +461,14 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [Fact]
     public async Task NotRecreateAliasOnLoad()
     {
-        var builder = new SqlGenerator().AppendAlias(a => a.WithFileName("un")
-                                                           .WithArguments("params un")
-                                                           .WithSynonyms("deux")
-                                        )
-                                        .AppendAlias(a => a.WithFileName("deux")
-                                                           .WithArguments("params deux")
-                                                           .WithSynonyms("trois")
-                                        );
+        var builder = new SqlBuilder().AppendAlias(a => a.WithFileName("un")
+                                                         .WithArguments("params un")
+                                                         .WithSynonyms("deux")
+                                      )
+                                      .AppendAlias(a => a.WithFileName("deux")
+                                                         .WithArguments("params deux")
+                                                         .WithSynonyms("trois")
+                                      );
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModelAsync(
             async (viewModel, _) =>

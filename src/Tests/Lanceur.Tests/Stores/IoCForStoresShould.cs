@@ -146,7 +146,7 @@ public class IoCForStoresShould : TestBase
         const string cmdlineString2 = "pp hello world";
         const string cmdlineString3 = "éé hello world";
 
-        var connectionManager = GetConnectionManager(SqlGenerator.Empty);
+        var connectionManager = GetConnectionManager(SqlBuilder.Empty);
         var serviceProvider = ConfigureServices();
  
         // act
