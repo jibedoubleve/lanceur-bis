@@ -7,7 +7,7 @@ public abstract class Store
 {
     #region Constructors
 
-    public Store(IStoreOrchestrationFactory factory)
+    protected Store(IStoreOrchestrationFactory factory)
     {
         StoreOrchestrationFactory
             = factory ??

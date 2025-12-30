@@ -26,8 +26,10 @@ public class CalculatorStore : Store, IStoreService
         ICalculatorService calculator
     ) : base(orchestrationFactory)
     {
+        ArgumentNullException.ThrowIfNull(calculator);
+        
         _logger = logger;
-        _calculator = calculator ?? throw new NullReferenceException("ICalculatorService is null");
+        _calculator = calculator;
     }
 
     #endregion

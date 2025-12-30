@@ -35,6 +35,7 @@ public class ReservedAliasStore : Store, IStoreService
     /// <param name="aliasRepository">Repository of all the aliases</param>
     /// <param name="logger">Used for logging</param>
     /// <param name="serviceProvider">Service provider used with the Macros</param>
+    /// <exception cref="ArgumentNullException">If assembly source is null or no ReservedKeywordSource configured</exception>
     /// <remarks>
     ///     Each reserved alias should be decorated with <see cref="ReservedAliasAttribute" />
     /// </remarks>
@@ -47,7 +48,7 @@ public class ReservedAliasStore : Store, IStoreService
     ) : base(orchestrationFactory)
     {
         _assembly = assembly?.ReservedKeywordSource ??
-                    throw new NullReferenceException("The AssemblySource is not set in the DI container.");
+                    throw new ArgumentNullException("The AssemblySource is not set in the DI container.");
         _aliasRepository = aliasRepository;
         _logger = logger;
         _serviceProvider = serviceProvider;

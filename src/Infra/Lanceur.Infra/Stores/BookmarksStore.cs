@@ -26,7 +26,7 @@ public class BookmarksStore : Store, IStoreService
     public BookmarksStore(
         IStoreOrchestrationFactory orchestrationFactory,
         ISection<StoreSection> settings,
-        IBookmarkRepositoryFactory bookmarkRepositoryFactory,
+        IBookmarkRepositoryFactory bookmarkRepositoryFactory
     ) : base(orchestrationFactory)
     {
         _settings = settings;
