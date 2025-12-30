@@ -1,10 +1,10 @@
 namespace Lanceur.Tests.Tools.SQL;
 
-public interface ISqlGenerator
+public interface ISqlBuilder
 {
     #region Methods
 
-    string GenerateSql();
+    string ToSql();
 
     #endregion
 }

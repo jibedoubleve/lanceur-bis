@@ -24,35 +24,25 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
 
     #region Methods
 
-    private static SqlGenerator BuildSqlBuilder()
+    private static SqlBuilder BuildSqlBuilder()
     {
-        return new SqlGenerator().AppendAlias(
-                                     a =>
-                                     {
-                                         a.WithSynonyms("a")
-                                          .WithUsage(
-                                              "2025-01-01",
-                                              "2025-02-01",
-                                              "2025-03-01",
-                                              "2021-03-01",
-                                              "2022-03-01"
-                                          );
-                                     }
-                                 )
-                                 .AppendAlias(
-                                     a =>
-                                     {
-                                         a.WithSynonyms("b")
-                                          .WithUsage(
-                                              "2024-01-01",
-                                              "2024-02-01",
-                                              "2024-03-01",
-                                              "2021-03-01",
-                                              "2022-03-01"
-                                          );
-                                     }
-                                 )
-                                 .AppendAlias(a => a.WithSynonyms("c"));
+        return new SqlBuilder().AppendAlias(a =>
+                                   a.WithSynonyms("a")
+                                    .WithUsage(
+                                        "2025-01-01",
+                                        "2025-02-01",
+                                        "2025-03-01",
+                                        "2021-03-01",
+                                        "2022-03-01"))
+                               .AppendAlias(a =>
+                                   a.WithSynonyms("b")
+                                    .WithUsage(
+                                        "2024-01-01",
+                                        "2024-02-01",
+                                        "2024-03-01",
+                                        "2021-03-01",
+                                        "2022-03-01"))
+                               .AppendAlias(a => a.WithSynonyms("c"));
     }
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)

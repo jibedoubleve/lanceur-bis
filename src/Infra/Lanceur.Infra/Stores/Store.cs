@@ -1,6 +1,5 @@
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Stores;
 
@@ -8,14 +7,13 @@ public abstract class Store
 {
     #region Constructors
 
-    public Store(IServiceProvider serviceProvider)
+    protected Store(IStoreOrchestrationFactory factory)
     {
-        var factory = serviceProvider.GetService<IStoreOrchestrationFactory>();
-
-        StoreOrchestrationFactory = factory ??
-                                    throw new NullReferenceException(
-                                        $"The {typeof(IStoreOrchestrationFactory)} should be configured in the IOC container."
-                                    );
+        StoreOrchestrationFactory
+            = factory ??
+              throw new NullReferenceException(
+                  $"The {typeof(IStoreOrchestrationFactory)} should be configured in the IOC container."
+              );
     }
 
     #endregion

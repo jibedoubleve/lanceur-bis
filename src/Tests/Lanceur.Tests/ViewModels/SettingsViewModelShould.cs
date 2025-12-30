@@ -63,7 +63,7 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
 
     protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
     {
-        serviceCollection.AddLoggingForTests<ApplicationSettingsViewModel>(OutputHelper)
+        serviceCollection.AddTestOutputHelper(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                          .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                          .AddSingleton<IInteractionHubService, InteractionHubService>()

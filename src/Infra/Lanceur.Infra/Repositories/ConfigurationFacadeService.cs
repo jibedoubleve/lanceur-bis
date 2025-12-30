@@ -55,7 +55,6 @@ public class ConfigurationFacadeService : IConfigurationFacade
         _databaseConfigurationService.Save();
 
         Reload();
-        OnUpdated();
     }
 
     #endregion

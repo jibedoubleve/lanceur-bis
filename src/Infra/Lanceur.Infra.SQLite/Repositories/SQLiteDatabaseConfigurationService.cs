@@ -48,7 +48,7 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
     #region Methods
 
     /// <summary>
-    ///     HACK: If there's new feature flags added (in a new version of the application,
+    ///     HACK: If there's new feature flags added in a new version of the application,
     ///     add it here.
     /// </summary>
     private DatabaseConfiguration AddNewFeatureFlags(DatabaseConfiguration config)

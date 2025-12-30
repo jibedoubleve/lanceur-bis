@@ -5,7 +5,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.SharedKernel.DI;
+using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Helpers;

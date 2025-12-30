@@ -11,8 +11,9 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
+using Lanceur.Infra.Stores;
 using Lanceur.Infra.Win32.Services;
-using Lanceur.SharedKernel.DI;
+using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Commands;
@@ -45,6 +46,7 @@ public partial class App
                                                                   .Register("Control", "Lanceur.Ui.WPF")
                                                                   .AddServices()
                                                                   .AddWpfServices()
+                                                                  .AddStoreServices()
                                                                   .AddCommands()
                                                                   .AddConfiguration()
                                                                   .AddDatabaseServices()

@@ -4,8 +4,6 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.SharedKernel.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
@@ -22,11 +20,14 @@ public class AliasStore : Store, IStoreService
 
     #region Constructors
 
-    public AliasStore(IServiceProvider serviceProvider) : base(serviceProvider)
+    public AliasStore(
+        IStoreOrchestrationFactory orchestrationFactory,
+        IAliasRepository aliasRepository,
+        ILogger<AliasStore> logger
+    ) : base(orchestrationFactory)
     {
-        _aliasRepository = serviceProvider.GetService<IAliasRepository>();
-        _logger = serviceProvider.GetService<ILoggerFactory>()
-                                 .GetLogger<AliasStore>();
+        _aliasRepository = aliasRepository;
+        _logger = logger;
     }
 
     #endregion
@@ -43,7 +44,7 @@ public class AliasStore : Store, IStoreService
 
     #region Methods
 
-    /// <inheritdoc cref="IStoreService.GetAll"/>
+    /// <inheritdoc cref="IStoreService.GetAll" />
     public override IEnumerable<QueryResult> GetAll()
     {
         using var _ = _logger.WarnIfSlow(this);

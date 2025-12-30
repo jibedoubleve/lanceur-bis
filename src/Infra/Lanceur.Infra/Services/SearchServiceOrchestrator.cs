@@ -3,8 +3,6 @@ using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.SharedKernel.Logging;
-using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
@@ -18,11 +16,7 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
 
     #region Constructors
 
-    public SearchServiceOrchestrator(ILoggerFactory factory, ISection<StoreSection> settings)
-    {
-        _settings = settings;
-        factory.GetLogger<SearchServiceOrchestrator>();
-    }
+    public SearchServiceOrchestrator(ISection<StoreSection> settings) => _settings = settings;
 
     #endregion
 
@@ -33,8 +27,10 @@ public class SearchServiceOrchestrator : ISearchServiceOrchestrator
     {
         if (storeService is null) return false;
 
+        _settings.Reload();
         var storeOverride = _settings.Value.StoreShortcuts
                                      .FirstOrDefault(x => x.StoreType == storeService.GetType().ToString());
+
         var regex = new Regex(storeOverride?.AliasOverride ?? storeService.StoreOrchestration.AlivePattern);
 
         var isAlive = regex.IsMatch(query.Name);

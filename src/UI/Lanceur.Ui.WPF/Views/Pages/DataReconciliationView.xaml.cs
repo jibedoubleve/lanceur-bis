@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.SharedKernel.DI;
+using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Helpers;
 

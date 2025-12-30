@@ -7,7 +7,6 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Extensions;
 using Lanceur.SharedKernel.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
@@ -27,11 +26,16 @@ public class EverythingStore : Store, IStoreService
 
     #region Constructors
 
-    public EverythingStore(IServiceProvider serviceProvider) : base(serviceProvider)
+    public EverythingStore(
+        IStoreOrchestrationFactory orchestrationFactory,
+        ILogger<EverythingStore> logger,
+        IEverythingApi everythingApi,
+        ISection<StoreSection> settings
+    ) : base(orchestrationFactory)
     {
-        _logger = serviceProvider.GetService<ILogger<EverythingStore>>();
-        _everythingApi = serviceProvider.GetService<IEverythingApi>();
-        _settings = serviceProvider.GetSection<StoreSection>();
+        _logger = logger;
+        _everythingApi = everythingApi;
+        _settings = settings;
     }
 
     #endregion
@@ -51,17 +55,15 @@ public class EverythingStore : Store, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        if (cmdline.Parameters.IsNullOrWhiteSpace()) return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
+        if (cmdline.Parameters.IsNullOrWhiteSpace())
+            return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
 
         var query = $"{cmdline.Parameters} {_settings.Value.EverythingQuerySuffix}";
         _logger.LogTrace("Everything query: {Query}", query);
 
         var result =  _everythingApi.Search(query);
 
-        if (result.HasError)
-        {
-            return DisplayQueryResult.SingleFromResult(result.ErrorMessage);
-        }
+        if (result.HasError) return DisplayQueryResult.SingleFromResult(result.ErrorMessage);
 
         return result.ToList()
                      .Select(item => item.ToAliasQueryResult());

@@ -23,6 +23,7 @@ using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;
@@ -44,59 +45,54 @@ public class AliasUseCases : TestBase
     {
         var connectionString = ConnectionStringFactory.InMemory;
         var db = GetConnectionManager(Sql.Empty, connectionString.ToString());
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddConfigurationSections()
+                         .AddLogging(builder => builder.AddXUnit(OutputHelper))
+                         .AddDatabase(db)
+                         .AddApplicationSettings()
+                         .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+                         .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
+                         .AddSingleton<ISearchService, SearchService>()
+                         .AddSingleton<IMacroService, MacroService>()
+                         .AddSingleton<IDbActionFactory, DbActionFactory>()
+                         .AddMockSingleton<IDatabaseConfigurationService>()
+                         .AddMockSingleton<IThumbnailService>()
+                         .AddMockSingleton<IUserNotificationService>()
+                         .AddMockSingleton<IInteractionHubService>()
+                         .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
+                         .AddMockSingleton<IExecutionService>((_, i) =>
+                             {
+                                 i.ExecuteAsync(Arg.Any<ExecutionRequest>())
+                                  .Returns(ExecutionResponse.NoResult);
+                                 return i;
+                             }
+                         )
+                         .AddMockSingleton<ISearchServiceOrchestrator>((_, i) =>
+                             {
+                                 i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
+                                  .Returns(true);
+                                 return i;
+                             }
+                         )
+                         .AddSingleton<IAliasManagementService, AliasManagementService>()
+                         .AddSingleton<IAliasValidationService, AliasValidationService>()
+                         .AddMockSingleton<IViewFactory>()
+                         .AddMockSingleton<IUserInteractionService>((_, i) =>
+                             {
+                                 i.AskUserYesNoAsync(Arg.Any<string>())
+                                  .Returns(true);
+                                 return i;
+                             }
+                         )
+                         .AddMockSingleton<IPackagedAppSearchService>()
+                         .AddSingleton<KeywordsViewModel>()
+                         .AddSingleton<MainViewModel>();
+            
+        // Register stores
+        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
 
-        return new ServiceCollection().AddConfigurationSections()
-                                      .AddLogging(builder => builder.AddXUnit(OutputHelper))
-                                      .AddDatabase(db)
-                                      .AddApplicationSettings()
-                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                      .AddSingleton<ISearchService, SearchService>()
-                                      .AddSingleton<IMacroService, MacroService>()
-                                      .AddSingleton<IDbActionFactory, DbActionFactory>()
-                                      .AddMockSingleton<IDatabaseConfigurationService>()
-                                      .AddMockSingleton<IThumbnailService>()
-                                      .AddMockSingleton<IUserNotificationService>()
-                                      .AddMockSingleton<IInteractionHubService>()
-                                      .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
-                                      .AddMockSingleton<IExecutionService>(
-                                          (_, i) =>
-                                          {
-                                              i.ExecuteAsync(Arg.Any<ExecutionRequest>())
-                                               .Returns(ExecutionResponse.NoResult);
-                                              return i;
-                                          }
-                                      )
-                                      .AddMockSingleton<ISearchServiceOrchestrator>(
-                                          (_, i) =>
-                                          {
-                                              i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
-                                               .Returns(true);
-                                              return i;
-                                          }
-                                      )
-                                      .AddMockSingleton<IStoreLoader>(
-                                          (sp, i) =>
-                                          {
-                                              i.Load().Returns([new AliasStore(sp)]);
-                                              return i;
-                                          }
-                                      )
-                                      .AddSingleton<IAliasManagementService, AliasManagementService>()
-                                      .AddSingleton<IAliasValidationService, AliasValidationService>()
-                                      .AddMockSingleton<IViewFactory>()
-                                      .AddMockSingleton<IUserInteractionService>(
-                                          (_, i) =>
-                                          {
-                                              i.AskUserYesNoAsync(Arg.Any<string>())
-                                               .Returns(true);
-                                              return i;
-                                          }
-                                      )
-                                      .AddMockSingleton<IPackagedAppSearchService>()
-                                      .AddSingleton<KeywordsViewModel>()
-                                      .AddSingleton<MainViewModel>()
-                                      .BuildServiceProvider();
+        return serviceCollection.BuildServiceProvider();
+        
     }
 
     [Fact]

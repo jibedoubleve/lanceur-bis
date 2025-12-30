@@ -7,7 +7,6 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Extensions;
 using Lanceur.SharedKernel.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
@@ -24,11 +23,14 @@ public class BookmarksStore : Store, IStoreService
 
     #region Constructors
 
-    public BookmarksStore(IServiceProvider serviceProvider) : base(serviceProvider)
+    public BookmarksStore(
+        IStoreOrchestrationFactory orchestrationFactory,
+        ISection<StoreSection> settings,
+        IBookmarkRepositoryFactory bookmarkRepositoryFactory
+    ) : base(orchestrationFactory)
     {
-        _settings = serviceProvider.GetSection<StoreSection>();
-        _bookmarkRepositoryFactory = serviceProvider.GetService<IBookmarkRepositoryFactory>();
-        serviceProvider.GetService<ILogger<BookmarksStore>>();
+        _settings = settings;
+        _bookmarkRepositoryFactory = bookmarkRepositoryFactory;
     }
 
     #endregion

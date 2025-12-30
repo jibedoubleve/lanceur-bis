@@ -7,4 +7,13 @@ public interface ISection<out T>
     T Value { get; }
 
     #endregion
+
+    #region Methods
+
+    /// <summary>
+    ///     Reloads the configuration section from its source, updating all values.
+    /// </summary>
+    void Reload();
+
+    #endregion
 }

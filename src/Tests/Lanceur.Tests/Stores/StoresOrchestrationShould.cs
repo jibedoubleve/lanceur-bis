@@ -8,17 +8,16 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
-using Xunit.v3;
 
 namespace Lanceur.Tests.Stores;
 
@@ -61,8 +60,12 @@ public class StoresOrchestrationShould
         var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
                                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(AliasRepository)
+                                                     .AddSingleton<AdditionalParametersStore>()
+                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddStoreServicesMockContext()
+                                                     .AddStoreServices()
                                                      .BuildServiceProvider();
-        var store = new AdditionalParametersStore(serviceProvider);
+        var store = serviceProvider.GetService<AdditionalParametersStore>();
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -82,8 +85,11 @@ public class StoresOrchestrationShould
         var serviceProvider = new ServiceCollection().AddSingleton(AliasRepository)
                                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(LoggerFactory)
+                                                     .AddSingleton<AliasStore>()
+                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
-        var store = new AliasStore(serviceProvider);
+        var store = serviceProvider.GetService<AliasStore>();
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -105,7 +111,7 @@ public class StoresOrchestrationShould
         var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                                                      .AddSingleton<IStoreService, CalculatorStore>()
-                                                     .AddLoggingForTests<NCalcCalculatorService>(_outputHelper)
+                                                     .AddTestOutputHelper(_outputHelper)
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>();
 
@@ -118,44 +124,42 @@ public class StoresOrchestrationShould
     [InlineData("(6+5)+1", "12")]
     public async Task UnderstandCalculationWithOrchestration(string query, string expected)
     {
-        var serviceProvider = new ServiceCollection().AddConfigurationSections()
-                                                     .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                                                     .AddSingleton<AliasStore>()
-                                                     .AddLogging()
-                                                     .AddSingleton<CalculatorStore>()
-                                                     .AddSingleton<ICalculatorService, NCalcCalculatorService>()
-                                                     .AddSingleton<ISearchService, SearchService>()
-                                                     .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                                                     .AddMockSingleton<IThumbnailService>()
-                                                     .AddLoggerFactoryForTests(_outputHelper)
-                                                     .AddMockSingleton<IMacroService>((_, i) =>
-                                                     {
-                                                         i.ExpandMacroAlias(Arg.Any<QueryResult[]>())
-                                                          .Returns(callInfo => callInfo.Arg<QueryResult[]>());
-                                                         return i;
-                                                     })
-                                                     .AddMockSingleton<IAliasRepository>((_, i) =>
-                                                     {
-                                                         i.Search(Arg.Any<string>()).Returns([]);
-                                                         return i;
-                                                     })
-                                                     .AddMockSingleton<IConfigurationFacade>((_, i) =>
-                                                     {
-                                                         i.Application.Returns(new DatabaseConfiguration());
-                                                         return i;
-                                                     })
-                                                     .AddMockSingleton<IStoreLoader>((sp, i) =>
-                                                     {
-                                                         IEnumerable<IStoreService> stores = new List<IStoreService>
-                                                         {
-                                                             sp.GetService<AliasStore>(),
-                                                             sp.GetService<CalculatorStore>(),
-                                                         };
-                                                         i.Load().Returns(stores);
-                                                         return i;
-                                                     })
-                                                     .BuildServiceProvider();
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddConfigurationSections()
+          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+          .AddSingleton<AliasStore>()
+          .AddLogging()
+          .AddSingleton<CalculatorStore>()
+          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
+          .AddSingleton<ISearchService, SearchService>()
+          .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
+          .AddMockSingleton<IThumbnailService>()
+          .AddLoggerFactoryForTests(_outputHelper)
+          .AddMockSingleton<IMacroService>((_, i) =>
+              {
+                  i.ExpandMacroAlias(Arg.Any<QueryResult[]>())
+                   .Returns(callInfo => callInfo.Arg<QueryResult[]>());
+                  return i;
+              }
+          )
+          .AddMockSingleton<IAliasRepository>((_, i) =>
+              {
+                  i.Search(Arg.Any<string>()).Returns([]);
+                  return i;
+              }
+          )
+          .AddMockSingleton<IConfigurationFacade>((_, i) =>
+              {
+                  i.Application.Returns(new DatabaseConfiguration());
+                  return i;
+              }
+          );
+
+        // Add stores...
+        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
+        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, CalculatorStore>());
         
+        var serviceProvider = serviceCollection.BuildServiceProvider();
         var searchService = serviceProvider.GetService<ISearchService>();
 
         var result = await searchService.SearchAsync(Cmdline.Parse(query));
@@ -179,8 +183,7 @@ public class StoresOrchestrationShould
         var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                                                      .AddSingleton<IStoreService, CalculatorStore>()
-                                                     .AddLoggingForTests<NCalcCalculatorService>(_outputHelper)
-                                                     .AddLoggingForTests<CalculatorStore>(_outputHelper)
+                                                     .AddTestOutputHelper(_outputHelper)
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>();
 
@@ -211,8 +214,12 @@ public class StoresOrchestrationShould
         var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<IEverythingApi>())
                                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(LoggerFactory)
+                                                     .AddSingleton<EverythingStore>()
+                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddStoreServicesMockContext()
+                                                     .AddStoreServicesConfiguration()
                                                      .BuildServiceProvider();
-        var store = new EverythingStore(serviceProvider);
+        var store = serviceProvider.GetService<EverythingStore>();
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -233,8 +240,11 @@ public class StoresOrchestrationShould
                                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(AliasRepository)
                                                      .AddSingleton(LoggerFactory)
+                                                     .AddSingleton<ReservedAliasStore>()
+                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
-        var store = new ReservedAliasStore(serviceProvider);
+        var store = serviceProvider.GetService<ReservedAliasStore>();
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -261,8 +271,11 @@ public class StoresOrchestrationShould
         var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
                                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(AliasRepository)
+                                                     .AddSingleton<AdditionalParametersStore>()
+                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
-        var store = new AdditionalParametersStore(serviceProvider);
+        var store = serviceProvider.GetService<AdditionalParametersStore>();
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -282,9 +295,10 @@ public class StoresOrchestrationShould
         // ACT
         var serviceProvider = new ServiceCollection().AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton<ICalculatorService, NCalcCalculatorService>()
-                                                     .AddLoggingForTests<NCalcCalculatorService>(_outputHelper)
+                                                     .AddSingleton<CalculatorStore>()
+                                                     .AddTestOutputHelper(_outputHelper)
                                                      .BuildServiceProvider();
-        var store = new CalculatorStore(serviceProvider);
+        var store = serviceProvider.GetService<CalculatorStore>();
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -304,8 +318,12 @@ public class StoresOrchestrationShould
         var serviceProvider = new ServiceCollection().AddSingleton(AliasRepository)
                                                      .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                                                      .AddSingleton(Substitute.For<IEverythingApi>())
+                                                     .AddSingleton<EverythingStore>()
+                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddStoreServicesMockContext()
+                                                     .AddStoreServicesConfiguration()
                                                      .BuildServiceProvider();
-        var store = new EverythingStore(serviceProvider);
+        var store = serviceProvider.GetService<EverythingStore>();
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);

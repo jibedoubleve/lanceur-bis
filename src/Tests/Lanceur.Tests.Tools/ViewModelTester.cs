@@ -25,7 +25,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
     #region Methods
 
     private DbSingleConnectionManager ConfigureServices(
-        ISqlGenerator? sqlBuilder,
+        ISqlBuilder? sqlBuilder,
         ServiceVisitors? visitors,
         out TViewModel viewModel
     )
@@ -63,7 +63,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
 
     protected void TestViewModel(
         Action<TViewModel, IDbConnectionManager> scope,
-        ISqlGenerator? sqlBuilder = null,
+        ISqlBuilder? sqlBuilder = null,
         ServiceVisitors? visitors = null
     )
     {
@@ -73,7 +73,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
 
     protected async Task TestViewModelAsync(
         Func<TViewModel, IDbConnectionManager, Task> scope,
-        ISqlGenerator? sqlBuilder = null,
+        ISqlBuilder? sqlBuilder = null,
         ServiceVisitors? visitors = null
     )
     {

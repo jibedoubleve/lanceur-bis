@@ -3,7 +3,6 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.SharedKernel.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
@@ -21,11 +20,16 @@ public class CalculatorStore : Store, IStoreService
 
     #region Constructors
 
-    public CalculatorStore(IServiceProvider serviceProvider) : base(serviceProvider)
+    public CalculatorStore(
+        IStoreOrchestrationFactory orchestrationFactory,
+        ILogger<CalculatorStore> logger,
+        ICalculatorService calculator
+    ) : base(orchestrationFactory)
     {
-        _logger = serviceProvider.GetService<ILogger<CalculatorStore>>();
-        _calculator = serviceProvider.GetService<ICalculatorService>()
-            ?? throw new NullReferenceException("ICalculatorService is null");
+        ArgumentNullException.ThrowIfNull(calculator);
+        
+        _logger = logger;
+        _calculator = calculator;
     }
 
     #endregion
@@ -49,11 +53,11 @@ public class CalculatorStore : Store, IStoreService
 
         var (isError, result) = _calculator.Evaluate(cmdline.ToString());
 
-        var returnResult = new DisplayQueryResult(result, cmdline.ToString()) { Icon = "calculator", Count = int.MaxValue };
+        var returnResult
+            = new DisplayQueryResult(result, cmdline.ToString()) { Icon = "calculator", Count = int.MaxValue };
         return isError
             ? QueryResult.NoResult
             : returnResult.ToEnumerable();
-
     }
 
     #endregion
