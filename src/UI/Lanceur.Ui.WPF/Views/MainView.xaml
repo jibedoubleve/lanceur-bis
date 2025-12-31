@@ -40,8 +40,7 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid Background="{DynamicResource ApplicationBackgroundBrush}" Opacity=".01" />
-        <Grid>
+        <Grid x:Name="MainContentGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />

@@ -44,6 +44,19 @@ public static class ConditionalExecution
         else
             onRelease?.Invoke();
     }
+    
+    /// <summary>
+    ///     Executes one of the provided functions based if the current compilation mode is DEBUG.
+    /// </summary>
+    /// <param name="onDebug">The function to execute in DEBUG mode.</param>
+    public static void ExecuteOnDebug(Action onDebug)
+    {
+        var isDebug = false;
+        SetIfDebug(ref isDebug);
+
+        if (isDebug)
+            onDebug?.Invoke();
+    }
 
     /// <summary>
     ///     Executes the provided functions only if the current compilation mode is RELEASE.
