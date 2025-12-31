@@ -15,10 +15,10 @@ issue-labels-include:
 - bug
 - feature
 - enhancement
+- internal refactoring
 issue-labels-exclude:
 - documentation
 - build
-- internal refactoring
 - analyse
 - duplicate
 - good first issue
