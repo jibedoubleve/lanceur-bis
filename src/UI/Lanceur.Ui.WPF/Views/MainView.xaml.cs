@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Core.Constants;
@@ -8,6 +9,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Extensions;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
@@ -69,6 +71,10 @@ public partial class MainView
 
         InitializeComponent();
         DataContext = viewModel;
+        
+        ConditionalExecution.ExecuteOnDebug(() => {
+                MainContentGrid.Background = new SolidColorBrush(Colors.Crimson);
+        });
 
         Closed += (_, _) =>
         {
