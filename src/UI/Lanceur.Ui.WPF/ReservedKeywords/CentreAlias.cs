@@ -18,7 +18,7 @@ public class CentreAlias : SelfExecutableQueryResult
 {
     #region Fields
 
-    private readonly IDatabaseConfigurationService? _appConfig;
+    private readonly IApplicationSettingsProvider? _appConfig;
     private readonly ILogger<CentreAlias> _logger;
 
     #endregion
@@ -32,8 +32,8 @@ public class CentreAlias : SelfExecutableQueryResult
         var factory = serviceProvider.GetService<ILoggerFactory>() ??
                       throw new InvalidOperationException($"{nameof(ILoggerFactory)} is not configured in the service provider");
         _logger = factory.CreateLogger<CentreAlias>();
-        _appConfig = serviceProvider.GetService<IDatabaseConfigurationService>() ??
-                     throw new InvalidOperationException($"{nameof(IDatabaseConfigurationService)} is not configured in the service provider");
+        _appConfig = serviceProvider.GetService<IApplicationSettingsProvider>() ??
+                     throw new InvalidOperationException($"{nameof(IApplicationSettingsProvider)} is not configured in the service provider");
     }
 
     #endregion

@@ -9,32 +9,32 @@ using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite.Repositories;
 
-/// <inheritdoc cref="IDatabaseConfigurationService" />
-public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabaseConfigurationService
+/// <inheritdoc cref="IApplicationSettingsProvider" />
+public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicationSettingsProvider
 {
     #region Fields
 
-    private DatabaseConfiguration _current;
+    private ApplicationSettings _current;
 
     private readonly JsonSerializerSettings _jsonSettings
         = new() { ObjectCreationHandling = ObjectCreationHandling.Replace };
 
-    private readonly ILogger<SQLiteDatabaseConfigurationService> _logger;
+    private readonly ILogger<SQLiteApplicationSettingsProvider> _logger;
 
     #endregion
 
     #region Constructors
 
-    public SQLiteDatabaseConfigurationService(
+    public SQLiteApplicationSettingsProvider(
         IDbConnectionManager manager,
-        ILogger<SQLiteDatabaseConfigurationService> logger
+        ILogger<SQLiteApplicationSettingsProvider> logger
     ) : base(manager) => _logger = logger;
 
     #endregion
 
     #region Properties
 
-    public DatabaseConfiguration Current
+    public ApplicationSettings Current
     {
         get
         {
@@ -51,11 +51,11 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
     ///     HACK: If there's new feature flags added in a new version of the application,
     ///     add it here.
     /// </summary>
-    private DatabaseConfiguration AddNewFeatureFlags(DatabaseConfiguration config)
+    private ApplicationSettings AddNewFeatureFlags(ApplicationSettings config)
     {
         if (config is null) return null;
 
-        var defaultFf = new DatabaseConfiguration().FeatureFlags; //Default featureFlags
+        var defaultFf = new ApplicationSettings().FeatureFlags; //Default featureFlags
         var currentFf = new List<FeatureFlag>(config.FeatureFlags);
 
         var newFf = defaultFf.Where(f => config.FeatureFlags.All(c => c.FeatureName != f.FeatureName));
@@ -65,13 +65,15 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
         return config;
     }
 
-    public void Edit(Action<DatabaseConfiguration> edit)
+    /// <inheritdoc/>
+    public void Edit(Action<ApplicationSettings> edit)
     {
         var stg = Current;
         edit(stg);
         Save();
     }
 
+    /// <inheritdoc/>
     public void Load()
     {
         const string sql = """
@@ -88,10 +90,11 @@ public class SQLiteDatabaseConfigurationService : SQLiteRepositoryBase, IDatabas
         _current =  AddNewFeatureFlags(
             json.IsNullOrEmpty()
                 ? new()
-                : JsonConvert.DeserializeObject<DatabaseConfiguration>(json, _jsonSettings)
+                : JsonConvert.DeserializeObject<ApplicationSettings>(json, _jsonSettings)
         );
     }
 
+    /// <inheritdoc/>
     public void Save()
     {
         Db.WithinTransaction(tx =>

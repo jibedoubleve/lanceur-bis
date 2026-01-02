@@ -43,14 +43,14 @@ public class ReservedKeywordsStoreShould
         var serviceProvider = new ServiceCollection()
                               .AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
                               .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                              .AddSingleton(Substitute.For<IDatabaseConfigurationService>())
+                              .AddSingleton(Substitute.For<IApplicationSettingsProvider>())
                               .AddSingleton(aliasRepository)
                               .AddTestOutputHelper(_output)
                               .AddLoggerFactoryForTests(_output)
                               .AddMockSingleton<IBookmarkRepositoryFactory>()
                               .AddMockSingleton<IConfigurationFacade>((_, i) =>
                                   {
-                                      i.Application.Returns(new DatabaseConfiguration());
+                                      i.Application.Returns(new ApplicationSettings());
                                       return i;
                                   }
                               )

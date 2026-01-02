@@ -33,7 +33,7 @@ public partial class MainView
     private readonly IComputerInfoService _computerInfoService;
     private readonly IConfigurationFacade _configuration;
 
-    private readonly IDatabaseConfigurationService _databaseConfig;
+    private readonly IApplicationSettingsProvider _databaseConfig;
     private readonly IFeatureFlagService _featureFlagService;
     private readonly ILogger<MainView> _logger;
     private readonly IServiceProvider _serviceProvider;
@@ -48,7 +48,7 @@ public partial class MainView
         IServiceProvider serviceProvider,
         IConfigurationFacade configuration,
         IHotKeyService hotKeyService,
-        IDatabaseConfigurationService databaseConfig,
+        IApplicationSettingsProvider databaseConfig,
         IComputerInfoService computerInfoService,
         IFeatureFlagService featureFlagService
     )

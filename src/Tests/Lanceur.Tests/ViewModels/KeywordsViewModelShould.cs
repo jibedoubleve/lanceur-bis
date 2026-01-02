@@ -42,7 +42,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
-                         .AddMockSingleton<IDatabaseConfigurationService>()
+                         .AddMockSingleton<IApplicationSettingsProvider>()
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()
                          .AddMockSingleton<IUserGlobalNotificationService>()

@@ -30,9 +30,9 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         // arrange
         var conn = BuildFreshDb();
         var scope = new DbSingleConnectionManager(conn);
-        var logger = CreateLogger<SQLiteDatabaseConfigurationService>();
+        var logger = CreateLogger<SQLiteApplicationSettingsProvider>();
 
-        var settings = new SQLiteDatabaseConfigurationService(scope, logger);
+        var settings = new SQLiteApplicationSettingsProvider(scope, logger);
         var featureFlag = new SQLiteFeatureFlagService(scope);
 
         settings.Current.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
@@ -55,8 +55,8 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         var conn = BuildFreshDb();
         
         var scope = new DbSingleConnectionManager(conn);
-        var logger = CreateLogger<SQLiteDatabaseConfigurationService>();
-        var settings = new SQLiteDatabaseConfigurationService(scope, logger);
+        var logger = CreateLogger<SQLiteApplicationSettingsProvider>();
+        var settings = new SQLiteApplicationSettingsProvider(scope, logger);
 
         settings.Current.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
         settings.Current.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");

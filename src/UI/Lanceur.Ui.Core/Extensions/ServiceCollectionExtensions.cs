@@ -47,7 +47,7 @@ public static class ServiceCollectionExtensions
     #region Methods
 
     public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection) 
-        => serviceCollection.AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
+        => serviceCollection.AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
                             .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                             .AddTransient<IGithubService, GithubService>();
 
@@ -175,8 +175,8 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
                          .AddTransientConditional<IProcessLauncher, ProcessLauncherLogger, ProcessLauncherWin32>()
-                         .AddSingletonConditional<IApplicationConfigurationService,
-                             MemoryApplicationConfigurationService, JsonApplicationConfigurationService>()
+                         .AddSingletonConditional<IInfrastructureSettingsProvider,
+                             MemoryInfrastructureSettingsProvider, JsonInfrastructureSettingsProvider>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>();

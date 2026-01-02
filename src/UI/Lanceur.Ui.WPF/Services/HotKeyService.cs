@@ -12,7 +12,7 @@ public class HotKeyService : IHotKeyService
 {
     #region Fields
 
-    private readonly IDatabaseConfigurationService _databaseConfigurationService;
+    private readonly IApplicationSettingsProvider _applicationSettingsProvider;
 
     private readonly ILogger<HotKeyService> _logger;
 
@@ -20,17 +20,17 @@ public class HotKeyService : IHotKeyService
 
     #region Constructors
 
-    public HotKeyService(ILogger<HotKeyService> logger, IDatabaseConfigurationService databaseConfigurationService)
+    public HotKeyService(ILogger<HotKeyService> logger, IApplicationSettingsProvider applicationSettingsProvider)
     {
         _logger = logger;
-        _databaseConfigurationService = databaseConfigurationService;
+        _applicationSettingsProvider = applicationSettingsProvider;
     }
 
     #endregion
 
     #region Properties
 
-    public HotKeySection HotKey => _databaseConfigurationService.Current.HotKey;
+    public HotKeySection HotKey => _applicationSettingsProvider.Current.HotKey;
 
     #endregion
 

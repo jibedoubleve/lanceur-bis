@@ -18,16 +18,16 @@ public class ConnectionString : BaseConnectionString, IConnectionString
     #region Constructors
 
     // TODO: STG-Provide settings instead of service
-    public ConnectionString(IApplicationConfigurationService applicationConfiguration, ILogger<ConnectionString> logger)
+    public ConnectionString(IInfrastructureSettingsProvider infrastructureSettings, ILogger<ConnectionString> logger)
     {
-        ArgumentNullException.ThrowIfNull(applicationConfiguration);
+        ArgumentNullException.ThrowIfNull(infrastructureSettings);
         ArgumentNullException.ThrowIfNull(logger);
 
-        if (applicationConfiguration?.Current.DbPath.IsNullOrWhiteSpace() ?? false) 
-            throw new ArgumentNullException(nameof(applicationConfiguration.Current.DbPath), "Database path should have a value");
+        if (infrastructureSettings?.Current.DbPath.IsNullOrWhiteSpace() ?? false) 
+            throw new ArgumentNullException(nameof(infrastructureSettings.Current.DbPath), "Database path should have a value");
 
         _logger = logger;
-        var s = applicationConfiguration!.Current;
+        var s = infrastructureSettings!.Current;
         _dbPath = s.DbPath.ExpandPath();
     }
 

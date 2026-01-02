@@ -150,7 +150,7 @@ public class StoresOrchestrationShould
           )
           .AddMockSingleton<IConfigurationFacade>((_, i) =>
               {
-                  i.Application.Returns(new DatabaseConfiguration());
+                  i.Application.Returns(new ApplicationSettings());
                   return i;
               }
           );

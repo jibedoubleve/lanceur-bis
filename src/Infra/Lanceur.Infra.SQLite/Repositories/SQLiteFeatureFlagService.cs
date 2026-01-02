@@ -33,7 +33,7 @@ public class SQLiteFeatureFlagService : SQLiteRepositoryBase, IFeatureFlagServic
                 var json = conn.Query<string>(sql).SingleOrDefault() ?? string.Empty;
 
                 return json.IsNullOrEmpty() 
-                    ? new DatabaseConfiguration().FeatureFlags 
+                    ? new ApplicationSettings().FeatureFlags 
                     : JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json);
             }
         );
