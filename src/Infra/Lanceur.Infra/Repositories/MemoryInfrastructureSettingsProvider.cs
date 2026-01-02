@@ -10,21 +10,19 @@ public class MemoryInfrastructureSettingsProvider : IInfrastructureSettingsProvi
 
     private readonly ILogger<MemoryInfrastructureSettingsProvider> _logger;
 
-    private static readonly InfrastructureSettings Configuration;
+    private static readonly InfrastructureSettings Configuration = new()
+    {
+        DbPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+        )
+    };
 
     #endregion
 
     #region Constructors
 
-    static MemoryInfrastructureSettingsProvider()
-    {
-        var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        var path = Path.Combine(desktop, @"lanceur\debug.sqlite");
-
-        Configuration = new() { DbPath = path };
-    }
-
-    public MemoryInfrastructureSettingsProvider(ILogger<MemoryInfrastructureSettingsProvider> logger) => _logger = logger;
+    public MemoryInfrastructureSettingsProvider(ILogger<MemoryInfrastructureSettingsProvider> logger)
+        => _logger = logger;
 
     #endregion
 
@@ -44,7 +42,10 @@ public class MemoryInfrastructureSettingsProvider : IInfrastructureSettingsProvi
     public void Save()
     {
         /*Does nothing, settings is already in memory*/
-        _logger.LogWarning("This is a mock service for development purposes. It simulates saving the settings. Debug database: {Settings}", Configuration.DbPath);
+        _logger.LogWarning(
+            "This is a mock service for development purposes. It simulates saving the settings. Debug database: {Settings}",
+            Configuration.DbPath
+        );
     }
 
     #endregion
