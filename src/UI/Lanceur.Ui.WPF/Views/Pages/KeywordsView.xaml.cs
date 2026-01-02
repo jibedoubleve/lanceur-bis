@@ -18,7 +18,7 @@ public partial class KeywordsView
     private readonly CodeEditorControl _codeEditorControl;
     private readonly IContentDialogService _contentDialogService;
     private readonly ILogger<KeywordsView> _logger;
-    private readonly IInteractionHubService _interactionHubService;
+    private readonly IUserCommunicationService _userCommunicationService;
 
     #endregion
 
@@ -29,12 +29,12 @@ public partial class KeywordsView
         CodeEditorControl codeEditorControl,
         IContentDialogService contentDialogService,
         ILogger<KeywordsView> logger,
-        IInteractionHubService  interactionHubService)
+        IUserCommunicationService  userCommunicationService)
     {
         _codeEditorControl = codeEditorControl;
         _contentDialogService = contentDialogService;
         _logger = logger;
-        _interactionHubService = interactionHubService;
+        _userCommunicationService = userCommunicationService;
         DataContext = ViewModel = viewModel;
 
         InitializeComponent();
@@ -75,7 +75,7 @@ public partial class KeywordsView
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Failed to load the lua script editor: {ErrorMessage}", ex.Message);
-            _interactionHubService.Notifications.Warning($"Failed to load the lua script editor: {ex.Message}");
+            _userCommunicationService.Notifications.Warning($"Failed to load the lua script editor: {ex.Message}");
         }
     }
 

@@ -3,18 +3,18 @@ using Lanceur.Core.Services;
 namespace Lanceur.Ui.WPF.Services;
 
 /// <inheritdoc />
-public class InteractionHubService : IInteractionHubService
+public class UserCommunicationService : IUserCommunicationService
 {
     #region Constructors
 
-    public InteractionHubService(
+    public UserCommunicationService(
         IUserGlobalNotificationService userGlobalNotificationService,
-        IUserInteractionService userInteractionService,
+        IUserDialogueService userDialogueService,
         IUserNotificationService userNotificationService
     )
     {
         GlobalNotifications = userGlobalNotificationService;
-        Interactions = userInteractionService;
+        Dialogues = userDialogueService;
         Notifications = userNotificationService;
     }
 
@@ -26,7 +26,7 @@ public class InteractionHubService : IInteractionHubService
     public IUserGlobalNotificationService GlobalNotifications { get; }
 
     /// <inheritdoc />
-    public IUserInteractionService Interactions { get; }
+    public IUserDialogueService Dialogues { get; }
 
     /// <inheritdoc />
     public IUserNotificationService Notifications { get; }

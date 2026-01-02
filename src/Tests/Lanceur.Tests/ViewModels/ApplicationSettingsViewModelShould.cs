@@ -39,13 +39,13 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                          .AddMockSingleton<IUserGlobalNotificationService>(
                              (sp, i) => visitors?.VisitGlobalUserInteractionService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IUserInteractionService>(
+                         .AddMockSingleton<IUserDialogueService>(
                              (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IUserNotificationService>(
                              (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
-                         .AddSingleton<IInteractionHubService, InteractionHubService>();
+                         .AddSingleton<IUserCommunicationService, UserCommunicationService>();
         return serviceCollection;
     }
 

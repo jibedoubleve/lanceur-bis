@@ -58,7 +58,7 @@ public class AliasUseCases : TestBase
                          .AddMockSingleton<IApplicationSettingsProvider>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IUserNotificationService>()
-                         .AddMockSingleton<IInteractionHubService>()
+                         .AddMockSingleton<IUserCommunicationService>()
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                          .AddMockSingleton<IExecutionService>((_, i) =>
                              {
@@ -77,7 +77,7 @@ public class AliasUseCases : TestBase
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()
                          .AddMockSingleton<IViewFactory>()
-                         .AddMockSingleton<IUserInteractionService>((_, i) =>
+                         .AddMockSingleton<IUserDialogueService>((_, i) =>
                              {
                                  i.AskUserYesNoAsync(Arg.Any<string>())
                                   .Returns(true);

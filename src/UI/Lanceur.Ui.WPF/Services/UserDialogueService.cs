@@ -9,7 +9,7 @@ using MessageBoxResult = Wpf.Ui.Controls.MessageBoxResult;
 
 namespace Lanceur.Ui.WPF.Services;
 
-public class UserInteractionService : IUserInteractionService
+public class UserDialogueService : IUserDialogueService
 {
     #region Methods
 

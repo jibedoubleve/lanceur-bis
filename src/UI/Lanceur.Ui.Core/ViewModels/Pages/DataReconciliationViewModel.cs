@@ -30,7 +30,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     private readonly IThumbnailService _thumbnailService;
     [ObservableProperty] private string _title = string.Empty;
     private DateTime? _today;
-    private readonly IUserInteractionService _userInteraction;
+    private readonly IUserDialogueService _userDialogue;
     private readonly IUserNotificationService _userNotification;
     private readonly IViewFactory _viewFactory;
 
@@ -41,7 +41,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     public DataReconciliationViewModel(
         IAliasRepository repository,
         ILogger<DataReconciliationViewModel> logger,
-        IInteractionHubService interactions,
+        IUserCommunicationService interactions,
         IReconciliationService reconciliationService,
         IViewFactory viewFactory,
         IWriteableSection<ReconciliationSection> settingsFacade,
@@ -50,7 +50,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         _repository = repository;
         _logger = logger;
-        _userInteraction = interactions.Interactions;
+        _userDialogue = interactions.Dialogues;
         _userNotification = interactions.Notifications;
         _reconciliationService = reconciliationService;
         _viewFactory = viewFactory;
@@ -96,7 +96,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             tooltip,
             reportType
         );
-        var answer = await _userInteraction.AskUserYesNoAsync(
+        var answer = await _userDialogue.AskUserYesNoAsync(
             _viewFactory.CreateView(vm),
             ButtonLabels.Ok,
             ButtonLabels.Cancel,
@@ -126,7 +126,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             NumericValue = numericValue
         };
 
-        var answer = await _userInteraction.AskUserYesNoAsync(
+        var answer = await _userDialogue.AskUserYesNoAsync(
             _viewFactory.CreateView(vm),
             ButtonLabels.Ok,
             ButtonLabels.Cancel,
@@ -160,7 +160,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         var toDelete = GetSelectedAliases();
         var response
-            = await _userInteraction.AskUserYesNoAsync(
+            = await _userDialogue.AskUserYesNoAsync(
                 $"Do you want to delete the {toDelete.Length} selected aliases?"
             );
         if (!response) return;
@@ -175,7 +175,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     private async Task OnDeletePermanently()
     {
         var toDelete = GetSelectedAliases();
-        var response = await _userInteraction.AskUserYesNoAsync(
+        var response = await _userDialogue.AskUserYesNoAsync(
             $"""
              Are you sure you want to permanently delete the {toDelete.Length} selected aliases? 
 
@@ -259,7 +259,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
 
         var dataContext = new DoubloonViewModel(parameters, alias.Synonyms);
-        var response = await _userInteraction.InteractAsync(
+        var response = await _userDialogue.InteractAsync(
             content,
             "Update changes",
             ButtonLabels.Cancel,
@@ -293,7 +293,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         var selectedAliases = GetSelectedAliases();
 
         var response
-            = await _userInteraction.AskUserYesNoAsync(
+            = await _userDialogue.AskUserYesNoAsync(
                 $"Do you want to restore {selectedAliases.Length} selected aliases?"
             );
         if (!response) return;
@@ -414,7 +414,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         var selectedAliases = GetSelectedAliases();
 
-        var response = await _userInteraction.AskUserYesNoAsync(
+        var response = await _userDialogue.AskUserYesNoAsync(
             $"Do you want to update the description the {selectedAliases.Length} selected aliases?"
         );
         if (!response) return;

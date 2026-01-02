@@ -50,7 +50,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IViewFactory>((sp, i) => visitors?.VisitViewFactory?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IUserInteractionService>((sp, i)
+                         .AddMockSingleton<IUserDialogueService>((sp, i)
                              => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IUserNotificationService>((sp, i)
@@ -59,7 +59,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AddMockSingleton<IProcessLauncher>((sp, i) 
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
-                         .AddSingleton<IInteractionHubService, InteractionHubService>()
+                         .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
                          .AddSingleton<IMemoryCache, MemoryCache>();
         return serviceCollection;
