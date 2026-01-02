@@ -54,9 +54,9 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                          .AddSingleton<IReconciliationService, ReconciliationService>()
                          .AddSingleton<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddMockSingleton<IThumbnailService>()
-                         .AddSingleton<IInteractionHubService, InteractionHubService>()
+                         .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddMockSingleton<IUserGlobalNotificationService>()
-                         .AddMockSingleton<IUserInteractionService>((sp, i)
+                         .AddMockSingleton<IUserDialogueService>((sp, i)
                              => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IUserNotificationService>((sp, i)

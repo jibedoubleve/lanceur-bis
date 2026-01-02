@@ -18,7 +18,7 @@ public class UserInteractionServiceShould : IDisposable
     {
         // ARRANGE
         const string viewModel = "undeux";
-        var sut = new UserInteractionService();
+        var sut = new UserDialogueService();
         var userControl = new UserControl { DataContext = viewModel };
         WeakReferenceMessenger.Default.Register<UserInteractionServiceShould, QuestionRequestMessage>(
             this,
@@ -36,7 +36,7 @@ public class UserInteractionServiceShould : IDisposable
     {
         // ARRANGE
         const string viewModel = "undeux";
-        var sut = new UserInteractionService();
+        var sut = new UserDialogueService();
         var userControl = new UserControl();
         WeakReferenceMessenger.Default.Register<UserInteractionServiceShould, QuestionRequestMessage>(
             this,

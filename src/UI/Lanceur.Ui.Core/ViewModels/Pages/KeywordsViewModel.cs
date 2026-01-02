@@ -24,7 +24,7 @@ public partial class KeywordsViewModel : ObservableObject
     private readonly IAliasManagementService _aliasManagementService;
     private List<AliasQueryResult> _cachedAliases = [];
     [ObservableProperty] private string _criterion = string.Empty;
-    private readonly IInteractionHubService _hubService;
+    private readonly IUserCommunicationService _hubService;
     private readonly ILogger<KeywordsViewModel> _logger;
     private readonly IPackagedAppSearchService _packagedAppSearchService;
     private AliasQueryResult? _selectedAlias;
@@ -40,7 +40,7 @@ public partial class KeywordsViewModel : ObservableObject
         IAliasManagementService aliasManagementService,
         IThumbnailService thumbnailService,
         ILogger<KeywordsViewModel> logger,
-        IInteractionHubService hubService,
+        IUserCommunicationService hubService,
         IAliasValidationService validationService,
         IViewFactory viewFactory,
         IPackagedAppSearchService packagedAppSearchService
@@ -75,7 +75,7 @@ public partial class KeywordsViewModel : ObservableObject
                     var viewModel = (KeywordsViewModel)r;
 
                     // Some changes are pending...
-                    var confirmed = await _hubService.Interactions.AskAsync(
+                    var confirmed = await _hubService.Dialogues.AskAsync(
                         $"Do you want to save the changes for alias '{SelectedAlias!.Name}'?"
                     );
                     if (!confirmed) return;
@@ -122,7 +122,7 @@ public partial class KeywordsViewModel : ObservableObject
     {
         var view = _viewFactory.CreateView(new MultipleAdditionalParameterViewModel());
 
-        var result = await _hubService.Interactions.InteractAsync(
+        var result = await _hubService.Dialogues.InteractAsync(
             view,
             ButtonLabels.Apply,
             ButtonLabels.Cancel,
@@ -160,7 +160,7 @@ public partial class KeywordsViewModel : ObservableObject
 
         var view = _viewFactory.CreateView(parameter);
 
-        var result = await _hubService.Interactions.InteractAsync(
+        var result = await _hubService.Dialogues.InteractAsync(
             view,
             ButtonLabels.Apply,
             ButtonLabels.Cancel,
@@ -206,7 +206,7 @@ public partial class KeywordsViewModel : ObservableObject
             return;
         }
 
-        var response = await _hubService.Interactions.AskUserYesNoAsync($"Do you want to delete {SelectedAlias.Name}?");
+        var response = await _hubService.Dialogues.AskUserYesNoAsync($"Do you want to delete {SelectedAlias.Name}?");
         if (!response) return;
 
         _logger.LogInformation("Deleting alias {AliasName}", aliasName);
@@ -228,7 +228,7 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnDeleteParameter(AdditionalParameter parameter)
     {
-        var confirmed = await _hubService.Interactions.AskUserYesNoAsync(
+        var confirmed = await _hubService.Dialogues.AskUserYesNoAsync(
             $"The parameter '{parameter.Name}' will disappear from the screen and be permanently deleted only after you save your changes. Do you want to continue?"
         );
 
@@ -258,7 +258,7 @@ public partial class KeywordsViewModel : ObservableObject
     {
         var view = _viewFactory.CreateView(parameter);
 
-        var result = await _hubService.Interactions.AskUserYesNoAsync(
+        var result = await _hubService.Dialogues.AskUserYesNoAsync(
             view,
             ButtonLabels.Apply,
             ButtonLabels.Cancel,
@@ -349,7 +349,7 @@ public partial class KeywordsViewModel : ObservableObject
         if (SelectedAlias is null) return;
 
         var viewModel = new UwpSelector { PackagedApps = await _packagedAppSearchService.GetInstalledUwpAppsAsync() };
-        var result =  await _hubService.Interactions.InteractAsync(
+        var result =  await _hubService.Dialogues.InteractAsync(
             _viewFactory.CreateView(viewModel),
             "Select",
             ButtonLabels.Cancel,

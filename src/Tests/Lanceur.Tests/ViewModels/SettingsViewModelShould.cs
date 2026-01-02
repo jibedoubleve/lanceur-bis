@@ -66,14 +66,14 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
         serviceCollection.AddTestOutputHelper(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                          .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
-                         .AddSingleton<IInteractionHubService, InteractionHubService>()
+                         .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddSingleton<IInfrastructureSettingsProvider, MemoryInfrastructureSettingsProvider>()
                          .AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
                          .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IUserNotificationService>()
                          .AddMockSingleton<IAppRestartService>()
                          .AddMockSingleton<IViewFactory>()
-                         .AddMockSingleton<IUserInteractionService>();
+                         .AddMockSingleton<IUserDialogueService>();
         return serviceCollection;
     }
 

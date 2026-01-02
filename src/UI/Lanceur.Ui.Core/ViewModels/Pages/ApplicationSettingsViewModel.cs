@@ -34,7 +34,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
     [ObservableProperty] private ObservableCollection<FeatureFlag> _featureFlags = [];
-    private readonly IInteractionHubService _hubService;
+    private readonly IUserCommunicationService _hubService;
     [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
     [ObservableProperty] private bool _isAdminModeEnabled;
     [ObservableProperty] private bool _isAlt;
@@ -62,7 +62,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     #region Constructors
 
     public ApplicationSettingsViewModel(
-        IInteractionHubService interactionHubService,
+        IUserCommunicationService userCommunicationService,
         ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
         IConfigurationFacade configuration,
@@ -70,14 +70,14 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IEnigma enigma
     )
     {
-        ArgumentNullException.ThrowIfNull(interactionHubService);
+        ArgumentNullException.ThrowIfNull(userCommunicationService);
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(appRestartService);
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(viewFactory);
 
 
-        _hubService = interactionHubService;
+        _hubService = userCommunicationService;
         _logger = logger;
         _configuration = configuration;
         _viewFactory = viewFactory;
@@ -217,7 +217,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
                                      .Replace("Store", "");
 
         var savedAliasOverride = storeShortcut.AliasOverride;
-        var result = await _hubService.Interactions.AskUserYesNoAsync(
+        var result = await _hubService.Dialogues.AskUserYesNoAsync(
             view,
             ButtonLabels.Apply,
             ButtonLabels.Cancel,

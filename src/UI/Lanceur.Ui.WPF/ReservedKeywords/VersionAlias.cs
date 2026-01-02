@@ -15,7 +15,7 @@ public class VersionAlias : SelfExecutableQueryResult
 {
     #region Fields
 
-    private readonly IUserInteractionService _userInteraction;
+    private readonly IUserDialogueService _userDialogue;
     private readonly IUserNotificationService _userNotification;
 
     #endregion
@@ -24,7 +24,7 @@ public class VersionAlias : SelfExecutableQueryResult
 
     public VersionAlias(IServiceProvider serviceProvider)
     {
-        _userInteraction = serviceProvider.GetService<IUserInteractionService>()!;
+        _userDialogue = serviceProvider.GetService<IUserDialogueService>()!;
         _userNotification = serviceProvider.GetService<IUserNotificationService>()!;
     }
 
@@ -45,7 +45,7 @@ public class VersionAlias : SelfExecutableQueryResult
             Assembly.GetExecutingAssembly()
         );
 
-        await _userInteraction.ShowAsync("Lanceur - Version", new VersionView(currentVersion));
+        await _userDialogue.ShowAsync("Lanceur - Version", new VersionView(currentVersion));
 
         return await NoResultAsync;
     }
