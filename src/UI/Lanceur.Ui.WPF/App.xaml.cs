@@ -220,8 +220,10 @@ public partial class App
 
         var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
 
+        /* If we're in DEBUG mode, setup a default hotkey
+         */
         var hk = new Conditional<HotKeySection>(
-            new((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R),
+            new((int)(ModifierKeys.Windows | ModifierKeys.Alt), (int)Key.P),
             hotKeyService.HotKey
         );
 

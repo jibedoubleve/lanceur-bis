@@ -58,17 +58,17 @@ public partial class KeywordsView
 
             _codeEditorControl.Load(ViewModel.SelectedAlias);
 
-            var result = await _contentDialogService.ShowSimpleDialogAsync(
-                new()
-                {
-                    Title = "Edit Lua script",
-                    Content = _codeEditorControl,
-                    PrimaryButtonText = "Apply",
-                    CloseButtonText = "Cancel"
-                }
-            );
+            var dialogue = new ContentDialog
+            {
+                Title = "Edit script",
+                Content = _codeEditorControl,
+                PrimaryButtonText = "Apply",
+                CloseButtonText = "Cancel",
+            };
 
-            ViewModel.SelectedAlias.LuaScript = result == ContentDialogResult.Primary
+            var result = await _contentDialogService.ShowAsync(dialogue, default);
+
+            ViewModel.SelectedAlias.Script = result == ContentDialogResult.Primary
                 ? _codeEditorControl.Apply()
                 : _codeEditorControl.Reset();
         }

@@ -68,5 +68,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SyntaxColouration\LUA-Mode.xml" />
+    <EmbeddedResource Include="SyntaxColouration\CSharp-Mode.xml" />
   </ItemGroup>
 </Project>

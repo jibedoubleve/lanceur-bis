@@ -1,7 +1,9 @@
 using System.Reflection;
 using Lanceur.Core;
+using Lanceur.Core.Scripting;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
+using Lanceur.Infra.Scripting;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.IoC;
@@ -39,6 +41,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddSingleton<IReleaseService, ReleaseService>()
                          .AddTransient<LazyLoadedSynchronisationContext>()
+                         .AddTransient<IScriptEngineFactory, ScriptEngineFactory>()
                          .AddSingletonConditional<IAppRestartService, AppRestartDummyService, AppRestartService>()
                          .AddSingleton(
                              new AssemblySource
