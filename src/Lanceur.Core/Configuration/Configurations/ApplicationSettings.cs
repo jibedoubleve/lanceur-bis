@@ -71,6 +71,12 @@ public class ApplicationSettings
     public ResourceMonitorSection ResourceMonitor { get; set; } = new(10, 500);
 
     /// <summary>
+    ///     Gets or sets the configuration settings for the scripting.
+    ///     This includes script engine and default usings
+    /// </summary>
+    public ScriptingSection Scripting { get; set; } = new();
+
+    /// <summary>
     ///     Gets or sets the configuration settings for the search box.
     /// </summary>
     public SearchBoxSection SearchBox { get; set; } = new();

@@ -8,8 +8,8 @@
     <Color name="Extra" foreground="#FFE07534" fontWeight="bold" exampleText="self"/>
     <Color name="Functions" foreground="#FF0080C0" fontWeight="bold" exampleText="print"/>
     <Color name="Number" foreground="#7610BB" exampleText="123 0x45"/>
-    <Color name="Class" foreground="Crimson" exampleText="context"/>
-    <Color name="ClassMembers" foreground="#ff9c52" exampleText="context.FileName"/>
+    <Color name="ApiClass" foreground="Crimson" exampleText="context"/>
+    <Color name="ApiClassMembers" foreground="#ff9c52" exampleText="context.FileName"/>
 
     <RuleSet ignoreCase="false">
 
@@ -46,14 +46,16 @@
             </RuleSet>
         </Span>
 
-        <Keywords color="Class">
+        <Keywords color="ApiClass">
             <Word>context</Word>
             <Word>notification</Word>
+            <Word>Logger</Word>
         </Keywords>
 
-        <Keywords color="ClassMembers">
+        <Keywords color="ApiClassMembers">
             <Word>FileName</Word>
             <Word>Parameters</Word>
+            <Word>AppendLog</Word>
         </Keywords>
 
         <Keywords color="Extra" fontStyle="oblique">

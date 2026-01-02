@@ -145,7 +145,7 @@ public class AliasDbAction
                                 a.start_mode            as {nameof(AliasQueryResult.StartMode)},
                                 a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
                                 a.icon                  as {nameof(AliasQueryResult.Icon)},
-                                a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
+                                a.lua_script            as {nameof(AliasQueryResult.Script)},
                                 a.exec_count            as {nameof(AliasQueryResult.Count)},
                                 a.hidden                as {nameof(AliasQueryResult.IsHidden)},
                                 a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
@@ -194,7 +194,7 @@ public class AliasDbAction
                                 a.start_mode            as {nameof(AliasQueryResult.StartMode)},
                                 a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
                                 a.icon                  as {nameof(AliasQueryResult.Icon)},
-                                a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
+                                a.lua_script            as {nameof(AliasQueryResult.Script)},
                                 a.hidden                as {nameof(AliasQueryResult.IsHidden)},
                                 a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
                             from
@@ -327,7 +327,7 @@ public class AliasDbAction
             startMode = alias.StartMode,
             workingDirectory = alias.WorkingDirectory,
             icon = alias.Icon,
-            luaScript = alias.LuaScript,
+            luaScript = alias.Script,
             isHidden = alias.IsHidden,
             isExecutionConfirmationRequired = alias.IsExecutionConfirmationRequired
         };

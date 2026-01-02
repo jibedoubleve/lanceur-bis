@@ -1,14 +1,16 @@
-﻿using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.LuaScripting;
+﻿using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections;
 using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
+using Lanceur.Core.Scripting;
 using Lanceur.Core.Services;
-using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Repositories;
+using Lanceur.Infra.Scripting;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
@@ -36,6 +38,9 @@ public class ExecutionServiceShould : TestBase
         IClipboardService clipboardService = null
     )
     {
+        var scriptEngineFactory = Substitute.For<IScriptEngineFactory>();
+        scriptEngineFactory.Current.Returns(new LuaScriptEngine(Substitute.For<IUserGlobalNotificationService>()));
+        
         var executionService = new ExecutionService(
             LoggerFactory,
             new ReplacementComposite(
@@ -43,7 +48,8 @@ public class ExecutionServiceShould : TestBase
                 LoggerFactory.CreateLogger<ReplacementComposite>()
             ),
             Substitute.For<IAliasRepository>(),
-            new LuaManager(Substitute.For<IUserGlobalNotificationService>()),
+            scriptEngineFactory,
+            Substitute.For<ISection<SearchBoxSection>>(),
             processLauncher ?? Substitute.For<IProcessLauncher>()
         );
         return executionService;
@@ -195,7 +201,7 @@ public class ExecutionServiceShould : TestBase
                                             builder.AddXUnit(OutputHelper)
                                                    .SetMinimumLevel(LogLevel.Trace))
                                         .AddMockSingleton<IAliasRepository>()
-                                        .AddMockSingleton<ILuaManager>()
+                                        .AddMockSingleton<IScriptEngine>()
                                         .AddSingleton<IWildcardService, ReplacementComposite>()
                                         .AddSingleton<IExecutionService, ExecutionService>()
                                         .AddSingleton<ReplacementComposite>()
@@ -204,6 +210,7 @@ public class ExecutionServiceShould : TestBase
                                         .AddSingleton(githubService)
                                         .AddMockSingleton<IUserGlobalNotificationService>()
                                         .AddMockSingleton<IEnigma>()
+                                        .AddMockSingleton<IScriptEngineFactory>()
                                         .BuildServiceProvider();
 
         var macro = new GithubIssueMacro(sp);
@@ -237,7 +244,7 @@ public class ExecutionServiceShould : TestBase
             new AliasQueryResult
             {
                 FileName = "alias",
-                LuaScript = """
+                Script = """
                             if context.Parameters == nil then
                                 context.Parameters = "wrongParameters"
                             end
@@ -299,7 +306,7 @@ public class ExecutionServiceShould : TestBase
         var executionService = CreateExecutionService(processLauncher);
         var cmdline = Cmdline.Parse(originatingQuery);
         var request = new ExecutionRequest(
-            new AliasQueryResult { FileName = fileName, LuaScript = script, OriginatingQuery = cmdline },
+            new AliasQueryResult { FileName = fileName, Script = script, OriginatingQuery = cmdline },
             cmdline
         );
 
@@ -341,7 +348,7 @@ public class ExecutionServiceShould : TestBase
             new AliasQueryResult
             {
                 FileName = "alias",
-                LuaScript = script,
+                Script = script,
                 OriginatingQuery = cmdline,
                 Parameters = queryParameter
             },

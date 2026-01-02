@@ -56,7 +56,7 @@ public class AliasStateTester
         if (alias is null) Assert.Fail($"{nameof(alias)} should not be null for assertion.");
 
         alias.FileName.ShouldBe(FileName);
-        alias.LuaScript.ShouldBe(LuaScript);
+        alias.Script.ShouldBe(LuaScript);
         alias.Name.ShouldBe(Name);
         alias.DescriptionDisplay.ShouldBe(Description);
         alias.Parameters.ShouldBe(Parameters);
@@ -75,7 +75,7 @@ public class AliasStateTester
         alias.RunAs = Constants.RunAs.Admin;
         alias.StartMode = Constants.StartMode.Maximised;
         alias.IsExecutionConfirmationRequired = true;
-        alias.LuaScript = LuaScript;
+        alias.Script = LuaScript;
         alias.AdditionalParameters = new(TestAdditionalParameter);
     }
 

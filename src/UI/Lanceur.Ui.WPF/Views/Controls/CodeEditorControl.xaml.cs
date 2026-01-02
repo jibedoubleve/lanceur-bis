@@ -4,10 +4,13 @@ using System.Windows.Input;
 using System.Xml;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
-using Lanceur.Core.LuaScripting;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Models;
+using Lanceur.Core.Scripting;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.IoC;
+using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.WPF.Views.Controls;
 
@@ -16,8 +19,11 @@ public partial class CodeEditorControl
 {
     #region Fields
 
-    private readonly ILuaManager _luaManager;
-    private string? _luaScriptCache;
+    private readonly ILogger<CodeEditorControl> _logger;
+    private string? _scriptCache;
+
+    private readonly IScriptEngineFactory _scriptEngineFactory;
+    private readonly ISection<ScriptingSection> _settings;
     private readonly IUserNotificationService _userNotificationService;
 
     #endregion
@@ -26,11 +32,15 @@ public partial class CodeEditorControl
 
     public CodeEditorControl(
         IUserNotificationService userNotificationService,
-        ILuaManager luaManager
+        IScriptEngineFactory scriptEngineFactoryFactory,
+        ISection<ScriptingSection> settings,
+        ILogger<CodeEditorControl> logger
     )
     {
         _userNotificationService = userNotificationService;
-        _luaManager = luaManager;
+        _scriptEngineFactory = scriptEngineFactoryFactory;
+        _settings = settings;
+        _logger = logger;
         InitializeComponent();
     }
 
@@ -38,81 +48,109 @@ public partial class CodeEditorControl
 
     #region Methods
 
-    private void MenuItem_Click(object sender, RoutedEventArgs e) => RunScript();
-
-    private void OnKeyUp(object sender, KeyEventArgs e)
+    private async void MenuItem_Click(object sender, RoutedEventArgs e)
     {
-        if (e.Key == Key.F5) RunScript();
+        try { await RunScriptAsync(); }
+        catch (Exception ex) { _logger.LogWarning(ex, "Unhandled exception when executing script."); }
     }
 
-    private void RunScript()
+    private void LogToggleMenuItem_Click(object sender, RoutedEventArgs e)
     {
-        ScriptOutput.Content = string.Empty;
-        ScriptErrorOutput.Content = string.Empty;
+        LogToggleMenuItem.Header = LogToggleMenuItem.IsChecked
+            ? "Log activated" 
+            : "Log deactivated";
+    }
+
+    private async void OnKeyUp(object sender, KeyEventArgs e)
+    {
+        try
+        {
+            if (e.Key == Key.F5) await RunScriptAsync();
+        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Unhandled exception when executing script."); }
+    }
+
+    private async Task RunScriptAsync()
+    {
+        ScriptOutput.Text = string.Empty;
+        ScriptErrorOutput.Text = string.Empty;
 
         var inputParameters = TbParameters.Text;
         var inputFileName = TbFileName.Text;
         var script = new Script
         {
-            Code = LuaEditor.Text, Context = new() { Parameters = inputParameters, FileName = inputFileName }
+            Code = CodeEditor.Text, 
+            Context = new() { Parameters = inputParameters, FileName = inputFileName }
         };
-        var result = _luaManager.ExecuteScript(script);
+
+        var isDebug = LogToggleMenuItem.IsChecked; 
+        var result = await _scriptEngineFactory.Current.ExecuteScriptAsync(script, isDebug);
 
         if (result.Exception is not null)
         {
             ScriptErrorOutput.Visibility = Visibility.Visible;
             ScriptOutput.Visibility = Visibility.Collapsed;
-            ScriptErrorOutput.Content = result.Exception.Message;
+            ScriptErrorOutput.Text = result.Exception.Message;
             return;
         }
 
         ScriptErrorOutput.Visibility = Visibility.Collapsed;
         ScriptOutput.Visibility = Visibility.Visible;
-        ScriptOutput.Content = $"""
-                                INPUT
-                                =====
+        ScriptOutput.Text = $"""
+                             INPUT
+                             =====
 
-                                File name  : {inputFileName}
-                                Parameters : {inputParameters}
+                             File name  : {inputFileName}
+                             Parameters : {inputParameters}
 
-                                ---------------------------------------
-                                OUTPUT
-                                =====
+                             ---------------------------------------
+                             OUTPUT
+                             =====
 
-                                {result}
+                             {result}
 
-                                """;
+                             """;
 
         _userNotificationService.Success("Script executed successfully in dry run mode.", "Build Successful");
     }
 
-    private void SetupSyntaxColouration()
+    private void SetupSyntaxColouration(string? res)
     {
-        const string res = "Lanceur.Ui.WPF.SyntaxColouration.LUA-Mode.xml";
+        if (res is null)
+        {
+            _logger.LogInformation("Script engine is unknown, no syntactic colouration is configured.");
+            return;
+        }
 
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(res) ??
                            throw new NotSupportedException($"Cannot find resource '{res}'");
         using var reader = new XmlTextReader(stream);
-        LuaEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+        CodeEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
     }
 
-    public string Apply() => LuaEditor.Text;
+    public string Apply() => CodeEditor.Text;
 
     public void Load(AliasQueryResult alias)
     {
-        ScriptOutput.Content
-            = ScriptErrorOutput.Content
+        ScriptOutput.Text
+            = ScriptErrorOutput.Text
                 = string.Empty;
 
-        SetupSyntaxColouration();
+        var syntax = _settings.Value.ScriptLanguage switch
+        {
+            ScriptLanguage.Lua             => "Lanceur.Ui.WPF.SyntaxColouration.LUA-Mode.xml",
+            ScriptLanguage.CSharpScripting => "Lanceur.Ui.WPF.SyntaxColouration.CSharp-Mode.xml",
+            _                              => null
+        };
+        SetupSyntaxColouration(syntax);
 
-        _luaScriptCache = alias?.LuaScript;
-        LuaEditor.Text = alias?.LuaScript;
-        TbFileName.Text = alias?.FileName ?? string.Empty;
-        TbParameters.Text = alias?.Parameters ?? string.Empty;
+        _scriptCache = alias.Script;
+        CodeEditor.Text = alias.Script;
+        TbFileName.Text = alias.FileName ?? string.Empty;
+        TbParameters.Text = alias.Parameters ?? string.Empty;
     }
 
-    public string Reset() => _luaScriptCache ?? string.Empty;
+    public string Reset() => _scriptCache ?? string.Empty;
 
     #endregion
 }

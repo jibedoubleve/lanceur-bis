@@ -25,5 +25,6 @@
     <conv:CmdLineArgumentsToVisibility x:Key="CmdLineArgumentsToVisibility" />
     <conv:CounterToVisibilityConverter x:Key="CounterToVisibilityConverter" />
     <conv:StoreOrchestrationToStringConverter x:Key="StoreOrchestrationToStringConverter" />
-    <conv:StoreTypeToStoreNameConverter x:Key="StoreTypeToStoreNameConverter"/>
+    <conv:StoreTypeToStoreNameConverter x:Key="StoreTypeToStoreNameConverter" />
+    <conv:ScriptingLanguageToTextConverter x:Key="ScriptingLanguageToTextConverter" />
 </ResourceDictionary>

@@ -1,17 +1,17 @@
-using Shouldly;
-using Lanceur.Core.LuaScripting;
+using Lanceur.Core.Scripting;
 using Lanceur.Core.Services;
-using Lanceur.Infra.LuaScripting;
+using Lanceur.Infra.Scripting;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
-namespace Lanceur.Tests.Functional;
+namespace Lanceur.Tests.Scripting;
 
 public class LuaManagerShould
 {
     #region Properties
 
-    private static ILuaManager LuaManager => new LuaManager(Substitute.For<IUserGlobalNotificationService>());
+    private static IScriptEngine ScriptEngine => new LuaScriptEngine(Substitute.For<IUserGlobalNotificationService>());
 
     #endregion
 
@@ -22,7 +22,7 @@ public class LuaManagerShould
     [InlineData("dev", "output_dev")]
     [InlineData("test", "output_test")]
     [InlineData("prod", "output_prod")]
-    public void GetExpectedParametersAfterScriptExecution(string parameter, string expectedParameter)
+    public async Task GetExpectedParametersAfterScriptExecution(string parameter, string expectedParameter)
     {
         // arrange
         const string url = "https://random.url.com";
@@ -41,7 +41,7 @@ public class LuaManagerShould
                                  end
                                  """;
 
-        var result = LuaManager.ExecuteScript(
+        var result = await ScriptEngine.ExecuteScriptAsync(
             new() { Code = luaScript, Context = new() { FileName = url, Parameters = parameter } }
         );
         result.ShouldSatisfyAllConditions(
@@ -56,7 +56,7 @@ public class LuaManagerShould
     [InlineData("dev", "output_dev")]
     [InlineData("test", "output_test")]
     [InlineData("prod", "output_prod")]
-    public void GetExpectedFileNameAfterScriptExecution(string parameter, string expectedFilename)
+    public async Task GetExpectedFileNameAfterScriptExecution(string parameter, string expectedFilename)
     {
         // arrange
         const string luaScript = """
@@ -74,7 +74,7 @@ public class LuaManagerShould
                                  end
                                  """;
 
-        var result = LuaManager.ExecuteScript(
+        var result = await ScriptEngine.ExecuteScriptAsync(
             new() { Code = luaScript, Context = new() { FileName = "", Parameters = parameter } }
         );
         result.ShouldSatisfyAllConditions(
@@ -84,9 +84,9 @@ public class LuaManagerShould
     }
 
     [Fact]
-    public void NotCrashWhenScriptIsNull()
+    public async Task NotCrashWhenScriptIsNull()
     {
-        var result = LuaManager.ExecuteScript(
+        var result = await ScriptEngine.ExecuteScriptAsync(
             new() { Code = null, Context = new() { FileName = null, Parameters = null } }
         );
         result.ShouldSatisfyAllConditions(
@@ -97,13 +97,13 @@ public class LuaManagerShould
     }
 
     [Fact]
-    public void ReturnAnErrorWhenScriptDoesNotCompile()
+    public async Task ReturnAnErrorWhenScriptDoesNotCompile()
     {
         // arrange
         const string url = "https://random.url.com";
         const string luaScript = "this is a failing script";
 
-        var result = LuaManager.ExecuteScript(
+        var result = await ScriptEngine.ExecuteScriptAsync(
             new() { Code = luaScript, Context = new() { FileName   = url, Parameters = "unhandled_case" } }
         );
         result.ShouldSatisfyAllConditions(
@@ -115,14 +115,14 @@ public class LuaManagerShould
     }
 
     [Fact]
-    public void ReturnEmptyContextWhenScriptDoNotReturnContext()
+    public async Task ReturnEmptyContextWhenScriptDoNotReturnContext()
     {
         // arrange
         const string url = "https://random.url.com";
         const string parameters = "unhandled_case";
         const string luaScript = "return 145";
 
-        var result = LuaManager.ExecuteScript(
+        var result = await ScriptEngine.ExecuteScriptAsync(
             new() { Code = luaScript, Context = new() { FileName   = url, Parameters = parameters } }
         );
         result.ShouldSatisfyAllConditions(

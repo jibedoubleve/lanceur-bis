@@ -4,6 +4,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -53,6 +54,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
+    [ObservableProperty] private ScriptLanguage _scriptLanguage;
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = [];
     private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _windowBackdropStyle = "Mica";
@@ -135,6 +137,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ShowAtStartup = Configuration.Application.SearchBox.ShowAtStartup;
         ShowLastQuery = Configuration.Application.SearchBox.ShowLastQuery;
         ToggleVisibility = Configuration.Application.SearchBox.ToggleVisibility;
+        
+        // Scripting section
+        ScriptLanguage = Configuration.Application.Scripting.ScriptLanguage;
 
         // Store section
         BookmarkSourceBrowser = Configuration.Application.Stores.BookmarkSourceBrowser;
@@ -173,6 +178,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Configuration.Application.SearchBox.ShowAtStartup = ShowAtStartup;
         Configuration.Application.SearchBox.ShowLastQuery = ShowLastQuery;
         Configuration.Application.SearchBox.ToggleVisibility = ToggleVisibility;
+        
+        // Scripting section
+        Configuration.Application.Scripting.ScriptLanguage = ScriptLanguage;
 
         // Store section
         Configuration.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
