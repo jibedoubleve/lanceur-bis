@@ -249,10 +249,10 @@
                                 OnContent="Ask confirmation before executing" />
                         </StackPanel>
                     </ui:CardControl>
-                    <!--  LUA SCRIPT  -->
+                    <!--  SCRIPT  -->
                     <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Script16}">
                         <ui:CardControl.Header>
-                            <ui:TextBlock FontTypography="Body" Text="Lua scipt" />
+                            <ui:TextBlock FontTypography="Body" Text="Script (Lua or C# Scripting)" />
                         </ui:CardControl.Header>
                         <StackPanel>
                             <ui:Button Click="OnClickCodeEditor">

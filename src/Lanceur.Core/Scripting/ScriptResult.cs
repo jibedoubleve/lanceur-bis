@@ -1,4 +1,4 @@
-namespace Lanceur.Core.LuaScripting;
+namespace Lanceur.Core.Scripting;
 
 public class ScriptResult : Script
 {

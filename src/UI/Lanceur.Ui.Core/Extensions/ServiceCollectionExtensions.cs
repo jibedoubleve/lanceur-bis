@@ -6,14 +6,14 @@ using Everything.Wrapper;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
-using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Scripting;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
-using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Repositories;
+using Lanceur.Infra.Scripting;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -178,7 +178,8 @@ public static class ServiceCollectionExtensions
                          .AddSingletonConditional<IInfrastructureSettingsProvider,
                              MemoryInfrastructureSettingsProvider, JsonInfrastructureSettingsProvider>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
-                         .AddSingleton<ILuaManager, LuaManager>()
+                         .AddSingleton<IScriptEngine, LuaScriptEngine>()
+                         .AddSingleton<IScriptEngine, CSharpScriptEngine>()
                          .AddSingleton<IEnigma, Enigma>();
 
 

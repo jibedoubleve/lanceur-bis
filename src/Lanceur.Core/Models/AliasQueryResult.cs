@@ -13,7 +13,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     private ObservableCollection<AdditionalParameter> _additionalParameters = new();
     private string _fileName;
 
-    private string _luaScript;
+    private string _script;
 
     private string _synonyms;
 
@@ -65,10 +65,10 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     ///     Gets or sets a Lua script that will be executed
     ///     when user launch an alias
     /// </summary>
-    public string LuaScript
+    public string Script
     {
-        get => _luaScript;
-        set => SetField(ref _luaScript, value);
+        get => _script;
+        set => SetField(ref _script, value);
     }
 
     public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();

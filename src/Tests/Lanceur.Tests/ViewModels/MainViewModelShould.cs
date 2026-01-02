@@ -4,10 +4,10 @@ using Bogus.Platform;
 using Dapper;
 using Lanceur.Core;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Scripting;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -75,7 +75,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                          .AddSingleton<IMemoryCache, MemoryCache>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<IWildcardService, ReplacementComposite>()
-                         .AddMockSingleton<ILuaManager>()
+                         .AddMockSingleton<IScriptEngine>()
                          .AddMockSingleton<IClipboardService>()
                          .AddMockSingleton<IProcessLauncher>((sp, i)
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i

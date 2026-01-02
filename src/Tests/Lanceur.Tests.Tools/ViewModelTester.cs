@@ -1,3 +1,4 @@
+using Lanceur.Core.Scripting;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tools.Extensions;
@@ -43,6 +44,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
                                                                       .SetMinimumLevel(LogLevel.Trace))
                                                            .AddSingleton<IEnigma, Enigma>()
                                                            .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
+                                                           .AddMockSingleton<IScriptEngineFactory>()
                                                            .AddDatabase(connectionManager);
 
             var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();

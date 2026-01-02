@@ -535,7 +535,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 await viewModel.CreateNewAlias(name, luaScript: script);
 
                 viewModel.SelectedAlias.ShouldNotBeNull("it is already selected for update");
-                viewModel.SelectedAlias!.LuaScript = script2;
+                viewModel.SelectedAlias!.Script = script2;
                 await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null);
 
                 // ASSERT

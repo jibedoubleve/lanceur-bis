@@ -23,7 +23,7 @@ public static class KeywordsViewModelExtensions
         viewModel.SelectedAlias.ShouldNotBeNull("it is just setup for creation");
         viewModel.SelectedAlias!.Synonyms = name;
         viewModel.SelectedAlias!.FileName = fileName;
-        viewModel.SelectedAlias!.LuaScript = luaScript;
+        viewModel.SelectedAlias!.Script = luaScript;
     }
 
     #endregion
