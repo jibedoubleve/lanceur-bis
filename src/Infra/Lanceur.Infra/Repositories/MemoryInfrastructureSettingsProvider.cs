@@ -4,19 +4,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Repositories;
 
-public class MemoryApplicationConfigurationService : IApplicationConfigurationService
+public class MemoryInfrastructureSettingsProvider : IInfrastructureSettingsProvider
 {
     #region Fields
 
-    private readonly ILogger<MemoryApplicationConfigurationService> _logger;
+    private readonly ILogger<MemoryInfrastructureSettingsProvider> _logger;
 
-    private static readonly ApplicationConfiguration Configuration;
+    private static readonly InfrastructureSettings Configuration;
 
     #endregion
 
     #region Constructors
 
-    static MemoryApplicationConfigurationService()
+    static MemoryInfrastructureSettingsProvider()
     {
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         var path = Path.Combine(desktop, @"lanceur\debug.sqlite");
@@ -24,13 +24,13 @@ public class MemoryApplicationConfigurationService : IApplicationConfigurationSe
         Configuration = new() { DbPath = path };
     }
 
-    public MemoryApplicationConfigurationService(ILogger<MemoryApplicationConfigurationService> logger) => _logger = logger;
+    public MemoryInfrastructureSettingsProvider(ILogger<MemoryInfrastructureSettingsProvider> logger) => _logger = logger;
 
     #endregion
 
     #region Properties
 
-    public ApplicationConfiguration Current => Configuration;
+    public InfrastructureSettings Current => Configuration;
 
     #endregion
 

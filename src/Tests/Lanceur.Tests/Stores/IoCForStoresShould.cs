@@ -56,7 +56,7 @@ public class IoCForStoresShould : TestBase
         // arrange 
         var cfgOverride = aliasOverride is null
             ? null
-            : new DatabaseConfiguration
+            : new ApplicationSettings
             {
                 Stores = new()
                 {
@@ -100,7 +100,7 @@ public class IoCForStoresShould : TestBase
         // arrange 
         var cfgOverride = aliasOverride is null
             ? null
-            : new DatabaseConfiguration
+            : new ApplicationSettings
             {
                 Stores = new()
                 {
@@ -182,7 +182,7 @@ public class IoCForStoresShould : TestBase
 
             serviceCollection.AddConfiguration() // Real configuration facility (not mocked)
                              .AddConfigurationSections()
-                             .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>();
+                             .AddSingleton<IInfrastructureSettingsProvider, MemoryInfrastructureSettingsProvider>();
             return serviceCollection.BuildServiceProvider();
         }
 

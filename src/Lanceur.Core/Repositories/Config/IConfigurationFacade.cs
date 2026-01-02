@@ -6,8 +6,8 @@ public interface IConfigurationFacade
 {
     #region Properties
 
-    DatabaseConfiguration Application { get; }
-    ApplicationConfiguration Local { get; }
+    ApplicationSettings Application { get; }
+    InfrastructureSettings Local { get; }
 
     #endregion
 

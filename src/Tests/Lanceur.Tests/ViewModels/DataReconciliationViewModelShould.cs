@@ -49,7 +49,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                          )
                          .AddMockSingleton<IViewFactory>()
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
-                         .AddMockSingleton<IDatabaseConfigurationService>()
+                         .AddMockSingleton<IApplicationSettingsProvider>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddSingleton<IReconciliationService, ReconciliationService>()
                          .AddSingleton<IPackagedAppSearchService, PackagedAppSearchService>()

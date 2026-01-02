@@ -7,21 +7,21 @@ public class ConfigurationFacadeService : IConfigurationFacade
 {
     #region Fields
 
-    private readonly IApplicationConfigurationService _applicationConfigurationService;
+    private readonly IInfrastructureSettingsProvider _infrastructureSettingsProvider;
 
-    private readonly IDatabaseConfigurationService _databaseConfigurationService;
+    private readonly IApplicationSettingsProvider _applicationSettingsProvider;
 
     #endregion
 
     #region Constructors
 
     public ConfigurationFacadeService(
-        IApplicationConfigurationService applicationConfigurationService,
-        IDatabaseConfigurationService databaseConfigurationService
+        IInfrastructureSettingsProvider infrastructureSettingsProvider,
+        IApplicationSettingsProvider applicationSettingsProvider
     )
     {
-        _applicationConfigurationService = applicationConfigurationService;
-        _databaseConfigurationService = databaseConfigurationService;
+        _infrastructureSettingsProvider = infrastructureSettingsProvider;
+        _applicationSettingsProvider = applicationSettingsProvider;
     }
 
     #endregion
@@ -29,10 +29,10 @@ public class ConfigurationFacadeService : IConfigurationFacade
     #region Properties
 
     /// <inheritdoc />
-    public DatabaseConfiguration Application => _databaseConfigurationService.Current;
+    public ApplicationSettings Application => _applicationSettingsProvider.Current;
 
     /// <inheritdoc />
-    public ApplicationConfiguration Local => _applicationConfigurationService.Current;
+    public InfrastructureSettings Local => _infrastructureSettingsProvider.Current;
 
     #endregion
 
@@ -43,16 +43,16 @@ public class ConfigurationFacadeService : IConfigurationFacade
     /// <inheritdoc />
     public void Reload()
     {
-        _applicationConfigurationService.Load();
-        _databaseConfigurationService.Load();
+        _infrastructureSettingsProvider.Load();
+        _applicationSettingsProvider.Load();
         OnUpdated();
     }
 
     /// <inheritdoc />
     public void Save()
     {
-        _applicationConfigurationService.Save();
-        _databaseConfigurationService.Save();
+        _infrastructureSettingsProvider.Save();
+        _applicationSettingsProvider.Save();
 
         Reload();
     }

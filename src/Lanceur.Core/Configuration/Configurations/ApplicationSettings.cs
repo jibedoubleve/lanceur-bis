@@ -8,7 +8,7 @@ namespace Lanceur.Core.Configuration.Configurations;
 ///     Represents the configuration settings for the application.
 ///     These settings are stored directly within the database and define key behaviours and preferences.
 /// </summary>
-public class DatabaseConfiguration
+public class ApplicationSettings
 {
     #region Properties
 

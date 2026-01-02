@@ -7,7 +7,7 @@ namespace Lanceur.Core.Configuration.Configurations;
 /// <summary>
 ///     Represents the configuration settings for the application.
 /// </summary>
-public class ApplicationConfiguration
+public class InfrastructureSettings
 {
     #region Properties
 

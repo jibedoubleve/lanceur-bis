@@ -17,14 +17,14 @@ public static class StoreExtensions
     {
         #region Methods
 
-        public IServiceCollection AddStoreServicesConfiguration(DatabaseConfiguration? configuration = null)
+        public IServiceCollection AddStoreServicesConfiguration(ApplicationSettings? configuration = null)
         {
             serviceCollection
                 .AddConfigurationSections()
                 .AddMockSingleton<IConfigurationFacade>((_, i) => {
                     i.Application.Returns(
                         configuration ??
-                        new DatabaseConfiguration { Caching = new(0, 0), Stores = new() }
+                        new ApplicationSettings { Caching = new(0, 0), Stores = new() }
                     );
                     return i;
                 });

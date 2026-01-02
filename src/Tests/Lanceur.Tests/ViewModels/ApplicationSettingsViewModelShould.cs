@@ -33,8 +33,8 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
     {
         serviceCollection.AddMockSingleton<IAppRestartService>()
                          .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
-                         .AddSingleton<IDatabaseConfigurationService, SQLiteDatabaseConfigurationService>()
-                         .AddSingleton<IApplicationConfigurationService, MemoryApplicationConfigurationService>()
+                         .AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
+                         .AddSingleton<IInfrastructureSettingsProvider, MemoryInfrastructureSettingsProvider>()
                          .AddMockSingleton<IViewFactory>()
                          .AddMockSingleton<IUserGlobalNotificationService>(
                              (sp, i) => visitors?.VisitGlobalUserInteractionService?.Invoke(sp, i) ?? i

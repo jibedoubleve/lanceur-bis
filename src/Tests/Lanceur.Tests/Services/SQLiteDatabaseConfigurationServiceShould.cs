@@ -25,22 +25,22 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
     #region Methods
 
-    private void WithConfiguration(Action<IDatabaseConfigurationService> assert, string json = null)
+    private void WithConfiguration(Action<IApplicationSettingsProvider> assert, string json = null)
     {
         var sql = $"insert into settings (s_key, s_value) values ('json', '{json}');";
 
         using var c = BuildFreshDb();
         c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteDatabaseConfigurationService(scope, CreateLogger<SQLiteDatabaseConfigurationService>());
+        var settingRepository = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
         assert(settingRepository);
     }
 
-    private void WithConfiguration(Action<DatabaseConfiguration> update, Action<DatabaseConfiguration> assert)
+    private void WithConfiguration(Action<ApplicationSettings> update, Action<ApplicationSettings> assert)
     {
         using var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteDatabaseConfigurationService(scope, CreateLogger<SQLiteDatabaseConfigurationService>());
+        var settingRepository = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
 
         update(settingRepository.Current);
 
@@ -54,7 +54,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     public void CreateFileWhenNotExists()
     {
         var file = Path.GetTempFileName();
-        var stg = new JsonApplicationConfigurationService(file);
+        var stg = new JsonInfrastructureSettingsProvider(file);
         File.Delete(file);
 
         var value = stg.Current.DbPath;
@@ -92,7 +92,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     public void GetAndSetData()
     {
         var file = Path.GetTempFileName();
-        var stg = new JsonApplicationConfigurationService(file);
+        var stg = new JsonInfrastructureSettingsProvider(file);
         var expected = "undeuxtrois";
 
         stg.Current.DbPath = expected;
@@ -251,7 +251,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settings = new SQLiteDatabaseConfigurationService(scope, CreateLogger<SQLiteDatabaseConfigurationService>());
+        var settings = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
 
         settings.Current.SearchBox.ShowAtStartup.ShouldBeTrue();
     }
@@ -261,38 +261,38 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var logger = CreateLogger<SQLiteDatabaseConfigurationService>();
-        var settings = new SQLiteDatabaseConfigurationService(scope, logger);
+        var logger = CreateLogger<SQLiteApplicationSettingsProvider>();
+        var settings = new SQLiteApplicationSettingsProvider(scope, logger);
 
         settings.Current.SearchBox.ShowResult.ShouldBeFalse();
     }
 
     [Theory]
     [MemberData(nameof(HaveUpdatedPropertyFeed))]
-    public void HaveUpdatedProperty(Action<DatabaseConfiguration> update, Action<DatabaseConfiguration> assert)
+    public void HaveUpdatedProperty(Action<ApplicationSettings> update, Action<ApplicationSettings> assert)
         => WithConfiguration(update, assert);
 
     public static IEnumerable<object[]> HaveUpdatedPropertyFeed()
     {
         yield return
         [
-            new Action<DatabaseConfiguration>(cfg  =>  cfg.Caching.StoreCacheDuration = 99),
-            new Action<DatabaseConfiguration>(cfg => cfg.Caching.StoreCacheDuration.ShouldBe(99))
+            new Action<ApplicationSettings>(cfg  =>  cfg.Caching.StoreCacheDuration = 99),
+            new Action<ApplicationSettings>(cfg => cfg.Caching.StoreCacheDuration.ShouldBe(99))
         ];
         yield return
         [
-            new Action<DatabaseConfiguration>(cfg  =>  cfg.Caching.ThumbnailCacheDuration = 99),
-            new Action<DatabaseConfiguration>(cfg => cfg.Caching.ThumbnailCacheDuration.ShouldBe(99))
+            new Action<ApplicationSettings>(cfg  =>  cfg.Caching.ThumbnailCacheDuration = 99),
+            new Action<ApplicationSettings>(cfg => cfg.Caching.ThumbnailCacheDuration.ShouldBe(99))
         ];
         yield return
         [
-            new Action<DatabaseConfiguration>(cfg  =>  cfg.Github.Tag = "hello world"),
-            new Action<DatabaseConfiguration>(cfg => cfg.Github.Tag.ShouldBe("hello world"))
+            new Action<ApplicationSettings>(cfg  =>  cfg.Github.Tag = "hello world"),
+            new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("hello world"))
         ];
         yield return
         [
-            new Action<DatabaseConfiguration>(cfg  =>  cfg.Github.Tag = cfg.Github.Tag),
-            new Action<DatabaseConfiguration>(cfg => cfg.Github.Tag.ShouldBe("ungroomed"))
+            new Action<ApplicationSettings>(cfg  =>  cfg.Github.Tag = cfg.Github.Tag),
+            new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("ungroomed"))
         ];
     }
 
@@ -318,7 +318,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     public void SaveJsonData()
     {
         var file = Path.GetTempFileName();
-        var stg = new JsonApplicationConfigurationService(file) { Current = { DbPath = "un_deux_trois" } };
+        var stg = new JsonInfrastructureSettingsProvider(file) { Current = { DbPath = "un_deux_trois" } };
 
         stg.Save();
 

@@ -181,10 +181,10 @@ public class ExecutionServiceShould : TestBase
         var sp = new ServiceCollection().AddConfigurationSections()
                                         .AddTestOutputHelper(OutputHelper)
                                         .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
-                                        .AddMockSingleton<IApplicationConfigurationService>()
-                                        .AddMockSingleton<IDatabaseConfigurationService>((_, i) =>
+                                        .AddMockSingleton<IInfrastructureSettingsProvider>()
+                                        .AddMockSingleton<IApplicationSettingsProvider>((_, i) =>
                                         {
-                                            var config = new DatabaseConfiguration
+                                            var config = new ApplicationSettings
                                             {
                                                 Github = { Token = $"{Guid.NewGuid()}" }
                                             };

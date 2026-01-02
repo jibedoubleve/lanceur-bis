@@ -66,7 +66,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<IMacroService, MacroService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
-                         .AddMockSingleton<IDatabaseConfigurationService>()
+                         .AddMockSingleton<IApplicationSettingsProvider>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IUserInteractionService>()
                          .AddMockSingleton<IUserNotificationService>()
@@ -252,7 +252,7 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
         {
             VisitSettings = settings =>
             {
-                var application = new DatabaseConfiguration { SearchBox = { ShowResult = showAllResults } };
+                var application = new ApplicationSettings { SearchBox = { ShowResult = showAllResults } };
                 settings.Application.Returns(application);
             }
         };
