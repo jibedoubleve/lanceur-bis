@@ -51,7 +51,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
     ///     HACK: If there's new feature flags added in a new version of the application,
     ///     add it here.
     /// </summary>
-    private ApplicationSettings AddNewFeatureFlags(ApplicationSettings config)
+    private static ApplicationSettings AddNewFeatureFlags(ApplicationSettings config)
     {
         if (config is null) return null;
 
