@@ -82,6 +82,7 @@ public partial class CodeEditorControl
                                 {result}
 
                                 """;
+        ScriptLogs.Content = result.OutputContent;
 
         _userNotificationService.Success("Script executed successfully in dry run mode.", "Build Successful");
     }
