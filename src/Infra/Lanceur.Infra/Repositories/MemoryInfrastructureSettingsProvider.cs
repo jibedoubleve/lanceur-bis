@@ -13,7 +13,8 @@ public class MemoryInfrastructureSettingsProvider : IInfrastructureSettingsProvi
     private static readonly InfrastructureSettings Configuration = new()
     {
         DbPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
+            Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+            @"lanceur\debug.sqlite"
         )
     };
 

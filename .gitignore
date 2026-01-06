@@ -371,3 +371,6 @@ Gemfile.lock
 # AI tools
 .claude/
 nul
+
+# Vim
+*.swp

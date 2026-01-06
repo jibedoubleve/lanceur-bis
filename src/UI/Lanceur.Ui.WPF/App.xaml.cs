@@ -221,7 +221,7 @@ public partial class App
         var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
 
         var hk = new Conditional<HotKeySection>(
-            new((int)(ModifierKeys.Windows | ModifierKeys.Control), (int)Key.R),
+            new((int)(ModifierKeys.Windows | ModifierKeys.Alt), (int)Key.P),
             hotKeyService.HotKey
         );
 
