@@ -43,7 +43,10 @@ public class ExecutionServiceShould : TestBase
                 LoggerFactory.CreateLogger<ReplacementComposite>()
             ),
             Substitute.For<IAliasRepository>(),
-            new LuaManager(Substitute.For<IUserGlobalNotificationService>()),
+            new LuaManager(
+                Substitute.For<IUserGlobalNotificationService>(),
+                Substitute.For<ILogger<LuaManager>>()
+            ),
             processLauncher ?? Substitute.For<IProcessLauncher>()
         );
         return executionService;
