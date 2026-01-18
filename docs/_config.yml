@@ -21,7 +21,9 @@ nav_external_links:
     opens_in_new_tab: true
 
 
-color_scheme: dark
+# color_scheme is now auto-detected from OS preference
+# Fallback to light for non-JS browsers
+color_scheme: light
 
 callouts:
   information:
