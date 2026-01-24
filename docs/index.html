@@ -14,14 +14,14 @@
       function getPreferredTheme() {
         const stored = localStorage.getItem('docsify-theme');
         if (stored) return stored;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
-      document.documentElement.setAttribute('data-theme', getPreferredTheme());
+      document.documentElement.dataset.theme = getPreferredTheme();
     })();
   </script>
 
   <!-- Docsify theme -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css" integrity="sha384-IuZucgNxm+6VGvZLv3+oxh1kE70WlIXci7p3g/Dtchij0oKFb9s8zG9GYnIkl8CB" crossorigin="anonymous">
 
   <!-- Custom theme variables -->
   <style>
@@ -310,7 +310,8 @@
 </head>
 <body>
   <!-- Theme toggle button -->
-  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark/light mode" id="theme-toggle">
+  <button class="theme-toggle" aria-label="Toggle dark/light mode" id="theme-toggle" type="button">
+    <span id="theme-icon" aria-hidden="true">&#9790;</span>
   </button>
 
   <div id="app">Loading...</div>
@@ -320,31 +321,34 @@
     function getPreferredTheme() {
       const stored = localStorage.getItem('docsify-theme');
       if (stored) return stored;
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
 
     function applyTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
+      document.documentElement.dataset.theme = theme;
       localStorage.setItem('docsify-theme', theme);
       updateToggleButton(theme);
     }
 
     function updateToggleButton(theme) {
-      const btn = document.getElementById('theme-toggle');
+      var icon = document.getElementById('theme-icon');
+      var btn = document.getElementById('theme-toggle');
+      if (icon) {
+        icon.innerHTML = theme === 'dark' ? '&#9728;' : '&#9790;'; // Sun or Moon
+      }
       if (btn) {
-        btn.innerHTML = theme === 'dark' ? '&#9728;' : '&#9790;'; // Sun or Moon
         btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
       }
     }
 
     function toggleTheme() {
-      const currentTheme = document.documentElement.getAttribute('data-theme') || getPreferredTheme();
+      const currentTheme = document.documentElement.dataset.theme || getPreferredTheme();
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       applyTheme(newTheme);
     }
 
     // Listen for OS theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
       if (!localStorage.getItem('docsify-theme')) {
         applyTheme(e.matches ? 'dark' : 'light');
       }
@@ -353,10 +357,16 @@
     // Initialize theme on load
     document.addEventListener('DOMContentLoaded', function() {
       applyTheme(getPreferredTheme());
+
+      // Attach click handler to theme toggle button
+      var toggleBtn = document.getElementById('theme-toggle');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleTheme);
+      }
     });
 
     // Docsify configuration
-    window.$docsify = {
+    globalThis.$docsify = {
       name: '<img src="assets/images/logo.png" alt="Lanceur">',
       repo: 'https://github.com/jibedoubleve/lanceur-bis',
       loadSidebar: true,
@@ -384,16 +394,16 @@
   </script>
 
   <!-- Docsify core -->
-  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js" integrity="sha384-KaHhgnx/OTLoJ4J33SSJsF4x1pk4I7q3s5ZOfIDHJYl6IG7Oyn2vNDsHiWJe46fD" crossorigin="anonymous"></script>
 
   <!-- Plugins -->
-  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js" integrity="sha384-LthJPBJ4RGco78kBY+EmKz5rmISZ5vrtAu3+l2ALQ2mrZHOe6Wyf6knyKjeC4cL6" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2" integrity="sha384-t4d9b4/0dEBkoJ5e77XEPBrqJ790jbFQFmEaTbBqIlTDeGosM1AbZvC1NQwqTg+5" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js" integrity="sha384-uFEp18/1vv2dYlO64J2lOcnbhirAQZPtruqAZZ7PZYoXenm5c+tIs3AqSMjVMRe8" crossorigin="anonymous"></script>
 
   <!-- Syntax highlighting -->
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-lua.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-csharp.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-lua.min.js" integrity="sha384-qnsmaXmSxuN1DguKvNsGsQFG1LyCwf1UaKmFgeac2/ssP3m7kDxtKmWTmOIkuOtE" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js" integrity="sha384-9WmlN8ABpoFSSHvBGGjhvB3E/D8UkNB9HpLJjBQFC2VSQsM1odiQDv4NbEo+7l15" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-csharp.min.js" integrity="sha384-nMKYzg6yfy0qgpaRpVhHvZp0gT5sgvmZYlFC0XAKZSp+zFUB9rE6zsdmIEiou4bV" crossorigin="anonymous"></script>
 </body>
 </html>
