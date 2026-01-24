@@ -139,7 +139,7 @@ _TeamCity*
 
 # Visual Studio code coverage results
 *.coverage
-*.coveragexml
+*.coveragexms
 
 # NCrunch
 _NCrunch_*
@@ -367,3 +367,7 @@ _site
 .jekyll-metadata
 vendor
 Gemfile.lock
+
+# AI tools
+.claude/
+nul

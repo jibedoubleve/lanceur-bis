@@ -1,24 +1,16 @@
----
-layout: page
-title: User Manual
-nav_order: 2
-permalink: user-manual
----
-
 # User Manual
 
 ## What is it, and how does it work?
 
 An alias is a keyword linked to an application. When users type it, the application will launch as configured.
 
-![Start alias](assets/images/usermanual/start_alias.png)
+![Start alias](../../assets/images/usermanual/start_alias.png)
 
 Create a list of shortcuts, configure them, and save time by simply typing the shortcut and pressing `ENTER`.
 
 To display the window, the default shortcut is `Ctrl + Alt + Space`.
 
-> `Ctrl + Alt` behaves the same way as [AltGr](https://en.wikipedia.org/wiki/AltGr_key).  
-> {: .note }
+> **Note:** `Ctrl + Alt` behaves the same way as [AltGr](https://en.wikipedia.org/wiki/AltGr_key).
 
 When you use the shortcut, a window appears:
 
@@ -36,8 +28,8 @@ A command line follows this structure:
 - The text before the first space is the **command**—the action to be executed.
 - Everything after the first space is the **parameters**, which modify the behavior of the command.
 
-If the command starts with any of the following characters:  
-`$ & | @ # ) § ! { } - _ \ + * / = < > ; : %`  
+If the command starts with any of the following characters:
+`$ & | @ # ) § ! { } - _ \ + * / = < > ; : %`
 then the first character is considered the **command**, and the rest are the **parameters**.
 
 For example, if you have configured a Google search command as follows:
@@ -50,4 +42,4 @@ then to search for "_aeroplane_" in Google, you would type:
 
 `search aeroplane`.
 
-> The use of `$W$` is explained [HERE](keywords-macros-wildcards).
+> The use of `$W$` is explained [HERE](pages/usermanual/2.keywords-macros-wildcards.md).
