@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lanceur - Launch Anything, Instantly</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Lanceur: Launch anything, instantly.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="icon" href="assets/favicon.ico">
+
+  <!-- Theme detection and application (before CSS loads to prevent flash) -->
+  <script>
+    (function() {
+      function getPreferredTheme() {
+        const stored = localStorage.getItem('docsify-theme');
+        if (stored) return stored;
+        return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.dataset.theme = getPreferredTheme();
+    })();
+  </script>
+
+  <!-- Docsify theme -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css" integrity="sha384-IuZucgNxm+6VGvZLv3+oxh1kE70WlIXci7p3g/Dtchij0oKFb9s8zG9GYnIkl8CB" crossorigin="anonymous">
+
+  <!-- Custom theme variables -->
+  <style>
+    /* Light theme (default) */
+    :root {
+      --base-background-color: #ffffff;
+      --base-color: #1a1a1a;
+      --theme-color: #0066cc;
+
+      /* Sidebar */
+      --sidebar-background: #f5f5f5;
+      --sidebar-border-color: #e0e0e0;
+      --sidebar-nav-link-color: #333333;
+      --sidebar-nav-link-color--active: #0066cc;
+      --sidebar-nav-link-color--hover: #0066cc;
+      --sidebar-nav-link-background-color--active: rgba(0, 102, 204, 0.1);
+      --sidebar-nav-link-font-weight--active: 600;
+      --sidebar-name-color: #1a1a1a;
+      --sidebar-name-font-weight: 700;
+
+      /* Content */
+      --heading-color: #1a1a1a;
+      --link-color: #0066cc;
+      --link-color--hover: #004499;
+
+      /* Code */
+      --code-inline-background: #f0f0f0;
+      --code-inline-color: #c7254e;
+      --code-theme-background: #f8f8f8;
+      --code-theme-text: #333333;
+
+      /* Blockquote */
+      --blockquote-background: #f9f9f9;
+      --blockquote-border-color: #0066cc;
+      --blockquote-color: #555555;
+
+      /* Table */
+      --table-head-background: #f0f0f0;
+      --table-head-color: #1a1a1a;
+      --table-row-odd-background: #fafafa;
+      --table-cell-border-color: #e0e0e0;
+
+      /* Search */
+      --search-background: #ffffff;
+      --search-input-background-color: #ffffff;
+      --search-input-border-color: #cccccc;
+      --search-input-color: #1a1a1a;
+      --search-result-heading-color: #0066cc;
+      --search-result-keyword-color: #c7254e;
+      --search-result-keyword-background: rgba(199, 37, 78, 0.1);
+    }
+
+    /* Dark theme */
+    [data-theme="dark"] {
+      --base-background-color: #1e1e1e;
+      --base-color: #d4d4d4;
+      --theme-color: #4da6ff;
+
+      /* Sidebar */
+      --sidebar-background: #252526;
+      --sidebar-border-color: #3c3c3c;
+      --sidebar-nav-link-color: #cccccc;
+      --sidebar-nav-link-color--active: #4da6ff;
+      --sidebar-nav-link-color--hover: #4da6ff;
+      --sidebar-nav-link-background-color--active: rgba(77, 166, 255, 0.15);
+      --sidebar-nav-link-font-weight--active: 600;
+      --sidebar-name-color: #ffffff;
+      --sidebar-name-font-weight: 700;
+
+      /* Content */
+      --heading-color: #ffffff;
+      --link-color: #4da6ff;
+      --link-color--hover: #80c0ff;
+
+      /* Code */
+      --code-inline-background: #3c3c3c;
+      --code-inline-color: #f48fb1;
+      --code-theme-background: #2d2d2d;
+      --code-theme-text: #d4d4d4;
+
+      /* Blockquote */
+      --blockquote-background: #2d2d2d;
+      --blockquote-border-color: #4da6ff;
+      --blockquote-color: #b0b0b0;
+
+      /* Table */
+      --table-head-background: #2d2d2d;
+      --table-head-color: #ffffff;
+      --table-row-odd-background: #262626;
+      --table-cell-border-color: #3c3c3c;
+
+      /* Search */
+      --search-background: #252526;
+      --search-input-background-color: #1e1e1e;
+      --search-input-border-color: #3c3c3c;
+      --search-input-color: #d4d4d4;
+      --search-result-heading-color: #4da6ff;
+      --search-result-keyword-color: #f48fb1;
+      --search-result-keyword-background: rgba(244, 143, 177, 0.2);
+    }
+
+    /* Theme toggle button - positioned in sidebar */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      background: var(--sidebar-background);
+      border: 2px solid var(--theme-color);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Sidebar styling */
+    .sidebar {
+      background: var(--sidebar-background);
+      border-right: 1px solid var(--sidebar-border-color);
+    }
+
+    /* Logo styling */
+    .app-name-link img {
+      max-width: 120px;
+      margin: 10px auto;
+      display: block;
+    }
+
+    /* Improved heading contrast */
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3,
+    .markdown-section h4,
+    .markdown-section h5,
+    .markdown-section h6 {
+      color: var(--heading-color);
+      font-weight: 600;
+    }
+
+    /* Improved table styling */
+    table {
+      display: table;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th {
+      background: var(--table-head-background);
+      color: var(--table-head-color);
+      font-weight: 600;
+    }
+
+    table td,
+    table th {
+      border: 1px solid var(--table-cell-border-color);
+      padding: 10px 12px;
+    }
+
+    table tr:nth-child(odd) td {
+      background: var(--table-row-odd-background);
+    }
+
+    /* Note/callout styling */
+    blockquote {
+      background: var(--blockquote-background);
+      border-left: 4px solid var(--blockquote-border-color);
+      color: var(--blockquote-color);
+      padding: 1em 1.2em;
+      margin: 1.5em 0;
+      border-radius: 0 6px 6px 0;
+    }
+
+    blockquote p {
+      margin: 0;
+    }
+
+    blockquote strong {
+      color: var(--heading-color);
+    }
+
+    /* Inline code styling */
+    .markdown-section code {
+      background: var(--code-inline-background);
+      color: var(--code-inline-color);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    /* Code blocks */
+    .markdown-section pre {
+      background: var(--code-theme-background);
+      border-radius: 6px;
+    }
+
+    .markdown-section pre code {
+      background: transparent;
+      color: var(--code-theme-text);
+      padding: 0;
+    }
+
+    /* GitHub corner - ensure it doesn't interfere */
+    .github-corner {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 99;
+    }
+
+    .github-corner svg {
+      fill: var(--theme-color);
+      color: var(--base-background-color);
+    }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+      .theme-toggle {
+        bottom: 15px;
+        left: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+      }
+    }
+
+    /* When sidebar is closed on mobile, move button */
+    @media screen and (max-width: 768px) {
+      body.close .theme-toggle {
+        left: 15px;
+      }
+    }
+
+    /* Download section */
+    .download-section {
+      text-align: center;
+      padding: 2rem 0;
+      margin: 1.5rem 0;
+    }
+
+    .download-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+      color: #ffffff !important;
+      padding: 16px 48px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-decoration: none !important;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 14px rgba(0, 102, 204, 0.4);
+    }
+
+    .download-button:hover {
+      background: linear-gradient(135deg, #0077ee 0%, #0066cc 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 102, 204, 0.5);
+    }
+
+    .download-note {
+      margin-top: 1rem;
+      color: var(--blockquote-color);
+      font-size: 0.9rem;
+    }
+
+    [data-theme="dark"] .download-button {
+      background: linear-gradient(135deg, #4da6ff 0%, #3d8bd9 100%);
+      box-shadow: 0 4px 14px rgba(77, 166, 255, 0.3);
+    }
+
+    [data-theme="dark"] .download-button:hover {
+      background: linear-gradient(135deg, #66b3ff 0%, #4da6ff 100%);
+      box-shadow: 0 6px 20px rgba(77, 166, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <!-- Theme toggle button -->
+  <button class="theme-toggle" aria-label="Toggle dark/light mode" id="theme-toggle" type="button">
+    <span id="theme-icon" aria-hidden="true">&#9790;</span>
+  </button>
+
+  <div id="app">Loading...</div>
+
+  <script>
+    // Theme management
+    function getPreferredTheme() {
+      const stored = localStorage.getItem('docsify-theme');
+      if (stored) return stored;
+      return globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem('docsify-theme', theme);
+      updateToggleButton(theme);
+    }
+
+    function updateToggleButton(theme) {
+      var icon = document.getElementById('theme-icon');
+      var btn = document.getElementById('theme-toggle');
+      if (icon) {
+        icon.innerHTML = theme === 'dark' ? '&#9728;' : '&#9790;'; // Sun or Moon
+      }
+      if (btn) {
+        btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+      }
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.dataset.theme || getPreferredTheme();
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+    }
+
+    // Listen for OS theme changes
+    globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+      if (!localStorage.getItem('docsify-theme')) {
+        applyTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+
+    // Initialize theme on load
+    document.addEventListener('DOMContentLoaded', function() {
+      applyTheme(getPreferredTheme());
+
+      // Attach click handler to theme toggle button
+      var toggleBtn = document.getElementById('theme-toggle');
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleTheme);
+      }
+    });
+
+    // Docsify configuration
+    globalThis.$docsify = {
+      name: '<img src="assets/images/logo.png" alt="Lanceur">',
+      repo: 'https://github.com/jibedoubleve/lanceur-bis',
+      loadSidebar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        placeholder: 'Search...',
+        noData: 'No results found',
+        depth: 3
+      },
+      copyCode: {
+        buttonText: 'Copy',
+        successText: 'Copied'
+      },
+      pagination: {
+        previousText: 'Previous',
+        nextText: 'Next',
+        crossChapter: true
+      },
+      themeable: {
+        readyTransition: true,
+        responsiveTables: true
+      }
+    };
+  </script>
+
+  <!-- Docsify core -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js" integrity="sha384-KaHhgnx/OTLoJ4J33SSJsF4x1pk4I7q3s5ZOfIDHJYl6IG7Oyn2vNDsHiWJe46fD" crossorigin="anonymous"></script>
+
+  <!-- Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js" integrity="sha384-LthJPBJ4RGco78kBY+EmKz5rmISZ5vrtAu3+l2ALQ2mrZHOe6Wyf6knyKjeC4cL6" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2" integrity="sha384-t4d9b4/0dEBkoJ5e77XEPBrqJ790jbFQFmEaTbBqIlTDeGosM1AbZvC1NQwqTg+5" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js" integrity="sha384-uFEp18/1vv2dYlO64J2lOcnbhirAQZPtruqAZZ7PZYoXenm5c+tIs3AqSMjVMRe8" crossorigin="anonymous"></script>
+
+  <!-- Syntax highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-lua.min.js" integrity="sha384-qnsmaXmSxuN1DguKvNsGsQFG1LyCwf1UaKmFgeac2/ssP3m7kDxtKmWTmOIkuOtE" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js" integrity="sha384-9WmlN8ABpoFSSHvBGGjhvB3E/D8UkNB9HpLJjBQFC2VSQsM1odiQDv4NbEo+7l15" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-csharp.min.js" integrity="sha384-nMKYzg6yfy0qgpaRpVhHvZp0gT5sgvmZYlFC0XAKZSp+zFUB9rE6zsdmIEiou4bV" crossorigin="anonymous"></script>
+</body>
+</html>
