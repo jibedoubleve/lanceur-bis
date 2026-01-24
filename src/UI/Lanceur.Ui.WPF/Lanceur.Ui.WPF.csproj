@@ -40,7 +40,7 @@
     <PackageReference Include="NHotkey.Wpf" Version="3.0.0" />
     <PackageReference Include="ScottPlot.WPF" Version="5.1.57" />
     <PackageReference Include="WPF-UI" Version="4.2.0" />
-    <PackageReference Include="WPF-UI.Tray" Version="4.1.0" />
+    <PackageReference Include="WPF-UI.Tray" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Monaco\**">
