@@ -1,4 +1,4 @@
-- [Home](/)
+- [Introduction](pages/introduction.md)
 - [How to install?](pages/install/1.install.md)
   - [Prerequisites](pages/install/2.prerequisites.md)
 - [User Manual](pages/usermanual/index.md)
@@ -11,5 +11,4 @@
   - [Calculator](pages/usermanual/7.calculator.md)
   - [Analytics](pages/usermanual/8.analytics.md)
   - [Data Reconciliation](pages/usermanual/9.data-reconciliation.md)
-- [Tips & Tricks](tipsandtricks.md)
-- [Releases](https://github.com/jibedoubleve/lanceur-bis/releases)
+- [Tips & Tricks](pages/tipsandtricks.md)
