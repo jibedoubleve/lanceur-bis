@@ -2,11 +2,6 @@
 
 ![Lanceur](assets/images/usermanual/search.png)
 
-<div class="download-section">
-  <a href="https://github.com/jibedoubleve/lanceur-bis/releases/latest" class="download-button">Download Lanceur</a>
-  <p class="download-note">Free & Open Source - Windows 10/11</p>
-</div>
-
 ---
 
 ## What is Lanceur?
