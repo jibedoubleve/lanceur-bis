@@ -1,6 +1,6 @@
 # Lanceur - Launch Anything, Instantly
 
-![Lanceur](assets/images/usermanual/search.png)
+![Lanceur](../assets/images/usermanual/search.png)
 
 ---
 
