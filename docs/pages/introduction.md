@@ -6,7 +6,7 @@
 
 ## What is Lanceur?
 
-Lanceur is a lightweight and highly customizable application launcher built in .NET. Inspired by [SlickRun](https://www.bayden.com/slickrun/), with features influenced by [Wox](https://github.com/Wox-launcher/Wox) and [Flow Launcher](https://www.flowlauncher.com/), it helps you open applications, files, and web pages instantly—just type a shortcut and press `ENTER`.
+Lanceur is a lightweight and highly customisable application launcher built in .NET. Inspired by [SlickRun](https://www.bayden.com/slickrun/), with features influenced by [Wox](https://github.com/Wox-launcher/Wox) and [Flow Launcher](https://www.flowlauncher.com/), it helps you open applications, files, and web pages instantly—just type a shortcut and press `ENTER`.
 
 I originally started Lanceur because I wanted to build my own project—something that carried my name and worked exactly the way I envisioned. I love SlickRun, but I wanted my own take on it, with a few differences that better suited my workflow. If others find it useful too, that's a bonus!
 
