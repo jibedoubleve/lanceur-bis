@@ -19,10 +19,10 @@ This design choice offers greater control but comes with a trade-off—a slightl
 ## Features
 
 - **Custom Aliases & Parameters** - Launch applications using custom keywords, with optional dynamic arguments.
-- **Lua Scripting** - Extend alias behavior with powerful scripts.
-- **Bookmarks & Web Shortcuts** - Quickly access favorite websites.
+- **Lua Scripting** - Extend alias behaviour with powerful scripts.
+- **Bookmarks & Web Shortcuts** - Quickly access favourite websites.
 - **Instant File Search** - Integrated with [VoidTools Everything](https://www.voidtools.com/) for lightning-fast file searches.
 - **Built-in Calculator** - Perform quick calculations on the fly.
 - **Macro Support** - Launch multiple applications at once or generate a new GUID instantly.
-- **Usage Analytics** - Track and visualize command usage to optimize your workflow.
+- **Usage Analytics** - Track and visualise command usage to optimise your workflow.
 - **Private & Local** - All configurations and analytics are stored securely in a local SQLite database—nothing is sent online.

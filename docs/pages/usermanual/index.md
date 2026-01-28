@@ -26,7 +26,7 @@ A command line follows this structure:
 > `command` [space] `parameters`
 
 - The text before the first space is the **command**—the action to be executed.
-- Everything after the first space is the **parameters**, which modify the behavior of the command.
+- Everything after the first space is the **parameters**, which modify the behaviour of the command.
 
 If the command starts with any of the following characters:
 `$ & | @ # ) § ! { } - _ \ + * / = < > ; : %`
