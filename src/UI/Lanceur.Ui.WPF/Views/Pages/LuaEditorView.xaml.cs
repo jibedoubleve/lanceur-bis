@@ -84,15 +84,14 @@ public partial class LuaEditorView
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(LuaEditorViewModel.LuaScript) && !_isUpdatingFromViewModel)
+        if (e.PropertyName != nameof(LuaEditorViewModel.LuaScript) || _isUpdatingFromViewModel) return;
+
+        _isUpdatingFromViewModel = true;
+        if (LuaEditor.Text != ViewModel.LuaScript)
         {
-            _isUpdatingFromViewModel = true;
-            if (LuaEditor.Text != ViewModel.LuaScript)
-            {
-                LuaEditor.Text = ViewModel.LuaScript;
-            }
-            _isUpdatingFromViewModel = false;
+            LuaEditor.Text = ViewModel.LuaScript;
         }
+        _isUpdatingFromViewModel = false;
     }
 
     private async void OnClickBack(object sender, RoutedEventArgs e)
@@ -129,7 +128,7 @@ public partial class LuaEditorView
         }
     }
 
-    private void NavigateBackToKeywords()
+    private static void NavigateBackToKeywords()
     {
         WeakReferenceMessenger.Default.Send(
             new NavigationMessage((typeof(KeywordsView), null))
