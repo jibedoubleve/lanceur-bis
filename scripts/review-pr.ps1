@@ -52,11 +52,12 @@ Write-Host "  URL   : $prUrl" -ForegroundColor White
 # ── 3. Fetch diff ────────────────────────────────────────────────────────────
 Write-Host "Fetching diff..." -ForegroundColor Cyan
 $diffFile = [System.IO.Path]::GetTempFileName() + ".diff"
-gh pr diff $PrNumber | Out-File -FilePath $diffFile -Encoding utf8
+$diffContent = gh pr diff $PrNumber 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to fetch diff for PR #$PrNumber."
     exit 1
 }
+$diffContent | Out-File -FilePath $diffFile -Encoding utf8
 $diffSize = (Get-Item $diffFile).Length
 Write-Host "  Diff saved to temp file ($([math]::Round($diffSize / 1024, 1)) KB)" -ForegroundColor White
 
