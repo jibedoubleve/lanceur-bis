@@ -61,7 +61,7 @@ try {
         Write-Error "Failed to fetch diff for PR #$PrNumber."
         exit 1
     }
-    $diffContent | Out-File -FilePath $diffFile -Encoding utf8
+    [System.IO.File]::WriteAllText($diffFile, ($diffContent | Out-String))
     $diffSize = (Get-Item $diffFile).Length
     Write-Host "  Diff saved to temp file ($([math]::Round($diffSize / 1024, 1)) KB)" -ForegroundColor White
 
@@ -110,7 +110,7 @@ Keep the review concise and actionable.
         New-Item -ItemType Directory -Path $reviewDir -Force | Out-Null
     }
     $reviewFile = Join-Path $reviewDir "pr-$PrNumber-review.md"
-    $reviewOutput | Out-File -FilePath $reviewFile -Encoding utf8
+    [System.IO.File]::WriteAllText($reviewFile, ($reviewOutput | Out-String))
     Write-Host "Review saved to: $reviewFile" -ForegroundColor Green
 
     # ── 6. Post to GitHub (only with -AutoPost) ──────────────────────────────
