@@ -83,8 +83,8 @@ A brief summary (2-4 sentences) of what this PR does.
 
 ### Issues
 List any bugs, logic errors, security concerns, or significant code-quality problems.
-For each issue, include a direct link to the file on GitHub using this format:
-[$repo/$filePath (line N)]($prUrl/files#diff-<use the file path>)
+For each issue, include a link to the PR files page with the file path and line number:
+[$filePath (lines N-M)]($prUrl/files)
 If there are no issues, write "No issues found."
 
 ### Suggestions
