@@ -4,7 +4,6 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Serilog;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;

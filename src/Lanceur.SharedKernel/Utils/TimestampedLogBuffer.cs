@@ -1,11 +1,11 @@
 using System.Text;
 
-namespace Lanceur.Infra.LuaScripting;
+namespace Lanceur.SharedKernel.Utils;
 
 /// <summary>
-///     Provides timestamped logging to a file on the desktop.
+///     Captures timestamped log output into an in-memory buffer.
 /// </summary>
-public class LuaScriptOutput
+public class TimestampedLogBuffer
 {
     #region Fields
 
@@ -18,9 +18,9 @@ public class LuaScriptOutput
     #region Methods
 
     /// <summary>
-    ///     Appends a timestamped line to the log buffer.
+    ///     Appends a line prefixed with an ISO 8601 timestamp to the log buffer.
     /// </summary>
-    /// <param name="line">The text to log.</param>
+    /// <param name="line">The text to append.</param>
     public void AppendLine(string line)
     {
         _logs.AppendLine(string.Format(LogTemplate, DateTime.Now.ToString("o"), line));

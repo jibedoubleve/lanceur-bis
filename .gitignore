@@ -371,6 +371,9 @@ Gemfile.lock
 # AI tools
 .claude/
 nul
+# Directories created by AI for reports
+_review/
 
 # Vim
 *.swp
+

@@ -115,23 +115,18 @@ public partial class LuaEditorViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Asks the user if they want to save unsaved changes.
-    /// Returns true if the user wants to proceed with navigation, false to cancel.
+    /// Asks the user if they want to save unsaved changes before leaving.
+    /// If confirmed, saves the current script; otherwise, discards changes.
     /// </summary>
-    public async Task<bool> ConfirmDiscardOrSaveAsync()
+    public async Task SaveOrDiscardAsync()
     {
-        if (!HasChanges) return true;
+        if (!HasChanges) return;
 
         var confirmed = await _hubService.Dialogues.AskAsync(
             "You have unsaved changes. Do you want to save before leaving?"
         );
 
-        if (confirmed)
-        {
-            Save();
-        }
-
-        return true; // Always allow navigation after the dialog
+        if (confirmed) { Save(); }
     }
 
     #endregion

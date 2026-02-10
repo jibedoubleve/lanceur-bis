@@ -2,6 +2,7 @@ using System.Text;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.Logging;
 using NLua;
 
@@ -45,7 +46,7 @@ public class LuaManager : ILuaManager
                 }
             };
 
-        var output = new LuaScriptOutput();
+        var output = new TimestampedLogBuffer();
         using var lua = new Lua();
         try
         {

@@ -98,7 +98,7 @@ public partial class LuaEditorView
     {
         try
         {
-            await ViewModel.ConfirmDiscardOrSaveAsync();
+            await ViewModel.SaveOrDiscardAsync();
             NavigateBackToKeywords();
         }
         catch (Exception ex)

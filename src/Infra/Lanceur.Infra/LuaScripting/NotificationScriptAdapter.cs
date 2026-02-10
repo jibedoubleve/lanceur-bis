@@ -40,7 +40,7 @@ public class NotificationScriptAdapter
     /// </summary>
     /// <param name="message">The message to be displayed in the toast notification.</param>
     /// <param name="url">The URL to navigate to when the user clicks the "View Details" button.</param>
-    public  void InformationWithNavigation(string message, string url)
+    public void InformationWithNavigation(string message, string url)
         => _notificationService.InformationWithNavigation(message, url);
 
     /// <summary>

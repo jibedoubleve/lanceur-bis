@@ -1,6 +1,7 @@
 using System.Text;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Services;
+using Lanceur.SharedKernel.Utils;
 using NLua;
 
 namespace Lanceur.Infra.LuaScripting;
@@ -29,7 +30,7 @@ internal static class LuaScriptExtensions
             return lua;
         }
 
-        public Lua AddOutput(LuaScriptOutput logger)
+        public Lua AddOutput(TimestampedLogBuffer logger)
         {
             lua["output"] = new Dictionary<string, object> { ["appendLine"] = new Action<string>(logger.AppendLine) };
             return lua;
