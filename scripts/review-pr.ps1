@@ -56,17 +56,17 @@ Write-Host "  URL   : $prUrl" -ForegroundColor White
 Write-Host "Fetching diff..." -ForegroundColor Cyan
 $diffFile = [System.IO.Path]::GetTempFileName() + ".diff"
 try {
-$diffContent = gh pr diff $PrNumber 2>&1
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to fetch diff for PR #$PrNumber."
-    exit 1
-}
-$diffContent | Out-File -FilePath $diffFile -Encoding utf8
-$diffSize = (Get-Item $diffFile).Length
-Write-Host "  Diff saved to temp file ($([math]::Round($diffSize / 1024, 1)) KB)" -ForegroundColor White
+    $diffContent = gh pr diff $PrNumber 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to fetch diff for PR #$PrNumber."
+        exit 1
+    }
+    $diffContent | Out-File -FilePath $diffFile -Encoding utf8
+    $diffSize = (Get-Item $diffFile).Length
+    Write-Host "  Diff saved to temp file ($([math]::Round($diffSize / 1024, 1)) KB)" -ForegroundColor White
 
-# ── 4. Call Claude CLI ───────────────────────────────────────────────────────
-$reviewPrompt = @"
+    # ── 4. Call Claude CLI ───────────────────────────────────────────────────
+    $reviewPrompt = @"
 You are reviewing a GitHub Pull Request. Produce a structured markdown review.
 
 **Repository:** $repo
@@ -97,36 +97,36 @@ Highlight positive aspects of the PR (good patterns, clean code, nice tests, etc
 Keep the review concise and actionable.
 "@
 
-Write-Host "Sending diff to Claude for review..." -ForegroundColor Cyan
-$reviewOutput = Get-Content $diffFile -Raw | claude --print "$reviewPrompt"
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Claude CLI failed. Make sure 'claude' is installed and configured."
-    exit 1
-}
-
-# ── 5. Save locally ─────────────────────────────────────────────────────────
-$reviewDir = Join-Path $PSScriptRoot ".." "_review"
-if (-not (Test-Path $reviewDir)) {
-    New-Item -ItemType Directory -Path $reviewDir -Force | Out-Null
-}
-$reviewFile = Join-Path $reviewDir "pr-$PrNumber-review.md"
-$reviewOutput | Out-File -FilePath $reviewFile -Encoding utf8
-Write-Host "Review saved to: $reviewFile" -ForegroundColor Green
-
-# ── 6. Post to GitHub (only with -AutoPost) ──────────────────────────────────
-if ($AutoPost) {
-    Write-Host "Posting review to PR #$PrNumber..." -ForegroundColor Cyan
-    gh pr review $PrNumber --comment --body-file $reviewFile
+    Write-Host "Sending diff to Claude for review..." -ForegroundColor Cyan
+    $reviewOutput = Get-Content $diffFile -Raw | claude --print "$reviewPrompt"
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "Failed to post review to GitHub."
+        Write-Error "Claude CLI failed. Make sure 'claude' is installed and configured."
         exit 1
     }
-    Write-Host "Review posted successfully!" -ForegroundColor Green
-} else {
-    Write-Host ""
-    Write-Host "Review saved. To post it to GitHub, run:" -ForegroundColor Yellow
-    Write-Host "  gh pr review $PrNumber --comment --body-file `"$reviewFile`"" -ForegroundColor White
-}
+
+    # ── 5. Save locally ─────────────────────────────────────────────────────
+    $reviewDir = Join-Path $PSScriptRoot ".." "_review"
+    if (-not (Test-Path $reviewDir)) {
+        New-Item -ItemType Directory -Path $reviewDir -Force | Out-Null
+    }
+    $reviewFile = Join-Path $reviewDir "pr-$PrNumber-review.md"
+    $reviewOutput | Out-File -FilePath $reviewFile -Encoding utf8
+    Write-Host "Review saved to: $reviewFile" -ForegroundColor Green
+
+    # ── 6. Post to GitHub (only with -AutoPost) ──────────────────────────────
+    if ($AutoPost) {
+        Write-Host "Posting review to PR #$PrNumber..." -ForegroundColor Cyan
+        gh pr review $PrNumber --comment --body-file $reviewFile
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to post review to GitHub."
+            exit 1
+        }
+        Write-Host "Review posted successfully!" -ForegroundColor Green
+    } else {
+        Write-Host ""
+        Write-Host "Review saved. To post it to GitHub, run:" -ForegroundColor Yellow
+        Write-Host "  gh pr review $PrNumber --comment --body-file `"$reviewFile`"" -ForegroundColor White
+    }
 
 }
 finally {
