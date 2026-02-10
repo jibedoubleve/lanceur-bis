@@ -20,6 +20,9 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = "jibedoubleve/lanceur-bis"
 
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 # ── 1. Resolve PR number from current branch ────────────────────────────────
 Write-Host "Detecting PR for current branch..." -ForegroundColor Cyan
 $prJson = gh pr view --json number 2>&1
@@ -32,7 +35,7 @@ Write-Host "Detected PR #$PrNumber" -ForegroundColor Green
 
 # ── 2. Fetch PR metadata ────────────────────────────────────────────────────
 Write-Host "Fetching PR #$PrNumber metadata..." -ForegroundColor Cyan
-$metaJson = gh pr view $PrNumber --json title,url,headRefName,baseRefName,files
+$metaJson = gh pr view $PrNumber --json title,url,headRefName,baseRefName,files 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to fetch PR #$PrNumber metadata."
     exit 1
@@ -52,6 +55,7 @@ Write-Host "  URL   : $prUrl" -ForegroundColor White
 # ── 3. Fetch diff ────────────────────────────────────────────────────────────
 Write-Host "Fetching diff..." -ForegroundColor Cyan
 $diffFile = [System.IO.Path]::GetTempFileName() + ".diff"
+try {
 $diffContent = gh pr diff $PrNumber 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Failed to fetch diff for PR #$PrNumber."
@@ -124,5 +128,8 @@ if ($AutoPost) {
     Write-Host "  gh pr review $PrNumber --comment --body-file `"$reviewFile`"" -ForegroundColor White
 }
 
-# ── Cleanup ──────────────────────────────────────────────────────────────────
-Remove-Item $diffFile -ErrorAction SilentlyContinue
+}
+finally {
+    # ── Cleanup ──────────────────────────────────────────────────────────────
+    Remove-Item $diffFile -ErrorAction SilentlyContinue
+}
