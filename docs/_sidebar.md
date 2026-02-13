@@ -6,6 +6,7 @@
   - [Keywords, Macros, Wildcards](pages/usermanual/2.keywords-macros-wildcards.md)
   - [Additional parameters](pages/usermanual/3.additional-params.md)
   - [Scripting with Lua](pages/usermanual/4.lua-scripting.md)
+    - [Lua script database](pages/usermanual/4.1.lua-script-db.md)
   - [Search with Everything](pages/usermanual/5.searcheverything.md)
   - [Bookmarks & Web shortcuts](pages/usermanual/6.bookmarks.md)
   - [Calculator](pages/usermanual/7.calculator.md)

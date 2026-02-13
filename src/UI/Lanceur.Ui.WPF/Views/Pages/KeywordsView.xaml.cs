@@ -1,12 +1,10 @@
 using System.Windows;
+using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.IoC;
+using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels.Pages;
-using Lanceur.Ui.WPF.Views.Controls;
 using Microsoft.Extensions.Logging;
-using Wpf.Ui;
-using Wpf.Ui.Controls;
-using Wpf.Ui.Extensions;
 
 namespace Lanceur.Ui.WPF.Views.Pages;
 
@@ -15,8 +13,7 @@ public partial class KeywordsView
 {
     #region Fields
 
-    private readonly CodeEditorControl _codeEditorControl;
-    private readonly IContentDialogService _contentDialogService;
+    private readonly LuaEditorView _luaEditorView;
     private readonly ILogger<KeywordsView> _logger;
     private readonly IUserCommunicationService _userCommunicationService;
 
@@ -26,13 +23,11 @@ public partial class KeywordsView
 
     public KeywordsView(
         KeywordsViewModel viewModel,
-        CodeEditorControl codeEditorControl,
-        IContentDialogService contentDialogService,
+        LuaEditorView luaEditorView,
         ILogger<KeywordsView> logger,
-        IUserCommunicationService  userCommunicationService)
+        IUserCommunicationService userCommunicationService)
     {
-        _codeEditorControl = codeEditorControl;
-        _contentDialogService = contentDialogService;
+        _luaEditorView = luaEditorView;
         _logger = logger;
         _userCommunicationService = userCommunicationService;
         DataContext = ViewModel = viewModel;
@@ -44,33 +39,23 @@ public partial class KeywordsView
 
     #region Properties
 
-    private KeywordsViewModel ViewModel { get;  }
+    private KeywordsViewModel ViewModel { get; }
 
     #endregion
 
     #region Methods
 
-    private async void OnClickCodeEditor(object sender, RoutedEventArgs e)
+    private void OnClickCodeEditor(object sender, RoutedEventArgs e)
     {
         try
         {
             if (ViewModel.SelectedAlias is null) return;
 
-            _codeEditorControl.Load(ViewModel.SelectedAlias);
+            _luaEditorView.LoadAlias(ViewModel.SelectedAlias);
 
-            var result = await _contentDialogService.ShowSimpleDialogAsync(
-                new()
-                {
-                    Title = "Edit Lua script",
-                    Content = _codeEditorControl,
-                    PrimaryButtonText = "Apply",
-                    CloseButtonText = "Cancel"
-                }
+            WeakReferenceMessenger.Default.Send(
+                new NavigationMessage((typeof(LuaEditorView), null))
             );
-
-            ViewModel.SelectedAlias.LuaScript = result == ContentDialogResult.Primary
-                ? _codeEditorControl.Apply()
-                : _codeEditorControl.Reset();
         }
         catch (Exception ex)
         {

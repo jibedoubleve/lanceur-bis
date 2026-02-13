@@ -2,6 +2,7 @@ using Shouldly;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
@@ -11,7 +12,10 @@ public class LuaManagerShould
 {
     #region Properties
 
-    private static ILuaManager LuaManager => new LuaManager(Substitute.For<IUserGlobalNotificationService>());
+    private static ILuaManager LuaManager => new LuaManager(
+        Substitute.For<IUserGlobalNotificationService>(),
+        Substitute.For<ILogger<LuaManager>>()
+    );
 
     #endregion
 
