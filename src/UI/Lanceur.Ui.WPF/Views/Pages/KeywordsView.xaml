@@ -35,13 +35,12 @@
             <ui:TextBox
                 x:Name="TbSearch"
                 Margin="5"
-                Text="{Binding Criterion}"
+                Text="{Binding Criterion, UpdateSourceTrigger=PropertyChanged}"
                 Icon="{ui:SymbolIcon Search24}"
                 IconPlacement="Right">
                 <interactivity:Interaction.Triggers>
                     <interactivity:EventTrigger EventName="TextChanged">
-                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}"
-                                                           CommandParameter="{Binding ElementName=TbSearch, Path=Text}" />
+                        <interactivity:InvokeCommandAction Command="{Binding SearchCommand}" />
                     </interactivity:EventTrigger>
                 </interactivity:Interaction.Triggers>
             </ui:TextBox>
