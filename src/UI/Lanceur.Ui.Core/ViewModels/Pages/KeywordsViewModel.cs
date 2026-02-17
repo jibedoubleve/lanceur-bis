@@ -327,19 +327,19 @@ public partial class KeywordsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OnSearch(string criterion)
+    private void OnSearch()
     {
-        if (criterion.IsNullOrWhiteSpace())
+        if (Criterion.IsNullOrWhiteSpace())
         {
             Aliases = new(_cachedAliases);
             return;
         }
 
-        criterion = criterion.ToLower();
-        var aliases = _cachedAliases.Where(x => x.Name.ToLower().StartsWith(criterion))
+        var aliases = _cachedAliases.Where(
+                                        x => x.Name.StartsWith(Criterion, StringComparison.CurrentCultureIgnoreCase))
                                     .ToArray();
 
-        _logger.LogTrace("Found {Count} alias(es) with criterion {Criterion}", aliases.Length, criterion);
+        _logger.LogTrace("Found {Count} alias(es) with criterion {Criterion}", aliases.Length, Criterion);
         Aliases = new(aliases);
     }
 
