@@ -83,9 +83,9 @@ public class ReservedAliasStore : Store, IStoreService
 
             if (instance is not SelfExecutableQueryResult qr) continue;
 
-            var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
             _aliasRepository.SetHiddenAliasUsage(qr);
-
+            
+            var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
             qr.Name = name;
             qr.Description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)
                 ?.Description;

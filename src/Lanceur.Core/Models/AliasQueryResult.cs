@@ -8,17 +8,6 @@ namespace Lanceur.Core.Models;
 [DebuggerDisplay("{Id} - Name: {Name} - Synonyms: {Synonyms}")]
 public class AliasQueryResult : ExecutableQueryResult, IElevated
 {
-    #region Fields
-
-    private ObservableCollection<AdditionalParameter> _additionalParameters = new();
-    private string _fileName;
-
-    private string _luaScript;
-
-    private string _synonyms;
-
-    #endregion
-
     #region Properties
 
     /// <summary>
@@ -27,9 +16,9 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     /// </summary>
     public ObservableCollection<AdditionalParameter> AdditionalParameters
     {
-        get => _additionalParameters;
-        set => SetField(ref _additionalParameters, value);
-    }
+        get;
+        set => SetField(ref field, value);
+    } = new();
 
     public int Delay { get; set; }
 
@@ -39,8 +28,8 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 
     public string FileName
     {
-        get => _fileName;
-        set => SetField(ref _fileName, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     /// <summary>
@@ -67,8 +56,8 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     /// </summary>
     public string LuaScript
     {
-        get => _luaScript;
-        set => SetField(ref _luaScript, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     public new static IEnumerable<AliasQueryResult> NoResult => new List<AliasQueryResult>();
@@ -82,10 +71,10 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     /// </summary>
     public string Synonyms
     {
-        get => _synonyms;
+        get;
         set
         {
-            SetField(ref _synonyms, value);
+            SetField(ref field, value);
             OnPropertyChanged(nameof(SynonymsToAdd));
         }
     }
