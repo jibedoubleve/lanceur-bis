@@ -1,20 +1,16 @@
 ﻿using System.Data;
 using Bogus;
 using Dapper;
-using Shouldly;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tools;
-using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
+using Shouldly;
 using Xunit;
 using static Lanceur.SharedKernel.Constants;
 
@@ -46,7 +42,7 @@ public class SQLiteAliasRepositoryShould : TestBase
             Icon = faker.Image.PlaceholderUrl(150, 150)
         };
     }
-    
+
     private AliasDbAction BuildAliasDbAction(ILoggerFactory loggerFactory = null)
     {
         var log = loggerFactory ?? CreateLoggerFactory();
@@ -87,7 +83,7 @@ public class SQLiteAliasRepositoryShould : TestBase
                            insert into alias_name(id, name, id_alias) values (200, 'some_name_1', 1002);
                            insert into alias_name(id, name, id_alias) values (300, 'some_name_2', 1003);
                            """;
-        
+
         var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
         var c = new DbSingleConnectionManager(connection);
         var aliasAction = BuildAliasDbAction();
@@ -175,7 +171,7 @@ public class SQLiteAliasRepositoryShould : TestBase
                            insert into alias_name(id, name, id_alias) values (2000, 'noname', 1002);
                            insert into alias_name(id, name, id_alias) values (3000, 'noname', 1003);
                            """;
-        
+
         var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
         var action = BuildAliasDbAction();
 
@@ -256,15 +252,15 @@ public class SQLiteAliasRepositoryShould : TestBase
         service.SaveOrUpdate(ref alias3);
 
         //ASSERT
-            const string sql2 = "select count(*) from alias;";
-            const string sql3 = "select count(*) from alias_name;";
-            Assert.Multiple(
-                () => alias1.Name.ShouldBe(name1),
-                () => alias2.Name.ShouldBe(name2),
-                () => alias3.Name.ShouldBe(name3),
-                () => connection.ExecuteScalar<int>(sql2).ShouldBe(6),
-                () => connection.ExecuteScalar<int>(sql3).ShouldBe(6)
-            );
+        const string sql2 = "select count(*) from alias;";
+        const string sql3 = "select count(*) from alias_name;";
+        Assert.Multiple(
+            () => alias1.Name.ShouldBe(name1),
+            () => alias2.Name.ShouldBe(name2),
+            () => alias3.Name.ShouldBe(name3),
+            () => connection.ExecuteScalar<int>(sql2).ShouldBe(6),
+            () => connection.ExecuteScalar<int>(sql3).ShouldBe(6)
+        );
     }
 
     [Fact]
@@ -418,13 +414,13 @@ public class SQLiteAliasRepositoryShould : TestBase
         // ACT
         c.WithinTransaction(tx => action.Remove(tx, new()  { Id = 256 }));
 
-            // ASSERT
-            const string sql2 = "select count(*) from alias where id = 256";
-            const string sql3 = "select count(*) from alias_name where id_alias = 256";
-            connection.ShouldSatisfyAllConditions(
-                co => co.ExecuteScalar<int>(sql2).ShouldBe(0),
-                co => co.ExecuteScalar<int>(sql3).ShouldBe(0)
-            );
+        // ASSERT
+        const string sql2 = "select count(*) from alias where id = 256";
+        const string sql3 = "select count(*) from alias_name where id_alias = 256";
+        connection.ShouldSatisfyAllConditions(
+            co => co.ExecuteScalar<int>(sql2).ShouldBe(0),
+            co => co.ExecuteScalar<int>(sql3).ShouldBe(0)
+        );
     }
 
     [Fact]
@@ -481,6 +477,5 @@ public class SQLiteAliasRepositoryShould : TestBase
             s => s.ElementAt(0).RunAs.ShouldBe(RunAs.Admin)
         );
     }
-
     #endregion
 }
