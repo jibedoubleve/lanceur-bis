@@ -84,12 +84,9 @@ public class SetUsageDbAction
         if (alias.Count < 0) return;
 
         var aliasDbAction = _dbActionFactory.AliasManagement;
-        if (alias.Id  == 0)
+        if (alias.Id == 0)
         {
-            if (alias is AliasQueryResult aqr &&  aliasDbAction.TryFind(tx, ref aqr))
-                alias!.Id = aqr.Id;
-            else
-                aliasDbAction.CreateInvisible(tx, ref alias);
+            aliasDbAction.CreateInvisible(tx, ref alias);
         }
 
         AddHistory(tx, ref alias);
