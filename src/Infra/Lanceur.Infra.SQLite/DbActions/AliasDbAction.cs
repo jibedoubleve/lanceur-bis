@@ -126,6 +126,7 @@ public class AliasDbAction
 
         var queryResult = exec.ToAliasQueryResult();
         queryResult.IsHidden = true;
+        queryResult.FileName = exec.Name; // By convention for builtin keyword
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
 
@@ -398,7 +399,8 @@ public class AliasDbAction
                                alias 
                            where
                                file_name = @fileName
-                               and hidden = true
+                               and hidden is true
+                               and deleted_at is null
                            order by
                                exec_count desc
                            """;
