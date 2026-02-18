@@ -294,5 +294,69 @@ public class MainViewModelShould : ViewModelTester<MainViewModel>
         );
     }
 
+    /// <summary>
+    /// Regression test for bug #1185: executing a builtin keyword multiple times
+    /// should reuse the existing dummy alias, not create a duplicate.
+    /// </summary>
+    [Fact]
+    public async Task ShowCorrectUsageForBuiltinKeywords()
+    {
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                const int count = 5; 
+                for(var i = 0; i < count; i++)
+                {
+                    viewModel.Query = "logs";
+                    await viewModel.SearchCommand.ExecuteAsync(null);
+                    await viewModel.ExecuteCommand.ExecuteAsync(false);
+                }
+                
+                // Assert
+                const string sqlDistinctAliases = "select count(distinct id_alias) from alias_usage";
+                const string sqlCountUsage = "select count(*) from alias_usage";
+                    
+                Assert.Multiple(
+                    () => db.WithConnection(c => c.ExecuteScalar(sqlDistinctAliases).ShouldBe(1)),
+                    () => db.WithConnection(c => c.ExecuteScalar(sqlCountUsage).ShouldBe(count))
+                );
+            },
+            Sql.Empty
+        );
+    }
+    
+    [Fact]
+    public async Task Show_correct_usage_for_regular_alias()
+    {
+        await TestViewModelAsync(
+            async (viewModel, db) =>
+            {
+                // Arrange
+                const int count = 5;
+                var sql =  new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+                                           .ToSql();
+                db.WithConnection(c => c.ExecuteScalar(sql));
+                
+                // Act
+                for (var i = 0; i < count; i++)
+                {
+                    viewModel.Query = "alias1";
+                    await viewModel.SearchCommand.ExecuteAsync(null);
+                    await viewModel.ExecuteCommand.ExecuteAsync(false);
+                }
+
+                // Assert
+                const string sqlDistinctAliases = "select count(distinct id_alias) from alias_usage";
+                const string sqlCountUsage = "select count(*) from alias_usage";
+
+                Assert.Multiple(
+                    () => db.WithConnection(c => c.ExecuteScalar(sqlDistinctAliases).ShouldBe(1)),
+                    () => db.WithConnection(c => c.ExecuteScalar(sqlCountUsage).ShouldBe(count))
+                );
+            },
+            Sql.Empty
+        );
+    }
+
     #endregion
 }
