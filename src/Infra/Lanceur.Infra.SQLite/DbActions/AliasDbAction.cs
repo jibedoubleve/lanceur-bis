@@ -378,41 +378,5 @@ public class AliasDbAction
         return new(result);
     }
 
-
-    /// <summary>
-    ///     Attempts to find the specified alias in the database. If found, updates the alias's ID and returns <c>true</c>.
-    ///     If not found, returns <c>false</c> and leaves the alias unchanged.
-    ///     The method performs a database query to find aliases matching the following criteria:
-    ///     - Same <c>file_name</c>
-    ///     - Alias is marked as hidden (<c>hidden = true</c>)
-    ///     If multiple aliases are found, the method will return <c>false</c>.
-    /// </summary>
-    /// <param name="tx">The database transaction to be used for querying.</param>
-    /// <param name="alias">The alias to search for. If found, its ID will be updated.</param>
-    /// <returns><c>true</c> if the alias was found and its ID was updated; otherwise, <c>false</c>.</returns>
-    internal bool TryFind(IDbTransaction tx, ref AliasQueryResult alias)
-    {
-        const string sql = """
-                           select
-                               Id 
-                           from
-                               alias 
-                           where
-                               file_name = @fileName
-                               and hidden is true
-                               and deleted_at is null
-                           order by
-                               exec_count desc
-                           """;
-        var foundAlias = tx.Connection!.Query<AliasQueryResult>(
-                               sql,
-                               new { fileName = alias.FileName }
-                           )
-                           .SingleOrDefault();
-
-        if (foundAlias is not null) alias.Id = foundAlias.Id;
-        return foundAlias is not null;
-    }
-
     #endregion
 }
