@@ -25,7 +25,16 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     public override string DescriptionDisplay => Description.IsNullOrEmpty() ? FileName : Description;
 
     public static AliasQueryResult EmptyForCreation => new() { Name = "new alias" };
-
+    
+    /// <remarks>
+    /// <see cref="FileName"/> may be <see langword="null"/> at runtime despite the
+    /// non-nullable declaration. Nullable reference type analysis is disabled
+    /// project-wide; callers must guard against <see langword="null"/> explicitly.
+    /// <para>
+    /// Nullable enforcement is pending project-wide activation (see issue #1227),
+    /// after which this property will be declared as <c>string?</c>.
+    /// </para>
+    /// </remarks>
     public string FileName
     {
         get;

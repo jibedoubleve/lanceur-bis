@@ -30,6 +30,8 @@ public static class AliasQueryResultExtensions
     /// <param name="alias">The <see cref="AliasQueryResult"/> to sanitize</param>
     public static void SanitizeFileName(this AliasQueryResult alias)
     {
+        if (alias?.FileName is null) { return; }
+        
         alias.FileName = alias.FileName.Replace("\"", string.Empty);
     }
 
