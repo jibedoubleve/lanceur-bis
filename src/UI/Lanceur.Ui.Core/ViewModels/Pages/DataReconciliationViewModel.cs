@@ -245,16 +245,22 @@ public partial class DataReconciliationViewModel : ObservableObject
         if (selectedAliases.Count == 0) return;
 
 
-        var alias = await Task.Run(() => _repository.GetById(
-                selectedAliases.FirstOrDefault()!.Id
-            )
-        );
-        _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
-        var parameters = _repository.GetAdditionalParameter(
-                                        selectedAliases.Select(item => item.Id)
-                                    )
-                                    .ToList();
+        var (alias, parameters) = await Task.Run(() => {
+            var alias = _repository.GetById(selectedAliases.FirstOrDefault()!.Id);
 
+            _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
+
+            var parameters = _repository.GetAdditionalParameter(
+                selectedAliases.Select(item => item.Id)
+            ).ToList();
+
+            return (alias, parameters);
+        });
+        
+        /* To be thread safe, this code should NOT be in the upper Task. If AdditionalParameters and AddDistinctSynonyms
+         * raise a PropertyChanged event it'll be from the thread and will handled in the UI thread. This could lead to
+         * a cross-thread exception...
+         */
         alias.AdditionalParameters = new(parameters);
         alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
 

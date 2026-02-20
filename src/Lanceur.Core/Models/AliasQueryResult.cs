@@ -18,7 +18,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     {
         get;
         set => SetField(ref field, value);
-    } = new();
+    } = [];
 
     public int Delay { get; set; }
 
