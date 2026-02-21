@@ -174,7 +174,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
-                         .AddTransientConditional<IProcessLauncher, ProcessLauncherLogger, ProcessLauncherWin32>()
+                         .AddTransientConditional<IProcessLauncher, ProcessLauncherNoOp, ProcessLauncherWin32>()
                          .AddSingletonConditional<IInfrastructureSettingsProvider,
                              MemoryInfrastructureSettingsProvider, JsonInfrastructureSettingsProvider>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()

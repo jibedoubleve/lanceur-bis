@@ -1,4 +1,4 @@
-namespace Lanceur.Infra.Win32.Services;
+namespace Lanceur.Core.Services;
 
 public interface IAppRestartService
 {
