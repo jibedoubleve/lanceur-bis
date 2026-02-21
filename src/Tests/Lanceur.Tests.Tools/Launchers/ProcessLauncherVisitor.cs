@@ -2,22 +2,22 @@ using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 
-namespace Lanceur.Infra.Services;
+namespace Lanceur.Tests.Tools.Launchers;
 
 public class ProcessLauncherVisitor : IProcessLauncher
 {
     #region Fields
 
-    private readonly Action<string> _pathVisitor;
-    private readonly Action<ProcessContext> _processContextVisitor;
+    private readonly Action<string>? _pathVisitor;
+    private readonly Action<ProcessContext>? _processContextVisitor;
 
     #endregion
 
     #region Constructors
 
     public ProcessLauncherVisitor(
-        Action<ProcessContext> processContextVisitor = null,
-        Action<string> pathVisitor = null
+        Action<ProcessContext>? processContextVisitor = null,
+        Action<string>? pathVisitor = null
     )
     {
         _processContextVisitor = processContextVisitor;

@@ -5,7 +5,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Mappers;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.Services;
+namespace Lanceur.Infra.Win32.Services;
 
 public class ProcessLauncherWin32 : IProcessLauncher
 {

@@ -6,17 +6,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
-public class ProcessLauncherLogger : IProcessLauncher
+public class ProcessLauncherDebug : IProcessLauncher
 {
     #region Fields
 
-    private readonly ILogger<ProcessLauncherLogger> _logger;
+    private readonly ILogger<ProcessLauncherDebug> _logger;
 
     #endregion
 
     #region Constructors
 
-    public ProcessLauncherLogger(ILogger<ProcessLauncherLogger> logger) => _logger = logger;
+    public ProcessLauncherDebug(ILogger<ProcessLauncherDebug> logger) => _logger = logger;
 
     #endregion
 

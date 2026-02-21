@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
+using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Win32.Services;
 
