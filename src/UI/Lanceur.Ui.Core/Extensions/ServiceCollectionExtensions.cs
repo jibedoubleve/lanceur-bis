@@ -55,81 +55,85 @@ public static class ServiceCollectionExtensions
         => serviceCollection.AddSingleton(typeof(ISection<>), typeof(ConfigurationSection<>))
                             .AddSingleton(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
 
-    public static void AddLoggers(
-        this IServiceCollection serviceCollection,
-        HostBuilderContext context,
-        ServiceProvider serviceProvider
-    )
+    public static IHostBuilder AddLoggers(this IHostBuilder hostBuilder)
     {
-        var configurationFacadeService = serviceProvider.GetRequiredService<IConfigurationFacade>();
-        var logEventLevel = new Conditional<LogEventLevel>(
-            LogEventLevel.Debug,
-            configurationFacadeService.GetMinimumLogLevel()
-        );
-        var levelSwitch = new LoggingLevelSwitch(logEventLevel);
-        var telemetry = serviceProvider.GetRequiredService<IConfigurationFacade>().Local.Telemetry;
-
-        serviceCollection.AddSingleton(levelSwitch);
-
-        var loggerCfg = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch)
-                                                 .Enrich.FromLogContext()
-                                                 .Enrich.WithEnvironmentUserName()
-                                                 .WriteTo.Console();
-
-        ConditionalExecution.Execute(
-            ConfigureLogForDebug,
-            ConfigureLogForRelease
-        );
-
-        serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
-        Log.Logger = loggerCfg.CreateLogger();
-
-        return;
-
-        void ConfigureLogForDebug()
-        {
-            if (telemetry.IsSeqEnabled)
-            {
-                // For now, only seq is configured in my development machine and not anymore in AWS.
-                var apiKey = context.Configuration["SEQ_LANCEUR"];
-                if (apiKey is null)
-                    throw new NotSupportedException(
-                        "Api key not found. Create a environment variable 'SEQ_LANCEUR' with the api key"
+        hostBuilder.ConfigureServices((_, services) => services.AddSingleton(sp =>
+                {
+                    var facade = sp.GetRequiredService<IConfigurationFacade>();
+                    var logEventLevel = new Conditional<LogEventLevel>(
+                        LogEventLevel.Debug,
+                        facade.GetMinimumLogLevel()
                     );
+                    return new LoggingLevelSwitch(logEventLevel);
+                }
+            )
+        );
 
-                loggerCfg.WriteTo.Seq(
-                    Paths.TelemetryUrlSeq,
-                    apiKey: apiKey
+        return hostBuilder.UseSerilog((context, services, loggerCfg) =>
+            {
+                var levelSwitch = services.GetRequiredService<LoggingLevelSwitch>();
+                var telemetry = services.GetRequiredService<IConfigurationFacade>().Local.Telemetry;
+
+                loggerCfg.MinimumLevel.ControlledBy(levelSwitch)
+                         .Enrich.FromLogContext()
+                         .Enrich.WithEnvironmentUserName()
+                         .WriteTo.Console();
+
+                ConditionalExecution.Execute(
+                    ConfigureLogForDebug,
+                    ConfigureLogForRelease
                 );
+
+                return;
+
+                void ConfigureLogForDebug()
+                {
+                    if (telemetry.IsSeqEnabled)
+                    {
+                        // For now, only seq is configured in my development machine and not anymore in AWS.
+                        var apiKey = context.Configuration["SEQ_LANCEUR"];
+                        if (apiKey is null)
+                            throw new NotSupportedException(
+                                "Api key not found. Create a environment variable 'SEQ_LANCEUR' with the api key"
+                            );
+
+                        loggerCfg.WriteTo.Seq(
+                            Paths.TelemetryUrlSeq,
+                            apiKey: apiKey
+                        );
+                    }
+
+                    if (telemetry.IsLokiEnabled)
+                        loggerCfg.WriteTo.GrafanaLoki(
+                            Paths.TelemetryUrlLoki,
+                            [
+                                new() { Key = "app", Value = "lanceur-bis" },
+                                new() { Key = "env", Value = new Conditional<string>("dev", "prod") }
+                            ]
+                        );
+                }
+
+                void ConfigureLogForRelease()
+                {
+                    if (telemetry.IsClefEnabled)
+                        // Clef file, easier to import into SEQ
+                        loggerCfg.WriteTo.File(
+                            new CompactJsonFormatter(),
+                            Paths.ClefLogFile,
+                            rollingInterval: RollingInterval.Day
+                        );
+
+                    // Raw log file, easier to read
+                    loggerCfg.WriteTo.File(
+                        new MessageTemplateTextFormatter(
+                            "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                        ),
+                        Paths.RawLogFile,
+                        rollingInterval: RollingInterval.Day
+                    );
+                }
             }
-
-            if (telemetry.IsLokiEnabled)
-                loggerCfg.WriteTo.GrafanaLoki(
-                    Paths.TelemetryUrlLoki,
-                    [
-                        new()  { Key = "app", Value = "lanceur-bis" },
-                        new()  { Key = "env", Value = new Conditional<string>("dev", "prod") }
-                    ]
-                );
-        }
-
-        void ConfigureLogForRelease()
-        {
-            if (telemetry.IsClefEnabled)
-                // Clef file, easier to import into SEQ
-                loggerCfg.WriteTo.File(
-                    new CompactJsonFormatter(),
-                    Paths.ClefLogFile,
-                    rollingInterval: RollingInterval.Day
-                );
-
-            // Raw log file, easier to read
-            loggerCfg.WriteTo.File(
-                new MessageTemplateTextFormatter("[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"),
-                Paths.RawLogFile,
-                rollingInterval: RollingInterval.Day
-            );
-        }
+        );
     }
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
