@@ -36,30 +36,30 @@ public partial class App
 {
     #region Fields
 
-    private static readonly IHost Host = Microsoft.Extensions.Hosting.Host
-                                                  .CreateDefaultBuilder()
-                                                  .ConfigureServices((context, services) =>
-                                                      {
-                                                          services.AddTrackedMemoryCache()
-                                                                  .RegisterView("Lanceur.Ui.WPF")
-                                                                  .RegisterViewModel("Lanceur.Ui.Core")
-                                                                  .Register("Control", "Lanceur.Ui.WPF")
-                                                                  .AddServices()
-                                                                  .AddWpfServices()
-                                                                  .AddStoreServices()
-                                                                  .AddCommands()
-                                                                  .AddConfiguration()
-                                                                  .AddDatabaseServices()
-                                                                  .AddLoggers(context, services.BuildServiceProvider());
-                                                      }
-                                                  )
-                                                  .ConfigureAppConfiguration((context, config) =>
-                                                      {
-                                                          if (context.HostingEnvironment.IsDevelopment())
-                                                              config.AddUserSecrets<App>();
-                                                      }
-                                                  )
-                                                  .Build();
+    private static readonly IHost Host
+        = Microsoft.Extensions.Hosting.Host
+                   .CreateDefaultBuilder()
+                   .ConfigureServices((_, services) =>
+                       {
+                           services.AddTrackedMemoryCache()
+                                   .RegisterView("Lanceur.Ui.WPF")
+                                   .RegisterViewModel("Lanceur.Ui.Core")
+                                   .Register("Control", "Lanceur.Ui.WPF")
+                                   .AddServices()
+                                   .AddWpfServices()
+                                   .AddStoreServices()
+                                   .AddCommands()
+                                   .AddConfiguration()
+                                   .AddDatabaseServices();
+                       }
+                   )
+                   .AddLoggers()
+                   .ConfigureAppConfiguration((context, config) =>
+                       {
+                           if (context.HostingEnvironment.IsDevelopment()) config.AddUserSecrets<App>();
+                       }
+                   )
+                   .Build();
 
     #endregion
 
