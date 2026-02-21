@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -33,7 +34,10 @@ public class ProcessLauncherWin32 : IProcessLauncher
     #region Methods
 
     /// <inheritdoc />
-    public void Open(string path) => Process.Start("explorer.exe", path);
+    public void Open(string path) => Process.Start(
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"),
+        path
+    );
 
     /// <inheritdoc />
     public void Start(ProcessContext context)
