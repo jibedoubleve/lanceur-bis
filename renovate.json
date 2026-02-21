@@ -1,7 +1,10 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "commitMessage": "(chore) Renovate: {{commitMessagePrefix}}Update {{depName}} to {{newVersion}}"
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended"
+	],
+	"commitMessagePrefix": "(chore) Renovate:",
+	"commitMessageAction": "Update",
+	"commitMessageTopic": "{{depName}}",
+	"commitMessageExtra": "to {{newVersion}}"
 }
