@@ -55,85 +55,84 @@ public static class ServiceCollectionExtensions
         => serviceCollection.AddSingleton(typeof(ISection<>), typeof(ConfigurationSection<>))
                             .AddSingleton(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
 
-    public static IHostBuilder AddLoggers(this IHostBuilder hostBuilder)
+    public static void AddLoggers(
+        this IServiceCollection serviceCollection,
+        HostBuilderContext context
+    )
     {
-        hostBuilder.ConfigureServices((_, services) => services.AddSingleton(sp =>
-                {
-                    var facade = sp.GetRequiredService<IConfigurationFacade>();
-                    var logEventLevel = new Conditional<LogEventLevel>(
-                        LogEventLevel.Debug,
-                        facade.GetMinimumLogLevel()
-                    );
-                    return new LoggingLevelSwitch(logEventLevel);
-                }
-            )
+        var settingsProvider = InfrastructureSettingsProviderFactory.GetInstance();
+        settingsProvider.Load();
+        
+        var minLogLevel = settingsProvider.Current.GetMinimumLogLevel();
+        var telemetry = settingsProvider.Current.Telemetry;
+        
+        var logEventLevel = new Conditional<LogEventLevel>(
+            LogEventLevel.Debug,
+            minLogLevel
+        );
+        var levelSwitch = new LoggingLevelSwitch(logEventLevel);
+
+        serviceCollection.AddSingleton(levelSwitch);
+
+        var loggerCfg = new LoggerConfiguration().MinimumLevel.ControlledBy(levelSwitch)
+                                                 .Enrich.FromLogContext()
+                                                 .Enrich.WithEnvironmentUserName()
+                                                 .WriteTo.Console();
+
+        ConditionalExecution.Execute(
+            ConfigureLogForDebug,
+            ConfigureLogForRelease
         );
 
-        return hostBuilder.UseSerilog((context, services, loggerCfg) =>
+        serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
+        Log.Logger = loggerCfg.CreateLogger();
+
+        return;
+
+        void ConfigureLogForDebug()
+        {
+            if (telemetry.IsSeqEnabled)
             {
-                var levelSwitch = services.GetRequiredService<LoggingLevelSwitch>();
-                var telemetry = services.GetRequiredService<IConfigurationFacade>().Local.Telemetry;
+                // For now, only seq is configured in my development machine and not anymore in AWS.
+                var apiKey = context.Configuration["SEQ_LANCEUR"];
+                if (apiKey is null)
+                    throw new NotSupportedException(
+                        "Api key not found. Create a environment variable 'SEQ_LANCEUR' with the api key"
+                    );
 
-                loggerCfg.MinimumLevel.ControlledBy(levelSwitch)
-                         .Enrich.FromLogContext()
-                         .Enrich.WithEnvironmentUserName()
-                         .WriteTo.Console();
+                loggerCfg.WriteTo.Seq(
+                    Paths.TelemetryUrlSeq,
+                    apiKey: apiKey
+                );
+            }
 
-                ConditionalExecution.Execute(
-                    ConfigureLogForDebug,
-                    ConfigureLogForRelease
+            if (telemetry.IsLokiEnabled)
+                loggerCfg.WriteTo.GrafanaLoki(
+                    Paths.TelemetryUrlLoki,
+                    [
+                        new()  { Key = "app", Value = "lanceur-bis" },
+                        new()  { Key = "env", Value = new Conditional<string>("dev", "prod") }
+                    ]
+                );
+        }
+
+        void ConfigureLogForRelease()
+        {
+            if (telemetry.IsClefEnabled)
+                // Clef file, easier to import into SEQ
+                loggerCfg.WriteTo.File(
+                    new CompactJsonFormatter(),
+                    Paths.ClefLogFile,
+                    rollingInterval: RollingInterval.Day
                 );
 
-                return;
-
-                void ConfigureLogForDebug()
-                {
-                    if (telemetry.IsSeqEnabled)
-                    {
-                        // For now, only seq is configured in my development machine and not anymore in AWS.
-                        var apiKey = context.Configuration["SEQ_LANCEUR"];
-                        if (apiKey is null)
-                            throw new NotSupportedException(
-                                "Api key not found. Create a environment variable 'SEQ_LANCEUR' with the api key"
-                            );
-
-                        loggerCfg.WriteTo.Seq(
-                            Paths.TelemetryUrlSeq,
-                            apiKey: apiKey
-                        );
-                    }
-
-                    if (telemetry.IsLokiEnabled)
-                        loggerCfg.WriteTo.GrafanaLoki(
-                            Paths.TelemetryUrlLoki,
-                            [
-                                new() { Key = "app", Value = "lanceur-bis" },
-                                new() { Key = "env", Value = new Conditional<string>("dev", "prod") }
-                            ]
-                        );
-                }
-
-                void ConfigureLogForRelease()
-                {
-                    if (telemetry.IsClefEnabled)
-                        // Clef file, easier to import into SEQ
-                        loggerCfg.WriteTo.File(
-                            new CompactJsonFormatter(),
-                            Paths.ClefLogFile,
-                            rollingInterval: RollingInterval.Day
-                        );
-
-                    // Raw log file, easier to read
-                    loggerCfg.WriteTo.File(
-                        new MessageTemplateTextFormatter(
-                            "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-                        ),
-                        Paths.RawLogFile,
-                        rollingInterval: RollingInterval.Day
-                    );
-                }
-            }
-        );
+            // Raw log file, easier to read
+            loggerCfg.WriteTo.File(
+                new MessageTemplateTextFormatter("[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"),
+                Paths.RawLogFile,
+                rollingInterval: RollingInterval.Day
+            );
+        }
     }
 
     public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
@@ -154,10 +153,8 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IAliasManagementService, AliasManagementService>()
                          .AddTransient<IClipboardService, ClipboardService>()
                          .AddTransient<IAliasRepository, SQLiteAliasRepository>()
-                         .AddTransient<IDbConnection, SQLiteConnection>(sp => new(
-                                 sp.GetService<IConnectionString>()!
-                                   .ToString()
-                             )
+                         .AddTransient<IDbConnection, SQLiteConnection>(sp
+                             => new(sp.GetService<IConnectionString>()!.ToString())
                          )
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
@@ -179,13 +176,11 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
                          .AddTransientConditional<IProcessLauncher, ProcessLauncherNoOp, ProcessLauncherWin32>()
-                         .AddSingletonConditional<IInfrastructureSettingsProvider,
-                             MemoryInfrastructureSettingsProvider, JsonInfrastructureSettingsProvider>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
-                         .AddSingleton<IEnigma, Enigma>();
-
-
+                         .AddSingleton<IEnigma, Enigma>()
+                         .RegisterInfrastructureSettingsProvider();
+        
         return serviceCollection;
     }
 
