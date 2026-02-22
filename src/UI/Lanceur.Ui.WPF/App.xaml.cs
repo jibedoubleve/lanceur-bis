@@ -39,7 +39,7 @@ public partial class App
     private static readonly IHost Host
         = Microsoft.Extensions.Hosting.Host
                    .CreateDefaultBuilder()
-                   .ConfigureServices((_, services) =>
+                   .ConfigureServices((context, services) =>
                        {
                            services.AddTrackedMemoryCache()
                                    .RegisterView("Lanceur.Ui.WPF")
@@ -50,10 +50,10 @@ public partial class App
                                    .AddStoreServices()
                                    .AddCommands()
                                    .AddConfiguration()
-                                   .AddDatabaseServices();
+                                   .AddDatabaseServices()
+                                   .AddLoggers(context);
                        }
                    )
-                   .AddLoggers()
                    .ConfigureAppConfiguration((context, config) =>
                        {
                            if (context.HostingEnvironment.IsDevelopment()) config.AddUserSecrets<App>();

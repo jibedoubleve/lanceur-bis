@@ -1,16 +1,16 @@
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Configuration.Configurations;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
 
 namespace Lanceur.Ui.Core.Extensions;
 
-public static class SettingsFacadeServiceExtension
+public static class InfrastructureSettingsExtension
 {
     #region Methods
 
-    public static LogEventLevel GetMinimumLogLevel(this IConfigurationFacade src)
+    public static LogEventLevel GetMinimumLogLevel(this InfrastructureSettings stg)
     {
-        return src.Local.MinimumLogLevel switch
+        return stg.MinimumLogLevel switch
         {
             LogLevel.Trace       => LogEventLevel.Verbose,
             LogLevel.Debug       => LogEventLevel.Debug,
@@ -20,7 +20,7 @@ public static class SettingsFacadeServiceExtension
             LogLevel.Critical    => LogEventLevel.Fatal,
             LogLevel.None        => LogEventLevel.Information,
             _                    => throw new ArgumentOutOfRangeException(
-                $"The log level '{src.Local.MinimumLogLevel}' is not supported."
+                $"The log level '{stg.MinimumLogLevel}' is not supported."
             )
         };
     }
