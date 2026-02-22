@@ -3,7 +3,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Shouldly;
 using Lanceur.Core;
-using Lanceur.Core.Mappers;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -12,6 +13,7 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
+using Lanceur.Infra.Stores;
 using Lanceur.Infra.Utils;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
@@ -19,9 +21,7 @@ using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.Macros;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Lanceur.Tests.Services;
 
@@ -39,28 +39,45 @@ public class MacroServiceShould : TestBase
     public void BeCastedToSelfExecutableQueryResult()
     {
         // ARRANGE
-        var srcNamespace = typeof(MultiMacro).Namespace!;
         var asm = Assembly.GetAssembly(typeof(MultiMacro));
-
-        var types = asm!.GetTypes()
-                        .Where(type => { return type.Namespace != null && type.Namespace.StartsWith(srcNamespace); })
-                        // I'll exclude all the anonymous class from the query
-                        .Where(type => !type.IsDefined(typeof(CompilerGeneratedAttribute), false))
-                        .ToArray();
+        var serviceProvider = new ServiceCollection()
+                              .AddSingleton(
+                                  new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! }
+                              )
+                              .AddSingleton<ILoggerFactory, LoggerFactory>()
+                              .AddMockSingleton<ILogger<MacroAliasExpanderService>>()
+                              .AddMockSingleton<IExecutionService>()
+                              .AddMockSingleton<ISearchService>()
+                              .AddMockSingleton<IAliasRepository>()
+                              .AddSingleton<MacroAliasExpanderService>()
+                              .AddMockSingleton<IClipboardService>()
+                              .AddSingleton(_ => asm)
+                              .AddLoggerFactoryForTests(OutputHelper)
+                              .AddLogging()
+                              .AddMockSingleton<IGithubService>()
+                              .AddMockSingleton<IUserGlobalNotificationService>()
+                              .AddMockSingleton<IEnigma>()
+                              .AddMockSingleton<ISection<GithubSection>>()
+                              .AddMacroServices()
+                              .BuildServiceProvider();
+        
+        
         // ACT
+        var macros = serviceProvider.GetServices<MacroQueryResult>()
+                                    .ToList();
+        
         // ASSERT
-        types.Length.ShouldBeGreaterThan(0, "there are preconfigured macros");
-        var sp = new ServiceCollection().AddMockSingleton<IExecutionService>()
-                                        .AddMockSingleton<ISearchService>()
-                                        .BuildServiceProvider();
+        
+        macros.ShouldNotBeNull();
+        macros!.Count.ShouldBeGreaterThan(0, "there are preconfigured macros");
+        
         Assert.All(
-            types,
-            type =>
+            macros,
+            macro =>
             {
-                OutputHelper.WriteLine($"Checking '{type.FullName}'");
-                var sut = Activator.CreateInstance(type, sp);
-                sut.ShouldBeAssignableTo(typeof(SelfExecutableQueryResult));
-                sut.ShouldBeAssignableTo(typeof(MacroQueryResult));
+                OutputHelper.WriteLine($"Checking '{macro.Name}'");
+                macro.ShouldBeAssignableTo(typeof(SelfExecutableQueryResult));
+                macro.ShouldBeAssignableTo(typeof(MacroQueryResult));
             }
         );
     }
@@ -85,19 +102,18 @@ public class MacroServiceShould : TestBase
     [InlineData("some", "a z e r t y")]
     public async Task BeExecutable(string name, string parameters)
     {
-        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroAliasExpanderService>>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                                     .AddSingleton<MacroService>()
+                                                     .AddSingleton<MacroAliasExpanderService>()
                                                      .BuildServiceProvider();
-        var macroMgr = serviceProvider.GetService<MacroService>();
+        var macroMgr = serviceProvider.GetService<MacroAliasExpanderService>();
         var macro = new MultiMacroTest(serviceProvider) { Parameters = parameters };
         var handler = (SelfExecutableQueryResult)macroMgr.ExpandMacroAlias(macro);
 
         var cmdline = new Cmdline(name, parameters);
-        var results = (await handler.ExecuteAsync(cmdline))
-            .ToArray();
+        var results = (await handler.ExecuteAsync(cmdline)).ToArray();
 
         results.ElementAt(0).Name.ShouldBe(name);
         results.ElementAt(0).Description.ShouldBe(parameters);
@@ -107,13 +123,13 @@ public class MacroServiceShould : TestBase
     public void BeExecutableQueryResult()
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<IAliasRepository>()
-                                                     .AddMockSingleton<ILogger<MacroService>>()
+                                                     .AddMockSingleton<ILogger<MacroAliasExpanderService>>()
                                                      .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
-                                                     .AddSingleton<MacroService>()
+                                                     .AddSingleton<MacroAliasExpanderService>()
                                                      .AddSingleton<MultiMacroTest>()
                                                      .BuildServiceProvider();
-        var macroMgr = serviceProvider.GetService<MacroService>();
+        var macroMgr = serviceProvider.GetService<MacroAliasExpanderService>();
         var macro = new MultiMacroTest(serviceProvider);
         var result = macroMgr.ExpandMacroAlias(macro);
 
@@ -159,16 +175,26 @@ public class MacroServiceShould : TestBase
     {
         QueryResult[] queryResults = [new AliasQueryResult { Name = "macro_1", FileName = "@multi@" }, new AliasQueryResult { Name = "macro_2", FileName = "@multi@" }, new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }];
 
-        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroAliasExpanderService>>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
-                                                     .AddSingleton<MacroService>()
+                                                     .AddSingleton<MacroAliasExpanderService>()
+                                                     .AddSingleton<AssemblySource>()
+                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddMacroServices()
+                                                     .AddMockSingleton<IClipboardService>()
+                                                     .AddMockSingleton<IGithubService>()
+                                                     .AddMockSingleton<IUserGlobalNotificationService>()
+                                                     .AddMockSingleton<IEnigma>()
+                                                     .AddMockSingleton<ISection<GithubSection>>()
+                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLogging()
                                                      .BuildServiceProvider();
 
-        var output = serviceProvider.GetService<MacroService>()
+        var output = serviceProvider.GetService<MacroAliasExpanderService>()
                                     .ExpandMacroAlias(queryResults)
                                     .ToArray();
 
@@ -184,15 +210,29 @@ public class MacroServiceShould : TestBase
     [Fact]
     public void HaveDefaultMacro()
     {
-        var serviceProvider = new ServiceCollection().AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! })
-                                                     .AddSingleton<ILoggerFactory, LoggerFactory>()
-                                                     .AddMockSingleton<ILogger<MacroService>>()
-                                                     .AddMockSingleton<IExecutionService>()
-                                                     .AddMockSingleton<ISearchService>()
-                                                     .AddMockSingleton<IAliasRepository>()
-                                                     .AddSingleton<MacroService>()
-                                                     .BuildServiceProvider();
-        var manager = serviceProvider.GetService<MacroService>();
+        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
+        var serviceProvider = new ServiceCollection()
+                              .AddSingleton(
+                                  new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! }
+                              )
+                              .AddSingleton<ILoggerFactory, LoggerFactory>()
+                              .AddMockSingleton<ILogger<MacroAliasExpanderService>>()
+                              .AddMockSingleton<IExecutionService>()
+                              .AddMockSingleton<ISearchService>()
+                              .AddMockSingleton<IAliasRepository>()
+                              .AddSingleton<MacroAliasExpanderService>()
+                              .AddMockSingleton<IClipboardService>()
+                              .AddSingleton(_ => asm)
+                              .AddLoggerFactoryForTests(OutputHelper)
+                              .AddLogging()
+                              .AddMockSingleton<IGithubService>()
+                              .AddMockSingleton<IUserGlobalNotificationService>()
+                              .AddMockSingleton<IEnigma>()
+                              .AddMockSingleton<ISection<GithubSection>>()
+                              .AddMacroServices()
+                              .BuildServiceProvider();
+        
+        var manager = serviceProvider.GetService<MacroAliasExpanderService>();
         manager.MacroCount.ShouldBeGreaterThan(0);
     }
 
@@ -235,14 +275,28 @@ public class MacroServiceShould : TestBase
     [Fact]
     public void LoadExpectedMacros()
     {
+        
+        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
         var serviceProvider = new ServiceCollection()
                               .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
                               .AddLogging()
                               .AddMockSingleton<IAliasRepository>()
                               .AddMockSingleton<IExecutionService>()
                               .AddMockSingleton<ISearchService>()
+                              .AddSingleton<MacroAliasExpanderService>()                                                     
+                              .AddSingleton(_ => asm)
+                              .AddLoggerFactoryForTests(OutputHelper)              
+                              .AddMockSingleton<IClipboardService>()
+                              .AddSingleton(_ => asm)
+                              .AddLoggerFactoryForTests(OutputHelper)
+                              .AddLogging()
+                              .AddMockSingleton<IGithubService>()
+                              .AddMockSingleton<IUserGlobalNotificationService>()
+                              .AddMockSingleton<IEnigma>()
+                              .AddMockSingleton<ISection<GithubSection>>()
+                              .AddMacroServices()
                               .BuildServiceProvider();
-        var macroService = new MacroService(serviceProvider);
+        var macroService = serviceProvider.GetService<MacroAliasExpanderService>();
         macroService.MacroCount.ShouldBe(4);
     }
 
@@ -282,18 +336,32 @@ public class MacroServiceShould : TestBase
             }
         ];
         
-        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
+        
+        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
+        var serviceProvider = new ServiceCollection().AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLogging()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
-                                                     .AddSingleton<MacroService>()
+                                                     .AddSingleton<MacroAliasExpanderService>()                                                     
+                                                     .AddSingleton(_ => asm)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddMockSingleton<IClipboardService>()
+                                                     .AddSingleton(_ => asm)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLogging()
+                                                     .AddMockSingleton<IGithubService>()
+                                                     .AddMockSingleton<IUserGlobalNotificationService>()
+                                                     .AddMockSingleton<IEnigma>()
+                                                     .AddMockSingleton<ISection<GithubSection>>()
+                                                     .AddMacroServices()
                                                      .BuildServiceProvider();
         
         
         // ACT
-        var output = serviceProvider.GetService<MacroService>()
+        var output = serviceProvider.GetService<MacroAliasExpanderService>()
                                     .ExpandMacroAlias(queryResults)
                                     .ToArray();
         // ASSERT
@@ -315,16 +383,29 @@ public class MacroServiceShould : TestBase
             new AliasQueryResult { Name = "macro_3", FileName = "@multi@" }
         ];
 
-        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroService>>()
+        
+        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
+        var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroAliasExpanderService>>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddLoggerFactoryForTests(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) })
-                                                     .AddSingleton<MacroService>()
+                                                     .AddSingleton<MacroAliasExpanderService>()                                                     
+                                                     .AddSingleton(_ => asm)
+                                                     .AddLoggerFactoryForTests(OutputHelper)              
+                                                     .AddMockSingleton<IClipboardService>()
+                                                     .AddSingleton(_ => asm)
+                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLogging()
+                                                     .AddMockSingleton<IGithubService>()
+                                                     .AddMockSingleton<IUserGlobalNotificationService>()
+                                                     .AddMockSingleton<IEnigma>()
+                                                     .AddMockSingleton<ISection<GithubSection>>()
+                                                     .AddMacroServices()
                                                      .BuildServiceProvider();
 
-        var output = serviceProvider.GetService<MacroService>()
+        var output = serviceProvider.GetService<MacroAliasExpanderService>()
                                     .ExpandMacroAlias(queryResults)
                                     .ToArray();
 

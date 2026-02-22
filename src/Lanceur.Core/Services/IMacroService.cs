@@ -8,7 +8,7 @@ public interface IMacroService
 
     /// <summary>
     ///     Expands macro aliases within a collection of <see cref="QueryResult" /> objects.
-    /// In other words, clone the macro template and update it with the informations provided in the command line (query)
+    /// In other words, clone the macro template and update it with the information provided in the command line (query)
     /// </summary>
     /// <param name="collection">An array of <see cref="QueryResult" /> items to process.</param>
     /// <returns>
@@ -20,7 +20,7 @@ public interface IMacroService
     ///     This <b>doesn't</b> touch <see cref="QueryResult" /> that
     ///     are <b>not</b> macro
     /// </remarks>
-    IEnumerable<QueryResult> ExpandMacroAlias(QueryResult[] collection);
+    IEnumerable<QueryResult> ExpandMacroAlias(params QueryResult[] collection);
 
     #endregion
 }

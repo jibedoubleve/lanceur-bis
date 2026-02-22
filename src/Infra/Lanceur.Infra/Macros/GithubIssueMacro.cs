@@ -21,21 +21,24 @@ public class GithubIssueMacro : MacroQueryResult
     private readonly ILogger<GithubIssueMacro> _logger;
     private readonly IUserGlobalNotificationService _notification;
 
-    private readonly IServiceProvider _serviceProvider;
     private readonly ISection<GithubSection> _settings;
 
     #endregion
 
     #region Constructors
 
-    public GithubIssueMacro(IServiceProvider serviceProvider)
+    public GithubIssueMacro(
+        ILogger<GithubIssueMacro> logger,
+        IGithubService githubService,
+        IUserGlobalNotificationService notification,
+        IEnigma enigma,
+        ISection<GithubSection> settings)
     {
-        _serviceProvider = serviceProvider;
-        _logger = _serviceProvider.GetService<ILogger<GithubIssueMacro>>();
-        _githubService = _serviceProvider.GetService<IGithubService>();
-        _notification = serviceProvider.GetService<IUserGlobalNotificationService>();
-        _enigma = serviceProvider.GetService<IEnigma>();
-        _settings = _serviceProvider.GetSection<GithubSection>();
+        _logger = logger; 
+        _githubService = githubService;
+        _notification = notification;
+        _enigma = enigma;
+        _settings = settings;
     }
 
     #endregion
@@ -48,7 +51,7 @@ public class GithubIssueMacro : MacroQueryResult
 
     #region Methods
 
-    public override SelfExecutableQueryResult Clone() => new GithubIssueMacro(_serviceProvider);
+    public override SelfExecutableQueryResult Clone() => new GithubIssueMacro(_logger, _githubService, _notification, _enigma, _settings);
 
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {

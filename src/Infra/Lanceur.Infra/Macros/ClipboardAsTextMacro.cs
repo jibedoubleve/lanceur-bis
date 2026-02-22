@@ -13,16 +13,14 @@ public class ClipboardAsTextMacro : MacroQueryResult
     #region Fields
 
     private readonly IClipboardService _clipboard;
-    private readonly IServiceProvider _serviceProvider;
 
     #endregion
 
     #region Constructors
 
-    public ClipboardAsTextMacro(IServiceProvider serviceProvider)
+    public ClipboardAsTextMacro(IClipboardService clipboard)
     {
-        _serviceProvider = serviceProvider;
-        _clipboard = _serviceProvider.GetService<IClipboardService>();
+        _clipboard = clipboard;
     }
 
     #endregion
@@ -35,7 +33,7 @@ public class ClipboardAsTextMacro : MacroQueryResult
 
     #region Methods
 
-    public override SelfExecutableQueryResult Clone() => new ClipboardAsTextMacro(_serviceProvider);
+    public override SelfExecutableQueryResult Clone() => new ClipboardAsTextMacro(_clipboard);
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
