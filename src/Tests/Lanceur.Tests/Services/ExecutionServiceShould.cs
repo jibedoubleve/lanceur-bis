@@ -209,9 +209,10 @@ public class ExecutionServiceShould : TestBase
                                         .AddSingleton(githubService)
                                         .AddMockSingleton<IUserGlobalNotificationService>()
                                         .AddMockSingleton<IEnigma>()
+                                        .AddSingleton<GithubIssueMacro>()
                                         .BuildServiceProvider();
 
-        var macro = new GithubIssueMacro(sp);
+        var macro = sp.GetService<GithubIssueMacro>();
         var request = new ExecutionRequest(macro, cmdline, false);
 
         try

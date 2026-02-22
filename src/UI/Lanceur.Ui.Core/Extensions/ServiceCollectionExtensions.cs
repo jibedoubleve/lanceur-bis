@@ -160,7 +160,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
                          .AddTransient<IConnectionString, ConnectionString>()
                          .AddTransient<ISearchService, SearchService>()
-                         .AddTransient<IMacroService, MacroService>()
+                         .AddTransient<IMacroService, MacroAliasExpanderService>()
                          .AddTransient<ILoggerFactory, LoggerFactory>()
                          .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>()

@@ -64,7 +64,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
                          )
                          .AddMockSingleton<IBookmarkRepositoryFactory>()
                          .AddSingleton<ISearchService, SearchService>()
-                         .AddSingleton<IMacroService, MacroService>()
+                         .AddSingleton<IMacroService, MacroAliasExpanderService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddMockSingleton<IApplicationSettingsProvider>()
                          .AddMockSingleton<IThumbnailService>()

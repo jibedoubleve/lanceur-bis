@@ -48,6 +48,7 @@ public partial class App
                                    .AddServices()
                                    .AddWpfServices()
                                    .AddStoreServices()
+                                   .AddMacroServices()
                                    .AddCommands()
                                    .AddConfiguration()
                                    .AddDatabaseServices()

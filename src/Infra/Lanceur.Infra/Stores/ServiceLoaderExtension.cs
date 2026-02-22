@@ -1,15 +1,41 @@
 ﻿using System.Reflection;
+using Lanceur.Core;
+using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
+using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Lanceur.Infra.Stores;
 
-public static class StoreLoaderExtension
+public static class ServiceLoaderExtension
 {
     #region Methods
+
+    /// <summary>
+    ///     Discovers and registers all macro into the dependency injection container.
+    ///     Uses reflection to find classes decorated with <see cref="MacroAttribute" /> that implement
+    ///     <see cref="MacroQueryResult" />.
+    ///     All discovered services are registered as singleton instances.
+    /// </summary>
+    /// <param name="serviceCollection">The service collection to register macros into.</param>
+    /// <returns>The service collection for method chaining.</returns>
+    public static IServiceCollection AddMacroServices(this IServiceCollection serviceCollection)
+    {
+        var asm = Assembly.GetAssembly(typeof(GuidMacro));
+        var types = asm?.GetTypes() ?? [];
+
+        var found = types.Where(t => t.GetCustomAttributes<MacroAttribute>().Any())
+                         .Where(t => t.IsAssignableTo(typeof(MacroQueryResult)))
+                         .ToList();
+        
+        foreach (var type in found)
+            serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(MacroQueryResult), type));
+
+        return serviceCollection;
+    }
 
     /// <summary>
     ///     Discovers and registers all store services into the dependency injection container.
