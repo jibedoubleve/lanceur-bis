@@ -6,7 +6,7 @@ using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.Views.Pages;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("add")]
 [Description("Add a new alias")]
