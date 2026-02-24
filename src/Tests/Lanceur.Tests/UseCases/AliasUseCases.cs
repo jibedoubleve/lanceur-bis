@@ -53,7 +53,7 @@ public class AliasUseCases : TestBase
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                          .AddSingleton<ISearchService, SearchService>()
-                         .AddSingleton<IMacroService, MacroAliasExpanderService>()
+                         .AddSingleton<IMacroAliasExpanderService, Infra.Services.MacroAliasExpanderService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddMockSingleton<IApplicationSettingsProvider>()
                          .AddMockSingleton<IThumbnailService>()

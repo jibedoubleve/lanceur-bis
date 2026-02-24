@@ -66,7 +66,7 @@ public class SearchServiceShould : TestBase
                          .AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton<AssemblySource>()
-                         .AddSingleton<IMacroService, MacroAliasExpanderService>()
+                         .AddSingleton<IMacroAliasExpanderService, Infra.Services.MacroAliasExpanderService>()
                          .AddSingleton<SearchService>()
                          .AddMockSingleton<ISearchServiceOrchestrator>()
                          .AddMockSingleton<IThumbnailService>()
@@ -166,7 +166,7 @@ public class SearchServiceShould : TestBase
                              new StoreOrchestrationFactory()
                          )
                          .AddSingleton<ILoggerFactory, LoggerFactory>()
-                         .AddSingleton<IMacroService, MacroAliasExpanderService>()
+                         .AddSingleton<IMacroAliasExpanderService, Infra.Services.MacroAliasExpanderService>()
                          .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
@@ -233,12 +233,12 @@ public class SearchServiceShould : TestBase
           .AddSingleton<ISearchService, SearchService>()
           .AddSingleton<IDbActionFactory, DbActionFactory>()
           .AddMockSingleton<IThumbnailService>()
-          .AddMockSingleton<IMacroService>((sp, macroManager) =>
+          .AddMockSingleton<IMacroAliasExpanderService>((sp, macroManager) =>
               {
                   var results = sp.GetService<IAliasRepository>()
                                   .Search(criterion)
                                   .ToList();
-                  macroManager.ExpandMacroAlias(Arg.Any<QueryResult[]>())
+                  macroManager.Expand(Arg.Any<QueryResult[]>())
                               .Returns(results);
                   return macroManager;
               }
@@ -271,7 +271,7 @@ public class SearchServiceShould : TestBase
     [Fact]
     public async Task ReturnValues()
     {
-        var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroService>()
+        var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroAliasExpanderService>()
                                                      .AddTestOutputHelper(OutputHelper)
                                                      .AddTransient<SearchService>()
                                                      .AddSingleton<IStoreService, EverythingStore>()

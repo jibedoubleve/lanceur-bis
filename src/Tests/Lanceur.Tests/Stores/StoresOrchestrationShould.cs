@@ -135,9 +135,9 @@ public class StoresOrchestrationShould
           .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
           .AddMockSingleton<IThumbnailService>()
           .AddLoggerFactoryForTests(_outputHelper)
-          .AddMockSingleton<IMacroService>((_, i) =>
+          .AddMockSingleton<IMacroAliasExpanderService>((_, i) =>
               {
-                  i.ExpandMacroAlias(Arg.Any<QueryResult[]>())
+                  i.Expand(Arg.Any<QueryResult[]>())
                    .Returns(callInfo => callInfo.Arg<QueryResult[]>());
                   return i;
               }

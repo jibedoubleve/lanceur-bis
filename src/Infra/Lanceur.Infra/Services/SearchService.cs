@@ -11,7 +11,7 @@ public class SearchService : ISearchService
     #region Fields
 
     private readonly ILogger<SearchService> _logger;
-    private readonly IMacroService _macroService;
+    private readonly Core.Services.IMacroAliasExpanderService _macroAliasExpanderService;
     private readonly ISearchServiceOrchestrator _orchestrator;
     private readonly IEnumerable<IStoreService> _storeServices;
 
@@ -21,7 +21,7 @@ public class SearchService : ISearchService
 
     public SearchService(
         IEnumerable<IStoreService> storeServices,
-        IMacroService macroService,
+        Core.Services.IMacroAliasExpanderService macroAliasExpanderService,
         ILogger<SearchService> logger,
         ISearchServiceOrchestrator orchestrator
     )
@@ -32,7 +32,7 @@ public class SearchService : ISearchService
         if (!_storeServices.Any())
             throw new ArgumentException($"There are no store activated for the search service");
 
-        _macroService = macroService;
+        _macroAliasExpanderService = macroAliasExpanderService;
         _orchestrator = orchestrator;
         _logger = logger;
     }
@@ -41,19 +41,20 @@ public class SearchService : ISearchService
 
     #region Methods
 
-    private IEnumerable<QueryResult> Sort(QueryResult[] collection)
+    private IEnumerable<QueryResult> FormatForDisplay(QueryResult[] collection)
     {
         collection ??= [];
-        // Upgrade alias to an executable macro and return the result
-        var results = collection.Length != 0
-            ? _macroService.ExpandMacroAlias(collection).ToList()
+        // Upgrade alias to executable macros (if any) 
+        var macros = collection.Length != 0
+            ? _macroAliasExpanderService.Expand(collection).ToList()
             : [];
 
-        // Order the list and return the result
-        var orderedResults = results.OrderByDescending(e => e.Count)
-                                    .ThenBy(e => e.Name)
-                                    .ToArray();
+        // Then order the list 
+        var orderedResults = macros.OrderByDescending(e => e.Count)
+                                   .ThenBy(e => e.Name)
+                                   .ToArray();
 
+        //Then return
         return collection.Length != 0
             ? orderedResults
             : DisplayQueryResult.NoResultFound;
@@ -69,7 +70,7 @@ public class SearchService : ISearchService
                       .SelectMany(x => x)
                       .ToArray();
 
-        return Sort(results);
+        return FormatForDisplay(results);
     }
 
     /// <inheritdoc />
@@ -110,7 +111,7 @@ public class SearchService : ISearchService
         // Remember the query
         foreach (var result in results) result.OriginatingQuery = query;
 
-        var orderedResults = Sort(results).ToList();
+        var orderedResults = FormatForDisplay(results).ToList();
 
         // If there's an exact match, promote
         // it to the top of the list.

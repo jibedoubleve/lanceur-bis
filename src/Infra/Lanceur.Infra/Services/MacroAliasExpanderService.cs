@@ -1,25 +1,11 @@
 ﻿using Lanceur.Core.Models;
-using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
-/// <summary>
-///     Resolves macro aliases into executable macro instances.
-/// </summary>
-/// <remarks>
-///     A macro alias is a user-defined shortcut (stored in the database) that points to a macro
-///     identified by its <c>@NAME@</c> pattern. This service matches that alias against the registered
-///     <see cref="MacroQueryResult" /> singletons, clones the matching template, and applies the
-///     alias's own properties (name, parameters, description, etc.) onto the clone.
-///     <para>
-///         Macros are registered at startup via <c>AddMacroServices()</c>, which discovers all classes
-///         decorated with <see cref="Lanceur.Core.MacroAttribute" /> and injects them as
-///         <see cref="MacroQueryResult" /> singletons.
-///     </para>
-/// </remarks>
-public class MacroAliasExpanderService : IMacroService
+/// <inheritdoc/>
+public class MacroAliasExpanderService : Core.Services.IMacroAliasExpanderService
 {
     #region Fields
 
@@ -86,7 +72,7 @@ public class MacroAliasExpanderService : IMacroService
     }
 
     /// <inheritdoc />
-    public IEnumerable<QueryResult> ExpandMacroAlias(params QueryResult[] collection)
+    public IEnumerable<QueryResult> Expand(params QueryResult[] collection)
     {
         using var _ = _logger.WarnIfSlow(this);
         var result = collection.Select(Expand)

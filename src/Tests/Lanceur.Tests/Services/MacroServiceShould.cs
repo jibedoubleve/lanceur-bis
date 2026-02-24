@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
@@ -9,7 +8,6 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Macros;
-using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
@@ -22,6 +20,7 @@ using Lanceur.Tests.Tools.Macros;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;
+using MacroAliasExpanderService = Lanceur.Infra.Services.MacroAliasExpanderService;
 
 namespace Lanceur.Tests.Services;
 
@@ -110,7 +109,7 @@ public class MacroServiceShould : TestBase
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroAliasExpanderService>();
         var macro = new MultiMacroTest(serviceProvider) { Parameters = parameters };
-        var handler = (SelfExecutableQueryResult)macroMgr.ExpandMacroAlias(macro);
+        var handler = (SelfExecutableQueryResult)(macroMgr.Expand(macro)).First();
 
         var cmdline = new Cmdline(name, parameters);
         var results = (await handler.ExecuteAsync(cmdline)).ToArray();
@@ -131,7 +130,7 @@ public class MacroServiceShould : TestBase
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroAliasExpanderService>();
         var macro = new MultiMacroTest(serviceProvider);
-        var result = macroMgr.ExpandMacroAlias(macro);
+        var result = macroMgr.Expand(macro).First();
 
         result.ShouldBeAssignableTo<SelfExecutableQueryResult>();
     }
@@ -195,7 +194,7 @@ public class MacroServiceShould : TestBase
                                                      .BuildServiceProvider();
 
         var output = serviceProvider.GetService<MacroAliasExpanderService>()
-                                    .ExpandMacroAlias(queryResults)
+                                    .Expand(queryResults)
                                     .ToArray();
 
         Assert.Multiple(
@@ -362,7 +361,7 @@ public class MacroServiceShould : TestBase
         
         // ACT
         var output = serviceProvider.GetService<MacroAliasExpanderService>()
-                                    .ExpandMacroAlias(queryResults)
+                                    .Expand(queryResults)
                                     .ToArray();
         // ASSERT
         output.Length.ShouldBe(1);
@@ -406,7 +405,7 @@ public class MacroServiceShould : TestBase
                                                      .BuildServiceProvider();
 
         var output = serviceProvider.GetService<MacroAliasExpanderService>()
-                                    .ExpandMacroAlias(queryResults)
+                                    .Expand(queryResults)
                                     .ToArray();
 
         output.ShouldSatisfyAllConditions(
