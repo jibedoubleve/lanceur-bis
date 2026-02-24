@@ -3,7 +3,6 @@ using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Utils;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Macros;
 
@@ -15,8 +14,7 @@ public class MultiMacro : MacroQueryResult
 
     private readonly int _delay;
     private readonly IExecutionService _executionService;
-    private readonly ISearchService _searchService;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly Lazy<ISearchService> _searchService;
 
     private static readonly Conditional<int> DefaultDelay = new(0, 1_000);
 
@@ -24,15 +22,10 @@ public class MultiMacro : MacroQueryResult
 
     #region Constructors
 
-    public MultiMacro(IServiceProvider serviceProvider)
+    public MultiMacro(IExecutionService executionService, Lazy<ISearchService> searchService)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
-
-        _serviceProvider = serviceProvider;
-        _executionService = serviceProvider.GetService<IExecutionService>() ??
-                            throw new InvalidOperationException("IExecutionService is not registered");
-        _searchService = serviceProvider.GetService<ISearchService>() ??
-                         throw new InvalidOperationException("ISearchService is not registered");
+        _executionService = executionService;
+        _searchService = searchService;
         _delay = DefaultDelay;
     }
 
@@ -42,12 +35,12 @@ public class MultiMacro : MacroQueryResult
 
     private async Task<AliasQueryResult> GetAlias(Cmdline cmdline)
     {
-        var t  = await _searchService.SearchAsync(cmdline);
+        var t  = await _searchService.Value.SearchAsync(cmdline);
         var macro = t.FirstOrDefault();
         return macro as AliasQueryResult;
     }
 
-    public override SelfExecutableQueryResult Clone() => new MultiMacro(_serviceProvider);
+    public override SelfExecutableQueryResult Clone() => new MultiMacro(_executionService, _searchService);
 
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {
