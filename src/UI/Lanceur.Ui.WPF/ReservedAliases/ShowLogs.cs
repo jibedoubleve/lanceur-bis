@@ -4,24 +4,12 @@ using Lanceur.Core;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("logs")]
 [Description("Open the directory containing the log files")]
 public class ShowLogs : SelfExecutableQueryResult
 {
-    #region Fields
-
-    private readonly IServiceProvider _serviceProvider;
-
-    #endregion
-
-    #region Constructors
-
-    public ShowLogs(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
-
-    #endregion
-
     #region Properties
 
     public override string Icon => "Book24";

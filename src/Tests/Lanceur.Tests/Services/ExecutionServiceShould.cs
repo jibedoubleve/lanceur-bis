@@ -169,7 +169,10 @@ public class ExecutionServiceShould : TestBase
                  .AddMockSingleton<ISearchService>()
                  .BuildServiceProvider();
 
-        var macro = new MultiMacro(sp);
+        var macro = new MultiMacro(
+            sp.GetService<IExecutionService>(),
+            sp.GetService<Lazy<ISearchService>>()
+        );
         var request = new ExecutionRequest(macro, cmdline, false);
 
         try { await executionService.ExecuteAsync(request); }
@@ -273,7 +276,11 @@ public class ExecutionServiceShould : TestBase
                  .AddMockSingleton<IExecutionService>()
                  .AddMockSingleton<ISearchService>()
                  .BuildServiceProvider();
-        var macro = new MultiMacro(sp);
+        
+        var macro = new MultiMacro(
+            sp.GetService<IExecutionService>(),
+            sp.GetService<Lazy<ISearchService>>()
+        );
 
         try { await macro.ExecuteAsync(cmdline); }
         catch (Exception) { Assert.Fail("This should not throw an exception"); }

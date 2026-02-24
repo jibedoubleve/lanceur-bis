@@ -1,19 +1,17 @@
-﻿using System.Reflection;
-using System.Web.Bookmarks;
+﻿using System.Web.Bookmarks;
 using Lanceur.Core;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling.ReservedAliases;
 using Lanceur.Tests.Tools.Extensions;
-using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.ReservedAliases;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -55,6 +53,9 @@ public class ReservedKeywordsStoreShould
                                   }
                               )
                               .AddSingleton<ReservedAliasStore>()
+                              .AddReservedAliasesServices(type)
+                              .AddMockSingleton<IUserDialogueService>()
+                              .AddMockSingleton<IUserNotificationService>()
                               .BuildServiceProvider();
 
         var store = serviceProvider.GetService<ReservedAliasStore>();
@@ -86,27 +87,16 @@ public class ReservedKeywordsStoreShould
         aliasRepository.GetHiddenCounters()
                        .Returns(new Dictionary<string, (long, int)> { { Names.Name1, (id, count) } });
 
+        var store = GetStore(aliasRepository, typeof(ExecutableTestAlias));
 
-        var sp = new ServiceCollection()
-                 .AddSingleton(
-                     new AssemblySource { ReservedKeywordSource = Assembly.GetAssembly(typeof(ExecutableTestAlias)) }
-                 )
-                 .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                 .AddSingleton(aliasRepository)
-                 .AddSingleton(new TestOutputHelperDecoratorForMicrosoftLogging<ReservedAliasStore>(_output))
-                 .AddSingleton<ReservedAliasStore>()
-                 .AddTestOutputHelper(_output)
-                 .BuildServiceProvider();
-
-        var store = sp.GetService<ReservedAliasStore>();
-
-        var result = store.Search(Cmdline.Empty)
+        var result = store.Search(Cmdline.Parse(Names.Name1))
                           .ToArray();
-
-        result.Length.ShouldBe(1);
-        var current = result.First();
-        current.Count.ShouldBe(count);
-        current.Id.ShouldBe(id);
+        
+        Assert.Multiple(
+            () => result.Length.ShouldBe(1),
+            () => result[0].Count.ShouldBe(count),
+            () => result[0].Id.ShouldBe(id)
+        );
     }
 
     #endregion

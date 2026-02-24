@@ -108,7 +108,7 @@ public class MacroServiceShould : TestBase
                                                      .AddSingleton<MacroAliasExpanderService>()
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroAliasExpanderService>();
-        var macro = new MultiMacroTest(serviceProvider) { Parameters = parameters };
+        var macro = new MultiMacroTest { Parameters = parameters };
         var handler = (SelfExecutableQueryResult)(macroMgr.Expand(macro)).First();
 
         var cmdline = new Cmdline(name, parameters);
@@ -129,7 +129,7 @@ public class MacroServiceShould : TestBase
                                                      .AddSingleton<MultiMacroTest>()
                                                      .BuildServiceProvider();
         var macroMgr = serviceProvider.GetService<MacroAliasExpanderService>();
-        var macro = new MultiMacroTest(serviceProvider);
+        var macro = new MultiMacroTest();
         var result = macroMgr.Expand(macro).First();
 
         result.ShouldBeAssignableTo<SelfExecutableQueryResult>();
@@ -365,12 +365,12 @@ public class MacroServiceShould : TestBase
                                     .ToArray();
         // ASSERT
         output.Length.ShouldBe(1);
-        
-        var macro = output.ElementAt(0);
-        macro.ShouldSatisfyAllConditions(
-            m => m.Id.ShouldBe(expectedId),
-            m => m.Count.ShouldBe(expectedCount)
-        );
+
+        output[0]
+            .ShouldSatisfyAllConditions(
+                m => m.Id.ShouldBe(expectedId),
+                m => m.Count.ShouldBe(expectedCount)
+            );
     }
     [Fact]
     public void NotHaveDoubloonsWhenMacroUsedMultipleTimes()

@@ -21,7 +21,7 @@ public class SearchService : ISearchService
 
     public SearchService(
         IEnumerable<IStoreService> storeServices,
-        Core.Services.IMacroAliasExpanderService macroAliasExpanderService,
+        IMacroAliasExpanderService macroAliasExpanderService,
         ILogger<SearchService> logger,
         ISearchServiceOrchestrator orchestrator
     )
@@ -30,7 +30,7 @@ public class SearchService : ISearchService
 
         _storeServices = storeServices.ToList();
         if (!_storeServices.Any())
-            throw new ArgumentException($"There are no store activated for the search service");
+            throw new ArgumentException("There are no store activated for the search service");
 
         _macroAliasExpanderService = macroAliasExpanderService;
         _orchestrator = orchestrator;

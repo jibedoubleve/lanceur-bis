@@ -19,7 +19,7 @@ using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
-using Lanceur.Ui.WPF.ReservedKeywords;
+using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;

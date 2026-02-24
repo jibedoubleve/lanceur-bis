@@ -10,6 +10,7 @@
     <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
     <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
     <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj" />
+    <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.5" />

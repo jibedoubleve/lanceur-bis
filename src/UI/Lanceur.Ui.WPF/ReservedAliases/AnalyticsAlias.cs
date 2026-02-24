@@ -4,7 +4,7 @@ using Lanceur.Core.Models;
 using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.Views.Pages;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("stat")]
 [Description("Shows analytics about the usage of Lanceur")]
@@ -22,7 +22,11 @@ public class SettingsViewModel : SelfExecutableQueryResult
 
     #endregion
 
+    #region Properties
+
     public override string Icon => "ChartMultiple24";
+
+    #endregion
 
     #region Methods
 
