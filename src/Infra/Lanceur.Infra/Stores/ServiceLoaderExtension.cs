@@ -31,6 +31,7 @@ public static class ServiceLoaderExtension
                          .Where(t => t.IsAssignableTo(typeof(MacroQueryResult)))
                          .ToList();
         
+        serviceCollection.AddTransient(sp => new Lazy<ISearchService>(sp.GetRequiredService<ISearchService>)); 
         foreach (var type in found)
             serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(MacroQueryResult), type));
 

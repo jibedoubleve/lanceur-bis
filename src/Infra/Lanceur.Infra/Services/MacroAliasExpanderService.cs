@@ -50,8 +50,12 @@ public class MacroAliasExpanderService : Core.Services.IMacroAliasExpanderServic
     private QueryResult Expand(QueryResult item)
     {
         if (item is not AliasQueryResult alias || !alias.IsMacro()) return item;
+       
+        var macroName = alias.GetMacroName();
+        var foundMacro = _macros.FirstOrDefault(
+            m => string.Equals(macroName, m.Name, StringComparison.InvariantCultureIgnoreCase)
+        );
         
-        var foundMacro = _macros.FirstOrDefault(m => alias.GetMacroName() == m.Name);
         if (foundMacro is null)
         {
             /* Well, this is a misconfigured macro, log it and forget it */
