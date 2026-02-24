@@ -1,10 +1,12 @@
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
+using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.WPF.ReservedAliases;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
@@ -43,6 +45,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
                                                                       .SetMinimumLevel(LogLevel.Trace))
                                                            .AddSingleton<IEnigma, Enigma>()
                                                            .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
+                                                           .AddReservedAliasesServices(typeof(AddAlias))
                                                            .AddDatabase(connectionManager);
 
             var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();

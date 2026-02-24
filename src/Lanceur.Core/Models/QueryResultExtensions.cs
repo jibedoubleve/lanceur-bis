@@ -7,13 +7,13 @@ public static partial class QueryResultExtensions
 {
     #region Fields
 
-    private static readonly Regex Regex = FindMacroRegex();
+    private static readonly Regex FindMacroRegex = BuildFindMacroRegex();
 
     #endregion
 
     #region Methods
 
-    [GeneratedRegex("@([a-zA-Z_]*)@")] private static partial Regex FindMacroRegex();
+    [GeneratedRegex("@([a-zA-Z_]*)@")] private static partial Regex BuildFindMacroRegex();
 
     private static bool Is(this AliasQueryResult @this, CompositeMacros macro) => @this.FileName.ToLower().Contains($"@{macro.ToLowerString()}@".ToLower());
 
@@ -21,7 +21,7 @@ public static partial class QueryResultExtensions
     {
         if (@this is null) return string.Empty;
 
-        var matches = Regex.Match(@this.FileName ?? string.Empty);
+        var matches = FindMacroRegex.Match(@this.FileName ?? string.Empty);
         var result = matches.Success ? matches.Groups[1].Value : string.Empty;
         return result.ToUpper();
     }

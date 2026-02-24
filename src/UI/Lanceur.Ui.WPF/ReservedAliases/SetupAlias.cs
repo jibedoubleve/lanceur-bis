@@ -4,7 +4,7 @@ using Lanceur.Core.Models;
 using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.Views.Pages;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("setup")]
 [Description("Open the setup page")]

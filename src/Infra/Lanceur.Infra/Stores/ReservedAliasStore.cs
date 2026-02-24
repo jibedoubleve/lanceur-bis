@@ -17,11 +17,8 @@ public class ReservedAliasStore : Store, IStoreService
     #region Fields
 
     private readonly IAliasRepository _aliasRepository;
-
-    private readonly Assembly _assembly;
     private readonly ILogger<ReservedAliasStore> _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private IEnumerable<QueryResult> _reservedAliases;
+    private readonly IEnumerable<QueryResult> _reservedAliases;
 
     #endregion
 
@@ -31,27 +28,23 @@ public class ReservedAliasStore : Store, IStoreService
     ///     Generate a new instance. Look into the Executing Assembly to find reserved aliases.
     /// </summary>
     /// <param name="orchestrationFactory">Service Provider used to inject dependencies</param>
-    /// <param name="assembly">Assembly where all the reserved keywords are defined</param>
     /// <param name="aliasRepository">Repository of all the aliases</param>
     /// <param name="logger">Used for logging</param>
-    /// <param name="serviceProvider">Service provider used with the Macros</param>
+    /// <param name="reservedAliases">List of reserved aliases (builtin aliases)</param>
     /// <exception cref="ArgumentNullException">If assembly source is null or no ReservedKeywordSource configured</exception>
     /// <remarks>
     ///     Each reserved alias should be decorated with <see cref="ReservedAliasAttribute" />
     /// </remarks>
     public ReservedAliasStore(
         IStoreOrchestrationFactory orchestrationFactory,
-        AssemblySource assembly,
         IAliasRepository aliasRepository,
         ILogger<ReservedAliasStore> logger,
-        IServiceProvider serviceProvider
+        IEnumerable<SelfExecutableQueryResult> reservedAliases
     ) : base(orchestrationFactory)
     {
-        _assembly = assembly?.ReservedKeywordSource ??
-                    throw new ArgumentNullException("The AssemblySource is not set in the DI container.");
         _aliasRepository = aliasRepository;
         _logger = logger;
-        _serviceProvider = serviceProvider;
+        _reservedAliases = reservedAliases;
     }
 
     #endregion
@@ -68,34 +61,6 @@ public class ReservedAliasStore : Store, IStoreService
 
     #region Methods
 
-    private void LoadAliases()
-    {
-        if (_reservedAliases != null) return;
-
-        var types = _assembly.GetTypes();
-
-        var found = types.Where(t => t.GetCustomAttributes<ReservedAliasAttribute>().Any())
-                         .ToList();
-        var foundItems = new List<QueryResult>();
-        foreach (var type in found)
-        {
-            var instance = Activator.CreateInstance(type, _serviceProvider);
-
-            if (instance is not SelfExecutableQueryResult qr) continue;
-
-            _aliasRepository.SetHiddenAliasUsage(qr);
-            
-            var name = (type.GetCustomAttribute(typeof(ReservedAliasAttribute)) as ReservedAliasAttribute)?.Name;
-            qr.Name = name;
-            qr.Description = (type.GetCustomAttribute(typeof(DescriptionAttribute)) as DescriptionAttribute)
-                ?.Description;
-            qr.Icon = "Settings24";
-
-            foundItems.Add(qr);
-        }
-
-        _reservedAliases = foundItems;
-    }
 
     private static IEnumerable<QueryResult> RefreshCounters(
         List<QueryResult> result,
@@ -118,18 +83,14 @@ public class ReservedAliasStore : Store, IStoreService
     }
 
     /// <inheritdoc cref="IStoreService.GetAll" />
-    public override IEnumerable<QueryResult> GetAll()
-    {
-        if (_reservedAliases == null) LoadAliases();
-        return _reservedAliases;
-    }
+    public override IEnumerable<QueryResult> GetAll() => _reservedAliases;
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
         using var _ = _logger.WarnIfSlow(this);
         var result = GetAll()
-                     .Where(k => k.Name.ToLower().StartsWith(cmdline.Name))
+                     .Where(k => k.Name.StartsWith(cmdline.Name, StringComparison.CurrentCultureIgnoreCase))
                      .ToList();
 
         var counters = _aliasRepository.GetHiddenCounters();

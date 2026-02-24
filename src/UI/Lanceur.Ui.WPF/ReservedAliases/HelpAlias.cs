@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("help")]
 [Description("Open help page")]
@@ -12,12 +12,6 @@ public class HelpAlias : SelfExecutableQueryResult
     #region Fields
 
     private const string Url = "https://jibedoubleve.github.io/lanceur-bis/";
-
-    #endregion
-
-    #region Constructors
-
-    public HelpAlias(IServiceProvider _) { }
 
     #endregion
 

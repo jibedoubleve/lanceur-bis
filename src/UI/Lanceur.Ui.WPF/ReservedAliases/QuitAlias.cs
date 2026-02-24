@@ -6,7 +6,7 @@ using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("quit")]
 [Description("Quit lanceur")]
@@ -20,11 +20,9 @@ public class QuitAlias : SelfExecutableQueryResult
 
     #region Constructors
 
-    public QuitAlias(IServiceProvider serviceProvider)
+    public QuitAlias(ILoggerFactory loggerFactory)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
-        var factory = serviceProvider.GetService<ILoggerFactory>() ?? throw new NullReferenceException("Log factory is not configured in the service provider.");
-        _logger = factory.GetLogger<QuitAlias>();
+        _logger = loggerFactory.GetLogger<QuitAlias>();
     }
 
     #endregion

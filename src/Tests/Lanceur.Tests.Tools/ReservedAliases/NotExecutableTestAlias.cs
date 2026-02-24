@@ -2,8 +2,9 @@
 using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.Tests.Tooling.ReservedAliases;
 
-namespace Lanceur.Tests.Tooling.ReservedAliases;
+namespace Lanceur.Tests.Tools.ReservedAliases;
 
 [ReservedAlias(Names.Name2)]
 [Description("To be a keyword, you should be executable")]

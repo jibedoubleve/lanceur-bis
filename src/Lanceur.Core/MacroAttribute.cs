@@ -28,7 +28,16 @@ public class MacroAttribute : Attribute
     /// </summary>
     public bool IsVisible { get; }
 
-    public string Name => $"@{_name}@";
+    /// <summary>
+    /// The name of the macro.
+    /// </summary>
+    public string Name => _name;
+
+    /// <summary>
+    /// The macro signature as stored in <c>FileName</c>, surrounded by <c>@</c> delimiters (e.g. <c>@NAME@</c>).
+    /// This is used by the system to distinguish a macro from a regular alias.
+    /// </summary>
+    public string Signature => $"@{_name}@";
 
     #endregion Properties
 }

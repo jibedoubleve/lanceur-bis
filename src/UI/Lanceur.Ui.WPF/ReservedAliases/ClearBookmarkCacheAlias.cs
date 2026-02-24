@@ -6,7 +6,7 @@ using Lanceur.Core.Repositories.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("clrbm")]
 [Description("Clears or invalidates the bookmark cache to ensure fresh data.")]
@@ -23,26 +23,16 @@ public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
 
     #region Constructors
 
-    public ClearBookmarkCacheAlias(IServiceProvider serviceProvider)
+    public ClearBookmarkCacheAlias(
+        ILoggerFactory loggerFactory,
+        IBookmarkRepositoryFactory bookmarkRepositoryFactory,
+        IConfigurationFacade configuration)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
-
-        var factory = serviceProvider.GetService<ILoggerFactory>() ??
-                      throw new InvalidOperationException("Logger factory is ont configured in the service provider");
-
-        var bookmarkRepositoryFactory
-            = serviceProvider.GetService<IBookmarkRepositoryFactory>() ??
-              throw new InvalidOperationException(
-                  "Bookmark repository is not configured in the service provider"
-              );
-
-        _configuration = serviceProvider.GetService<IConfigurationFacade>() ??
-                    throw new InvalidOperationException("Settings facade is not configured in the service provider");
-
+        _configuration = configuration;
         _bookmarks = bookmarkRepositoryFactory.BuildBookmarkRepository(
-            _configuration.Application.Stores.BookmarkSourceBrowser
+            configuration.Application.Stores.BookmarkSourceBrowser
         );
-        _logger = factory.CreateLogger<ClearBookmarkCacheAlias>();
+        _logger = loggerFactory.CreateLogger<ClearBookmarkCacheAlias>();
     }
 
     #endregion

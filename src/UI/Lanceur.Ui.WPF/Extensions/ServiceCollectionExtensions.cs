@@ -8,7 +8,7 @@ using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.Commands;
 using Lanceur.Ui.WPF.Helpers;
-using Lanceur.Ui.WPF.ReservedKeywords;
+using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui;

@@ -9,25 +9,9 @@ namespace Lanceur.Tests.Tools.ReservedAliases;
 [Description("description")]
 public class ExecutableTestAlias : MacroQueryResult
 {
-    #region Fields
-
-    private readonly IServiceProvider _serviceProvider;
-
-    #endregion
-
-    #region Constructors
-
-    public ExecutableTestAlias(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-        Name = Guid.NewGuid().ToString()[..8];
-    }
-
-    #endregion
-
     #region Methods
 
-    public override SelfExecutableQueryResult Clone() => new ExecutableTestAlias(_serviceProvider);
+    public override SelfExecutableQueryResult Clone() => new ExecutableTestAlias();
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {

@@ -6,11 +6,10 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Win32.Extensions;
 using Lanceur.Ui.Core.Messages;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Coordinate = Lanceur.Core.Models.Coordinate;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("centre")]
 [Description("Centre Lanceur in the middle of the screen.")]
@@ -25,15 +24,10 @@ public class CentreAlias : SelfExecutableQueryResult
 
     #region Constructors
 
-    public CentreAlias(IServiceProvider serviceProvider)
+    public CentreAlias(ILoggerFactory loggerFactory, IApplicationSettingsProvider appConfig)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
-
-        var factory = serviceProvider.GetService<ILoggerFactory>() ??
-                      throw new InvalidOperationException($"{nameof(ILoggerFactory)} is not configured in the service provider");
-        _logger = factory.CreateLogger<CentreAlias>();
-        _appConfig = serviceProvider.GetService<IApplicationSettingsProvider>() ??
-                     throw new InvalidOperationException($"{nameof(IApplicationSettingsProvider)} is not configured in the service provider");
+        _logger = loggerFactory.CreateLogger<CentreAlias>();
+        _appConfig = appConfig;
     }
 
     #endregion

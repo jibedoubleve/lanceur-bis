@@ -18,6 +18,7 @@ using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Commands;
 using Lanceur.Ui.WPF.Extensions;
+using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Services;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.Configuration;
@@ -48,6 +49,7 @@ public partial class App
                                    .AddServices()
                                    .AddWpfServices()
                                    .AddStoreServices()
+                                   .AddReservedAliasesServices(typeof(AddAlias))
                                    .AddMacroServices()
                                    .AddCommands()
                                    .AddConfiguration()

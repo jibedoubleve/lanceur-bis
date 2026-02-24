@@ -3,7 +3,7 @@ using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 /// <summary>
 ///     This keyword is only visible in debug mode. The sole prurpose of this keyword is to throw an exception
@@ -13,12 +13,6 @@ namespace Lanceur.Ui.WPF.ReservedKeywords;
 [Description("Throws an unexpected exception")]
 public class ThrowAlias : SelfExecutableQueryResult
 {
-    #region Constructors
-
-    public ThrowAlias(IServiceProvider serviceProvider) { }
-
-    #endregion
-
     #region Properties
 
     public override string Icon => "Bug24";

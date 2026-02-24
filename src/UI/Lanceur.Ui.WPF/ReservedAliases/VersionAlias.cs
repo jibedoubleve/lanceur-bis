@@ -5,9 +5,8 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.WPF.Views.Controls;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Lanceur.Ui.WPF.ReservedKeywords;
+namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("version")]
 [Description("Indicates the version of the application")]
@@ -22,10 +21,10 @@ public class VersionAlias : SelfExecutableQueryResult
 
     #region Constructors
 
-    public VersionAlias(IServiceProvider serviceProvider)
+    public VersionAlias(IUserDialogueService userDialogue, IUserNotificationService userNotification)
     {
-        _userDialogue = serviceProvider.GetService<IUserDialogueService>()!;
-        _userNotification = serviceProvider.GetService<IUserNotificationService>()!;
+        _userDialogue = userDialogue;
+        _userNotification = userNotification;
     }
 
     #endregion
