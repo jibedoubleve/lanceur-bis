@@ -373,6 +373,7 @@ Gemfile.lock
 nul
 # Directories created by AI for reports
 _review/
+_audit/
 
 # Vim
 *.swp
