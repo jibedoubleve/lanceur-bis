@@ -34,7 +34,7 @@ public partial class ExceptionView
         _configuration = configuration;
     }
 
-    #endregion²
+    #endregion
 
     #region Methods
 

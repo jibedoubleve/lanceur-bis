@@ -94,7 +94,7 @@ public class AliasUseCases : TestBase
     }
 
     [Fact]
-    public async Task CreateAndUpdateAlias()
+    public async Task When_creating_and_updating_alias_Then_no_error()
     {
         /*
          * Arrange
