@@ -12,6 +12,7 @@ using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.Infra.Stores;
+using Lanceur.Infra.Win32.Helpers;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
@@ -134,12 +135,14 @@ public partial class App
                     view.ExceptionTrace.Text = arguments["StackTrace"];
                     view.Show();
                 },
-                ToastNotificationArguments.ClickShowLogs  => () => Process.Start("explorer.exe", Paths.LogRepository),
+                ToastNotificationArguments.ClickShowLogs  => () 
+                    => WindowsShell.StartExplorer(Paths.LogRepository),
                 // ---- Restart application ----
                 ToastNotificationArguments.ClickRestart => ()
                     => Host.Services.GetRequiredService<IAppRestartService>().Restart(),
                 // ---- Visit Website ----
-                ToastNotificationArguments.VisitWebsite => () => Process.Start("explorer.exe", Paths.ReleasesUrl),
+                ToastNotificationArguments.VisitWebsite => () 
+                    => WindowsShell.StartExplorer(Paths.ReleasesUrl),
                 // ---- Skip current version ----
                 ToastNotificationArguments.SkipVersion => () =>
                 {
@@ -149,7 +152,8 @@ public partial class App
                     settings.Save();
                 },
                 // ---- Navigate to Url ----
-                ToastNotificationArguments.ClickNavigateIssue => () => Process.Start("explorer.exe", arguments["Url"]),
+                ToastNotificationArguments.ClickNavigateIssue => () 
+                    => WindowsShell.StartExplorer(arguments["Url"]),
                 // ---- Default  ----
                 _ => () => Log.Warning(
                     "The argument {Argument} is not supported in the toast arguments. Are you using a button that has not been configured yet?",

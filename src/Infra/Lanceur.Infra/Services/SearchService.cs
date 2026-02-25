@@ -11,7 +11,7 @@ public class SearchService : ISearchService
     #region Fields
 
     private readonly ILogger<SearchService> _logger;
-    private readonly Core.Services.IMacroAliasExpanderService _macroAliasExpanderService;
+    private readonly IMacroAliasExpanderService _macroAliasExpanderService;
     private readonly ISearchServiceOrchestrator _orchestrator;
     private readonly IEnumerable<IStoreService> _storeServices;
 

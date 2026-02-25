@@ -92,10 +92,10 @@ public class ReservedKeywordsStoreShould
         var result = store.Search(Cmdline.Parse(Names.Name1))
                           .ToArray();
         
-        Assert.Multiple(
-            () => result.Length.ShouldBe(1),
-            () => result[0].Count.ShouldBe(count),
-            () => result[0].Id.ShouldBe(id)
+        result.ShouldSatisfyAllConditions(
+            r => r.Length.ShouldBe(1),
+            r => r[0].Count.ShouldBe(count),
+            r => r[0].Id.ShouldBe(id)
         );
     }
 

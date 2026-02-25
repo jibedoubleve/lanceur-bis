@@ -5,7 +5,7 @@ namespace Lanceur.Core.Models;
 
 public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfExecutable
 {
-    public SelfExecutableQueryResult()
+    protected SelfExecutableQueryResult()
     {           
         var type = GetType();
         

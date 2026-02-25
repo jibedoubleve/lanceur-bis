@@ -2,13 +2,11 @@ using System.Reflection;
 using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
-using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
@@ -53,7 +51,7 @@ public class AliasUseCases : TestBase
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                          .AddSingleton<ISearchService, SearchService>()
-                         .AddSingleton<IMacroAliasExpanderService, Infra.Services.MacroAliasExpanderService>()
+                         .AddSingleton<IMacroAliasExpanderService, MacroAliasExpanderService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddMockSingleton<IApplicationSettingsProvider>()
                          .AddMockSingleton<IThumbnailService>()
