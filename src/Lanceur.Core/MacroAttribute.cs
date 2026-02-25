@@ -37,7 +37,7 @@ public class MacroAttribute : Attribute
     /// The macro signature as stored in <c>FileName</c>, surrounded by <c>@</c> delimiters (e.g. <c>@NAME@</c>).
     /// This is used by the system to distinguish a macro from a regular alias.
     /// </summary>
-    public string Signature => $"@{_name}@";
+    public string Signature => $"@{_name.ToUpper()}@";
 
     #endregion Properties
 }

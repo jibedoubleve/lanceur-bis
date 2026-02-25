@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.Models;
+using Lanceur.Infra.Win32.Helpers;
 
 namespace Lanceur.Ui.WPF.ReservedAliases;
 
@@ -25,7 +26,7 @@ public class HelpAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        Process.Start("explorer.exe", Url);
+        WindowsShell.StartExplorer(Url);
         return NoResultAsync;
     }
 

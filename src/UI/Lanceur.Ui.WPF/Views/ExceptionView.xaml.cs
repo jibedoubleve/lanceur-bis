@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Infra.Win32.Helpers;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
 using Wpf.Ui.Appearance;
@@ -33,7 +34,7 @@ public partial class ExceptionView
         _configuration = configuration;
     }
 
-    #endregion
+    #endregion²
 
     #region Methods
 
@@ -52,7 +53,8 @@ public partial class ExceptionView
         );
     }
 
-    private void OnOpenLogs(object sender, RoutedEventArgs e) => Process.Start("explorer.exe", Paths.LogRepository);
+    private void OnOpenLogs(object sender, RoutedEventArgs e) 
+        => WindowsShell.StartExplorer(Paths.LogRepository);
 
     #endregion
 }
