@@ -27,8 +27,7 @@ internal static class Win32ThumbnailProvider
     #region Fields
 
     private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
-    private static readonly Dictionary<string, BitmapSource> _thumbnailCache = new();
-    private static readonly object Locker = new();
+    private static readonly Lock Locker = new();
 
     #endregion Fields
 
@@ -66,6 +65,7 @@ internal static class Win32ThumbnailProvider
 
     #endregion Enums
 
+    
     #region Interfaces
 
     [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
