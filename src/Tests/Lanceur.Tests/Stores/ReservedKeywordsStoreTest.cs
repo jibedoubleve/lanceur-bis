@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Stores;
 
-public class ReservedKeywordsStoreShould
+public class ReservedKeywordsStoreTest
 {
     #region Fields
 
@@ -28,7 +28,7 @@ public class ReservedKeywordsStoreShould
 
     #region Constructors
 
-    public ReservedKeywordsStoreShould(ITestOutputHelper output) => _output = output;
+    public ReservedKeywordsStoreTest(ITestOutputHelper output) => _output = output;
 
     #endregion
 
@@ -68,7 +68,8 @@ public class ReservedKeywordsStoreShould
     [InlineData("setup")]
     [InlineData("version")]
     [InlineData("clrbm")]
-    public void ReturnSpecifiedReservedAliasFromLanceur(string criterion)
+    [InlineData("logs")]
+    public void When_search_Then_ReservedAlias_exists_in_store_by_default(string criterion)
     {
         var repository = Substitute.For<IAliasRepository>();
         var store = GetStore(repository, typeof(MainView));
@@ -78,7 +79,7 @@ public class ReservedKeywordsStoreShould
     }
 
     [Fact]
-    public void UpdateCounterOnSearch()
+    public void When_search_found_alias_Then_it_has_correct_count_value()
     {
         const int count = 100;
         const int id = 12;

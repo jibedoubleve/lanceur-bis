@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Models;
 
-public class AliasQueryResultTests
+public class AliasQueryResultTest
 {
     #region Methods
 
@@ -16,7 +16,7 @@ public class AliasQueryResultTests
     [InlineData(null, null)]
     [InlineData(@"C:\dir\dir2\file.exe", @"C:\dir\dir2\file.exe")]
     [InlineData(@"""C:\dir\dir2\file.exe""", @"C:\dir\dir2\file.exe")]
-    public void Alias_can_be_sanitized(string filename, string expected)
+    public void When_sanitize_FileName_Then_quotes_are_removed(string filename, string expected)
     {
         // Arrange
         var alias = new AliasQueryResult { FileName = filename };

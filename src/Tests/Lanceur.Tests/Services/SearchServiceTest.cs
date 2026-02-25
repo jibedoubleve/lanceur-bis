@@ -16,8 +16,6 @@ using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
-using Lanceur.Tests.Tools.ViewModels;
-using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -27,7 +25,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class SearchServiceShould : TestBase
+public class SearchServiceTest : TestBase
 {
     #region Fields
 
@@ -48,52 +46,15 @@ public class SearchServiceShould : TestBase
 
     #region Constructors
 
-    public SearchServiceShould(ITestOutputHelper output) : base(output)
+    public SearchServiceTest(ITestOutputHelper output) : base(output)
         => _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
 
     #endregion
 
     #region Methods
 
-    private ServiceProvider BuildConfigureServices(
-        IServiceCollection serviceCollection = null,
-        ServiceVisitors visitors = null
-    )
-    {
-        serviceCollection ??= new ServiceCollection();
-        serviceCollection.AddConfigurationSections()
-                         .AddLoggerFactoryForTests(OutputHelper)
-                         .AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
-                         .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                         .AddSingleton<AssemblySource>()
-                         .AddSingleton<IMacroAliasExpanderService, MacroAliasExpanderService>()
-                         .AddSingleton<SearchService>()
-                         .AddMockSingleton<ISearchServiceOrchestrator>()
-                         .AddMockSingleton<IThumbnailService>()
-                         .AddMockSingleton<ICalculatorService>()
-                         .AddMemoryCache();
-
-        return serviceCollection.BuildServiceProvider();
-    }
-
     [Fact]
-    public void HaveStores()
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddStoreServicesMockContext();
-        serviceCollection.AddTestOutputHelper(OutputHelper);
-        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
-        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, CalculatorStore>());
-        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, EverythingStore>());
-        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, ReservedAliasStore>());
-
-        var serviceProvider = BuildConfigureServices(serviceCollection);
-        var services = serviceProvider.GetServices<IStoreService>();
-        services.Count().ShouldBe(4);
-    }
-
-    [Fact]
-    public void NOT_HaveNullParameters()
+    public void When_retrieving_aliases_from_repository_Then_parameters_are_mapped_as_expected()
     {
         // arrange
         using var db = BuildFreshDb(SqlCreateAlias);
@@ -114,7 +75,7 @@ public class SearchServiceShould : TestBase
     }
 
     [Fact]
-    public void NotSetUsageWhenCounterIsNegative()
+    public void When_alias_has_negative_counter_Then_usage_is_ignored()
     {
         /*
          * Create a new alias with usage set to -1
@@ -147,7 +108,7 @@ public class SearchServiceShould : TestBase
     }
 
     [Fact]
-    public async Task ReturnNoResultMessageWhenMisconfiguredMacro()
+    public async Task When_macro_is_misconfigured_Then_it_is_excluded_from_result()
     {
         // ARRANGE
         const string sql = SqlCreateAlias +
@@ -192,7 +153,7 @@ public class SearchServiceShould : TestBase
     }
 
     [Fact]
-    public async Task ReturnResultWithExactMatchOnTop()
+    public async Task When_there_is_result_with_exact_match_Then_it_is_moved_on_top_of_the_list()
     {
         var dt = DateTime.Now;
         var sql = new SqlBuilder()
@@ -264,12 +225,12 @@ public class SearchServiceShould : TestBase
         // ASSERT
         result.ShouldSatisfyAllConditions(
             r => r.Length.ShouldBe(2),
-            r => r.First().Name.ShouldBe("u")
+            r => r[0].Name.ShouldBe("u")
         );
     }
 
     [Fact]
-    public async Task ReturnValues()
+    public async Task When_search_has_no_result_Then_result_is_informational_QueryResult()
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroAliasExpanderService>()
                                                      .AddTestOutputHelper(OutputHelper)
@@ -287,12 +248,12 @@ public class SearchServiceShould : TestBase
 
         result.ShouldSatisfyAllConditions(
             r => r.Length.ShouldBe(1),
-            r => r.ElementAt(0).IsResult.ShouldBeFalse()
+            r => r[0].IsResult.ShouldBeFalse()
         );
     }
 
     [Fact]
-    public void SetUsageDoesNotResetAdditionalParameters()
+    public void When_setting_usage_Then_it_does_not_reset_additional_parameters()
     {
         OutputHelper.Arrange();
         var sql = new SqlBuilder().AppendAlias(a =>

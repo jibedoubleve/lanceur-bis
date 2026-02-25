@@ -10,6 +10,7 @@ using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
+using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tools;
@@ -59,7 +60,7 @@ public class ExecutionServiceShould : TestBase
     [InlineData("$R$", "un deux / \\ - <", "un deux / \\ - <")]
     [InlineData("$I$", "un deux", "un deux")]
     [InlineData("$W$", "hello world", "hello+world")]
-    public async Task ExecuteAliasWithCorrectFileNameReplacements(string actual, string parameters, string expected)
+    public async Task When_using_replacements_for_FileName_Then_correct_values_applied(string actual, string parameters, string expected)
     {
         // arrange
         var outputFileName = string.Empty;
@@ -89,7 +90,7 @@ public class ExecutionServiceShould : TestBase
     [InlineData("--$R$", "un deux / \\ - <", "--un deux / \\ - <")]
     [InlineData("--$I$", "un deux", "--un deux")]
     [InlineData("--$W$", "hello world", "--hello+world")]
-    public async Task ExecuteAliasWithCorrectParametersReplacements(
+    public async Task When_using_replacements_for_Parameters_Then_correct_values_applied(
         string parameters,
         string queryParameters,
         string expectedParameters
@@ -122,7 +123,7 @@ public class ExecutionServiceShould : TestBase
     [Theory]
     [InlineData("application.exe", "-c aa -b bb", "app")]
     [InlineData("application.exe", "-c aa -b bb", "app undeux trois")]
-    public async Task ExecuteAliasWithCorrectParametersWithoutReplacements(
+    public async Task When_not_using_replacements_for_Parameters_Then_no_replacement_occured(
         string fileName,
         string parameters,
         string originatingQuery
@@ -159,7 +160,7 @@ public class ExecutionServiceShould : TestBase
 
     [Theory]
     [InlineData("ini", "thb@joplin@spotify")]
-    public async Task ExecuteMultiMacro(string cmd, string parameters)
+    public async Task When_executing_MultiMacro_Then_no_error(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
         var executionService = CreateExecutionService();
@@ -167,6 +168,7 @@ public class ExecutionServiceShould : TestBase
         var sp = new ServiceCollection()
                  .AddMockSingleton<IExecutionService>()
                  .AddMockSingleton<ISearchService>()
+                 .AddMacroServices()
                  .BuildServiceProvider();
 
         var macro = new MultiMacro(
@@ -181,7 +183,7 @@ public class ExecutionServiceShould : TestBase
     
     [Theory]
     [InlineData("issue", "with some text as parameters")]
-    public async Task ExecuteMacroWithParameters(string cmd, string parameters)
+    public async Task When_executing_macro_with_parameters_Then_parameters_are_used(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
 
@@ -216,7 +218,7 @@ public class ExecutionServiceShould : TestBase
                                         .BuildServiceProvider();
 
         var macro = sp.GetService<GithubIssueMacro>();
-        var request = new ExecutionRequest(macro, cmdline, false);
+        var request = new ExecutionRequest(macro, cmdline);
 
         try
         {
@@ -227,13 +229,13 @@ public class ExecutionServiceShould : TestBase
 
         await githubService.Received()
                            .CreateIssue(
-                               Arg.Is<string>(s => s.Contains("some text as parameters")),
+                               Arg.Is<string>(s => string.Equals(s, parameters)),
                                Arg.Any<string>()
                            );
     }
 
     [Fact]
-    public async Task HandleLuaScriptWithParameters()
+    public async Task When_executing_alias_with_parameters_Then_parameters_are_used()
     {
         // arrange
         const string queryParameters = "hello world";
@@ -253,8 +255,7 @@ public class ExecutionServiceShould : TestBase
                             return context
                             """
             },
-            Cmdline.Parse(originatingQuery),
-            false
+            Cmdline.Parse(originatingQuery)
         );
 
         // act
@@ -269,14 +270,14 @@ public class ExecutionServiceShould : TestBase
 
     [Theory]
     [InlineData("ini", "thb@joplin@spotify")]
-    public async Task SelfExecuteMacroWithoutCrash(string cmd, string parameters)
+    public async Task When_executing_multi_macro_Then_no_crash(string cmd, string parameters)
     {
         var cmdline = new Cmdline(cmd, parameters);
         var sp = new ServiceCollection()
                  .AddMockSingleton<IExecutionService>()
                  .AddMockSingleton<ISearchService>()
                  .BuildServiceProvider();
-        
+
         var macro = new MultiMacro(
             sp.GetService<IExecutionService>(),
             sp.GetService<Lazy<ISearchService>>()
@@ -291,7 +292,7 @@ public class ExecutionServiceShould : TestBase
     [InlineData("$I$")]
     [InlineData("$w$")]
     [InlineData("$W$")]
-    public async Task UpdateFileNameAfterScriptExecution(string fileName)
+    public async Task When_executing_lua_script_Then_file_name_replacement_is_done_after_script_execution(string fileName)
     {
         // arrange
         const string prefix = "prefix:";
@@ -331,7 +332,7 @@ public class ExecutionServiceShould : TestBase
     [InlineData("$I$")]
     [InlineData("$w$")]
     [InlineData("$W$")]
-    public async Task UpdateParametersAfterScriptExecution(string queryParameter)
+    public async Task When_executing_lua_script_Then_parameter_replacement_is_done_after_script_execution(string queryParameter)
     {
         // arrange
         const string numericParameters = "12";
