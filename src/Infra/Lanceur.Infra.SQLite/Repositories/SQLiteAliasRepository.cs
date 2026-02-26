@@ -71,6 +71,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 an.name       as {nameof(SelectableAliasQueryResult.Name)},
                                 sub.synonyms  as {nameof(SelectableAliasQueryResult.Synonyms)},
                                 a.icon        as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.thumbnail   as {nameof(SelectableAliasQueryResult.Thumbnail)},
                                 a.exec_count  as {nameof(SelectableAliasQueryResult.Count)},
                                 lu.last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                             from 
@@ -120,6 +121,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
                                 a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.thumbnail  as {nameof(SelectableAliasQueryResult.Thumbnail)},
                                 a.exec_count as {nameof(SelectableAliasQueryResult.Count)},
                                 l.last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
 
@@ -174,6 +176,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 a.arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
                                 an.name      as {nameof(SelectableAliasQueryResult.Name)},
                                 a.icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                a.thumbnail  as {nameof(SelectableAliasQueryResult.Thumbnail)},
                                 a.exec_count as {nameof(SelectableAliasQueryResult.Count)},
                                 l.last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                             from 
@@ -192,14 +195,15 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     {
         const string sql = $"""
                             select
-                                id        as {nameof(SelectableAliasQueryResult.Id)},
-                                notes     as {nameof(SelectableAliasQueryResult.Description)},
-                                file_name as {nameof(SelectableAliasQueryResult.FileName)},
-                                arguments as {nameof(SelectableAliasQueryResult.Parameters)},
-                                name      as {nameof(SelectableAliasQueryResult.Name)},
-                                icon      as {nameof(SelectableAliasQueryResult.Icon)},
-                                exec_count as {nameof(SelectableAliasQueryResult.Count)},
-                                last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
+                                id           as {nameof(SelectableAliasQueryResult.Id)},
+                                notes        as {nameof(SelectableAliasQueryResult.Description)},
+                                file_name    as {nameof(SelectableAliasQueryResult.FileName)},
+                                arguments    as {nameof(SelectableAliasQueryResult.Parameters)},
+                                name         as {nameof(SelectableAliasQueryResult.Name)},
+                                icon         as {nameof(SelectableAliasQueryResult.Icon)},
+                                thumbnail    as {nameof(SelectableAliasQueryResult.Thumbnail)},
+                                exec_count   as {nameof(SelectableAliasQueryResult.Count)},
+                                last_usage   as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                             from
                                 data_doubloons_v a
                                 left join data_last_usage_v b on a.id = b.id_alias
@@ -288,6 +292,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                        c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
                        group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
                        c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
+                       c.thumbnail          as {nameof(SelectableAliasQueryResult.Thumbnail)},
                        a.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)},
                        e.count              as {nameof(SelectableAliasQueryResult.Count)}
                    from 
@@ -352,6 +357,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                        c.arguments          as {nameof(SelectableAliasQueryResult.Parameters)},
                        group_concat(b.name) as {nameof(SelectableAliasQueryResult.Name)},
                        c.icon               as {nameof(SelectableAliasQueryResult.Icon)},
+                       c.thumbnail          as {nameof(SelectableAliasQueryResult.Thumbnail)},
                        a.count              as {nameof(SelectableAliasQueryResult.Count)},
                        d.last_used          as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                    from 
@@ -384,6 +390,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 arguments  as {nameof(SelectableAliasQueryResult.Parameters)},
                                 name       as {nameof(SelectableAliasQueryResult.Name)},
                                 icon       as {nameof(SelectableAliasQueryResult.Icon)},
+                                thumbnail  as {nameof(SelectableAliasQueryResult.Thumbnail)},
                                 last_usage as {nameof(SelectableAliasQueryResult.LastUsedAt)}
                             from (
                                 select 
@@ -427,20 +434,21 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     /// <inheritdoc />
     public IEnumerable<AliasUsageItem> GetUsageFor(DateTime selectedDay)
     {
-        const string sql = """
-                           select
-                               a.id        as Id,
-                               sy.synonyms as Name,
-                               time_stamp  as Timestamp,
-                               a.file_name as FileName,
-                               a.Icon      as Icon
-                           from 
-                               alias_usage au
-                               left join data_alias_synonyms_v sy on sy.id_alias = au.id_alias
-                               inner join alias a on a.id = au.id_alias
-                           where date(time_stamp) = date(@selectedDay)
-                           order by au.time_stamp
-                           """;
+        const string sql = $"""
+                             select
+                                 a.id        as {nameof(AliasUsageItem.Id)},
+                                 sy.synonyms as {nameof(AliasUsageItem.Name)},
+                                 time_stamp  as {nameof(AliasUsageItem.Timestamp)},
+                                 a.file_name as {nameof(AliasUsageItem.FileName)},
+                                 a.Icon      as {nameof(AliasUsageItem.Thumbnail)},
+                                 a.thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
+                             from 
+                                 alias_usage au
+                                 left join data_alias_synonyms_v sy on sy.id_alias = au.id_alias
+                                 inner join alias a on a.id = au.id_alias
+                             where date(time_stamp) = date(@selectedDay)
+                             order by au.time_stamp
+                             """;
         return Db.WithConnection(c => c.Query<AliasUsageItem>(sql, new { selectedDay }));
     }
 
