@@ -19,6 +19,7 @@ using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Wildcards;
+using Lanceur.Infra.Win32.Helpers;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Caching;
@@ -189,7 +190,8 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>()
-                         .RegisterInfrastructureSettingsProvider();
+                         .RegisterInfrastructureSettingsProvider()
+                         .AddStaThreadRunner();
         
         return serviceCollection;
     }
