@@ -58,7 +58,11 @@ public class FavIconDownloader : IFavIconDownloader
             var bytes = await _client.GetByteArrayAsync(favIconUrl);
             if (bytes.Length == 0)
             {
-                _logger.LogWarning("Failed to save favicon to {Url} with {FavIconUrl}", favIconUrl, favIconUrl);
+                _logger.LogWarning(
+                    "Failed to save favicon to {OutputPath}. Favicon url: {FavIconUrl}",
+                    outputPath,
+                    favIconUrl
+                );
                 return false;
             }
 
