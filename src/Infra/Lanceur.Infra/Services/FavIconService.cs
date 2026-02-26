@@ -24,13 +24,8 @@ public class FavIconService : IFavIconService
 
     #region Constructors
 
-    public FavIconService(
-        IPackagedAppSearchService searchService,
-        IFavIconDownloader favIconDownloader,
-        string imageRepository = null
-    )
+    public FavIconService(IFavIconDownloader favIconDownloader, string imageRepository = null)
     {
-        ArgumentNullException.ThrowIfNull(searchService);
         ArgumentNullException.ThrowIfNull(favIconDownloader);
 
         _imageRepository = imageRepository ?? Paths.ImageRepository;
