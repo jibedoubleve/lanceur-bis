@@ -46,23 +46,19 @@ public class FavIconDownloader : IFavIconDownloader
         return requestUrl;
     }
 
-    private async Task<bool> SaveThumbnailAsync(Uri favIconUrl, string outputPath)
+    private async Task<bool> SaveThumbnailAsync(HttpResponseMessage response, string outputPath)
     {
-        ArgumentNullException.ThrowIfNull(favIconUrl);
+        ArgumentNullException.ThrowIfNull(response);
         ArgumentNullException.ThrowIfNull(outputPath);
 
         var foundFavIcon = false;
 
         try
         {
-            var bytes = await _client.GetByteArrayAsync(favIconUrl);
+            var bytes = await response.Content.ReadAsByteArrayAsync();
             if (bytes.Length == 0)
             {
-                _logger.LogWarning(
-                    "Failed to save favicon to {OutputPath}. Favicon url: {FavIconUrl}",
-                    outputPath,
-                    favIconUrl
-                );
+                _logger.LogInformation("Cannot save thumbnail, response from favicon url is empty.");
                 return false;
             }
 
@@ -72,12 +68,7 @@ public class FavIconDownloader : IFavIconDownloader
         }
         catch (Exception ex)
         {
-            _logger.LogInformation(
-                ex,
-                "Failed to retrieve favicon for {Url} with {FavIconUrl}",
-                favIconUrl,
-                favIconUrl
-            );
+            _logger.LogWarning(ex, "Failed to save favicon into {OutputPath}.", outputPath);
         }
 
         return foundFavIcon;
@@ -95,17 +86,17 @@ public class FavIconDownloader : IFavIconDownloader
             try
             {
                 var requestUrl = GetFaviconUrl(url, faviconUrl);
-                var result = await _client.SendAsync(new(HttpMethod.Get, requestUrl));
+                var response = await _client.SendAsync(new(HttpMethod.Get, requestUrl));
 
                 _logger.LogTrace(
                     "Checking favicon with {FavIconManager} - Status: {Status} - Host: {Host}",
                     faviconUrl.Key,
-                    result.StatusCode,
+                    response.StatusCode,
                     url.Host
                 );
-                if (result.StatusCode != HttpStatusCode.OK) continue;
+                if (response.StatusCode != HttpStatusCode.OK) continue;
 
-                if (!await SaveThumbnailAsync(new(requestUrl), outputPath)) continue;
+                if (!await SaveThumbnailAsync(response, outputPath)) continue;
 
                 return true;
             }
