@@ -24,7 +24,6 @@ using Lanceur.Scripts;
 using Lanceur.SharedKernel.Caching;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
-using Lanceur.SharedKernel.Web;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
@@ -175,7 +174,8 @@ public static class ServiceCollectionExtensions
                              return new(
                                  sp.GetService<ILogger<FavIconDownloader>>(),
                                  sp.GetService<IMemoryCache>(),
-                                 TimeSpan.FromMinutes(duration)
+                                 TimeSpan.FromMinutes(duration),
+                                 sp.GetService<IHttpClientFactory>()
                              );
                          })
                          .AddTransient<IEverythingApi, EverythingApi>()

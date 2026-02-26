@@ -1,4 +1,4 @@
-namespace Lanceur.SharedKernel.Web;
+namespace Lanceur.Core.Services;
 
 /// <summary>
 ///     This class will download the favicon of the the website defined by the
