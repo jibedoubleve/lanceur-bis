@@ -39,6 +39,7 @@ using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Display;
 using Serilog.Sinks.Grafana.Loki;
+using ILogger = Serilog.ILogger;
 
 namespace Lanceur.Ui.Core.Extensions;
 
@@ -167,7 +168,16 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IFavIconService, FavIconService>()
-                         .AddSingleton<IFavIconDownloader, FavIconDownloader>()
+                         .AddSingleton<IFavIconDownloader, FavIconDownloader>(sp =>
+                         {
+                             var duration 
+                                 = sp.GetService<ISection<CachingSection>>()?.Value.ThumbnailCacheDuration ?? 30;
+                             return new(
+                                 sp.GetService<ILogger<FavIconDownloader>>(),
+                                 sp.GetService<IMemoryCache>(),
+                                 TimeSpan.FromMinutes(duration)
+                             );
+                         })
                          .AddTransient<IEverythingApi, EverythingApi>()
                          .AddTransient<IExecutionService, ExecutionService>()
                          .AddTransient<IWildcardService, ReplacementComposite>()
