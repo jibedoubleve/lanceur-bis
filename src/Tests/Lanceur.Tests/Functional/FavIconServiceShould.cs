@@ -2,6 +2,7 @@ using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
+using Lanceur.Infra.Win32.Helpers;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Web;
 using NSubstitute;
@@ -40,13 +41,12 @@ public class FavIconServiceShould
     public async Task RetrieveExpectedUrl(string url, string asExpected)
     {
         // ARRANGE
-        var searchService = Substitute.For<IPackagedAppSearchService>();
         var favIconDownloader = Substitute.For<IFavIconDownloader>();
         var repository = Path.GetTempPath();
+        
 
         // ACT
         var manager = new FavIconService(
-            searchService,
             favIconDownloader,
             repository
         );
