@@ -1,5 +1,6 @@
 using System.Net;
 using Lanceur.SharedKernel.Extensions;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.SharedKernel.Web;
@@ -9,14 +10,9 @@ public class FavIconDownloader : IFavIconDownloader
     #region Fields
 
     private readonly HttpClient _client = new();
-
-    /// <summary>
-    ///     Cache the path where it is impossible to retrieve the favicon to not spend time
-    ///     on something that doesn't work
-    /// </summary>
-    private readonly HashSet<string> _failedPaths = [];
-
     private readonly ILogger<FavIconDownloader> _logger;
+    private readonly IMemoryCache _faviconCache;
+    private readonly TimeSpan _retryDelay;
 
     private static readonly Dictionary<string, (bool IsManual, string Url)> FaviconUrls = new()
     {
@@ -30,7 +26,12 @@ public class FavIconDownloader : IFavIconDownloader
 
     #region Constructors
 
-    public FavIconDownloader(ILogger<FavIconDownloader> logger) => _logger = logger;
+    public FavIconDownloader(ILogger<FavIconDownloader> logger, IMemoryCache faviconCache, TimeSpan retryDelay)
+    {
+        _logger = logger;
+        _faviconCache = faviconCache;
+        _retryDelay = retryDelay;
+    }
 
     #endregion
 
@@ -76,7 +77,8 @@ public class FavIconDownloader : IFavIconDownloader
 
     public async Task<bool> RetrieveAndSaveFavicon(Uri url, string outputPath)
     {
-        if (_failedPaths.Contains(url.ToString()))
+        
+        if (_faviconCache.TryGetValue(url.ToString(), out _))
         {
             _logger.LogTrace("{Url} is in the failed paths for favicon retrieving.", url);
             return false;
@@ -110,7 +112,9 @@ public class FavIconDownloader : IFavIconDownloader
                 );
             }
 
-        _failedPaths.Add(url.ToString());
+        if (!_faviconCache.TryGetValue(url.ToString(), out _))
+            _faviconCache.Set(url.ToString(), true, _retryDelay);
+
         return false;
     }
 
