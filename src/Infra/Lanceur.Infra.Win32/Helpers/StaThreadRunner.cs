@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 namespace Lanceur.Infra.Win32.Helpers;
 
 /// <inheritdoc />
-public class StaThreadRunner : IStaThreadRunner
+public sealed class StaThreadRunner : IStaThreadRunner
 {
     #region Fields
 
