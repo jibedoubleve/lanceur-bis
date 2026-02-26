@@ -2,6 +2,7 @@
 using Lanceur.Core.Decorators;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Win32.Helpers;
 using Lanceur.Infra.Win32.Images;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.SharedKernel.Extensions;
@@ -18,6 +19,7 @@ public class ThumbnailService : IThumbnailService
     private readonly ILogger<ThumbnailService> _logger;
     private readonly IPackagedAppSearchService _packagedAppSearchService;
     private readonly Win32ThumbnailService _win32ThumbnailService;
+    private readonly StaThreadRunner _staThreadRunner;
 
     #endregion
 
@@ -29,6 +31,7 @@ public class ThumbnailService : IThumbnailService
         IFavIconService favIconService
     )
     {
+        _staThreadRunner = new();
         _win32ThumbnailService = new(loggerFactory.CreateLogger<Win32ThumbnailService>());
         _packagedAppSearchService = packagedAppSearchService;
         _favIconService = favIconService;
@@ -107,7 +110,7 @@ public class ThumbnailService : IThumbnailService
         // ----
         // Manage win32 applications
         // ----
-        var imageSource = _win32ThumbnailService.GetThumbnail(alias.FileName);
+        var imageSource = await _staThreadRunner.RunAsync(() => _win32ThumbnailService.GetThumbnail(alias.FileName));
         if (imageSource is not null)
         {
             var file = new FileInfo(alias.FileName);
@@ -160,7 +163,7 @@ public class ThumbnailService : IThumbnailService
         try
         {
             _logger.LogTrace("Refreshing thumbnails for alias {AliasNAme}", queryResult.Name);
-            UpdateThumbnailAsync(query) // Fire & forget thumbnail refresh
+            _ = UpdateThumbnailAsync(query) // Fire & forget thumbnail refresh
                 .ContinueWith(
                     t =>
                     {
