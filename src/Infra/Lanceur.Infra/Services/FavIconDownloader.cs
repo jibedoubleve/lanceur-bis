@@ -1,15 +1,16 @@
 using System.Net;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.SharedKernel.Web;
+namespace Lanceur.Infra.Services;
 
 public class FavIconDownloader : IFavIconDownloader
 {
     #region Fields
 
-    private readonly HttpClient _client = new();
+    private readonly HttpClient _client;
     private readonly ILogger<FavIconDownloader> _logger;
     private readonly IMemoryCache _faviconCache;
     private readonly TimeSpan _retryDelay;
@@ -26,11 +27,16 @@ public class FavIconDownloader : IFavIconDownloader
 
     #region Constructors
 
-    public FavIconDownloader(ILogger<FavIconDownloader> logger, IMemoryCache faviconCache, TimeSpan retryDelay)
+    public FavIconDownloader(
+        ILogger<FavIconDownloader> logger, 
+        IMemoryCache faviconCache, 
+        TimeSpan retryDelay,
+        IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _faviconCache = faviconCache;
         _retryDelay = retryDelay;
+        _client = httpClientFactory.CreateClient("favicon");
     }
 
     #endregion

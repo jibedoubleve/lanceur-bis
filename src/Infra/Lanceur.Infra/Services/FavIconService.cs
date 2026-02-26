@@ -3,7 +3,6 @@ using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.SharedKernel.Web;
 
 namespace Lanceur.Infra.Services;
 

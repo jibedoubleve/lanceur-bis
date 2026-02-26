@@ -4,7 +4,6 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Win32.Helpers;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.SharedKernel.Web;
 using NSubstitute;
 using Xunit;
 
