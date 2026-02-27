@@ -25,7 +25,5 @@ public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfEx
 
     public abstract Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
 
-    public override string ToQuery() => $"{Name} {Parameters}".Trim();
-
     #endregion
 }

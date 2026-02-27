@@ -227,7 +227,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 and a.deleted_at is null
                                 and an.id_alias != @idAlias
                             """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = names, idAlias }));
+        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new {   names, idAlias }));
     }
 
     /// <inheritdoc />
@@ -435,20 +435,20 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public IEnumerable<AliasUsageItem> GetUsageFor(DateTime selectedDay)
     {
         const string sql = $"""
-                             select
-                                 a.id        as {nameof(AliasUsageItem.Id)},
-                                 sy.synonyms as {nameof(AliasUsageItem.Name)},
-                                 time_stamp  as {nameof(AliasUsageItem.Timestamp)},
-                                 a.file_name as {nameof(AliasUsageItem.FileName)},
-                                 a.Icon      as {nameof(AliasUsageItem.Thumbnail)},
-                                 a.thumbnail as {nameof(SelectableAliasQueryResult.Thumbnail)}
-                             from 
-                                 alias_usage au
-                                 left join data_alias_synonyms_v sy on sy.id_alias = au.id_alias
-                                 inner join alias a on a.id = au.id_alias
-                             where date(time_stamp) = date(@selectedDay)
-                             order by au.time_stamp
-                             """;
+                            select
+                                a.id        as {nameof(AliasUsageItem.Id)},
+                                sy.synonyms as {nameof(AliasUsageItem.Name)},
+                                time_stamp  as {nameof(AliasUsageItem.Timestamp)},
+                                a.file_name as {nameof(AliasUsageItem.FileName)},
+                                a.Icon      as {nameof(AliasUsageItem.Icon)},
+                                a.thumbnail as {nameof(AliasUsageItem.Thumbnail)}
+                            from 
+                                alias_usage au
+                                left join data_alias_synonyms_v sy on sy.id_alias = au.id_alias
+                                inner join alias a on a.id = au.id_alias
+                            where date(time_stamp) = date(@selectedDay)
+                            order by au.time_stamp
+                            """;
         return Db.WithConnection(c => c.Query<AliasUsageItem>(sql, new { selectedDay }));
     }
 
@@ -659,6 +659,14 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
             }
 
             _dbActionFactory.UsageManagement.SetUsage(tx, ref alias);
+        }
+    );
+
+    /// <inheritdoc />
+    public void UpdateThumbnail(AliasQueryResult alias) => Db.WithinTransaction(tx =>
+        {
+            const string sql = "update alias set thumbnail = @thumbnail where id = @id;";
+            tx.Connection!.Execute(sql, new { id = alias.Id, thumbnail = alias.Thumbnail });
         }
     );
 

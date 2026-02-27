@@ -20,20 +20,24 @@ public class AliasManagementService : IAliasManagementService
 
     #region Methods
 
+    /// <inheritdoc />
     public void Delete(AliasQueryResult alias) => _repository.RemoveLogically(alias);
 
+    /// <inheritdoc />
     public IEnumerable<AliasQueryResult> GetAll()
     {
         var results = _repository.GetAll()
-                                 .Where(x => x.IsHidden == false)
+                                 .Where(x => !x.IsHidden)
                                  .OrderBy(x => x.Name)
                                  .ToArray();
         foreach (var result in results) result.MarkUnchanged();
         return results;
     }
 
+    /// <inheritdoc />
     public AliasQueryResult GetById(long id) => _repository.GetById(id);
 
+    /// <inheritdoc />
     public AliasQueryResult Hydrate(AliasQueryResult queryResult)
     {
         _repository.HydrateAlias(queryResult);
@@ -41,11 +45,15 @@ public class AliasManagementService : IAliasManagementService
         return queryResult;
     }
 
+    /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias)
     {
         _repository.SaveOrUpdate(ref alias);
         alias.MarkUnchanged();
     }
+
+    /// <inheritdoc />
+    public void UpdateThumbnail(AliasQueryResult alias) => _repository.UpdateThumbnail(alias);
 
     #endregion
 }

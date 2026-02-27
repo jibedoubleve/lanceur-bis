@@ -30,6 +30,7 @@ public interface IAliasManagementService
     /// </summary>
     /// <param name="id">The unique identifier of the alias query result to retrieve.</param>
     /// <returns>The AliasQueryResult corresponding to the provided ID, or null if not found.</returns>
+    [Obsolete("Not used anymore")]
     AliasQueryResult GetById(long id);
 
     /// <summary>
@@ -54,6 +55,18 @@ public interface IAliasManagementService
     ///     the entity is newly created in the database.
     /// </param>
     void SaveOrUpdate(ref AliasQueryResult alias);
+
+    /// <summary>
+    ///     Updates only the thumbnail property of the specified alias in the database.
+    /// </summary>
+    /// <param name="alias">
+    ///     The alias query result containing the new thumbnail data to be persisted.
+    /// </param>
+    /// <remarks>
+    ///     This method is an optimised update that ignores all other properties of the <see cref="AliasQueryResult" />.
+    ///     To persist changes to other fields (such as Name or Criteria), use <see cref="SaveOrUpdate" /> instead.
+    /// </remarks>
+    void UpdateThumbnail(AliasQueryResult alias);
 
     #endregion
 }

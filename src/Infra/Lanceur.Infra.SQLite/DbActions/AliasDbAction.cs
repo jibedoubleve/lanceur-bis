@@ -101,17 +101,13 @@ public class AliasDbAction
 
         // Create alias additional parameters
         var entities = parameters.ToEntity(idAlias).ToList();
-        var addedRowsCount = entities.Sum(entity =>
-                                              tx.Connection.Execute(
-                                                  sql2,
-                                                  new
-                                                  {
-                                                      idAlias = entity.IdAlias,
-                                                      parameter = entity.Parameter,
-                                                      name = entity.Name
-                                                  }
-                                              )
-        );
+        var addedRowsCount
+            = entities.Sum(entity =>
+                tx.Connection.Execute(
+                    sql2,
+                    new { idAlias = entity.IdAlias, parameter = entity.Parameter, name = entity.Name }
+                )
+            );
 
         if (deletedRowsCount > 0 && addedRowsCount == 0)
             _logger.LogWarning(
@@ -130,7 +126,10 @@ public class AliasDbAction
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
 
-    internal AliasQueryResult GetById(IDbTransaction tx, long id)
+    [Obsolete("Use GetById with IDbConnection instead")]
+    internal AliasQueryResult GetById(IDbTransaction tx, long id) => GetById(tx.Connection, id);
+    
+    internal AliasQueryResult GetById(IDbConnection connection, long id) 
     {
         if (id <= 0) throw new ArgumentException("The id of the alias should be greater than zero.");
 
@@ -146,6 +145,7 @@ public class AliasDbAction
                                 a.start_mode            as {nameof(AliasQueryResult.StartMode)},
                                 a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
                                 a.icon                  as {nameof(AliasQueryResult.Icon)},
+                                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
                                 a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
                                 a.exec_count            as {nameof(AliasQueryResult.Count)},
                                 a.hidden                as {nameof(AliasQueryResult.IsHidden)},
@@ -162,7 +162,7 @@ public class AliasDbAction
                             limit 1;
                             """;
 
-        var result = tx.Connection!
+        var result = connection!
                        .Query<AliasQueryResult>(sql, new { id })
                        .SingleOrDefault();
 
@@ -170,16 +170,28 @@ public class AliasDbAction
     }
 
     /// <summary>
-    ///     Get all the alias that has an exact name in the specified list of names.
-    ///     . In case of multiple aliases with same name, the one with greater counter
-    ///     is selected.
+    ///     Returns all aliases whose name exactly matches one of the specified names.
     /// </summary>
-    /// <param name="tx">The transaction to use for the query</param>
-    /// <param name="names">The list of names to find.</param>
-    /// <param name="includeHidden">Indicate whether include or not hidden aliases</param>
-    /// <returns>The exact match or <c>null</c> if not found.</returns>
+    /// <param name="tx">The transaction to use for the query.</param>
+    /// <param name="names">The list of names to search for.</param>
+    /// <param name="includeHidden">Whether to include hidden aliases in the results.</param>
+    /// <returns>All matching aliases, or an empty collection if none are found.</returns>
+    [Obsolete("Use GetByNames with IDbConnection instead")]
     internal IEnumerable<AliasQueryResult> GetByNames(
         IDbTransaction tx,
+        IEnumerable<string> names,
+        bool includeHidden = false
+    ) => GetByNames(tx.Connection, names, includeHidden);
+
+    /// <summary>
+    ///     Returns all aliases whose name exactly matches one of the specified names.
+    /// </summary>
+    /// <param name="connection">The database connection to use for the query.</param>
+    /// <param name="names">The list of names to search for.</param>
+    /// <param name="includeHidden">Whether to include hidden aliases in the results.</param>
+    /// <returns>All matching aliases, or an empty collection if none are found.</returns>
+    internal IEnumerable<AliasQueryResult> GetByNames(
+        IDbConnection connection,
         IEnumerable<string> names,
         bool includeHidden = false
     )
@@ -195,6 +207,7 @@ public class AliasDbAction
                                 a.start_mode            as {nameof(AliasQueryResult.StartMode)},
                                 a.working_dir           as {nameof(AliasQueryResult.WorkingDirectory)},
                                 a.icon                  as {nameof(AliasQueryResult.Icon)},
+                                a.thumbnail             as {nameof(AliasQueryResult.Thumbnail)},
                                 a.lua_script            as {nameof(AliasQueryResult.LuaScript)},
                                 a.hidden                as {nameof(AliasQueryResult.IsHidden)},
                                 a.confirmation_required as {nameof(AliasQueryResult.IsExecutionConfirmationRequired)}
@@ -210,7 +223,7 @@ public class AliasDbAction
         var hidden = includeHidden ? [0, 1] : 0.ToEnumerable();
         var arguments = new { names, hidden };
 
-        return tx.Connection!.Query<AliasQueryResult>(sql, arguments).ToArray();
+        return connection.Query<AliasQueryResult>(sql, arguments).ToArray();
     }
 
     internal AliasUsage GetHiddenAlias(IDbTransaction tx, string name)
@@ -284,6 +297,7 @@ public class AliasDbAction
                                     start_mode  = @startMode,
                                     working_dir = @workingDirectory,
                                     icon        = @icon,
+                                    thumbnail   = @thumbnail,
                                     lua_script  = @luaScript,
                                     hidden      = @isHidden,
                                     confirmation_required = @isExecutionConfirmationRequired
@@ -298,6 +312,7 @@ public class AliasDbAction
                                     start_mode,
                                     working_dir,
                                     icon,
+                                    thumbnail,
                                     lua_script,
                                     hidden,
                                     confirmation_required
@@ -310,6 +325,7 @@ public class AliasDbAction
                                     @startMode,
                                     @workingDirectory,
                                     @icon,
+                                    @thumbnail,
                                     @luaScript,
                                     @isHidden,
                                     @isExecutionConfirmationRequired
@@ -328,6 +344,7 @@ public class AliasDbAction
             startMode = alias.StartMode,
             workingDirectory = alias.WorkingDirectory,
             icon = alias.Icon,
+            thumbnail = alias.Thumbnail,
             luaScript = alias.LuaScript,
             isHidden = alias.IsHidden,
             isExecutionConfirmationRequired = alias.IsExecutionConfirmationRequired

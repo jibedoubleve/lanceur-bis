@@ -1,33 +1,30 @@
 ﻿using System.Text.RegularExpressions;
-using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.Services;
 
-public class FavIconService : IFavIconService
+public sealed partial class FavIconService : IFavIconService
 {
     #region Fields
 
     private readonly IFavIconDownloader _favIconDownloader;
-    private readonly string _imageRepository;
 
     /// <summary>
     ///     A regex to check whether the specified text
     ///     is the template of a Macro
     /// </summary>
-    private static readonly Regex IsMacroRegex = new("@.*@");
+    private static readonly Regex IsMacroRegex = IsMacroRegexBuilder();
 
     #endregion
 
     #region Constructors
 
-    public FavIconService(IFavIconDownloader favIconDownloader, string imageRepository = null)
+    public FavIconService(IFavIconDownloader favIconDownloader)
     {
         ArgumentNullException.ThrowIfNull(favIconDownloader);
 
-        _imageRepository = imageRepository ?? Paths.ImageRepository;
         _favIconDownloader = favIconDownloader;
     }
 
@@ -35,24 +32,31 @@ public class FavIconService : IFavIconService
 
     #region Methods
 
-    public async Task UpdateFaviconAsync(AliasQueryResult alias)
+    [GeneratedRegex("@.*@")] private static partial Regex IsMacroRegexBuilder();
+
+    /// <inheritdoc />
+    public async Task<string> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver)
     {
         var url = alias.FileName;
-        if (url is null) return;
-        if (IsMacroRegex.Match(url).Success) return;
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return;
+        // You don't need to check favicon when
+        //   - no url is provided
+        //   - alias is a Macro
+        //   - Uri is malformed
+        if (url is null 
+            || IsMacroRegex.Match(url).Success 
+            || !Uri.TryCreate(url, UriKind.Absolute, out var uri)) { return null; }
 
-        var favIconPath = Path.Combine(_imageRepository, $"{FavIconExtensions.FilePrefix}{uri.Host}.ico");
+        var favIconPath = cachePathResolver(uri.Host);
+
         if (File.Exists(favIconPath))
         {
-            alias.Thumbnail = favIconPath;
-            return;
+            return favIconPath;
         }
 
         var uriAuthority = uri.GetAuthority();
         var success = await _favIconDownloader.RetrieveAndSaveFavicon(uriAuthority, favIconPath);
-        
-        alias.Thumbnail = success ? favIconPath : null;
+
+        return success ? favIconPath : null;
     }
 
     #endregion

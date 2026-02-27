@@ -21,6 +21,7 @@ using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Helpers;
 using Lanceur.Infra.Win32.Services;
+using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Scripts;
 using Lanceur.SharedKernel.Caching;
 using Lanceur.SharedKernel.IoC;
@@ -39,7 +40,6 @@ using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Display;
 using Serilog.Sinks.Grafana.Loki;
-using ILogger = Serilog.ILogger;
 
 namespace Lanceur.Ui.Core.Extensions;
 
@@ -56,7 +56,7 @@ public static class ServiceCollectionExtensions
         => serviceCollection.AddSingleton(typeof(ISection<>), typeof(ConfigurationSection<>))
                             .AddSingleton(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
 
-    public static void AddLoggers(
+    public static IServiceCollection AddLoggers(
         this IServiceCollection serviceCollection,
         HostBuilderContext context
     )
@@ -88,7 +88,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
         Log.Logger = loggerCfg.CreateLogger();
 
-        return;
+        return serviceCollection;
 
         void ConfigureLogForDebug()
         {
@@ -169,16 +169,17 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IFavIconService, FavIconService>()
                          .AddSingleton<IFavIconDownloader, FavIconDownloader>(sp =>
-                         {
-                             var duration 
-                                 = sp.GetService<ISection<CachingSection>>()?.Value.ThumbnailCacheDuration ?? 30;
-                             return new(
-                                 sp.GetService<ILogger<FavIconDownloader>>(),
-                                 sp.GetService<IMemoryCache>(),
-                                 TimeSpan.FromMinutes(duration),
-                                 sp.GetService<IHttpClientFactory>()
-                             );
-                         })
+                             {
+                                 var duration
+                                     = sp.GetService<ISection<CachingSection>>()?.Value.ThumbnailCacheDuration ?? 30;
+                                 return new(
+                                     sp.GetService<ILogger<FavIconDownloader>>(),
+                                     sp.GetService<IMemoryCache>(),
+                                     TimeSpan.FromMinutes(duration),
+                                     sp.GetService<IHttpClientFactory>()
+                                 );
+                             }
+                         )
                          .AddTransient<IEverythingApi, EverythingApi>()
                          .AddTransient<IExecutionService, ExecutionService>()
                          .AddTransient<IWildcardService, ReplacementComposite>()
@@ -190,7 +191,9 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>()
+                         .AddHttpClient()
                          .RegisterInfrastructureSettingsProvider()
+                         .AddThumbnailStrategies()
                          .AddStaThreadRunner();
         
         return serviceCollection;

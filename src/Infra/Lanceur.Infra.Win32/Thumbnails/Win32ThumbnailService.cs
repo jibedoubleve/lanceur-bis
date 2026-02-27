@@ -73,7 +73,7 @@ internal class Win32ThumbnailService
         }
         catch (Exception ex) { _logger.LogWarning(ex, "Failed to extract thumbnail for {Path}", path); }
 
-        //Return the value event if null;
+        //The value is returned even if null;
         return image;
     }
 
