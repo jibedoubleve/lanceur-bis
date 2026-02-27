@@ -311,7 +311,8 @@ public interface IAliasRepository
     void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases);
 
     /// <summary>
-    ///     Searches for all aliases that match the specified criteria.
+    ///     Searches for aliases that match the specified name.
+    ///     Note: This method does not load additional parameters.
     /// </summary>
     /// <param name="name">The criteria used to search for aliases.</param>
     /// <param name="isReturnAllIfEmpty">
@@ -319,6 +320,10 @@ public interface IAliasRepository
     ///     if <c>true</c>, all aliases are returned; if <c>false</c>, no results are returned.
     /// </param>
     /// <returns>A collection of aliases that match the search criteria.</returns>
+    /// <remarks>
+    ///     By design, this method provides a lightweight search. If you require the inclusion of
+    ///     additional parameters in the results, use <see cref="SearchAliasWithAdditionalParameters" /> instead.
+    /// </remarks>
     IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false);
 
     /// <summary>
@@ -333,6 +338,7 @@ public interface IAliasRepository
     /// </summary>
     /// <param name="names">The names to find in the database</param>
     /// <returns></returns>
+    [Obsolete("Not used anymore")]
     ExistingNameResponse SelectNames(string[] names);
 
     /// <summary>
@@ -356,6 +362,18 @@ public interface IAliasRepository
     /// </remarks>
     /// <param name="alias">The QueryResult object representing the alias to be updated. Must not be null.</param>
     void SetUsage(QueryResult alias);
+
+    /// <summary>
+    ///     Updates only the thumbnail property of the specified alias in the database.
+    /// </summary>
+    /// <param name="alias">
+    ///     The alias query result containing the new thumbnail data to be persisted.
+    /// </param>
+    /// <remarks>
+    ///     This method is an optimised update that ignores all other properties of the <see cref="AliasQueryResult" />.
+    ///     To persist changes to other fields (such as Name or Criteria), use <see cref="SaveOrUpdate" /> instead.
+    /// </remarks>
+    void UpdateThumbnail(AliasQueryResult alias);
 
     #endregion
 }

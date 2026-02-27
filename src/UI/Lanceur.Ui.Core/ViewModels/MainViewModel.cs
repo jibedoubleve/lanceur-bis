@@ -146,9 +146,7 @@ public partial class MainViewModel : ObservableObject
     private void OnLoadThumbnail(QueryResult? queryResult)
     {
         if (queryResult is null) return;
-
-        if (!queryResult.Thumbnail.IsNullOrEmpty()) return; /* Already loaded */
-
+        
         try { _thumbnailService.UpdateThumbnail(queryResult); }
         catch (Exception ex)
         {

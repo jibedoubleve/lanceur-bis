@@ -10,4 +10,7 @@
     <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
     <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" Version="10.0.3" />
+  </ItemGroup>
 </Project>

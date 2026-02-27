@@ -14,16 +14,6 @@ namespace Lanceur.Core.Models;
 [DebuggerDisplay("({Id}) {Name} - Desc: {Description}")]
 public abstract class QueryResult : ObservableModel
 {
-    #region Fields
-
-    private int _count  ;
-
-    private string _description;
-
-    private string _thumbnail;
-
-    #endregion
-
     #region Properties
 
     protected static Task<IEnumerable<QueryResult>> NoResultAsync => Task.FromResult(NoResult);
@@ -37,14 +27,14 @@ public abstract class QueryResult : ObservableModel
     /// </remarks>
     public int Count
     {
-        get => _count;
-        set => SetField(ref _count, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     public string Description
     {
-        get => _description;
-        set => SetField(ref _description, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     public virtual string DescriptionDisplay => Description;
@@ -93,15 +83,20 @@ public abstract class QueryResult : ObservableModel
     /// </summary>
     public string Thumbnail
     {
-        get => _thumbnail;
-        set => SetField(ref _thumbnail, value);
+        get;
+        set
+        {
+            // PropertyChanged is raised unconditionally (even when the value is the same) to
+            // handle the following scenario:
+            //   1. A thumbnail file is deleted from disk.
+            //   2. The thumbnail is re-downloaded and saved under the same path.
+            //   3. The alias already holds that path, so a standard equality check would skip
+            //      the notification — leaving the UI stuck on a broken image.
+            // By always notifying, the UI re-evaluates the binding and reloads the image.
+            field = value;
+            OnPropertyChanged();
+        }
     }
-
-    #endregion
-
-    #region Methods
-
-    public virtual string ToQuery() => $"{Name}";
 
     #endregion
 }

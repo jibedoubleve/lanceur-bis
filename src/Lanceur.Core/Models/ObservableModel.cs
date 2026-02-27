@@ -7,15 +7,11 @@ public class ObservableModel : INotifyPropertyChanged
 {
     #region Fields
 
-    private bool _isDirty;
-
     /// <summary>
     ///     Properties that do not affect the dirty state when modified.
-    ///     For example, changing <see cref="Count" /> on a clean item keeps it clean.
     /// </summary>
     private static readonly IEnumerable<string> ExcludedProperties = [
         nameof(IsDirty),
-        nameof(AliasQueryResult.Thumbnail),
         nameof(AliasQueryResult.Count)
     ];
 
@@ -28,8 +24,8 @@ public class ObservableModel : INotifyPropertyChanged
     /// </summary>
     public bool IsDirty
     {
-        get => _isDirty;
-        private set => SetField(ref _isDirty, value);
+        get;
+        private set => SetField(ref field, value);
     }
 
     #endregion

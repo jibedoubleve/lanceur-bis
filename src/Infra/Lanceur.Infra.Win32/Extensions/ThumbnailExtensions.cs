@@ -1,10 +1,12 @@
 using System.IO;
+using System.IO.Hashing;
+using System.Text;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Lanceur.Core.Constants;
 using Lanceur.SharedKernel.Extensions;
 
-namespace Lanceur.Infra.Win32.Images;
+namespace Lanceur.Infra.Win32.Extensions;
 
 public static class ThumbnailExtensions
 {
@@ -25,13 +27,12 @@ public static class ThumbnailExtensions
     public static void CopyToImageRepository(this ImageSource imageSource, string fileName)
     {
         if (fileName.IsNullOrWhiteSpace()) return;
-        
-        var destination = fileName.GetThumbnailPath();
+
+        var destination = fileName.GetThumbnailAbsolutePath();
 
         lock (Locker)
         {
             if (File.Exists(destination)) return;
-
             if (!Directory.Exists(Paths.ImageRepository)) Directory.CreateDirectory(Paths.ImageRepository);
             if (imageSource is not BitmapSource bitmapSource) return;
 
@@ -55,29 +56,44 @@ public static class ThumbnailExtensions
         if (fileName.IsNullOrWhiteSpace()) return;
         if (imageSource.IsNullOrWhiteSpace()) return;
 
-        var destination = fileName.GetThumbnailPath();
-
-        if (File.Exists(destination)) return;
+        var destination = fileName.GetThumbnailAbsolutePath();
 
         lock (Locker)
         {
+            if (File.Exists(destination)) return;
             if (!Directory.Exists(Paths.ImageRepository)) Directory.CreateDirectory(Paths.ImageRepository);
+            
             File.Copy(imageSource, destination, true);
         }
     }
 
     /// <summary>
-    ///     Generates the absolute path for the thumbnail image associated with the specified file name.
+    ///     Resolves the absolute path of a thumbnail file in the image repository.
     /// </summary>
-    /// <param name="fileName">
-    ///     The file name, possibly containing a prefix like "package:", for which to generate the thumbnail
-    ///     path.
-    /// </param>
-    /// <returns>The absolute path to the thumbnail image corresponding to the given file name.</returns>
-    public static string GetThumbnailPath(this string fileName) => Path.Combine(
-        Paths.ImageRepository,
-        $"{fileName.Replace("package:", "")}.ico"
-    );
+    /// <param name="fileName">The thumbnail file name (without directory).</param>
+    /// <returns>
+    ///     The absolute path to the thumbnail file, combining <see cref="Paths.ImageRepository" />
+    ///     with <paramref name="fileName" />.
+    /// </returns>
+    public static string GetThumbnailAbsolutePath(this string fileName)
+        => Path.Combine(Paths.ImageRepository, fileName);
+
+    /// <summary>
+    ///     Computes a deterministic file name for the thumbnail associated with the specified input.
+    ///     The name is derived by hashing the input using XxHash64, ensuring a unique and
+    ///     collision-resistant file name within the thumbnail repository.
+    /// </summary>
+    /// <param name="path">The file name or path used as input to generate the thumbnail file name.</param>
+    /// <returns>
+    ///     A file name (without directory) in the form <c>{hash:x16}.png</c>,
+    ///     using the XxHash64 hash of <paramref name="path" />.
+    /// </returns>
+    public static string GetThumbnailFileName(this string path)
+    {
+        var bytes = Encoding.UTF8.GetBytes(path);
+        var hash = XxHash64.HashToUInt64(bytes);
+        return $"{hash:x16}.png";
+    }
 
     #endregion
 }
