@@ -1,30 +1,34 @@
 using Dapper;
+using Lanceur.Core.Repositories;
 using Shouldly;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tools;
+using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
-using NSubstitute;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class ThumbnailServiceShould : TestBase
+public class ThumbnailServiceTest : TestBase
 {
     #region Constructors
 
-    public ThumbnailServiceShould(ITestOutputHelper output) : base(output) { }
+    public ThumbnailServiceTest(ITestOutputHelper output) : base(output) { }
 
     #endregion
 
     #region Methods
 
     [Fact]
-    public void RefreshThumbnailsWithoutRemovingAdditionalParameters()
+    public void When_refresh_thumbnails_Then_additional_parameters_are_not_removed()
     {
         // ARRANGE
         var sql = new SqlBuilder().AppendAlias(a => a.WithFileName("fileName1")
@@ -48,25 +52,24 @@ public class ThumbnailServiceShould : TestBase
                                   .ToSql();
 
         OutputHelper.WriteLine(sql);
-        var connectionMgr = new DbSingleConnectionManager(
-            BuildFreshDb(sql, ConnectionStringFactory.InMemory)
-        );
-        var loggerFactory = new MicrosoftLoggingLoggerFactory(OutputHelper);
 
-        var dbRepository = new SQLiteAliasRepository(
-            connectionMgr,
-            loggerFactory,
-            new DbActionFactory(loggerFactory)
-        );
+        var sp = new ServiceCollection()
+                 .AddSingleton<IDbConnectionManager>(_
+                     => new DbSingleConnectionManager(BuildFreshDb(sql, ConnectionStringFactory.InMemory))
+                 )
+                 .AddSingleton<ILoggerFactory>(_ => new MicrosoftLoggingLoggerFactory(OutputHelper))
+                 .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
+                 .AddSingleton<IDbActionFactory, DbActionFactory>()
+                 .AddSingleton<IThumbnailService, ThumbnailService>()
+                 .AddSingleton<IAliasManagementService, AliasManagementService>()
+                 .AddMockSingleton<IPackagedAppSearchService>()
+                 .AddMockSingleton<IFavIconService>()
+                 .BuildServiceProvider();
 
-        var packagedAppSearchService = Substitute.For<IPackagedAppSearchService>();
-        var favIconManager = Substitute.For<IFavIconService>();
-        var thumbnailService = new ThumbnailService(
-            loggerFactory,
-            packagedAppSearchService,
-            favIconManager
-        );
-
+        var dbRepository = sp.GetService<IAliasRepository>();
+        var thumbnailService = sp.GetService<IThumbnailService>();
+        var connectionMgr = sp.GetService<IDbConnectionManager>();
+        
         var aliases = dbRepository.Search("a1");
 
         // ACT
