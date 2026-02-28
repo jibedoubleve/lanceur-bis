@@ -128,6 +128,8 @@ Keep the review concise and actionable.
         Write-Host "  gh pr review $PrNumber --comment --body-file `"$reviewFile`"" -ForegroundColor White
     }
 
+    & "$PSScriptRoot/convert.ps1" -file $reviewFile
+
 }
 finally {
     # ── Cleanup ──────────────────────────────────────────────────────────────
