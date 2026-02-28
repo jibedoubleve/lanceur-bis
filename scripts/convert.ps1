@@ -47,11 +47,11 @@ function private:Convert-File {
         return
     }
 
-    Write-Host "Converting $Path to PDF..." -NoNewline
+    Write-Host "Converting $Path to HTML..." -NoNewline
 
     try {
-        $outPath = [System.IO.Path]::ChangeExtension($Path, '.pdf')
-        pandoc $Path -o $outPath -s --pdf-engine=xelatex 2>&1
+        $outPath = [System.IO.Path]::ChangeExtension($Path, '.html')
+        pandoc $Path -o $outPath --embed-resources --standalone 2>&1
         Write-Host " Done." -ForegroundColor Green
 
         if ($AutoClear) {
@@ -83,19 +83,17 @@ function private:Convert-All {
                 continue
             }
 
-            Write-Host "Converting $($file.FullName) to pdf..." -NoNewline
+            Write-Host "Converting $($file.FullName) to HTML..." -NoNewline
     
-            $outPath = [System.IO.Path]::ChangeExtension($file.FullName, '.pdf')
-
-            # Convert the Markdown file to PDF using pandoc with the XeLaTeX engine
-            pandoc $file.FullName -o "$($file.FullName).pdf" -s --pdf-engine=xelatex 2>&1
-
+            # Convert the Markdown file to HTML using pandoc 
+            $outPath = [System.IO.Path]::ChangeExtension($file.FullName, '.html')
+            pandoc $file.FullName -o $outPath --embed-resources --standalone 2>&1
             Write-Host " Done." -foregroundcolor green
         }
 
         # If -AutoClear is specified, remove the source .md files after successful conversion
         if ($AutoClear) {
-            Write-Host "Clear all md files..." -ForegroundColor Cyan -NoNewline
+		Write-Host "Clear all md files..." -ForegroundColor Cyan -NoNewline
             Remove-Item *.md
             Write-Host " Done." -ForegroundColor Green
         }
