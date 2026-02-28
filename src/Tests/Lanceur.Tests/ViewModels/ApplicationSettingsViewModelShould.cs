@@ -155,7 +155,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
             {
                 // arrange
                 var sqlDefaultConfig = $"insert into settings(s_key, s_value) values ('json', '{defaultConfig}');";
-                db.WithinTransaction(t => t.Connection!.Execute(sqlDefaultConfig));
+                db.WithConnection(t => t.Execute(sqlDefaultConfig));
 
                 // act
                 StoreShortcut[] shortcuts = [new() { AliasOverride = shortcut }, new()  { AliasOverride = shortcut }];

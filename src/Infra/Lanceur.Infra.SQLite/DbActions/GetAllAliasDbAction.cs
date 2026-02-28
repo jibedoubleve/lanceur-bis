@@ -21,7 +21,7 @@ internal class GetAllAliasDbAction
 
     #region Methods
 
-    internal IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(IDbTransaction tx)
+    internal IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters(IDbConnection connection)
     {
         const string sql = $"""
                             select
@@ -51,7 +51,7 @@ internal class GetAllAliasDbAction
                                 an.name
                             """;
 
-        return tx.Connection!.Query<AliasQueryResult>(sql);
+        return connection.Query<AliasQueryResult>(sql);
     }
 
     #endregion

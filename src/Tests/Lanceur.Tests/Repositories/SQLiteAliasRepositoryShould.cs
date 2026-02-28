@@ -91,7 +91,7 @@ public class SQLiteAliasRepositoryShould : TestBase
 
         // ACT & ASSERT
         // -- Find the alias
-        var alias = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
+        var alias = c.WithConnection(conn => aliasSearch.Search(conn, "noname_1").SingleOrDefault());
         alias.ShouldSatisfyAllConditions(
             a => a.Id.ShouldBe(1001, "this is the id of the alias to find"),
             a => a.ShouldNotBeNull("the search matches one alias")
@@ -104,7 +104,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         outputId.ShouldBe(id, "the alias has only be updated");
 
         // -- Retrieve back the alias and check the names
-        var found = c.WithinTransaction(tx => aliasSearch.Search(tx, "noname_1").SingleOrDefault());
+        var found = c.WithConnection(conn => aliasSearch.Search(conn, "noname_1").SingleOrDefault());
         found.ShouldSatisfyAllConditions(
             f => f.ShouldNotBeNull(),
             f => f.Synonyms.SplitCsv().Length.ShouldBe(5)
@@ -127,7 +127,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        var found = c.WithinTransaction(tx => action.GetById(tx, 100));
+        var found = c.WithConnection(conn => action.GetById(conn, 100));
 
         // ASSERT
         found.ShouldSatisfyAllConditions(
@@ -152,7 +152,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        var found = c.WithinTransaction(tx => action.GetById(tx, 1000));
+        var found = c.WithConnection(conn => action.GetById(conn, 1000));
 
         // ASSERT
         found.ShouldBeNull();
@@ -214,7 +214,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         db.WithinTransaction(tx => action.CreateInvisible(tx, ref alias1));
 
         // ACT
-        var sut = db.WithinTransaction(tx => action.GetById(tx, alias1.Id));
+        var sut = db.WithConnection(conn => action.GetById(conn, alias1.Id));
 
         //ASSERT
         sut.ShouldNotBeNull();

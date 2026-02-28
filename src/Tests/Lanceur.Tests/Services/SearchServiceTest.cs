@@ -104,7 +104,7 @@ public class SearchServiceTest : TestBase
         OutputHelper.Assert();
         const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
 
-        connectionMgr.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount)).ShouldBe(0);
+        connectionMgr.WithConnection(conn => conn.ExecuteScalar<int>(sqlCount)).ShouldBe(0);
     }
 
     [Fact]
@@ -281,7 +281,7 @@ public class SearchServiceTest : TestBase
         OutputHelper.Assert();
         const string sqlCount = "select count(*) from alias_argument";
 
-        connectionManager.WithinTransaction(x => x.Connection!.ExecuteScalar<int>(sqlCount))
+        connectionManager.WithConnection(conn => conn.ExecuteScalar<int>(sqlCount))
                          .ShouldBe(3);
     }
 

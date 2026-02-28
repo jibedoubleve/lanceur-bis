@@ -56,7 +56,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                            from alias_argument	
                            where id_alias in @ids
                            """;
-        return Db.WithinTransaction(tx => tx!.Connection!.Query<AdditionalParameter>(sql, new { ids }));
+        return Db.WithConnection(conn => conn.Query<AdditionalParameter>(sql, new { ids }));
     }
 
     /// <inheritdoc />
@@ -91,7 +91,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 and a.deleted_at is null
                             order by an.name
                             """;
-        var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+        var results = Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql));
 
 
         results = results
@@ -104,11 +104,11 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
     /// <inheritdoc />
     public IEnumerable<AliasQueryResult> GetAll()
-        => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, isReturnAllIfEmpty: true));
+        => Db.WithConnection(conn => _dbActionFactory.SearchManagement.Search(conn, isReturnAllIfEmpty: true));
 
     /// <inheritdoc />
     public IEnumerable<AliasQueryResult> GetAllAliasWithAdditionalParameters()
-        => Db.WithinTransaction(tx => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters(tx));
+        => Db.WithConnection(conn => _getAllAliasDbAction.GetAllAliasWithAdditionalParameters(conn));
 
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetBrokenAliases()
@@ -142,14 +142,14 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             	    or file_name like 'i:\%'
                             	)
                             """;
-        var aliases = Db.WithinTransaction(tx => tx!.Connection!.Query<SelectableAliasQueryResult>(sql));
+        var aliases = Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql));
         return aliases.Where(e => !File.Exists(e.FileName))
                       .ToArray();
     }
 
     /// <inheritdoc />
     public AliasQueryResult GetById(long id)
-        => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetById(tx, id));
+        => Db.WithConnection(conn => _dbActionFactory.AliasManagement.GetById(conn, id));
 
     /// <inheritdoc />
     public IEnumerable<DateTime> GetDaysWithHistory(DateTime day)
@@ -187,7 +187,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 deleted_at is not null
                             order by an.name;
                             """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+        return Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql));
     }
 
     /// <inheritdoc />
@@ -209,7 +209,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 left join data_last_usage_v b on a.id = b.id_alias
                             order by file_name
                             """;
-        var results = Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+        var results = Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql));
         var r = results.ToSelectableQueryResult();
         return r;
     }
@@ -227,7 +227,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 and a.deleted_at is null
                                 and an.id_alias != @idAlias
                             """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new {   names, idAlias }));
+        return Db.WithConnection(conn => conn.Query<string>(sql, new {   names, idAlias }));
     }
 
     /// <inheritdoc />
@@ -243,7 +243,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                 and a.deleted_at is not null
                                 and id_alias != @idAlias
                             """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
+        return Db.WithConnection(conn => conn.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
     }
 
     /// <inheritdoc />
@@ -254,7 +254,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public Dictionary<string, (long Id, int Counter)> GetHiddenCounters() => Db.WithinTransaction(tx =>
+    public Dictionary<string, (long Id, int Counter)> GetHiddenCounters() => Db.WithConnection(conn =>
         {
             const string sql = """
                                select 
@@ -270,9 +270,9 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                     and an.name = a.file_name
                                order by a.id desc
                                """;
-            var dictionary = tx.Connection!.Query<dynamic>(sql)
-                               .Select(e => new { Key = e.AliasName, Value = ((long)e.Id, (int)e.Counter) })
-                               .ToDictionary(e => (string)e.Key, e => e.Value);
+            var dictionary = conn.Query<dynamic>(sql)
+                                 .Select(e => new { Key = e.AliasName, Value = ((long)e.Id, (int)e.Counter) })
+                                 .ToDictionary(e => (string)e.Key, e => e.Value);
             return dictionary;
         }
     );
@@ -311,7 +311,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                    group by a.id_alias
                    order by last_used asc
                    """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql, new { nowDate }));
+        return Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql, new { nowDate }));
     }
 
     /// <inheritdoc />
@@ -326,7 +326,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             order
                                 by exec_count desc
                             """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql));
+        return Db.WithConnection(conn => conn.Query<UsageQueryResult>(sql));
     }
 
     /// <inheritdoc />
@@ -343,7 +343,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             order
                                 by exec_count desc
                             """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<UsageQueryResult>(sql, new { year = $"{year}" }));
+        return Db.WithConnection(conn => conn.Query<UsageQueryResult>(sql, new { year = $"{year}" }));
     }
 
     /// <inheritdoc />
@@ -376,7 +376,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                    group by b.id_alias
                    order by a.count desc
                    """;
-        return Db.WithinTransaction(tx => tx.Connection!.Query<SelectableAliasQueryResult>(sql));
+        return Db.WithConnection(conn => conn.Query<SelectableAliasQueryResult>(sql));
     }
 
     /// <inheritdoc />
@@ -457,7 +457,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     public IEnumerable<int> GetYearsWithUsage()
     {
         const string sql = "select distinct strftime('%Y', time_stamp) from alias_usage";
-        return Db.WithinTransaction(tx => tx.Connection!.Query<int>(sql));
+        return Db.WithConnection(conn => conn.Query<int>(sql));
     }
 
     /// <inheritdoc />
@@ -479,13 +479,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                                    where id_alias = @idAlias
                                    """;
         var (parameters, synonyms) =
-            Db.WithinTransaction(tx =>
+            Db.WithConnection(conn =>
                 {
-                    var parameters = tx.Connection!.Query<AdditionalParameter>(
+                    var parameters = conn.Query<AdditionalParameter>(
                         sqlArguments,
                         new { idAlias = alias.Id }
                     );
-                    var synonyms = tx.Connection!.Query<string>(sqlSynonyms, new { idAlias = alias.Id });
+                    var synonyms = conn.Query<string>(sqlSynonyms, new { idAlias = alias.Id });
 
                     return (parameters, synonyms);
                 }
@@ -511,9 +511,9 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             	a.id;
                             """;
 
-        Db.WithinTransaction(tx =>
+        Db.WithConnection(conn =>
             {
-                var item = tx.Connection!.Query<dynamic>(sql, new { name = alias.Name }).FirstOrDefault();
+                var item = conn.Query<dynamic>(sql, new { name = alias.Name }).FirstOrDefault();
 
                 if (item is null) return;
 
@@ -620,28 +620,13 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
     /// <inheritdoc />
     public IEnumerable<AliasQueryResult> Search(string name, bool isReturnAllIfEmpty = false)
-        => Db.WithinTransaction(tx => _dbActionFactory.SearchManagement.Search(tx, name, isReturnAllIfEmpty));
+        => Db.WithConnection(conn => _dbActionFactory.SearchManagement.Search(conn, name, isReturnAllIfEmpty));
 
     /// <inheritdoc />
-    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria) => Db.WithinTransaction(tx
-        => _dbActionFactory.SearchManagement.SearchAliasWithAdditionalParameters(tx, criteria)
-    );
-
-    /// <inheritdoc />
-    public ExistingNameResponse SelectNames(string[] names)
-        => Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.SelectNames(tx, names));
-
-    /// <inheritdoc />
-    public void SetHiddenAliasUsage(QueryResult alias)
-    {
-        ArgumentNullException.ThrowIfNull(alias);
-
-        var usage = Db.WithinTransaction(tx => _dbActionFactory.AliasManagement.GetHiddenAlias(tx, alias.Name));
-        if (usage is null) return;
-
-        alias.Id = usage.Id;
-        alias.Count = usage.Count;
-    }
+    public IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria)
+        => Db.WithConnection(conn
+            => _dbActionFactory.SearchManagement.SearchAliasWithAdditionalParameters(conn, criteria)
+        );
 
     /// <inheritdoc />
     public void SetUsage(QueryResult alias) => Db.WithinTransaction(tx =>

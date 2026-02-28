@@ -125,9 +125,6 @@ public class AliasDbAction
         queryResult.FileName = exec.Name; // By convention for builtin keyword
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
-
-    [Obsolete("Use GetById with IDbConnection instead")]
-    internal AliasQueryResult GetById(IDbTransaction tx, long id) => GetById(tx.Connection, id);
     
     internal AliasQueryResult GetById(IDbConnection connection, long id) 
     {
@@ -162,26 +159,11 @@ public class AliasDbAction
                             limit 1;
                             """;
 
-        var result = connection!
-                       .Query<AliasQueryResult>(sql, new { id })
-                       .SingleOrDefault();
+        var result = connection.Query<AliasQueryResult>(sql, new { id })
+                               .SingleOrDefault();
 
         return result;
     }
-
-    /// <summary>
-    ///     Returns all aliases whose name exactly matches one of the specified names.
-    /// </summary>
-    /// <param name="tx">The transaction to use for the query.</param>
-    /// <param name="names">The list of names to search for.</param>
-    /// <param name="includeHidden">Whether to include hidden aliases in the results.</param>
-    /// <returns>All matching aliases, or an empty collection if none are found.</returns>
-    [Obsolete("Use GetByNames with IDbConnection instead")]
-    internal IEnumerable<AliasQueryResult> GetByNames(
-        IDbTransaction tx,
-        IEnumerable<string> names,
-        bool includeHidden = false
-    ) => GetByNames(tx.Connection, names, includeHidden);
 
     /// <summary>
     ///     Returns all aliases whose name exactly matches one of the specified names.
@@ -224,29 +206,6 @@ public class AliasDbAction
         var arguments = new { names, hidden };
 
         return connection.Query<AliasQueryResult>(sql, arguments).ToArray();
-    }
-
-    internal AliasUsage GetHiddenAlias(IDbTransaction tx, string name)
-    {
-        const string sql = """
-                           select
-                               a.id,
-                               n.name,
-                               (
-                                   select count(id)
-                                   from alias_usage
-                                   where id = a.id
-                               ) as count
-                           from
-                               alias a
-                               inner join alias_name n on a.id = n.id_alias
-                           where
-                               hidden = 1
-                               and n.name = @name;
-                           """;
-        var result = tx.Connection!.Query<AliasUsage>(sql, new { name }).FirstOrDefault();
-
-        return result;
     }
 
     internal void LogicalRemove(IDbTransaction tx, AliasQueryResult alias)
@@ -378,21 +337,6 @@ public class AliasDbAction
         // return the id of the just updated alias (which
         // should be the same as the one specified as arg)
         return alias.Id;
-    }
-
-    internal ExistingNameResponse SelectNames(IDbTransaction tx, string[] names)
-    {
-        const string sql = """
-                           select an.name
-                           from
-                               alias_name an
-                               inner join alias a on a.id = an.id_alias
-                           where an.name in @names
-                           """;
-
-        var result = tx.Connection!.Query<string>(sql, new { names }).ToArray();
-
-        return new(result);
     }
 
     #endregion
