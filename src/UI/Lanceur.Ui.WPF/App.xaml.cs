@@ -55,7 +55,7 @@ public partial class App
                                    .AddCommands()
                                    .AddConfiguration()
                                    .AddDatabaseServices()
-                                   .AddLoggers(context);
+                                   .AddLoggers();
                        }
                    )
                    .ConfigureAppConfiguration((context, config) =>
