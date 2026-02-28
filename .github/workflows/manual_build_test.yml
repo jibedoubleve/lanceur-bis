@@ -9,5 +9,7 @@ jobs:
     steps:
       - name: Get the sources
         uses: actions/checkout@v6
+        with: 
+          fetch-depth: 0
       - name: Run the Cake script
         uses: cake-build/cake-action@v3
