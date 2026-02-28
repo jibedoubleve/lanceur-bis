@@ -156,6 +156,13 @@ public class SqlAliasBuilder : SqlBuilderBase
         return this;
     }
 
+    public SqlAliasBuilder WithThumbnail(string thumbnail)
+    {
+        const string sql = "update alias set thumbnail = '{1}' where id = {0};";
+        Sql.AppendLine(sql.Format(_idAlias, thumbnail));
+        return this;
+    }
+
     public SqlAliasBuilder WithUsage(params string[] dateString)
     {
         try
@@ -166,10 +173,12 @@ public class SqlAliasBuilder : SqlBuilderBase
         catch (Exception ex)
         {
             throw new InvalidCastException(
-                "Impossible to cast a string into date when creating an alias execution date.", ex
+                "Impossible to cast a string into date when creating an alias execution date.",
+                ex
             );
         }
     }
+
     public SqlAliasBuilder WithUsage(params DateTime[] usage)
     {
         foreach (var date in usage)

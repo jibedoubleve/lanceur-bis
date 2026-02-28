@@ -44,7 +44,7 @@ public class ReservedKeywordsStoreTest
                               .AddSingleton(Substitute.For<IApplicationSettingsProvider>())
                               .AddSingleton(aliasRepository)
                               .AddTestOutputHelper(_output)
-                              .AddLoggerFactoryForTests(_output)
+                              .AddLoggingForTests(_output)
                               .AddMockSingleton<IBookmarkRepositoryFactory>()
                               .AddMockSingleton<IConfigurationFacade>((_, i) =>
                                   {

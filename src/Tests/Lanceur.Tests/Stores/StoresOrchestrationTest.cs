@@ -60,7 +60,7 @@ public class StoresOrchestrationTest
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                          .AddMockSingleton<IThumbnailService>()
-                         .AddLoggerFactoryForTests(_outputHelper)
+                         .AddLoggingForTests(_outputHelper)
                          .AddMockSingleton<IMacroAliasExpanderService>((_, i) =>
                              {
                                  i.Expand(Arg.Any<QueryResult[]>())

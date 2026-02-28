@@ -44,13 +44,14 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddLoggerFactoryForTests(
+    public static IServiceCollection AddLoggingForTests(
         this IServiceCollection serviceCollection,
         ITestOutputHelper outputHelper
     )
     {
         var factory = new MicrosoftLoggingLoggerFactory(outputHelper);
         serviceCollection.AddSingleton<ILoggerFactory>(factory);
+        serviceCollection.AddLogging();
         return serviceCollection;
     }
 
