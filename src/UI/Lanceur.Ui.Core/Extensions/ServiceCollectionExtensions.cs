@@ -32,14 +32,12 @@ using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Display;
-using Serilog.Sinks.Grafana.Loki;
 
 namespace Lanceur.Ui.Core.Extensions;
 
@@ -57,16 +55,15 @@ public static class ServiceCollectionExtensions
                             .AddSingleton(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
 
     public static IServiceCollection AddLoggers(
-        this IServiceCollection serviceCollection,
-        HostBuilderContext context
+        this IServiceCollection serviceCollection
     )
     {
         var settingsProvider = InfrastructureSettingsProviderFactory.GetInstance();
         settingsProvider.Load();
-        
+
         var minLogLevel = settingsProvider.Current.GetMinimumLogLevel();
         var telemetry = settingsProvider.Current.Telemetry;
-        
+
         var logEventLevel = new Conditional<LogEventLevel>(
             LogEventLevel.Debug,
             minLogLevel
@@ -79,58 +76,32 @@ public static class ServiceCollectionExtensions
                                                  .Enrich.FromLogContext()
                                                  .Enrich.WithEnvironmentUserName()
                                                  .WriteTo.Console();
+        
 
         ConditionalExecution.Execute(
-            ConfigureLogForDebug,
-            ConfigureLogForRelease
+            () => ConfigureLog(Paths.DebugClefLogFile, Paths.DebugRawLogFile),
+            () => ConfigureLog(Paths.ClefLogFile, Paths.RawLogFile)
         );
-
+        
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
         Log.Logger = loggerCfg.CreateLogger();
 
         return serviceCollection;
 
-        void ConfigureLogForDebug()
-        {
-            if (telemetry.IsSeqEnabled)
-            {
-                // For now, only seq is configured in my development machine and not anymore in AWS.
-                var apiKey = context.Configuration["SEQ_LANCEUR"];
-                if (apiKey is null)
-                    throw new NotSupportedException(
-                        "Api key not found. Create a environment variable 'SEQ_LANCEUR' with the api key"
-                    );
-
-                loggerCfg.WriteTo.Seq(
-                    Paths.TelemetryUrlSeq,
-                    apiKey: apiKey
-                );
-            }
-
-            if (telemetry.IsLokiEnabled)
-                loggerCfg.WriteTo.GrafanaLoki(
-                    Paths.TelemetryUrlLoki,
-                    [
-                        new()  { Key = "app", Value = "lanceur-bis" },
-                        new()  { Key = "env", Value = new Conditional<string>("dev", "prod") }
-                    ]
-                );
-        }
-
-        void ConfigureLogForRelease()
+        void ConfigureLog(string clefFile, string logFile)
         {
             if (telemetry.IsClefEnabled)
                 // Clef file, easier to import into SEQ
                 loggerCfg.WriteTo.File(
                     new CompactJsonFormatter(),
-                    Paths.ClefLogFile,
+                    clefFile,
                     rollingInterval: RollingInterval.Day
                 );
 
             // Raw log file, easier to read
             loggerCfg.WriteTo.File(
                 new MessageTemplateTextFormatter("[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"),
-                Paths.RawLogFile,
+                logFile,
                 rollingInterval: RollingInterval.Day
             );
         }
@@ -195,7 +166,7 @@ public static class ServiceCollectionExtensions
                          .RegisterInfrastructureSettingsProvider()
                          .AddThumbnailStrategies()
                          .AddStaThreadRunner();
-        
+
         return serviceCollection;
     }
 
