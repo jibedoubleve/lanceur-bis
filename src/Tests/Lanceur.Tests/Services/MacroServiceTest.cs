@@ -39,7 +39,7 @@ public class MacroServiceTest : TestBase
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<IAliasRepository>()
                                                      .AddMockSingleton<ILogger<MacroAliasExpanderService>>()
-                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddSingleton(
                                                          new AssemblySource
                                                          {
@@ -64,7 +64,7 @@ public class MacroServiceTest : TestBase
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroAliasExpanderService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddSingleton(
                                                          new AssemblySource
                                                          {
@@ -91,10 +91,10 @@ public class MacroServiceTest : TestBase
     {
         
         var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
-        return new ServiceCollection().AddLoggerFactoryForTests(OutputHelper)
+        return new ServiceCollection().AddLoggingForTests(OutputHelper)
                             .AddLogging()
                             .AddMockSingleton<IAliasRepository>()
-                            .AddLoggerFactoryForTests(OutputHelper)
+                            .AddLoggingForTests(OutputHelper)
                             .AddMockSingleton<IExecutionService>()
                             .AddMockSingleton<ISearchService>()
                             .AddSingleton(
@@ -160,7 +160,7 @@ public class MacroServiceTest : TestBase
                               .AddMockSingleton<IAliasRepository>()
                               .AddSingleton<MacroAliasExpanderService>()
                               .AddMockSingleton<IClipboardService>()
-                              .AddLoggerFactoryForTests(OutputHelper)
+                              .AddLoggingForTests(OutputHelper)
                               .AddLogging()
                               .AddMockSingleton<IGithubService>()
                               .AddMockSingleton<IUserGlobalNotificationService>()
@@ -195,7 +195,7 @@ public class MacroServiceTest : TestBase
         var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroAliasExpanderService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(
@@ -206,10 +206,10 @@ public class MacroServiceTest : TestBase
                                                      )
                                                      .AddSingleton<MacroAliasExpanderService>()
                                                      .AddSingleton(_ => asm)
-                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddMockSingleton<IClipboardService>()
                                                      .AddSingleton(_ => asm)
-                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddLogging()
                                                      .AddMockSingleton<IGithubService>()
                                                      .AddMockSingleton<IUserGlobalNotificationService>()
@@ -261,7 +261,7 @@ public class MacroServiceTest : TestBase
 
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroAliasExpanderService>>()
                                                      .AddMockSingleton<IAliasRepository>()
-                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddMockSingleton<IExecutionService>()
                                                      .AddMockSingleton<ISearchService>()
                                                      .AddSingleton(
@@ -272,14 +272,14 @@ public class MacroServiceTest : TestBase
                                                      )
                                                      .AddSingleton<MacroAliasExpanderService>()
                                                      .AddSingleton<AssemblySource>()
-                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddMacroServices()
                                                      .AddMockSingleton<IClipboardService>()
                                                      .AddMockSingleton<IGithubService>()
                                                      .AddMockSingleton<IUserGlobalNotificationService>()
                                                      .AddMockSingleton<IEnigma>()
                                                      .AddMockSingleton<ISection<GithubSection>>()
-                                                     .AddLoggerFactoryForTests(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddLogging()
                                                      .BuildServiceProvider();
 
@@ -336,7 +336,7 @@ public class MacroServiceTest : TestBase
                               .AddMockSingleton<IAliasRepository>()
                               .AddSingleton<MacroAliasExpanderService>()
                               .AddMockSingleton<IClipboardService>()
-                              .AddLoggerFactoryForTests(OutputHelper)
+                              .AddLoggingForTests(OutputHelper)
                               .AddLogging()
                               .AddMockSingleton<IGithubService>()
                               .AddMockSingleton<IUserGlobalNotificationService>()

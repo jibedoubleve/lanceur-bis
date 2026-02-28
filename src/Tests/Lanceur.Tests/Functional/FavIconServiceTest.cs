@@ -1,7 +1,6 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.Tests.Tools.Logging;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -56,8 +55,7 @@ public class FavIconServiceTest
 
         // ACT
         var manager = new Infra.Services.FavIconService(
-            favIconDownloader,
-            new TestOutputHelperDecoratorForMicrosoftLogging<Infra.Services.FavIconService>(_output)
+            favIconDownloader
         );
         var alias = new AliasQueryResult { FileName = url };
 

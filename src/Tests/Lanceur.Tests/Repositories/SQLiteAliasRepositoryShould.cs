@@ -340,6 +340,57 @@ public class SQLiteAliasRepositoryShould : TestBase
     }
 
     [Fact]
+    public void HaveThumbnailWhenRetrievedFromId()
+    {
+        // ARRANGE
+        var thumbnail = Guid.NewGuid().ToString();
+        var sql = new SqlBuilder().AppendAlias(a => { a.WithThumbnail(thumbnail); }).ToSql();
+
+        var connection = BuildFreshDb(sql);
+        var action = BuildAliasDbAction();
+        var c = new DbSingleConnectionManager(connection);
+
+        // ACT
+        var found = c.WithConnection(conn => action.GetById(conn, 1));
+
+        // ASSERT
+        found.ShouldSatisfyAllConditions(
+            f => f.ShouldNotBeNull(),
+            f => f.Thumbnail.ShouldNotBeNullOrEmpty()
+        );
+    }
+
+    [Fact]
+    public void HaveThumbnailWhenRetrievedFromNames()
+    {
+        // ARRANGE
+        var name = Guid.NewGuid().ToString();
+        var thumbnail = Guid.NewGuid().ToString();
+        var sql = new SqlBuilder().AppendAlias(a =>
+                                      {
+                                          a.WithSynonyms(name)
+                                           .WithThumbnail(thumbnail);
+                                      }
+                                  )
+                                  .ToSql();
+
+        var connection = BuildFreshDb(sql);
+        var action = BuildAliasDbAction();
+        var c = new DbSingleConnectionManager(connection);
+
+        // ACT
+        var found = c.WithConnection(conn => action.GetByNames(conn, [name]));
+
+        // ASSERT
+        found.ToList()
+             .ShouldSatisfyAllConditions(
+                 f => f.ShouldNotBeNull(),
+                 f => f.Count.ShouldBe(1),
+                 f => f[0].Thumbnail.ShouldNotBeNullOrEmpty()
+             );
+    }
+
+    [Fact]
     public void RemoveAlias()
     {
         // ARRANGE
@@ -460,22 +511,49 @@ public class SQLiteAliasRepositoryShould : TestBase
         // ARRANGE
         var connection = BuildFreshDb();
         var service = BuildDataService(connection);
+        const string name = "admin";
 
-        const string sql = """
-                           insert into alias (id, run_as) values (1, 0);
-                           insert into alias_name(id, name, id_alias) values (1, 'admin', 1);
-                           """;
+        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
+                                                     .WithRunAs(RunAs.Admin)
+                                  )
+                                  .ToSql();
         connection.Execute(sql);
 
         // ACT
-        var sut = service.Search("admin").ToArray();
+        var sut = service.Search(name).ToList();
 
         // ASSERT
         sut.ShouldSatisfyAllConditions(
             s => s.ShouldNotBeEmpty(),
-            s => s.Length.ShouldBe(1),
-            s => s.ElementAt(0).RunAs.ShouldBe(RunAs.Admin)
+            s => s.Count.ShouldBe(1),
+            s => s[0].RunAs.ShouldBe(RunAs.Admin)
         );
     }
+
+    [Fact]
+    public void RetrieveAliasWithThumbnailUsingService()
+    {
+        // ARRANGE
+        var connection = BuildFreshDb();
+        var service = BuildDataService(connection);
+        const string name = "admin";
+        const string thumbnail = "thumbnail";
+
+        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
+                                                     .WithThumbnail(thumbnail)
+                                  ).ToSql();
+        connection.Execute(sql);
+
+        // ACT
+        var sut = service.Search(name).ToList();
+
+        // ASSERT
+        sut.ShouldSatisfyAllConditions(
+            s => s.ShouldNotBeEmpty(),
+            s => s.Count.ShouldBe(1),
+            s => s[0].Thumbnail.ShouldBe(thumbnail)
+        );
+    }
+
     #endregion
 }
