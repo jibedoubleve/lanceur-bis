@@ -217,19 +217,16 @@ resharper_object_creation_when_type_not_evident = target_typed
 resharper_outdent_statement_labels = true
 resharper_place_attribute_on_same_line = if_owner_is_single_line
 resharper_place_expr_accessor_on_single_line = true
-resharper_place_expr_method_on_single_line = true
 resharper_place_expr_property_on_single_line = true
 resharper_place_linq_into_on_new_line = false
 resharper_place_method_attribute_on_same_line = if_owner_is_single_line
 resharper_place_simple_case_statement_on_same_line = true
-resharper_place_simple_embedded_block_on_same_line = true
 resharper_place_simple_enum_on_single_line = true
 resharper_place_simple_method_on_single_line = true
 resharper_place_simple_switch_expression_on_single_line = true
 resharper_place_type_attribute_on_same_line = if_owner_is_single_line
 resharper_show_autodetect_configure_formatting_tip = false
 resharper_use_indent_from_vs = false
-resharper_wrap_before_arrow_with_expressions = true
 resharper_wrap_before_binary_pattern_op = false
 resharper_wrap_before_eq = true
 resharper_wrap_before_extends_colon = true
@@ -268,6 +265,10 @@ resharper_web_config_module_not_resolved_highlighting = warning
 resharper_web_config_type_not_resolved_highlighting = warning
 resharper_web_config_wrong_module_highlighting = warning
 resharper_wrap_before_arrow_with_expressions = true
+
+#Brace management
+resharper_braces_for_ifelse = required
+resharper_place_simple_embedded_block_on_same_line = true
 
 [{*.har,*.jsb2,*.jsb3,*.json,*.jsonc,*.postman_collection,*.postman_collection.json,*.postman_environment,*.postman_environment.json,.babelrc,.eslintrc,.prettierrc,.stylelintrc,.ws-context,bowerrc,jest.config}]
 indent_style = space
