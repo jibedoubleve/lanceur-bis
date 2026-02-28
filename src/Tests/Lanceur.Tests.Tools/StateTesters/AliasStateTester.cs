@@ -51,7 +51,7 @@ public class AliasStateTester
 
     #region Methods
 
-    public void AssertValues(AliasQueryResult alias)
+    public void AssertValues(AliasQueryResult? alias)
     {
         if (alias is null) Assert.Fail($"{nameof(alias)} should not be null for assertion.");
 
