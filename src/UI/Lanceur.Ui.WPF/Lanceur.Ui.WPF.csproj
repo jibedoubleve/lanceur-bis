@@ -43,11 +43,6 @@
     <PackageReference Include="WPF-UI.Tray" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Monaco\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Assets\appIcon.ico" />
   </ItemGroup>
   <ItemGroup>
