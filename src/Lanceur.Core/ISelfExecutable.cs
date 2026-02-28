@@ -8,5 +8,5 @@ public interface ISelfExecutable : IElevated
 
     Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
 
-    #endregion Methods
+    #endregion
 }

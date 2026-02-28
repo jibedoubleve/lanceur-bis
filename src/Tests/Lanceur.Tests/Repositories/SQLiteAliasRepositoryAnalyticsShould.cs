@@ -1,5 +1,3 @@
-using Shouldly;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Utils;
@@ -8,8 +6,7 @@ using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.SQL;
-using Microsoft.Extensions.Logging;
-using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Repositories;
@@ -42,8 +39,10 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         return service;
     }
 
-    [Fact] public void GetAdditionalParameter() => Record.Exception(() => BuildRepository().GetAdditionalParameter([1, 2, 3]))
-                                                         .ShouldBeNull();
+    [Fact]
+    public void GetAdditionalParameter()
+        => Record.Exception(() => BuildRepository().GetAdditionalParameter([1, 2, 3]))
+                 .ShouldBeNull();
 
     [Fact]
     public void GetAliasesWithoutNotes()
@@ -92,10 +91,12 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     [Fact] public void GetAll() => Record.Exception(() => BuildRepository().GetAll()).ShouldBeNull();
 
     [Fact]
-    public void GetAllAliasWithAdditionalParameters() => Record
-                                                         .Exception(()
-                                                             => BuildRepository().GetAllAliasWithAdditionalParameters()
-                                                         ).ShouldBeNull();
+    public void GetAllAliasWithAdditionalParameters()
+        => Record
+           .Exception(()
+               => BuildRepository().GetAllAliasWithAdditionalParameters()
+           )
+           .ShouldBeNull();
 
     [Theory]
     [InlineData(@"c:\Not\A\Real\File.exe")]
@@ -111,31 +112,31 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         var gen = new SqlBuilder();
         var sql = gen.AppendAlias(a => a.WithUsage(date1, date2)
-                                                       .WithFileName($"{fileName}_{gen.IdSequence}")
-                                                       .WithCount(count)
-                                                       .WithSynonyms()
-                                    )
-                                    .AppendAlias(a => a.WithUsage(date1, date2)
-                                                       .WithFileName($"{fileName}_{gen.IdSequence}")
-                                                       .WithCount(count)
-                                                       .WithSynonyms()
-                                    )
-                                    .AppendAlias(a => a.WithUsage(date1, date2)
-                                                       .WithFileName($"{fileName}_{gen.IdSequence}")
-                                                       .WithCount(count)
-                                                       .WithSynonyms()
-                                    )
-                                    .AppendAlias(a => a.WithUsage(date1, date2)
-                                                       .WithFileName($"{fileName}_{gen.IdSequence}")
-                                                       .WithCount(count)
-                                                       .WithSynonyms()
-                                    )
-                                    .AppendAlias(a => a.WithUsage(date1, date2)
-                                                       .WithFileName($"{fileName}_{gen.IdSequence}")
-                                                       .WithCount(count)
-                                                       .WithSynonyms()
-                                    )
-                                    .ToSql();
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -143,15 +144,17 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-            aliases.Length.ShouldBe(gen.IdSequence);
-            aliases.ShouldSatisfyAllConditions(
-                col => Assert.All(col, a => a.Count.ShouldBe(count)),
-                col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
-            );
+        aliases.Length.ShouldBe(gen.IdSequence);
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, a => a.Count.ShouldBe(count)),
+            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
+        );
     }
 
-    [Fact] public void GetById() => Record.Exception(() => BuildRepository().GetById(1))
-                                          .ShouldBeNull();
+    [Fact]
+    public void GetById()
+        => Record.Exception(() => BuildRepository().GetById(1))
+                 .ShouldBeNull();
 
     [Fact]
     public void GetDeletedAlias()
@@ -167,28 +170,28 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                         .WithCount(count)
                                         .WithUsage(date1, date2)
                                         .WithSynonyms()
-                                    )
-                                    .AppendAlias(a => a.WithDeletedAt(now)
-                                                       .WithCount(count)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms()
-                                    )
-                                    .AppendAlias(a => a.WithDeletedAt(now)
-                                                       .WithCount(count)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms()
-                                    )
-                                    .AppendAlias(a => a.WithDeletedAt(now)
-                                                       .WithCount(count)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms()
-                                    )
-                                    .AppendAlias(a => a.WithDeletedAt(now)
-                                                       .WithCount(count)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms()
-                                    )
-                                    .ToSql();
+                     )
+                     .AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -196,11 +199,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-            aliases.Length.ShouldBe(gen.IdSequence);
-            aliases.ShouldSatisfyAllConditions(
-                col => Assert.All(col, a => a.Count.ShouldBe(2)),
-                col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
-            );
+        aliases.Length.ShouldBe(gen.IdSequence);
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, a => a.Count.ShouldBe(2)),
+            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
+        );
     }
 
     [Theory]
@@ -220,32 +223,32 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                         .WithCount(count)
                                         .WithUsage(date1, date2)
                                         .WithSynonyms(name)
-                                    )
-                                    .AppendAlias(a => a.WithFileName(filename)
-                                                       .WithArguments(arguments)
-                                                       .WithCount(count)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms(name)
-                                    )
-                                    .AppendAlias(a => a.WithFileName(filename)
-                                                       .WithArguments(arguments)
-                                                       .WithCount(count)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms(name)
-                                    )
-                                    .AppendAlias(a => a.WithFileName(filename)
-                                                       .WithArguments(arguments)
-                                                       .WithCount(count)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms(name)
-                                    )
-                                    .AppendAlias(a => a.WithFileName(filename)
-                                                       .WithArguments(arguments)
-                                                       .WithCount(count)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms(name)
-                                    )
-                                    .ToSql();
+                     )
+                     .AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -253,11 +256,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                              .ToArray();
 
         // assert
-            aliases.Length.ShouldBe(gen.IdSequence);
-            aliases.ShouldSatisfyAllConditions(
-                col => Assert.All(col, a => a.Count.ShouldBe(count)),
-                col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
-            );
+        aliases.Length.ShouldBe(gen.IdSequence);
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, a => a.Count.ShouldBe(count)),
+            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
+        );
     }
 
     [Fact]
@@ -278,34 +281,38 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                         .WithCount(count)
                                         .WithLuaScript(script1)
                                         .WithSynonyms(name)
-                                        .WithUsage(date1, date2))
-                    .AppendAlias(a => a.WithFileName(name)
+                                        .WithUsage(date1, date2)
+                     )
+                     .AppendAlias(a => a.WithFileName(name)
                                         .WithArguments(name)
                                         .WithCount(count)
                                         .WithLuaScript(script1)
                                         .WithSynonyms(name)
                                         .WithUsage(date1, date2)
-                                        .WithSynonyms(name))
-                    .AppendAlias(a => a.WithFileName(name)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(name)
                                         .WithArguments(name)
                                         .WithCount(count)
                                         .WithLuaScript(script1)
                                         .WithUsage(date1, date2)
-                                        .WithSynonyms(name))
-                    .AppendAlias(a => a.WithFileName(name)
-                                       .WithArguments(name)
-                                       .WithCount(count)
-                                       .WithLuaScript($"{Guid.NewGuid()}")
-                                       .WithUsage(date1, date2)
-                                       .WithSynonyms(name))
-                    .AppendAlias(a => a.WithFileName(name)
-                                       .WithArguments(name)
-                                       .WithCount(count)
-                                       .WithLuaScript($"{Guid.NewGuid()}")
-                                       .WithUsage(date1, date2)
-                                       .WithSynonyms(name)
-                                    )
-                    .ToSql();
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(name)
+                                        .WithArguments(name)
+                                        .WithCount(count)
+                                        .WithLuaScript($"{Guid.NewGuid()}")
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(name)
+                                        .WithArguments(name)
+                                        .WithCount(count)
+                                        .WithLuaScript($"{Guid.NewGuid()}")
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -333,41 +340,41 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
         const string name = "is_a_doubloon";
         var sql = new SqlBuilder().AppendAlias(a => a.WithFileName(name)
-                                                       .WithArguments(name)
-                                                       .WithCount(count)
-                                                       .WithLuaScript(null)
-                                                       .WithSynonyms(name)
-                                                       .WithUsage(date1, date2)
-                                    )
-                                    .AppendAlias(a => a.WithFileName(name)
-                                                       .WithArguments(name)
-                                                       .WithCount(count)
-                                                       .WithLuaScript(script1)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms(name)
-                                    )
-                                    .AppendAlias(a => a.WithFileName(name)
-                                                       .WithArguments(name)
-                                                       .WithCount(count)
-                                                       .WithLuaScript(script1)
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms(name)
-                                    )
-                                    .AppendAlias(a => a.WithFileName(name)
-                                                       .WithArguments(name)
-                                                       .WithCount(count)
-                                                       .WithLuaScript($"{Guid.NewGuid()}")
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms(name)
-                                    )
-                                    .AppendAlias(a => a.WithFileName(name)
-                                                       .WithArguments(name)
-                                                       .WithCount(count)
-                                                       .WithLuaScript($"{Guid.NewGuid()}")
-                                                       .WithUsage(date1, date2)
-                                                       .WithSynonyms(name)
-                                    )
-                                    .ToSql();
+                                                     .WithArguments(name)
+                                                     .WithCount(count)
+                                                     .WithLuaScript(null)
+                                                     .WithSynonyms(name)
+                                                     .WithUsage(date1, date2)
+                                  )
+                                  .AppendAlias(a => a.WithFileName(name)
+                                                     .WithArguments(name)
+                                                     .WithCount(count)
+                                                     .WithLuaScript(script1)
+                                                     .WithUsage(date1, date2)
+                                                     .WithSynonyms(name)
+                                  )
+                                  .AppendAlias(a => a.WithFileName(name)
+                                                     .WithArguments(name)
+                                                     .WithCount(count)
+                                                     .WithLuaScript(script1)
+                                                     .WithUsage(date1, date2)
+                                                     .WithSynonyms(name)
+                                  )
+                                  .AppendAlias(a => a.WithFileName(name)
+                                                     .WithArguments(name)
+                                                     .WithCount(count)
+                                                     .WithLuaScript($"{Guid.NewGuid()}")
+                                                     .WithUsage(date1, date2)
+                                                     .WithSynonyms(name)
+                                  )
+                                  .AppendAlias(a => a.WithFileName(name)
+                                                     .WithArguments(name)
+                                                     .WithCount(count)
+                                                     .WithLuaScript($"{Guid.NewGuid()}")
+                                                     .WithUsage(date1, date2)
+                                                     .WithSynonyms(name)
+                                  )
+                                  .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -387,11 +394,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     {
         // arrange
         var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("name_1"))
-                                    .AppendAlias(a => a.WithSynonyms("name_1"))
-                                    .AppendAlias(a => a.WithSynonyms("name_1"))
-                                    .AppendAlias(a => a.WithSynonyms("name_1"))
-                                    .AppendAlias(a => a.WithSynonyms("name_1"))
-                                    .ToSql();
+                                  .AppendAlias(a => a.WithSynonyms("name_1"))
+                                  .AppendAlias(a => a.WithSynonyms("name_1"))
+                                  .AppendAlias(a => a.WithSynonyms("name_1"))
+                                  .AppendAlias(a => a.WithSynonyms("name_1"))
+                                  .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -406,11 +413,15 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         );
     }
 
-    [Fact] public void GetExistingDeletedAliases() => Record.Exception(() => BuildRepository().GetExistingDeletedAliases([], 0))
-                                                            .ShouldBeNull();
+    [Fact]
+    public void GetExistingDeletedAliases()
+        => Record.Exception(() => BuildRepository().GetExistingDeletedAliases([], 0))
+                 .ShouldBeNull();
 
-    [Fact] public void GetHiddenCounters() => Record.Exception(() => BuildRepository().GetHiddenCounters())
-                                                    .ShouldBeNull();
+    [Fact]
+    public void GetHiddenCounters()
+        => Record.Exception(() => BuildRepository().GetHiddenCounters())
+                 .ShouldBeNull();
 
 
     [Fact]
@@ -420,27 +431,26 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var date1 = DateTime.Now.AddMonths(-10);
         var date2 = DateTime.Now.AddMonths(-20);
         var sql = new SqlBuilder().AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(DateTime.Now)
-                                    )
-                                    .AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(date1, date2)
-                                    )
-                                    .AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(date1, date2)
-                                    )
-                                    .AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(date1, date2)
-                                    )
-                                    .AppendAlias(
-                                        a =>
-                                            a.WithSynonyms()
-                                             .WithUsage(date1, date2)
-                                    )
-                                    .ToSql();
+                                      a.WithSynonyms()
+                                       .WithUsage(DateTime.Now)
+                                  )
+                                  .AppendAlias(a =>
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2)
+                                  )
+                                  .AppendAlias(a =>
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2)
+                                  )
+                                  .AppendAlias(a =>
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2)
+                                  )
+                                  .AppendAlias(a =>
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2)
+                                  )
+                                  .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -463,26 +473,26 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         var date2 = DateTime.Now.AddMonths(-20);
         var date3 = DateTime.Now.AddMonths(-30);
         var sql = new SqlBuilder().AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(date1, date2, date3)
-                                    )
-                                    .AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(date1, date2)
-                                    )
-                                    .AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(date1, date2)
-                                    )
-                                    .AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(date1, date2)
-                                    )
-                                    .AppendAlias(a =>
-                                        a.WithSynonyms()
-                                         .WithUsage(date1, date2)
-                                    )
-                                    .ToSql();
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2, date3)
+                                  )
+                                  .AppendAlias(a =>
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2)
+                                  )
+                                  .AppendAlias(a =>
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2)
+                                  )
+                                  .AppendAlias(a =>
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2)
+                                  )
+                                  .AppendAlias(a =>
+                                      a.WithSynonyms()
+                                       .WithUsage(date1, date2)
+                                  )
+                                  .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -504,11 +514,11 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         // arrange
         var gen = new SqlBuilder();
         var sql = gen.AppendAlias(a => a.WithSynonyms())
-                                    .AppendAlias(a => a.WithSynonyms())
-                                    .AppendAlias(a => a.WithSynonyms())
-                                    .AppendAlias(a => a.WithSynonyms())
-                                    .AppendAlias(a => a.WithSynonyms())
-                                    .ToSql();
+                     .AppendAlias(a => a.WithSynonyms())
+                     .AppendAlias(a => a.WithSynonyms())
+                     .AppendAlias(a => a.WithSynonyms())
+                     .AppendAlias(a => a.WithSynonyms())
+                     .ToSql();
         var service = BuildRepository(sql);
 
         // act
@@ -521,18 +531,24 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     }
 
     [Fact]
-    public void GetUsage() => Record.Exception(() => BuildRepository().GetUsage(Per.DayOfWeek))
-                                    .ShouldBeNull();
-
-    [Fact] public void GetYearsWithUsage() => Record.Exception(() => BuildRepository().GetYearsWithUsage())
-                                                    .ShouldBeNull();
-
-    [Fact] public void HydrateAlias() => Record.Exception(() => BuildRepository().HydrateAlias(new()))
-                                               .ShouldBeNull();
+    public void GetUsage()
+        => Record.Exception(() => BuildRepository().GetUsage(Per.DayOfWeek))
+                 .ShouldBeNull();
 
     [Fact]
-    public void HydrateMacro() => Record.Exception(() => BuildRepository().HydrateMacro(new AliasQueryResult()))
-                                        .ShouldBeNull();
+    public void GetYearsWithUsage()
+        => Record.Exception(() => BuildRepository().GetYearsWithUsage())
+                 .ShouldBeNull();
+
+    [Fact]
+    public void HydrateAlias()
+        => Record.Exception(() => BuildRepository().HydrateAlias(new()))
+                 .ShouldBeNull();
+
+    [Fact]
+    public void HydrateMacro()
+        => Record.Exception(() => BuildRepository().HydrateMacro(new AliasQueryResult()))
+                 .ShouldBeNull();
 
     #endregion
 }

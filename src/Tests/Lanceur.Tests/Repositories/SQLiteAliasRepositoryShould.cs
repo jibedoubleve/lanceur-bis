@@ -541,7 +541,8 @@ public class SQLiteAliasRepositoryShould : TestBase
 
         var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
                                                      .WithThumbnail(thumbnail)
-                                  ).ToSql();
+                                  )
+                                  .ToSql();
         connection.Execute(sql);
 
         // ACT

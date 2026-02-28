@@ -11,6 +11,7 @@ public class StringToStartModeConverter : IValueConverter
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is StartMode startMode)
+        {
             return startMode switch
             {
                 StartMode.Default   => "Default",
@@ -18,6 +19,7 @@ public class StringToStartModeConverter : IValueConverter
                 StartMode.Maximised => "Maximized",
                 _                   => "Default"
             };
+        }
 
         return Binding.DoNothing;
     }
@@ -25,6 +27,7 @@ public class StringToStartModeConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is string str)
+        {
             return str switch
             {
                 "Default"   => StartMode.Default,
@@ -32,6 +35,7 @@ public class StringToStartModeConverter : IValueConverter
                 "Maximized" => StartMode.Maximised,
                 _           => StartMode.Default
             };
+        }
 
         return Binding.DoNothing;
     }

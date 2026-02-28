@@ -136,10 +136,12 @@ public class ReportTypeToVisibilityConverter : IValueConverter
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not ReportType report || parameter is not string paramString) return Binding.DoNothing;
+        if (value is not ReportType report || parameter is not string paramString) { return Binding.DoNothing; }
 
-        if (false == Enum.TryParse(paramString, out ActionOnAlias actionOnAlias))
+        if (!Enum.TryParse(paramString, out ActionOnAlias actionOnAlias))
+        {
             throw new InvalidCastException($"Cannot cast '{paramString}' to 'ActionOnAlias'");
+        }
 
         return report switch
         {

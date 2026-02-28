@@ -19,13 +19,13 @@ public static class ViewModelExtensions
         foreach (var property in properties)
             if (typeof(ICommand).IsAssignableFrom(property.PropertyType))
             {
-                if (property.GetValue(@this) is not ICommand command) continue;
+                if (property.GetValue(@this) is not ICommand command) { continue; }
 
                 var methodInfo = command.GetType().GetMethod("NotifyCanExecuteChanged");
                 if (methodInfo is null)
                 {
                     methodInfo = command.GetType().GetMethod("RaiseCanExecuteChanged");
-                    if (methodInfo == null) continue;
+                    if (methodInfo == null) { continue; }
                 }
 
                 methodInfo.Invoke(command, null);

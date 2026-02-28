@@ -34,17 +34,18 @@ public class ProcessLauncherWin32 : IProcessLauncher
     #region Methods
 
     /// <inheritdoc />
-    public void Open(string path) => Process.Start(
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"),
-        path
-    );
+    public void Open(string path)
+        => Process.Start(
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"),
+            path
+        );
 
     /// <inheritdoc />
     public void Start(ProcessContext context)
     {
         var process = new Process { StartInfo = context.ToProcessStartInfo(), EnableRaisingEvents = true };
 
-        if (!process.Start()) _logger.LogInformation("Process {ProcessName} failed to start.", context.FileName);
+        if (!process.Start()) { _logger.LogInformation("Process {ProcessName} failed to start.", context.FileName); }
 
         _ = Task.Run(() =>
             {

@@ -64,12 +64,13 @@ public class SetUsageDbAction
     }
 
     /// <summary>
-    /// Adds an entry to the usage table with the alias and the current date and time, 
-    /// and updates the counter of the specified QueryResult.
+    ///     Adds an entry to the usage table with the alias and the current date and time,
+    ///     and updates the counter of the specified QueryResult.
     /// </summary>
     /// <remarks>
-    /// This method has a side effect: it modifies the counter of the provided alias.  
-    /// If the counter is negative, no usage is recorded or saved in the history, and the counter remains hidden from the user.
+    ///     This method has a side effect: it modifies the counter of the provided alias.
+    ///     If the counter is negative, no usage is recorded or saved in the history, and the counter remains hidden from the
+    ///     user.
     /// </remarks>
     /// <param name="tx">The database transaction context.</param>
     /// <param name="alias">The QueryResult object representing the alias to be updated. Must not be null.</param>
@@ -81,13 +82,10 @@ public class SetUsageDbAction
         //   * Usage tracking is disabled.
         //   * The alias is excluded from the history.
         //   * The counter is hidden from the user.
-        if (alias.Count < 0) return;
+        if (alias.Count < 0) { return; }
 
         var aliasDbAction = _dbActionFactory.AliasManagement;
-        if (alias.Id == 0)
-        {
-            aliasDbAction.CreateInvisible(tx, ref alias);
-        }
+        if (alias.Id == 0) { aliasDbAction.CreateInvisible(tx, ref alias); }
 
         AddHistory(tx, ref alias);
         UpdateCounter(tx, ref alias);

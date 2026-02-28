@@ -10,7 +10,7 @@ public partial class VersionView : UserControl
 {
     #region Fields
 
-    private const string GithubUrl =Paths.GithubUrl;
+    private const string GithubUrl = Paths.GithubUrl;
 
     #endregion
 
@@ -29,8 +29,9 @@ public partial class VersionView : UserControl
     #region Properties
 
     public string Commit { get; }
-    public string Version { get; }
     public string Suffix { get; set; }
+    public string Version { get; }
+
     #endregion
 
     #region Methods

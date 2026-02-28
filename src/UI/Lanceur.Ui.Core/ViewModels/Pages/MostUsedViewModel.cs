@@ -71,9 +71,10 @@ public partial class MostUsedViewModel : ObservableObject
             async Task<IEnumerable<UsageQueryResult>> (_) =>
             {
                 if (int.TryParse(SelectedYear, out var year))
-                    return await Task.Run(
-                        () =>   _repository.GetMostUsedAliasesByYear(year)
+                {
+                    return await Task.Run(() =>   _repository.GetMostUsedAliasesByYear(year)
                     );
+                }
 
                 return await Task.Run(() => _repository.GetMostUsedAliases());
             },

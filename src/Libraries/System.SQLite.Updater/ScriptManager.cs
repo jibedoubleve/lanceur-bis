@@ -34,10 +34,12 @@ public partial class ScriptManager
     {
         using var stream = _asm.GetManifestResourceStream(resourceName);
         if (stream == null)
+        {
             throw new ArgumentNullException(
                 nameof(resourceName),
                 $"'{nameof(resourceName)}' is null. Are you sure the resource '{resourceName}' exists in the assembly '{_asm.FullName}'"
             );
+        }
 
         var reader = new StreamReader(stream);
         return reader.ReadToEnd();
@@ -53,7 +55,7 @@ public partial class ScriptManager
         foreach (var item in resources)
         {
             var match = RegexSelectVersion().Matches(item.Key);
-            if (match.Count <= 0 || match[0].Groups.Count < 1) continue;
+            if (match.Count <= 0 || match[0].Groups.Count < 1) { continue; }
 
             var ver = match[0].Groups[1].Value.Trim('.');
             var version = new Version(ver);
@@ -64,8 +66,9 @@ public partial class ScriptManager
         return new(new Dictionary<Version, string>(ordered));
     }
 
-    public IEnumerable<string> ListResources() => _asm.GetManifestResourceNames()
-                                                      .Where(s => _regex.IsMatch(s));
+    public IEnumerable<string> ListResources()
+        => _asm.GetManifestResourceNames()
+               .Where(s => _regex.IsMatch(s));
 
     #endregion
 }

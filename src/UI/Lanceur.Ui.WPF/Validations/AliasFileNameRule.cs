@@ -21,8 +21,9 @@ public class AliasFileNameRule : ValidationRule
 
     #region Methods
 
-    public override ValidationResult Validate(object? value, CultureInfo cultureInfo) => _validationService.IsFileNameValid(value)
-                                                                                                           .ToValidationResult();
+    public override ValidationResult Validate(object? value, CultureInfo cultureInfo)
+        => _validationService.IsFileNameValid(value)
+                             .ToValidationResult();
 
     #endregion
 }

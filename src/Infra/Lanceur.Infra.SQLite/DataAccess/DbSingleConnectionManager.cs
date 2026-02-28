@@ -25,12 +25,13 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
 
     #region Constructors
 
-    public DbSingleConnectionManager(IDbConnection connection) => Connection =
-        connection ??
-        throw new ArgumentNullException(
-            nameof(connection),
-            "Cannot create a connection scope with an empty connection (NULL)."
-        );
+    public DbSingleConnectionManager(IDbConnection connection)
+        => Connection =
+            connection ??
+            throw new ArgumentNullException(
+                nameof(connection),
+                "Cannot create a connection scope with an empty connection (NULL)."
+            );
 
     #endregion
 
@@ -49,7 +50,8 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     {
         lock (_monitor)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             return action(Connection);
         }
     }
@@ -59,7 +61,8 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     {
         lock (_monitor)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             action(Connection);
         }
     }
@@ -80,7 +83,8 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     {
         lock (_monitor)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
             try
             {
@@ -101,7 +105,8 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     {
         lock (_monitor)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
             try
             {
@@ -122,7 +127,8 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     {
         lock (_monitor)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
             try
             {

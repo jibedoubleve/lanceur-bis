@@ -4,10 +4,7 @@ public class TelemetrySection
 {
     #region Constructors
 
-    public TelemetrySection()
-    {
-        IsClefEnabled = false;
-    }
+    public TelemetrySection() => IsClefEnabled = false;
 
     #endregion
 

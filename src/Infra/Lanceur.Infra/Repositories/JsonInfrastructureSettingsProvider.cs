@@ -10,11 +10,12 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
 {
     #region Fields
 
-    private static readonly object Locker = new();
-    private readonly string _filePath;
     private InfrastructureSettings _current;
+    private readonly string _filePath;
 
-    #endregion Fields
+    private static readonly object Locker = new();
+
+    #endregion
 
     #region Constructors
 
@@ -24,7 +25,7 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
         _filePath = path.ExpandPath();
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -32,23 +33,24 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
     {
         get
         {
-            if (_current is null) Load();
+            if (_current is null) { Load(); }
+
             return _current;
         }
     }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
     private FileStream OpenFile()
     {
         var dir = _filePath.GetDirectoryName();
-        if (dir.IsNullOrEmpty()) throw new DirectoryNotFoundException($"Directory '{dir}' does not exist.");
+        if (dir.IsNullOrEmpty()) { throw new DirectoryNotFoundException($"Directory '{dir}' does not exist."); }
 
-        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir!);
+        if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir!); }
 
-        if (File.Exists(_filePath)) File.Delete(_filePath);
+        if (File.Exists(_filePath)) { File.Delete(_filePath); }
 
         return File.Create(_filePath);
     }
@@ -74,7 +76,7 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
         {
             // If _current is null, it was never loaded, then
             // not modified...
-            if (_current is null) return;
+            if (_current is null) { return; }
 
             var json = JsonConvert.SerializeObject(_current);
 
@@ -84,5 +86,5 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
         }
     }
 
-    #endregion Methods
+    #endregion
 }

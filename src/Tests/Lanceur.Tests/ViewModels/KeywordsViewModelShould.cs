@@ -1,11 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
-using Shouldly;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Core.Requests;
-using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -22,6 +18,7 @@ using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
@@ -56,7 +53,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AddMockSingleton<IUserNotificationService>((sp, i)
                              => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IProcessLauncher>((sp, i) 
+                         .AddMockSingleton<IProcessLauncher>((sp, i)
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
@@ -203,7 +200,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                                    from alias a 
                                    inner join alias_name an on a.id = an.id_alias 
                                    """;
-                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[]) [name] }))
+                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[])[name] }))
                                .ToArray();
 
                 result.ShouldSatisfyAllConditions(

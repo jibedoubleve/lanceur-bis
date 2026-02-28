@@ -7,9 +7,9 @@ public class ConfigurationFacadeService : IConfigurationFacade
 {
     #region Fields
 
-    private readonly IInfrastructureSettingsProvider _infrastructureSettingsProvider;
-
     private readonly IApplicationSettingsProvider _applicationSettingsProvider;
+
+    private readonly IInfrastructureSettingsProvider _infrastructureSettingsProvider;
 
     #endregion
 

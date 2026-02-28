@@ -7,10 +7,7 @@ public abstract class CacheEntryOptions
 {
     #region Properties
 
-    public static MemoryCacheEntryOptions Default => new()
-    {
-        AbsoluteExpirationRelativeToNow = 2.Minutes(), 
-    };
+    public static MemoryCacheEntryOptions Default => new() { AbsoluteExpirationRelativeToNow = 2.Minutes() };
 
     #endregion
 }

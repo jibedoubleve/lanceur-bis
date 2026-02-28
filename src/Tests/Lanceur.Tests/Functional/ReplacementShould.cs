@@ -1,9 +1,9 @@
-﻿using Shouldly;
-using Lanceur.Core.Services;
+﻿using Lanceur.Core.Services;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;

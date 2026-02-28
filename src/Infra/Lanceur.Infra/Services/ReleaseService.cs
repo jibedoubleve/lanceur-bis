@@ -9,8 +9,9 @@ public class ReleaseService : IReleaseService
 {
     #region Fields
 
-    private readonly ILogger<ReleaseService> _logger;
     private readonly IGithubService _githubService;
+
+    private readonly ILogger<ReleaseService> _logger;
 
     #endregion
 

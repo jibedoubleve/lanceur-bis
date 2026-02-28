@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Macros;
 
@@ -18,10 +17,7 @@ public class ClipboardAsTextMacro : MacroQueryResult
 
     #region Constructors
 
-    public ClipboardAsTextMacro(IClipboardService clipboard)
-    {
-        _clipboard = clipboard;
-    }
+    public ClipboardAsTextMacro(IClipboardService clipboard) => _clipboard = clipboard;
 
     #endregion
 

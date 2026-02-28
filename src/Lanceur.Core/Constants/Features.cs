@@ -4,8 +4,9 @@ public static class Features
 {
     #region Fields
 
-    public const string ResourceDisplay = "ShowSystemUsage";
     public const string AdditionalParameterAlwaysActive = "AdditionalParameterAlwaysActive";
+
+    public const string ResourceDisplay = "ShowSystemUsage";
     public const string ShowSettingButton = "ShowSettingButton";
 
     #endregion

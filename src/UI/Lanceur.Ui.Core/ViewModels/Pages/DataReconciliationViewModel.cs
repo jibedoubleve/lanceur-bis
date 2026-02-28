@@ -73,7 +73,7 @@ public partial class DataReconciliationViewModel : ObservableObject
 
     private bool CanMerge()
     {
-        if (!HasSelection()) return false;
+        if (!HasSelection()) { return false; }
 
         return GetSelectedAliases()
                .Select(e => e.FileName)
@@ -149,7 +149,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             ReportType
         );
 
-        if (!result.IsSuccess) return;
+        if (!result.IsSuccess) { return; }
 
         _settingsFacade.Save();
         await OnShowAsync(ReportType);
@@ -163,7 +163,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             = await _userDialogue.AskUserYesNoAsync(
                 $"Do you want to delete the {toDelete.Length} selected aliases?"
             );
-        if (!response) return;
+        if (!response) { return; }
 
         await Task.Run(() => _repository.RemoveLogically(toDelete));
         Aliases.RemoveMultiple(toDelete);
@@ -182,7 +182,7 @@ public partial class DataReconciliationViewModel : ObservableObject
              This action is irreversible.
              """
         );
-        if (!response) return;
+        if (!response) { return; }
 
         await Task.Run(() => _repository.RemovePermanently(toDelete));
         Aliases.RemoveMultiple(toDelete);
@@ -212,9 +212,9 @@ public partial class DataReconciliationViewModel : ObservableObject
     [RelayCommand]
     private void OnLoadThumbnail(QueryResult? queryResult)
     {
-        if (queryResult is null) return;
+        if (queryResult is null) { return; }
 
-        if (!queryResult.Thumbnail.IsNullOrEmpty()) return; /* Already loaded */
+        if (!queryResult.Thumbnail.IsNullOrEmpty()) { return; /* Already loaded */ }
 
         try { _thumbnailService.UpdateThumbnail(queryResult); }
         catch (Exception ex)
@@ -227,10 +227,12 @@ public partial class DataReconciliationViewModel : ObservableObject
     private void OnMarkSameIdAsSelected(AliasQueryResult alias)
     {
         if (alias == null)
+        {
             throw new ArgumentNullException(
                 nameof(alias),
                 "No alias was selected, did you forget to setup CommandParameter?"
             );
+        }
 
         var selected = Aliases.Where(e => e.Id == alias.Id);
         foreach (var item in selected) item.IsSelected = true;
@@ -242,21 +244,24 @@ public partial class DataReconciliationViewModel : ObservableObject
         using var _ = _logger.BeginCorrelatedLogs();
 
         var selectedAliases = GetSelectedAliases().ToList();
-        if (selectedAliases.Count == 0) return;
+        if (selectedAliases.Count == 0) { return; }
 
 
-        var (alias, parameters) = await Task.Run(() => {
-            var alias = _repository.GetById(selectedAliases.FirstOrDefault()!.Id);
+        var (alias, parameters) = await Task.Run(() =>
+            {
+                var alias = _repository.GetById(selectedAliases.FirstOrDefault()!.Id);
 
-            _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
+                _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
 
-            var parameters = _repository.GetAdditionalParameter(
-                selectedAliases.Select(item => item.Id)
-            ).ToList();
+                var parameters = _repository.GetAdditionalParameter(
+                                                selectedAliases.Select(item => item.Id)
+                                            )
+                                            .ToList();
 
-            return (alias, parameters);
-        });
-        
+                return (alias, parameters);
+            }
+        );
+
         /* To be thread safe, this code should NOT be in the upper Task. If AdditionalParameters and AddDistinctSynonyms
          * raise a PropertyChanged event it'll be from the thread and will handled in the UI thread. This could lead to
          * a cross-thread exception...
@@ -272,7 +277,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             "Merge aliases",
             dataContext
         );
-        if (!response.IsConfirmed) return;
+        if (!response.IsConfirmed) { return; }
 
         alias.Synonyms = dataContext.Synonyms;
 
@@ -302,7 +307,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             = await _userDialogue.AskUserYesNoAsync(
                 $"Do you want to restore {selectedAliases.Length} selected aliases?"
             );
-        if (!response) return;
+        if (!response) { return; }
 
         _repository.Restore(selectedAliases);
         _userNotification.Success($"Restored {selectedAliases.Length} selected aliases");
@@ -323,7 +328,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             Reconciliation.InactivityThreshold
         );
 
-        if (!result.IsSuccess) return;
+        if (!result.IsSuccess) { return; }
 
         if (Reconciliation.InactivityThreshold != result.NumericValue)
         {
@@ -346,7 +351,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             Reconciliation.LowUsageThreshold
         );
 
-        if (!result.IsSuccess) return;
+        if (!result.IsSuccess) { return; }
 
         if (Reconciliation.LowUsageThreshold != result.NumericValue)
         {
@@ -399,7 +404,11 @@ public partial class DataReconciliationViewModel : ObservableObject
         _buffer = new(aliases);
         Aliases = _buffer;
 
-        if (isDescriptionUpdated) _ = _reconciliationService.ProposeDescriptionAsync(Aliases); // Fire & forget
+        if (isDescriptionUpdated)
+        {
+            _ = _reconciliationService.ProposeDescriptionAsync(Aliases); // Fire & forget
+        }
+
         OnSelectionChanged();
     }
 
@@ -423,7 +432,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         var response = await _userDialogue.AskUserYesNoAsync(
             $"Do you want to update the description the {selectedAliases.Length} selected aliases?"
         );
-        if (!response) return;
+        if (!response) { return; }
 
         _repository.SaveOrUpdate(selectedAliases);
         _userNotification.Success($"Updated {selectedAliases.Length} selected aliases");

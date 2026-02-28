@@ -40,8 +40,7 @@ public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionServi
 
     public void SetCurrentDbVersion(Version version)
     {
-        Db.WithinTransaction(
-            tx =>
+        Db.WithinTransaction(tx =>
             {
                 var exists = tx.Connection!.ExecuteScalar<int>(Sql.DbVersionCount) >= 1;
                 tx.Connection.Execute(exists ? Sql.UpdateDbVersion.Format(version) : Sql.SetDbVersion.Format(version));

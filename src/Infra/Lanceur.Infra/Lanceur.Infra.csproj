@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Humanizer" Version="3.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3" />
-    <PackageReference Include="NCalcSync" Version="5.12.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.*" />
-    <PackageReference Include="NLua" Version="1.7.8" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
-    <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
-    <ProjectReference Include="..\..\Libraries\Everything.Wrapper\Everything.Wrapper.csproj" />
-    <ProjectReference Include="..\..\Libraries\System.Web.Bookmarks\System.Web.Bookmarks.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Humanizer" Version="3.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.3"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3"/>
+        <PackageReference Include="NCalcSync" Version="5.12.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.*"/>
+        <PackageReference Include="NLua" Version="1.7.8"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
+        <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj"/>
+        <ProjectReference Include="..\..\Libraries\Everything.Wrapper\Everything.Wrapper.csproj"/>
+        <ProjectReference Include="..\..\Libraries\System.Web.Bookmarks\System.Web.Bookmarks.csproj"/>
+    </ItemGroup>
 </Project>

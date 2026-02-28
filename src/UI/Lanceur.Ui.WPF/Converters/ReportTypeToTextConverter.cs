@@ -11,6 +11,7 @@ public class ReportTypeToTextConverter : IValueConverter
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is ReportType reportType)
+        {
             return reportType switch
             {
                 ReportType.None               => "Use default settings",
@@ -23,6 +24,7 @@ public class ReportTypeToTextConverter : IValueConverter
                 ReportType.RarelyUsedAliases  => "Rarely used aliases report",
                 _                             => "Unrecognised report type"
             };
+        }
 
         return Binding.DoNothing;
     }

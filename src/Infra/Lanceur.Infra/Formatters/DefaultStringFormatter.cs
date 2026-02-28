@@ -8,5 +8,5 @@ public class DefaultStringFormatter : IStringFormatter
 
     public string Format(object value) => value?.ToString();
 
-    #endregion Methods
+    #endregion
 }

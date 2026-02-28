@@ -1,7 +1,7 @@
 namespace Lanceur.Core.Services;
 
 /// <summary>
-/// Provides methods for encrypting and decrypting text.
+///     Provides methods for encrypting and decrypting text.
 /// </summary>
 public interface IEnigma
 {

@@ -5,12 +5,13 @@ namespace Lanceur.Ui.Core.Utils.Watchdogs;
 /// </summary>
 public interface IWatchdogBuilder
 {
+    #region Methods
+
     /// <summary>
-    ///     Configures the interval for the watchdog, specifying how frequently the watchdog triggers.
+    ///     Constructs and returns a fully configured <see cref="IWatchdog" /> instance based on the specified configurations.
     /// </summary>
-    /// <param name="interval">The time interval between each trigger of the watchdog.</param>
-    /// <returns>The current instance of <see cref="IWatchdogBuilder" /> to allow method chaining.</returns>
-    IWatchdogBuilder WithInterval(TimeSpan interval);
+    /// <returns>A fully configured instance of <see cref="IWatchdog" />.</returns>
+    IWatchdog Build();
 
     /// <summary>
     ///     Specifies the action to execute when the watchdog triggers.
@@ -21,8 +22,11 @@ public interface IWatchdogBuilder
     IWatchdogBuilder WithAction(Func<Task> action);
 
     /// <summary>
-    ///     Constructs and returns a fully configured <see cref="IWatchdog" /> instance based on the specified configurations.
+    ///     Configures the interval for the watchdog, specifying how frequently the watchdog triggers.
     /// </summary>
-    /// <returns>A fully configured instance of <see cref="IWatchdog" />.</returns>
-    IWatchdog Build();
+    /// <param name="interval">The time interval between each trigger of the watchdog.</param>
+    /// <returns>The current instance of <see cref="IWatchdogBuilder" /> to allow method chaining.</returns>
+    IWatchdogBuilder WithInterval(TimeSpan interval);
+
+    #endregion
 }

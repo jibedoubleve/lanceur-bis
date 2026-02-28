@@ -28,7 +28,8 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
     public SQLiteApplicationSettingsProvider(
         IDbConnectionManager manager,
         ILogger<SQLiteApplicationSettingsProvider> logger
-    ) : base(manager) => _logger = logger;
+    ) : base(manager)
+        => _logger = logger;
 
     #endregion
 
@@ -38,7 +39,8 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
     {
         get
         {
-            if (_current is null) Load();
+            if (_current is null) { Load(); }
+
             return _current;
         }
     }
@@ -53,7 +55,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
     /// </summary>
     private static ApplicationSettings AddNewFeatureFlags(ApplicationSettings config)
     {
-        if (config is null) return null;
+        if (config is null) { return null; }
 
         var defaultFf = new ApplicationSettings().FeatureFlags; //Default featureFlags
         var currentFf = new List<FeatureFlag>(config.FeatureFlags);
@@ -65,7 +67,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
         return config;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Edit(Action<ApplicationSettings> edit)
     {
         var stg = Current;
@@ -73,7 +75,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
         Save();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Load()
     {
         const string sql = """
@@ -94,7 +96,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
         );
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Save()
     {
         Db.WithConnection(conn =>

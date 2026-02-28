@@ -13,7 +13,6 @@ public class ResourceMonitorSection
     #endregion
 
     #region Properties
-    
 
     /// <summary>
     ///     Defines the smoothing index for the CPU monitor.

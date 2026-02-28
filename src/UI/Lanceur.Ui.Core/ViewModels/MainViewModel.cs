@@ -19,16 +19,16 @@ public partial class MainViewModel : ObservableObject
     #region Fields
 
     private readonly IExecutionService _executionService;
-    private readonly IUserCommunicationService _userCommunicationService;
     private readonly ILogger<MainViewModel> _logger;
     [ObservableProperty] private string? _query;
     [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
     private readonly ISearchService _searchService;
     [ObservableProperty] private QueryResult? _selectedResult;
-    private readonly ISection<WindowSection> _stgWindow;
     private readonly ISection<SearchBoxSection> _stgSearchBox;
+    private readonly ISection<WindowSection> _stgWindow;
     [ObservableProperty] private string? _suggestion;
     private readonly IThumbnailService _thumbnailService;
+    private readonly IUserCommunicationService _userCommunicationService;
     private readonly IWatchdog _watchdog;
     [ObservableProperty] private string _windowBackdropStyle;
 
@@ -102,7 +102,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OnCompleteQuery()
     {
-        if (SelectedResult is null) return;
+        if (SelectedResult is null) { return; }
 
         var query = Cmdline.Parse(Query);
         var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
@@ -114,7 +114,7 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            if (SelectedResult is null) return;
+            if (SelectedResult is null) { return; }
 
             if (SelectedResult.IsExecutionConfirmationRequired)
             {
@@ -122,7 +122,7 @@ public partial class MainViewModel : ObservableObject
                     $"Do you want to execute alias '{SelectedResult.Name}'?",
                     "Execute"
                 );
-                if (!result) return;
+                if (!result) { return; }
             }
 
             var response = await _executionService.ExecuteAsync(
@@ -130,7 +130,7 @@ public partial class MainViewModel : ObservableObject
             );
 
             WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
-            if (response.HasResult) Results = new(response.Results);
+            if (response.HasResult) { Results = new(response.Results); }
         }
         catch (Exception ex)
         {
@@ -145,8 +145,8 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OnLoadThumbnail(QueryResult? queryResult)
     {
-        if (queryResult is null) return;
-        
+        if (queryResult is null) { return; }
+
         try { _thumbnailService.UpdateThumbnail(queryResult); }
         catch (Exception ex)
         {
@@ -180,7 +180,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OnOpenDirectory()
     {
-        if (SelectedResult is null) return;
+        if (SelectedResult is null) { return; }
 
         _logger.LogInformation("Open directory of {Alias}", SelectedResult.Name);
         _executionService.OpenDirectoryAsync(SelectedResult);
@@ -194,7 +194,8 @@ public partial class MainViewModel : ObservableObject
         {
             var criterion = Cmdline.Parse(Query);
 
-            if (criterion.IsNullOrEmpty()) Results.Clear();
+            if (criterion.IsNullOrEmpty()) { Results.Clear(); }
+
             var results = await _searchService.SearchAsync(criterion, DoesReturnAllIfEmpty);
             Results = new(results);
             SelectedResult = Results.FirstOrDefault()!;

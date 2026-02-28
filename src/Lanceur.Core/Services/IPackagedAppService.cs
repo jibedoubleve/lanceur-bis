@@ -16,5 +16,5 @@ public interface IPackagedAppService
 
     Task<bool> IsPackageAsync(string fileName);
 
-    #endregion Methods
+    #endregion
 }

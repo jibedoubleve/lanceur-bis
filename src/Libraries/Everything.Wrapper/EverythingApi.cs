@@ -89,15 +89,20 @@ public class EverythingApi : IEverythingApi
 
     [DllImport("Everything64.dll")] private static extern uint Everything_GetResultAttributes(uint nIndex);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateAccessed(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateAccessed(uint nIndex, out long lpFileTime);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateCreated(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateCreated(uint nIndex, out long lpFileTime);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateModified(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateModified(uint nIndex, out long lpFileTime);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateRecentlyChanged(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateRecentlyChanged(uint nIndex, out long lpFileTime);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateRun(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateRun(uint nIndex, out long lpFileTime);
 
     [DllImport("Everything64.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr Everything_GetResultExtension(uint nIndex);
@@ -127,7 +132,8 @@ public class EverythingApi : IEverythingApi
 
     [DllImport("Everything64.dll")] private static extern uint Everything_GetResultRunCount(uint nIndex);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultSize(uint nIndex, out long lpFileSize);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultSize(uint nIndex, out long lpFileSize);
 
     [DllImport("Everything64.dll", CharSet = CharSet.Unicode)]
     private static extern uint Everything_GetRunCountFromFileName(string lpFileName);
@@ -215,7 +221,7 @@ public class EverythingApi : IEverythingApi
             };
         }
 
-        if (Everything_IsFolderResult(resultIndex)) return ResultType.Directory;
+        if (Everything_IsFolderResult(resultIndex)) { return ResultType.Directory; }
 
 
         return ResultType.File;
@@ -223,11 +229,8 @@ public class EverythingApi : IEverythingApi
 
     public ResultSet Search(string query)
     {
-        if (!Everything_IsDBLoaded())
-        {
-            return ResultSet.Failure("Unable to connect to the Everything database.");
-        }
-        
+        if (!Everything_IsDBLoaded()) { return ResultSet.Failure("Unable to connect to the Everything database."); }
+
         uint i;
         const int fileAndPathSize = 260;
 
@@ -249,9 +252,16 @@ public class EverythingApi : IEverythingApi
             var stringBuilder = new StringBuilder(fileAndPathSize);
             Everything_GetResultFullPathName(i, stringBuilder, fileAndPathSize);
 
-            result.Add(new() { Name = Marshal.PtrToStringUni(Everything_GetResultFileName(i)) ?? string.Empty, Path = stringBuilder.ToString(), ResultType = GetResultType(i) });
+            result.Add(
+                new()
+                {
+                    Name = Marshal.PtrToStringUni(Everything_GetResultFileName(i)) ?? string.Empty,
+                    Path = stringBuilder.ToString(),
+                    ResultType = GetResultType(i)
+                }
+            );
         }
-        
+
         return result;
     }
 

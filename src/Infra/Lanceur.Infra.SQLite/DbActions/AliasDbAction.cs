@@ -110,25 +110,27 @@ public class AliasDbAction
             );
 
         if (deletedRowsCount > 0 && addedRowsCount == 0)
+        {
             _logger.LogWarning(
                 "Deleting {DeletedRowsCount} parameters while adding no new parameters",
                 deletedRowsCount
             );
+        }
     }
 
     internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
     {
-        if (alias is not ExecutableQueryResult exec) return;
+        if (alias is not ExecutableQueryResult exec) { return; }
 
         var queryResult = exec.ToAliasQueryResult();
         queryResult.IsHidden = true;
         queryResult.FileName = exec.Name; // By convention for builtin keyword
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
-    
-    internal AliasQueryResult GetById(IDbConnection connection, long id) 
+
+    internal AliasQueryResult GetById(IDbConnection connection, long id)
     {
-        if (id <= 0) throw new ArgumentException("The id of the alias should be greater than zero.");
+        if (id <= 0) { throw new ArgumentException("The id of the alias should be greater than zero."); }
 
         const string sql = $"""
                             select
@@ -236,7 +238,7 @@ public class AliasDbAction
     /// </exception>
     internal void Remove(IDbTransaction tx, AliasQueryResult alias)
     {
-        if (alias == null) throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias.");
+        if (alias == null) { throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias."); }
 
         ClearAliasUsage(tx, alias.Id);
         ClearAliasArgument(tx, alias.Id);
@@ -321,10 +323,8 @@ public class AliasDbAction
         tx.Connection.Execute(sqlDelete, new { id });
 
         // Add the updated synonyms 
-        var names = alias.Synonyms 
-                    ?? alias.Name 
-                    ?? throw new ArgumentException("The alias to create has no name");
-        
+        var names = alias.Synonyms ?? alias.Name ?? throw new ArgumentException("The alias to create has no name");
+
         var csv = names.SplitCsv();
         const string sqlSynonyms = "insert into alias_name (id_alias, name) values (@id, @name)";
         foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });

@@ -27,16 +27,16 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
     {
         using var conn = _connectionFactory.CreateConnection();
-        if (conn.State != ConnectionState.Open) conn.Open();
+        if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         return action(conn);
     }
-    
+
     /// <inheritdoc />
     public void WithConnection(Action<IDbConnection> action)
     {
         using var conn = _connectionFactory.CreateConnection();
-        if (conn.State != ConnectionState.Open) conn.Open();
+        if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         action(conn);
     }
@@ -44,8 +44,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public void WithinTransaction(Action<IDbTransaction> action)
     {
-        WithinTransaction(
-            tx =>
+        WithinTransaction(tx =>
             {
                 action(tx);
                 return default(object);
@@ -57,7 +56,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)
     {
         using var conn = _connectionFactory.CreateConnection();
-        if (conn.State != ConnectionState.Open) conn.Open();
+        if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
         try
@@ -77,7 +76,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     public TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext, TContext> action, TContext context)
     {
         using var conn = _connectionFactory.CreateConnection();
-        if (conn.State != ConnectionState.Open) conn.Open();
+        if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
         try
@@ -97,7 +96,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     public void WithinTransaction<TContext>(Action<IDbTransaction, TContext> action, TContext context)
     {
         using var conn = _connectionFactory.CreateConnection();
-        if (conn.State != ConnectionState.Open) conn.Open();
+        if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
         try

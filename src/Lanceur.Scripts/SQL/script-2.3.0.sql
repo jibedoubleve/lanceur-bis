@@ -1,13 +1,16 @@
-begin transaction;
-      
+begin
+transaction;
+
 update alias
 set icon = 'Link24'
 where file_name like 'http%';
 
-commit transaction;      
+commit transaction;
 
-PRAGMA foreign_keys=off;
-begin transaction;
+PRAGMA
+foreign_keys=off;
+begin
+transaction;
 
 /* The 'thumbnail' field in the 'alias' table is no longer in use.  
  * Therefore, we are removing it from the database. 
@@ -34,20 +37,19 @@ create table temp_alias
 );
 
 insert into temp_alias
-select
-    id,
-    arguments,
-    file_name,
-    notes,
-    run_as,
-    start_mode,
-    working_dir,
-    icon,
-    hidden,
-    deleted_at,
-    lua_script,
-    exec_count,
-    confirmation_required
+select id,
+       arguments,
+       file_name,
+       notes,
+       run_as,
+       start_mode,
+       working_dir,
+       icon,
+       hidden,
+       deleted_at,
+       lua_script,
+       exec_count,
+       confirmation_required
 from alias;
 
 --------------------------------------------------------------
@@ -72,21 +74,21 @@ create table alias
 );
 
 insert into alias
-select
-    id,
-    arguments,
-    file_name,
-    notes,
-    run_as,
-    start_mode,
-    working_dir,
-    icon,
-    hidden,
-    deleted_at,
-    lua_script,
-    exec_count,
-    confirmation_required
+select id,
+       arguments,
+       file_name,
+       notes,
+       run_as,
+       start_mode,
+       working_dir,
+       icon,
+       hidden,
+       deleted_at,
+       lua_script,
+       exec_count,
+       confirmation_required
 from temp_alias;
 
 commit transaction;
-PRAGMA foreign_keys=on;
+PRAGMA
+foreign_keys=on;

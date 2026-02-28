@@ -10,7 +10,8 @@
             <b:Interaction.Triggers>
                 <!--  When the item becomes visible, load the thumbnail  -->
                 <b:EventTrigger EventName="Loaded">
-                    <b:InvokeCommandAction Command="{Binding DataContext.LoadThumbnailCommand, ElementName=Result}" CommandParameter="{Binding}" />
+                    <b:InvokeCommandAction Command="{Binding DataContext.LoadThumbnailCommand, ElementName=Result}"
+                                           CommandParameter="{Binding}" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
             <DockPanel>
@@ -47,7 +48,8 @@
                             Opacity="{StaticResource PrimaryTextOpacity}"
                             Text="{Binding Name}" />
                     </StackPanel>
-                    <DockPanel Margin="12,0,15,0" Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <DockPanel Margin="12,0,15,0"
+                               Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ui:TextBlock
                             FontTypography="Body"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
@@ -71,7 +73,8 @@
             <b:Interaction.Triggers>
                 <!--  When the item becomes visible, load the thumbnail  -->
                 <b:EventTrigger EventName="Loaded">
-                    <b:InvokeCommandAction Command="{Binding DataContext.LoadThumbnailCommand, ElementName=AliasList}" CommandParameter="{Binding}" />
+                    <b:InvokeCommandAction Command="{Binding DataContext.LoadThumbnailCommand, ElementName=AliasList}"
+                                           CommandParameter="{Binding}" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
             <DockPanel>

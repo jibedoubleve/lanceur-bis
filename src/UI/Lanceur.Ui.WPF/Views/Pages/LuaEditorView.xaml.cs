@@ -19,8 +19,9 @@ public partial class LuaEditorView
 {
     #region Fields
 
-    private readonly ILogger<LuaEditorView> _logger;
     private bool _isUpdatingFromViewModel;
+
+    private readonly ILogger<LuaEditorView> _logger;
 
     #endregion
 
@@ -28,7 +29,8 @@ public partial class LuaEditorView
 
     public LuaEditorView(
         LuaEditorViewModel viewModel,
-        ILogger<LuaEditorView> logger)
+        ILogger<LuaEditorView> logger
+    )
     {
         _logger = logger;
         DataContext = ViewModel = viewModel;
@@ -49,12 +51,58 @@ public partial class LuaEditorView
 
     #region Methods
 
-    public void LoadAlias(AliasQueryResult alias)
+    private static void NavigateBackToKeywords()
     {
-        ViewModel.Load(alias);
+        WeakReferenceMessenger.Default.Send(
+            new NavigationMessage((typeof(KeywordsView), null))
+        );
+    }
+
+    private async void OnClickBack(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await ViewModel.SaveOrDiscardAsync();
+            NavigateBackToKeywords();
+        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Failed to navigate back: {ErrorMessage}", ex.Message); }
+    }
+
+    private void OnClickSave(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            ViewModel.Save();
+            NavigateBackToKeywords();
+        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Failed to save: {ErrorMessage}", ex.Message); }
+    }
+
+    private void OnKeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.F5) { ViewModel.DryRunCommand.Execute(null); }
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(LuaEditorViewModel.LuaScript) || _isUpdatingFromViewModel) { return; }
+
         _isUpdatingFromViewModel = true;
-        LuaEditor.Text = ViewModel.LuaScript;
+        if (LuaEditor.Text != ViewModel.LuaScript) { LuaEditor.Text = ViewModel.LuaScript; }
+
         _isUpdatingFromViewModel = false;
+    }
+
+    private void SetupEditorBinding()
+    {
+        // AvalonEdit's Text property is not a DependencyProperty, so we need manual binding
+        LuaEditor.TextChanged += (_, _) =>
+        {
+            if (!_isUpdatingFromViewModel) { ViewModel.LuaScript = LuaEditor.Text; }
+        };
+
+        // Update editor when ViewModel's LuaScript changes
+        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
     }
 
     private void SetupSyntaxColouration()
@@ -67,72 +115,12 @@ public partial class LuaEditorView
         LuaEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
     }
 
-    private void SetupEditorBinding()
+    public void LoadAlias(AliasQueryResult alias)
     {
-        // AvalonEdit's Text property is not a DependencyProperty, so we need manual binding
-        LuaEditor.TextChanged += (_, _) =>
-        {
-            if (!_isUpdatingFromViewModel)
-            {
-                ViewModel.LuaScript = LuaEditor.Text;
-            }
-        };
-
-        // Update editor when ViewModel's LuaScript changes
-        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
-    }
-
-    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName != nameof(LuaEditorViewModel.LuaScript) || _isUpdatingFromViewModel) return;
-
+        ViewModel.Load(alias);
         _isUpdatingFromViewModel = true;
-        if (LuaEditor.Text != ViewModel.LuaScript)
-        {
-            LuaEditor.Text = ViewModel.LuaScript;
-        }
+        LuaEditor.Text = ViewModel.LuaScript;
         _isUpdatingFromViewModel = false;
-    }
-
-    private async void OnClickBack(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            await ViewModel.SaveOrDiscardAsync();
-            NavigateBackToKeywords();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to navigate back: {ErrorMessage}", ex.Message);
-        }
-    }
-
-    private void OnClickSave(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            ViewModel.Save();
-            NavigateBackToKeywords();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to save: {ErrorMessage}", ex.Message);
-        }
-    }
-
-    private void OnKeyUp(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.F5)
-        {
-            ViewModel.DryRunCommand.Execute(null);
-        }
-    }
-
-    private static void NavigateBackToKeywords()
-    {
-        WeakReferenceMessenger.Default.Send(
-            new NavigationMessage((typeof(KeywordsView), null))
-        );
     }
 
     #endregion

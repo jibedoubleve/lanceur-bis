@@ -19,13 +19,6 @@ public class SearchBoxSection
     public bool ShowAtStartup { get; set; } = true;
 
     /// <summary>
-    ///     Gets or sets a value indicating whether the shortcut toggles the search box,
-    ///     showing it on first use and hiding it on subsequent use.
-    /// </summary>
-    /// <remarks> Default value is <c>True</c></remarks>
-    public bool ToggleVisibility { get; set; } = true;
-
-    /// <summary>
     ///     Gets or sets a value indicating whether the last search query should be displayed when the user opens the search
     ///     box.
     ///     When set to <c>true</c>, the search box will display the last query. If set to <c>false</c>, the search box will be
@@ -41,6 +34,13 @@ public class SearchBoxSection
     /// </summary>
     /// <remarks> Default value is <c>False</c></remarks>
     public bool ShowResult { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the shortcut toggles the search box,
+    ///     showing it on first use and hiding it on subsequent use.
+    /// </summary>
+    /// <remarks> Default value is <c>True</c></remarks>
+    public bool ToggleVisibility { get; set; } = true;
 
     #endregion
 }

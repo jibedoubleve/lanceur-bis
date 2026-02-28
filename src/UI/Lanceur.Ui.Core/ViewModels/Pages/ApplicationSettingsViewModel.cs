@@ -9,7 +9,6 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Stores.Everything;
-using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.Constants;
@@ -26,8 +25,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     [ObservableProperty] private string _apiToken = string.Empty;
     [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
+    [ObservableProperty] private IConfigurationFacade _configuration;
     [ObservableProperty] private int _cpuSmoothingIndex;
-    [ObservableProperty] private bool _toggleVisibility;
     [ObservableProperty] private string _dbPath = string.Empty;
     private readonly IEnigma _enigma;
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
@@ -49,11 +48,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private int _refreshRate;
     [ObservableProperty] private double _searchDelay;
     [ObservableProperty] private  LogLevel _selectedLogLevel;
-    [ObservableProperty] private IConfigurationFacade _configuration;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
     [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = [];
+    [ObservableProperty] private bool _toggleVisibility;
     private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _windowBackdropStyle = "Mica";
 
@@ -92,7 +91,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Key = hk.Key;
 
         // Logging
-        SelectedLogLevel = _configuration.Local.MinimumLogLevel; 
+        SelectedLogLevel = _configuration.Local.MinimumLogLevel;
 
         // Miscellaneous
         MapSettingsFromDbToUi();
@@ -118,10 +117,14 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     private int GetHotKey()
     {
         var result = 0;
-        if (IsCtrl) result += (int)ModifierKeys.Control;
-        if (IsAlt) result += (int)ModifierKeys.Alt;
-        if (IsWin) result += (int)ModifierKeys.Windows;
-        if (IsShift) result += (int)ModifierKeys.Shift;
+        if (IsCtrl) { result += (int)ModifierKeys.Control; }
+
+        if (IsAlt) { result += (int)ModifierKeys.Alt; }
+
+        if (IsWin) { result += (int)ModifierKeys.Windows; }
+
+        if (IsShift) { result += (int)ModifierKeys.Shift; }
+
         return result;
     }
 
@@ -180,10 +183,14 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Everything Store
         var query = new EverythingQueryBuilder();
-        if (ExcludeHiddenFilesWithEverything) query.ExcludeHiddenFiles();
-        if (ExcludeSystemFilesWithEverything) query.ExcludeSystemFiles();
-        if (IncludeOnlyExecFilesWithEverything) query.OnlyExecFiles();
-        if (ExcludeFilesInBinWithEverything) query.ExcludeFilesInBin();
+        if (ExcludeHiddenFilesWithEverything) { query.ExcludeHiddenFiles(); }
+
+        if (ExcludeSystemFilesWithEverything) { query.ExcludeSystemFiles(); }
+
+        if (IncludeOnlyExecFilesWithEverything) { query.OnlyExecFiles(); }
+
+        if (ExcludeFilesInBinWithEverything) { query.ExcludeFilesInBin(); }
+
         Configuration.Application.Stores.EverythingQuerySuffix = query.BuildQuery();
 
         // Window section
@@ -199,7 +206,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Configuration.Application.ResourceMonitor.RefreshRate = RefreshRate;
 
         // Miscellaneous
-        Configuration.Application.Github.Token = ApiToken.IsNullOrWhiteSpace() ? string.Empty : _enigma.Encrypt(ApiToken);
+        Configuration.Application.Github.Token
+            = ApiToken.IsNullOrWhiteSpace() ? string.Empty : _enigma.Encrypt(ApiToken);
     }
 
     [RelayCommand]
@@ -236,7 +244,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         string[] properties = [nameof(IsResourceMonitorEnabled), nameof(IsAdminModeEnabled)];
-        if (properties.Contains(e.PropertyName)) return;
+        if (properties.Contains(e.PropertyName)) { return; }
 
         _logger.LogTrace("Property {Property} changed", e.PropertyName);
         SaveSettings();
@@ -250,8 +258,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         hk.ModifierKey = GetHotKey();
         hk.Key = Key;
 
-        List<bool> reboot = [
-            hash != (hk.ModifierKey, hk.Key).GetHashCode(), 
+        List<bool> reboot =
+        [
+            hash != (hk.ModifierKey, hk.Key).GetHashCode(),
             Configuration.Local.DbPath != DbPath,
             Configuration.Local.MinimumLogLevel != SelectedLogLevel
         ];
@@ -261,10 +270,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Configuration.Save();
 
         var needRestart = reboot.Any(r => r);
-        
+
         _logger.LogTrace("Saved settings. Need restart {NeedRestart}", needRestart);
-        
-        if (needRestart) _hubService.GlobalNotifications.AskRestart();
+
+        if (needRestart) { _hubService.GlobalNotifications.AskRestart(); }
     }
 
     #endregion

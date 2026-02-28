@@ -79,7 +79,12 @@ public partial class ProcessFinderButton
         control.InvalidateArrange();
         control.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
 
-        var rect = new Rect(0, 0, control.DesiredSize.Width, control.DesiredSize.Height);
+        var rect = new Rect(
+            0,
+            0,
+            control.DesiredSize.Width,
+            control.DesiredSize.Height
+        );
 
         control.Arrange(rect);
         control.UpdateLayout();
@@ -100,18 +105,49 @@ public partial class ProcessFinderButton
         // write cursor header info
         using var cursorStream = new MemoryStream();
         cursorStream.Write([0x00, 0x00], 0, 2);                       // ICONDIR: Reserved. Must always be 0.
-        cursorStream.Write([0x02, 0x00], 0, 2);                       // ICONDIR: Specifies image type: 1 for icon (.ICO) image, 2 for cursor (.CUR) image. Other values are invalid
-        cursorStream.Write([0x01, 0x00], 0, 2);                       // ICONDIR: Specifies number of images in the file.
-        cursorStream.Write([(byte)control.DesiredSize.Width], 0, 1);  // ICONDIRENTRY: Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
-        cursorStream.Write([(byte)control.DesiredSize.Height], 0, 1); // ICONDIRENTRY: Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
-        cursorStream.Write([0x00], 0, 1);                             // ICONDIRENTRY: Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
+        cursorStream.Write(
+            [0x02, 0x00],
+            0,
+            2
+        );                       // ICONDIR: Specifies image type: 1 for icon (.ICO) image, 2 for cursor (.CUR) image. Other values are invalid
+        cursorStream.Write(
+            [0x01, 0x00],
+            0,
+            2
+        );                       // ICONDIR: Specifies number of images in the file.
+        cursorStream.Write(
+            [(byte)control.DesiredSize.Width],
+            0,
+            1
+        );  // ICONDIRENTRY: Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
+        cursorStream.Write(
+            [(byte)control.DesiredSize.Height],
+            0,
+            1
+        ); // ICONDIRENTRY: Specifies image height in pixels. Can be any number between 0 and 255. Value 0 means image height is 256 pixels.
+        cursorStream.Write(
+            [0x00],
+            0,
+            1
+        );                             // ICONDIRENTRY: Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
         cursorStream.Write([0x00], 0, 1);                             // ICONDIRENTRY: Reserved. Should be 0.
-        cursorStream.Write([(byte)hotSpot.X, 0x00], 0, 2);            // ICONDIRENTRY: Specifies the horizontal coordinates of the hotspot in number of pixels from the left.
-        cursorStream.Write([(byte)hotSpot.Y, 0x00], 0, 2);            // ICONDIRENTRY: Specifies the vertical coordinates of the hotspot in number of pixels from the top.
+        cursorStream.Write(
+            [(byte)hotSpot.X, 0x00],
+            0,
+            2
+        );            // ICONDIRENTRY: Specifies the horizontal coordinates of the hotspot in number of pixels from the left.
+        cursorStream.Write(
+            [(byte)hotSpot.Y, 0x00],
+            0,
+            2
+        );            // ICONDIRENTRY: Specifies the vertical coordinates of the hotspot in number of pixels from the top.
         cursorStream.Write(
             [
                 // ICONDIRENTRY: Specifies the size of the image's data in bytes
-                (byte)(pngStream.Length & 0x000000FF), (byte)((pngStream.Length & 0x0000FF00) >> 0x08), (byte)((pngStream.Length & 0x00FF0000) >> 0x10), (byte)((pngStream.Length & 0xFF000000) >> 0x18)
+                (byte)(pngStream.Length & 0x000000FF),
+                (byte)((pngStream.Length & 0x0000FF00) >> 0x08),
+                (byte)((pngStream.Length & 0x00FF0000) >> 0x10),
+                (byte)((pngStream.Length & 0xFF000000) >> 0x18)
             ],
             0,
             4

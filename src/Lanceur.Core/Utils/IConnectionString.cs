@@ -4,7 +4,7 @@ public interface IConnectionString
 {
     #region Methods
 
-    public string ToString();
+    string ToString();
 
-    #endregion Methods
+    #endregion
 }

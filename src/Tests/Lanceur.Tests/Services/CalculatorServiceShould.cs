@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
-using Shouldly;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Logging;
 using Lanceur.Tests.Tools.Logging;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Services;
@@ -33,45 +33,35 @@ public class CalculatorServiceShould
     {
         IEnumerable<string> operations1 =
         [
-            "Abs", "Acos", "Asin", "Atan", "Ceiling", "Cos", "Exp", "Floor", "IEEERemainder", "Ln", "Log",
-            "Max", "Min", "Pow", "Round", "Sign", "Sin", "Sqrt", "Tan", "Truncate", "in", "if", "ifs"
+            "Abs",
+            "Acos",
+            "Asin",
+            "Atan",
+            "Ceiling",
+            "Cos",
+            "Exp",
+            "Floor",
+            "IEEERemainder",
+            "Ln",
+            "Log",
+            "Max",
+            "Min",
+            "Pow",
+            "Round",
+            "Sign",
+            "Sin",
+            "Sqrt",
+            "Tan",
+            "Truncate",
+            "in",
+            "if",
+            "ifs"
         ];
         operations1 = operations1.ToArray();
         var operations2 = operations1.Select(e => $"       {e}").ToArray();
 
         return operations1.Concat(operations2)
                           .Select(e => new object[] { e });
-    }
-
-    [Theory]
-    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
-    public void ValidateExpressionWhenNumberInIt(string operation)
-    {
-        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
-
-        operation = $"{operation} 4"; // An calculation is only triggered when there's a number.
-
-        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
-        
-        var regex = new Regex(calculator!.ValidationRegex);
-
-        _output.WriteLine($"Expression: {operation}");
-        regex.IsMatch(operation).ShouldBeTrue("'operation' is valid");
-    }
-    
-    [Theory]
-    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
-    public void NotValidateExpressionWhenNoNumberInIt(string operation)
-    {
-        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
-
-        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
-
-
-        var regex = new Regex(calculator!.ValidationRegex);
-
-        _output.WriteLine($"Expression: {operation}");
-        regex.IsMatch(operation).ShouldBeFalse("'operation' is invalid");
     }
 
     [Theory]
@@ -89,6 +79,21 @@ public class CalculatorServiceShould
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
         var regex = new Regex(calculator!.ValidationRegex);
         regex.IsMatch(expression).ShouldBeTrue();
+    }
+
+    [Theory]
+    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
+    public void NotValidateExpressionWhenNoNumberInIt(string operation)
+    {
+        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
+
+        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
+
+
+        var regex = new Regex(calculator!.ValidationRegex);
+
+        _output.WriteLine($"Expression: {operation}");
+        regex.IsMatch(operation).ShouldBeFalse("'operation' is invalid");
     }
 
     [Theory]
@@ -124,6 +129,22 @@ public class CalculatorServiceShould
             r => r.IsError.ShouldBeFalse(),
             r => r.Result.ShouldBe(expected)
         );
+    }
+
+    [Theory]
+    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
+    public void ValidateExpressionWhenNumberInIt(string operation)
+    {
+        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
+
+        operation = $"{operation} 4"; // An calculation is only triggered when there's a number.
+
+        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
+
+        var regex = new Regex(calculator!.ValidationRegex);
+
+        _output.WriteLine($"Expression: {operation}");
+        regex.IsMatch(operation).ShouldBeTrue("'operation' is valid");
     }
 
     #endregion

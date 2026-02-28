@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Infra.Win32.Helpers;

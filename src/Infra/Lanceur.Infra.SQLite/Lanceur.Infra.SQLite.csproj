@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.3" />
-    <PackageReference Include="MiniProfiler.Shared" Version="4.5.4" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
-    <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
-    <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Dapper" Version="2.1.66"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.3"/>
+        <PackageReference Include="MiniProfiler.Shared" Version="4.5.4"/>
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
+        <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj"/>
+        <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj"/>
+    </ItemGroup>
 </Project>

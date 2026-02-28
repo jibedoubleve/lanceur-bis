@@ -9,11 +9,11 @@ public class LimitedStringLengthFormatter : IStringFormatter
 
     private const int MaxLength = 90;
 
-    #endregion Fields
+    #endregion
 
     #region Methods
 
     public string Format(object value) => value?.ToString()?.Truncate(MaxLength, "(...)");
 
-    #endregion Methods
+    #endregion
 }

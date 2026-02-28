@@ -6,7 +6,7 @@ public static class SingleInstance
 
     private static readonly Mutex Mutex = new(true, @"Global\Lanceur2");
 
-    #endregion Fields
+    #endregion
 
     #region Methods
 
@@ -18,5 +18,5 @@ public static class SingleInstance
         catch (AbandonedMutexException) { return false; }
     }
 
-    #endregion Methods
+    #endregion
 }

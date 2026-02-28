@@ -34,6 +34,29 @@ public class MacroServiceTest : TestBase
 
     #region Methods
 
+    private ServiceProvider BuildMacroServiceProvider()
+    {
+        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
+        return new ServiceCollection().AddLoggingForTests(OutputHelper)
+                                      .AddLogging()
+                                      .AddMockSingleton<IAliasRepository>()
+                                      .AddLoggingForTests(OutputHelper)
+                                      .AddMockSingleton<IExecutionService>()
+                                      .AddMockSingleton<ISearchService>()
+                                      .AddSingleton(
+                                          new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) }
+                                      )
+                                      .AddSingleton<MacroAliasExpanderService>()
+                                      .AddSingleton(_ => asm)
+                                      .AddMockSingleton<IClipboardService>()
+                                      .AddMockSingleton<IGithubService>()
+                                      .AddMockSingleton<IUserGlobalNotificationService>()
+                                      .AddMockSingleton<IEnigma>()
+                                      .AddMockSingleton<ISection<GithubSection>>()
+                                      .AddMacroServices()
+                                      .BuildServiceProvider();
+    }
+
     [Fact]
     public void When_expanding_Multi_macro_Then_it_is_SelfExecutableQueryResult()
     {
@@ -87,32 +110,6 @@ public class MacroServiceTest : TestBase
         );
     }
 
-    private ServiceProvider BuildMacroServiceProvider()
-    {
-        
-        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
-        return new ServiceCollection().AddLoggingForTests(OutputHelper)
-                            .AddLogging()
-                            .AddMockSingleton<IAliasRepository>()
-                            .AddLoggingForTests(OutputHelper)
-                            .AddMockSingleton<IExecutionService>()
-                            .AddMockSingleton<ISearchService>()
-                            .AddSingleton(
-                                new AssemblySource
-                                {
-                                    MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
-                                }
-                            )
-                            .AddSingleton<MacroAliasExpanderService>()
-                            .AddSingleton(_ => asm)
-                            .AddMockSingleton<IClipboardService>()
-                            .AddMockSingleton<IGithubService>()
-                            .AddMockSingleton<IUserGlobalNotificationService>()
-                            .AddMockSingleton<IEnigma>()
-                            .AddMockSingleton<ISection<GithubSection>>()
-                            .AddMacroServices()
-                            .BuildServiceProvider();
-    }
     [Fact]
     public void When_loading_macro_Then_id_and_count_are_not_modified()
     {

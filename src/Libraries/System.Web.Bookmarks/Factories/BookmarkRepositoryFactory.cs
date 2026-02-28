@@ -37,15 +37,27 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
     {
         IBookmarkRepository repository = browser switch
         {
-            Browser.Chrome  => new BlinkBrowserBookmarks(_memoryCache,  _loggerFactory, BrowserConfigurationFactory.Chrome),
-            Browser.Edge    => new BlinkBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Edge),
-            Browser.Firefox => new GeckoBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Firefox),
-            Browser.Zen     => new GeckoBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Zen),
-            _               => throw new ArgumentOutOfRangeException(nameof(browser), browser, null)
+            Browser.Chrome  => new BlinkBrowserBookmarks(
+                _memoryCache,
+                _loggerFactory,
+                BrowserConfigurationFactory.Chrome
+            ),
+            Browser.Edge    => new BlinkBrowserBookmarks(
+                _memoryCache,
+                _loggerFactory,
+                BrowserConfigurationFactory.Edge
+            ),
+            Browser.Firefox => new GeckoBrowserBookmarks(
+                _memoryCache,
+                _loggerFactory,
+                BrowserConfigurationFactory.Firefox
+            ),
+            Browser.Zen => new GeckoBrowserBookmarks(_memoryCache, _loggerFactory, BrowserConfigurationFactory.Zen),
+            _           => throw new ArgumentOutOfRangeException(nameof(browser), browser, null)
         };
 
         PreviousBrowserCacheKey ??= repository.CacheKey;
-        if (PreviousBrowserCacheKey is null || PreviousBrowserCacheKey == repository.CacheKey) return repository;
+        if (PreviousBrowserCacheKey is null || PreviousBrowserCacheKey == repository.CacheKey) { return repository; }
 
         // Invalidate bookmarks cache when browser changed
         _memoryCache.Remove(PreviousBrowserCacheKey!);

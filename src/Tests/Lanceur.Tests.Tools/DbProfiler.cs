@@ -78,16 +78,17 @@ public class DbProfiler : IDbProfiler
         );
     }
 
-    public void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception) => Log(
-        profiledDbCommand,
-        (sql, parameters) =>
-        {
-            _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            _outputHelper.WriteLine(@"/!\/!\/!\  ERROR OCCURED /!\/!\/!\");
-            _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            _outputHelper.WriteLine(Template, sql, parameters);
-        }
-    );
+    public void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception)
+        => Log(
+            profiledDbCommand,
+            (sql, parameters) =>
+            {
+                _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                _outputHelper.WriteLine(@"/!\/!\/!\  ERROR OCCURED /!\/!\/!\");
+                _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                _outputHelper.WriteLine(Template, sql, parameters);
+            }
+        );
 
     public void ReaderFinish(IDataReader reader) { _outputHelper.WriteLine("Reader finished."); }
 

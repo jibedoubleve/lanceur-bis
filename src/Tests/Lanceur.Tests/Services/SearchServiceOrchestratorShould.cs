@@ -1,7 +1,6 @@
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections;
-using Shouldly;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -13,6 +12,7 @@ using Lanceur.Ui.WPF.Converters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Services;
@@ -29,10 +29,15 @@ public class SearchServiceOrchestratorShould
     {
         var converter = new StoreOrchestrationToStringConverter();
 
-        converter.ConvertBack(input, null!, null, null!)
+        converter.ConvertBack(
+                     input,
+                     null!,
+                     null,
+                     null!
+                 )
                  .ShouldBe(output);
     }
-    
+
     [Theory]
     [InlineData(@"^\s{0,}\..*", ".")]
     [InlineData(@"^\s{0,}.*", "")]
@@ -41,7 +46,12 @@ public class SearchServiceOrchestratorShould
     {
         var converter = new StoreOrchestrationToStringConverter();
 
-        converter.Convert(input, null!, null, null!)
+        converter.Convert(
+                     input,
+                     null!,
+                     null,
+                     null!
+                 )
                  .ShouldBe(output);
     }
 
@@ -60,8 +70,7 @@ public class SearchServiceOrchestratorShould
         // arrange
         var sp = new ServiceCollection()
                  .AddLogging(builder => builder.AddXUnit())
-                 .AddMockSingleton<IConfigurationFacade>(
-                     (_, i) =>
+                 .AddMockSingleton<IConfigurationFacade>((_, i) =>
                      {
                          i.Application.Returns(new ApplicationSettings());
                          return i;

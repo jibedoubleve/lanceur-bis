@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Globalization;
 using System.Windows.Data;
-using Shouldly;
 using Lanceur.Infra.Stores;
 using Lanceur.Ui.WPF.Converters;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Ui;

@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection) 
+    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
         => serviceCollection.AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
                             .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                             .AddTransient<IGithubService, GithubService>();
@@ -76,13 +76,13 @@ public static class ServiceCollectionExtensions
                                                  .Enrich.FromLogContext()
                                                  .Enrich.WithEnvironmentUserName()
                                                  .WriteTo.Console();
-        
+
 
         ConditionalExecution.Execute(
             () => ConfigureLog(Paths.DebugClefLogFile, Paths.DebugRawLogFile),
             () => ConfigureLog(Paths.ClefLogFile, Paths.RawLogFile)
         );
-        
+
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
         Log.Logger = loggerCfg.CreateLogger();
 
@@ -92,11 +92,13 @@ public static class ServiceCollectionExtensions
         {
             if (telemetry.IsClefEnabled)
                 // Clef file, easier to import into SEQ
+            {
                 loggerCfg.WriteTo.File(
                     new CompactJsonFormatter(),
                     clefFile,
                     rollingInterval: RollingInterval.Day
                 );
+            }
 
             // Raw log file, easier to read
             loggerCfg.WriteTo.File(

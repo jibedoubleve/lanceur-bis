@@ -2,8 +2,15 @@ namespace Lanceur.Ui.Core.Utils.Watchdogs;
 
 public class TestWatchdogBuilder : IWatchdogBuilder
 {
+    #region Fields
+
     private Func<Task>? _action;
-    public IWatchdogBuilder WithInterval(TimeSpan interval) => this;
+
+    #endregion
+
+    #region Methods
+
+    public IWatchdog Build() => new TestWatchdog(_action);
 
     public IWatchdogBuilder WithAction(Func<Task> action)
     {
@@ -11,5 +18,7 @@ public class TestWatchdogBuilder : IWatchdogBuilder
         return this;
     }
 
-    public IWatchdog Build() => new TestWatchdog(_action);
+    public IWatchdogBuilder WithInterval(TimeSpan interval) => this;
+
+    #endregion
 }

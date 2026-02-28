@@ -9,11 +9,12 @@ public static class TestOutputHelperExtensions
 
     private const string Tab = "  ";
 
-    #endregion Fields
+    #endregion
 
     #region Methods
 
-    private static void Write(this ITestOutputHelper output, string message, [CallerMemberName] string? method = null) => output.WriteLine($"[{method,-6}] {message}");
+    private static void Write(this ITestOutputHelper output, string message, [CallerMemberName] string? method = null)
+        => output.WriteLine($"[{method,-6}] {message}");
 
     public static void Act(this ITestOutputHelper output) => output.Write("---- ACT", nameof(Info));
 
@@ -29,5 +30,5 @@ public static class TestOutputHelperExtensions
 
     public static void Warn(this ITestOutputHelper output, string message) => output.Write($"{Tab}{message}");
 
-    #endregion Methods
+    #endregion
 }

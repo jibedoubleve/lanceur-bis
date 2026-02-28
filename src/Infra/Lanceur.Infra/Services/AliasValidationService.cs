@@ -10,12 +10,17 @@ internal static class AliasValidationRulesExtensions
 {
     #region Methods
 
-    public static ValidationStatus ShouldNotBeNullOrEmpty(this string value, string error) => value.IsNullOrWhiteSpace() ? ValidationStatus.Invalid(error) : ValidationStatus.Valid();
+    public static ValidationStatus ShouldNotBeNullOrEmpty(this string value, string error)
+        => value.IsNullOrWhiteSpace() ? ValidationStatus.Invalid(error) : ValidationStatus.Valid();
 
     public static ValidationStatus ValidateString(this object str, Func<string, ValidationStatus> validate)
     {
-        if (str is null) return ValidationStatus.Invalid("The value cannot be null. Please provide a valid input.");
-        if (str is not string s) return ValidationStatus.Invalid("The input must be a valid string. Please enter text.");
+        if (str is null) { return ValidationStatus.Invalid("The value cannot be null. Please provide a valid input."); }
+
+        if (str is not string s)
+        {
+            return ValidationStatus.Invalid("The input must be a valid string. Please enter text.");
+        }
 
         return validate(s);
     }
@@ -41,47 +46,65 @@ public class AliasValidationService : IAliasValidationService
 
     private ValidationStatus IsDeleted(object names, long idAlias)
     {
-        if (names is null) return ValidationStatus.Valid();
-        if (names is not string s) return ValidationStatus.Valid();
+        if (names is null) { return ValidationStatus.Valid(); }
+
+        if (names is not string s) { return ValidationStatus.Valid(); }
 
         var nameArray = s.Split(',', StringSplitOptions.RemoveEmptyEntries)
                          .Select(e => e.Trim())
                          .ToArray();
 
-        if (nameArray.Length == 0) return ValidationStatus.Valid();
+        if (nameArray.Length == 0) { return ValidationStatus.Valid(); }
 
         var existing = _repository.GetExistingDeletedAliases(nameArray, idAlias)
                                   .ToArray();
         return existing.Length != 0
-            ? ValidationStatus.Invalid($"These names belong to a deleted alias: {string.Join(", ", existing)}. To use these names, restore the alias.")
+            ? ValidationStatus.Invalid(
+                $"These names belong to a deleted alias: {string.Join(", ", existing)}. To use these names, restore the alias."
+            )
             : ValidationStatus.Valid();
     }
 
     public ValidationStatus AreNamesUnique(object names, long idAlias)
     {
-        if (names is null) return ValidationStatus.Invalid("The names cannot be null. Please provide a valid input.");
-        if (names is not string s) return ValidationStatus.Invalid("The names must be a valid string. Please enter text.");
+        if (names is null)
+        {
+            return ValidationStatus.Invalid("The names cannot be null. Please provide a valid input.");
+        }
+
+        if (names is not string s)
+        {
+            return ValidationStatus.Invalid("The names must be a valid string. Please enter text.");
+        }
 
         var nameArray = s.Split(',', StringSplitOptions.RemoveEmptyEntries)
                          .Select(e => e.Trim())
                          .ToArray();
 
-        if (nameArray.Length == 0) return ValidationStatus.Invalid("Names are required and cannot be empty.");
+        if (nameArray.Length == 0) { return ValidationStatus.Invalid("Names are required and cannot be empty."); }
 
         var existing = _repository.GetExistingAliases(nameArray, idAlias)
                                   .ToArray();
         return existing.Length != 0
-            ? ValidationStatus.Invalid($"These names are already in use for other aliases: {string.Join(", ", existing)}")
+            ? ValidationStatus.Invalid(
+                $"These names are already in use for other aliases: {string.Join(", ", existing)}"
+            )
             : ValidationStatus.Valid();
     }
 
-    public ValidationStatus IsFileNameValid(object fileName) => fileName.ValidateString(f => f.ShouldNotBeNullOrEmpty("Filename is required and cannot be empty."));
+    public ValidationStatus IsFileNameValid(object fileName)
+        => fileName.ValidateString(f => f.ShouldNotBeNullOrEmpty("Filename is required and cannot be empty."));
 
-    public ValidationStatus IsNameValid(object name) => name.ValidateString(n => n.ShouldNotBeNullOrEmpty("An alias must contain at least one name, or multiple names separated by commas."));
+    public ValidationStatus IsNameValid(object name)
+        => name.ValidateString(n
+            => n.ShouldNotBeNullOrEmpty(
+                "An alias must contain at least one name, or multiple names separated by commas."
+            )
+        );
 
     public ValidationStatus IsValid(AliasQueryResult alias)
     {
-        if (alias is null) return ValidationStatus.Invalid("The alias should not be null.");
+        if (alias is null) { return ValidationStatus.Invalid("The alias should not be null."); }
 
         var rules = new List<ValidationStatus>
         {
@@ -91,7 +114,7 @@ public class AliasValidationService : IAliasValidationService
             IsDeleted(alias!.Synonyms, alias!.Id)
         };
 
-        if (rules.All(x => x.IsSuccess)) return ValidationStatus.Valid();
+        if (rules.All(x => x.IsSuccess)) { return ValidationStatus.Valid(); }
 
         var errors = rules.Where(x => !x.ErrorContent.IsNullOrWhiteSpace())
                           .Select(x => x.ErrorContent);

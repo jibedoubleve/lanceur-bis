@@ -9,7 +9,7 @@ public class TestOutputHelperDisposable : IDisposable
     private readonly object _state;
     private readonly Action<string> _write;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
@@ -19,7 +19,7 @@ public class TestOutputHelperDisposable : IDisposable
         _write = write;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -29,5 +29,5 @@ public class TestOutputHelperDisposable : IDisposable
         _write($"[Scope] Dumped scope:\r\n{json}");
     }
 
-    #endregion Methods
+    #endregion
 }

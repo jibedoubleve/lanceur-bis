@@ -17,9 +17,11 @@ public class LightConnectionString : BaseConnectionString, IConnectionString
     {
         ArgumentNullException.ThrowIfNull(dbPath);
         if (!Path.Exists(dbPath))
+        {
             throw new InvalidDataException(
                 "The path of the SQLite database does not exist or is invalid."
             );
+        }
 
         var path = dbPath.ExpandPath();
         _connectionString = ConnectionStringPattern.Format(path);

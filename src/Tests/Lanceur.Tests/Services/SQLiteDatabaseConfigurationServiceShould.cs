@@ -6,10 +6,7 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
-using Lanceur.Tests.Tools.Logging;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -32,7 +29,10 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         using var c = BuildFreshDb();
         c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
+        var settingRepository = new SQLiteApplicationSettingsProvider(
+            scope,
+            CreateLogger<SQLiteApplicationSettingsProvider>()
+        );
         assert(settingRepository);
     }
 
@@ -40,7 +40,10 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         using var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
+        var settingRepository = new SQLiteApplicationSettingsProvider(
+            scope,
+            CreateLogger<SQLiteApplicationSettingsProvider>()
+        );
 
         update(settingRepository.Current);
 

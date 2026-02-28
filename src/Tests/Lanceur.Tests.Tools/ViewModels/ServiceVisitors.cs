@@ -14,11 +14,25 @@ public class ServiceVisitors
     #region Properties
 
     public IConnectionString? OverridenConnectionString { get; init; }
+
+    public Func<IServiceProvider, IUserGlobalNotificationService, IUserGlobalNotificationService>?
+        VisitGlobalUserInteractionService { get; init; }
+
     public Func<IServiceProvider, IProcessLauncher, IProcessLauncher>? VisitProcessLauncher { get; init; }
-    public Func<IServiceProvider, IUserGlobalNotificationService, IUserGlobalNotificationService>? VisitGlobalUserInteractionService { get; init; }
     public Action<IConfigurationFacade>? VisitSettings { get; init; }
-    public Func<IServiceProvider, IUserDialogueService, IUserDialogueService>? VisitUserInteractionService { get; init; }
-    public Func<IServiceProvider, IUserNotificationService, IUserNotificationService>? VisitUserNotificationService { get; init; }
+
+    public Func<IServiceProvider, IUserDialogueService, IUserDialogueService>? VisitUserInteractionService
+    {
+        get;
+        init;
+    }
+
+    public Func<IServiceProvider, IUserNotificationService, IUserNotificationService>? VisitUserNotificationService
+    {
+        get;
+        init;
+    }
+
     public Func<IServiceProvider, IViewFactory, IViewFactory>? VisitViewFactory { get; init; }
 
     #endregion

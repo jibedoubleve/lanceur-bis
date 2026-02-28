@@ -1,5 +1,5 @@
-﻿using Shouldly;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Models;

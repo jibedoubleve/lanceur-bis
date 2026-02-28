@@ -54,27 +54,6 @@ public class SearchServiceTest : TestBase
     #region Methods
 
     [Fact]
-    public void When_retrieving_aliases_from_repository_Then_parameters_are_mapped_as_expected()
-    {
-        // arrange
-        using var db = BuildFreshDb(SqlCreateAlias);
-        using var conn = new DbSingleConnectionManager(db);
-
-        var repository = new SQLiteAliasRepository(
-            conn,
-            _testLoggerFactory,
-            new DbActionFactory(_testLoggerFactory)
-        );
-
-        // act
-        var results = repository.GetAll();
-        var parameters = results.Select(c => c.Parameters);
-
-        //assert
-        parameters.ShouldNotContain((string)null);
-    }
-
-    [Fact]
     public void When_alias_has_negative_counter_Then_usage_is_ignored()
     {
         /*
@@ -86,7 +65,7 @@ public class SearchServiceTest : TestBase
         var sql = new SqlBuilder()
                   .AppendAlias(a => a.WithSynonyms("a", "b"))
                   .ToSql();
-        
+
         var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
         var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
         QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
@@ -150,6 +129,86 @@ public class SearchServiceTest : TestBase
             () => result.Length.ShouldBeGreaterThan(0),
             () => result[0].Name.ShouldBe("No result found")
         );
+    }
+
+    [Fact]
+    public void When_retrieving_aliases_from_repository_Then_parameters_are_mapped_as_expected()
+    {
+        // arrange
+        using var db = BuildFreshDb(SqlCreateAlias);
+        using var conn = new DbSingleConnectionManager(db);
+
+        var repository = new SQLiteAliasRepository(
+            conn,
+            _testLoggerFactory,
+            new DbActionFactory(_testLoggerFactory)
+        );
+
+        // act
+        var results = repository.GetAll();
+        var parameters = results.Select(c => c.Parameters);
+
+        //assert
+        parameters.ShouldNotContain((string)null);
+    }
+
+    [Fact]
+    public async Task When_search_has_no_result_Then_result_is_informational_QueryResult()
+    {
+        var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroAliasExpanderService>()
+                                                     .AddTestOutputHelper(OutputHelper)
+                                                     .AddTransient<SearchService>()
+                                                     .AddSingleton<IStoreService, EverythingStore>()
+                                                     .AddSingleton<IStoreOrchestrationFactory,
+                                                         StoreOrchestrationFactory>()
+                                                     .AddSingleton<ISearchServiceOrchestrator,
+                                                         SearchServiceOrchestrator>()
+                                                     .AddStoreServicesMockContext()
+                                                     .AddStoreServicesConfiguration()
+                                                     .BuildServiceProvider();
+        var query = new Cmdline("code");
+        var service = serviceProvider.GetService<SearchService>();
+
+        var result = (await service.SearchAsync(query)).ToArray();
+
+        result.ShouldSatisfyAllConditions(
+            r => r.Length.ShouldBe(1),
+            r => r[0].IsResult.ShouldBeFalse()
+        );
+    }
+
+    [Fact]
+    public void When_setting_usage_Then_it_does_not_reset_additional_parameters()
+    {
+        OutputHelper.Arrange();
+        var sql = new SqlBuilder().AppendAlias(a =>
+                                      {
+                                          a.WithSynonyms("a")
+                                           .WithAdditionalParameters()
+                                           .WithAdditionalParameters()
+                                           .WithAdditionalParameters();
+                                      }
+                                  )
+                                  .ToSql();
+
+        var connectionManager = new DbSingleConnectionManager(BuildFreshDb(sql));
+        var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
+        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
+
+        var repository = new SQLiteAliasRepository(
+            connectionManager,
+            logger,
+            new DbActionFactory(logger)
+        );
+
+        OutputHelper.Act();
+        repository.SetUsage(alias);
+
+        OutputHelper.Assert();
+        const string sqlCount = "select count(*) from alias_argument";
+
+        connectionManager.WithConnection(conn => conn.ExecuteScalar<int>(sqlCount))
+                         .ShouldBe(3);
     }
 
     [Fact]
@@ -227,62 +286,6 @@ public class SearchServiceTest : TestBase
             r => r.Length.ShouldBe(2),
             r => r[0].Name.ShouldBe("u")
         );
-    }
-
-    [Fact]
-    public async Task When_search_has_no_result_Then_result_is_informational_QueryResult()
-    {
-        var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroAliasExpanderService>()
-                                                     .AddTestOutputHelper(OutputHelper)
-                                                     .AddTransient<SearchService>()
-                                                     .AddSingleton<IStoreService, EverythingStore>()
-                                                     .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-                                                     .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                                                     .AddStoreServicesMockContext()
-                                                     .AddStoreServicesConfiguration()
-                                                     .BuildServiceProvider();
-        var query = new Cmdline("code");
-        var service = serviceProvider.GetService<SearchService>();
-
-        var result = (await service.SearchAsync(query)).ToArray();
-
-        result.ShouldSatisfyAllConditions(
-            r => r.Length.ShouldBe(1),
-            r => r[0].IsResult.ShouldBeFalse()
-        );
-    }
-
-    [Fact]
-    public void When_setting_usage_Then_it_does_not_reset_additional_parameters()
-    {
-        OutputHelper.Arrange();
-        var sql = new SqlBuilder().AppendAlias(a =>
-                                    {
-                                        a.WithSynonyms("a")
-                                         .WithAdditionalParameters()
-                                         .WithAdditionalParameters()
-                                         .WithAdditionalParameters();
-                                    })
-                                    .ToSql();
-
-        var connectionManager = new DbSingleConnectionManager(BuildFreshDb(sql));
-        var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a" };
-
-        var repository = new SQLiteAliasRepository(
-            connectionManager,
-            logger,
-            new DbActionFactory(logger)
-        );
-
-        OutputHelper.Act();
-        repository.SetUsage(alias);
-
-        OutputHelper.Assert();
-        const string sqlCount = "select count(*) from alias_argument";
-
-        connectionManager.WithConnection(conn => conn.ExecuteScalar<int>(sqlCount))
-                         .ShouldBe(3);
     }
 
     #endregion

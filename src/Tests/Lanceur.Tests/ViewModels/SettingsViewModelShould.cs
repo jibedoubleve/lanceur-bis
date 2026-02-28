@@ -1,10 +1,8 @@
 using Dapper;
-using Shouldly;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
@@ -15,6 +13,7 @@ using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Core;
 using Serilog.Events;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
@@ -41,7 +40,7 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
                 // values are updated. Initial save will enure there's
                 // data to compare.
                 viewModel.SaveSettings();
-                
+
                 // act
                 act(viewModel);
 
@@ -55,13 +54,17 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
         );
     }
 
-    private static string GetProperty(string jsonPath) => $"""
-                                                           select s_value ->> '$.{jsonPath}' as value
-                                                           from settings
-                                                           where s_key = 'json'
-                                                           """;
+    private static string GetProperty(string jsonPath)
+        => $"""
+            select s_value ->> '$.{jsonPath}' as value
+            from settings
+            where s_key = 'json'
+            """;
 
-    protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
+    protected override IServiceCollection ConfigureServices(
+        IServiceCollection serviceCollection,
+        ServiceVisitors visitors
+    )
     {
         serviceCollection.AddTestOutputHelper(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
@@ -80,38 +83,42 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
     [Theory]
     [InlineData(500)]
     [InlineData(123)]
-    public void SaveOptionSearchDelay(double value) => AssertProperty(
-        viewModel => viewModel.SearchDelay = value,
-        () => GetProperty("SearchBox.SearchDelay"),
-        value.ToString
-    );
+    public void SaveOptionSearchDelay(double value)
+        => AssertProperty(
+            viewModel => viewModel.SearchDelay = value,
+            () => GetProperty("SearchBox.SearchDelay"),
+            value.ToString
+        );
 
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void SaveOptionShowAtStartup(bool value) => AssertProperty(
-        viewModel => viewModel.ShowAtStartup = value,
-        () => GetProperty("SearchBox.ShowAtStartup"),
-        () => Convert.ToInt32(value).ToString()
-    );
+    public void SaveOptionShowAtStartup(bool value)
+        => AssertProperty(
+            viewModel => viewModel.ShowAtStartup = value,
+            () => GetProperty("SearchBox.ShowAtStartup"),
+            () => Convert.ToInt32(value).ToString()
+        );
 
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void SaveOptionShowLastQuery(bool value) => AssertProperty(
-        viewModel => viewModel.ShowLastQuery = value,
-        () => GetProperty("SearchBox.ShowLastQuery"),
-        () => Convert.ToInt32(value).ToString()
-    );
+    public void SaveOptionShowLastQuery(bool value)
+        => AssertProperty(
+            viewModel => viewModel.ShowLastQuery = value,
+            () => GetProperty("SearchBox.ShowLastQuery"),
+            () => Convert.ToInt32(value).ToString()
+        );
 
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void SaveOptionShowResult(bool value) =>  AssertProperty(
-        viewModel => viewModel.ShowResult = value,
-        () => GetProperty("SearchBox.ShowResult"),
-        () => Convert.ToInt32(value).ToString()
-    );
+    public void SaveOptionShowResult(bool value)
+        =>  AssertProperty(
+            viewModel => viewModel.ShowResult = value,
+            () => GetProperty("SearchBox.ShowResult"),
+            () => Convert.ToInt32(value).ToString()
+        );
 
     [Theory]
     [InlineData("Zen")]
@@ -119,11 +126,12 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
     [InlineData("Edge")]
     [InlineData("Firefox")]
     [InlineData("SomeUnknownValue")]
-    public void SaveOptionStoresBookmarkSourceBrowser(string value) => AssertProperty(
-        viewModel => viewModel.BookmarkSourceBrowser = value,
-        () => GetProperty("Stores.BookmarkSourceBrowser"),
-        () => value
-    );
+    public void SaveOptionStoresBookmarkSourceBrowser(string value)
+        => AssertProperty(
+            viewModel => viewModel.BookmarkSourceBrowser = value,
+            () => GetProperty("Stores.BookmarkSourceBrowser"),
+            () => value
+        );
 
     #endregion
 }

@@ -1,7 +1,7 @@
 ﻿namespace Lanceur.Ui.WPF.Views.Controls;
 
 /// <summary>
-/// Interaction logic for WindowInfoControl.xaml
+///     Interaction logic for WindowInfoControl.xaml
 /// </summary>
 public partial class WindowInfoControl
 {
@@ -9,5 +9,5 @@ public partial class WindowInfoControl
 
     public WindowInfoControl() { InitializeComponent(); }
 
-    #endregion Constructors
+    #endregion
 }

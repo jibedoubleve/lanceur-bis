@@ -8,13 +8,11 @@ public abstract class Store
     #region Constructors
 
     protected Store(IStoreOrchestrationFactory factory)
-    {
-        StoreOrchestrationFactory
+        => StoreOrchestrationFactory
             = factory ??
               throw new NullReferenceException(
                   $"The {typeof(IStoreOrchestrationFactory)} should be configured in the IOC container."
               );
-    }
 
     #endregion
 

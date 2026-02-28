@@ -1,8 +1,8 @@
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.Messaging;
-using Shouldly;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.WPF.Services;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Services;

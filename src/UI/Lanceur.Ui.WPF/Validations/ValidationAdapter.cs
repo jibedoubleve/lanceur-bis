@@ -5,7 +5,12 @@ namespace Lanceur.Ui.WPF.Validations;
 
 public static class ValidationAdapter
 {
-    public static ValidationResult ToValidationResult(this ValidationStatus validationStatus) => validationStatus.IsSuccess
-        ? ValidationResult.ValidResult
-        : new(false, validationStatus.ErrorContent);
+    #region Methods
+
+    public static ValidationResult ToValidationResult(this ValidationStatus validationStatus)
+        => validationStatus.IsSuccess
+            ? ValidationResult.ValidResult
+            : new(false, validationStatus.ErrorContent);
+
+    #endregion
 }

@@ -1,11 +1,17 @@
-using Humanizer;
 using System.Windows.Threading;
+using Humanizer;
 
 namespace Lanceur.Ui.Core.Utils.Watchdogs;
 
 public class Watchdog : IWatchdog
 {
+    #region Fields
+
     private readonly DispatcherTimer _timer;
+
+    #endregion
+
+    #region Constructors
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Watchdog" /> class with a countdown duration and an action to execute.
@@ -15,7 +21,7 @@ public class Watchdog : IWatchdog
     /// <exception cref="ArgumentNullException">Thrown if the <paramref name="action" /> parameter is null.</exception>
     public Watchdog(Func<Task> action, TimeSpan interval)
     {
-        if (action is null) throw new ArgumentNullException(nameof(action));
+        if (action is null) { throw new ArgumentNullException(nameof(action)); }
 
         _timer = new() { Interval = interval };
         _timer.Tick += async (_, _) =>
@@ -25,14 +31,21 @@ public class Watchdog : IWatchdog
         };
     }
 
+    #endregion
+
+    #region Methods
+
     /// <inheritdoc />
     public Task Pulse()
     {
-        if (_timer.IsEnabled) _timer.Stop();
+        if (_timer.IsEnabled) { _timer.Stop(); }
+
         _timer.Start();
         return Task.CompletedTask;
     }
 
     /// <inheritdoc />
     public void ResetDelay(double searchDelay) => _timer.Interval = searchDelay.Milliseconds();
+
+    #endregion
 }

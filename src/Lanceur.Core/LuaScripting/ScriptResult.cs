@@ -23,10 +23,11 @@ public class ScriptResult : Script
 
     #region Methods
 
-    public override string ToString() => $"""
-                                          File Name  : {Context.FileName}
-                                          Parameters : {Context.Parameters}
-                                          """;
+    public override string ToString()
+        => $"""
+            File Name  : {Context.FileName}
+            Parameters : {Context.Parameters}
+            """;
 
     #endregion
 }

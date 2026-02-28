@@ -14,7 +14,9 @@ public static class StartModeExtensions
             StartMode.Default   => ProcessWindowStyle.Normal,
             StartMode.Maximised => ProcessWindowStyle.Maximized,
             StartMode.Minimised => ProcessWindowStyle.Minimized,
-            _                   => throw new NotSupportedException($"The 'StartMode' of {mode} is not supported. Did you forget to support it?")
+            _                   => throw new NotSupportedException(
+                $"The 'StartMode' of {mode} is not supported. Did you forget to support it?"
+            )
         };
     }
 

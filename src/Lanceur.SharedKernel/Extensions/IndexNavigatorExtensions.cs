@@ -19,11 +19,15 @@ public static class IndexNavigatorExtensions
 
     public static int GetNextIndex<T>(this IEnumerable<T> collection, int current)
     {
-        if (current == -1) return -1;
+        if (current == -1) { return -1; }
 
         var max = collection.Count();
         return  current < -1 || current >= max
-            ? throw new ArgumentOutOfRangeException(nameof(current), current, "Cannot navigate to next index when index if out of range.")
+            ? throw new ArgumentOutOfRangeException(
+                nameof(current),
+                current,
+                "Cannot navigate to next index when index if out of range."
+            )
             : ValidateNewIndex(current + 1, max);
     }
 
@@ -42,7 +46,7 @@ public static class IndexNavigatorExtensions
 
     public static int GetNextPage<T>(this IEnumerable<T> collection, int current, int pageSize)
     {
-        if (current == -1) return -1;
+        if (current == -1) { return -1; }
 
         var max = collection.Count();
         var newIdx = current + pageSize > max
@@ -63,7 +67,7 @@ public static class IndexNavigatorExtensions
     /// <returns>The index of the previous item in the collection.</returns>
     public static int GetPreviousIndex<T>(this IEnumerable<T> collection, int current)
     {
-        if (current == -1) return -1;
+        if (current == -1) { return -1; }
 
         var max = collection.Count();
         return current < 0 || current >= max
@@ -78,11 +82,12 @@ public static class IndexNavigatorExtensions
     /// <param name="collection">The collection to navigate</param>
     /// <param name="currentIndex">The actual index into the collection</param>
     /// <returns>The next element</returns>
-    public static T GetPreviousItem<T>(this IEnumerable<T> collection, int currentIndex) => collection.ElementAt(collection.GetPreviousIndex(currentIndex));
+    public static T GetPreviousItem<T>(this IEnumerable<T> collection, int currentIndex)
+        => collection.ElementAt(collection.GetPreviousIndex(currentIndex));
 
     public static int GetPreviousPage<T>(this IEnumerable<T> collection, int current, int pageSize)
     {
-        if (current == -1) return -1;
+        if (current == -1) { return -1; }
 
         var max = collection.Count();
         var newIdx = current - pageSize < 0

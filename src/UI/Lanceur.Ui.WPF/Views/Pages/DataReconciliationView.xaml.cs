@@ -41,7 +41,7 @@ public partial class DataReconciliationView
 
     private void HandleColumnVisibility(string? propertyName)
     {
-        if (propertyName != "CurrentReportConfiguration") return;
+        if (propertyName != "CurrentReportConfiguration") { return; }
 
         ColumnLastUsed.Visibility = new BoolToVisibility(
             ViewModel.CurrentReportConfiguration.ColumnsVisibility.LastUsed
@@ -63,10 +63,10 @@ public partial class DataReconciliationView
     private void OnViewModelReportTypeChanged(object? sender, PropertyChangedEventArgs e)
     {
         HandleColumnVisibility(e.PropertyName);
-        if (e.PropertyName != nameof(ViewModel.ReportType)) return;
+        if (e.PropertyName != nameof(ViewModel.ReportType)) { return; }
 
         var cfg = _reportConfigurations.SingleOrDefault(r => r.ReportType == ViewModel.ReportType);
-        if (cfg is null) return;
+        if (cfg is null) { return; }
 
         ColumnProposedDescription.Visibility = new BoolToVisibility(cfg.ColumnsVisibility.ProposedDescription);
         ColumnLastUsed.Visibility = new BoolToVisibility(cfg.ColumnsVisibility.LastUsed);

@@ -15,7 +15,8 @@ public class ReconciliationService : IReconciliationService
 
     #region Constructors
 
-    public ReconciliationService(IPackagedAppSearchService packagedAppSearchService) => _packagedAppSearchService = packagedAppSearchService;
+    public ReconciliationService(IPackagedAppSearchService packagedAppSearchService)
+        => _packagedAppSearchService = packagedAppSearchService;
 
     #endregion
 
@@ -24,9 +25,11 @@ public class ReconciliationService : IReconciliationService
     /// <inheritdoc />
     public async Task ProposeDescriptionAsync(AliasQueryResult alias)
     {
-        if (alias.FileName.IsNullOrEmpty()) return;
-        if (!File.Exists(alias.FileName)) return;
-        if (await _packagedAppSearchService.TryResolveDetailsAsync(alias)) return;
+        if (alias.FileName.IsNullOrEmpty()) { return; }
+
+        if (!File.Exists(alias.FileName)) { return; }
+
+        if (await _packagedAppSearchService.TryResolveDetailsAsync(alias)) { return; }
 
         alias.Description = FileVersionInfo.GetVersionInfo(alias.FileName)
                                            .FileDescription;

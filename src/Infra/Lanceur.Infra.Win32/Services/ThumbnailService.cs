@@ -34,10 +34,13 @@ public class ThumbnailService : IThumbnailService
 
     private static bool CanReturnEarly(QueryResult queryResult)
     {
-        if (queryResult.IsThumbnailDisabled) return true;
-        if (queryResult is not AliasQueryResult alias) return true;
-        if (File.Exists(alias.Thumbnail)) return true;
-        if (alias.FileName.IsNullOrEmpty()) return true;
+        if (queryResult.IsThumbnailDisabled) { return true; }
+
+        if (queryResult is not AliasQueryResult alias) { return true; }
+
+        if (File.Exists(alias.Thumbnail)) { return true; }
+
+        if (alias.FileName.IsNullOrEmpty()) { return true; }
 
         return false;
     }
@@ -51,8 +54,8 @@ public class ThumbnailService : IThumbnailService
     /// <param name="queryResult">The list of queries for which thumbnails need to be updated.</param>
     public void UpdateThumbnail(QueryResult queryResult)
     {
-        if (CanReturnEarly(queryResult)) return;
-        
+        if (CanReturnEarly(queryResult)) { return; }
+
         _logger.LogTrace("Loading thumbnail for {AliasName}...", queryResult.Name);
 
         _ = RunStrategy(
@@ -60,17 +63,15 @@ public class ThumbnailService : IThumbnailService
         );
 
         return;
-        
+
         async Task RunStrategy(AliasQueryResult alias)
         {
             foreach (var strategy in _thumbnailStrategy)
-            {
                 try { await strategy.UpdateThumbnailAsync(alias); }
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "One thumbnail retrieve strategy failed: {Message}", ex.Message);
                 }
-            }
         }
     }
 

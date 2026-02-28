@@ -21,8 +21,9 @@ public class AliasNameRule : ValidationRule
 
     #region Methods
 
-    public override ValidationResult Validate(object? value, CultureInfo cultureInfo) => _validationService.IsNameValid(value)
-                                                                                                           .ToValidationResult();
+    public override ValidationResult Validate(object? value, CultureInfo cultureInfo)
+        => _validationService.IsNameValid(value)
+                             .ToValidationResult();
 
     #endregion
 }

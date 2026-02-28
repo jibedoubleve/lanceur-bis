@@ -40,10 +40,10 @@ public record CurrentVersion
 
     private static (string Version, string Suffix) GetVersion(string version)
     {
-        if (version.IsNullOrWhiteSpace()) return ("0.0.0", string.Empty);
+        if (version.IsNullOrWhiteSpace()) { return ("0.0.0", string.Empty); }
 
         var idx = version.IndexOf('-');
-        if (idx <= 0) return (version, string.Empty);
+        if (idx <= 0) { return (version, string.Empty); }
 
         return (
             version[..idx],
@@ -75,7 +75,8 @@ public record CurrentVersion
         var commit = semverSplit?.Length > 1 ? semverSplit[1] : string.Empty;
         (string Version, string Suffix) semVer = ("0.0.0", "");
 
-        if (semverSplit?.Length > 0) semVer = GetVersion(semverSplit[0]);
+        if (semverSplit?.Length > 0) { semVer = GetVersion(semverSplit[0]); }
+
         return new(semVer.Version, semVer.Suffix, commit);
     }
 

@@ -4,7 +4,6 @@ using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Macros;
@@ -32,9 +31,10 @@ public class GithubIssueMacro : MacroQueryResult
         IGithubService githubService,
         IUserGlobalNotificationService notification,
         IEnigma enigma,
-        ISection<GithubSection> settings)
+        ISection<GithubSection> settings
+    )
     {
-        _logger = logger; 
+        _logger = logger;
         _githubService = githubService;
         _notification = notification;
         _enigma = enigma;
@@ -51,7 +51,14 @@ public class GithubIssueMacro : MacroQueryResult
 
     #region Methods
 
-    public override SelfExecutableQueryResult Clone() => new GithubIssueMacro(_logger, _githubService, _notification, _enigma, _settings);
+    public override SelfExecutableQueryResult Clone()
+        => new GithubIssueMacro(
+            _logger,
+            _githubService,
+            _notification,
+            _enigma,
+            _settings
+        );
 
     public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
     {

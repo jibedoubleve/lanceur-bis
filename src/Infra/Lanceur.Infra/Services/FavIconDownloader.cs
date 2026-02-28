@@ -11,8 +11,8 @@ public class FavIconDownloader : IFavIconDownloader
     #region Fields
 
     private readonly HttpClient _client;
-    private readonly ILogger<FavIconDownloader> _logger;
     private readonly IMemoryCache _faviconCache;
+    private readonly ILogger<FavIconDownloader> _logger;
     private readonly TimeSpan _retryDelay;
 
     private static readonly Dictionary<string, (bool IsManual, string Url)> FaviconUrls = new()
@@ -28,10 +28,11 @@ public class FavIconDownloader : IFavIconDownloader
     #region Constructors
 
     public FavIconDownloader(
-        ILogger<FavIconDownloader> logger, 
-        IMemoryCache faviconCache, 
+        ILogger<FavIconDownloader> logger,
+        IMemoryCache faviconCache,
         TimeSpan retryDelay,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory
+    )
     {
         _logger = logger;
         _faviconCache = faviconCache;
@@ -73,17 +74,13 @@ public class FavIconDownloader : IFavIconDownloader
             foundFavIcon = true;
             return true;
         }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to save favicon into {OutputPath}.", outputPath);
-        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Failed to save favicon into {OutputPath}.", outputPath); }
 
         return foundFavIcon;
     }
 
     public async Task<bool> RetrieveAndSaveFavicon(Uri url, string outputPath)
     {
-        
         if (_faviconCache.TryGetValue(url.ToString(), out _))
         {
             _logger.LogTrace("{Url} is in the failed paths for favicon retrieving.", url);
@@ -102,9 +99,9 @@ public class FavIconDownloader : IFavIconDownloader
                     response.StatusCode,
                     url.Host
                 );
-                if (response.StatusCode != HttpStatusCode.OK) continue;
+                if (response.StatusCode != HttpStatusCode.OK) { continue; }
 
-                if (!await SaveThumbnailAsync(response, outputPath)) continue;
+                if (!await SaveThumbnailAsync(response, outputPath)) { continue; }
 
                 return true;
             }
@@ -118,8 +115,7 @@ public class FavIconDownloader : IFavIconDownloader
                 );
             }
 
-        if (!_faviconCache.TryGetValue(url.ToString(), out _))
-            _faviconCache.Set(url.ToString(), true, _retryDelay);
+        if (!_faviconCache.TryGetValue(url.ToString(), out _)) { _faviconCache.Set(url.ToString(), true, _retryDelay); }
 
         return false;
     }

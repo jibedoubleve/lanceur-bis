@@ -48,7 +48,6 @@
 
 
             <MenuItem
-                Grid.Column="2"
                 Click="OnClickSave"
                 Header="Apply changes"
                 Icon="{ui:SymbolIcon Save24}"

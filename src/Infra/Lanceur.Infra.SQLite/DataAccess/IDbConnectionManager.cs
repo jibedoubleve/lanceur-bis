@@ -25,7 +25,7 @@ public interface IDbConnectionManager : IDisposable
     ///     This could be the result of a database query or any other operation defined within the action.
     /// </returns>
     TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action);
-    
+
     /// <summary>
     ///     Manages database connections and ensures proper disposal of resources.
     ///     This method creates a database connection and passes it to the provided action.
@@ -85,7 +85,7 @@ public interface IDbConnectionManager : IDisposable
     ///     If the function fails, the transaction is rolled back.
     /// </remarks>
     TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext, TContext> action, TContext context);
-    
+
     /// <summary>
     ///     Executes a function within a database transaction and passes a context object.
     /// </summary>

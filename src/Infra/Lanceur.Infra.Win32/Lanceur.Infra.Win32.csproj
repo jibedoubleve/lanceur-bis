@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <UseWpf>True</UseWpf>
-    <LangVersion>latest</LangVersion>      
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
-    <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.IO.Hashing" Version="10.0.3" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UseWpf>True</UseWpf>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
+        <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="System.IO.Hashing" Version="10.0.3"/>
+    </ItemGroup>
 </Project>

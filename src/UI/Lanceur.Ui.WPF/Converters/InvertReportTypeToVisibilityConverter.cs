@@ -16,15 +16,23 @@ public class InvertReportTypeToVisibilityConverter : IValueConverter
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (Instance.Convert(value, targetType, parameter, culture) is Visibility visibility)
+        if (Instance.Convert(
+                value,
+                targetType,
+                parameter,
+                culture
+            ) is Visibility visibility)
+        {
             return visibility == Visibility.Visible
                 ? Visibility.Collapsed
                 : Visibility.Visible;
+        }
 
         return Binding.DoNothing;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 
     #endregion
 }

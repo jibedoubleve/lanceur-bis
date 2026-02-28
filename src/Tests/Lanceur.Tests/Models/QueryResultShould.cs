@@ -1,6 +1,6 @@
-﻿using Shouldly;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
 using Lanceur.SharedKernel.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Models;

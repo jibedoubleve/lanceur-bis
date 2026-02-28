@@ -21,7 +21,8 @@ public class ThrowAlias : SelfExecutableQueryResult
 
     #region Methods
 
-    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null) => throw new NotImplementedException("Some unexpected exception");
+    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
+        => throw new NotImplementedException("Some unexpected exception");
 
     #endregion
 }

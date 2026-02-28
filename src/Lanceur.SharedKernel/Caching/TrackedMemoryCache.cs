@@ -46,11 +46,9 @@ public class TrackedMemoryCache : IMemoryCache
     {
         var hasHit = _memoryCache.TryGetValue(key, out value);
         const string template = "{Hit} cache with key {Key}";
-        
-        if (hasHit)
-            _logger.LogTrace(template, "Hit", key);
-        else
-            _logger.LogDebug(template, "Miss", key);
+
+        if (hasHit) { _logger.LogTrace(template, "Hit", key); }
+        else { _logger.LogDebug(template, "Miss", key); }
 
         return hasHit;
     }

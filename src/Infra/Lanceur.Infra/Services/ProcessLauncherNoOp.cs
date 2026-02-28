@@ -26,11 +26,12 @@ public class ProcessLauncherNoOp : IProcessLauncher
     public void Open(string path) => _logger.LogInformation("Opening {Path}", path);
 
     /// <inheritdoc />
-    public void Start(ProcessContext context) => _logger.LogInformation(
-        "Executing process with context: {ProcessContext}",
-        context.ToJson()
-    );
-    
+    public void Start(ProcessContext context)
+        => _logger.LogInformation(
+            "Executing process with context: {ProcessContext}",
+            context.ToJson()
+        );
+
     /// <inheritdoc />
     public async Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline)
     {

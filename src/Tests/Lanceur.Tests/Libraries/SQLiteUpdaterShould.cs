@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using System.SQLite.Updater;
 using Dapper;
-using Shouldly;
 using Lanceur.Tests.Tools;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Libraries;
@@ -11,16 +11,18 @@ public class SQLiteUpdaterShould : TestBase
 {
     #region Fields
 
-    private const string Pattern = @"Lanceur\.Tests\.Libraries\.Scripts\.script-(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*.sql";
     private static readonly Assembly Asm = Assembly.GetExecutingAssembly();
 
-    #endregion Fields
+    private const string Pattern
+        = @"Lanceur\.Tests\.Libraries\.Scripts\.script-(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*.sql";
+
+    #endregion
 
     #region Constructors
 
     public SQLiteUpdaterShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -38,5 +40,5 @@ public class SQLiteUpdaterShould : TestBase
         db.ExecuteScalar<int>(sql).ShouldBe(2);
     }
 
-    #endregion Methods
+    #endregion
 }

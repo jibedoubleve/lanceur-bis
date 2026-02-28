@@ -42,7 +42,8 @@ public abstract class ViewModelTester<TViewModel> : TestBase
                                                            .AddSingleton<TViewModel>()
                                                            .AddLogging(builder =>
                                                                builder.AddXUnit(OutputHelper)
-                                                                      .SetMinimumLevel(LogLevel.Trace))
+                                                                      .SetMinimumLevel(LogLevel.Trace)
+                                                           )
                                                            .AddSingleton<IEnigma, Enigma>()
                                                            .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                                                            .AddReservedAliasesServices(typeof(AddAlias))

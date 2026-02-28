@@ -57,9 +57,10 @@ public class ReplacementComposite : IReplacement, IWildcardService
     }
 
     /// <inheritdoc />
-    public string ReplaceOrReplacementOnNull(string text, string replacement) => text.IsNullOrWhiteSpace()
-        ? replacement
-        : Replace(text, replacement);
+    public string ReplaceOrReplacementOnNull(string text, string replacement)
+        => text.IsNullOrWhiteSpace()
+            ? replacement
+            : Replace(text, replacement);
 
     #endregion
 }

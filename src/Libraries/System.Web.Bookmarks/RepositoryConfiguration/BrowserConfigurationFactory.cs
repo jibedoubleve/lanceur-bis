@@ -9,7 +9,7 @@ internal struct BrowserConfigurationFactory
     public static IBlinkBrowserConfiguration Edge => new EdgeConfiguration();
 
     public static IGeckoBrowserConfiguration Firefox => new FirefoxConfiguration();
-    
+
     public static IGeckoBrowserConfiguration Zen => new ZenConfiguration();
 
     #endregion

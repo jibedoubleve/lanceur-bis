@@ -11,7 +11,7 @@ public static class PackageExtensions
 
     private static readonly ConcurrentDictionary<string, bool> CacheIsAppUser = new();
 
-    #endregion Fields
+    #endregion
 
     #region Methods
 
@@ -19,7 +19,7 @@ public static class PackageExtensions
     {
         var key = entry.Id.FullName;
 
-        if (CacheAppUser.TryGetValue(key, out var value)) return value;
+        if (CacheAppUser.TryGetValue(key, out var value)) { return value; }
 
         var result = entry.GetAppListEntries()
                           .Where(e => !string.IsNullOrEmpty(e.AppUserModelId))
@@ -33,7 +33,7 @@ public static class PackageExtensions
     public static bool IsAppUserModelId(this Package entry, string fileName)
     {
         var key = $"{fileName}-{entry.Id.FullName}";
-        if (CacheIsAppUser.TryGetValue(key, out var value)) return value;
+        if (CacheIsAppUser.TryGetValue(key, out var value)) { return value; }
 
         var result = entry.GetAppListEntries()
                           .Where(e => !string.IsNullOrEmpty(e.AppUserModelId))
@@ -44,5 +44,5 @@ public static class PackageExtensions
         return CacheIsAppUser[key];
     }
 
-    #endregion Methods
+    #endregion
 }

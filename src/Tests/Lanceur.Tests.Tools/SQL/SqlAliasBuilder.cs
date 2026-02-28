@@ -43,7 +43,8 @@ public class SqlAliasBuilder : SqlBuilderBase
 
     public SqlAliasBuilder WithAdditionalParameters(params (string Name, string Argument)[] parameters)
     {
-        if (parameters.Length == 0) parameters = [($"{RandomString}", $"{RandomString}")];
+        if (parameters.Length == 0) { parameters = [($"{RandomString}", $"{RandomString}")]; }
+
         foreach (var parameter in parameters)
         {
             const string sql = "insert into alias_argument (id_alias, name, argument) values ({0}, '{1}', '{2}');";

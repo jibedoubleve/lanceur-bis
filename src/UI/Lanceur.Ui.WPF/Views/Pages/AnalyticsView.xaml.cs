@@ -26,10 +26,35 @@ public partial class AnalyticsView : IDisposable
         _logger = logger;
 
         viewModel.OnRefreshDailyPlot = (x, y) => RefreshHistogram(x, y, "Daily history");
-        viewModel.OnRefreshYearlyPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToYear, "Yearly history", "Year");
-        viewModel.OnRefreshMonthlyPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToMonthYear, "Monthly history", "Month Year", new() { Rotation = -45, PositionMultipier =  2 });
-        viewModel.OnRefreshUsageByHourPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToTimeString, "Usage by hour of day", "Hours of day");
-        viewModel.OnRefreshUsageByDayOfWeekPlot = (x, y) => RefreshBar(x, y, DoubleConverter.ToDayOfWeek, "Usage by day of week", "Day of week");
+        viewModel.OnRefreshYearlyPlot = (x, y) => RefreshBar(
+            x,
+            y,
+            DoubleConverter.ToYear,
+            "Yearly history",
+            "Year"
+        );
+        viewModel.OnRefreshMonthlyPlot = (x, y) => RefreshBar(
+            x,
+            y,
+            DoubleConverter.ToMonthYear,
+            "Monthly history",
+            "Month Year",
+            new() { Rotation = -45, PositionMultipier =  2 }
+        );
+        viewModel.OnRefreshUsageByHourPlot = (x, y) => RefreshBar(
+            x,
+            y,
+            DoubleConverter.ToTimeString,
+            "Usage by hour of day",
+            "Hours of day"
+        );
+        viewModel.OnRefreshUsageByDayOfWeekPlot = (x, y) => RefreshBar(
+            x,
+            y,
+            DoubleConverter.ToDayOfWeek,
+            "Usage by day of week",
+            "Day of week"
+        );
 
         DataContext = viewModel;
         ApplicationThemeManager.Changed += OnThemeChanged;
@@ -54,7 +79,14 @@ public partial class AnalyticsView : IDisposable
 
     private void OnThemeChanged(ApplicationTheme _, Color __) => SetTheme();
 
-    private void RefreshBar(IEnumerable<double> xPoint, IEnumerable<double> yPoint, Func<double, string> convertBarName, string plotTitle, string bottomAxesTitle, Options? options = null)
+    private void RefreshBar(
+        IEnumerable<double> xPoint,
+        IEnumerable<double> yPoint,
+        Func<double, string> convertBarName,
+        string plotTitle,
+        string bottomAxesTitle,
+        Options? options = null
+    )
     {
         options ??= new();
         var x = xPoint.ToArray();
@@ -62,13 +94,14 @@ public partial class AnalyticsView : IDisposable
 
         _logger.LogDebug("[View] Refreshing BAR plot (Points: {Points})", x.Length);
 
-        if (!x.Any() || !y.Any()) return;
+        if (!x.Any() || !y.Any()) { return; }
 
         HistoryPlot.Reset();
         HistoryPlot.Plot.Clear();
 
         var positions = Enumerable.Range(0, y.Length)
-                                  .Select(e => (double)e * options.PositionMultipier) // Artificially add space between axis
+                                  .Select(e => (double)e * options.PositionMultipier
+                                  ) // Artificially add space between axis
                                   .ToArray();
 
 
@@ -90,7 +123,7 @@ public partial class AnalyticsView : IDisposable
         HistoryPlot.Plot.Axes.Bottom.Label.Text = bottomAxesTitle;
         HistoryPlot.Plot.Axes.Left.Label.Text = "Usage";
         HistoryPlot.Refresh();
-        
+
         // Usages
         var uMax = y.Max();
 
@@ -106,7 +139,7 @@ public partial class AnalyticsView : IDisposable
 
         _logger.LogDebug("[View] Refreshing HISTOGRAM plot (Points: {Points})", x.Length);
 
-        if (!x.Any() || !y.Any()) return;
+        if (!x.Any() || !y.Any()) { return; }
 
         // Styling
         HistoryPlot.Plot.Axes.DateTimeTicksBottom();
@@ -123,7 +156,7 @@ public partial class AnalyticsView : IDisposable
         HistoryPlot.Plot.Axes.Bottom.Label.Text = "Date";
         HistoryPlot.Plot.Axes.Bottom.Max = x.Max();
         HistoryPlot.Plot.Axes.Bottom.Min = x.Min();
-        
+
         // Configure
         foreach (var bar in plot.Bars)
         {
@@ -197,15 +230,30 @@ public partial class AnalyticsView : IDisposable
 
         #region Properties
 
-        public ScottPlot.Color Axes => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#616161");
+        public ScottPlot.Color Axes
+            => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#616161");
+
         public static ThemeColor Dark => new(true);
-        public ScottPlot.Color DataBackground => _isDark ? ScottPlot.Color.FromHex("#1f1f1f") : ScottPlot.Color.FromHex("#010101000");
-        public ScottPlot.Color FigureBackground => _isDark ? ScottPlot.Color.FromHex("#181818") : ScottPlot.Color.FromHex("#FFFFFF");
-        public ScottPlot.Color LegendBackgroundColor => _isDark ? ScottPlot.Color.FromHex("#404040") : ScottPlot.Color.FromHex("#FFFFFF");
-        public ScottPlot.Color LegendFontColor => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#ff0000");
-        public ScottPlot.Color LegendOutlineColor => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#000000");
+
+        public ScottPlot.Color DataBackground
+            => _isDark ? ScottPlot.Color.FromHex("#1f1f1f") : ScottPlot.Color.FromHex("#010101000");
+
+        public ScottPlot.Color FigureBackground
+            => _isDark ? ScottPlot.Color.FromHex("#181818") : ScottPlot.Color.FromHex("#FFFFFF");
+
+        public ScottPlot.Color LegendBackgroundColor
+            => _isDark ? ScottPlot.Color.FromHex("#404040") : ScottPlot.Color.FromHex("#FFFFFF");
+
+        public ScottPlot.Color LegendFontColor
+            => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#ff0000");
+
+        public ScottPlot.Color LegendOutlineColor
+            => _isDark ? ScottPlot.Color.FromHex("#d7d7d7") : ScottPlot.Color.FromHex("#000000");
+
         public static ThemeColor Light => new(false);
-        public ScottPlot.Color MajorLineColor => _isDark ? ScottPlot.Color.FromHex("#404040") : ScottPlot.Color.FromHex("#d7d7d7");
+
+        public ScottPlot.Color MajorLineColor
+            => _isDark ? ScottPlot.Color.FromHex("#404040") : ScottPlot.Color.FromHex("#d7d7d7");
 
         public IPalette Palette =>  _isDark ? new Penumbra() : new Nord();
 

@@ -8,26 +8,29 @@ public static class ConnectionStringFactory
     #region Properties
 
     /// <summary>
-    /// Creates a connection string for a SQLite database stored on the desktop in the "Databases" folder.
-    /// The file is named "Output_Test_Database__{date-and-time}.sqlite", where {date-and-time} represents the current timestamp.
-    /// This configuration is intended for debugging purposes only and should not be used in CI/CD environments.
+    ///     Creates a connection string for a SQLite database stored on the desktop in the "Databases" folder.
+    ///     The file is named "Output_Test_Database__{date-and-time}.sqlite", where {date-and-time} represents the current
+    ///     timestamp.
+    ///     This configuration is intended for debugging purposes only and should not be used in CI/CD environments.
     /// </summary>
     public static IConnectionString InDesktop
     {
         get
         {
             var desktop = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Databases");
-            if (!Directory.Exists(desktop)) Directory.CreateDirectory(desktop);
+            if (!Directory.Exists(desktop)) { Directory.CreateDirectory(desktop); }
+
             var path = Path.Join(
-                desktop,
-                $"Output_Test_Database__{DateTime.Now:yyyy-MM-dd_HH-mm-ss_}{Guid.NewGuid().ToString()[..8]}.sqlite"
-            ).ToSQLiteConnectionString();
+                               desktop,
+                               $"Output_Test_Database__{DateTime.Now:yyyy-MM-dd_HH-mm-ss_}{Guid.NewGuid().ToString()[..8]}.sqlite"
+                           )
+                           .ToSQLiteConnectionString();
             return new ConnectionString(path);
         }
     }
 
     /// <summary>
-    /// Creates a connection string for an in-memory SQLite database.
+    ///     Creates a connection string for an in-memory SQLite database.
     /// </summary>
     public static IConnectionString InMemory => new ConnectionString("Data Source =:memory:");
 

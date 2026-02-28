@@ -1,45 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="UI\**" />
-    <Compile Include="Ui\ConverterShould.cs" />
-    <EmbeddedResource Remove="UI\**" />
-    <None Remove="UI\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Libraries\Scripts\invalid_script.sql" />
-    <EmbeddedResource Include="Libraries\Scripts\script-0.2.1.sql" />
-    <EmbeddedResource Include="Libraries\Scripts\script-0.2.sql" />
-    <EmbeddedResource Include="Libraries\Scripts\script-0.1.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.5" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-    <PackageReference Include="MiniProfiler.Shared" Version="4.5.4" />
-    <PackageReference Include="NSubstitute" Version="5.3.0" />
-    <PackageReference Include="Shouldly" Version="4.3.0" />
-    <PackageReference Include="xunit.v3.core" Version="3.2.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Xunit.StaFact" Version="3.0.13" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
-    <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
-    <ProjectReference Include="..\..\Infra\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj" />
-    <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj" />
-    <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj" />
-    <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
-    <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj" />
-    <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj" />
-    <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj" />
-    <ProjectReference Include="..\Lanceur.Tests.Tools\Lanceur.Tests.Tools.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Remove="UI\**"/>
+        <Compile Include="Ui\ConverterShould.cs"/>
+        <EmbeddedResource Remove="UI\**"/>
+        <None Remove="UI\**"/>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Libraries\Scripts\invalid_script.sql"/>
+        <EmbeddedResource Include="Libraries\Scripts\script-0.2.1.sql"/>
+        <EmbeddedResource Include="Libraries\Scripts\script-0.2.sql"/>
+        <EmbeddedResource Include="Libraries\Scripts\script-0.1.sql"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Bogus" Version="35.6.5"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0"/>
+        <PackageReference Include="MiniProfiler.Shared" Version="4.5.4"/>
+        <PackageReference Include="NSubstitute" Version="5.3.0"/>
+        <PackageReference Include="Shouldly" Version="4.3.0"/>
+        <PackageReference Include="xunit.v3.core" Version="3.2.2"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Xunit.StaFact" Version="3.0.13"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj"/>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj"/>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj"/>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj"/>
+        <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj"/>
+        <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj"/>
+        <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj"/>
+        <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj"/>
+        <ProjectReference Include="..\Lanceur.Tests.Tools\Lanceur.Tests.Tools.csproj"/>
+    </ItemGroup>
 </Project>

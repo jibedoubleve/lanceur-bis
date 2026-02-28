@@ -18,18 +18,93 @@ public enum ThumbnailOptions
 }
 
 /// <summary>
-/// Encapsulates P/Invoke functionality for retrieving the thumbnails of Win32 applications.
+///     Encapsulates P/Invoke functionality for retrieving the thumbnails of Win32 applications.
 /// </summary>
 internal static class Win32ThumbnailProvider
 {
-    // Based on https://stackoverflow.com/questions/21751747/extract-thumbnail-for-any-file-in-windows
-
     #region Fields
 
     private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
     private static readonly Lock Locker = new();
 
-    #endregion Fields
+    #endregion
+
+    #region Methods
+
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool DeleteObject(IntPtr hObject);
+
+    private static IntPtr GetHBitmap(string fileName, int width, int height, ThumbnailOptions options)
+    {
+        IShellItem nativeShellItem;
+        var shellItem2Guid = new Guid(IShellItem2Guid);
+        var retCode = SHCreateItemFromParsingName(
+            fileName,
+            IntPtr.Zero,
+            ref shellItem2Guid,
+            out nativeShellItem
+        );
+
+        if (retCode != 0) { throw Marshal.GetExceptionForHR(retCode)!; }
+
+        var nativeSize = new NativeSize { Width = width, Height = height };
+
+        IntPtr hBitmap;
+        var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out hBitmap);
+
+        // if extracting image thumbnail and failed, extract shell icon
+        if (options == ThumbnailOptions.ThumbnailOnly && hr == HResult.ExtractionFailed)
+        {
+            hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, ThumbnailOptions.IconOnly, out hBitmap);
+        }
+
+        Marshal.ReleaseComObject(nativeShellItem);
+
+        if (hr == HResult.Ok) { return hBitmap; }
+
+        throw new COMException($"Error while extracting thumbnail for {fileName}", Marshal.GetExceptionForHR((int)hr));
+    }
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern int SHCreateItemFromParsingName(
+        [MarshalAs(UnmanagedType.LPWStr)] string path,
+        IntPtr pbc,
+        ref Guid riid,
+        [MarshalAs(UnmanagedType.Interface)] out IShellItem shellItem
+    );
+
+    public static BitmapSource GetThumbnail(string fileName, int width, int height, ThumbnailOptions options)
+    {
+        lock (Locker)
+        {
+            var hBitmap = GetHBitmap(
+                Path.GetFullPath(fileName),
+                width,
+                height,
+                options
+            );
+
+            try
+            {
+                return Imaging.CreateBitmapSourceFromHBitmap(
+                    hBitmap,
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions()
+                );
+            }
+            finally
+            {
+                // delete HBitmap to avoid memory leaks
+                DeleteObject(hBitmap);
+            }
+        }
+    }
+
+    #endregion
+
+    // Based on https://stackoverflow.com/questions/21751747/extract-thumbnail-for-any-file-in-windows
 
     #region Enums
 
@@ -65,12 +140,16 @@ internal static class Win32ThumbnailProvider
 
     #endregion Enums
 
-    
+
     #region Interfaces
 
-    [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
+    [ComImport]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
     internal interface IShellItem
     {
+        #region Methods
+
         void BindToHandler(
             IntPtr pbc,
             [MarshalAs(UnmanagedType.LPStruct)] Guid bhid,
@@ -78,109 +157,62 @@ internal static class Win32ThumbnailProvider
             out IntPtr ppv
         );
 
-        void GetParent(out IShellItem ppsi);
-
-        void GetDisplayName(SIGDN sigdnName, out IntPtr ppszName);
+        void Compare(IShellItem psi, uint hint, out int piOrder);
 
         void GetAttributes(uint sfgaoMask, out uint psfgaoAttribs);
 
-        void Compare(IShellItem psi, uint hint, out int piOrder);
-    };
+        void GetDisplayName(SIGDN sigdnName, out IntPtr ppszName);
 
-    [ComImport(), Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        void GetParent(out IShellItem ppsi);
+
+        #endregion
+    }
+
+    [ComImport]
+    [Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     internal interface IShellItemImageFactory
     {
+        #region Methods
+
         [PreserveSig]
         HResult GetImage(
-            [In, MarshalAs(UnmanagedType.Struct)] NativeSize size,
+            [In] [MarshalAs(UnmanagedType.Struct)] NativeSize size,
             [In] ThumbnailOptions flags,
             [Out] out IntPtr phbm
         );
+
+        #endregion
     }
 
     #endregion Interfaces
-
-    #region Methods
-
-    [DllImport("gdi32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool DeleteObject(IntPtr hObject);
-
-    private static IntPtr GetHBitmap(string fileName, int width, int height, ThumbnailOptions options)
-    {
-        IShellItem nativeShellItem;
-        var shellItem2Guid = new Guid(IShellItem2Guid);
-        var retCode = SHCreateItemFromParsingName(fileName, IntPtr.Zero, ref shellItem2Guid, out nativeShellItem);
-
-        if (retCode != 0) throw Marshal.GetExceptionForHR(retCode)!;
-
-        var nativeSize = new NativeSize { Width = width, Height = height };
-
-        IntPtr hBitmap;
-        var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out hBitmap);
-
-        // if extracting image thumbnail and failed, extract shell icon
-        if (options == ThumbnailOptions.ThumbnailOnly && hr == HResult.ExtractionFailed) hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, ThumbnailOptions.IconOnly, out hBitmap);
-
-        Marshal.ReleaseComObject(nativeShellItem);
-
-        if (hr == HResult.Ok)
-            return hBitmap;
-        else
-            throw new COMException($"Error while extracting thumbnail for {fileName}", Marshal.GetExceptionForHR((int)hr));
-    }
-
-    [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern int SHCreateItemFromParsingName(
-        [MarshalAs(UnmanagedType.LPWStr)] string path,
-        IntPtr pbc,
-        ref Guid riid,
-        [MarshalAs(UnmanagedType.Interface)] out IShellItem shellItem
-    );
-
-    public static BitmapSource GetThumbnail(string fileName, int width, int height, ThumbnailOptions options)
-    {
-        lock (Locker)
-        {
-            var hBitmap = GetHBitmap(Path.GetFullPath(fileName), width, height, options);
-
-            try
-            {
-                return Imaging.CreateBitmapSourceFromHBitmap(
-                    hBitmap,
-                    IntPtr.Zero,
-                    Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions()
-                );
-            }
-            finally
-            {
-                // delete HBitmap to avoid memory leaks
-                DeleteObject(hBitmap);
-            }
-        }
-    }
-
-    #endregion Methods
 
     #region Structs
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct NativeSize
     {
-        private int width;
+        #region Fields
+
         private int height;
+        private int width;
+
+        #endregion
+
+        #region Properties
+
+        public int Height
+        {
+            set => height = value;
+        }
 
         public int Width
         {
             set => width = value;
         }
 
-        public int Height
-        {
-            set => height = value;
-        }
-    };
+        #endregion
+    }
 
     #endregion Structs
 }

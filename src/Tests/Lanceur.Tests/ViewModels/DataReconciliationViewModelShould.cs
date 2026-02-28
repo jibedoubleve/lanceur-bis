@@ -1,5 +1,4 @@
 using Dapper;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -149,14 +148,14 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 2
         };
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A")
-                                                              .WithUsage(DateTime.Now.AddMonths(-10))
-                                           )
-                                           .AppendAlias(a => a.WithSynonyms("B")
-                                                              .WithUsage(DateTime.Now.AddMonths(-10))
-                                           )
-                                           .AppendAlias(a => a.WithSynonyms("C")
-                                                              .WithUsage(DateTime.Now.AddMonths(-10))
-                                           );
+                                                            .WithUsage(DateTime.Now.AddMonths(-10))
+                                         )
+                                         .AppendAlias(a => a.WithSynonyms("B")
+                                                            .WithUsage(DateTime.Now.AddMonths(-10))
+                                         )
+                                         .AppendAlias(a => a.WithSynonyms("C")
+                                                            .WithUsage(DateTime.Now.AddMonths(-10))
+                                         );
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -195,23 +194,23 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 10
         };
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A")
-                                                              .WithUsage(
-                                                                  DateTime.Now.AddMonths(-10),
-                                                                  DateTime.Now.AddMonths(-10)
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithSynonyms("B")
-                                                              .WithUsage(
-                                                                  DateTime.Now.AddMonths(-10),
-                                                                  DateTime.Now.AddMonths(-10)
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithSynonyms("C")
-                                                              .WithUsage(
-                                                                  DateTime.Now.AddMonths(-10),
-                                                                  DateTime.Now.AddMonths(-10)
-                                                              )
-                                           );
+                                                            .WithUsage(
+                                                                DateTime.Now.AddMonths(-10),
+                                                                DateTime.Now.AddMonths(-10)
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithSynonyms("B")
+                                                            .WithUsage(
+                                                                DateTime.Now.AddMonths(-10),
+                                                                DateTime.Now.AddMonths(-10)
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithSynonyms("C")
+                                                            .WithUsage(
+                                                                DateTime.Now.AddMonths(-10),
+                                                                DateTime.Now.AddMonths(-10)
+                                                            )
+                                         );
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -281,21 +280,21 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             }
         };
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName("FileName")
-                                                              .WithArguments("null")
-                                                              .WithSynonyms("a1", "a2", "a3")
-                                                              .WithAdditionalParameters(
-                                                                  ("params1", "params one"),
-                                                                  ("params2", "params two")
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithFileName("FileName")
-                                                              .WithArguments("null")
-                                                              .WithSynonyms("a4", "a5", "a6")
-                                                              .WithAdditionalParameters(
-                                                                  ("params1", "params one"),
-                                                                  ("params2", "params two")
-                                                              )
-                                           );
+                                                            .WithArguments("null")
+                                                            .WithSynonyms("a1", "a2", "a3")
+                                                            .WithAdditionalParameters(
+                                                                ("params1", "params one"),
+                                                                ("params2", "params two")
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithFileName("FileName")
+                                                            .WithArguments("null")
+                                                            .WithSynonyms("a4", "a5", "a6")
+                                                            .WithAdditionalParameters(
+                                                                ("params1", "params one"),
+                                                                ("params2", "params two")
+                                                            )
+                                         );
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -332,33 +331,33 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             }
         };
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName(fileName)
-                                                              .WithArguments(arguments)
-                                                              .WithSynonyms("a1", "a2", "a3")
-                                                              .WithAdditionalParameters(
-                                                                  ("params1", "params one"),
-                                                                  ("params2", "params two")
-                                                              )
-                                                              .WithUsage(
-                                                                  now.AddHours(++timeOffset),
-                                                                  now.AddHours(++timeOffset),
-                                                                  now.AddHours(++timeOffset),
-                                                                  now.AddHours(++timeOffset)
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithFileName(fileName)
-                                                              .WithArguments(arguments)
-                                                              .WithSynonyms("a4", "a5", "a6")
-                                                              .WithAdditionalParameters(
-                                                                  ("params3", "params three"),
-                                                                  ("params4", "params four")
-                                                              )
-                                                              .WithUsage(
-                                                                  now.AddHours(++timeOffset),
-                                                                  now.AddHours(++timeOffset),
-                                                                  now.AddHours(++timeOffset),
-                                                                  now.AddHours(++timeOffset)
-                                                              )
-                                           );
+                                                            .WithArguments(arguments)
+                                                            .WithSynonyms("a1", "a2", "a3")
+                                                            .WithAdditionalParameters(
+                                                                ("params1", "params one"),
+                                                                ("params2", "params two")
+                                                            )
+                                                            .WithUsage(
+                                                                now.AddHours(++timeOffset),
+                                                                now.AddHours(++timeOffset),
+                                                                now.AddHours(++timeOffset),
+                                                                now.AddHours(++timeOffset)
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithFileName(fileName)
+                                                            .WithArguments(arguments)
+                                                            .WithSynonyms("a4", "a5", "a6")
+                                                            .WithAdditionalParameters(
+                                                                ("params3", "params three"),
+                                                                ("params4", "params four")
+                                                            )
+                                                            .WithUsage(
+                                                                now.AddHours(++timeOffset),
+                                                                now.AddHours(++timeOffset),
+                                                                now.AddHours(++timeOffset),
+                                                                now.AddHours(++timeOffset)
+                                                            )
+                                         );
         await TestViewModelAsync(
             async (viewModel, db) =>
             {
@@ -466,18 +465,18 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         var fileName = Guid.NewGuid().ToString();
         var arguments = Guid.NewGuid().ToString();
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName(fileName)
-                                                              .WithArguments(arguments)
-                                                              .WithDeletedAt(DateTime.Now)
-                                                              .WithSynonyms("a1", "a2")
-                                           )
-                                           .AppendAlias(a => a.WithFileName(fileName)
-                                                              .WithArguments(arguments)
-                                                              .WithSynonyms("b1", "b2")
-                                           )
-                                           .AppendAlias(a => a.WithFileName(fileName)
-                                                              .WithArguments(arguments)
-                                                              .WithSynonyms("c1", "c2")
-                                           );
+                                                            .WithArguments(arguments)
+                                                            .WithDeletedAt(DateTime.Now)
+                                                            .WithSynonyms("a1", "a2")
+                                         )
+                                         .AppendAlias(a => a.WithFileName(fileName)
+                                                            .WithArguments(arguments)
+                                                            .WithSynonyms("b1", "b2")
+                                         )
+                                         .AppendAlias(a => a.WithFileName(fileName)
+                                                            .WithArguments(arguments)
+                                                            .WithSynonyms("c1", "c2")
+                                         );
         await TestViewModelAsync(
             async (viewModel, db) =>
             {
@@ -536,29 +535,29 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         var arguments = Guid.NewGuid().ToString();
 
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName(fileName)
-                                                              .WithArguments(arguments)
-                                                              .WithSynonyms("a1", "a2", "a3")
-                                                              .WithAdditionalParameters(
-                                                                  ("params1", "params one"),
-                                                                  ("params2", "params two")
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithFileName(fileName)
-                                                              .WithArguments(arguments)
-                                                              .WithSynonyms("a4", "a5", "a6")
-                                                              .WithAdditionalParameters(
-                                                                  ("params1", "params one"),
-                                                                  ("params2", "params two")
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithFileName(fileName)
-                                                              .WithArguments(arguments)
-                                                              .WithSynonyms("a4", "a5", "a6")
-                                                              .WithAdditionalParameters(
-                                                                  ("params1", "params one"),
-                                                                  ("params2", "params two")
-                                                              )
-                                           );
+                                                            .WithArguments(arguments)
+                                                            .WithSynonyms("a1", "a2", "a3")
+                                                            .WithAdditionalParameters(
+                                                                ("params1", "params one"),
+                                                                ("params2", "params two")
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithFileName(fileName)
+                                                            .WithArguments(arguments)
+                                                            .WithSynonyms("a4", "a5", "a6")
+                                                            .WithAdditionalParameters(
+                                                                ("params1", "params one"),
+                                                                ("params2", "params two")
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithFileName(fileName)
+                                                            .WithArguments(arguments)
+                                                            .WithSynonyms("a4", "a5", "a6")
+                                                            .WithAdditionalParameters(
+                                                                ("params1", "params one"),
+                                                                ("params2", "params two")
+                                                            )
+                                         );
 
         OutputHelper.WriteLine(
             $"""
@@ -647,29 +646,29 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 1
         };
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A")
-                                                              .WithUsage(
-                                                                  lastUsageDate.AddMonths(-1), // Recent usage
-                                                                  lastUsageDate.AddMonths(-100)
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithSynonyms("B")
-                                                              .WithUsage(
-                                                                  lastUsageDate.AddMonths(-100),
-                                                                  lastUsageDate.AddMonths(-110),
-                                                                  lastUsageDate.AddMonths(-120)
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithSynonyms("C")
-                                                              .WithUsage(
-                                                                  lastUsageDate,
-                                                                  lastUsageDate.AddMonths(-1), // Recent usage
-                                                                  lastUsageDate.AddMonths(-120),
-                                                                  lastUsageDate.AddMonths(-121),
-                                                                  lastUsageDate.AddMonths(-122),
-                                                                  lastUsageDate.AddMonths(-123),
-                                                                  lastUsageDate.AddMonths(-124)
-                                                              )
-                                           );
+                                                            .WithUsage(
+                                                                lastUsageDate.AddMonths(-1), // Recent usage
+                                                                lastUsageDate.AddMonths(-100)
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithSynonyms("B")
+                                                            .WithUsage(
+                                                                lastUsageDate.AddMonths(-100),
+                                                                lastUsageDate.AddMonths(-110),
+                                                                lastUsageDate.AddMonths(-120)
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithSynonyms("C")
+                                                            .WithUsage(
+                                                                lastUsageDate,
+                                                                lastUsageDate.AddMonths(-1), // Recent usage
+                                                                lastUsageDate.AddMonths(-120),
+                                                                lastUsageDate.AddMonths(-121),
+                                                                lastUsageDate.AddMonths(-122),
+                                                                lastUsageDate.AddMonths(-123),
+                                                                lastUsageDate.AddMonths(-124)
+                                                            )
+                                         );
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -689,8 +688,8 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     public async Task ShowNeverUsedAliases()
     {
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A"))
-                                           .AppendAlias(a => a.WithSynonyms("B"))
-                                           .AppendAlias(a => a.WithSynonyms("C"));
+                                         .AppendAlias(a => a.WithSynonyms("B"))
+                                         .AppendAlias(a => a.WithSynonyms("C"));
         await TestViewModelAsync(
             async (viewModel, _) =>
             {
@@ -722,29 +721,29 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 3
         };
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A")
-                                                              .WithUsage(
-                                                                  DateTime.Now.AddMonths(-1), // Recent usage
-                                                                  DateTime.Now.AddMonths(-100)
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithSynonyms("B")
-                                                              .WithUsage(
-                                                                  DateTime.Now.AddMonths(-100),
-                                                                  DateTime.Now.AddMonths(-110),
-                                                                  DateTime.Now.AddMonths(-120)
-                                                              )
-                                           )
-                                           .AppendAlias(a => a.WithSynonyms("C")
-                                                              .WithUsage(
-                                                                  DateTime.Now,
-                                                                  DateTime.Now.AddMonths(-1), // Recent usage
-                                                                  DateTime.Now.AddMonths(-120),
-                                                                  DateTime.Now.AddMonths(-121),
-                                                                  DateTime.Now.AddMonths(-122),
-                                                                  DateTime.Now.AddMonths(-123),
-                                                                  DateTime.Now.AddMonths(-124)
-                                                              )
-                                           );
+                                                            .WithUsage(
+                                                                DateTime.Now.AddMonths(-1), // Recent usage
+                                                                DateTime.Now.AddMonths(-100)
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithSynonyms("B")
+                                                            .WithUsage(
+                                                                DateTime.Now.AddMonths(-100),
+                                                                DateTime.Now.AddMonths(-110),
+                                                                DateTime.Now.AddMonths(-120)
+                                                            )
+                                         )
+                                         .AppendAlias(a => a.WithSynonyms("C")
+                                                            .WithUsage(
+                                                                DateTime.Now,
+                                                                DateTime.Now.AddMonths(-1), // Recent usage
+                                                                DateTime.Now.AddMonths(-120),
+                                                                DateTime.Now.AddMonths(-121),
+                                                                DateTime.Now.AddMonths(-122),
+                                                                DateTime.Now.AddMonths(-123),
+                                                                DateTime.Now.AddMonths(-124)
+                                                            )
+                                         );
         await TestViewModelAsync(
             async (viewModel, _) =>
             {

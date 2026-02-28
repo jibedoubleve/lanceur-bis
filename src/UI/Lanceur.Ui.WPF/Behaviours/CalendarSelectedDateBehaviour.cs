@@ -33,7 +33,7 @@ public class CalendarSelectedDateBehaviour : Behavior<Calendar>
     private void OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
     {
         var date = e.AddedItems.Count > 0 ? e.AddedItems[0] as DateTime? : null;
-        if (Command?.CanExecute(date) == true) Command.Execute(date);
+        if (Command?.CanExecute(date) == true) { Command.Execute(date); }
     }
 
     protected override void OnAttached() { AssociatedObject.SelectedDatesChanged += OnSelectedDateChanged; }

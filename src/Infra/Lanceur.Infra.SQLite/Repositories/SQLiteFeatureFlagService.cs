@@ -27,22 +27,22 @@ public class SQLiteFeatureFlagService : SQLiteRepositoryBase, IFeatureFlagServic
                            from settings
                            where s_key = 'json'
                            """;
-        return Db.WithConnection(
-            conn =>
+        return Db.WithConnection(conn =>
             {
                 var json = conn.Query<string>(sql).SingleOrDefault() ?? string.Empty;
 
-                return json.IsNullOrEmpty() 
-                    ? new ApplicationSettings().FeatureFlags 
+                return json.IsNullOrEmpty()
+                    ? new ApplicationSettings().FeatureFlags
                     : JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json);
             }
         );
     }
 
     /// <inheritdoc />
-    public bool IsEnabled(string featureName) => GetFeatureFlags()
-                                                 .Where(e => string.Equals(e.FeatureName, featureName, StringComparison.CurrentCultureIgnoreCase))
-                                                 .Any(e => e.Enabled);
+    public bool IsEnabled(string featureName)
+        => GetFeatureFlags()
+           .Where(e => string.Equals(e.FeatureName, featureName, StringComparison.CurrentCultureIgnoreCase))
+           .Any(e => e.Enabled);
 
     #endregion
 }

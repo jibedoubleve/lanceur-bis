@@ -33,13 +33,15 @@ public class DisplayQueryResult : QueryResult
     /// </summary>
     public override bool IsResult => false;
 
-    public static IEnumerable<QueryResult> NoResultFound => SingleFromResult("No result found", iconKind: "AlertCircleOutline");
+    public static IEnumerable<QueryResult> NoResultFound
+        => SingleFromResult("No result found", iconKind: "AlertCircleOutline");
 
     #endregion
 
     #region Methods
 
-    public static IEnumerable<QueryResult> SingleFromResult(string text, string subtext = null, string iconKind = null) => new List<QueryResult> { new DisplayQueryResult(text, subtext, iconKind) };
+    public static IEnumerable<QueryResult> SingleFromResult(string text, string subtext = null, string iconKind = null)
+        => new List<QueryResult> { new DisplayQueryResult(text, subtext, iconKind) };
 
     #endregion
 }

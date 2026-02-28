@@ -119,7 +119,7 @@ public static class ServiceRegistrationExtensions
     /// </returns>
     public static IServiceCollection Register(this IServiceCollection serviceCollection, string suffix, Type source)
         => serviceCollection.Register(suffix, source.Assembly);
-    
+
     /// <summary>
     ///     Registers all types from the assembly identified by the specified assembly name whose names end with the specified
     ///     suffix (e.g., "ViewModel") into the provided <see cref="IServiceCollection" /> for dependency injection.

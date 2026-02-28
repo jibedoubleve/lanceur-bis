@@ -7,11 +7,11 @@ public class ReservedAliasAttribute : Attribute
 
     public ReservedAliasAttribute(string name) => Name = name;
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     public string Name { get; set; }
 
-    #endregion Properties
+    #endregion
 }

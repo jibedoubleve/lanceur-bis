@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
@@ -40,7 +39,7 @@ public class MacroDbAction
     private AliasQueryResult Hydrate(IDbConnection connection, AliasQueryResult item)
     {
         _logger.BeginSingleScope("AliasToHydrate", item);
-        if (!item.IsComposite()) return item;
+        if (!item.IsComposite()) { return item; }
 
         var action = _dbActionFactory.AliasManagement;
         var subAliases = new List<AliasQueryResult>();
@@ -56,9 +55,13 @@ public class MacroDbAction
                 var alias = aliases.FirstOrDefault(a => a.Name == name);
                 if (alias is null)
                 {
-                    _logger.LogWarning("Failed to create composite alias {CompositeAlias} because the alias {AliasName} " +
-                                       "is missing or has been deleted. To resolve this, remove the invalid aliases " +
-                                       "from the composite alias configuration.", item?.Name ?? "<NULL>", name);
+                    _logger.LogWarning(
+                        "Failed to create composite alias {CompositeAlias} because the alias {AliasName} " +
+                        "is missing or has been deleted. To resolve this, remove the invalid aliases " +
+                        "from the composite alias configuration.",
+                        item?.Name ?? "<NULL>",
+                        name
+                    );
 
                     continue;
                 }
@@ -83,11 +86,14 @@ public class MacroDbAction
     ///     The collection with all element that are upgradable
     ///     to composite, upgraded
     /// </returns>
-    internal IEnumerable<AliasQueryResult> UpgradeToComposite(IDbConnection connection, IEnumerable<AliasQueryResult> collection)
+    internal IEnumerable<AliasQueryResult> UpgradeToComposite(
+        IDbConnection connection,
+        IEnumerable<AliasQueryResult> collection
+    )
     {
         using var _ = _logger.WarnIfSlow(this);
         var list = new List<AliasQueryResult>(collection);
-        var composites = list.Where(item => false == item.FileName.IsNullOrEmpty())
+        var composites = list.Where(item => !item.FileName.IsNullOrEmpty())
                              .Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
                              .Select(x => Hydrate(connection, x))
                              .ToArray();

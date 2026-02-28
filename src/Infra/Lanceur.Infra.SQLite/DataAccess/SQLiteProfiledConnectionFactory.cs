@@ -17,7 +17,11 @@ public class SQLiteProfiledConnectionFactory : IDbConnectionFactory
 
     #region Constructors
 
-    public SQLiteProfiledConnectionFactory(IConnectionString connectionString, ILogger<SQLiteProfiledConnectionFactory> loggerFactory, bool isFullProvider = false)
+    public SQLiteProfiledConnectionFactory(
+        IConnectionString connectionString,
+        ILogger<SQLiteProfiledConnectionFactory> loggerFactory,
+        bool isFullProvider = false
+    )
     {
         _connectionString = connectionString.ToString();
         _dbProfiler = new(loggerFactory, isFullProvider);
@@ -27,7 +31,8 @@ public class SQLiteProfiledConnectionFactory : IDbConnectionFactory
 
     #region Methods
 
-    public DbConnection CreateConnection() => new ProfiledDbConnection(new SQLiteConnection(_connectionString), _dbProfiler);
+    public DbConnection CreateConnection()
+        => new ProfiledDbConnection(new SQLiteConnection(_connectionString), _dbProfiler);
 
     #endregion
 }

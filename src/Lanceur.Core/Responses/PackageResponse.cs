@@ -10,7 +10,7 @@ public class PackageResponse
         FileName = fileName;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -19,5 +19,5 @@ public class PackageResponse
     public string UniqueId { get; }
     public string Uri => IsPackage ? $"package:{UniqueId}" : FileName;
 
-    #endregion Properties
+    #endregion
 }

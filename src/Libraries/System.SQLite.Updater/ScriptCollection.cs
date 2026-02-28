@@ -25,8 +25,9 @@ public class ScriptCollection : IEnumerable<string>
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public IEnumerable<string> After(Version version) => _resources.Where(item => item.Key > version)
-                                                                   .Select(item => item.Value);
+    public IEnumerable<string> After(Version version)
+        => _resources.Where(item => item.Key > version)
+                     .Select(item => item.Value);
 
     public IEnumerator<string> GetEnumerator() => _resources.Values.GetEnumerator();
 

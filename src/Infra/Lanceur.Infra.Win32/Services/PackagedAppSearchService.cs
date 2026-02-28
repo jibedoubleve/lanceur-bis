@@ -35,10 +35,19 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
                 return userPackages.AsParallel()
                                    .Where(p =>
                                        {
-                                           try { return p is { IsFramework: false, IsDevelopmentMode: false } && (installedDir.StartsWith(p.InstalledLocation.Path) || p.IsAppUserModelId(fileName)); }
+                                           try
+                                           {
+                                               return p is { IsFramework: false, IsDevelopmentMode: false } &&
+                                                      (installedDir.StartsWith(p.InstalledLocation.Path) ||
+                                                       p.IsAppUserModelId(fileName));
+                                           }
                                            catch (Exception ex)
                                            {
-                                               _logger.LogWarning(ex, "An error occured when selecting package {FileName}", fileName);
+                                               _logger.LogWarning(
+                                                   ex,
+                                                   "An error occured when selecting package {FileName}",
+                                                   fileName
+                                               );
                                                return false;
                                            }
                                        }
@@ -71,7 +80,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
                                                 .Select(e => e.AppUserModelId)
                                                 .FirstOrDefault(e => !string.IsNullOrEmpty(e));
 
-                    if (appUserModelId.IsNullOrEmpty()) continue;
+                    if (appUserModelId.IsNullOrEmpty()) { continue; }
 
                     var currentPackage = new PackagedApp
                     {
@@ -96,10 +105,10 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
         var results = await GetByInstalledDirectoryAsync(queryResult.FileName);
         results  = results.ToArray();
 
-        if (!results.Any()) return false;
+        if (!results.Any()) { return false; }
 
         var result = results.First();
-        if (queryResult.Description.IsNullOrEmpty()) queryResult.Description = result.DisplayName ?? "Packaged App";
+        if (queryResult.Description.IsNullOrEmpty()) { queryResult.Description = result.DisplayName ?? "Packaged App"; }
 
         queryResult.FileName = result.FileName;
         return true;

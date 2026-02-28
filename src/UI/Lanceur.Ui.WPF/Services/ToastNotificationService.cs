@@ -21,7 +21,10 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
 
     #region Constructors
 
-    public ToastUserNotificationService(LazyLoadedSynchronisationContext dispatcher, ILogger<ToastUserNotificationService> logger)
+    public ToastUserNotificationService(
+        LazyLoadedSynchronisationContext dispatcher,
+        ILogger<ToastUserNotificationService> logger
+    )
     {
         _dispatcher = dispatcher;
         _logger = logger;
@@ -153,7 +156,6 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     {
         _logger.LogTrace("Stopping Busy Indicator");
         _dispatcher.Current.Post(_ => Mouse.OverrideCursor = null, null);
-        
     }
 
     /// <inheritdoc />

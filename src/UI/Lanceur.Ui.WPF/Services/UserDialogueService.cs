@@ -28,13 +28,13 @@ public class UserDialogueService : IUserDialogueService
             PrimaryButtonText = yes,
             CloseButtonText = no
         };
-        
+
         messageBox.Loaded += (_, _) =>
         {
             messageBox.Activate();
             Keyboard.Focus(messageBox);
         };
-        
+
         var result = await messageBox.ShowDialogAsync();
         return result == MessageBoxResult.Primary;
     }
@@ -45,14 +45,15 @@ public class UserDialogueService : IUserDialogueService
         string yesText = "Yes",
         string noText = "No",
         string title = "Question"
-    ) => await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
-        new(
-            content,
-            title,
-            yesText,
-            noText
-        )
-    );
+    )
+        => await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
+            new(
+                content,
+                title,
+                yesText,
+                noText
+            )
+        );
 
     ///<inheritdoc />
     public async Task<(bool IsConfirmed, object DataContext)> InteractAsync(
@@ -65,10 +66,8 @@ public class UserDialogueService : IUserDialogueService
     {
         if (content is FrameworkElement d)
         {
-            if (dataContext is not null)
-                d.DataContext = dataContext;
-            else
-                dataContext = d.DataContext;
+            if (dataContext is not null) { d.DataContext = dataContext; }
+            else { dataContext = d.DataContext; }
         }
 
         var isConfirmed = await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
@@ -88,18 +87,18 @@ public class UserDialogueService : IUserDialogueService
         var messageBox
             = new MessageBox
             {
-                Title = title, 
+                Title = title,
                 Content = content,
                 ShowActivated = true,
                 IsCloseButtonEnabled = true
             };
-        
+
         messageBox.Loaded += (_, _) =>
         {
             messageBox.Activate();
             Keyboard.Focus(messageBox);
         };
-        
+
         await messageBox.ShowDialogAsync();
     }
 
