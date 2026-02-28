@@ -26,14 +26,6 @@ public interface IAliasManagementService
     IEnumerable<AliasQueryResult> GetAll();
 
     /// <summary>
-    ///     Retrieves an alias query result by its unique identifier.
-    /// </summary>
-    /// <param name="id">The unique identifier of the alias query result to retrieve.</param>
-    /// <returns>The AliasQueryResult corresponding to the provided ID, or null if not found.</returns>
-    [Obsolete("Not used anymore")]
-    AliasQueryResult GetById(long id);
-
-    /// <summary>
     ///     Populates or "hydrates" the provided <see cref="AliasQueryResult" /> instance
     ///     with additional parameters that may not be initially included.
     /// </summary>

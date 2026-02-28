@@ -316,7 +316,7 @@ public interface IAliasRepository
     /// </summary>
     /// <param name="name">The criteria used to search for aliases.</param>
     /// <param name="isReturnAllIfEmpty">
-    ///     Specifies the behavior when <paramref name="name" /> is null or empty:
+    ///     Specifies the behaviour when <paramref name="name" /> is null or empty:
     ///     if <c>true</c>, all aliases are returned; if <c>false</c>, no results are returned.
     /// </param>
     /// <returns>A collection of aliases that match the search criteria.</returns>
@@ -332,24 +332,6 @@ public interface IAliasRepository
     /// <param name="criteria">Criteria to find the aliases</param>
     /// <returns>Resulting aliases</returns>
     IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(string criteria);
-
-    /// <summary>
-    ///     Returns all the names that exists in the database AND in the specified list of <see cref="names" />
-    /// </summary>
-    /// <param name="names">The names to find in the database</param>
-    /// <returns></returns>
-    [Obsolete("Not used anymore")]
-    ExistingNameResponse SelectNames(string[] names);
-
-    /// <summary>
-    ///     Searches for a hidden alias with the specified name. and, if exists, set the usage into the specified QueryResult's
-    ///     count property
-    /// </summary>
-    /// <param name="alias">The hidden alias to search for.</param>
-    /// <returns>
-    ///     The usage of the alias if found; otherwise, an empty <see cref="AliasUsage" /> object with its Id set to '0'.
-    /// </returns>
-    void SetHiddenAliasUsage(QueryResult alias);
 
     /// <summary>
     ///     Adds an entry to the usage table with the alias and the current date and time,

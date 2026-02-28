@@ -28,7 +28,11 @@ public class AliasSearchDbAction
 
     #region Methods
 
-    internal IEnumerable<AliasQueryResult> Search(IDbTransaction tx, string name = null, bool isReturnAllIfEmpty = false)
+    internal IEnumerable<AliasQueryResult> Search(
+        IDbConnection connection,
+        string name = null,
+        bool isReturnAllIfEmpty = false
+    )
     {
         using var _ = _logger.WarnIfSlow(this);
 
@@ -73,13 +77,13 @@ public class AliasSearchDbAction
                """;
 
         name = $"{name ?? string.Empty}%";
-        var results = tx.Connection!.Query<AliasQueryResult>(sql, new { name });
+        var results = connection.Query<AliasQueryResult>(sql, new { name });
 
-        results = _dbActionFactory.MacroManagement.UpgradeToComposite(tx, results);
+        results = _dbActionFactory.MacroManagement.UpgradeToComposite(connection, results);
         return results ?? AliasQueryResult.NoResult;
     }
 
-    internal IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(IDbTransaction tx, string name)
+    internal IEnumerable<AliasQueryResult> SearchAliasWithAdditionalParameters(IDbConnection connection, string name)
     {
         const string sql = $"""
                             select
@@ -112,10 +116,10 @@ public class AliasSearchDbAction
                             """;
 
         name = $"{name ?? string.Empty}%";
-        var results = tx.Connection!.Query<AliasQueryResult>(sql, new { name });
+        var results = connection.Query<AliasQueryResult>(sql, new { name });
 
         results = _dbActionFactory.MacroManagement
-                                  .UpgradeToComposite(tx, results);
+                                  .UpgradeToComposite(connection, results);
         return results ?? AliasQueryResult.NoResult;
     }
 

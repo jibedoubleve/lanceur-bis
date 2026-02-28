@@ -18,7 +18,7 @@ public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionServi
 
     public Version GetCurrentDbVersion()
     {
-        var version = Db.WithinTransaction(tx => tx.Connection!.Query<string>(Sql.GetDbVersion).FirstOrDefault());
+        var version = Db.WithConnection(conn => conn.Query<string>(Sql.GetDbVersion).FirstOrDefault());
 
         return version.IsNullOrEmpty()
             ? new()
@@ -27,7 +27,7 @@ public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionServi
 
     public bool IsUpToDate(Version expectedVersion)
     {
-        var version = Db.WithinTransaction(tx => tx.Connection!.Query<string>(Sql.GetDbVersion).FirstOrDefault());
+        var version = Db.WithConnection(conn => conn.Query<string>(Sql.GetDbVersion).FirstOrDefault());
 
         var currentVersion = version.IsNullOrEmpty()
             ? new()

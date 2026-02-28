@@ -97,7 +97,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
     /// <inheritdoc/>
     public void Save()
     {
-        Db.WithinTransaction(tx =>
+        Db.WithConnection(conn =>
             {
                 const string sql = """
                                    insert into settings(s_key, s_value) values ('json', @json)
@@ -107,7 +107,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
                                    where s_key = 'json'
                                    """;
                 var json = JsonConvert.SerializeObject(Current);
-                tx.Connection!.Execute(sql, new { json });
+                conn.Execute(sql, new { json });
             }
         );
         _logger.LogTrace("Saved settings in database.");

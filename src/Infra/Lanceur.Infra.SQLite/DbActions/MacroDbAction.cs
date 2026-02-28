@@ -34,10 +34,10 @@ public class MacroDbAction
     ///     this method will hydrate and create a <see cref="CompositeAliasQueryResult" />;
     ///     otherwise it'll return <paramref name="item" />
     /// </summary>
-    /// <param name="tx">The transaction to use for this query</param>
+    /// <param name="connection">The connection to use for this query</param>
     /// <param name="item">The <see cref="QueryResult" /> to hydrate</param>
     /// <returns>The hydrated <see cref="QueryResult" /> or <paramref name="item" /></returns>
-    private AliasQueryResult Hydrate(IDbTransaction tx, AliasQueryResult item)
+    private AliasQueryResult Hydrate(IDbConnection connection, AliasQueryResult item)
     {
         _logger.BeginSingleScope("AliasToHydrate", item);
         if (!item.IsComposite()) return item;
@@ -46,7 +46,7 @@ public class MacroDbAction
         var subAliases = new List<AliasQueryResult>();
 
         var names = item?.Parameters?.Split("@") ?? [];
-        var aliases = action.GetByNames(tx, names).ToArray();
+        var aliases = action.GetByNames(connection, names).ToArray();
 
         var delay = 0;
         foreach (var name in names)
@@ -77,19 +77,19 @@ public class MacroDbAction
     ///     Go through the collection and upgrade items to composite when they are
     ///     composite macro.
     /// </summary>
-    /// <param name="tx">The transaction to use for this query</param>
+    /// <param name="connection">The connection to use for this query</param>
     /// <param name="collection">The collection to upgrade</param>
     /// <returns>
     ///     The collection with all element that are upgradable
     ///     to composite, upgraded
     /// </returns>
-    internal IEnumerable<AliasQueryResult> UpgradeToComposite(IDbTransaction tx, IEnumerable<AliasQueryResult> collection)
+    internal IEnumerable<AliasQueryResult> UpgradeToComposite(IDbConnection connection, IEnumerable<AliasQueryResult> collection)
     {
         using var _ = _logger.WarnIfSlow(this);
         var list = new List<AliasQueryResult>(collection);
         var composites = list.Where(item => false == item.FileName.IsNullOrEmpty())
                              .Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
-                             .Select(x => Hydrate(tx, x))
+                             .Select(x => Hydrate(connection, x))
                              .ToArray();
 
         list.RemoveAll(x => composites.Select(c => c.Id).Contains(x.Id));
