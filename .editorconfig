@@ -123,14 +123,15 @@ resharper_csharp_style_var_when_type_is_apparent = true
 csharp_style_prefer_switch_expression = true
 resharper_csharp_align_switch_expression_arms_style = align_at_binary_operator
 
-# Attributes on some line as much as possible
-resharper_csharp_place_attribute_on_same_line = true
-resharper_csharp_place_method_attribute_on_same_line = true
+# Attributes manegement
+resharper_csharp_place_attribute_on_same_line = false
+resharper_csharp_place_method_attribute_on_same_line = false
 resharper_csharp_place_property_attribute_on_same_line = true
 resharper_csharp_place_field_attribute_on_same_line = true
-
-# Gérer les attributs multiples (ex: [Attr1, Attr2] au lieu de [Attr1][Attr2])
 resharper_csharp_keep_existing_attribute_declaration_format = false
+resharper_csharp_attribute_section_wrapping = wrap_if_long
+resharper_max_attribute_section_on_line = 1
+resharper_csharp_attribute_wrapping = wrap_if_long
 
 # ReSharper inspection severities
 resharper_arrange_redundant_parentheses_highlighting = hint
