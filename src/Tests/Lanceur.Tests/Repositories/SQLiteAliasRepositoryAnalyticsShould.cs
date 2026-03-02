@@ -5,6 +5,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
+using Lanceur.Tests.Tools.Generators;
 using Lanceur.Tests.Tools.SQL;
 using Shouldly;
 using Xunit;
@@ -16,7 +17,6 @@ namespace Lanceur.Tests.Repositories;
 ///     Consider them as a health check for SQL queries in AliasRepository.
 /// </summary>
 public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
-
 {
     #region Constructors
 
@@ -302,14 +302,14 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                      .AppendAlias(a => a.WithFileName(name)
                                         .WithArguments(name)
                                         .WithCount(count)
-                                        .WithLuaScript($"{Guid.NewGuid()}")
+                                        .WithLuaScript(Generate.Text())
                                         .WithUsage(date1, date2)
                                         .WithSynonyms(name)
                      )
                      .AppendAlias(a => a.WithFileName(name)
                                         .WithArguments(name)
                                         .WithCount(count)
-                                        .WithLuaScript($"{Guid.NewGuid()}")
+                                        .WithLuaScript(Generate.Text())
                                         .WithUsage(date1, date2)
                                         .WithSynonyms(name)
                      )
@@ -364,14 +364,14 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
                                   .AppendAlias(a => a.WithFileName(name)
                                                      .WithArguments(name)
                                                      .WithCount(count)
-                                                     .WithLuaScript($"{Guid.NewGuid()}")
+                                                     .WithLuaScript(Generate.Text())
                                                      .WithUsage(date1, date2)
                                                      .WithSynonyms(name)
                                   )
                                   .AppendAlias(a => a.WithFileName(name)
                                                      .WithArguments(name)
                                                      .WithCount(count)
-                                                     .WithLuaScript($"{Guid.NewGuid()}")
+                                                     .WithLuaScript(Generate.Text())
                                                      .WithUsage(date1, date2)
                                                      .WithSynonyms(name)
                                   )

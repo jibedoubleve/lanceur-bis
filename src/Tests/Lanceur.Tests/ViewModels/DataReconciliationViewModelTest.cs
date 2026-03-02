@@ -21,11 +21,11 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliationViewModel>
+public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliationViewModel>
 {
     #region Constructors
 
-    public DataReconciliationViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public DataReconciliationViewModelTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -66,7 +66,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task DeletePermanentlyWithValidation()
+    public async Task When_delete_permanently_alias_Then_all_correlated_data_is_deleted()
     {
         var visitors = new ServiceVisitors
         {
@@ -76,22 +76,23 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 return i;
             }
         };
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName("name")
-                                                            .WithDeletedAt(DateTime.Now)
-                                                            .WithSynonyms("a1", "a2")
-                                                            .WithAdditionalParameters(
-                                                                ("1", "un"),
-                                                                ("2", "deux"),
-                                                                ("3", "trois")
-                                                            )
-                                                            .WithUsage(
-                                                                "01/01/2025",
-                                                                "01/01/2025",
-                                                                "01/01/2025",
-                                                                "01/01/2025",
-                                                                "01/01/2025"
-                                                            )
-        );
+        var sqlBuilder = new SqlBuilder()
+            .AppendAlias(a => a.WithFileName("name")
+                               .WithDeletedAt(DateTime.Now)
+                               .WithSynonyms("a1", "a2")
+                               .WithAdditionalParameters(
+                                   ("1", "un"),
+                                   ("2", "deux"),
+                                   ("3", "trois")
+                               )
+                               .WithUsage(
+                                   "01/01/2025",
+                                   "01/01/2025",
+                                   "01/01/2025",
+                                   "01/01/2025",
+                                   "01/01/2025"
+                               )
+            );
         await TestViewModelAsync(
             async (viewModel, db) => {
                 // arrange
@@ -126,7 +127,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     [InlineData("B", 1)]
     [InlineData("C", 1)]
     [InlineData("E", 0)]
-    public async Task FilterInactiveAliases(string filter, int count)
+    public async Task When_changing_inactivity_threshold_Then_search_does_not_select_inactive_aliases(string filter, int count)
     {
         var visitors = new ServiceVisitors
         {
@@ -143,15 +144,16 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             },
             VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 2
         };
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A")
-                                                            .WithUsage(DateTime.Now.AddMonths(-10))
-                                         )
-                                         .AppendAlias(a => a.WithSynonyms("B")
-                                                            .WithUsage(DateTime.Now.AddMonths(-10))
-                                         )
-                                         .AppendAlias(a => a.WithSynonyms("C")
-                                                            .WithUsage(DateTime.Now.AddMonths(-10))
-                                         );
+        var sqlBuilder = new SqlBuilder()
+                         .AppendAlias(a => a.WithSynonyms("A")
+                                            .WithUsage(DateTime.Now.AddMonths(-10))
+                         )
+                         .AppendAlias(a => a.WithSynonyms("B")
+                                            .WithUsage(DateTime.Now.AddMonths(-10))
+                         )
+                         .AppendAlias(a => a.WithSynonyms("C")
+                                            .WithUsage(DateTime.Now.AddMonths(-10))
+                         );
         await TestViewModelAsync(
             async (viewModel, _) => {
                 await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
@@ -170,7 +172,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     [InlineData("B", 1)]
     [InlineData("C", 1)]
     [InlineData("E", 0)]
-    public async Task FilterRarelyUsedAliases(string filter, int count)
+    public async Task When_changing_rarely_used_threshold_Then_search_does_not_select_inactive_aliases(string filter, int count)
     {
         var visitors = new ServiceVisitors
         {
@@ -187,24 +189,25 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             },
             VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 10
         };
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A")
-                                                            .WithUsage(
-                                                                DateTime.Now.AddMonths(-10),
-                                                                DateTime.Now.AddMonths(-10)
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithSynonyms("B")
-                                                            .WithUsage(
-                                                                DateTime.Now.AddMonths(-10),
-                                                                DateTime.Now.AddMonths(-10)
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithSynonyms("C")
-                                                            .WithUsage(
-                                                                DateTime.Now.AddMonths(-10),
-                                                                DateTime.Now.AddMonths(-10)
-                                                            )
-                                         );
+        var sqlBuilder = new SqlBuilder()
+                         .AppendAlias(a => a.WithSynonyms("A")
+                                            .WithUsage(
+                                                DateTime.Now.AddMonths(-10),
+                                                DateTime.Now.AddMonths(-10)
+                                            )
+                         )
+                         .AppendAlias(a => a.WithSynonyms("B")
+                                            .WithUsage(
+                                                DateTime.Now.AddMonths(-10),
+                                                DateTime.Now.AddMonths(-10)
+                                            )
+                         )
+                         .AppendAlias(a => a.WithSynonyms("C")
+                                            .WithUsage(
+                                                DateTime.Now.AddMonths(-10),
+                                                DateTime.Now.AddMonths(-10)
+                                            )
+                         );
         await TestViewModelAsync(
             async (viewModel, _) => {
                 await viewModel.SetLowUsageThresholdCommand.ExecuteAsync(null);
@@ -220,7 +223,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
 
     [Theory]
     [ClassData(typeof(DoubloonGenerator))]
-    public async Task FixDoubloons(ISqlBuilder sqlBuilder)
+    public async Task When_merged_aliases_Then_only_one_is_found(ISqlBuilder sqlBuilder)
     {
         var visitors = new ServiceVisitors
         {
@@ -255,7 +258,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task HaveDoubloonsWithoutParameters()
+    public async Task When_searching_doubloons_Then_they_can_be_found()
     {
         var visitors = new ServiceVisitors
         {
@@ -272,22 +275,23 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 return i;
             }
         };
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName("FileName")
-                                                            .WithArguments("null")
-                                                            .WithSynonyms("a1", "a2", "a3")
-                                                            .WithAdditionalParameters(
-                                                                ("params1", "params one"),
-                                                                ("params2", "params two")
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithFileName("FileName")
-                                                            .WithArguments("null")
-                                                            .WithSynonyms("a4", "a5", "a6")
-                                                            .WithAdditionalParameters(
-                                                                ("params1", "params one"),
-                                                                ("params2", "params two")
-                                                            )
-                                         );
+        var sqlBuilder = new SqlBuilder()
+                         .AppendAlias(a => a.WithFileName("FileName")
+                                            .WithArguments("null")
+                                            .WithSynonyms("a1", "a2", "a3")
+                                            .WithAdditionalParameters(
+                                                ("params1", "params one"),
+                                                ("params2", "params two")
+                                            )
+                         )
+                         .AppendAlias(a => a.WithFileName("FileName")
+                                            .WithArguments("null")
+                                            .WithSynonyms("a4", "a5", "a6")
+                                            .WithAdditionalParameters(
+                                                ("params1", "params one"),
+                                                ("params2", "params two")
+                                            )
+                         );
         await TestViewModelAsync(
             async (viewModel, _) => {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
@@ -299,10 +303,10 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task MergeDoubloonWithExpectedDetails()
+    public async Task When_merged_aliases_Then_all_the_correlated_tables_are_updated()
     {
-        var fileName = Guid.NewGuid().ToString();
-        var arguments = Guid.NewGuid().ToString();
+        var fileName = Generate.Text();
+        var arguments = Generate.Text();
         var now = DateTime.Now;
         var timeOffset = 0;
 
@@ -321,34 +325,35 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 return i;
             }
         };
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName(fileName)
-                                                            .WithArguments(arguments)
-                                                            .WithSynonyms("a1", "a2", "a3")
-                                                            .WithAdditionalParameters(
-                                                                ("params1", "params one"),
-                                                                ("params2", "params two")
-                                                            )
-                                                            .WithUsage(
-                                                                now.AddHours(++timeOffset),
-                                                                now.AddHours(++timeOffset),
-                                                                now.AddHours(++timeOffset),
-                                                                now.AddHours(++timeOffset)
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithFileName(fileName)
-                                                            .WithArguments(arguments)
-                                                            .WithSynonyms("a4", "a5", "a6")
-                                                            .WithAdditionalParameters(
-                                                                ("params3", "params three"),
-                                                                ("params4", "params four")
-                                                            )
-                                                            .WithUsage(
-                                                                now.AddHours(++timeOffset),
-                                                                now.AddHours(++timeOffset),
-                                                                now.AddHours(++timeOffset),
-                                                                now.AddHours(++timeOffset)
-                                                            )
-                                         );
+        var sqlBuilder = new SqlBuilder()
+                         .AppendAlias(a => a.WithFileName(fileName)
+                                            .WithArguments(arguments)
+                                            .WithSynonyms("a1", "a2", "a3")
+                                            .WithAdditionalParameters(
+                                                ("params1", "params one"),
+                                                ("params2", "params two")
+                                            )
+                                            .WithUsage(
+                                                now.AddHours(++timeOffset),
+                                                now.AddHours(++timeOffset),
+                                                now.AddHours(++timeOffset),
+                                                now.AddHours(++timeOffset)
+                                            )
+                         )
+                         .AppendAlias(a => a.WithFileName(fileName)
+                                            .WithArguments(arguments)
+                                            .WithSynonyms("a4", "a5", "a6")
+                                            .WithAdditionalParameters(
+                                                ("params3", "params three"),
+                                                ("params4", "params four")
+                                            )
+                                            .WithUsage(
+                                                now.AddHours(++timeOffset),
+                                                now.AddHours(++timeOffset),
+                                                now.AddHours(++timeOffset),
+                                                now.AddHours(++timeOffset)
+                                            )
+                         );
         await TestViewModelAsync(
             async (viewModel, db) => {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
@@ -377,7 +382,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task NotDeletePermanentlyWithoutValidation()
+    public async Task When_canceling_permanent_deletion_Then_nothing_is_deleted()
     {
         var visitors = new ServiceVisitors
         {
@@ -434,7 +439,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task NotDeleteWhenMergingDoubloons()
+    public async Task When_merged_alias_Then_no_soft_deleted_aliases_correlated_to_the_merge_is_found()
     {
         var visitors = new ServiceVisitors
         {
@@ -451,21 +456,22 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
                 return i;
             }
         };
-        var fileName = Guid.NewGuid().ToString();
-        var arguments = Guid.NewGuid().ToString();
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName(fileName)
-                                                            .WithArguments(arguments)
-                                                            .WithDeletedAt(DateTime.Now)
-                                                            .WithSynonyms("a1", "a2")
-                                         )
-                                         .AppendAlias(a => a.WithFileName(fileName)
-                                                            .WithArguments(arguments)
-                                                            .WithSynonyms("b1", "b2")
-                                         )
-                                         .AppendAlias(a => a.WithFileName(fileName)
-                                                            .WithArguments(arguments)
-                                                            .WithSynonyms("c1", "c2")
-                                         );
+        var fileName = Generate.Text();
+        var arguments = Generate.Text();
+        var sqlBuilder = new SqlBuilder()
+                         .AppendAlias(a => a.WithFileName(fileName)
+                                            .WithArguments(arguments)
+                                            .WithDeletedAt(DateTime.Now)
+                                            .WithSynonyms("a1", "a2")
+                         )
+                         .AppendAlias(a => a.WithFileName(fileName)
+                                            .WithArguments(arguments)
+                                            .WithSynonyms("b1", "b2")
+                         )
+                         .AppendAlias(a => a.WithFileName(fileName)
+                                            .WithArguments(arguments)
+                                            .WithSynonyms("c1", "c2")
+                         );
         await TestViewModelAsync(
             async (viewModel, db) => {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
@@ -488,7 +494,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
 
     [Theory]
     [ClassData(typeof(DoubloonWithNullGenerator))]
-    public async Task NotHaveDoubloonWithNullValues(string description, int doubloons, SqlBuilder sqlBuilder)
+    public async Task When_properties_are_null_Then_it_does_not_affect_doubloon_retrieving(string description, int doubloons, SqlBuilder sqlBuilder)
     {
         OutputHelper.WriteLine($"Test description: {description}");
         var visitors = new ServiceVisitors
@@ -517,36 +523,37 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task RemoveDoubloons()
+    public async Task When_searching_doubloons_then_doubloons_are_showed()
     {
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
-        var fileName = Guid.NewGuid().ToString();
-        var arguments = Guid.NewGuid().ToString();
+        var fileName = Generate.Text();
+        var arguments = Generate.Text();
 
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithFileName(fileName)
-                                                            .WithArguments(arguments)
-                                                            .WithSynonyms("a1", "a2", "a3")
-                                                            .WithAdditionalParameters(
-                                                                ("params1", "params one"),
-                                                                ("params2", "params two")
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithFileName(fileName)
-                                                            .WithArguments(arguments)
-                                                            .WithSynonyms("a4", "a5", "a6")
-                                                            .WithAdditionalParameters(
-                                                                ("params1", "params one"),
-                                                                ("params2", "params two")
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithFileName(fileName)
-                                                            .WithArguments(arguments)
-                                                            .WithSynonyms("a4", "a5", "a6")
-                                                            .WithAdditionalParameters(
-                                                                ("params1", "params one"),
-                                                                ("params2", "params two")
-                                                            )
-                                         );
+        var sqlBuilder = new SqlBuilder()
+                         .AppendAlias(a => a.WithFileName(fileName)
+                                            .WithArguments(arguments)
+                                            .WithSynonyms("a1", "a2", "a3")
+                                            .WithAdditionalParameters(
+                                                ("params1", "params one"),
+                                                ("params2", "params two")
+                                            )
+                         )
+                         .AppendAlias(a => a.WithFileName(fileName)
+                                            .WithArguments(arguments)
+                                            .WithSynonyms("a4", "a5", "a6")
+                                            .WithAdditionalParameters(
+                                                ("params1", "params one"),
+                                                ("params2", "params two")
+                                            )
+                         )
+                         .AppendAlias(a => a.WithFileName(fileName)
+                                            .WithArguments(arguments)
+                                            .WithSynonyms("a4", "a5", "a6")
+                                            .WithAdditionalParameters(
+                                                ("params1", "params one"),
+                                                ("params2", "params two")
+                                            )
+                         );
 
         OutputHelper.WriteLine(
             $"""
@@ -566,7 +573,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task ShowAliasesWithoutNotes() =>
+    public async Task When_executing_ShowAliasesWithoutNotesCommand_then_no_error() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -578,7 +585,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         );
 
     [Fact]
-    public async Task ShowBrokenAliasesAsync() =>
+    public async Task When_executing_ShowBrokenAliasesCommand_then_no_error() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -590,7 +597,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
         );
 
     [Fact]
-    public async Task ShowDoubloons() =>
+    public async Task When_executing_ShowDoubloonsCommand_then_no_error() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -603,7 +610,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
 
     [Theory]
     [MemberData(nameof(ShowInactiveAliasesSource))]
-    public async Task ShowInactiveAliases(DateOnly lastUsage, DateOnly today)
+    public async Task When_retriving_aliases_with_recent_usage_Then_filter_works_as_expected(DateOnly lastUsage, DateOnly today)
     {
         var todayDate = today.ToDateTime(TimeOnly.MinValue);
         var lastUsageDate = lastUsage.ToDateTime(TimeOnly.MinValue);
@@ -623,37 +630,38 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             },
             VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 1
         };
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A")
-                                                            .WithUsage(
-                                                                lastUsageDate.AddMonths(-1), // Recent usage
-                                                                lastUsageDate.AddMonths(-100)
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithSynonyms("B")
-                                                            .WithUsage(
-                                                                lastUsageDate.AddMonths(-100),
-                                                                lastUsageDate.AddMonths(-110),
-                                                                lastUsageDate.AddMonths(-120)
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithSynonyms("C")
-                                                            .WithUsage(
-                                                                lastUsageDate,
-                                                                lastUsageDate.AddMonths(-1), // Recent usage
-                                                                lastUsageDate.AddMonths(-120),
-                                                                lastUsageDate.AddMonths(-121),
-                                                                lastUsageDate.AddMonths(-122),
-                                                                lastUsageDate.AddMonths(-123),
-                                                                lastUsageDate.AddMonths(-124)
-                                                            )
-                                         );
+        var sqlBuilder = new SqlBuilder()
+                         .AppendAlias(a => a.WithSynonyms("A")
+                                            .WithUsage(
+                                                lastUsageDate.AddMonths(-1), // Recent usage
+                                                lastUsageDate.AddMonths(-100)
+                                            )
+                         )
+                         .AppendAlias(a => a.WithSynonyms("B")
+                                            .WithUsage(
+                                                lastUsageDate.AddMonths(-100),
+                                                lastUsageDate.AddMonths(-110),
+                                                lastUsageDate.AddMonths(-120)
+                                            )
+                         )
+                         .AppendAlias(a => a.WithSynonyms("C")
+                                            .WithUsage(
+                                                lastUsageDate,
+                                                lastUsageDate.AddMonths(-1), // Recent usage
+                                                lastUsageDate.AddMonths(-120),
+                                                lastUsageDate.AddMonths(-121),
+                                                lastUsageDate.AddMonths(-122),
+                                                lastUsageDate.AddMonths(-123),
+                                                lastUsageDate.AddMonths(-124)
+                                            )
+                         );
         await TestViewModelAsync(
             async (viewModel, _) => {
                 viewModel.OverrideToday(todayDate);
                 await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
                 await viewModel.ShowInactiveAliasesCommand.ExecuteAsync(null);
 
-                //Only alias B is not used since a long time...
+                //Only alias B has recent usage...
                 viewModel.Aliases.Count.ShouldBe(1);
             },
             sqlBuilder,
@@ -662,7 +670,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task ShowNeverUsedAliases()
+    public async Task When_filer_never_used_aliases_Then_filter_works_as_expected()
     {
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A"))
                                          .AppendAlias(a => a.WithSynonyms("B"))
@@ -678,7 +686,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task ShowRarelyUsedAliases()
+    public async Task When_filer_rarely_used_aliases_Then_filter_works_as_expected()
     {
         var visitors = new ServiceVisitors
         {
@@ -695,37 +703,37 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             },
             VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 3
         };
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("A")
-                                                            .WithUsage(
-                                                                DateTime.Now.AddMonths(-1), // Recent usage
-                                                                DateTime.Now.AddMonths(-100)
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithSynonyms("B")
-                                                            .WithUsage(
-                                                                DateTime.Now.AddMonths(-100),
-                                                                DateTime.Now.AddMonths(-110),
-                                                                DateTime.Now.AddMonths(-120)
-                                                            )
-                                         )
-                                         .AppendAlias(a => a.WithSynonyms("C")
-                                                            .WithUsage(
-                                                                DateTime.Now,
-                                                                DateTime.Now.AddMonths(-1), // Recent usage
-                                                                DateTime.Now.AddMonths(-120),
-                                                                DateTime.Now.AddMonths(-121),
-                                                                DateTime.Now.AddMonths(-122),
-                                                                DateTime.Now.AddMonths(-123),
-                                                                DateTime.Now.AddMonths(-124)
-                                                            )
-                                         );
+        var sqlBuilder = new SqlBuilder()
+                         .AppendAlias(a => a.WithSynonyms("A")
+                                            .WithUsage(
+                                                DateTime.Now.AddMonths(-1), // Recent usage
+                                                DateTime.Now.AddMonths(-100)
+                                            )
+                         )
+                         .AppendAlias(a => a.WithSynonyms("B")
+                                            .WithUsage(
+                                                DateTime.Now.AddMonths(-100),
+                                                DateTime.Now.AddMonths(-110),
+                                                DateTime.Now.AddMonths(-120)
+                                            )
+                         )
+                         .AppendAlias(a => a.WithSynonyms("C")
+                                            .WithUsage(
+                                                DateTime.Now,
+                                                DateTime.Now.AddMonths(-1), // Recent usage
+                                                DateTime.Now.AddMonths(-120),
+                                                DateTime.Now.AddMonths(-121),
+                                                DateTime.Now.AddMonths(-122),
+                                                DateTime.Now.AddMonths(-123),
+                                                DateTime.Now.AddMonths(-124)
+                                            )
+                         );
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async () => {
-                        await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
-                        await viewModel.ShowRarelyUsedAliasesCommand.ExecuteAsync(null);
-                    }
-                );
+                    await viewModel.SetInactivityThresholdCommand.ExecuteAsync(null);
+                    await viewModel.ShowRarelyUsedAliasesCommand.ExecuteAsync(null);
+                });
                 t.ShouldBeNull();
 
                 viewModel.Aliases.Count.ShouldBe(1);
@@ -736,7 +744,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task ShowRestoreAlias() =>
+    public async Task When_filer_restored_aliases_Then_filter_works_as_expected() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
