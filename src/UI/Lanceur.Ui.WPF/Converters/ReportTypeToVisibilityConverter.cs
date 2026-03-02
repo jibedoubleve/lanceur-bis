@@ -20,7 +20,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
 {
     #region Methods
 
-    private Visibility GetDefaultVisibility(ActionOnAlias actionOnAlias) =>
+    private static Visibility GetDefaultVisibility(ActionOnAlias actionOnAlias) =>
         actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
@@ -37,7 +37,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             )
         };
 
-    private Visibility GetVisibilityForDeleted(ActionOnAlias actionOnAlias) =>
+    private static Visibility GetVisibilityForDeleted(ActionOnAlias actionOnAlias) =>
         actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
@@ -71,7 +71,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             )
         };
 
-    private object GetVisibilityForInactive(ActionOnAlias actionOnAlias) =>
+    private static object GetVisibilityForInactive(ActionOnAlias actionOnAlias) =>
         actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
@@ -88,7 +88,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             )
         };
 
-    private Visibility GetVisibilityForLowUsage(ActionOnAlias actionOnAlias) =>
+    private static Visibility GetVisibilityForLowUsage(ActionOnAlias actionOnAlias) =>
         actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
@@ -105,7 +105,7 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             )
         };
 
-    private Visibility GetVisibilityForUnannotated(ActionOnAlias actionOnAlias) =>
+    private static Visibility GetVisibilityForUnannotated(ActionOnAlias actionOnAlias) =>
         actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Visible,

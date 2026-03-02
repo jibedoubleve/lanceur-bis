@@ -11,7 +11,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
-public partial class AnalyticsViewModel : ObservableObject
+public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
 {
     #region Fields
 
@@ -58,7 +58,7 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #region Methods
 
-    private ObservableCollection<string> GetYears(IEnumerable<DataPoint<DateTime, double>> points)
+    private static ObservableCollection<string> GetYears(IEnumerable<DataPoint<DateTime, double>> points)
     {
         var list = points.Select(e => e.X.Year.ToString())
                          .Distinct()
@@ -224,7 +224,7 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #endregion
 
-    private record PlotContext
+    private sealed record PlotContext
     {
         #region Properties
 
@@ -257,5 +257,11 @@ public partial class AnalyticsViewModel : ObservableObject
         }
 
         #endregion
+    }
+
+    public void Dispose()
+    {
+        _cancellationCacheTokenSource.Dispose();
+        _memoryCache.Dispose();
     }
 }
