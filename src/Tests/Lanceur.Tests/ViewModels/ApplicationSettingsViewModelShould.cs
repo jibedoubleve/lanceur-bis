@@ -7,6 +7,7 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Generators;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
@@ -67,7 +68,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
         TestViewModel(
             (viewModel, _) => {
                 // act
-                viewModel.DbPath = Guid.NewGuid().ToString();
+                viewModel.DbPath = Generate.Text();
 
                 // assert
                 userInteractionService.Received(1)

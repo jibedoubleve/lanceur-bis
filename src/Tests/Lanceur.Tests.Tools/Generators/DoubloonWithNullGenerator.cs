@@ -17,43 +17,45 @@ public class DoubloonWithNullGenerator : IEnumerable<object[]>
         [
             "Two doubloons with null file names.",
             2,
-            new SqlBuilder().AppendAlias(a => a.WithFileName("null")
-                                               .WithArguments(arguments)
-                                               .WithSynonyms("a1", "a2", "a3")
-                                               .WithAdditionalParameters(
-                                                   ("params1", "params one"),
-                                                   ("params2", "params two")
-                                               )
-                            )
-                            .AppendAlias(a => a.WithFileName("null")
-                                               .WithArguments(arguments)
-                                               .WithSynonyms("a4", "a5", "a6")
-                                               .WithAdditionalParameters(
-                                                   ("params4", "params four"),
-                                                   ("params5", "params five")
-                                               )
-                            )
+            new SqlBuilder()
+                .AppendAlias(a => a.WithFileName(null)
+                                   .WithArguments(arguments)
+                                   .WithSynonyms("a1", "a2", "a3")
+                                   .WithAdditionalParameters(
+                                       ("params1", "params one"),
+                                       ("params2", "params two")
+                                   )
+                )
+                .AppendAlias(a => a.WithFileName(null)
+                                   .WithArguments(arguments)
+                                   .WithSynonyms("a4", "a5", "a6")
+                                   .WithAdditionalParameters(
+                                       ("params4", "params four"),
+                                       ("params5", "params five")
+                                   )
+                )
         ];
         yield return
         [
             "Two doubloons with null arguments.",
             2,
-            new SqlBuilder().AppendAlias(a => a.WithFileName(fileName)
-                                               .WithArguments("null")
-                                               .WithSynonyms("a1", "a2", "a3")
-                                               .WithAdditionalParameters(
-                                                   ("params1", "params one"),
-                                                   ("params2", "params two")
-                                               )
-                            )
-                            .AppendAlias(a => a.WithFileName(fileName)
-                                               .WithArguments("null")
-                                               .WithSynonyms("a4", "a5", "a6")
-                                               .WithAdditionalParameters(
-                                                   ("params4", "params four"),
-                                                   ("params5", "params five")
-                                               )
-                            )
+            new SqlBuilder()
+                .AppendAlias(a => a.WithFileName(fileName)
+                                   .WithArguments(null)
+                                   .WithSynonyms("a1", "a2", "a3")
+                                   .WithAdditionalParameters(
+                                       ("params1", "params one"),
+                                       ("params2", "params two")
+                                   )
+                )
+                .AppendAlias(a => a.WithFileName(fileName)
+                                   .WithArguments(null)
+                                   .WithSynonyms("a4", "a5", "a6")
+                                   .WithAdditionalParameters(
+                                       ("params4", "params four"),
+                                       ("params5", "params five")
+                                   )
+                )
         ];
         yield return
         [
@@ -61,11 +63,11 @@ public class DoubloonWithNullGenerator : IEnumerable<object[]>
             0,
             new SqlBuilder()
                 .AppendAlias(a => a.WithRandomFileName()
-                                   .WithArguments("null")
+                                   .WithArguments(null)
                                    .WithSynonyms("a1")
                 )
                 .AppendAlias(a => a.WithRandomFileName()
-                                   .WithArguments("null")
+                                   .WithArguments(null)
                                    .WithSynonyms("a2")
                 )
         ];
@@ -75,15 +77,15 @@ public class DoubloonWithNullGenerator : IEnumerable<object[]>
             2,
             new SqlBuilder()
                 .AppendAlias(a => a.WithRandomFileName()
-                                   .WithArguments("null")
+                                   .WithArguments(null)
                                    .WithSynonyms("a1")
                 )
                 .AppendAlias(a => a.WithFileName(fileName)
-                                   .WithArguments("null")
+                                   .WithArguments(null)
                                    .WithSynonyms("a2")
                 )
                 .AppendAlias(a => a.WithFileName(fileName)
-                                   .WithArguments("null")
+                                   .WithArguments(null)
                                    .WithSynonyms("a2")
                 )
         ];

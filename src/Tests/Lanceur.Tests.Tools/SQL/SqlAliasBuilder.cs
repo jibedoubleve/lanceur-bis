@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.Tests.Tools.Generators;
 
 namespace Lanceur.Tests.Tools.SQL;
 
@@ -26,24 +27,18 @@ public class SqlAliasBuilder : SqlBuilderBase
 
     #endregion
 
-    #region Properties
-
-    private static string RandomString => Guid.NewGuid().ToString();
-
-    #endregion
-
     #region Methods
 
     private void AppendAlias()
     {
         const string sql = "insert into alias (id, file_name) values ({0}, '{1}');";
         Sql.AppendLine("-----------------------------------------------------------");
-        Sql.AppendLine(sql.Format(_idAlias, RandomString));
+        Sql.AppendLine(sql.Format(_idAlias, Generate.Text()));
     }
 
     public SqlAliasBuilder WithAdditionalParameters(params (string Name, string Argument)[] parameters)
     {
-        if (parameters.Length == 0) { parameters = [($"{RandomString}", $"{RandomString}")]; }
+        if (parameters.Length == 0) { parameters = [($"{Generate.Text()}", $"{Generate.Text()}")]; }
 
         foreach (var parameter in parameters)
         {
@@ -60,10 +55,11 @@ public class SqlAliasBuilder : SqlBuilderBase
         return this;
     }
 
-    public SqlAliasBuilder WithArguments(string arguments)
+    public SqlAliasBuilder WithArguments(string? arguments)
     {
-        const string sql = "update alias set arguments = '{0}' where id = {1};";
-        Sql.AppendLine(sql.Format(arguments, _idAlias));
+        var arg = arguments is null ? "null" : $"'{arguments}'"; 
+        const string sql = "update alias set arguments = {0} where id = {1};";
+        Sql.AppendLine(sql.Format(arg, _idAlias));
         return this;
     }
 
@@ -86,10 +82,11 @@ public class SqlAliasBuilder : SqlBuilderBase
         return this;
     }
 
-    public SqlAliasBuilder WithFileName(string fileName)
+    public SqlAliasBuilder WithFileName(string? fileName)
     {
-        const string sql = "update alias set file_name = '{0}' where id = {1};";
-        Sql.AppendLine(sql.Format(fileName, _idAlias));
+        var fname = (fileName is null) ? "null" : $"'{fileName}'";
+        const string sql = "update alias set file_name = {0} where id = {1};";
+        Sql.AppendLine(sql.Format(fname, _idAlias));
         return this;
     }
 
@@ -124,7 +121,7 @@ public class SqlAliasBuilder : SqlBuilderBase
 
     public SqlAliasBuilder WithRandomFileName()
     {
-        WithFileName(Guid.NewGuid().ToString());
+        WithFileName(Generate.FilName());
         return this;
     }
 
@@ -148,7 +145,7 @@ public class SqlAliasBuilder : SqlBuilderBase
 
         if (names.Length == 0)
         {
-            Sql.AppendLine(sql.Format(RandomString, _idAlias));
+            Sql.AppendLine(sql.Format(Generate.Text(), _idAlias));
             return this;
         }
 
