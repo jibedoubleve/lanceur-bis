@@ -452,24 +452,31 @@ public class SQLiteAliasRepositoryShould : TestBase
                            insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
                            insert into alias_name(name, id_alias) values ('noname', 257);
 
-                           insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
-                           insert into alias_name(name, id_alias) values ('noname', 258);
-                           """;
+    [Fact]
+    public void When_retrieving_alias_from_names_Then_alias_contains_thumbnails()
+    {
+        // ARRANGE
+        var name = Generate.Text();
+        var thumbnail = Generate.Text();
+        var sql = new SqlBuilder().AppendAlias(a => {
+            a.WithSynonyms(name)
+             .WithThumbnail(thumbnail);
+        }).ToSql();
+
         var connection = BuildFreshDb(sql);
+        var action = BuildAliasDbAction();
         var c = new DbSingleConnectionManager(connection);
 
-        var action = BuildAliasDbAction();
-
         // ACT
-        c.WithinTransaction(tx => action.Remove(tx, new AliasQueryResult { Id = 256 }));
+        var found = c.WithConnection(conn => action.GetByNames(conn, [name]));
 
         // ASSERT
-        const string sql2 = "select count(*) from alias where id = 256";
-        const string sql3 = "select count(*) from alias_name where id_alias = 256";
-        connection.ShouldSatisfyAllConditions(
-            co => co.ExecuteScalar<int>(sql2).ShouldBe(0),
-            co => co.ExecuteScalar<int>(sql3).ShouldBe(0)
-        );
+        found.ToList()
+             .ShouldSatisfyAllConditions(
+                 f => f.ShouldNotBeNull(),
+                 f => f.Count.ShouldBe(1),
+                 f => f[0].Thumbnail.ShouldNotBeNullOrEmpty()
+             );
     }
 
     [Fact]
