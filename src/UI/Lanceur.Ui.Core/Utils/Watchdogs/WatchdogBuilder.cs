@@ -13,9 +13,9 @@ public class WatchdogBuilder : IWatchdogBuilder
 
     public IWatchdog Build()
     {
-        if (_action is null) { throw new ArgumentNullException(nameof(_action)); }
-
-        return new Watchdog(_action, _interval);
+        return _action is null 
+            ? throw new ArgumentException(nameof(_action)) 
+            : new Watchdog(_action, _interval);
     }
 
     public IWatchdogBuilder WithAction(Func<Task> action)

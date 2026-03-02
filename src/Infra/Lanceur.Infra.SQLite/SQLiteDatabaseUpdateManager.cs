@@ -29,10 +29,10 @@ internal class SQLiteDatabaseUpdateManager
 
         if (string.IsNullOrEmpty(db.ConnectionString))
         {
-            throw new ArgumentNullException(nameof(db.ConnectionString), "ConnectionString should have a value");
+            throw new ArgumentException($"Argument {nameof(db.ConnectionString)}: ConnectionString should have a value");
         }
 
-        _dbUpdater = new(db, asm, pattern);
+        _dbUpdater = new DatabaseUpdater(db, asm, pattern);
         _versionService = versionService;
     }
 
