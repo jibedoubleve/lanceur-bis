@@ -1,12 +1,28 @@
-<?xml version="1.0" encoding="utf-16"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns">
     <TypePattern DisplayName="Default Pattern">
+
         <Region Name="Fields">
             <Entry DisplayName="Fields">
                 <Entry.Match>
                     <Or>
                         <Kind Is="Field" />
                         <Kind Is="Constant" />
+                    </Or>
+                </Entry.Match>
+                <Entry.SortBy>
+                    <Access/>
+                    <Name/>
+                </Entry.SortBy>
+            </Entry>
+        </Region>
+
+
+        <Region Name="Events">
+            <Entry DisplayName="Events">
+                <Entry.Match>
+                    <Or>
+                        <Kind Is="Event" />
                     </Or>
                 </Entry.Match>
                 <Entry.SortBy>
