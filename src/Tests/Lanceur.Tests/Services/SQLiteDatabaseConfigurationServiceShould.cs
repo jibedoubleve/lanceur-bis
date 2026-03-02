@@ -6,10 +6,7 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
-using Lanceur.Tests.Tools.Logging;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -32,7 +29,10 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         using var c = BuildFreshDb();
         c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
+        var settingRepository = new SQLiteApplicationSettingsProvider(
+            scope,
+            CreateLogger<SQLiteApplicationSettingsProvider>()
+        );
         assert(settingRepository);
     }
 
@@ -40,7 +40,10 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         using var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
+        var settingRepository = new SQLiteApplicationSettingsProvider(
+            scope,
+            CreateLogger<SQLiteApplicationSettingsProvider>()
+        );
 
         update(settingRepository.Current);
 
@@ -69,8 +72,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                             { "FeatureFlags": [ { "Description": "Show CPU", "Enabled": false, "FeatureName": "ShowSystemUsage1", "Icon": "Gauge241" }, { "Description": "Enables administrator", "Enabled": true, "FeatureName": "AdminMode1", "Icon": "ShieldKeyhole241" } ] }
                             """;
         WithConfiguration(
-            repository =>
-            {
+            repository => {
                 var settings = repository.Current;
                 settings.FeatureFlags.Count().ShouldBe(5);
 
@@ -168,8 +170,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                             }
                             """;
         WithConfiguration(
-            assert =>
-            {
+            assert => {
                 assert.Current.Caching.StoreCacheDuration.ShouldBe(11);
                 assert.Current.Caching.ThumbnailCacheDuration.ShouldBe(12);
                 if (assert.Current.FeatureFlags.Any())
@@ -182,7 +183,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 }
                 else { Assert.Fail("No feature flags"); }
 
-                assert.Current.Github.LastCheckedVersion.ShouldBe(new("1.2.3"));
+                assert.Current.Github.LastCheckedVersion.ShouldBe(new Version("1.2.3"));
                 assert.Current.Github.SnoozeVersionCheck.ShouldBe(true);
                 assert.Current.Github.Token.ShouldBe("123456789");
 
@@ -223,28 +224,22 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     }
 
     [Fact]
-    public void HaveDefaultHotKey()
-    {
-        WithConfiguration(repository =>
-            {
+    public void HaveDefaultHotKey() =>
+        WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.HotKey.ModifierKey.ShouldBe(3);
                 settings.HotKey.Key.ShouldBe(18);
             }
         );
-    }
 
     [Fact]
-    public void HaveDefaultPosition()
-    {
-        WithConfiguration(repository =>
-            {
+    public void HaveDefaultPosition() =>
+        WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.Window.Position.Left.ShouldBe(double.MaxValue);
                 settings.Window.Position.Top.ShouldBe(double.MaxValue);
             }
         );
-    }
 
     [Fact]
     public void HaveDefaultShowAtStartup()
@@ -276,22 +271,22 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         yield return
         [
-            new Action<ApplicationSettings>(cfg  =>  cfg.Caching.StoreCacheDuration = 99),
+            new Action<ApplicationSettings>(cfg => cfg.Caching.StoreCacheDuration = 99),
             new Action<ApplicationSettings>(cfg => cfg.Caching.StoreCacheDuration.ShouldBe(99))
         ];
         yield return
         [
-            new Action<ApplicationSettings>(cfg  =>  cfg.Caching.ThumbnailCacheDuration = 99),
+            new Action<ApplicationSettings>(cfg => cfg.Caching.ThumbnailCacheDuration = 99),
             new Action<ApplicationSettings>(cfg => cfg.Caching.ThumbnailCacheDuration.ShouldBe(99))
         ];
         yield return
         [
-            new Action<ApplicationSettings>(cfg  =>  cfg.Github.Tag = "hello world"),
+            new Action<ApplicationSettings>(cfg => cfg.Github.Tag = "hello world"),
             new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("hello world"))
         ];
         yield return
         [
-            new Action<ApplicationSettings>(cfg  =>  cfg.Github.Tag = cfg.Github.Tag),
+            new Action<ApplicationSettings>(cfg => cfg.Github.Tag = cfg.Github.Tag),
             new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("ungroomed"))
         ];
     }
@@ -300,10 +295,8 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     [Theory]
     [InlineData(1, 2)]
     [InlineData(10, 20)]
-    public void SaveHotKey(int modifierKey, int key)
-    {
-        WithConfiguration(repository =>
-            {
+    public void SaveHotKey(int modifierKey, int key) =>
+        WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.SetHotKey(key, modifierKey);
 
@@ -312,7 +305,6 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 settings.HotKey.Key.ShouldBe(key);
             }
         );
-    }
 
     [Fact]
     public void SaveJsonData()
@@ -330,10 +322,8 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
     [Theory]
     [InlineData(1.1d, 2.1d)]
-    public void SavePosition(double left, double top)
-    {
-        WithConfiguration(repository =>
-            {
+    public void SavePosition(double left, double top) =>
+        WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.Window.Position.Left = left;
                 settings.Window.Position.Top = top;
@@ -345,7 +335,6 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 loaded.Window.Position.Top.ShouldBe(top);
             }
         );
-    }
 
     #endregion
 }

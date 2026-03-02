@@ -65,39 +65,56 @@ public class EverythingApi : IEverythingApi
 
     #region Methods
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetLastError();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetLastError();
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetMatchCase();
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetMatchCase();
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetMatchPath();
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetMatchPath();
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetMatchWholeWord();
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetMatchWholeWord();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetMax();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetMax();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetNumFileResults();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetNumFileResults();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetNumFolderResults();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetNumFolderResults();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetNumResults();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetNumResults();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetOffset();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetOffset();
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetRegex();
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetRegex();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetRequestFlags();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetRequestFlags();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetResultAttributes(uint nIndex);
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetResultAttributes(uint nIndex);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateAccessed(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateAccessed(uint nIndex, out long lpFileTime);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateCreated(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateCreated(uint nIndex, out long lpFileTime);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateModified(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateModified(uint nIndex, out long lpFileTime);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateRecentlyChanged(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateRecentlyChanged(uint nIndex, out long lpFileTime);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultDateRun(uint nIndex, out long lpFileTime);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultDateRun(uint nIndex, out long lpFileTime);
 
     [DllImport("Everything64.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr Everything_GetResultExtension(uint nIndex);
@@ -121,55 +138,78 @@ public class EverythingApi : IEverythingApi
     [DllImport("Everything64.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr Everything_GetResultHighlightedPath(uint nIndex);
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetResultListRequestFlags();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetResultListRequestFlags();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetResultListSort();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetResultListSort();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetResultRunCount(uint nIndex);
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetResultRunCount(uint nIndex);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_GetResultSize(uint nIndex, out long lpFileSize);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_GetResultSize(
+        uint nIndex, out long lpFileSize);
 
     [DllImport("Everything64.dll", CharSet = CharSet.Unicode)]
     private static extern uint Everything_GetRunCountFromFileName(string lpFileName);
 
-    [DllImport("Everything64.dll")] private static extern IntPtr Everything_GetSearchW();
+    [DllImport("Everything64.dll")]
+    private static extern IntPtr Everything_GetSearchW();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetSort();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetSort();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetTotFileResults();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetTotFileResults();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetTotFolderResults();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetTotFolderResults();
 
-    [DllImport("Everything64.dll")] private static extern uint Everything_GetTotResults();
+    [DllImport("Everything64.dll")]
+    private static extern uint Everything_GetTotResults();
 
     [DllImport("Everything64.dll", CharSet = CharSet.Unicode)]
     private static extern uint Everything_IncRunCountFromFileName(string lpFileName);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_IsDBLoaded();
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_IsDBLoaded();
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_IsFileResult(uint nIndex);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_IsFileResult(uint nIndex);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_IsFolderResult(uint nIndex);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_IsFolderResult(uint nIndex);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_IsVolumeResult(uint nIndex);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_IsVolumeResult(uint nIndex);
 
-    [DllImport("Everything64.dll")] private static extern bool Everything_QueryW(bool bWait);
+    [DllImport("Everything64.dll")]
+    private static extern bool Everything_QueryW(bool bWait);
 
-    [DllImport("Everything64.dll")] private static extern void Everything_Reset();
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_Reset();
 
-    [DllImport("Everything64.dll")] private static extern void Everything_SetMatchCase(bool bEnable);
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SetMatchCase(bool bEnable);
 
-    [DllImport("Everything64.dll")] private static extern void Everything_SetMatchPath(bool bEnable);
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SetMatchPath(bool bEnable);
 
-    [DllImport("Everything64.dll")] private static extern void Everything_SetMatchWholeWord(bool bEnable);
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SetMatchWholeWord(bool bEnable);
 
-    [DllImport("Everything64.dll")] private static extern void Everything_SetMax(uint dwMax);
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SetMax(uint dwMax);
 
-    [DllImport("Everything64.dll")] private static extern void Everything_SetOffset(uint dwOffset);
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SetOffset(uint dwOffset);
 
-    [DllImport("Everything64.dll")] private static extern void Everything_SetRegex(bool bEnable);
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SetRegex(bool bEnable);
 
-    [DllImport("Everything64.dll")] private static extern void Everything_SetRequestFlags(uint dwRequestFlags);
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SetRequestFlags(uint dwRequestFlags);
 
     [DllImport("Everything64.dll", CharSet = CharSet.Unicode)]
     private static extern bool Everything_SetRunCountFromFileName(string lpFileName, uint dwRunCount);
@@ -178,9 +218,11 @@ public class EverythingApi : IEverythingApi
     private static extern uint Everything_SetSearchW(string lpSearchString);
 
     // Everything 1.4
-    [DllImport("Everything64.dll")] private static extern void Everything_SetSort(uint dwSortType);
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SetSort(uint dwSortType);
 
-    [DllImport("Everything64.dll")] private static extern void Everything_SortResultsByPath();
+    [DllImport("Everything64.dll")]
+    private static extern void Everything_SortResultsByPath();
 
     private static ResultType GetResultType(uint resultIndex)
     {
@@ -215,7 +257,7 @@ public class EverythingApi : IEverythingApi
             };
         }
 
-        if (Everything_IsFolderResult(resultIndex)) return ResultType.Directory;
+        if (Everything_IsFolderResult(resultIndex)) { return ResultType.Directory; }
 
 
         return ResultType.File;
@@ -223,11 +265,8 @@ public class EverythingApi : IEverythingApi
 
     public ResultSet Search(string query)
     {
-        if (!Everything_IsDBLoaded())
-        {
-            return ResultSet.Failure("Unable to connect to the Everything database.");
-        }
-        
+        if (!Everything_IsDBLoaded()) { return ResultSet.Failure("Unable to connect to the Everything database."); }
+
         uint i;
         const int fileAndPathSize = 260;
 
@@ -249,9 +288,16 @@ public class EverythingApi : IEverythingApi
             var stringBuilder = new StringBuilder(fileAndPathSize);
             Everything_GetResultFullPathName(i, stringBuilder, fileAndPathSize);
 
-            result.Add(new() { Name = Marshal.PtrToStringUni(Everything_GetResultFileName(i)) ?? string.Empty, Path = stringBuilder.ToString(), ResultType = GetResultType(i) });
+            result.Add(
+                new EverythingResult
+                {
+                    Name = Marshal.PtrToStringUni(Everything_GetResultFileName(i)) ?? string.Empty,
+                    Path = stringBuilder.ToString(),
+                    ResultType = GetResultType(i)
+                }
+            );
         }
-        
+
         return result;
     }
 

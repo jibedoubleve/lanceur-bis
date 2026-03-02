@@ -1,5 +1,5 @@
-﻿using Shouldly;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Models;
@@ -35,7 +35,9 @@ public class QueryResultMacroShould
     [InlineData("une/deux/trois/@aze")]
     [InlineData(@"une\deux\trois\aze@")]
     [InlineData(@"une\deux\trois\@aze")]
-    [InlineData(@"C:\Users\jibedoubleve\AppData\Local\Microsoft\TypeScript\4.4\node_modules\@types\sass-loader\node_modules\@types")]
+    [InlineData(
+        @"C:\Users\jibedoubleve\AppData\Local\Microsoft\TypeScript\4.4\node_modules\@types\sass-loader\node_modules\@types"
+    )]
     public void NotBeMacroWhenNotSurroundedWithArobase(string name)
     {
         var queryResult = new AliasQueryResult { FileName = name };

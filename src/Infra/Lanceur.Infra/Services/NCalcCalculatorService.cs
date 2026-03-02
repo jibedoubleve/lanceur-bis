@@ -47,14 +47,12 @@ public class NCalcCalculatorService : ICalculatorService
 
     #region Methods
 
-    private static string Normalize(string expression)
-    {
-        return Operators.Aggregate(
+    private static string Normalize(string expression) =>
+        Operators.Aggregate(
             expression,
             (current, op)
                 => current.Replace(op.ToLower(), op)
         );
-    }
 
     /// <inheritdoc />
     public (bool IsError, string Result) Evaluate(string expression)
@@ -64,7 +62,7 @@ public class NCalcCalculatorService : ICalculatorService
             expression = Normalize(expression);
 
             var exp = new Expression(expression);
-            var result =  exp.Evaluate() ?? string.Empty;
+            var result = exp.Evaluate() ?? string.Empty;
             _logger.LogTrace("Calculation: {Expression} =>  {Result}", expression, result);
             return (false, $"{result}");
         }

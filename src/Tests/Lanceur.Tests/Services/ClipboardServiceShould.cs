@@ -20,11 +20,12 @@ public class ClipboardServiceShould
 
     public ClipboardServiceShould(ITestOutputHelper output) => _output = output;
 
-    private ILogger<ReplacementComposite> CreateLogger()
-        => new TestOutputHelperDecoratorForMicrosoftLogging<ReplacementComposite>(_output);
     #endregion
 
     #region Methods
+
+    private ILogger<ReplacementComposite> CreateLogger()
+        => new TestOutputHelperDecoratorForMicrosoftLogging<ReplacementComposite>(_output);
 
     [Theory]
     [InlineData("$r$", "", "")]

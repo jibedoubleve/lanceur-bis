@@ -11,23 +11,28 @@ public class SQLiteProfiledConnectionFactory : IDbConnectionFactory
     #region Fields
 
     private readonly string _connectionString;
-    private readonly SQLiteLoggerDbProfiler _dbProfiler  ;
+    private readonly SQLiteLoggerDbProfiler _dbProfiler;
 
     #endregion
 
     #region Constructors
 
-    public SQLiteProfiledConnectionFactory(IConnectionString connectionString, ILogger<SQLiteProfiledConnectionFactory> loggerFactory, bool isFullProvider = false)
+    public SQLiteProfiledConnectionFactory(
+        IConnectionString connectionString,
+        ILogger<SQLiteProfiledConnectionFactory> loggerFactory,
+        bool isFullProvider = false
+    )
     {
         _connectionString = connectionString.ToString();
-        _dbProfiler = new(loggerFactory, isFullProvider);
+        _dbProfiler = new SQLiteLoggerDbProfiler(loggerFactory, isFullProvider);
     }
 
     #endregion
 
     #region Methods
 
-    public DbConnection CreateConnection() => new ProfiledDbConnection(new SQLiteConnection(_connectionString), _dbProfiler);
+    public DbConnection CreateConnection()
+        => new ProfiledDbConnection(new SQLiteConnection(_connectionString), _dbProfiler);
 
     #endregion
 }

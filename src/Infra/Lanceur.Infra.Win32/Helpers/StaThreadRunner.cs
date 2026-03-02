@@ -15,9 +15,11 @@ public sealed class StaThreadRunner : IStaThreadRunner
 
     public StaThreadRunner()
     {
-        var staThread = new Thread(() =>
-            {
-                foreach (var action in _threadQueue.GetConsumingEnumerable()) action.Invoke();
+        var staThread = new Thread(() => {
+                foreach (var action in _threadQueue.GetConsumingEnumerable())
+                {
+                    action.Invoke();
+                }
             }
         );
         staThread.SetApartmentState(ApartmentState.STA);
@@ -36,8 +38,7 @@ public sealed class StaThreadRunner : IStaThreadRunner
     public Task<T> RunAsync<T>(Func<T> func)
     {
         var tcs = new TaskCompletionSource<T>();
-        _threadQueue.Add(() =>
-            {
+        _threadQueue.Add(() => {
                 try { tcs.SetResult(func()); }
                 catch (Exception ex) { tcs.SetException(ex); }
             }

@@ -57,10 +57,8 @@ public class ExecutionService : IExecutionService
                 await Task.Delay(query.Delay * 1000);
             }
 
-            if (query.IsUwp())
-                ExecuteUwp(query);
-            else
-                ExecuteProcess(query);
+            if (query.IsUwp()) { ExecuteUwp(query); }
+            else { ExecuteProcess(query); }
         }
         catch (Exception ex)
         {
@@ -80,22 +78,26 @@ public class ExecutionService : IExecutionService
     private ScriptResult ExecuteLuaScript(AliasQueryResult query)
     {
         if (query.LuaScript.IsNullOrWhiteSpace())
-            return new()
+        {
+            return new ScriptResult
             {
-                Context = new() { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
+                Context = new ScriptContext
+                    { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
             };
+        }
 
         using var _ = _logger.BeginSingleScope("Query", query);
 
         var result = _luaManager.ExecuteScript(
-            new()
+            new Script
             {
                 Code = query.LuaScript ?? string.Empty,
-                Context = new() { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
+                Context = new ScriptContext
+                    { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
             }
         );
         using var __ = _logger.BeginSingleScope("ScriptResult", result);
-        if (result.Exception is not null) _logger.LogWarning(result.Exception, "The Lua script is on error");
+        if (result.Exception is not null) { _logger.LogWarning(result.Exception, "The Lua script is on error"); }
 
         _logger.LogInformation(
             "Lua script executed on {AliasName}",
@@ -106,7 +108,7 @@ public class ExecutionService : IExecutionService
 
     private void ExecuteProcess(AliasQueryResult query)
     {
-        if (query is null) return;
+        if (query is null) { return; }
 
         using var _ = _logger.WarnIfSlow(this);
 
@@ -179,10 +181,9 @@ public class ExecutionService : IExecutionService
         if (request is null)
         {
             _logger.LogInformation("The execution request is null");
-            return new()
+            return new ExecutionResponse
             {
-                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"),
-                HasResult = true
+                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"), HasResult = true
             };
         }
 
@@ -228,7 +229,7 @@ public class ExecutionService : IExecutionService
         foreach (var queryResult in queryResults)
         {
             currentDelay += delay;
-            _ = ExecuteAsync(new(queryResult), currentDelay);
+            _ = ExecuteAsync(new ExecutionRequest(queryResult), currentDelay);
         }
 
         return ExecutionResponse.NoResult;
@@ -237,13 +238,14 @@ public class ExecutionService : IExecutionService
     /// <inheritdoc />
     public void OpenDirectoryAsync(QueryResult queryResult)
     {
-        if (queryResult is not AliasQueryResult alias) return;
+        if (queryResult is not AliasQueryResult alias) { return; }
 
-        if (!File.Exists(alias.FileName) && !Directory.Exists(alias.FileName)) return;
+        if (!File.Exists(alias.FileName) && !Directory.Exists(alias.FileName)) { return; }
 
         var directory = Path.GetDirectoryName(alias.FileName);
-        if (directory is not null) _process.Open(directory);
-        if (Directory.Exists(alias.FileName)) _process.Open(alias.FileName);
+        if (directory is not null) { _process.Open(directory); }
+
+        if (Directory.Exists(alias.FileName)) { _process.Open(alias.FileName); }
     }
 
     #endregion

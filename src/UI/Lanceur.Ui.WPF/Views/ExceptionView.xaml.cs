@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using Lanceur.Core.Constants;
@@ -42,19 +41,16 @@ public partial class ExceptionView
 
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape) Close();
+        if (e.Key == Key.Escape) { Close(); }
     }
 
-    private void OnLoaded(object _, RoutedEventArgs e)
-    {
+    private void OnLoaded(object _, RoutedEventArgs e) =>
         SystemThemeWatcher.Watch(
             this,
             _configuration.Application.Window.BackdropStyle.ToWindowBackdropType()
         );
-    }
 
-    private void OnOpenLogs(object sender, RoutedEventArgs e) 
-        => WindowsShell.StartExplorer(Paths.LogRepository);
+    private void OnOpenLogs(object sender, RoutedEventArgs e) => WindowsShell.StartExplorer(Paths.LogRepository);
 
     #endregion
 }

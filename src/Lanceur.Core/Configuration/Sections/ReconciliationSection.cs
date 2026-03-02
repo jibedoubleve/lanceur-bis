@@ -43,7 +43,7 @@ public class ReconciliationSection
     [
         new(
             ReportType.RestoreAlias, // A.K.A. logically deleted aliases...
-            new()
+            new ColumnsConfiguration
             {
                 ProposedDescription = false,
                 LastUsed = false,
@@ -54,7 +54,7 @@ public class ReconciliationSection
         ),
         new(
             ReportType.UnusedAliases,
-            new()
+            new ColumnsConfiguration
             {
                 ProposedDescription = false,
                 LastUsed = false,
@@ -65,7 +65,7 @@ public class ReconciliationSection
         ),
         new(
             ReportType.InactiveAliases,
-            new()
+            new ColumnsConfiguration
             {
                 ProposedDescription = false,
                 LastUsed = true,
@@ -76,7 +76,7 @@ public class ReconciliationSection
         ),
         new(
             ReportType.RarelyUsedAliases,
-            new()
+            new ColumnsConfiguration
             {
                 ProposedDescription = false,
                 LastUsed = true,
@@ -87,7 +87,7 @@ public class ReconciliationSection
         ),
         new(
             ReportType.UnannotatedAliases,
-            new()
+            new ColumnsConfiguration
             {
                 ProposedDescription = false,
                 LastUsed = false,
@@ -98,7 +98,7 @@ public class ReconciliationSection
         ),
         new(
             ReportType.DoubloonAliases,
-            new()
+            new ColumnsConfiguration
             {
                 ProposedDescription = false,
                 LastUsed = false,
@@ -109,7 +109,7 @@ public class ReconciliationSection
         ),
         new(
             ReportType.BrokenAliases,
-            new()
+            new ColumnsConfiguration
             {
                 ProposedDescription = false,
                 LastUsed = false,

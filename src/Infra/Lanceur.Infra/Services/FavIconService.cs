@@ -32,7 +32,8 @@ public sealed partial class FavIconService : IFavIconService
 
     #region Methods
 
-    [GeneratedRegex("@.*@")] private static partial Regex IsMacroRegexBuilder();
+    [GeneratedRegex("@.*@")]
+    private static partial Regex IsMacroRegexBuilder();
 
     /// <inheritdoc />
     public async Task<string> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver)
@@ -42,16 +43,14 @@ public sealed partial class FavIconService : IFavIconService
         //   - no url is provided
         //   - alias is a Macro
         //   - Uri is malformed
-        if (url is null 
-            || IsMacroRegex.Match(url).Success 
-            || !Uri.TryCreate(url, UriKind.Absolute, out var uri)) { return null; }
+        if (url is null || IsMacroRegex.Match(url).Success || !Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return null;
+        }
 
         var favIconPath = cachePathResolver(uri.Host);
 
-        if (File.Exists(favIconPath))
-        {
-            return favIconPath;
-        }
+        if (File.Exists(favIconPath)) { return favIconPath; }
 
         var uriAuthority = uri.GetAuthority();
         var success = await _favIconDownloader.RetrieveAndSaveFavicon(uriAuthority, favIconPath);

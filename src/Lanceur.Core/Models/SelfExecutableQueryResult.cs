@@ -5,16 +5,20 @@ namespace Lanceur.Core.Models;
 
 public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfExecutable
 {
+    #region Constructors
+
     protected SelfExecutableQueryResult()
-    {           
+    {
         var type = GetType();
-        
-        Name = type.GetCustomAttribute<ReservedAliasAttribute>()?.Name
-            ?? type.GetCustomAttribute<MacroAttribute>()?.Name;
-        
+
+        Name = type.GetCustomAttribute<ReservedAliasAttribute>()?.Name ??
+               type.GetCustomAttribute<MacroAttribute>()?.Name;
+
         Description = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
-        
     }
+
+    #endregion
+
     #region Properties
 
     public override string Icon => "AppGeneric24";

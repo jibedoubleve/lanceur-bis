@@ -21,7 +21,7 @@ public record ExecutionRequest
 
     public bool ExecuteWithPrivilege { get; }
 
-    public QueryResult QueryResult { get;  }
+    public QueryResult QueryResult { get; }
 
     #endregion
 }

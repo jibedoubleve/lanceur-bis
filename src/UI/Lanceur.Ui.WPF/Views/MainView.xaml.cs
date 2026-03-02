@@ -71,13 +71,11 @@ public partial class MainView
 
         InitializeComponent();
         DataContext = viewModel;
-        
-        ConditionalExecution.ExecuteOnDebug(() => {
-                MainContentGrid.Background = new SolidColorBrush(Colors.Crimson);
-        });
 
-        Closed += (_, _) =>
-        {
+        ConditionalExecution.ExecuteOnDebug(() => { MainContentGrid.Background = new SolidColorBrush(Colors.Crimson); }
+        );
+
+        Closed += (_, _) => {
             var messenger = WeakReferenceMessenger.Default;
             messenger.Unregister<KeepAliveMessage>(this);
             messenger.Unregister<ChangeCoordinateMessage>(this);
@@ -99,18 +97,18 @@ public partial class MainView
     {
         var enabled = _featureFlagService.IsEnabled(Features.ResourceDisplay);
         if (enabled)
+        {
             _ = _computerInfoService.StartMonitoring(
                 _configuration.Application.ResourceMonitor.RefreshRate.Milliseconds(),
-                t =>
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                        {
+                t => {
+                    Application.Current.Dispatcher.Invoke(() => {
                             CpuProgressBar.Value = t.CpuLoad;
                             MemoryProgressBar.Value = t.MemoryLoad;
                         }
                     );
                 }
             );
+        }
 
         PanelCpu.Visibility
             = PanelMemory.Visibility
@@ -130,10 +128,9 @@ public partial class MainView
     /// </remarks>
     private void HideWindow()
     {
-        if (ViewModel.ShowLastQuery)
-            QueryTextBox.SelectAll();
-        else
-            QueryTextBox.Clear();
+        if (ViewModel.ShowLastQuery) { QueryTextBox.SelectAll(); }
+        else { QueryTextBox.Clear(); }
+
         _computerInfoService.StopMonitoring();
         Hide();
     }
@@ -167,12 +164,9 @@ public partial class MainView
         var messenger = WeakReferenceMessenger.Default;
         messenger.Register<KeepAliveMessage>(
             this,
-            (_, m) =>
-            {
-                if (m.Value)
-                    ShowWindow();
-                else
-                    HideWindow();
+            (_, m) => {
+                if (m.Value) { ShowWindow(); }
+                else { HideWindow(); }
             }
         );
         messenger.Register<ChangeCoordinateMessage>(this, (_, m) => SetWindowPosition(m.Value));
@@ -189,14 +183,14 @@ public partial class MainView
 
     private void OnMouseDown(object _, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left) DragMove();
+        if (e.ChangedButton == MouseButton.Left) { DragMove(); }
     }
 
     private void OnMouseUp(object _, MouseButtonEventArgs e)
     {
         var coordinate = _databaseConfig.Current.Window.Position;
 
-        if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) return;
+        if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) { return; }
 
         _logger.LogDebug("Save new coordinate ({Top},{Left})", Top, Left);
         coordinate.Top = Top;
@@ -206,7 +200,7 @@ public partial class MainView
 
     private void OnPreviewKeyDown(object _, KeyEventArgs e)
     {
-        if (e.Key != Key.Escape) return;
+        if (e.Key != Key.Escape) { return; }
 
         e.Handled = true;
         HideWindow();
@@ -220,7 +214,7 @@ public partial class MainView
 
     private void OnSettingsClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement frameworkElement) return;
+        if (sender is not FrameworkElement frameworkElement) { return; }
 
         switch (frameworkElement.Tag)
         {
@@ -246,12 +240,10 @@ public partial class MainView
     {
         coordinate ??= _databaseConfig!.Current.Window.Position.ToCoordinate();
 
-        if (coordinate.IsEmpty)
-            this.SetDefaultPosition();
-        else
-            this.SetPosition(coordinate);
+        if (coordinate.IsEmpty) { this.SetDefaultPosition(); }
+        else { this.SetPosition(coordinate); }
 
-        if (this.IsInScreen()) return;
+        if (this.IsInScreen()) { return; }
 
         _logger.LogWarning(
             "Window is out of screen {Coordinate}. Set it to default position at centre of the screen",
@@ -267,7 +259,7 @@ public partial class MainView
         // HACK: Settings take effect only after closing the window.  
         // When changing settings, the previous ones persist until the window is hidden at least once.  
         // This ensures the window is cleared immediately if settings are updated.  
-        if (!_configuration.Application.SearchBox.ShowLastQuery) ViewModel.Clear();
+        if (!_configuration.Application.SearchBox.ShowLastQuery) { ViewModel.Clear(); }
 
         ViewModel.RefreshSettings();
 
@@ -280,7 +272,7 @@ public partial class MainView
         QueryTextBox.Focus();
 
         //https://stackoverflow.com/questions/3109080/focus-on-textbox-when-usercontrol-change-visibility
-        Dispatcher.BeginInvoke((Action)delegate { Keyboard.Focus(QueryTextBox); });
+        Dispatcher.BeginInvoke((Action)delegate{ Keyboard.Focus(QueryTextBox); });
 
         Activate();
         Topmost = true;
@@ -290,11 +282,8 @@ public partial class MainView
 
     public void OnShowWindow(object? _, HotkeyEventArgs? e)
     {
-        if (_configuration.Application.SearchBox.ToggleVisibility
-            && Visibility == Visibility.Visible)
-            HideWindow();
-        else
-            ShowWindow();
+        if (_configuration.Application.SearchBox.ToggleVisibility && Visibility == Visibility.Visible) { HideWindow(); }
+        else { ShowWindow(); }
 
         e?.Handled = true;
     }
@@ -306,7 +295,7 @@ public partial class MainView
     /// </summary>
     public void ShowOnStartup()
     {
-        if (ViewModel.ShowAtStartup) Show();
+        if (ViewModel.ShowAtStartup) { Show(); }
     }
 
     #endregion

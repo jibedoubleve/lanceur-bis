@@ -45,7 +45,7 @@ public static class ServiceCollectionExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection) 
+    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
         => serviceCollection.AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
                             .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                             .AddTransient<IGithubService, GithubService>();
@@ -76,13 +76,13 @@ public static class ServiceCollectionExtensions
                                                  .Enrich.FromLogContext()
                                                  .Enrich.WithEnvironmentUserName()
                                                  .WriteTo.Console();
-        
+
 
         ConditionalExecution.Execute(
             () => ConfigureLog(Paths.DebugClefLogFile, Paths.DebugRawLogFile),
             () => ConfigureLog(Paths.ClefLogFile, Paths.RawLogFile)
         );
-        
+
         serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
         Log.Logger = loggerCfg.CreateLogger();
 
@@ -92,11 +92,13 @@ public static class ServiceCollectionExtensions
         {
             if (telemetry.IsClefEnabled)
                 // Clef file, easier to import into SEQ
+            {
                 loggerCfg.WriteTo.File(
                     new CompactJsonFormatter(),
                     clefFile,
                     rollingInterval: RollingInterval.Day
                 );
+            }
 
             // Raw log file, easier to read
             loggerCfg.WriteTo.File(
@@ -112,7 +114,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddConfigurationSections()
                          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
-                         .AddSingleton<SQLiteUpdater>(sp => new(
+                         .AddSingleton<SQLiteUpdater>(sp => new SQLiteUpdater(
                                  sp.GetService<IDataStoreVersionService>(),
                                  sp.GetService<ILoggerFactory>(),
                                  sp.GetService<IDbConnection>(),
@@ -126,7 +128,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IClipboardService, ClipboardService>()
                          .AddTransient<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp
-                             => new(sp.GetService<IConnectionString>()!.ToString())
+                             => new SQLiteConnection(sp.GetService<IConnectionString>()!.ToString())
                          )
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
@@ -139,11 +141,10 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IFavIconService, FavIconService>()
-                         .AddSingleton<IFavIconDownloader, FavIconDownloader>(sp =>
-                             {
+                         .AddSingleton<IFavIconDownloader, FavIconDownloader>(sp => {
                                  var duration
                                      = sp.GetService<ISection<CachingSection>>()?.Value.ThumbnailCacheDuration ?? 30;
-                                 return new(
+                                 return new FavIconDownloader(
                                      sp.GetService<ILogger<FavIconDownloader>>(),
                                      sp.GetService<IMemoryCache>(),
                                      TimeSpan.FromMinutes(duration),

@@ -21,7 +21,8 @@ public static class ProcessHelper
     [DllImport("user32.dll", SetLastError = true)]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-    [DllImport("user32.dll")] private static extern IntPtr WindowFromPoint(Win32Point point);
+    [DllImport("user32.dll")]
+    private static extern IntPtr WindowFromPoint(Win32Point point);
 
     /// <summary>
     ///     Retrieves the file path and description of the executable associated with the process
@@ -53,10 +54,12 @@ public static class ProcessHelper
         catch (Win32Exception ex)
         {
             if (ex.ErrorCode.ToString("X") == "80004005")
+            {
                 throw new NotSupportedException(
                     "You don't have sufficient right to access the process. You probably must have administration rights for this application, which is not yet supported.",
                     ex
                 );
+            }
 
             throw new NotSupportedException($"Cannot find the executable path: {ex.Message}", ex);
         }

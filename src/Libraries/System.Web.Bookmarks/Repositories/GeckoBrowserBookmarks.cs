@@ -13,7 +13,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
 {
     #region Fields
 
-    private  readonly string _bookmarksPath;
+    private readonly string _bookmarksPath;
     private readonly ILogger<GeckoBrowserBookmarks> _logger;
 
     private readonly IMemoryCache _memoryCache;
@@ -48,7 +48,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
     #region Properties
 
     /// <inheritdoc />
-    public string CacheKey { get;  }
+    public string CacheKey { get; }
 
     #endregion
 
@@ -56,7 +56,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
 
     private IEnumerable<Bookmark> FetchAll()
     {
-        if (_bookmarksPath.IsNullOrWhiteSpace()) return [];
+        if (_bookmarksPath.IsNullOrWhiteSpace()) { return []; }
 
         const string sql = """
                            select 

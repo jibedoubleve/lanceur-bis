@@ -22,7 +22,7 @@ public class SqlAliasBuilder : SqlBuilderBase
         AppendAlias();
     }
 
-    private  SqlAliasBuilder() { }
+    private SqlAliasBuilder() { }
 
     #endregion
 
@@ -43,7 +43,8 @@ public class SqlAliasBuilder : SqlBuilderBase
 
     public SqlAliasBuilder WithAdditionalParameters(params (string Name, string Argument)[] parameters)
     {
-        if (parameters.Length == 0) parameters = [($"{RandomString}", $"{RandomString}")];
+        if (parameters.Length == 0) { parameters = [($"{RandomString}", $"{RandomString}")]; }
+
         foreach (var parameter in parameters)
         {
             const string sql = "insert into alias_argument (id_alias, name, argument) values ({0}, '{1}', '{2}');";
@@ -151,7 +152,10 @@ public class SqlAliasBuilder : SqlBuilderBase
             return this;
         }
 
-        foreach (var name in names) Sql.AppendLine(sql.Format(name, _idAlias));
+        foreach (var name in names)
+        {
+            Sql.AppendLine(sql.Format(name, _idAlias));
+        }
 
         return this;
     }

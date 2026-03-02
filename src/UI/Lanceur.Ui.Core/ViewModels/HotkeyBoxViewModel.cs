@@ -22,10 +22,14 @@ public partial class HotkeyBoxViewModel : ObservableObject
         get
         {
             var modifierKeys = ModifierKeys.None;
-            if (IsAlt) modifierKeys |= ModifierKeys.Alt;
-            if (IsCtrl) modifierKeys |= ModifierKeys.Control;
-            if (IsShift) modifierKeys |= ModifierKeys.Shift;
-            if (IsWin) modifierKeys |= ModifierKeys.Windows;
+            if (IsAlt) { modifierKeys |= ModifierKeys.Alt; }
+
+            if (IsCtrl) { modifierKeys |= ModifierKeys.Control; }
+
+            if (IsShift) { modifierKeys |= ModifierKeys.Shift; }
+
+            if (IsWin) { modifierKeys |= ModifierKeys.Windows; }
+
             return modifierKeys;
         }
     }

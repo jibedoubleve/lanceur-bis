@@ -13,16 +13,32 @@ public class TestOutputHelperDecoratorForMicrosoftLogging<T> : BaseTestOutputHel
 
     #region Constructors
 
-    public TestOutputHelperDecoratorForMicrosoftLogging(ITestOutputHelper output) : base(output) => _logger = new(output);
+    public TestOutputHelperDecoratorForMicrosoftLogging(ITestOutputHelper output) : base(output)
+        => _logger = new TestOutputHelperDecoratorForMicrosoftLogging(output);
 
     #endregion
 
     #region Methods
 
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull => new TestOutputHelperDisposable(state, Write);
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull
+        => new TestOutputHelperDisposable(state, Write);
+
     public bool IsEnabled(LogLevel logLevel) => true;
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter) => _logger.Log(logLevel, eventId, state, exception, formatter);
+    public void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception? exception,
+        Func<TState, Exception?, string> formatter
+    )
+        => _logger.Log(
+            logLevel,
+            eventId,
+            state,
+            exception,
+            formatter
+        );
 
     #endregion
 }
@@ -37,9 +53,8 @@ public class TestOutputHelperDecoratorForMicrosoftLogging : BaseTestOutputHelper
 
     #region Methods
 
-    private static string ToShortLevel(LogLevel logLevel)
-    {
-        return logLevel switch
+    private static string ToShortLevel(LogLevel logLevel) =>
+        logLevel switch
         {
             LogLevel.Trace       => "Trace",
             LogLevel.Debug       => "Debug",
@@ -50,13 +65,19 @@ public class TestOutputHelperDecoratorForMicrosoftLogging : BaseTestOutputHelper
             LogLevel.None        => "     ",
             _                    => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null)
         };
-    }
 
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull => new TestOutputHelperDisposable(state, Write);
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull
+        => new TestOutputHelperDisposable(state, Write);
 
     public bool IsEnabled(LogLevel logLevel) => true;
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    public void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception? exception,
+        Func<TState, Exception?, string> formatter
+    )
     {
         var message = formatter(state, exception);
         var parameters = new object[] { eventId, ToShortLevel(logLevel), message };

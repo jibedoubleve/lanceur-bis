@@ -25,7 +25,7 @@ public class CircularQueue<T> : IEnumerable<T>
     public CircularQueue(int maxSize)
     {
         _maxSize = maxSize;
-        _queue = new(maxSize);
+        _queue = new Queue<T>(maxSize);
     }
 
     #endregion
@@ -61,7 +61,7 @@ public class CircularQueue<T> : IEnumerable<T>
     /// <param name="item">The item to add to the queue.</param>
     public void Enqueue(T item)
     {
-        if (_queue.Count >= _maxSize) _queue.Dequeue();
+        if (_queue.Count >= _maxSize) { _queue.Dequeue(); }
 
         _queue.Enqueue(item);
     }

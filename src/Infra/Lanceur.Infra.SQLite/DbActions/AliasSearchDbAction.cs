@@ -36,7 +36,7 @@ public class AliasSearchDbAction
     {
         using var _ = _logger.WarnIfSlow(this);
 
-        if (name.IsNullOrEmpty() && !isReturnAllIfEmpty) return Array.Empty<AliasQueryResult>();
+        if (name.IsNullOrEmpty() && !isReturnAllIfEmpty) { return Array.Empty<AliasQueryResult>(); }
 
         var sql = $"""
                    select
@@ -64,10 +64,13 @@ public class AliasSearchDbAction
                        
                    """;
         if (!name.IsNullOrEmpty())
+        {
             sql += """
                       an.Name like @name
                       and 
                    """;
+        }
+
         sql += """
                a.deleted_at is null
                    and a.hidden = 0

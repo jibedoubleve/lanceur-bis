@@ -1,4 +1,5 @@
 using System.Security.Principal;
+using Windows.ApplicationModel;
 using Windows.Management.Deployment;
 
 namespace Lanceur.Infra.Win32.Services;
@@ -8,9 +9,9 @@ public class AbstractPackagedAppSearchService
     #region Fields
 
     private SecurityIdentifier? _currentUser;
-    private IEnumerable<Windows.ApplicationModel.Package>? _packages;
+    private IEnumerable<Package>? _packages;
 
-    #endregion Fields
+    #endregion
 
     #region Methods
 
@@ -20,17 +21,17 @@ public class AbstractPackagedAppSearchService
         return _currentUser;
     }
 
-    protected IEnumerable<Windows.ApplicationModel.Package> GetUserPackages()
+    protected IEnumerable<Package> GetUserPackages()
     {
-        if (_packages is not null) return _packages.ToArray();
+        if (_packages is not null) { return _packages.ToArray(); }
 
         var user = GetCurrentUser();
-        if (user is null) return [];
+        if (user is null) { return []; }
 
         return _packages ??= new PackageManager().FindPackagesForUser(user.Value)
                                                  .Where(e => e is not null)
                                                  .OrderBy(e => e.DisplayName);
     }
 
-    #endregion Methods
+    #endregion
 }

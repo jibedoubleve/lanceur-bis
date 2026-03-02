@@ -34,7 +34,7 @@ public class AliasSaveDbAction
 
         alias.SanitizeSynonyms();
         alias.SanitizeFileName();
-       
+
         using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
 
         _dbActionFactory.AliasManagement.SaveOrUpdate(tx, ref alias);

@@ -33,7 +33,8 @@ public partial class WebClipboardReplacement : IReplacement
 
     #region Methods
 
-    [GeneratedRegex(@"\$[Cc]\$")] private static partial Regex GetRegex();
+    [GeneratedRegex(@"\$[Cc]\$")]
+    private static partial Regex GetRegex();
 
     /// <inheritdoc />
     public string Replace(string newText, string replacement)

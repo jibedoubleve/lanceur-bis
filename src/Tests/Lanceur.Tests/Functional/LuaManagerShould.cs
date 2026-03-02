@@ -1,9 +1,9 @@
-using Shouldly;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;
@@ -20,6 +20,38 @@ public class LuaManagerShould
     #endregion
 
     #region Methods
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("dev", "output_dev")]
+    [InlineData("test", "output_test")]
+    [InlineData("prod", "output_prod")]
+    public void GetExpectedFileNameAfterScriptExecution(string parameter, string expectedFilename)
+    {
+        // arrange
+        const string luaScript = """
+                                 if context.Parameters == "dev" then
+                                     context.FileName = "output_dev"
+                                     return context
+                                 end
+                                 if context.Parameters == "test" then
+                                     context.FileName = "output_test"
+                                     return context
+                                 end
+                                 if context.Parameters == "prod" then
+                                     context.FileName = "output_prod"
+                                     return context
+                                 end
+                                 """;
+
+        var result = LuaManager.ExecuteScript(
+            new Script { Code = luaScript, Context = new ScriptContext { FileName = "", Parameters = parameter } }
+        );
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldBe(expectedFilename)
+        );
+    }
 
     [Theory]
     [InlineData("", "")]
@@ -46,7 +78,7 @@ public class LuaManagerShould
                                  """;
 
         var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName = url, Parameters = parameter } }
+            new Script { Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = parameter } }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),
@@ -54,44 +86,12 @@ public class LuaManagerShould
             r => r.Context.Parameters.ShouldBe(expectedParameter)
         );
     }
-    
-    [Theory]
-    [InlineData("", "")]
-    [InlineData("dev", "output_dev")]
-    [InlineData("test", "output_test")]
-    [InlineData("prod", "output_prod")]
-    public void GetExpectedFileNameAfterScriptExecution(string parameter, string expectedFilename)
-    {
-        // arrange
-        const string luaScript = """
-                                 if context.Parameters == "dev" then
-                                     context.FileName = "output_dev"
-                                     return context
-                                 end
-                                 if context.Parameters == "test" then
-                                     context.FileName = "output_test"
-                                     return context
-                                 end
-                                 if context.Parameters == "prod" then
-                                     context.FileName = "output_prod"
-                                     return context
-                                 end
-                                 """;
-
-        var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName = "", Parameters = parameter } }
-        );
-        result.ShouldSatisfyAllConditions(
-            r => r.ShouldNotBeNull(),
-            r => r.Context.FileName.ShouldBe(expectedFilename)
-        );
-    }
 
     [Fact]
     public void NotCrashWhenScriptIsNull()
     {
         var result = LuaManager.ExecuteScript(
-            new() { Code = null, Context = new() { FileName = null, Parameters = null } }
+            new Script { Code = null, Context = new ScriptContext { FileName = null, Parameters = null } }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),
@@ -108,7 +108,10 @@ public class LuaManagerShould
         const string luaScript = "this is a failing script";
 
         var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName   = url, Parameters = "unhandled_case" } }
+            new Script
+            {
+                Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = "unhandled_case" }
+            }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),
@@ -127,7 +130,7 @@ public class LuaManagerShould
         const string luaScript = "return 145";
 
         var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName   = url, Parameters = parameters } }
+            new Script { Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = parameters } }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),

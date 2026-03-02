@@ -14,7 +14,8 @@ public static class ScriptRepository
     ///     The pattern used to identify embedded SQL script resources.
     ///     It matches file names in the format: script-X.X.X.sql.
     /// </summary>
-    public const string DbScriptEmbeddedResourcePattern = @"Lanceur\.Scripts\.SQL\.script-(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*.sql";
+    public const string DbScriptEmbeddedResourcePattern
+        = @"Lanceur\.Scripts\.SQL\.script-(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*.sql";
 
     #endregion
 

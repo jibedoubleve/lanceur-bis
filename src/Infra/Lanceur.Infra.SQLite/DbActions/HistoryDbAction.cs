@@ -77,7 +77,7 @@ internal class HistoryDbAction
 
     internal IEnumerable<DataPoint<DateTime, double>> PerDay(int? year)
     {
-        if (year is null) return PerDay();
+        if (year is null) { return PerDay(); }
 
         const string sql = """
                            select
@@ -96,7 +96,7 @@ internal class HistoryDbAction
 
     internal IEnumerable<DataPoint<DateTime, double>> PerDayOfWeek(int? year)
     {
-        if (year is null) return PerDayOfWeek();
+        if (year is null) { return PerDayOfWeek(); }
 
         const string sql = """
                            select
@@ -145,7 +145,7 @@ internal class HistoryDbAction
 
     internal IEnumerable<DataPoint<DateTime, double>> PerHour(int? year)
     {
-        if (year is null) return PerHour();
+        if (year is null) { return PerHour(); }
 
         const string sql = """
                            select
@@ -178,7 +178,7 @@ internal class HistoryDbAction
 
     internal IEnumerable<DataPoint<DateTime, double>> PerMonth(int? year)
     {
-        if (year is null) return PerMonth();
+        if (year is null) { return PerMonth(); }
 
         const string sql = """
                            select
@@ -199,7 +199,7 @@ internal class HistoryDbAction
 
     internal IEnumerable<DataPoint<DateTime, double>> PerYear(int? year)
     {
-        if (year is null) return PerYear();
+        if (year is null) { return PerYear(); }
 
         const string sql = """
                            select

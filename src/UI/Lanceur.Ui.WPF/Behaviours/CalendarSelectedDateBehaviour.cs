@@ -13,7 +13,7 @@ public class CalendarSelectedDateBehaviour : Behavior<Calendar>
         nameof(Command),
         typeof(ICommand),
         typeof(CalendarSelectedDateBehaviour),
-        new(default(ICommand))
+        new PropertyMetadata(default(ICommand))
     );
 
     #endregion
@@ -33,12 +33,12 @@ public class CalendarSelectedDateBehaviour : Behavior<Calendar>
     private void OnSelectedDateChanged(object? sender, SelectionChangedEventArgs e)
     {
         var date = e.AddedItems.Count > 0 ? e.AddedItems[0] as DateTime? : null;
-        if (Command?.CanExecute(date) == true) Command.Execute(date);
+        if (Command?.CanExecute(date) == true) { Command.Execute(date); }
     }
 
-    protected override void OnAttached() { AssociatedObject.SelectedDatesChanged += OnSelectedDateChanged; }
+    protected override void OnAttached() => AssociatedObject.SelectedDatesChanged += OnSelectedDateChanged;
 
-    protected override void OnDetaching() { AssociatedObject.SelectedDatesChanged -= OnSelectedDateChanged; }
+    protected override void OnDetaching() => AssociatedObject.SelectedDatesChanged -= OnSelectedDateChanged;
 
     #endregion
 }

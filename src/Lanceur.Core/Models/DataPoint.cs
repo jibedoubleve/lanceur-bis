@@ -7,5 +7,5 @@ public class DataPoint<Tx, Ty>
     public Tx X { get; set; }
     public Ty Y { get; set; }
 
-    #endregion Properties
+    #endregion
 }

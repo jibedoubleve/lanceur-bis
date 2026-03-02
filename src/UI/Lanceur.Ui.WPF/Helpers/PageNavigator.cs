@@ -10,8 +10,9 @@ public class PageNavigator
 {
     #region Fields
 
-    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<PageNavigator> _logger;
+
+    private readonly IServiceProvider _serviceProvider;
 
     #endregion
 
@@ -30,14 +31,13 @@ public class PageNavigator
     public void NavigateToSettings<TView>() where TView : Page
     {
         var windows = Application.Current.Windows.OfType<SettingsView>().ToArray();
-        var view  = windows.Length != 0
+        var view = windows.Length != 0
             ? windows[0]
             : _serviceProvider.GetService<SettingsView>()!;
-        
+
         _logger.LogDebug("Navigating to settings subview {View}", view.GetType().FullName);
         view.Show();
         view.Navigate<TView>();
-        
     }
 
     #endregion

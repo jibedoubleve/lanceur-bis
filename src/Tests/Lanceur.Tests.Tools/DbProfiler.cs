@@ -54,42 +54,36 @@ public class DbProfiler : IDbProfiler
         log(sql, parameters);
     }
 
-    public void ExecuteFinish(IDbCommand profiledDbCommand, SqlExecuteType executeType, DbDataReader? reader)
-    {
+    public void ExecuteFinish(IDbCommand profiledDbCommand, SqlExecuteType executeType, DbDataReader? reader) =>
         Log(
             profiledDbCommand,
-            (sql, parameters) =>
-            {
+            (sql, parameters) => {
                 _outputHelper.WriteLine($"==== Finished executing command of type {executeType}.");
                 _outputHelper.WriteLine(Template, sql, string.Join(Environment.NewLine, parameters));
             }
         );
-    }
 
-    public void ExecuteStart(IDbCommand profiledDbCommand, SqlExecuteType executeType)
-    {
+    public void ExecuteStart(IDbCommand profiledDbCommand, SqlExecuteType executeType) =>
         Log(
             profiledDbCommand,
-            (sql, parameters) =>
-            {
+            (sql, parameters) => {
                 _outputHelper.WriteLine($"==== Start executing command of type {executeType}.");
                 _outputHelper.WriteLine(Template, sql, string.Join(Environment.NewLine, parameters));
             }
         );
-    }
 
-    public void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception) => Log(
-        profiledDbCommand,
-        (sql, parameters) =>
-        {
-            _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            _outputHelper.WriteLine(@"/!\/!\/!\  ERROR OCCURED /!\/!\/!\");
-            _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            _outputHelper.WriteLine(Template, sql, parameters);
-        }
-    );
+    public void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception)
+        => Log(
+            profiledDbCommand,
+            (sql, parameters) => {
+                _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                _outputHelper.WriteLine(@"/!\/!\/!\  ERROR OCCURED /!\/!\/!\");
+                _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                _outputHelper.WriteLine(Template, sql, parameters);
+            }
+        );
 
-    public void ReaderFinish(IDataReader reader) { _outputHelper.WriteLine("Reader finished."); }
+    public void ReaderFinish(IDataReader reader) => _outputHelper.WriteLine("Reader finished.");
 
     #endregion
 }

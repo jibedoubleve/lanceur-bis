@@ -14,10 +14,12 @@ public static class GithubSectionExtensions
 
 public class GithubSection
 {
-    public GithubSection()
-    {
-        Tag = "ungroomed";
-    }
+    #region Constructors
+
+    public GithubSection() => Tag = "ungroomed";
+
+    #endregion
+
     #region Properties
 
     /// <summary>

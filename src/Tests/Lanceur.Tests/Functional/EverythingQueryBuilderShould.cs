@@ -1,5 +1,5 @@
-using Shouldly;
 using Lanceur.Infra.Stores.Everything;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;
@@ -9,19 +9,19 @@ public class EverythingQueryBuilderShould
     #region Methods
 
     [Fact]
-    public void ExcludeHiddenFiles()
-    {
-        const string query = $"!{EverythingModifiers.IncludeHiddenFilesSwitch}";
-        var adapter = new EverythingQueryAdapter(query);
-        adapter.IsHiddenFilesExcluded.ShouldBeTrue();
-    }
-    
-    [Fact]
     public void ExcludeFilesInTrashBin()
     {
         const string query = EverythingModifiers.ExcludeFileInTrashBin;
         var adapter = new EverythingQueryAdapter(query);
         adapter.IsFilesInTrashBinExcluded.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void ExcludeHiddenFiles()
+    {
+        const string query = $"!{EverythingModifiers.IncludeHiddenFilesSwitch}";
+        var adapter = new EverythingQueryAdapter(query);
+        adapter.IsHiddenFilesExcluded.ShouldBeTrue();
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class EverythingQueryBuilderShould
         var adapter = new EverythingQueryAdapter(query);
         adapter.IsSystemFilesExcluded.ShouldBeTrue();
     }
-    
+
     [Fact]
     public void NotExcludeExecFiles()
     {
@@ -63,7 +63,9 @@ public class EverythingQueryBuilderShould
                                                 .ExcludeHiddenFiles()
                                                 .OnlyExecFiles()
                                                 .BuildQuery();
-        query.ShouldBe($"!{EverythingModifiers.IncludeSystemFilesSwitch} !{EverythingModifiers.IncludeHiddenFilesSwitch} {EverythingModifiers.OnlyExecFilesSwitch}");
+        query.ShouldBe(
+            $"!{EverythingModifiers.IncludeSystemFilesSwitch} !{EverythingModifiers.IncludeHiddenFilesSwitch} {EverythingModifiers.OnlyExecFilesSwitch}"
+        );
     }
 
     [Fact]

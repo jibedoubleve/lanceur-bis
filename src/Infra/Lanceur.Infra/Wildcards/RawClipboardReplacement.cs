@@ -31,7 +31,8 @@ public partial class RawClipboardReplacement : IReplacement
 
     #region Methods
 
-    [GeneratedRegex(@"\$[rR]\$")] private static partial Regex GetRegex();
+    [GeneratedRegex(@"\$[rR]\$")]
+    private static partial Regex GetRegex();
 
     /// <inheritdoc />
     public string Replace(string newText, string replacement)

@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
@@ -13,7 +12,6 @@ using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.Infra.Stores;
 using Lanceur.Infra.Win32.Helpers;
-using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
@@ -41,8 +39,7 @@ public partial class App
     private static readonly IHost Host
         = Microsoft.Extensions.Hosting.Host
                    .CreateDefaultBuilder()
-                   .ConfigureServices((context, services) =>
-                       {
+                   .ConfigureServices((context, services) => {
                            services.AddTrackedMemoryCache()
                                    .RegisterView("Lanceur.Ui.WPF")
                                    .RegisterViewModel("Lanceur.Ui.Core")
@@ -58,9 +55,8 @@ public partial class App
                                    .AddLoggers();
                        }
                    )
-                   .ConfigureAppConfiguration((context, config) =>
-                       {
-                           if (context.HostingEnvironment.IsDevelopment()) config.AddUserSecrets<App>();
+                   .ConfigureAppConfiguration((context, config) => {
+                           if (context.HostingEnvironment.IsDevelopment()) { config.AddUserSecrets<App>(); }
                        }
                    )
                    .Build();
@@ -118,41 +114,37 @@ public partial class App
         );
     }
 
-    private static void RegisterToastNotifications()
-    {
-        ToastNotificationManagerCompat.OnActivated += toastArgs =>
-        {
+    private static void RegisterToastNotifications() =>
+        ToastNotificationManagerCompat.OnActivated += toastArgs => {
             var arguments = ToastArguments.Parse(toastArgs.Argument);
-            if (arguments.Count == 0) return;
+            if (arguments.Count == 0) { return; }
 
             Action action = arguments["Type"] switch
             {
                 // ---- Show logs on error ----
-                ToastNotificationArguments.ClickShowError => () =>
-                {
+                ToastNotificationArguments.ClickShowError => () => {
                     var view = Host.Services.GetService<ExceptionView>()!;
                     view.ExceptionMessage.Text = arguments["Message"];
                     view.ExceptionTrace.Text = arguments["StackTrace"];
                     view.Show();
                 },
-                ToastNotificationArguments.ClickShowLogs  => () 
+                ToastNotificationArguments.ClickShowLogs => ()
                     => WindowsShell.StartExplorer(Paths.LogRepository),
                 // ---- Restart application ----
                 ToastNotificationArguments.ClickRestart => ()
                     => Host.Services.GetRequiredService<IAppRestartService>().Restart(),
                 // ---- Visit Website ----
-                ToastNotificationArguments.VisitWebsite => () 
+                ToastNotificationArguments.VisitWebsite => ()
                     => WindowsShell.StartExplorer(Paths.ReleasesUrl),
                 // ---- Skip current version ----
-                ToastNotificationArguments.SkipVersion => () =>
-                {
+                ToastNotificationArguments.SkipVersion => () => {
                     var settings = Host.Services.GetRequiredService<IConfigurationFacade>();
                     settings.Application.Github.SnoozeVersionCheck = true;
-                    settings.Application.Github.LastCheckedVersion = new(arguments["Version"]);
+                    settings.Application.Github.LastCheckedVersion = new Version(arguments["Version"]);
                     settings.Save();
                 },
                 // ---- Navigate to Url ----
-                ToastNotificationArguments.ClickNavigateIssue => () 
+                ToastNotificationArguments.ClickNavigateIssue => ()
                     => WindowsShell.StartExplorer(arguments["Url"]),
                 // ---- Default  ----
                 _ => () => Log.Warning(
@@ -162,10 +154,9 @@ public partial class App
             };
 
             Current.Dispatcher.Invoke(
-                delegate { action.Invoke(); }
+                delegate{ action.Invoke(); }
             );
         };
-    }
 
     protected override void OnExit(ExitEventArgs e)
     {
@@ -196,9 +187,8 @@ public partial class App
 
         /* Only one instance allowed in prod...
          */
-        ConditionalExecution.ExecuteOnRelease(() =>
-            {
-                if (SingleInstance.WaitOne()) return;
+        ConditionalExecution.ExecuteOnRelease(() => {
+                if (SingleInstance.WaitOne()) { return; }
 
                 const string msg = "The application is already running.";
                 MessageBox.Show(
@@ -210,7 +200,7 @@ public partial class App
                 Environment.Exit(0);
             }
         );
-        
+
         /* Display application version in the logs
          */
         logger.LogVersion(Assembly.GetExecutingAssembly());
@@ -228,7 +218,7 @@ public partial class App
         var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
 
         var hk = new Conditional<HotKeySection>(
-            new((int)(ModifierKeys.Windows | ModifierKeys.Alt), (int)Key.P),
+            new HotKeySection((int)(ModifierKeys.Windows | ModifierKeys.Alt), (int)Key.P),
             hotKeyService.HotKey
         );
 
@@ -236,7 +226,7 @@ public partial class App
         while (!success)
         {
             (success, var hotkey) = RegisterHandler(logger, hotKeyService, mainView);
-            if (success) continue;
+            if (success) { continue; }
 
             // Should be only useful in debug mode as Mutex should avoid this situation...
             var errorMessage = $"The shortcut '{hotkey.ToStringHotKey()}' is already registered.";
@@ -250,7 +240,7 @@ public partial class App
 
         /* Now all preliminary stuff is done, let's start the application
          */
-        if (mainView.ViewModel.ShowAtStartup) mainView.ShowOnStartup();
+        if (mainView.ViewModel.ShowAtStartup) { mainView.ShowOnStartup(); }
 
         /* Check if new Version
          */
@@ -258,9 +248,8 @@ public partial class App
         _ = Host.Services.GetRequiredService<IReleaseService>()
                 .HasUpdateAsync()
                 .ContinueWith(
-                    context =>
-                    {
-                        if (!context.Result.HasUpdate || settings.Application.Github.SnoozeVersionCheck) return;
+                    context => {
+                        if (!context.Result.HasUpdate || settings.Application.Github.SnoozeVersionCheck) { return; }
 
                         // A new version has been release, notify user...
                         Host.Services.GetService<UpdateNotification>()!

@@ -2,13 +2,17 @@ namespace Everything.Wrapper;
 
 public interface IEverythingApi
 {
+    #region Methods
+
     /// <summary>
-    /// Search files that matches the specified query
+    ///     Search files that matches the specified query
     /// </summary>
     /// <param name="query">Query for the search</param>
     /// <returns>The result of the query</returns>
     /// <remarks>
-    /// If you activate the icons, then the query is <c>much</c> slower.
+    ///     If you activate the icons, then the query is <c>much</c> slower.
     /// </remarks>
     ResultSet Search(string query);
+
+    #endregion
 }

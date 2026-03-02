@@ -1,6 +1,6 @@
 namespace Lanceur.Tests.Tools.SQL;
 
-public  class Sql : ISqlBuilder
+public class Sql : ISqlBuilder
 {
     #region Constructors
 

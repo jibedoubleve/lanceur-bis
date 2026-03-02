@@ -1,11 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
-using Shouldly;
-using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
-using Lanceur.Core.Requests;
-using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -22,6 +18,7 @@ using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
@@ -56,7 +53,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AddMockSingleton<IUserNotificationService>((sp, i)
                              => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IProcessLauncher>((sp, i) 
+                         .AddMockSingleton<IProcessLauncher>((sp, i)
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
@@ -73,8 +70,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                   .AppendAlias(a => a.WithSynonyms())
                   .AppendAlias(a => a.WithSynonyms());
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 // ARRANGE
                 const string name = "add";
                 const string parameters = "aliasToCreate";
@@ -99,11 +95,9 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     }
 
     [Fact]
-    public async Task CreateAliasWithLuaScript()
-    {
+    public async Task CreateAliasWithLuaScript() =>
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 // ARRANGE
                 const string name = "SomeTestName";
                 const string script = "some random text that represent a lua script";
@@ -130,7 +124,6 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             },
             Sql.Empty
         );
-    }
 
     [Fact]
     public async Task CreateAliasWorkOnSecondNavigation()
@@ -140,8 +133,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AppendAlias(a => a.WithSynonyms())
                          .AppendAlias(a => a.WithSynonyms());
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 // ARRANGE
                 const string cmdName = "add";
                 const string parameters = "aliasToCreate";
@@ -150,7 +142,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 // ACT
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate navigate to this page once
 
-                viewModel.CreateAliasCommand.Execute(new(cmdline));
+                viewModel.CreateAliasCommand.Execute(new AddAliasMessage(cmdline));
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
 
                 // ASSERT
@@ -171,8 +163,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     {
         var visitors = new ServiceVisitors
         {
-            VisitUserInteractionService = (_, i) =>
-            {
+            VisitUserInteractionService = (_, i) => {
                 // Configured to say yes when it'll be asked to delete the alias
                 i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
@@ -181,8 +172,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         };
 
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 // ARRANGE
                 const string name = "SomeTestName";
                 const string fileName = "SomeFileName";
@@ -203,7 +193,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                                    from alias a 
                                    inner join alias_name an on a.id = an.id_alias 
                                    """;
-                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[]) [name] }))
+                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[])[name] }))
                                .ToArray();
 
                 result.ShouldSatisfyAllConditions(
@@ -250,8 +240,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
-            {
+            VisitUserInteractionService = (_, i) => {
                 var parameter = new AdditionalParameter { Name = "SomeTestName", Parameter = "SomeParameter" };
                 i.InteractAsync(
                      Arg.Any<object>(),
@@ -265,8 +254,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             }
         };
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 // ARRANGE
                 const string name = "SomeTestName";
 
@@ -297,8 +285,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                          .AppendAlias(a => a.WithSynonyms())
                          .AppendAlias(a => a.WithSynonyms());
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 // ARRANGE
 
                 // ACT
@@ -318,13 +305,11 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         IUserNotificationService userNotificationService = null;
         var visitors = new ServiceVisitors
         {
-            VisitUserNotificationService = (_, i) =>
-            {
+            VisitUserNotificationService = (_, i) => {
                 userNotificationService = i;
                 return i;
             },
-            VisitUserInteractionService = (_, i) =>
-            {
+            VisitUserInteractionService = (_, i) => {
                 // Configured to say yes when it'll be asked to delete the alias
                 i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
@@ -333,16 +318,15 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         };
 
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 // ARRANGE
                 const string name = "SomeTestName";
                 const string fileName = "SomeFileName";
 
                 // ACT
-                await viewModel.CreateNewAlias(name, fileName);               // Create alias
+                await viewModel.CreateNewAlias(name, fileName); // Create alias
                 await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null); // Delete alias
-                await viewModel.CreateNewAlias(name, fileName);               // Recreate the alias
+                await viewModel.CreateNewAlias(name, fileName); // Recreate the alias
 
                 // ASSERT
                 const string sql = """
@@ -383,8 +367,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) =>
-            {
+            VisitUserInteractionService = (_, i) => {
                 var parameter = new MultipleAdditionalParameterViewModel { RawParameters = additionalParameters };
                 i.InteractAsync(
                      Arg.Any<object>(),
@@ -398,8 +381,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             }
         };
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 // ARRANGE
                 const string name = "SomeTestName";
 
@@ -423,8 +405,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     {
         var visitors = new ServiceVisitors
         {
-            VisitUserInteractionService = (_, i) =>
-            {
+            VisitUserInteractionService = (_, i) => {
                 // Configured to say yes when it'll be asked to delete the alias
                 i.InteractAsync(
                      Arg.Any<object>(),
@@ -438,8 +419,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             }
         };
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 // ARRANGE
                 const string name = "SomeTestName";
 
@@ -471,8 +451,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                                       );
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
                 viewModel.Aliases.Count.ShouldBe(2);
 
@@ -491,8 +470,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     {
         var visitors = new ServiceVisitors
         {
-            VisitUserInteractionService = (_, i) =>
-            {
+            VisitUserInteractionService = (_, i) => {
                 // Configured to say yes when it'll be asked to delete the alias
                 i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
@@ -501,8 +479,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
         };
 
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 // ARRANGE
                 const string name = "SomeTestName";
                 const string fileName = "SomeFileName";
@@ -521,11 +498,9 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     }
 
     [Fact]
-    public async Task UpdateAliasWithLuaScript()
-    {
+    public async Task UpdateAliasWithLuaScript() =>
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 // ARRANGE
                 const string name = "SomeTestName";
                 const string script = "some random text that represent a lua script";
@@ -557,7 +532,6 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             },
             Sql.Empty
         );
-    }
 
     #endregion
 }

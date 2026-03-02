@@ -7,8 +7,9 @@ public interface IAliasValidationService
 {
     #region Methods
 
-    ValidationStatus IsFileNameValid(object fileName);
     ValidationStatus AreNamesUnique(object names, long idAlias);
+
+    ValidationStatus IsFileNameValid(object fileName);
     ValidationStatus IsNameValid(object name);
     ValidationStatus IsValid(AliasQueryResult alias);
 

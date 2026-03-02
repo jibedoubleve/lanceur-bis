@@ -1,3 +1,4 @@
+using System.Windows.Media;
 using ICSharpCode.AvalonEdit.CodeCompletion;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Editing;
@@ -15,7 +16,7 @@ public class LuaCompletionData : ICompletionData
         Priority = priority;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
@@ -23,11 +24,11 @@ public class LuaCompletionData : ICompletionData
     public object Content => Text;
 
     public object? Description { get; }
-    public System.Windows.Media.ImageSource? Image => null;
+    public ImageSource? Image => null;
     public double Priority { get; }
     public string Text { get; }
 
-    #endregion Properties
+    #endregion
 
     #region Methods
 
@@ -35,10 +36,8 @@ public class LuaCompletionData : ICompletionData
         TextArea textArea,
         ISegment completionSegment,
         EventArgs insertionRequestEventArgs
-    )
-    {
+    ) =>
         textArea.Document.Replace(completionSegment, Text);
-    }
 
-    #endregion Methods
+    #endregion
 }

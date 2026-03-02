@@ -19,15 +19,13 @@ public class UserNotificationService : IUserNotificationService
     public void EnableLoadingState() => Mouse.OverrideCursor = Cursors.Wait;
 
     /// <inheritdoc />
-    public void Success(string message, string title = "Success") 
-        => Send(MessageLevel.Success, title, message);
+    public void Success(string message, string title = "Success") => Send(MessageLevel.Success, title, message);
 
     /// <inheritdoc />
     public IDisposable TrackLoadingState() => new WaitScope(this);
 
     /// <inheritdoc />
-    public void Warning(string message, string title = "Warning") 
-        => Send(MessageLevel.Warning, title, message);
+    public void Warning(string message, string title = "Warning") => Send(MessageLevel.Warning, title, message);
 
     #endregion
 
@@ -51,7 +49,7 @@ public class UserNotificationService : IUserNotificationService
 
         #region Methods
 
-        public void Dispose() { _userInteractionService.DisableLoadingState(); }
+        public void Dispose() => _userInteractionService.DisableLoadingState();
 
         #endregion
     }

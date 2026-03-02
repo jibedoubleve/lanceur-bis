@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>      
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
-    <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
-    <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
-    <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj" />
-    <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.5" />
-    <PackageReference Include="MartinCostello.Logging.XUnit.v3" Version="0.7.0" />
-    <PackageReference Include="MiniProfiler.Shared" Version="4.5.4" />
-    <PackageReference Include="NSubstitute" Version="5.3.0" />
-    <PackageReference Include="Shouldly" Version="4.3.0" />
-    <PackageReference Include="xunit.v3.assert" Version="3.2.2" />
-    <PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj"/>
+        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
+        <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj"/>
+        <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj"/>
+        <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Bogus" Version="35.6.5"/>
+        <PackageReference Include="MartinCostello.Logging.XUnit.v3" Version="0.7.0"/>
+        <PackageReference Include="MiniProfiler.Shared" Version="4.5.4"/>
+        <PackageReference Include="NSubstitute" Version="5.3.0"/>
+        <PackageReference Include="Shouldly" Version="4.3.0"/>
+        <PackageReference Include="xunit.v3.assert" Version="3.2.2"/>
+        <PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2"/>
+    </ItemGroup>
 </Project>

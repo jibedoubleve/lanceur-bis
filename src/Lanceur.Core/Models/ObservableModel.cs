@@ -10,10 +10,7 @@ public class ObservableModel : INotifyPropertyChanged
     /// <summary>
     ///     Properties that do not affect the dirty state when modified.
     /// </summary>
-    private static readonly IEnumerable<string> ExcludedProperties = [
-        nameof(IsDirty),
-        nameof(AliasQueryResult.Count)
-    ];
+    private static readonly IEnumerable<string> ExcludedProperties = [nameof(IsDirty), nameof(AliasQueryResult.Count)];
 
     #endregion
 
@@ -39,7 +36,7 @@ public class ObservableModel : INotifyPropertyChanged
     ///     The name of the property that changed. Automatically supplied by the compiler if not explicitly provided.
     /// </param>
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        => PropertyChanged?.Invoke(this, new(propertyName));
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
     ///     Updates the specified field with the provided value, triggers the <see cref="PropertyChanged" /> event
@@ -58,11 +55,11 @@ public class ObservableModel : INotifyPropertyChanged
     /// </returns>
     protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        if (EqualityComparer<T>.Default.Equals(field, value)) { return false; }
 
         field = value;
         OnPropertyChanged(propertyName);
-        if (ExcludedProperties.Contains(propertyName)) return false;
+        if (ExcludedProperties.Contains(propertyName)) { return false; }
 
         IsDirty = true;
         return true;

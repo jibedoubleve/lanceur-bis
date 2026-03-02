@@ -11,7 +11,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
 
-public partial class AnalyticsViewModel : ObservableObject
+public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
 {
     #region Fields
 
@@ -31,7 +31,11 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #region Constructors
 
-    public AnalyticsViewModel(ILogger<AnalyticsViewModel> logger, IAliasRepository aliasRepository, IMemoryCache memoryCache)
+    public AnalyticsViewModel(
+        ILogger<AnalyticsViewModel> logger,
+        IAliasRepository aliasRepository,
+        IMemoryCache memoryCache
+    )
     {
         _logger = logger;
         _aliasRepository = aliasRepository;
@@ -54,19 +58,19 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #region Methods
 
-    private ObservableCollection<string> GetYears(IEnumerable<DataPoint<DateTime, double>> points)
+    private static ObservableCollection<string> GetYears(IEnumerable<DataPoint<DateTime, double>> points)
     {
         var list = points.Select(e => e.X.Year.ToString())
                          .Distinct()
                          .ToList();
         list.Insert(0, SelectAll);
-        return new(list);
+        return new ObservableCollection<string>(list);
     }
 
     private void InvalidateCache(IEnumerable<DataPoint<DateTime, double>> points)
     {
         _cancellationCacheTokenSource.Cancel();
-        _cancellationCacheTokenSource = new(1.Minutes());
+        _cancellationCacheTokenSource = new CancellationTokenSource(1.Minutes());
         _memoryCache.Set(CacheKey, points, new CancellationChangeToken(_cancellationCacheTokenSource.Token));
     }
 
@@ -87,10 +91,11 @@ public partial class AnalyticsViewModel : ObservableObject
         InvalidateCache(points);
 
         IsMonthlyVisible = points.Any();
-        if (IsMonthlyVisible)
-            RedrawPlot(OnRefreshMonthlyPlot, points, PlotType.MonthlyHistory);
+        if (IsMonthlyVisible) { RedrawPlot(OnRefreshMonthlyPlot, points, PlotType.MonthlyHistory); }
         else // To be here means there's nothing to show, fallback is daily history...
+        {
             await OnRefreshDailyHistory();
+        }
     }
 
     [RelayCommand]
@@ -129,10 +134,11 @@ public partial class AnalyticsViewModel : ObservableObject
         InvalidateCache(points);
 
         IsMonthlyVisible = points.Any();
-        if (IsMonthlyVisible)
-            RedrawPlot(OnRefreshYearlyPlot, points, PlotType.YearlyHistory);
+        if (IsMonthlyVisible) { RedrawPlot(OnRefreshYearlyPlot, points, PlotType.YearlyHistory); }
         else // To be here means there's nothing to show, fallback is daily history...
+        {
             await OnRefreshDailyHistory();
+        }
     }
 
     [RelayCommand]
@@ -156,22 +162,28 @@ public partial class AnalyticsViewModel : ObservableObject
 
     private void RedrawLastTrendPlot(string yearStr)
     {
-        if (LastPlotContext is null) return;
+        if (LastPlotContext is null) { return; }
 
         int? year = int.TryParse(yearStr, out var yearValue) ? yearValue : null;
-        var per =  LastPlotContext.PlotType switch
+        var per = LastPlotContext.PlotType switch
         {
-            PlotType.UsageByHourOfDay =>  Per.HourOfDay,
+            PlotType.UsageByHourOfDay => Per.HourOfDay,
             PlotType.UsageByDayOfWeek => Per.DayOfWeek,
-            _                         => throw new ArgumentOutOfRangeException($"Plot '{LastPlotContext.PlotType}' is not supported for a trend plot refresh.")
+            _ => throw new ArgumentOutOfRangeException(
+                $"Plot '{LastPlotContext.PlotType}' is not supported for a trend plot refresh."
+            )
         };
         var points = _aliasRepository.GetUsage(per, year);
         RedrawPlot(LastPlotContext, points);
     }
 
-    private void RedrawPlot(PlotContext? plotContext, IEnumerable<DataPoint<DateTime, double>> dataPoints, [CallerMemberName] string? caller = null)
+    private void RedrawPlot(
+        PlotContext? plotContext,
+        IEnumerable<DataPoint<DateTime, double>> dataPoints,
+        [CallerMemberName] string? caller = null
+    )
     {
-        if (plotContext is null) return;
+        if (plotContext is null) { return; }
 
         RedrawPlot(
             plotContext.RedrawPlotAction,
@@ -193,8 +205,14 @@ public partial class AnalyticsViewModel : ObservableObject
         dateTimeToDoubleConverter ??= r => r.ToOADate();
         dataPoints = dataPoints.ToList();
 
-        if (LastPlotContext is null) Years = GetYears(dataPoints);
-        LastPlotContext = new() { DateTimeToDoubleConverter = dateTimeToDoubleConverter, PlotType = plotType, RedrawPlotAction = redrawPlotAction };
+        if (LastPlotContext is null) { Years = GetYears(dataPoints); }
+
+        LastPlotContext = new PlotContext
+        {
+            DateTimeToDoubleConverter = dateTimeToDoubleConverter,
+            PlotType = plotType,
+            RedrawPlotAction = redrawPlotAction
+        };
 
         _logger.LogDebug("[ViewModel] Refreshing plot {Caller}", caller);
         var points = dataPoints.ToArray();
@@ -206,7 +224,7 @@ public partial class AnalyticsViewModel : ObservableObject
 
     #endregion
 
-    private record PlotContext
+    private sealed record PlotContext
     {
         #region Properties
 
@@ -239,5 +257,11 @@ public partial class AnalyticsViewModel : ObservableObject
         }
 
         #endregion
+    }
+
+    public void Dispose()
+    {
+        _cancellationCacheTokenSource.Dispose();
+        _memoryCache.Dispose();
     }
 }

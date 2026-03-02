@@ -3,7 +3,6 @@ using System.Windows;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.WPF.ReservedAliases;
@@ -20,10 +19,7 @@ public class QuitAlias : SelfExecutableQueryResult
 
     #region Constructors
 
-    public QuitAlias(ILoggerFactory loggerFactory)
-    {
-        _logger = loggerFactory.GetLogger<QuitAlias>();
-    }
+    public QuitAlias(ILoggerFactory loggerFactory) => _logger = loggerFactory.GetLogger<QuitAlias>();
 
     #endregion
 

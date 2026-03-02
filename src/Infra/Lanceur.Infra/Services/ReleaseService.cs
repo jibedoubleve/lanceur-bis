@@ -9,8 +9,9 @@ public class ReleaseService : IReleaseService
 {
     #region Fields
 
-    private readonly ILogger<ReleaseService> _logger;
     private readonly IGithubService _githubService;
+
+    private readonly ILogger<ReleaseService> _logger;
 
     #endregion
 
@@ -41,7 +42,7 @@ public class ReleaseService : IReleaseService
         if (!Version.TryParse(tag, out var version))
         {
             _logger.LogWarning("The tag {Tag} is not a valid version number", tag);
-            return (false, new());
+            return (false, new Version());
         }
 
         return ConditionalExecution.Execute(

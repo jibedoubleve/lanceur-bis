@@ -12,11 +12,11 @@ public abstract class SQLiteRepositoryBase
         Db = manager;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     protected IDbConnectionManager Db { get; }
 
-    #endregion Properties
+    #endregion
 }

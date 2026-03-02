@@ -18,15 +18,15 @@ public class TextToParameterParser
         var parts = line.Split(",");
         if (parts.Length > 2)
         {
-            parameter = new();
+            parameter = new AdditionalParameter();
             return false;
         }
 
-        parameter =  new() { Name = parts[0].Trim(), Parameter = parts[1].Trim() };
+        parameter = new AdditionalParameter { Name = parts[0].Trim(), Parameter = parts[1].Trim() };
         return true;
     }
 
-   
+
     /// <summary>
     ///     Parses a block of text into a collection of <see cref="AdditionalParameter" /> objects.
     ///     Each line in the text is processed as an individual parameter.
@@ -39,7 +39,8 @@ public class TextToParameterParser
         var parameters = new List<AdditionalParameter>();
         foreach (var line in text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
         {
-            if (!TryParseLine(line, out var parameter)) return ParseResult.Failed();
+            if (!TryParseLine(line, out var parameter)) { return ParseResult.Failed(); }
+
             parameters.Add(parameter);
         }
 
@@ -70,9 +71,9 @@ public record ParseResult
 
     #region Methods
 
-    internal static ParseResult Succeeded(IEnumerable<AdditionalParameter> parameters) => new(parameters, true);
-
     internal static ParseResult Failed() => new(null, false);
+
+    internal static ParseResult Succeeded(IEnumerable<AdditionalParameter> parameters) => new(parameters, true);
 
     #endregion
 }

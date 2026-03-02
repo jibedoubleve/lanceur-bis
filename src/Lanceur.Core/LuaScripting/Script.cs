@@ -8,5 +8,5 @@ public class Script
 
     public ScriptContext Context { get; init; } = ScriptContext.Empty;
 
-    #endregion Properties
+    #endregion
 }

@@ -30,7 +30,7 @@ public class SQLiteAliasRepositoryShould : TestBase
     {
         var faker = new Faker();
         name ??= faker.Lorem.Word();
-        return new()
+        return new AliasQueryResult
         {
             Name = name,
             Synonyms = name,
@@ -53,7 +53,7 @@ public class SQLiteAliasRepositoryShould : TestBase
     private AliasSearchDbAction BuildAliasSearchDbAction()
     {
         var log = CreateLoggerFactory();
-        return new(log, new DbActionFactory(log));
+        return new AliasSearchDbAction(log, new DbActionFactory(log));
     }
 
     private SQLiteAliasRepository BuildDataService(IDbConnection connection)
@@ -181,8 +181,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        c.WithinTransaction(tx =>
-            {
+        c.WithinTransaction(tx => {
                 action.SaveOrUpdate(tx, ref alias1);
                 action.SaveOrUpdate(tx, ref alias2);
                 action.SaveOrUpdate(tx, ref alias3);
@@ -299,7 +298,8 @@ public class SQLiteAliasRepositoryShould : TestBase
         var alias = new AliasQueryResult { Id = 1, Name = "Alias" };
 
         // ACT
-        alias.AdditionalParameters.Add(new() { AliasId = 1, Name = "someName", Parameter = "someParameter" });
+        alias.AdditionalParameters.Add(new AdditionalParameter
+            { AliasId = 1, Name = "someName", Parameter = "someParameter" });
         dbAction.SaveOrUpdate(connection.BeginTransaction(), ref alias);
 
         // ASSERT
@@ -366,8 +366,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         // ARRANGE
         var name = Guid.NewGuid().ToString();
         var thumbnail = Guid.NewGuid().ToString();
-        var sql = new SqlBuilder().AppendAlias(a =>
-                                      {
+        var sql = new SqlBuilder().AppendAlias(a => {
                                           a.WithSynonyms(name)
                                            .WithThumbnail(thumbnail);
                                       }
@@ -401,8 +400,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var alias = BuildAlias();
 
         // ACT
-        c.WithinTransaction(tx =>
-            {
+        c.WithinTransaction(tx => {
                 action.SaveOrUpdate(tx, ref alias);
                 action.Remove(tx, alias);
             }
@@ -463,7 +461,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var action = BuildAliasDbAction();
 
         // ACT
-        c.WithinTransaction(tx => action.Remove(tx, new()  { Id = 256 }));
+        c.WithinTransaction(tx => action.Remove(tx, new AliasQueryResult { Id = 256 }));
 
         // ASSERT
         const string sql2 = "select count(*) from alias where id = 256";
@@ -493,7 +491,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var service = BuildDataService(connection);
 
         // ACT
-        service.RemoveLogically((AliasQueryResult)new() { Id = 256 });
+        service.RemoveLogically((AliasQueryResult)new AliasQueryResult { Id = 256 });
 
         // ASSERT
         const string sql2 = "select count(*) from alias where id = 256 and deleted_at is null";
@@ -541,7 +539,8 @@ public class SQLiteAliasRepositoryShould : TestBase
 
         var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
                                                      .WithThumbnail(thumbnail)
-                                  ).ToSql();
+                                  )
+                                  .ToSql();
         connection.Execute(sql);
 
         // ACT

@@ -57,7 +57,7 @@ public partial class MostUsedViewModel : ObservableObject
                            .ToList();
         yearStr.Insert(0, "All time usage");
 
-        Years = new(yearStr);
+        Years = new ObservableCollection<string>(yearStr);
     }
 
     [RelayCommand]
@@ -68,19 +68,19 @@ public partial class MostUsedViewModel : ObservableObject
 
         var aliases = await _cache.GetOrCreateAsync(
             CacheTag,
-            async Task<IEnumerable<UsageQueryResult>> (_) =>
-            {
+            async Task<IEnumerable<UsageQueryResult>> (_) => {
                 if (int.TryParse(SelectedYear, out var year))
-                    return await Task.Run(
-                        () =>   _repository.GetMostUsedAliasesByYear(year)
+                {
+                    return await Task.Run(() => _repository.GetMostUsedAliasesByYear(year)
                     );
+                }
 
                 return await Task.Run(() => _repository.GetMostUsedAliases());
             },
             CacheEntryOptions.Default
         );
 
-        Aliases = new(aliases ?? []);
+        Aliases = new ObservableCollection<UsageQueryResult>(aliases ?? []);
     }
 
     #endregion

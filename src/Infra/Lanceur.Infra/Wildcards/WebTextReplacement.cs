@@ -20,7 +20,8 @@ public partial class WebTextReplacement : IReplacement
 
     #region Methods
 
-    [GeneratedRegex(@"\$[Ww]\$")] private static partial Regex GetRegex();
+    [GeneratedRegex(@"\$[Ww]\$")]
+    private static partial Regex GetRegex();
 
     /// <inheritdoc />
     public string Replace(string newText, string replacement)

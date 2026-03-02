@@ -13,7 +13,9 @@ public record Cmdline
         Parameters = (parameters ?? "").Trim();
 
         if (Name.Contains(' '))
+        {
             throw new ArgumentException("The name of a cmdline cannot contain whitespaces.", nameof(name));
+        }
     }
 
     #endregion
@@ -46,16 +48,18 @@ public record Cmdline
         cmdline = (cmdline ?? string.Empty).Trim();
 
         if (CmdlineManager.HasSpecialName(cmdline))
-            return new(
+        {
+            return new Cmdline(
                 CmdlineManager.GetSpecialName(cmdline),
                 cmdline[1..]
             );
+        }
 
         var elements = cmdline.Split(" ");
-        if (elements.Length <= 0) return Empty;
+        if (elements.Length <= 0) { return Empty; }
 
         var name = elements[0];
-        return new(
+        return new Cmdline(
             name,
             cmdline[name.Length..]
         );
@@ -72,7 +76,7 @@ public static class CmdLineExtension
 
     public static bool IsEmpty(this Cmdline cmdline)
     {
-        if (cmdline is null) return true;
+        if (cmdline is null) { return true; }
 
         return cmdline.Name.IsNullOrEmpty() && !cmdline.HasParameters;
     }

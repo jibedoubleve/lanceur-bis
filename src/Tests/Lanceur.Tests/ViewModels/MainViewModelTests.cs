@@ -45,7 +45,10 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
         var keywords = typeof(QuitAlias).Assembly.GetTypes()
                                         .Where(t => t.GetCustomAttribute<ReservedAliasAttribute>() is not null)
                                         .Select(t => t.GetCustomAttribute<ReservedAliasAttribute>()!.Name);
-        foreach (var type in keywords) yield return [type];
+        foreach (var type in keywords)
+        {
+            yield return [type];
+        }
     }
 
     protected override IServiceCollection ConfigureServices(
@@ -81,8 +84,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IExecutionService, ExecutionService>()
-                         .AddMockSingleton<ISearchServiceOrchestrator>((_, i) =>
-                             {
+                         .AddMockSingleton<ISearchServiceOrchestrator>((_, i) => {
                                  i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
                                   .Returns(true);
                                  return i;
@@ -106,15 +108,13 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
 
         var visitors = new ServiceVisitors
         {
-            VisitSettings = settings =>
-            {
+            VisitSettings = settings => {
                 var application = new ApplicationSettings { SearchBox = { ShowResult = showAllResults } };
                 settings.Application.Returns(application);
             }
         };
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 await viewModel.DisplayResultsIfAllowed();
                 /* If showAllResults is true, then more than one result is expected user displays the search box results
                  * Otherwise, when showAllResults is false, then zero result are displayed in the search box results
@@ -134,12 +134,10 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
         IConfigurationFacade configuration = null;
         var visitors = new ServiceVisitors { VisitSettings = s => configuration = s };
         TestViewModel(
-            (viewModel, _) =>
-            {
+            (viewModel, _) => {
                 Assert.All(
                     callsOfShowLastQuery.Select((expected, i) => (expected, i)),
-                    t =>
-                    {
+                    t => {
                         configuration.Application.SearchBox.ShowLastQuery = t.expected;
                         viewModel.ShowLastQuery.ShouldBe(t.expected, $"this is the call n° {t.i + 1} of the test");
                     }
@@ -160,15 +158,13 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitSettings = s =>
-            {
+            VisitSettings = s => {
                 s.Application.SearchBox.ShowLastQuery = true;
                 s.Application.SearchBox.ShowResult = true;
             }
         };
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 const int expectedCount = 1;
                 viewModel.Query = "alias_1"; // default name is alias_{idAlias}
 
@@ -193,15 +189,13 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
         IProcessLauncher sut = null;
         var visitors = new ServiceVisitors
         {
-            VisitProcessLauncher = (_, i) =>
-            {
+            VisitProcessLauncher = (_, i) => {
                 sut = i;
                 return i;
             }
         };
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 // ARRANGE
                 var alias = new AliasQueryResult();
                 viewModel.Results.Add(alias);
@@ -225,10 +219,8 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
     [InlineData("2+5", "7")]
     [InlineData("2 + 5", "7")]
     [InlineData("2 * 5", "10")]
-    public async Task Execute_calculation(string operation, string result)
-    {
-        await TestViewModelAsync(async (viewModel, _) =>
-            {
+    public async Task Execute_calculation(string operation, string result) =>
+        await TestViewModelAsync(async (viewModel, _) => {
                 // ARRANGE
                 var alias = Substitute.For<ExecutableQueryResult>();
                 viewModel.Results.Add(alias);
@@ -244,7 +236,6 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
                 );
             }
         );
-    }
 
     [Fact]
     public async Task Execute_search_aliases()
@@ -256,8 +247,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
 
 
         await TestViewModelAsync(
-            async (viewModel, _) =>
-            {
+            async (viewModel, _) => {
                 // ACT
                 viewModel.Query = "alias";
                 await viewModel.SearchCommand.ExecuteAsync(null);
@@ -275,11 +265,9 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
     /// </summary>
     [Theory]
     [MemberData(nameof(GetBuiltinKeywords))]
-    public async Task Show_correct_usage_for_builtin_keywords(string keyword)
-    {
+    public async Task Show_correct_usage_for_builtin_keywords(string keyword) =>
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 const int count = 5;
                 for (var i = 0; i < count; i++)
                 {
@@ -299,18 +287,15 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
             },
             Sql.Empty
         );
-    }
 
     [Fact]
-    public async Task Show_correct_usage_for_regular_alias()
-    {
+    public async Task Show_correct_usage_for_regular_alias() =>
         await TestViewModelAsync(
-            async (viewModel, db) =>
-            {
+            async (viewModel, db) => {
                 // Arrange
                 const int count = 5;
-                var sql =  new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
-                                           .ToSql();
+                var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+                                          .ToSql();
                 db.WithConnection(c => c.Execute(sql));
 
                 // Act
@@ -332,7 +317,6 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
             },
             Sql.Empty
         );
-    }
 
     #endregion
 }

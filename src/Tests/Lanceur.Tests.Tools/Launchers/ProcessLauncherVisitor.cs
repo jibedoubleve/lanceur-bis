@@ -35,7 +35,7 @@ public class ProcessLauncherVisitor : IProcessLauncher
     public void Start(ProcessContext context) => _processContextVisitor?.Invoke(context);
 
     /// <inheritdoc />
-    public async Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline) 
+    public async Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline)
         => await Task.FromResult(new List<QueryResult>());
 
     #endregion

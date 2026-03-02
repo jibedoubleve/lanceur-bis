@@ -60,7 +60,11 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
                 case null: return;
                 case JsonArray array:
                 {
-                    foreach (var item in array) FetchAll(item, results);
+                    foreach (var item in array)
+                    {
+                        FetchAll(item, results);
+                    }
+
                     return;
                 }
                 case JsonObject jsonObject when jsonObject.ContainsKey("children"):
@@ -73,7 +77,10 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
                     var order = jsonObject["date_last_used"]?.ToString() ?? "0";
 
                     if (name is not null && url is not null)
-                        results.Add(new() { Name = name, Url = url, SortKey = order });
+                    {
+                        results.Add(new Bookmark { Name = name, Url = url, SortKey = order });
+                    }
+
                     break;
                 }
             }
@@ -86,14 +93,14 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
     {
         var bookmarks = _memoryCache.GetOrCreate(
             CacheKey,
-            IEnumerable<Bookmark> (_) =>
-            {
+            IEnumerable<Bookmark> (_) => {
                 var json = GetJson();
                 var node = JsonNode.Parse(json);
                 var results = new List<Bookmark>();
 
                 var startNode = node?["roots"]?["bookmark_bar"];
-                if (startNode is not null) FetchAll(startNode, results);
+                if (startNode is not null) { FetchAll(startNode, results); }
+
                 return results.OrderByDescending(e => e.SortKey);
             },
             CacheEntryOptions.Default
@@ -114,7 +121,7 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
         if (!File.Exists(Path))
         {
             _logger.LogWarning("(Chromium) Cannot find bookmark at {Path}", Path);
-            return  "{}";
+            return "{}";
         }
 
         return File.ReadAllText(Path);

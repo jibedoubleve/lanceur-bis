@@ -12,7 +12,7 @@ public static class TimeMeter
         ArgumentNullException.ThrowIfNull(caller);
         ArgumentNullException.ThrowIfNull(logger);
 
-        return new(LogStart, LogSplit);
+        return new Measurement(LogStart, LogSplit);
 
         void Log(TimeSpan ts, string type)
         {

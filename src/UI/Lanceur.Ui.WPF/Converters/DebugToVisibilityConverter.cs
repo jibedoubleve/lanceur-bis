@@ -1,25 +1,25 @@
-using Lanceur.SharedKernel.Utils;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using Lanceur.SharedKernel.Utils;
 
-namespace Lanceur.Ui.WPF.Converters
+namespace Lanceur.Ui.WPF.Converters;
+
+internal class DebugToVisibilityConverter : IValueConverter
 {
-    internal class DebugToVisibilityConverter : IValueConverter
-    {
-        #region Fields
+    #region Fields
 
-        private Conditional<Visibility> _conditional = new(Visibility.Visible, Visibility.Collapsed);
+    private readonly Conditional<Visibility> _conditional = new(Visibility.Visible, Visibility.Collapsed);
 
-        #endregion Fields
+    #endregion
 
-        #region Methods
+    #region Methods
 
-        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value is Visibility ? _conditional : Binding.DoNothing;
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is Visibility ? _conditional : Binding.DoNothing;
 
-        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 
-        #endregion Methods
-
-    }
+    #endregion
 }

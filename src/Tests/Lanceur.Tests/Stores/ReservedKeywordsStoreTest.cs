@@ -46,8 +46,7 @@ public class ReservedKeywordsStoreTest
                               .AddTestOutputHelper(_output)
                               .AddLoggingForTests(_output)
                               .AddMockSingleton<IBookmarkRepositoryFactory>()
-                              .AddMockSingleton<IConfigurationFacade>((_, i) =>
-                                  {
+                              .AddMockSingleton<IConfigurationFacade>((_, i) => {
                                       i.Application.Returns(new ApplicationSettings());
                                       return i;
                                   }
@@ -60,22 +59,6 @@ public class ReservedKeywordsStoreTest
 
         var store = serviceProvider.GetService<ReservedAliasStore>();
         return store;
-    }
-
-    [Theory]
-    [InlineData("add")]
-    [InlineData("quit")]
-    [InlineData("setup")]
-    [InlineData("version")]
-    [InlineData("clrbm")]
-    [InlineData("logs")]
-    public void When_search_Then_ReservedAlias_exists_in_store_by_default(string criterion)
-    {
-        var repository = Substitute.For<IAliasRepository>();
-        var store = GetStore(repository, typeof(MainView));
-        var query = new Cmdline(criterion);
-
-        store.Search(query).Count().ShouldBe(1);
     }
 
     [Fact]
@@ -92,12 +75,28 @@ public class ReservedKeywordsStoreTest
 
         var result = store.Search(Cmdline.Parse(Names.Name1))
                           .ToArray();
-        
+
         result.ShouldSatisfyAllConditions(
             r => r.Length.ShouldBe(1),
             r => r[0].Count.ShouldBe(count),
             r => r[0].Id.ShouldBe(id)
         );
+    }
+
+    [Theory]
+    [InlineData("add")]
+    [InlineData("quit")]
+    [InlineData("setup")]
+    [InlineData("version")]
+    [InlineData("clrbm")]
+    [InlineData("logs")]
+    public void When_search_Then_ReservedAlias_exists_in_store_by_default(string criterion)
+    {
+        var repository = Substitute.For<IAliasRepository>();
+        var store = GetStore(repository, typeof(MainView));
+        var query = new Cmdline(criterion);
+
+        store.Search(query).Count().ShouldBe(1);
     }
 
     #endregion

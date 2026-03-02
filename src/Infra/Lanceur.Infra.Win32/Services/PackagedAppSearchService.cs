@@ -29,27 +29,34 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
         fileName = fileName.Replace("package:", "");
         var installedDir = fileName.GetDirectoryName();
 
-        return await Task.Run(() =>
-            {
+        return await Task.Run(() => {
                 var userPackages = GetUserPackages();
                 return userPackages.AsParallel()
-                                   .Where(p =>
-                                       {
-                                           try { return p is { IsFramework: false, IsDevelopmentMode: false } && (installedDir.StartsWith(p.InstalledLocation.Path) || p.IsAppUserModelId(fileName)); }
+                                   .Where(p => {
+                                           try
+                                           {
+                                               return p is { IsFramework: false, IsDevelopmentMode: false } &&
+                                                      (installedDir.StartsWith(p.InstalledLocation.Path) ||
+                                                       p.IsAppUserModelId(fileName));
+                                           }
                                            catch (Exception ex)
                                            {
-                                               _logger.LogWarning(ex, "An error occured when selecting package {FileName}", fileName);
+                                               _logger.LogWarning(
+                                                   ex,
+                                                   "An error occured when selecting package {FileName}",
+                                                   fileName
+                                               );
                                                return false;
                                            }
                                        }
                                    )
                                    .Select(p => new PackagedApp
                                        {
-                                           AppUserModelId    = p.GetAppUserModelId(),
+                                           AppUserModelId = p.GetAppUserModelId(),
                                            InstalledLocation = p.InstalledLocation.Path,
-                                           Logo              = p.Logo,
-                                           Description       = p.Description,
-                                           DisplayName       = p.DisplayName
+                                           Logo = p.Logo,
+                                           Description = p.Description,
+                                           DisplayName = p.DisplayName
                                        }
                                    )
                                    .Where(e => !string.IsNullOrEmpty(e.AppUserModelId))
@@ -59,10 +66,8 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<PackagedApp>> GetInstalledUwpAppsAsync()
-    {
-        return await Task.Run(() =>
-            {
+    public async Task<IEnumerable<PackagedApp>> GetInstalledUwpAppsAsync() =>
+        await Task.Run(() => {
                 var packages = new List<PackagedApp>();
                 foreach (var package in GetUserPackages())
                 {
@@ -71,15 +76,15 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
                                                 .Select(e => e.AppUserModelId)
                                                 .FirstOrDefault(e => !string.IsNullOrEmpty(e));
 
-                    if (appUserModelId.IsNullOrEmpty()) continue;
+                    if (appUserModelId.IsNullOrEmpty()) { continue; }
 
                     var currentPackage = new PackagedApp
                     {
-                        AppUserModelId    = appUserModelId,
+                        AppUserModelId = appUserModelId,
                         InstalledLocation = package.InstalledLocation.Path,
-                        Logo              = package.Logo,
-                        Description       = package.Description,
-                        DisplayName       = package.DisplayName
+                        Logo = package.Logo,
+                        Description = package.Description,
+                        DisplayName = package.DisplayName
                     };
                     packages.Add(currentPackage);
                 }
@@ -87,19 +92,18 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
                 return packages;
             }
         );
-    }
 
     /// <inheritdoc />
     public async Task<bool> TryResolveDetailsAsync(AliasQueryResult queryResult)
     {
         ArgumentNullException.ThrowIfNull(queryResult);
         var results = await GetByInstalledDirectoryAsync(queryResult.FileName);
-        results  = results.ToArray();
+        results = results.ToArray();
 
-        if (!results.Any()) return false;
+        if (!results.Any()) { return false; }
 
         var result = results.First();
-        if (queryResult.Description.IsNullOrEmpty()) queryResult.Description = result.DisplayName ?? "Packaged App";
+        if (queryResult.Description.IsNullOrEmpty()) { queryResult.Description = result.DisplayName ?? "Packaged App"; }
 
         queryResult.FileName = result.FileName;
         return true;

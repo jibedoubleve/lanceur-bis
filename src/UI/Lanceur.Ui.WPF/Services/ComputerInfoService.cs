@@ -19,11 +19,10 @@ public class ComputerInfoService : IComputerInfoService
     {
         IsMonitoring = true;
 
-        await Task.Run(() =>
-            {
+        await Task.Run(() => {
                 while (true)
                 {
-                    if (!IsMonitoring) break;
+                    if (!IsMonitoring) { break; }
 
                     var cpuLoadTask = SystemMetrics.GetCpuUsagePercentAsync((int)interval.TotalMilliseconds);
                     var memoryLoad = SystemMetrics.GetMemoryUse();
@@ -38,7 +37,7 @@ public class ComputerInfoService : IComputerInfoService
     }
 
     /// <inheritdoc />
-    public void StopMonitoring() { IsMonitoring = false; }
+    public void StopMonitoring() => IsMonitoring = false;
 
     #endregion
 }
@@ -58,9 +57,11 @@ internal static class SystemMetrics
     private static CpuSample SampleCpu()
     {
         if (!GetSystemTimes(out var idle, out var kernel, out var user))
+        {
             throw new InvalidOperationException("GetSystemTimes failed.");
+        }
 
-        return new(ToUInt64(idle), ToUInt64(kernel), ToUInt64(user));
+        return new CpuSample(ToUInt64(idle), ToUInt64(kernel), ToUInt64(user));
     }
 
     private static ulong ToUInt64(Filetime ft) => ((ulong)ft.dwHighDateTime << 32) | ft.dwLowDateTime;
@@ -76,11 +77,12 @@ internal static class SystemMetrics
         var busy = kernelDelta - idleDelta + userDelta;
         var total = kernelDelta + userDelta;
 
-        if (total == 0) return 0;
+        if (total == 0) { return 0; }
 
         var pct = 100.0 * busy / total;
-        if (pct < 0) return 0;
-        if (pct > 100) return 100;
+        if (pct < 0) { return 0; }
+
+        if (pct > 100) { return 100; }
 
         return pct;
     }
@@ -97,7 +99,7 @@ internal static class SystemMetrics
     public static uint GetMemoryUse()
     {
         var ms = new MemoryStatusEx { dwLength = (uint)Marshal.SizeOf<MemoryStatusEx>() };
-        if (!GlobalMemoryStatusEx(ref ms)) throw new InvalidOperationException("GlobalMemoryStatusEx failed.");
+        if (!GlobalMemoryStatusEx(ref ms)) { throw new InvalidOperationException("GlobalMemoryStatusEx failed."); }
 
         return ms.dwMemoryLoad;
     }
@@ -143,7 +145,7 @@ internal static class SystemMetrics
         #region Fields
 
         public uint dwLength;
-        public uint dwMemoryLoad;     // % of physical memory in use (approx)  
+        public uint dwMemoryLoad; // % of physical memory in use (approx)  
         public ulong ullAvailExtendedVirtual;
         public ulong ullAvailPageFile;
         public ulong ullAvailPhys;

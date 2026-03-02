@@ -10,15 +10,19 @@ public static class CompletionDataListExtensions
 
     private static readonly List<LuaCompletionData> FunctionsCompletion;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     static CompletionDataListExtensions()
     {
-        ContextCompletion = new() { new("FileName", "Path to the file to execute or the URL"), new("Parameters", "The parameters of the command to execute") };
+        ContextCompletion = new List<LuaCompletionData>
+        {
+            new("FileName", "Path to the file to execute or the URL"),
+            new("Parameters", "The parameters of the command to execute")
+        };
 
-        FunctionsCompletion = new()
+        FunctionsCompletion = new List<LuaCompletionData>
         {
             new("abs"),
             new("acos"),
@@ -144,21 +148,27 @@ public static class CompletionDataListExtensions
         };
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
     public static void FillContextFields(this IList<ICompletionData> data)
     {
-        foreach (var item in ContextCompletion) data.Add(item);
+        foreach (var item in ContextCompletion)
+        {
+            data.Add(item);
+        }
     }
 
     public static void FillFunctions(this IList<ICompletionData> data)
     {
-        foreach (var item in FunctionsCompletion) data.Add(item);
+        foreach (var item in FunctionsCompletion)
+        {
+            data.Add(item);
+        }
     }
 
     public static bool IsContextKeyword(this string codeBuffer) => codeBuffer.StartsWith("context");
 
-    #endregion Methods
+    #endregion
 }

@@ -38,7 +38,7 @@ public class Conditional<T>
     #region Properties
 
     /// <summary>
-    /// Gets the value of the conditional
+    ///     Gets the value of the conditional
     /// </summary>
     public T Value => _value;
 

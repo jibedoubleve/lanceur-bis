@@ -51,8 +51,8 @@ values ((select max(rowid) from alias), 'version');
 --
 drop view if exists stat_usage_per_app_v;
 create view stat_usage_per_app_v as
-select id_alias        as id_alias,
-       id_session      as id_session,
+select id_alias   as id_alias,
+       id_session as id_session,
        count(id_alias) as count
 from alias_usage
 group by id_alias;

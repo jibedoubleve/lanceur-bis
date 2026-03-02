@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using Dapper;
-using Shouldly;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Tests.Tools;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Repositories;

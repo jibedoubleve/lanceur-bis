@@ -1,5 +1,4 @@
 using Lanceur.Core.Models;
-using Lanceur.Core.Responses;
 
 namespace Lanceur.Core.Services;
 
@@ -26,7 +25,7 @@ public interface IProcessLauncher
     ///     required to start the process. Must not be null.
     /// </param>
     void Start(ProcessContext context);
-    
+
     /// <summary>
     ///     Starts the process defined by the specified <see cref="ISelfExecutable" /> instance,
     ///     using the provided <see cref="Cmdline" /> as execution parameters.
@@ -41,7 +40,6 @@ public interface IProcessLauncher
     /// </param>
     Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline);
 
-
     #endregion
 }
 
@@ -51,9 +49,9 @@ public class ProcessContext
 
     public string Arguments { get; set; }
     public string FileName { get; set; }
-    public SharedKernel.Constants.StartMode WindowStyle { get; set; }
     public bool UseShellExecute { get; set; }
     public string Verb { get; set; }
+    public SharedKernel.Constants.StartMode WindowStyle { get; set; }
     public string WorkingDirectory { get; set; }
 
     #endregion

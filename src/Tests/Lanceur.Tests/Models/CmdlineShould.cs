@@ -1,5 +1,5 @@
-﻿using Shouldly;
-using Lanceur.Core.Models;
+﻿using Lanceur.Core.Models;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Models;
@@ -62,11 +62,9 @@ public class CmdlineShould
     [InlineData("%AAAA aa")]
     [InlineData("?AAAA aa")]
     [InlineData(".AAAA aa")]
-    public void HandleSpecialCmdCharacter(string cmdline)
-    {
+    public void HandleSpecialCmdCharacter(string cmdline) =>
         Cmdline.Parse(cmdline)
                .Name.ShouldBe(cmdline[0].ToString());
-    }
 
     [Theory]
     [InlineData("arg1 arg2", "cls arg1 arg2")]
@@ -84,13 +82,17 @@ public class CmdlineShould
         line.Parameters.ShouldBe(asExpected);
     }
 
-    [Fact] public void HaveEmptyNameByDefault() { Cmdline.Empty.Name.ShouldBeEmpty(); }
+    [Fact]
+    public void HaveEmptyNameByDefault() => Cmdline.Empty.Name.ShouldBeEmpty();
 
-    [Fact] public void HaveEmptyNameWhenCtorNull() { new Cmdline(null, null).Name.ShouldBeEmpty(); }
+    [Fact]
+    public void HaveEmptyNameWhenCtorNull() => new Cmdline(null, null).Name.ShouldBeEmpty();
 
-    [Fact] public void HaveEmptyParametersByDefault() { Cmdline.Empty.Parameters.ShouldBeEmpty(); }
+    [Fact]
+    public void HaveEmptyParametersByDefault() => Cmdline.Empty.Parameters.ShouldBeEmpty();
 
-    [Fact] public void HaveEmptyParametersWhenCtorNull() { new Cmdline(null, null).Parameters.ShouldBeEmpty(); }
+    [Fact]
+    public void HaveEmptyParametersWhenCtorNull() => new Cmdline(null, null).Parameters.ShouldBeEmpty();
 
     [Theory]
     [InlineData("cmd", "cmd")]
@@ -131,12 +133,10 @@ public class CmdlineShould
     [InlineData("m&&", "m&&")]
     [InlineData("m& fff", "m&")]
     [InlineData("m&& fff", "m&&")]
-    public void RecogniseDoubleOrSingleSpecialChar(string cmdline, string expected)
-    {
+    public void RecogniseDoubleOrSingleSpecialChar(string cmdline, string expected) =>
         Cmdline.Parse(cmdline)
                .Name
                .ShouldBe(expected);
-    }
 
     [Fact]
     public void ReturnsEmptyOnEmptyCmdline()
@@ -161,11 +161,9 @@ public class CmdlineShould
     [InlineData("  undeux  ")]
     [InlineData("  undeux")]
     [InlineData("undeux  ")]
-    public void TrimLeadingAndTrailingWhitespace(string cmd)
-    {
+    public void TrimLeadingAndTrailingWhitespace(string cmd) =>
         Cmdline.Parse(cmd)
                .Name.ShouldBe(cmd.Trim());
-    }
 
     #endregion
 }

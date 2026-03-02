@@ -20,7 +20,7 @@ public class AddAlias : SelfExecutableQueryResult
 
     #region Constructors
 
-    public AddAlias(IServiceProvider serviceProvider) => _navigator = new(serviceProvider);
+    public AddAlias(IServiceProvider serviceProvider) => _navigator = new PageNavigator(serviceProvider);
 
     #endregion
 

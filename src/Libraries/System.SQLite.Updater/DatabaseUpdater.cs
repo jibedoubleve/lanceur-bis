@@ -22,7 +22,7 @@ public class DatabaseUpdater
 
         _db = db ?? throw new ArgumentNullException(nameof(db));
 
-        _scriptManager = new(asm, pattern);
+        _scriptManager = new ScriptManager(asm, pattern);
     }
 
     #endregion
@@ -31,7 +31,10 @@ public class DatabaseUpdater
 
     private void ExecuteScript(IEnumerable<string> scripts)
     {
-        foreach (var script in scripts) _db.Execute(script);
+        foreach (var script in scripts)
+        {
+            _db.Execute(script);
+        }
     }
 
     public Version MaxVersion() => _scriptManager.GetScripts().MaxVersion();

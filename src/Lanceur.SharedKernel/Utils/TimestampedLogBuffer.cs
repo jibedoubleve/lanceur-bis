@@ -21,10 +21,8 @@ public class TimestampedLogBuffer
     ///     Appends a line prefixed with an ISO 8601 timestamp to the log buffer.
     /// </summary>
     /// <param name="line">The text to append.</param>
-    public void AppendLine(string line)
-    {
+    public void AppendLine(string line) =>
         _logs.AppendLine(string.Format(LogTemplate, DateTime.Now.ToString("o"), line));
-    }
 
     /// <inheritdoc />
     public override string ToString() => _logs.ToString();

@@ -8,9 +8,8 @@ public static class InfrastructureSettingsExtension
 {
     #region Methods
 
-    public static LogEventLevel GetMinimumLogLevel(this InfrastructureSettings stg)
-    {
-        return stg.MinimumLogLevel switch
+    public static LogEventLevel GetMinimumLogLevel(this InfrastructureSettings stg) =>
+        stg.MinimumLogLevel switch
         {
             LogLevel.Trace       => LogEventLevel.Verbose,
             LogLevel.Debug       => LogEventLevel.Debug,
@@ -19,11 +18,10 @@ public static class InfrastructureSettingsExtension
             LogLevel.Error       => LogEventLevel.Error,
             LogLevel.Critical    => LogEventLevel.Fatal,
             LogLevel.None        => LogEventLevel.Information,
-            _                    => throw new ArgumentOutOfRangeException(
+            _ => throw new ArgumentOutOfRangeException(
                 $"The log level '{stg.MinimumLogLevel}' is not supported."
             )
         };
-    }
 
     #endregion
 }

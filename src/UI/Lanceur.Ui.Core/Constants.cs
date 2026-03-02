@@ -6,5 +6,5 @@ public enum Direction : byte
     Up,
     Down,
     PageUp,
-    PageDown,
+    PageDown
 }

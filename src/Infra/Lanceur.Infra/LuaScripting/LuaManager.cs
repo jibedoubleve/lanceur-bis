@@ -36,15 +36,17 @@ public class LuaManager : ILuaManager
     public ScriptResult ExecuteScript(Script script)
     {
         if (script.Code.IsNullOrWhiteSpace())
-            return new()
+        {
+            return new ScriptResult
             {
                 Code = script.Code ?? string.Empty,
-                Context = new()
+                Context = new ScriptContext
                 {
                     FileName = script.Context?.FileName ?? string.Empty,
                     Parameters = script.Context?.Parameters ?? string.Empty
                 }
             };
+        }
 
         var output = new TimestampedLogBuffer();
         using var lua = new Lua();
@@ -58,22 +60,23 @@ public class LuaManager : ILuaManager
 
             var result = lua.DoString(script.Code);
 
-            if (result.Length == 0) return script.ToScriptResult();
+            if (result.Length == 0) { return script.ToScriptResult(); }
 
             return result[0] is not ScriptContext scriptContext
                 ? script.ToScriptResult()
-                : new()
+                : new ScriptResult
                 {
                     Code = script.Code,
-                    Context = new() { FileName = scriptContext.FileName, Parameters = scriptContext.Parameters },
+                    Context = new ScriptContext
+                        { FileName = scriptContext.FileName, Parameters = scriptContext.Parameters },
                     OutputContent = output.ToString()
                 };
         }
-        catch (Exception e) 
+        catch (Exception ex)
         {
-            _logger.LogTrace("Scripts: {Logger}", output.ToString());
-            return new() { Code = script.Code, Exception = e, OutputContent = output.ToString() };
-        }        
+            _logger.LogTrace(ex, "Scripts: {Logger}", output.ToString());
+            return new ScriptResult { Code = script.Code, Exception = ex, OutputContent = output.ToString() };
+        }
     }
 
     #endregion

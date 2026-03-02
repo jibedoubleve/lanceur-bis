@@ -1,13 +1,16 @@
 ﻿using Lanceur.Core.Models;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
-/// <inheritdoc/>
-public class MacroAliasExpanderService : Core.Services.IMacroAliasExpanderService
+/// <inheritdoc />
+public class MacroAliasExpanderService : IMacroAliasExpanderService
 {
     #region Fields
+
+    private readonly ILogger _logger;
 
     private readonly IEnumerable<MacroQueryResult> _macros;
 
@@ -28,8 +31,6 @@ public class MacroAliasExpanderService : Core.Services.IMacroAliasExpanderServic
 
     #region Properties
 
-    private readonly ILogger _logger;
-
     public int MacroCount => _macros.Count();
 
     #endregion
@@ -49,13 +50,16 @@ public class MacroAliasExpanderService : Core.Services.IMacroAliasExpanderServic
     /// </returns>
     private QueryResult Expand(QueryResult item)
     {
-        if (item is not AliasQueryResult alias || !alias.IsMacro()) return item;
-       
+        if (item is not AliasQueryResult alias || !alias.IsMacro()) { return item; }
+
         var macroName = alias.GetMacroName();
-        var foundMacro = _macros.FirstOrDefault(
-            m => string.Equals(macroName, m.Name, StringComparison.InvariantCultureIgnoreCase)
+        var foundMacro = _macros.FirstOrDefault(m => string.Equals(
+                macroName,
+                m.Name,
+                StringComparison.InvariantCultureIgnoreCase
+            )
         );
-        
+
         if (foundMacro is null)
         {
             /* Well, this is a misconfigured macro, log it and forget it */

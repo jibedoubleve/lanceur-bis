@@ -16,47 +16,43 @@ public class DoubloonGenerator : IEnumerable<object[]>
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private static ISqlBuilder WithDifferentSynonyms()
-    {
-        return new SqlBuilder()
-               .AppendAlias(a => a.WithFileName(FileName)
-                                  .WithSynonyms("a1", "a2", "a3")
-                                  .WithAdditionalParameters(
-                                      ("params1", "params one"),
-                                      ("params2", "params two")
-                                  )
-               )
-               .AppendAlias(a => a.WithFileName(FileName)
-                                  .WithSynonyms("a4", "a5", "a6")
-                                  .WithAdditionalParameters(
-                                      ("params3", "params three"),
-                                      ("params4", "params four")
-                                  )
-               );
-    }
+    private static ISqlBuilder WithDifferentSynonyms() =>
+        new SqlBuilder()
+            .AppendAlias(a => a.WithFileName(FileName)
+                               .WithSynonyms("a1", "a2", "a3")
+                               .WithAdditionalParameters(
+                                   ("params1", "params one"),
+                                   ("params2", "params two")
+                               )
+            )
+            .AppendAlias(a => a.WithFileName(FileName)
+                               .WithSynonyms("a4", "a5", "a6")
+                               .WithAdditionalParameters(
+                                   ("params3", "params three"),
+                                   ("params4", "params four")
+                               )
+            );
 
-    private static ISqlBuilder WithSynonymsDoubloons()
-    {
-        return new SqlBuilder()
-               .AppendAlias(a => a.WithFileName(FileName)
-                                  .WithArguments(Arguments)
-                                  .WithSynonyms("a1", "a2", "a3")
-                                  .WithAdditionalParameters(
-                                      ("params1", "params one"),
-                                      ("params2", "params two")
-                                  )
-               )
-               .AppendAlias(a => a.WithFileName(FileName)
-                                  .WithArguments(Arguments)
-                                  .WithSynonyms("a4", "a5", "a6")
-                                  .WithAdditionalParameters(("params1", "params one"))
-               )
-               .AppendAlias(a => a.WithFileName(FileName)
-                                  .WithArguments(Arguments)
-                                  .WithSynonyms("a4", "a5", "a6")
-                                  .WithAdditionalParameters(("params1", "params one"))
-               );
-    }
+    private static ISqlBuilder WithSynonymsDoubloons() =>
+        new SqlBuilder()
+            .AppendAlias(a => a.WithFileName(FileName)
+                               .WithArguments(Arguments)
+                               .WithSynonyms("a1", "a2", "a3")
+                               .WithAdditionalParameters(
+                                   ("params1", "params one"),
+                                   ("params2", "params two")
+                               )
+            )
+            .AppendAlias(a => a.WithFileName(FileName)
+                               .WithArguments(Arguments)
+                               .WithSynonyms("a4", "a5", "a6")
+                               .WithAdditionalParameters(("params1", "params one"))
+            )
+            .AppendAlias(a => a.WithFileName(FileName)
+                               .WithArguments(Arguments)
+                               .WithSynonyms("a4", "a5", "a6")
+                               .WithAdditionalParameters(("params1", "params one"))
+            );
 
     public IEnumerator<object[]> GetEnumerator()
     {

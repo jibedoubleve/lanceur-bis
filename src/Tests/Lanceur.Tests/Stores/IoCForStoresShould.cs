@@ -1,5 +1,6 @@
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -58,11 +59,11 @@ public class IoCForStoresShould : TestBase
             ? null
             : new ApplicationSettings
             {
-                Stores = new()
+                Stores = new StoreSection
                 {
                     StoreShortcuts =
                     [
-                        new()
+                        new StoreShortcut
                         {
                             AliasOverride = aliasOverride,
                             StoreType = typeof(EverythingStore).ToString()
@@ -102,11 +103,11 @@ public class IoCForStoresShould : TestBase
             ? null
             : new ApplicationSettings
             {
-                Stores = new()
+                Stores = new StoreSection
                 {
                     StoreShortcuts =
                     [
-                        new()
+                        new StoreShortcut
                         {
                             AliasOverride = aliasOverride,
                             StoreType = typeof(EverythingStore).ToString()
@@ -141,32 +142,34 @@ public class IoCForStoresShould : TestBase
         // arrange
         const string aliasOverride1 = "^pp.*";
         const string aliasOverride2 = "^éé.*";
-        
+
         const string cmdlineString1 = ": hello world";
         const string cmdlineString2 = "pp hello world";
         const string cmdlineString3 = "éé hello world";
 
         var connectionManager = GetConnectionManager(SqlBuilder.Empty);
         var serviceProvider = ConfigureServices();
- 
+
         // act
         var store = serviceProvider
                     .GetServices<IStoreService>()
                     .Single(x => x.GetType() == typeof(EverythingStore));
         var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>();
         var configuration = serviceProvider.GetService<IConfigurationFacade>();
-        
+
         // At this point, there's no configuration, we used the default config (hardcoded)
         orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString1)).ShouldBeTrue("Default values should be used");
 
         // Let's update the configuration and check whether it is taken into account
         UpdateConfiguration(aliasOverride1);
-        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString2)).ShouldBeTrue("When updating from default values to new value");
-        
+        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString2))
+                    .ShouldBeTrue("When updating from default values to new value");
+
         // Let's do this again to be sure the update can be done multiple times
         UpdateConfiguration(aliasOverride2);
-        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString3)).ShouldBeTrue("When updating from some values to updated values");
-        
+        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString3))
+                    .ShouldBeTrue("When updating from some values to updated values");
+
         return;
 
         IServiceProvider ConfigureServices()
@@ -190,7 +193,7 @@ public class IoCForStoresShould : TestBase
         {
             configuration.Application.Stores.StoreShortcuts =
             [
-                new() { StoreType =  typeof(EverythingStore).ToString(), AliasOverride = aliasOverride }
+                new StoreShortcut { StoreType = typeof(EverythingStore).ToString(), AliasOverride = aliasOverride }
             ];
             configuration.Save();
         }

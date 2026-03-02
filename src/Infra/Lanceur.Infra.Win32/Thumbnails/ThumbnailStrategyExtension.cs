@@ -18,7 +18,9 @@ public static class ThumbnailStrategyExtension
         ];
 
         foreach (var type in types)
+        {
             services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IThumbnailStrategy), type));
+        }
 
         return services;
     }

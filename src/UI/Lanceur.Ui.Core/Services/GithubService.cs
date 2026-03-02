@@ -23,7 +23,7 @@ public class GithubService : IGithubService
     public GithubService(ISection<GithubSection> settings, IUserGlobalNotificationService notificationService)
     {
         _notificationService = notificationService;
-        _client = new(new ProductHeaderValue("Lanceur"));
+        _client = new GitHubClient(new ProductHeaderValue("Lanceur"));
         _tag = settings.Value.Tag;
     }
 
@@ -36,8 +36,8 @@ public class GithubService : IGithubService
     /// <inheritdoc />
     public async Task CreateIssue(string title, string token)
     {
-        var issue =  new NewIssue(title) { Labels = { _tag } };
-        _client.Credentials = new(token);
+        var issue = new NewIssue(title) { Labels = { _tag } };
+        _client.Credentials = new Credentials(token);
         var number = (await _client.Issue.Create(Owner, Repository, issue)).Number;
         _notificationService.InformationWithNavigation($"Created new Github issue n° {number}", Url(number));
     }

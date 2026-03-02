@@ -1,5 +1,5 @@
-using Shouldly;
 using Lanceur.Core.BusinessLogic;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;

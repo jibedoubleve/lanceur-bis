@@ -5,24 +5,26 @@ public interface IWildcardService
     #region Methods
 
     /// <summary>
-    /// Executes all the replacement actions.
+    ///     Executes all the replacement actions.
     /// </summary>
     /// <param name="newText">The text in which the replacement will occur</param>
     /// <param name="replacement">The replacement text</param>
     /// <returns>
-    /// The modified text after applying all replacements
+    ///     The modified text after applying all replacements
     /// </returns>
     string Replace(string newText, string replacement);
 
     /// <summary>
-    /// Executes all the replacement actions, or returns the replacement text if the provided <paramref name="text"/> is null.
+    ///     Executes all the replacement actions, or returns the replacement text if the provided <paramref name="text" /> is
+    ///     null.
     /// </summary>
     /// <param name="text">The parameters as specified in the Alias</param>
     /// <param name="replacement">The replacement text</param>
     /// <returns>
-    /// The modified text if replacements are performed, or the <paramref name="replacement"/> if <paramref name="text"/> is null
+    ///     The modified text if replacements are performed, or the <paramref name="replacement" /> if <paramref name="text" />
+    ///     is null
     /// </returns>
     string ReplaceOrReplacementOnNull(string text, string replacement);
 
-    #endregion Methods
+    #endregion
 }

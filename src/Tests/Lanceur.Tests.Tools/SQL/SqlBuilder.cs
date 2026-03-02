@@ -5,15 +5,15 @@ public class SqlBuilder : SqlBuilderBase
     #region Properties
 
     /// <summary>
-    ///     Tracks the last identifier assigned to an alias.
-    ///     A value of 0 means that no alias has been created yet.
-    /// </summary>
-    public int IdSequence  { get; private set; }
-
-    /// <summary>
     ///     Represents an empty generator, that's no sql will be generated from this instance
     /// </summary>
     public static SqlBuilder Empty { get; } = new();
+
+    /// <summary>
+    ///     Tracks the last identifier assigned to an alias.
+    ///     A value of 0 means that no alias has been created yet.
+    /// </summary>
+    public int IdSequence { get; private set; }
 
     #endregion
 
@@ -31,7 +31,7 @@ public class SqlBuilder : SqlBuilderBase
     /// </returns>
     public SqlBuilder AppendAlias(Action<SqlAliasBuilder> generator)
     {
-        generator(new(++IdSequence, Sql));
+        generator(new SqlAliasBuilder(++IdSequence, Sql));
         return this;
     }
 

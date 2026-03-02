@@ -32,8 +32,8 @@ group by su.time_stamp,
  */
 drop view if exists stat_usage_per_day_v;
 create view stat_usage_per_day_v as
-select id_session                       as id_session,
-       count(*)                         as exec_count,
+select id_session as id_session,
+       count(*)   as exec_count,
        strftime('%Y-%m-%d', time_stamp) as day
 from alias_usage
 group by strftime('%Y-%m-%d', time_stamp)
@@ -45,8 +45,8 @@ order by id_session,
  */
 drop view if exists stat_usage_per_month_v;
 create view stat_usage_per_month_v as
-select id_session                       as id_session,
-       count(*)                         as exec_count,
+select id_session as id_session,
+       count(*)   as exec_count,
        strftime('%Y-%m-01', time_stamp) as month
 from alias_usage
 where strftime('%Y-%m-%d', time_stamp) < strftime('%Y-%m-01', date())

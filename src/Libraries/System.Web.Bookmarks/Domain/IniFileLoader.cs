@@ -24,18 +24,19 @@ public partial class IniFileLoader
 
     #region Methods
 
-    [GeneratedRegex(@"^\[(.*)\]")] private static partial Regex IsSectionPattern();
+    [GeneratedRegex(@"^\[(.*)\]")]
+    private static partial Regex IsSectionPattern();
 
     private IEnumerable<IniNode> Load(string filename)
     {
-        if (!File.Exists(filename)) return [];
+        if (!File.Exists(filename)) { return []; }
 
         List<IniNode> nodes = [];
         var isSection = IsSectionPattern();
         var currentSection = string.Empty;
         foreach (var line in File.ReadAllLines(filename))
         {
-            if (line.IsNullOrWhiteSpace()) continue;
+            if (line.IsNullOrWhiteSpace()) { continue; }
 
             if (isSection.IsMatch(line))
             {
@@ -44,7 +45,7 @@ public partial class IniFileLoader
             }
 
             var row = line.Split("=");
-            nodes.Add(new(currentSection, row[0], row[1]));
+            nodes.Add(new IniNode(currentSection, row[0], row[1]));
         }
 
         return nodes;

@@ -68,8 +68,7 @@ public partial class KeywordsViewModel : ObservableObject
         );
         WeakReferenceMessenger.Default.Register<SaveAliasMessage>(
             this,
-            async void (r, m) =>
-            {
+            async void (r, m) => {
                 try
                 {
                     var viewModel = (KeywordsViewModel)r;
@@ -78,7 +77,7 @@ public partial class KeywordsViewModel : ObservableObject
                     var confirmed = await _hubService.Dialogues.AskAsync(
                         $"Do you want to save the changes for alias '{SelectedAlias!.Name}'?"
                     );
-                    if (!confirmed) return;
+                    if (!confirmed) { return; }
 
                     await viewModel.SaveAliasAsync(m.Value);
                     _logger.LogInformation("Update alias {Name}", m.Value.Name ?? "<EMPTY>");
@@ -102,7 +101,9 @@ public partial class KeywordsViewModel : ObservableObject
         set
         {
             if (_selectedAlias?.IsDirty ?? false)
-                WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new(SelectedAlias!));
+            {
+                WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new SaveAliasMessage(SelectedAlias!));
+            }
 
             value?.MarkUnchanged(); // Newly selected means no changed to be saved...
             SetProperty(ref _selectedAlias, value);
@@ -128,7 +129,7 @@ public partial class KeywordsViewModel : ObservableObject
             ButtonLabels.Cancel,
             "Add multiple parameters"
         );
-        if (!result.IsConfirmed) return;
+        if (!result.IsConfirmed) { return; }
 
         var viewModel = result.DataContext as MultipleAdditionalParameterViewModel;
 
@@ -149,7 +150,7 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private async Task OnAddParameter()
     {
-        if (SelectedAlias is null) return;
+        if (SelectedAlias is null) { return; }
 
         var parameter = this.NewAdditionalParameter();
         if (parameter is null)
@@ -166,8 +167,9 @@ public partial class KeywordsViewModel : ObservableObject
             ButtonLabels.Cancel,
             "Add parameter"
         );
-        if (!result.IsConfirmed) return;
-        if (result.DataContext is not AdditionalParameter param) return;
+        if (!result.IsConfirmed) { return; }
+
+        if (result.DataContext is not AdditionalParameter param) { return; }
 
         SelectedAlias.AdditionalParameters.Add(param);
         SelectedAlias.MarkChanged();
@@ -183,12 +185,14 @@ public partial class KeywordsViewModel : ObservableObject
         if (Aliases.Any(x => x.Id == 0))
             // An alias for creation already exists in the list,
             // remove all these aliases...
+        {
             Aliases.RemoveWhere(e => e.Id == 0);
+        }
 
         var names = message?.Cmdline?.Parameters;
         var newAlias = names is null
             ? AliasQueryResult.EmptyForCreation
-            : new() { Name = names, Synonyms = names };
+            : new AliasQueryResult { Name = names, Synonyms = names };
 
         _logger.LogInformation("Creating new alias with name {Name}", names);
         Aliases.Insert(0, newAlias);
@@ -207,7 +211,7 @@ public partial class KeywordsViewModel : ObservableObject
         }
 
         var response = await _hubService.Dialogues.AskUserYesNoAsync($"Do you want to delete {SelectedAlias.Name}?");
-        if (!response) return;
+        if (!response) { return; }
 
         _logger.LogInformation("Deleting alias {AliasName}", aliasName);
 
@@ -218,8 +222,12 @@ public partial class KeywordsViewModel : ObservableObject
         var toDelete = Aliases.Where(x => x.Id == SelectedAlias.Id).ToArray();
 
         Criterion = string.Empty;
-        foreach (var item in toDelete) _cachedAliases.Remove(item);
-        Aliases = new(_cachedAliases);
+        foreach (var item in toDelete)
+        {
+            _cachedAliases.Remove(item);
+        }
+
+        Aliases = new ObservableCollection<AliasQueryResult>(_cachedAliases);
         SelectedAlias = Aliases.FirstOrDefault();
 
         _hubService.Notifications.Success($"Alias {aliasName} deleted.", "Item deleted.");
@@ -232,7 +240,7 @@ public partial class KeywordsViewModel : ObservableObject
             $"The parameter '{parameter.Name}' will disappear from the screen and be permanently deleted only after you save your changes. Do you want to continue?"
         );
 
-        if (!confirmed) return;
+        if (!confirmed) { return; }
 
         var parameters = SelectedAlias?.AdditionalParameters
                                       .FirstOrDefault(x => x.Id != 0 && x.Id == parameter.Id);
@@ -264,7 +272,7 @@ public partial class KeywordsViewModel : ObservableObject
             ButtonLabels.Cancel,
             "Edit parameter"
         );
-        if (!result) return;
+        if (!result) { return; }
 
         var param = SelectedAlias?.AdditionalParameters?.SingleOrDefault(x => x.Id == parameter.Id);
         if (param is null)
@@ -289,7 +297,8 @@ public partial class KeywordsViewModel : ObservableObject
         var newAlias = Aliases.FirstOrDefault(e => e.Id == 0);
         Aliases.Clear();
 
-        if (newAlias is not null) Aliases.Add(newAlias);
+        if (newAlias is not null) { Aliases.Add(newAlias); }
+
         Aliases.AddRange(_cachedAliases);
         SelectedAlias = Aliases.Hydrate(previous);
 
@@ -299,7 +308,7 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanExecuteCurrentAlias))]
     private async Task OnLoadCurrentAliasAsync()
     {
-        if ((SelectedAlias?.Id ?? 0) == 0) return;
+        if ((SelectedAlias?.Id ?? 0) == 0) { return; }
 
         SelectedAlias = await Task.Run(() => _aliasManagementService.Hydrate(SelectedAlias));
         _logger.LogInformation("Loading alias {AliasName}", SelectedAlias.Name);
@@ -308,9 +317,9 @@ public partial class KeywordsViewModel : ObservableObject
     [RelayCommand]
     private void OnLoadThumbnail(QueryResult? queryResult)
     {
-        if (queryResult is null) return;
+        if (queryResult is null) { return; }
 
-        if (!queryResult.Thumbnail.IsNullOrEmpty()) return; /* Already loaded */
+        if (!queryResult.Thumbnail.IsNullOrEmpty()) { return; /* Already loaded */ }
 
         try { _thumbnailService.UpdateThumbnail(queryResult); }
         catch (Exception ex)
@@ -331,32 +340,31 @@ public partial class KeywordsViewModel : ObservableObject
     {
         if (Criterion.IsNullOrWhiteSpace())
         {
-            Aliases = new(_cachedAliases);
+            Aliases = new ObservableCollection<AliasQueryResult>(_cachedAliases);
             return;
         }
 
-        var aliases = _cachedAliases.Where(
-                                        x => x.Name.StartsWith(Criterion, StringComparison.CurrentCultureIgnoreCase))
+        var aliases = _cachedAliases.Where(x => x.Name.StartsWith(Criterion, StringComparison.CurrentCultureIgnoreCase))
                                     .ToArray();
 
         _logger.LogTrace("Found {Count} alias(es) with criterion {Criterion}", aliases.Length, Criterion);
-        Aliases = new(aliases);
+        Aliases = new ObservableCollection<AliasQueryResult>(aliases);
     }
 
     [RelayCommand]
     private async Task OnSetPackagedApplication()
     {
-        if (SelectedAlias is null) return;
+        if (SelectedAlias is null) { return; }
 
         var viewModel = new UwpSelector { PackagedApps = await _packagedAppSearchService.GetInstalledUwpAppsAsync() };
-        var result =  await _hubService.Dialogues.InteractAsync(
+        var result = await _hubService.Dialogues.InteractAsync(
             _viewFactory.CreateView(viewModel),
             "Select",
             ButtonLabels.Cancel,
             "Select UWP application"
         );
 
-        if (!result.IsConfirmed) return;
+        if (!result.IsConfirmed) { return; }
 
         SelectedAlias.FileName = viewModel.SelectedPackagedApp?.AppUserModelId;
     }
