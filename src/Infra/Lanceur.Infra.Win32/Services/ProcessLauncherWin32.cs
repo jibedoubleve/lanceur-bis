@@ -64,7 +64,7 @@ public class ProcessLauncherWin32 : IProcessLauncher
 
     /// <inheritdoc />
     public async Task<IEnumerable<QueryResult>> Start(ISelfExecutable executable, Cmdline cmdline)
-        => await  executable.ExecuteAsync(cmdline);
+        => await executable.ExecuteAsync(cmdline);
 
     #endregion
 }

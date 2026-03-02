@@ -79,19 +79,21 @@ public class ExecutionService : IExecutionService
     {
         if (query.LuaScript.IsNullOrWhiteSpace())
         {
-            return new()
+            return new ScriptResult
             {
-                Context = new() { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
+                Context = new ScriptContext
+                    { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
             };
         }
 
         using var _ = _logger.BeginSingleScope("Query", query);
 
         var result = _luaManager.ExecuteScript(
-            new()
+            new Script
             {
                 Code = query.LuaScript ?? string.Empty,
-                Context = new() { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
+                Context = new ScriptContext
+                    { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
             }
         );
         using var __ = _logger.BeginSingleScope("ScriptResult", result);
@@ -179,7 +181,7 @@ public class ExecutionService : IExecutionService
         if (request is null)
         {
             _logger.LogInformation("The execution request is null");
-            return new()
+            return new ExecutionResponse
             {
                 Results = DisplayQueryResult.SingleFromResult("This alias does not exist"), HasResult = true
             };
@@ -227,7 +229,7 @@ public class ExecutionService : IExecutionService
         foreach (var queryResult in queryResults)
         {
             currentDelay += delay;
-            _ = ExecuteAsync(new(queryResult), currentDelay);
+            _ = ExecuteAsync(new ExecutionRequest(queryResult), currentDelay);
         }
 
         return ExecutionResponse.NoResult;

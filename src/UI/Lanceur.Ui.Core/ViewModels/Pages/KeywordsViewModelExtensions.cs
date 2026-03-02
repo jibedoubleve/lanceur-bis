@@ -67,7 +67,7 @@ public static class KeywordsViewModelExtensions
     {
         if (keywordsViewModel.SelectedAlias is null) { return null; }
 
-        return new() { AliasId = keywordsViewModel.SelectedAlias.Id };
+        return new AdditionalParameter { AliasId = keywordsViewModel.SelectedAlias.Id };
     }
 
     #endregion

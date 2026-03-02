@@ -6,7 +6,7 @@ public static class Paths
 {
     #region Fields
 
-    public const string GithubUrl =  "https://github.com/jibedoubleve/lanceur-bis";
+    public const string GithubUrl = "https://github.com/jibedoubleve/lanceur-bis";
 
     #endregion
 

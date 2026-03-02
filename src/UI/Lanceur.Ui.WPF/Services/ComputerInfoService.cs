@@ -37,7 +37,7 @@ public class ComputerInfoService : IComputerInfoService
     }
 
     /// <inheritdoc />
-    public void StopMonitoring() { IsMonitoring = false; }
+    public void StopMonitoring() => IsMonitoring = false;
 
     #endregion
 }
@@ -61,7 +61,7 @@ internal static class SystemMetrics
             throw new InvalidOperationException("GetSystemTimes failed.");
         }
 
-        return new(ToUInt64(idle), ToUInt64(kernel), ToUInt64(user));
+        return new CpuSample(ToUInt64(idle), ToUInt64(kernel), ToUInt64(user));
     }
 
     private static ulong ToUInt64(Filetime ft) => ((ulong)ft.dwHighDateTime << 32) | ft.dwLowDateTime;
@@ -145,7 +145,7 @@ internal static class SystemMetrics
         #region Fields
 
         public uint dwLength;
-        public uint dwMemoryLoad;     // % of physical memory in use (approx)  
+        public uint dwMemoryLoad; // % of physical memory in use (approx)  
         public ulong ullAvailExtendedVirtual;
         public ulong ullAvailPageFile;
         public ulong ullAvailPhys;

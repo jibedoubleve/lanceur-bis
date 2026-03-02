@@ -11,12 +11,10 @@ public class WatchdogBuilder : IWatchdogBuilder
 
     #region Methods
 
-    public IWatchdog Build()
-    {
-        return _action is null 
-            ? throw new ArgumentException(nameof(_action)) 
+    public IWatchdog Build() =>
+        _action is null
+            ? throw new ArgumentException(nameof(_action))
             : new Watchdog(_action, _interval);
-    }
 
     public IWatchdogBuilder WithAction(Func<Task> action)
     {

@@ -9,7 +9,8 @@ public static class ConditionalExecution
 {
     #region Methods
 
-    [Conditional("DEBUG")] private static void SetIfDebug(ref bool isDebug) => isDebug = true;
+    [Conditional("DEBUG")]
+    private static void SetIfDebug(ref bool isDebug) => isDebug = true;
 
     /// <summary>
     ///     Executes one of the provided functions based on the current compilation mode.

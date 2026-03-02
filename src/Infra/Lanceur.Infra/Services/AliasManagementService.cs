@@ -30,7 +30,11 @@ public class AliasManagementService : IAliasManagementService
                                  .Where(x => !x.IsHidden)
                                  .OrderBy(x => x.Name)
                                  .ToArray();
-        foreach (var result in results) result.MarkUnchanged();
+        foreach (var result in results)
+        {
+            result.MarkUnchanged();
+        }
+
         return results;
     }
 

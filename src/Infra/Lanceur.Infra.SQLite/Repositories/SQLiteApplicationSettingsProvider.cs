@@ -89,9 +89,9 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
                 .FirstOrDefault()
         );
 
-        _current =  AddNewFeatureFlags(
+        _current = AddNewFeatureFlags(
             json.IsNullOrEmpty()
-                ? new()
+                ? new ApplicationSettings()
                 : JsonConvert.DeserializeObject<ApplicationSettings>(json, _jsonSettings)
         );
     }

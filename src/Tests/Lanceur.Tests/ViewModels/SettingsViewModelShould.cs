@@ -113,7 +113,7 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
     [InlineData(true)]
     [InlineData(false)]
     public void SaveOptionShowResult(bool value)
-        =>  AssertProperty(
+        => AssertProperty(
             viewModel => viewModel.ShowResult = value,
             () => GetProperty("SearchBox.ShowResult"),
             () => Convert.ToInt32(value).ToString()

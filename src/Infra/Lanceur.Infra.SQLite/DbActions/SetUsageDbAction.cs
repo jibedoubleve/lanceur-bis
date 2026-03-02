@@ -58,7 +58,7 @@ public class SetUsageDbAction
         var count = tx.Connection!.ExecuteScalar<int>(sql, new { id = alias.Id });
 
         const string sqlUpdate = "update alias set exec_count = @count where id = @id;";
-        tx.Connection!.Execute(sqlUpdate, new { id = alias.Id,   count });
+        tx.Connection!.Execute(sqlUpdate, new { id = alias.Id, count });
 
         alias.Count = count;
     }

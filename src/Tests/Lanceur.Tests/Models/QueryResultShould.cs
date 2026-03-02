@@ -9,7 +9,8 @@ public class QueryResultShould
 {
     #region Methods
 
-    [Fact] public void HaveEmptyNameByDefault() => new TestQueryResult().Name.ShouldBeEmpty();
+    [Fact]
+    public void HaveEmptyNameByDefault() => new TestQueryResult().Name.ShouldBeEmpty();
 
     [Fact]
     public void HaveEmptyQueryByDefault()
@@ -31,7 +32,8 @@ public class QueryResultShould
         queryResult.DescriptionDisplay.ShouldBe(expected);
     }
 
-    [Fact] public void HaveNullDescriptionByDefault() { new TestQueryResult().Description.ShouldBeNull(); }
+    [Fact]
+    public void HaveNullDescriptionByDefault() => new TestQueryResult().Description.ShouldBeNull();
 
     [Theory]
     [InlineData("un, deux,trois,quatre,cinq", 5)]
@@ -48,13 +50,14 @@ public class QueryResultShould
 
         // ASSERT
         names.ShouldSatisfyAllConditions(
-            n =>  n.Length.ShouldBe(count),
-            n =>  Assert.All(n, x => x.ShouldNotStartWith(" ")),
-            n =>  Assert.All(n, x => x.ShouldNotEndWith(" "))
+            n => n.Length.ShouldBe(count),
+            n => Assert.All(n, x => x.ShouldNotStartWith(" ")),
+            n => Assert.All(n, x => x.ShouldNotEndWith(" "))
         );
     }
 
-    [Fact] public void HaveZeroCountByDefault() { new TestQueryResult().Count.ShouldBe(0); }
+    [Fact]
+    public void HaveZeroCountByDefault() => new TestQueryResult().Count.ShouldBe(0);
 
     #endregion
 

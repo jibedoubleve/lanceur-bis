@@ -23,12 +23,12 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
     public Win32AppThumbnailStrategy(
         IStaThreadRunner staThreadRunner,
         ILoggerFactory loggerFactory,
-        IAliasManagementService  aliasManagementService
+        IAliasManagementService aliasManagementService
     )
     {
         _staThreadRunner = staThreadRunner;
         _aliasManagementService = aliasManagementService;
-        _win32ThumbnailService = new(loggerFactory.CreateLogger<Win32ThumbnailService>());
+        _win32ThumbnailService = new Win32ThumbnailService(loggerFactory.CreateLogger<Win32ThumbnailService>());
     }
 
     #endregion

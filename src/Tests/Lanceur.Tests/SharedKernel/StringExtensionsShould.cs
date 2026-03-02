@@ -28,17 +28,15 @@ public class StringExtensionsShould
     [InlineData("tostring", "ToString")]
     [InlineData("", "")]
     [InlineData(null, null)]
-    public void ReturnLowerString(string expected, string actual) { actual.ToLowerString().ShouldBe(expected); }
+    public void ReturnLowerString(string expected, string actual) => actual.ToLowerString().ShouldBe(expected);
 
     [Theory]
     [InlineData("firstvalue", EnumValues.FirstValue)]
     [InlineData("secondvalue", EnumValues.SecondValue)]
     [InlineData("thirdvalue", EnumValues.ThirdValue)]
     [InlineData("fourthvalue", EnumValues.FourthValue)]
-    public void ReturnLowerStringFromEnum(string expected, EnumValues actual)
-    {
+    public void ReturnLowerStringFromEnum(string expected, EnumValues actual) =>
         actual.ToLowerString().ShouldBe(expected);
-    }
 
     [Fact]
     public void ReturnTrueOnEmptyUsingNullOrWhiteSpace()
@@ -65,12 +63,12 @@ public class StringExtensionsShould
     [Theory]
     [InlineData("un")]
     [InlineData("deux")]
-    public void ReturnTrueOnTextUsingNullOrEmpty(string value) { value.ShouldNotBeNullOrEmpty(); }
+    public void ReturnTrueOnTextUsingNullOrEmpty(string value) => value.ShouldNotBeNullOrEmpty();
 
     [Theory]
     [InlineData("un")]
     [InlineData("deux")]
-    public void ReturnTrueOnTextUsingNullOrWhiteSpace(string value) { value.ShouldNotBeNullOrWhiteSpace(); }
+    public void ReturnTrueOnTextUsingNullOrWhiteSpace(string value) => value.ShouldNotBeNullOrWhiteSpace();
 
     #endregion
 

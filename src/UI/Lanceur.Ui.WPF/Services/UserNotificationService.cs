@@ -49,7 +49,7 @@ public class UserNotificationService : IUserNotificationService
 
         #region Methods
 
-        public void Dispose() { _userInteractionService.DisableLoadingState(); }
+        public void Dispose() => _userInteractionService.DisableLoadingState();
 
         #endregion
     }

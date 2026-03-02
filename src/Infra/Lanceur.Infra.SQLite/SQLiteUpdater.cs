@@ -32,7 +32,7 @@ public class SQLiteUpdater
     {
         _versionService = versionService;
         _logger = logFactory.GetLogger<SQLiteUpdater>();
-        _updater = new(
+        _updater = new SQLiteDatabaseUpdateManager(
             versionService,
             dbConnection,
             assembly,

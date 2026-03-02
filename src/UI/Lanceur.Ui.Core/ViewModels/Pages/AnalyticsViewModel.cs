@@ -64,13 +64,13 @@ public partial class AnalyticsViewModel : ObservableObject
                          .Distinct()
                          .ToList();
         list.Insert(0, SelectAll);
-        return new(list);
+        return new ObservableCollection<string>(list);
     }
 
     private void InvalidateCache(IEnumerable<DataPoint<DateTime, double>> points)
     {
         _cancellationCacheTokenSource.Cancel();
-        _cancellationCacheTokenSource = new(1.Minutes());
+        _cancellationCacheTokenSource = new CancellationTokenSource(1.Minutes());
         _memoryCache.Set(CacheKey, points, new CancellationChangeToken(_cancellationCacheTokenSource.Token));
     }
 
@@ -165,11 +165,11 @@ public partial class AnalyticsViewModel : ObservableObject
         if (LastPlotContext is null) { return; }
 
         int? year = int.TryParse(yearStr, out var yearValue) ? yearValue : null;
-        var per =  LastPlotContext.PlotType switch
+        var per = LastPlotContext.PlotType switch
         {
-            PlotType.UsageByHourOfDay =>  Per.HourOfDay,
+            PlotType.UsageByHourOfDay => Per.HourOfDay,
             PlotType.UsageByDayOfWeek => Per.DayOfWeek,
-            _                         => throw new ArgumentOutOfRangeException(
+            _ => throw new ArgumentOutOfRangeException(
                 $"Plot '{LastPlotContext.PlotType}' is not supported for a trend plot refresh."
             )
         };
@@ -207,7 +207,7 @@ public partial class AnalyticsViewModel : ObservableObject
 
         if (LastPlotContext is null) { Years = GetYears(dataPoints); }
 
-        LastPlotContext = new()
+        LastPlotContext = new PlotContext
         {
             DateTimeToDoubleConverter = dateTimeToDoubleConverter,
             PlotType = plotType,

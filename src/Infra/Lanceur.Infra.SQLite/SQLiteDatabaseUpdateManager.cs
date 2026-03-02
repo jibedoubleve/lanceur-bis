@@ -29,7 +29,8 @@ internal class SQLiteDatabaseUpdateManager
 
         if (string.IsNullOrEmpty(db.ConnectionString))
         {
-            throw new ArgumentException($"Argument {nameof(db.ConnectionString)}: ConnectionString should have a value");
+            throw new ArgumentException(
+                $"Argument {nameof(db.ConnectionString)}: ConnectionString should have a value");
         }
 
         _dbUpdater = new DatabaseUpdater(db, asm, pattern);

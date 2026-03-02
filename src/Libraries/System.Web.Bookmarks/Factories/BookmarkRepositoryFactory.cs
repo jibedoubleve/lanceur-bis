@@ -37,12 +37,12 @@ public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
     {
         IBookmarkRepository repository = browser switch
         {
-            Browser.Chrome  => new BlinkBrowserBookmarks(
+            Browser.Chrome => new BlinkBrowserBookmarks(
                 _memoryCache,
                 _loggerFactory,
                 BrowserConfigurationFactory.Chrome
             ),
-            Browser.Edge    => new BlinkBrowserBookmarks(
+            Browser.Edge => new BlinkBrowserBookmarks(
                 _memoryCache,
                 _loggerFactory,
                 BrowserConfigurationFactory.Edge

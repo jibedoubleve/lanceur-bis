@@ -9,7 +9,7 @@ public class ConfigurationSection<T> : IWriteableSection<T>
 {
     #region Fields
 
-    private T _cachedSection  ;
+    private T _cachedSection;
 
     private readonly IConfigurationFacade _configuration;
 

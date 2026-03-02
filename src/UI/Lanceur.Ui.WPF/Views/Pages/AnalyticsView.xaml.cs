@@ -39,7 +39,7 @@ public sealed partial class AnalyticsView : IDisposable
             DoubleConverter.ToMonthYear,
             "Monthly history",
             "Month Year",
-            new() { Rotation = -45, PositionMultipier =  2 }
+            new Options { Rotation = -45, PositionMultipier = 2 }
         );
         viewModel.OnRefreshUsageByHourPlot = (x, y) => RefreshBar(
             x,
@@ -65,7 +65,8 @@ public sealed partial class AnalyticsView : IDisposable
 
     #region Properties
 
-    private static ThemeColor CurrentTheme => ApplicationThemeManager.IsMatchedDark() ? ThemeColor.Dark : ThemeColor.Light;
+    private static ThemeColor CurrentTheme =>
+        ApplicationThemeManager.IsMatchedDark() ? ThemeColor.Dark : ThemeColor.Light;
 
     #endregion
 
@@ -75,7 +76,7 @@ public sealed partial class AnalyticsView : IDisposable
     ///     Click on the menu should reset the year
     /// </remarks>
     /// >
-    private void OnClickMenu(object sender, RoutedEventArgs e) { CbYears.SelectedIndex = 0; }
+    private void OnClickMenu(object sender, RoutedEventArgs e) => CbYears.SelectedIndex = 0;
 
     private void OnThemeChanged(ApplicationTheme _, Color __) => SetTheme();
 
@@ -88,7 +89,7 @@ public sealed partial class AnalyticsView : IDisposable
         Options? options = null
     )
     {
-        options ??= new();
+        options ??= new Options();
         var x = xPoint.ToArray();
         var y = yPoint.ToArray();
 
@@ -231,7 +232,7 @@ public sealed partial class AnalyticsView : IDisposable
         #region Properties
 
         private const string ColorWhite = "#d7d7d7";
-        
+
         public ScottPlot.Color Axes
             => _isDark ? ScottPlot.Color.FromHex(ColorWhite) : ScottPlot.Color.FromHex("#616161");
 
@@ -257,7 +258,7 @@ public sealed partial class AnalyticsView : IDisposable
         public ScottPlot.Color MajorLineColor
             => _isDark ? ScottPlot.Color.FromHex("#404040") : ScottPlot.Color.FromHex(ColorWhite);
 
-        public IPalette Palette =>  _isDark ? new Penumbra() : new Nord();
+        public IPalette Palette => _isDark ? new Penumbra() : new Nord();
 
         #endregion
     }

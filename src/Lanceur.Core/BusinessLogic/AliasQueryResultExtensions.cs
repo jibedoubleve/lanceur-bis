@@ -14,6 +14,7 @@ public static class AliasQueryResultExtensions
         var results = new List<AliasQueryResult>();
 
         foreach (var name in names)
+        {
             try
             {
                 var toAdd = alias.CloneObject();
@@ -21,6 +22,7 @@ public static class AliasQueryResultExtensions
                 results.Add(toAdd);
             }
             catch (Exception ex) { errors.Add(ex); }
+        }
 
         if (errors.Any())
         {

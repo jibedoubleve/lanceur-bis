@@ -2,6 +2,7 @@ using System.Web.Bookmarks;
 using Everything.Wrapper;
 using Lanceur.Core;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
@@ -24,7 +25,7 @@ public static class StoreExtensions
                 .AddMockSingleton<IConfigurationFacade>((_, i) => {
                         i.Application.Returns(
                             configuration ??
-                            new ApplicationSettings { Caching = new(0, 0), Stores = new() }
+                            new ApplicationSettings { Caching = new CachingSection(0, 0), Stores = new StoreSection() }
                         );
                         return i;
                     }
@@ -32,7 +33,7 @@ public static class StoreExtensions
             return serviceCollection;
         }
 
-        public IServiceCollection  AddStoreServicesMockContext()
+        public IServiceCollection AddStoreServicesMockContext()
         {
             serviceCollection
                 .AddMockSingleton<IAliasRepository>()

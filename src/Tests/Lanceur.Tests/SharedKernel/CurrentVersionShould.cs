@@ -10,15 +10,13 @@ public class CurrentVersionShould
 
     [Theory]
     [MemberData(nameof(FeedCreateCurrentVersionFromFullVersion))]
-    public void CreateCurrentVersionFromFullVersion(string fullVersion, string version, string suffix, string commit)
-    {
+    public void CreateCurrentVersionFromFullVersion(string fullVersion, string version, string suffix, string commit) =>
         CurrentVersion.FromFullVersion(fullVersion)
                       .ShouldSatisfyAllConditions(
                           v => v.Commit.ShouldBe(commit),
-                          v => v.Version.ShouldBe(new(version)),
+                          v => v.Version.ShouldBe(new Version(version)),
                           v => v.Suffix.ShouldBe(suffix)
                       );
-    }
 
     public static IEnumerable<object[]> FeedCreateCurrentVersionFromFullVersion()
     {

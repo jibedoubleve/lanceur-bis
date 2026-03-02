@@ -67,11 +67,13 @@ public class ThumbnailService : IThumbnailService
         async Task RunStrategy(AliasQueryResult alias)
         {
             foreach (var strategy in _thumbnailStrategy)
+            {
                 try { await strategy.UpdateThumbnailAsync(alias); }
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "One thumbnail retrieve strategy failed: {Message}", ex.Message);
                 }
+            }
         }
     }
 

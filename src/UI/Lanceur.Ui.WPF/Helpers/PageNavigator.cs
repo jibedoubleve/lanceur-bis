@@ -31,7 +31,7 @@ public class PageNavigator
     public void NavigateToSettings<TView>() where TView : Page
     {
         var windows = Application.Current.Windows.OfType<SettingsView>().ToArray();
-        var view  = windows.Length != 0
+        var view = windows.Length != 0
             ? windows[0]
             : _serviceProvider.GetService<SettingsView>()!;
 

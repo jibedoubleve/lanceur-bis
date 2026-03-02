@@ -26,12 +26,10 @@ public class AppRestartDummyService : IAppRestartService
     public void ReleaseInstance() { }
 
     /// <inheritdoc />
-    public void Restart()
-    {
+    public void Restart() =>
         _notification.LogInformation(
             "Application restart requested. Note: This is a placeholder restarter for development purposes only."
         );
-    }
 
     #endregion
 }

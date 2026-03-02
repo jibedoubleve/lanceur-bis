@@ -13,7 +13,7 @@ public class SqlBuilder : SqlBuilderBase
     ///     Tracks the last identifier assigned to an alias.
     ///     A value of 0 means that no alias has been created yet.
     /// </summary>
-    public int IdSequence  { get; private set; }
+    public int IdSequence { get; private set; }
 
     #endregion
 
@@ -31,7 +31,7 @@ public class SqlBuilder : SqlBuilderBase
     /// </returns>
     public SqlBuilder AppendAlias(Action<SqlAliasBuilder> generator)
     {
-        generator(new(++IdSequence, Sql));
+        generator(new SqlAliasBuilder(++IdSequence, Sql));
         return this;
     }
 

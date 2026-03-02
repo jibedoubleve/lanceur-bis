@@ -36,10 +36,8 @@ public class LuaCompletionData : ICompletionData
         TextArea textArea,
         ISegment completionSegment,
         EventArgs insertionRequestEventArgs
-    )
-    {
+    ) =>
         textArea.Document.Replace(completionSegment, Text);
-    }
 
     #endregion
 }

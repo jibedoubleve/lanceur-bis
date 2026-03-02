@@ -19,7 +19,7 @@ public class ExecutionResponse
     public static ExecutionResponse FromResults(IEnumerable<QueryResult> results)
     {
         results = results?.ToArray() ?? [];
-        return new() { Results = results, HasResult = results.Any() };
+        return new ExecutionResponse { Results = results, HasResult = results.Any() };
     }
 
     #endregion

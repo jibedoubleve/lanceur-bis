@@ -49,6 +49,7 @@ public class MacroDbAction
 
         var delay = 0;
         foreach (var name in names)
+        {
             if (name == string.Empty) { delay++; }
             else
             {
@@ -71,6 +72,7 @@ public class MacroDbAction
                 subAliases.Add(alias);
                 delay = 1;
             }
+        }
 
         var result = item.ToAliasQueryResultComposite(subAliases);
         return result;

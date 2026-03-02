@@ -22,7 +22,7 @@ public static class IndexNavigatorExtensions
         if (current == -1) { return -1; }
 
         var max = collection.Count();
-        return  current < -1 || current >= max
+        return current < -1 || current >= max
             ? throw new ArgumentOutOfRangeException(
                 nameof(current),
                 current,
@@ -53,7 +53,7 @@ public static class IndexNavigatorExtensions
             ? 0
             : current + pageSize;
 
-        return  current < -1 || current >= max
+        return current < -1 || current >= max
             ? throw new IndexOutOfRangeException("Cannot navigate to next page when index if out of range.")
             : ValidateNewIndex(newIdx, max);
     }
@@ -94,7 +94,7 @@ public static class IndexNavigatorExtensions
             ? max - 1
             : current - pageSize;
 
-        return  current < 0 || current >= max
+        return current < 0 || current >= max
             ? throw new IndexOutOfRangeException("Cannot navigate to previous page when index if out of range.")
             : ValidateNewIndex(newIdx, max);
     }

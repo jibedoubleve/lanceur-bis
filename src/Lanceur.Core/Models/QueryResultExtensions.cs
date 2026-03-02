@@ -13,7 +13,8 @@ public static partial class QueryResultExtensions
 
     #region Methods
 
-    [GeneratedRegex("@([a-zA-Z_]*)@")] private static partial Regex BuildFindMacroRegex();
+    [GeneratedRegex("@([a-zA-Z_]*)@")]
+    private static partial Regex BuildFindMacroRegex();
 
     private static bool Is(this AliasQueryResult @this, CompositeMacros macro)
         => @this.FileName.ToLower().Contains($"@{macro.ToLowerString()}@".ToLower());

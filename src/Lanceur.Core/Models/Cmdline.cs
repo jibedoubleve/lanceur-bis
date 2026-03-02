@@ -49,7 +49,7 @@ public record Cmdline
 
         if (CmdlineManager.HasSpecialName(cmdline))
         {
-            return new(
+            return new Cmdline(
                 CmdlineManager.GetSpecialName(cmdline),
                 cmdline[1..]
             );
@@ -59,7 +59,7 @@ public record Cmdline
         if (elements.Length <= 0) { return Empty; }
 
         var name = elements[0];
-        return new(
+        return new Cmdline(
             name,
             cmdline[name.Length..]
         );

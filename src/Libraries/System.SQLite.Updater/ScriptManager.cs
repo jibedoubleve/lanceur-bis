@@ -19,7 +19,7 @@ public partial class ScriptManager
         ArgumentNullException.ThrowIfNull(asm);
         ArgumentNullException.ThrowIfNull(pattern);
 
-        _regex = new(pattern);
+        _regex = new Regex(pattern);
         _asm = asm;
     }
 
@@ -63,7 +63,7 @@ public partial class ScriptManager
         }
 
         var ordered = src.OrderBy(x => x.Key);
-        return new(new Dictionary<Version, string>(ordered));
+        return new ScriptCollection(new Dictionary<Version, string>(ordered));
     }
 
     public IEnumerable<string> ListResources()

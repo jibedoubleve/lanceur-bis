@@ -6,6 +6,7 @@ using Humanizer;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Models;
+using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.Core.Messages;
@@ -106,7 +107,7 @@ public partial class MainViewModel : ObservableObject
 
         var query = Cmdline.Parse(Query);
         var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
-        WeakReferenceMessenger.Default.Send<SetQueryMessage>(new(cmd));
+        WeakReferenceMessenger.Default.Send<SetQueryMessage>(new SetQueryMessage(cmd));
     }
 
     [RelayCommand]
@@ -126,11 +127,11 @@ public partial class MainViewModel : ObservableObject
             }
 
             var response = await _executionService.ExecuteAsync(
-                new(SelectedResult, Cmdline.Parse(Query), runAsAdmin)
+                new ExecutionRequest(SelectedResult, Cmdline.Parse(Query), runAsAdmin)
             );
 
             WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
-            if (response.HasResult) { Results = new(response.Results); }
+            if (response.HasResult) { Results = new ObservableCollection<QueryResult>(response.Results); }
         }
         catch (Exception ex)
         {
@@ -186,7 +187,8 @@ public partial class MainViewModel : ObservableObject
         _executionService.OpenDirectoryAsync(SelectedResult);
     }
 
-    [RelayCommand] private async Task OnSearch() => await _watchdog.Pulse();
+    [RelayCommand]
+    private async Task OnSearch() => await _watchdog.Pulse();
 
     private async Task SearchAsync()
     {
@@ -197,7 +199,7 @@ public partial class MainViewModel : ObservableObject
             if (criterion.IsNullOrEmpty()) { Results.Clear(); }
 
             var results = await _searchService.SearchAsync(criterion, DoesReturnAllIfEmpty);
-            Results = new(results);
+            Results = new ObservableCollection<QueryResult>(results);
             SelectedResult = Results.FirstOrDefault()!;
             Suggestion = GetSuggestion(criterion.Name, SelectedResult);
 
@@ -232,7 +234,7 @@ public partial class MainViewModel : ObservableObject
             if (_stgSearchBox.Value.ShowResult && Query.IsNullOrWhiteSpace())
             {
                 var results = await Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true));
-                Results = new(results);
+                Results = new ObservableCollection<QueryResult>(results);
             }
         }
         catch (Exception ex)

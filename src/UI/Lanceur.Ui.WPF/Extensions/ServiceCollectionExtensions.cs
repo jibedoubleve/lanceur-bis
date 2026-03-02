@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
 {
     #region Methods
 
-    public static  IServiceCollection AddCommands(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddCommands(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<UpdateNotification>();
         return serviceCollection;

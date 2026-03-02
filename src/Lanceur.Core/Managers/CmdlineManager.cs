@@ -37,17 +37,15 @@ public static class CmdlineManager
 
     #region Methods
 
-    public static string GetSpecialName(string cmdline)
-    {
-        return cmdline.Length switch
+    public static string GetSpecialName(string cmdline) =>
+        cmdline.Length switch
         {
             > 1 when cmdline[0] == cmdline[1] => cmdline[..2],
             > 0                               => cmdline[..1],
-            _                                 => throw new ArgumentException(
+            _ => throw new ArgumentException(
                 $"Cmdline is too short (length {cmdline.Length})"
             )
         };
-    }
 
     public static bool HasSpecialName(string cmdName)
     {

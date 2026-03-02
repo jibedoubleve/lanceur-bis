@@ -10,7 +10,7 @@ public static class ValidationAdapter
     public static ValidationResult ToValidationResult(this ValidationStatus validationStatus)
         => validationStatus.IsSuccess
             ? ValidationResult.ValidResult
-            : new(false, validationStatus.ErrorContent);
+            : new ValidationResult(false, validationStatus.ErrorContent);
 
     #endregion
 }

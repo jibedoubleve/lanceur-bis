@@ -44,13 +44,11 @@ public partial class ExceptionView
         if (e.Key == Key.Escape) { Close(); }
     }
 
-    private void OnLoaded(object _, RoutedEventArgs e)
-    {
+    private void OnLoaded(object _, RoutedEventArgs e) =>
         SystemThemeWatcher.Watch(
             this,
             _configuration.Application.Window.BackdropStyle.ToWindowBackdropType()
         );
-    }
 
     private void OnOpenLogs(object sender, RoutedEventArgs e) => WindowsShell.StartExplorer(Paths.LogRepository);
 

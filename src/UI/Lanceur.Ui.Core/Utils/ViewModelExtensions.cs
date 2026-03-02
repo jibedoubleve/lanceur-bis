@@ -17,6 +17,7 @@ public static class ViewModelExtensions
         );
 
         foreach (var property in properties)
+        {
             if (typeof(ICommand).IsAssignableFrom(property.PropertyType))
             {
                 if (property.GetValue(@this) is not ICommand command) { continue; }
@@ -30,6 +31,7 @@ public static class ViewModelExtensions
 
                 methodInfo.Invoke(command, null);
             }
+        }
     }
 
     #endregion

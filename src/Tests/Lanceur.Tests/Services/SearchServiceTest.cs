@@ -122,7 +122,7 @@ public class SearchServiceTest : TestBase
 
         // ACT
         var service = serviceProvider.GetService<SearchService>();
-        var result = (await service.SearchAsync(new("z"))).ToArray();
+        var result = (await service.SearchAsync(new Cmdline("z"))).ToArray();
 
         // ASSERT
         Assert.Multiple(
@@ -276,7 +276,7 @@ public class SearchServiceTest : TestBase
 
         // ACT
         var searchService = serviceProvider.GetService<ISearchService>();
-        var result = (await searchService.SearchAsync(new(criterion))).ToArray();
+        var result = (await searchService.SearchAsync(new Cmdline(criterion))).ToArray();
 
         // ASSERT
         result.ShouldSatisfyAllConditions(

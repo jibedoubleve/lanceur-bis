@@ -45,7 +45,7 @@ public class LuaManagerShould
                                  """;
 
         var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName = "", Parameters = parameter } }
+            new Script { Code = luaScript, Context = new ScriptContext { FileName = "", Parameters = parameter } }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),
@@ -78,7 +78,7 @@ public class LuaManagerShould
                                  """;
 
         var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName = url, Parameters = parameter } }
+            new Script { Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = parameter } }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),
@@ -91,7 +91,7 @@ public class LuaManagerShould
     public void NotCrashWhenScriptIsNull()
     {
         var result = LuaManager.ExecuteScript(
-            new() { Code = null, Context = new() { FileName = null, Parameters = null } }
+            new Script { Code = null, Context = new ScriptContext { FileName = null, Parameters = null } }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),
@@ -108,7 +108,10 @@ public class LuaManagerShould
         const string luaScript = "this is a failing script";
 
         var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName   = url, Parameters = "unhandled_case" } }
+            new Script
+            {
+                Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = "unhandled_case" }
+            }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),
@@ -127,7 +130,7 @@ public class LuaManagerShould
         const string luaScript = "return 145";
 
         var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName   = url, Parameters = parameters } }
+            new Script { Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = parameters } }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),

@@ -7,9 +7,8 @@ public class NumberToBooleanConverter : IValueConverter
 {
     #region Methods
 
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value switch
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value switch
         {
             int i     => i > 0,
             uint u    => u > 0,
@@ -18,7 +17,6 @@ public class NumberToBooleanConverter : IValueConverter
             float f   => f > 0,
             _         => Binding.DoNothing
         };
-    }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotImplementedException();

@@ -9,10 +9,10 @@ public partial class ReportConfigurationViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private ObservableCollection<ReportConfiguration> _configurations  ;
-    [ObservableProperty] private string _label  ;
+    [ObservableProperty] private ObservableCollection<ReportConfiguration> _configurations;
+    [ObservableProperty] private string _label;
     [ObservableProperty] private ReportConfiguration _selectedConfiguration;
-    [ObservableProperty] private string _toolTip  ;
+    [ObservableProperty] private string _toolTip;
 
     #endregion
 
@@ -26,7 +26,7 @@ public partial class ReportConfigurationViewModel : ObservableObject
         ReportType currentReport
     )
     {
-        Configurations = new(configurations);
+        Configurations = new ObservableCollection<ReportConfiguration>(configurations);
         SelectedConfiguration = Configurations.FirstOrDefault(e => e.ReportType == currentReport)!;
         Label = label;
         ToolTip = toolTip;

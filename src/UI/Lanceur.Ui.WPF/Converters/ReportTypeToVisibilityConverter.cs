@@ -20,9 +20,8 @@ public class ReportTypeToVisibilityConverter : IValueConverter
 {
     #region Methods
 
-    private Visibility GetDefaultVisibility(ActionOnAlias actionOnAlias)
-    {
-        return actionOnAlias switch
+    private Visibility GetDefaultVisibility(ActionOnAlias actionOnAlias) =>
+        actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
             ActionOnAlias.Delete             => Visibility.Visible,
@@ -31,17 +30,15 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.DeletePermanently  => Visibility.Collapsed,
             ActionOnAlias.InactivitySelector => Visibility.Collapsed,
             ActionOnAlias.LowUsageSelector   => Visibility.Collapsed,
-            _                                => throw new ArgumentOutOfRangeException(
+            _ => throw new ArgumentOutOfRangeException(
                 nameof(actionOnAlias),
                 actionOnAlias,
                 null
             )
         };
-    }
 
-    private Visibility GetVisibilityForDeleted(ActionOnAlias actionOnAlias)
-    {
-        return actionOnAlias switch
+    private Visibility GetVisibilityForDeleted(ActionOnAlias actionOnAlias) =>
+        actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
             ActionOnAlias.Delete             => Visibility.Collapsed,
@@ -50,17 +47,15 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.DeletePermanently  => Visibility.Visible,
             ActionOnAlias.InactivitySelector => Visibility.Collapsed,
             ActionOnAlias.LowUsageSelector   => Visibility.Collapsed,
-            _                                => throw new ArgumentOutOfRangeException(
+            _ => throw new ArgumentOutOfRangeException(
                 nameof(actionOnAlias),
                 actionOnAlias,
                 null
             )
         };
-    }
 
-    private static Visibility GetVisibilityForDoubloon(ActionOnAlias actionOnAlias)
-    {
-        return actionOnAlias switch
+    private static Visibility GetVisibilityForDoubloon(ActionOnAlias actionOnAlias) =>
+        actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
             ActionOnAlias.Delete             => Visibility.Visible,
@@ -69,17 +64,15 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.DeletePermanently  => Visibility.Collapsed,
             ActionOnAlias.InactivitySelector => Visibility.Collapsed,
             ActionOnAlias.LowUsageSelector   => Visibility.Collapsed,
-            _                                => throw new ArgumentOutOfRangeException(
+            _ => throw new ArgumentOutOfRangeException(
                 nameof(actionOnAlias),
                 actionOnAlias,
                 null
             )
         };
-    }
 
-    private object GetVisibilityForInactive(ActionOnAlias actionOnAlias)
-    {
-        return actionOnAlias switch
+    private object GetVisibilityForInactive(ActionOnAlias actionOnAlias) =>
+        actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
             ActionOnAlias.Delete             => Visibility.Visible,
@@ -88,17 +81,15 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.DeletePermanently  => Visibility.Collapsed,
             ActionOnAlias.InactivitySelector => Visibility.Visible,
             ActionOnAlias.LowUsageSelector   => Visibility.Collapsed,
-            _                                => throw new ArgumentOutOfRangeException(
+            _ => throw new ArgumentOutOfRangeException(
                 nameof(actionOnAlias),
                 actionOnAlias,
                 null
             )
         };
-    }
 
-    private Visibility GetVisibilityForLowUsage(ActionOnAlias actionOnAlias)
-    {
-        return actionOnAlias switch
+    private Visibility GetVisibilityForLowUsage(ActionOnAlias actionOnAlias) =>
+        actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Collapsed,
             ActionOnAlias.Delete             => Visibility.Visible,
@@ -107,17 +98,15 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.DeletePermanently  => Visibility.Collapsed,
             ActionOnAlias.InactivitySelector => Visibility.Collapsed,
             ActionOnAlias.LowUsageSelector   => Visibility.Visible,
-            _                                => throw new ArgumentOutOfRangeException(
+            _ => throw new ArgumentOutOfRangeException(
                 nameof(actionOnAlias),
                 actionOnAlias,
                 null
             )
         };
-    }
 
-    private Visibility GetVisibilityForUnannotated(ActionOnAlias actionOnAlias)
-    {
-        return actionOnAlias switch
+    private Visibility GetVisibilityForUnannotated(ActionOnAlias actionOnAlias) =>
+        actionOnAlias switch
         {
             ActionOnAlias.UpdateDescription  => Visibility.Visible,
             ActionOnAlias.Delete             => Visibility.Collapsed,
@@ -126,13 +115,12 @@ public class ReportTypeToVisibilityConverter : IValueConverter
             ActionOnAlias.DeletePermanently  => Visibility.Collapsed,
             ActionOnAlias.InactivitySelector => Visibility.Collapsed,
             ActionOnAlias.LowUsageSelector   => Visibility.Collapsed,
-            _                                => throw new ArgumentOutOfRangeException(
+            _ => throw new ArgumentOutOfRangeException(
                 nameof(actionOnAlias),
                 actionOnAlias,
                 null
             )
         };
-    }
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

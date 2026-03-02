@@ -24,7 +24,8 @@ public partial class IniFileLoader
 
     #region Methods
 
-    [GeneratedRegex(@"^\[(.*)\]")] private static partial Regex IsSectionPattern();
+    [GeneratedRegex(@"^\[(.*)\]")]
+    private static partial Regex IsSectionPattern();
 
     private IEnumerable<IniNode> Load(string filename)
     {
@@ -44,7 +45,7 @@ public partial class IniFileLoader
             }
 
             var row = line.Split("=");
-            nodes.Add(new(currentSection, row[0], row[1]));
+            nodes.Add(new IniNode(currentSection, row[0], row[1]));
         }
 
         return nodes;

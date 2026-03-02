@@ -18,7 +18,7 @@ public class SettingsViewModel : SelfExecutableQueryResult
 
     #region Constructors
 
-    public SettingsViewModel(IServiceProvider serviceProvider) => _navigator = new(serviceProvider);
+    public SettingsViewModel(IServiceProvider serviceProvider) => _navigator = new PageNavigator(serviceProvider);
 
     #endregion
 

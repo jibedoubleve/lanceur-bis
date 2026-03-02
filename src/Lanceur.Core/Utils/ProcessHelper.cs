@@ -21,7 +21,8 @@ public static class ProcessHelper
     [DllImport("user32.dll", SetLastError = true)]
     private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
-    [DllImport("user32.dll")] private static extern IntPtr WindowFromPoint(Win32Point point);
+    [DllImport("user32.dll")]
+    private static extern IntPtr WindowFromPoint(Win32Point point);
 
     /// <summary>
     ///     Retrieves the file path and description of the executable associated with the process

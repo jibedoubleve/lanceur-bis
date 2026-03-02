@@ -25,7 +25,7 @@ public static class DateTimeExtensions
         var days = new List<DateTime>();
         for (var day = 1; day <= dayInMonth; day++)
             days.Add(
-                new(
+                new DateTime(
                     year,
                     month,
                     day,

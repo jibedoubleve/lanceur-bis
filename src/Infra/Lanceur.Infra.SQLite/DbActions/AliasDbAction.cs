@@ -22,7 +22,7 @@ public class AliasDbAction
 
     #region Constructors
 
-    internal AliasDbAction(ILoggerFactory logFactory)  => _logger = logFactory.GetLogger<AliasDbAction>();
+    internal AliasDbAction(ILoggerFactory logFactory) => _logger = logFactory.GetLogger<AliasDbAction>();
 
     #endregion
 
@@ -229,7 +229,10 @@ public class AliasDbAction
 
     internal void LogicalRemove(IDbTransaction tx, IEnumerable<AliasQueryResult> aliases)
     {
-        foreach (var alias in aliases) LogicalRemove(tx, alias);
+        foreach (var alias in aliases)
+        {
+            LogicalRemove(tx, alias);
+        }
     }
 
     /// <summary>
@@ -332,7 +335,10 @@ public class AliasDbAction
 
         var csv = names.SplitCsv();
         const string sqlSynonyms = "insert into alias_name (id_alias, name) values (@id, @name)";
-        foreach (var name in csv) tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
+        foreach (var name in csv)
+        {
+            tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
+        }
 
         // Additional parameters
         var additionalParameters = alias.AdditionalParameters;

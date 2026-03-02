@@ -45,7 +45,10 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
         var keywords = typeof(QuitAlias).Assembly.GetTypes()
                                         .Where(t => t.GetCustomAttribute<ReservedAliasAttribute>() is not null)
                                         .Select(t => t.GetCustomAttribute<ReservedAliasAttribute>()!.Name);
-        foreach (var type in keywords) yield return [type];
+        foreach (var type in keywords)
+        {
+            yield return [type];
+        }
     }
 
     protected override IServiceCollection ConfigureServices(
@@ -216,8 +219,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
     [InlineData("2+5", "7")]
     [InlineData("2 + 5", "7")]
     [InlineData("2 * 5", "10")]
-    public async Task Execute_calculation(string operation, string result)
-    {
+    public async Task Execute_calculation(string operation, string result) =>
         await TestViewModelAsync(async (viewModel, _) => {
                 // ARRANGE
                 var alias = Substitute.For<ExecutableQueryResult>();
@@ -234,7 +236,6 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
                 );
             }
         );
-    }
 
     [Fact]
     public async Task Execute_search_aliases()
@@ -264,8 +265,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
     /// </summary>
     [Theory]
     [MemberData(nameof(GetBuiltinKeywords))]
-    public async Task Show_correct_usage_for_builtin_keywords(string keyword)
-    {
+    public async Task Show_correct_usage_for_builtin_keywords(string keyword) =>
         await TestViewModelAsync(
             async (viewModel, db) => {
                 const int count = 5;
@@ -287,17 +287,15 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
             },
             Sql.Empty
         );
-    }
 
     [Fact]
-    public async Task Show_correct_usage_for_regular_alias()
-    {
+    public async Task Show_correct_usage_for_regular_alias() =>
         await TestViewModelAsync(
             async (viewModel, db) => {
                 // Arrange
                 const int count = 5;
-                var sql =  new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
-                                           .ToSql();
+                var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+                                          .ToSql();
                 db.WithConnection(c => c.Execute(sql));
 
                 // Act
@@ -319,7 +317,6 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
             },
             Sql.Empty
         );
-    }
 
     #endregion
 }

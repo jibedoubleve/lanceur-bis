@@ -38,7 +38,10 @@ public class ReconciliationService : IReconciliationService
     /// <inheritdoc />
     public async Task ProposeDescriptionAsync(IEnumerable<AliasQueryResult> aliases)
     {
-        foreach (var alias in aliases) await ProposeDescriptionAsync(alias);
+        foreach (var alias in aliases)
+        {
+            await ProposeDescriptionAsync(alias);
+        }
     }
 
     #endregion

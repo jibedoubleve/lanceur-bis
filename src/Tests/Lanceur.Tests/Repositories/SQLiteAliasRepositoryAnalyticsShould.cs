@@ -88,7 +88,8 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         );
     }
 
-    [Fact] public void GetAll() => Record.Exception(() => BuildRepository().GetAll()).ShouldBeNull();
+    [Fact]
+    public void GetAll() => Record.Exception(() => BuildRepository().GetAll()).ShouldBeNull();
 
     [Fact]
     public void GetAllAliasWithAdditionalParameters()
@@ -460,8 +461,8 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         // assert
         aliases.Length.ShouldBe(4);
         aliases.ShouldSatisfyAllConditions(
-            a => Assert.All(a, alias =>  alias.Count.ShouldBe(2)),
-            a => Assert.All(a, alias =>  alias.LastUsedAt.ShouldBe(date1))
+            a => Assert.All(a, alias => alias.Count.ShouldBe(2)),
+            a => Assert.All(a, alias => alias.LastUsedAt.ShouldBe(date1))
         );
     }
 
@@ -542,7 +543,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
     [Fact]
     public void HydrateAlias()
-        => Record.Exception(() => BuildRepository().HydrateAlias(new()))
+        => Record.Exception(() => BuildRepository().HydrateAlias(new AliasQueryResult()))
                  .ShouldBeNull();
 
     [Fact]

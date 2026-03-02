@@ -36,7 +36,7 @@ public class ObservableModel : INotifyPropertyChanged
     ///     The name of the property that changed. Automatically supplied by the compiler if not explicitly provided.
     /// </param>
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        => PropertyChanged?.Invoke(this, new(propertyName));
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
     ///     Updates the specified field with the provided value, triggers the <see cref="PropertyChanged" /> event

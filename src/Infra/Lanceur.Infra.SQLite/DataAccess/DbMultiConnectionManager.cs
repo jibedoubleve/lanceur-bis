@@ -42,14 +42,12 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     }
 
     /// <inheritdoc />
-    public void WithinTransaction(Action<IDbTransaction> action)
-    {
+    public void WithinTransaction(Action<IDbTransaction> action) =>
         WithinTransaction(tx => {
                 action(tx);
                 return default(object);
             }
         );
-    }
 
     /// <inheritdoc />
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)

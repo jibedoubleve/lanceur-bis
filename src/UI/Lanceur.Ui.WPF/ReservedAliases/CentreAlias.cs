@@ -40,14 +40,12 @@ public class CentreAlias : SelfExecutableQueryResult
 
     #region Methods
 
-    private void Save(Coordinate coordinate)
-    {
+    private void Save(Coordinate coordinate) =>
         _appConfig!.Edit(s => {
                 s.Window.Position.Left = coordinate.X;
                 s.Window.Position.Top = coordinate.Y;
             }
         );
-    }
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {

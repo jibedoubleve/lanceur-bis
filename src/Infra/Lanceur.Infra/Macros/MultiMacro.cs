@@ -35,7 +35,7 @@ public class MultiMacro : MacroQueryResult
 
     private async Task<AliasQueryResult> GetAlias(Cmdline cmdline)
     {
-        var t  = await _searchService.Value.SearchAsync(cmdline);
+        var t = await _searchService.Value.SearchAsync(cmdline);
         var macro = t.FirstOrDefault();
         return macro as AliasQueryResult;
     }
@@ -49,7 +49,7 @@ public class MultiMacro : MacroQueryResult
 
         foreach (var item in items)
         {
-            var toAdd = await GetAlias(new(item));
+            var toAdd = await GetAlias(new Cmdline(item));
             aliases.Add(toAdd);
         }
 

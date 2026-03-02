@@ -32,7 +32,7 @@ public record FallbackShortcuts
     /// <summary>
     ///     Indicates whether there are more shortcuts available in the list.
     /// </summary>
-    public bool CanNext =>  _current <= _globalShortcut.Length;
+    public bool CanNext => _current <= _globalShortcut.Length;
 
     #endregion
 

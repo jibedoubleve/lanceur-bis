@@ -58,7 +58,10 @@ public class ScriptManagerShould
     {
         var manager = new ScriptManager(Asm, Pattern);
 
-        foreach (var script in manager.GetScripts()) script.ShouldNotBeNullOrEmpty();
+        foreach (var script in manager.GetScripts())
+        {
+            script.ShouldNotBeNullOrEmpty();
+        }
     }
 
     [Fact]
@@ -104,10 +107,11 @@ public class ScriptManagerShould
     [InlineData("1.1.1", 0)]
     public void UpdateAfter(string version, int count)
     {
-        var dico = new Dictionary<Version, string> { { new("1.0.0"), "" }, { new("1.0.1"), "" }, { new("1.1.1"), "" } };
+        var dico = new Dictionary<Version, string>
+            { { new Version("1.0.0"), "" }, { new Version("1.0.1"), "" }, { new Version("1.1.1"), "" } };
         var scripts = new ScriptCollection(dico);
 
-        scripts.After(new(version)).Count().ShouldBe(count);
+        scripts.After(new Version(version)).Count().ShouldBe(count);
     }
 
     #endregion

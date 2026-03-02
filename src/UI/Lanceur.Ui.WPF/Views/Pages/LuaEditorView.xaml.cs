@@ -51,12 +51,10 @@ public partial class LuaEditorView
 
     #region Methods
 
-    private static void NavigateBackToKeywords()
-    {
+    private static void NavigateBackToKeywords() =>
         WeakReferenceMessenger.Default.Send(
             new NavigationMessage((typeof(KeywordsView), null))
         );
-    }
 
     private async void OnClickBack(object sender, RoutedEventArgs e)
     {

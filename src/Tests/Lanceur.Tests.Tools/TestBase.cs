@@ -29,7 +29,7 @@ public abstract class TestBase
 
     protected TestBase(ITestOutputHelper outputHelper)
     {
-        SqlProfiler = new(outputHelper);
+        SqlProfiler = new DbProfiler(outputHelper);
         OutputHelper = outputHelper;
     }
 
@@ -39,7 +39,7 @@ public abstract class TestBase
 
     private static bool IsProfilingSql => false;
 
-    private DbProfiler SqlProfiler { get;  }
+    private DbProfiler SqlProfiler { get; }
 
     protected ILoggerFactory LoggerFactory
     {
@@ -49,15 +49,15 @@ public abstract class TestBase
 
             var xunitLoggerOptions = new XUnitLoggerOptions();
             _loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder
-                                                                                          .AddProvider(
-                                                                                              new XUnitLoggerProvider(
-                                                                                                  OutputHelper,
-                                                                                                  xunitLoggerOptions
-                                                                                              )
-                                                                                          )
-                                                                                          .SetMinimumLevel(
-                                                                                              LogLevel.Trace
-                                                                                          )
+                .AddProvider(
+                    new XUnitLoggerProvider(
+                        OutputHelper,
+                        xunitLoggerOptions
+                    )
+                )
+                .SetMinimumLevel(
+                    LogLevel.Trace
+                )
             );
 
             return _loggerFactory;
@@ -114,7 +114,7 @@ public abstract class TestBase
         try
         {
             var database = BuildFreshDb(builder.ToSql(), connectionString);
-            connectionManager = new(database);
+            connectionManager = new DbSingleConnectionManager(database);
             return connectionManager;
         }
         catch

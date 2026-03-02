@@ -14,7 +14,7 @@ public class TestOutputHelperDecoratorForMicrosoftLogging<T> : BaseTestOutputHel
     #region Constructors
 
     public TestOutputHelperDecoratorForMicrosoftLogging(ITestOutputHelper output) : base(output)
-        => _logger = new(output);
+        => _logger = new TestOutputHelperDecoratorForMicrosoftLogging(output);
 
     #endregion
 
@@ -53,9 +53,8 @@ public class TestOutputHelperDecoratorForMicrosoftLogging : BaseTestOutputHelper
 
     #region Methods
 
-    private static string ToShortLevel(LogLevel logLevel)
-    {
-        return logLevel switch
+    private static string ToShortLevel(LogLevel logLevel) =>
+        logLevel switch
         {
             LogLevel.Trace       => "Trace",
             LogLevel.Debug       => "Debug",
@@ -66,7 +65,6 @@ public class TestOutputHelperDecoratorForMicrosoftLogging : BaseTestOutputHelper
             LogLevel.None        => "     ",
             _                    => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null)
         };
-    }
 
     public IDisposable BeginScope<TState>(TState state) where TState : notnull
         => new TestOutputHelperDisposable(state, Write);

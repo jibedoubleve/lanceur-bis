@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Dapper;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Repositories.Config;
@@ -94,7 +95,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 // arrange
 
                 // act
-                viewModel.IsAlt = false;  // By default, is on true
+                viewModel.IsAlt = false; // By default, is on true
                 viewModel.IsCtrl = false; // By default, is on true
                 viewModel.IsShift = true;
                 viewModel.IsWin = true;
@@ -155,8 +156,8 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                 db.WithConnection(t => t.Execute(sqlDefaultConfig));
 
                 // act
-                StoreShortcut[] shortcuts = [new() { AliasOverride = shortcut }, new()  { AliasOverride = shortcut }];
-                viewModel.StoreShortcuts = new(shortcuts);
+                StoreShortcut[] shortcuts = [new() { AliasOverride = shortcut }, new() { AliasOverride = shortcut }];
+                viewModel.StoreShortcuts = new ObservableCollection<StoreShortcut>(shortcuts);
 
                 // assert
                 // I select all the shortcuts directly in the database

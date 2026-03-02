@@ -22,7 +22,7 @@ public class CalculatorServiceShould
     public CalculatorServiceShould(ITestOutputHelper output)
     {
         _output = output;
-        _testLoggerFactory = new(output);
+        _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
     }
 
     #endregion

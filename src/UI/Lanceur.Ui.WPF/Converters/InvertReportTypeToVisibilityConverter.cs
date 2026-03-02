@@ -8,7 +8,7 @@ public class InvertReportTypeToVisibilityConverter : IValueConverter
 {
     #region Fields
 
-    private  static readonly ReportTypeToVisibilityConverter Instance = new();
+    private static readonly ReportTypeToVisibilityConverter Instance = new();
 
     #endregion
 

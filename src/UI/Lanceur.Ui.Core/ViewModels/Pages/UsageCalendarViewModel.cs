@@ -52,7 +52,7 @@ public partial class UsageCalendarViewModel : ObservableObject
     private async Task OnLoadAsync()
     {
         var date = await Task.Run(() => _aliasRepository.GetFirstHistory());
-        DisplayDateStart = date ??  DateTime.Today;
+        DisplayDateStart = date ?? DateTime.Today;
         DisplayDateEnd = DateTime.Today;
         DisplayDateTitle = DateTime.Today.ToString(DatePattern, CultureInfo.InvariantCulture);
     }
@@ -63,7 +63,7 @@ public partial class UsageCalendarViewModel : ObservableObject
         var history = await Task.Run(() => _aliasRepository.GetUsageFor(selectedDay));
 
         DisplayDateTitle = selectedDay.ToString(DatePattern, CultureInfo.InvariantCulture);
-        History = new(history);
+        History = new ObservableCollection<AliasUsageItem>(history);
     }
 
     [RelayCommand]
@@ -79,7 +79,9 @@ public partial class UsageCalendarViewModel : ObservableObject
         {
             _thumbnailService.UpdateThumbnail(queryResult);
             foreach (var item in History)
+            {
                 if (item.Id == usageItem.Id) { item.Thumbnail = queryResult.Thumbnail; }
+            }
         }
         catch (Exception ex)
         {

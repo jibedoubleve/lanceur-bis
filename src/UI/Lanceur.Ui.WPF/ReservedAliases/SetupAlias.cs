@@ -18,7 +18,7 @@ public class SetupAlias : SelfExecutableQueryResult
 
     #region Constructors
 
-    public SetupAlias(IServiceProvider serviceProvider) => _navigator = new(serviceProvider);
+    public SetupAlias(IServiceProvider serviceProvider) => _navigator = new PageNavigator(serviceProvider);
 
     #endregion
 

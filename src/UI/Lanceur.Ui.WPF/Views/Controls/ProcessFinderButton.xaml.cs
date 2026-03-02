@@ -77,7 +77,7 @@ public partial class ProcessFinderButton
         using var pngStream = new MemoryStream();
         control.InvalidateMeasure();
         control.InvalidateArrange();
-        control.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
+        control.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
         var rect = new Rect(
             0,
@@ -104,22 +104,22 @@ public partial class ProcessFinderButton
 
         // write cursor header info
         using var cursorStream = new MemoryStream();
-        cursorStream.Write([0x00, 0x00], 0, 2);                       // ICONDIR: Reserved. Must always be 0.
+        cursorStream.Write([0x00, 0x00], 0, 2); // ICONDIR: Reserved. Must always be 0.
         cursorStream.Write(
             [0x02, 0x00],
             0,
             2
-        );                       // ICONDIR: Specifies image type: 1 for icon (.ICO) image, 2 for cursor (.CUR) image. Other values are invalid
+        ); // ICONDIR: Specifies image type: 1 for icon (.ICO) image, 2 for cursor (.CUR) image. Other values are invalid
         cursorStream.Write(
             [0x01, 0x00],
             0,
             2
-        );                       // ICONDIR: Specifies number of images in the file.
+        ); // ICONDIR: Specifies number of images in the file.
         cursorStream.Write(
             [(byte)control.DesiredSize.Width],
             0,
             1
-        );  // ICONDIRENTRY: Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
+        ); // ICONDIRENTRY: Specifies image width in pixels. Can be any number between 0 and 255. Value 0 means image width is 256 pixels.
         cursorStream.Write(
             [(byte)control.DesiredSize.Height],
             0,
@@ -129,18 +129,18 @@ public partial class ProcessFinderButton
             [0x00],
             0,
             1
-        );                             // ICONDIRENTRY: Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
-        cursorStream.Write([0x00], 0, 1);                             // ICONDIRENTRY: Reserved. Should be 0.
+        ); // ICONDIRENTRY: Specifies number of colors in the color palette. Should be 0 if the image does not use a color palette.
+        cursorStream.Write([0x00], 0, 1); // ICONDIRENTRY: Reserved. Should be 0.
         cursorStream.Write(
             [(byte)hotSpot.X, 0x00],
             0,
             2
-        );            // ICONDIRENTRY: Specifies the horizontal coordinates of the hotspot in number of pixels from the left.
+        ); // ICONDIRENTRY: Specifies the horizontal coordinates of the hotspot in number of pixels from the left.
         cursorStream.Write(
             [(byte)hotSpot.Y, 0x00],
             0,
             2
-        );            // ICONDIRENTRY: Specifies the vertical coordinates of the hotspot in number of pixels from the top.
+        ); // ICONDIRENTRY: Specifies the vertical coordinates of the hotspot in number of pixels from the top.
         cursorStream.Write(
             [
                 // ICONDIRENTRY: Specifies the size of the image's data in bytes
@@ -167,7 +167,7 @@ public partial class ProcessFinderButton
 
         // return cursor stream
         cursorStream.Seek(0, SeekOrigin.Begin);
-        return new(cursorStream);
+        return new Cursor(cursorStream);
     }
 
     private void StartTargetsSearch()

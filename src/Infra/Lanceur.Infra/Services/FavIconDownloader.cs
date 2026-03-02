@@ -44,7 +44,7 @@ public class FavIconDownloader : IFavIconDownloader
 
     #region Methods
 
-    private string  GetFaviconUrl(Uri url, KeyValuePair<string, (bool IsManual, string Url)> manager)
+    private string GetFaviconUrl(Uri url, KeyValuePair<string, (bool IsManual, string Url)> manager)
     {
         var requestUrl = manager.Value.IsManual
             ? new Uri(url, manager.Value.Url).ToString()
@@ -88,10 +88,11 @@ public class FavIconDownloader : IFavIconDownloader
         }
 
         foreach (var faviconUrl in FaviconUrls)
+        {
             try
             {
                 var requestUrl = GetFaviconUrl(url, faviconUrl);
-                var response = await _client.SendAsync(new(HttpMethod.Get, requestUrl));
+                var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUrl));
 
                 _logger.LogTrace(
                     "Checking favicon with {FavIconManager} - Status: {Status} - Host: {Host}",
@@ -114,6 +115,7 @@ public class FavIconDownloader : IFavIconDownloader
                     faviconUrl.Value.Url
                 );
             }
+        }
 
         if (!_faviconCache.TryGetValue(url.ToString(), out _)) { _faviconCache.Set(url.ToString(), true, _retryDelay); }
 

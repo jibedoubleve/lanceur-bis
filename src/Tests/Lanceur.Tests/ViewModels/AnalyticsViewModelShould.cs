@@ -31,8 +31,7 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
     }
 
     [Fact]
-    public void NotCrashWhenNoResultRetrievedFromDb()
-    {
+    public void NotCrashWhenNoResultRetrievedFromDb() =>
         TestViewModel(
             (viewModel, _) => {
                 Record.Exception(() => viewModel.SelectYearCommand.Execute(null))
@@ -40,7 +39,6 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
             },
             Sql.Empty
         );
-    }
 
     #endregion
 }

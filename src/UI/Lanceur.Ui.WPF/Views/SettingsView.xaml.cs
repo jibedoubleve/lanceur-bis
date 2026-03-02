@@ -73,7 +73,7 @@ public partial class SettingsView : INavigationWindow
     private async Task<bool> HandleMessageBoxAsync(QuestionRequestMessage request)
     {
         var result = await _contentDialogService.ShowSimpleDialogAsync(
-            new()
+            new SimpleContentDialogCreateOptions
             {
                 Title = request.Title,
                 Content = request.Content,
@@ -106,8 +106,7 @@ public partial class SettingsView : INavigationWindow
     private void NavigateTo(NavigationMessage message)
         => PageNavigationView.Navigate(message.Value.ViewType, message.Value.DataContext);
 
-    private void Notify(NotificationMessage message)
-    {
+    private void Notify(NotificationMessage message) =>
         _snackbarService.Show(
             message.Value.Title,
             message.Value.Message,
@@ -115,7 +114,6 @@ public partial class SettingsView : INavigationWindow
             MapIcon(message.Value.Level),
             _configuration.Application.Window.NotificationDisplayDuration.Seconds()
         );
-    }
 
     private void OnClosing(object? sender, CancelEventArgs e)
     {

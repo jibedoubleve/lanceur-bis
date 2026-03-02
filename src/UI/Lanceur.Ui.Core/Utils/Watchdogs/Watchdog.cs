@@ -23,7 +23,7 @@ public class Watchdog : IWatchdog
     {
         if (action is null) { throw new ArgumentNullException(nameof(action)); }
 
-        _timer = new() { Interval = interval };
+        _timer = new DispatcherTimer { Interval = interval };
         _timer.Tick += async (_, _) => {
             _timer.Stop();
             await action();

@@ -112,7 +112,10 @@ public class SearchService : ISearchService
         var results = (await Task.WhenAll(tasks)).SelectMany(x => x).ToArray();
 
         // Remember the query
-        foreach (var result in results) result.OriginatingQuery = query;
+        foreach (var result in results)
+        {
+            result.OriginatingQuery = query;
+        }
 
         var orderedResults = FormatForDisplay(results).ToList();
 

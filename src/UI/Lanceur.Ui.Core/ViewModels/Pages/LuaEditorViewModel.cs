@@ -55,7 +55,8 @@ public partial class LuaEditorViewModel : ObservableObject
         HasError = false;
         Output = string.Empty;
 
-        var script = new Script { Code = LuaScript, Context = new() { Parameters = Parameters, FileName = FileName } };
+        var script = new Script
+            { Code = LuaScript, Context = new ScriptContext { Parameters = Parameters, FileName = FileName } };
         var result = _luaManager.ExecuteScript(script);
 
         if (result.Exception is not null)

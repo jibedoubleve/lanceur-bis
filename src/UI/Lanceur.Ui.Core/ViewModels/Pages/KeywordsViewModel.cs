@@ -102,7 +102,7 @@ public partial class KeywordsViewModel : ObservableObject
         {
             if (_selectedAlias?.IsDirty ?? false)
             {
-                WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new(SelectedAlias!));
+                WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new SaveAliasMessage(SelectedAlias!));
             }
 
             value?.MarkUnchanged(); // Newly selected means no changed to be saved...
@@ -192,7 +192,7 @@ public partial class KeywordsViewModel : ObservableObject
         var names = message?.Cmdline?.Parameters;
         var newAlias = names is null
             ? AliasQueryResult.EmptyForCreation
-            : new() { Name = names, Synonyms = names };
+            : new AliasQueryResult { Name = names, Synonyms = names };
 
         _logger.LogInformation("Creating new alias with name {Name}", names);
         Aliases.Insert(0, newAlias);
@@ -222,8 +222,12 @@ public partial class KeywordsViewModel : ObservableObject
         var toDelete = Aliases.Where(x => x.Id == SelectedAlias.Id).ToArray();
 
         Criterion = string.Empty;
-        foreach (var item in toDelete) _cachedAliases.Remove(item);
-        Aliases = new(_cachedAliases);
+        foreach (var item in toDelete)
+        {
+            _cachedAliases.Remove(item);
+        }
+
+        Aliases = new ObservableCollection<AliasQueryResult>(_cachedAliases);
         SelectedAlias = Aliases.FirstOrDefault();
 
         _hubService.Notifications.Success($"Alias {aliasName} deleted.", "Item deleted.");
@@ -336,7 +340,7 @@ public partial class KeywordsViewModel : ObservableObject
     {
         if (Criterion.IsNullOrWhiteSpace())
         {
-            Aliases = new(_cachedAliases);
+            Aliases = new ObservableCollection<AliasQueryResult>(_cachedAliases);
             return;
         }
 
@@ -344,7 +348,7 @@ public partial class KeywordsViewModel : ObservableObject
                                     .ToArray();
 
         _logger.LogTrace("Found {Count} alias(es) with criterion {Criterion}", aliases.Length, Criterion);
-        Aliases = new(aliases);
+        Aliases = new ObservableCollection<AliasQueryResult>(aliases);
     }
 
     [RelayCommand]
@@ -353,7 +357,7 @@ public partial class KeywordsViewModel : ObservableObject
         if (SelectedAlias is null) { return; }
 
         var viewModel = new UwpSelector { PackagedApps = await _packagedAppSearchService.GetInstalledUwpAppsAsync() };
-        var result =  await _hubService.Dialogues.InteractAsync(
+        var result = await _hubService.Dialogues.InteractAsync(
             _viewFactory.CreateView(viewModel),
             "Select",
             ButtonLabels.Cancel,

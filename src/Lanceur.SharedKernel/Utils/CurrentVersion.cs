@@ -15,7 +15,7 @@ public record CurrentVersion
     {
         Commit = commit;
         Suffix = suffix;
-        Version = new(version);
+        Version = new Version(version);
     }
 
     #endregion
@@ -77,7 +77,7 @@ public record CurrentVersion
 
         if (semverSplit?.Length > 0) { semVer = GetVersion(semverSplit[0]); }
 
-        return new(semVer.Version, semVer.Suffix, commit);
+        return new CurrentVersion(semVer.Version, semVer.Suffix, commit);
     }
 
     #endregion

@@ -60,7 +60,11 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
                 case null: return;
                 case JsonArray array:
                 {
-                    foreach (var item in array) FetchAll(item, results);
+                    foreach (var item in array)
+                    {
+                        FetchAll(item, results);
+                    }
+
                     return;
                 }
                 case JsonObject jsonObject when jsonObject.ContainsKey("children"):
@@ -74,7 +78,7 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
 
                     if (name is not null && url is not null)
                     {
-                        results.Add(new() { Name = name, Url = url, SortKey = order });
+                        results.Add(new Bookmark { Name = name, Url = url, SortKey = order });
                     }
 
                     break;
@@ -117,7 +121,7 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
         if (!File.Exists(Path))
         {
             _logger.LogWarning("(Chromium) Cannot find bookmark at {Path}", Path);
-            return  "{}";
+            return "{}";
         }
 
         return File.ReadAllText(Path);

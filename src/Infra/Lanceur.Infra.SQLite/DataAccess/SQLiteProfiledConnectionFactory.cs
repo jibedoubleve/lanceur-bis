@@ -11,7 +11,7 @@ public class SQLiteProfiledConnectionFactory : IDbConnectionFactory
     #region Fields
 
     private readonly string _connectionString;
-    private readonly SQLiteLoggerDbProfiler _dbProfiler  ;
+    private readonly SQLiteLoggerDbProfiler _dbProfiler;
 
     #endregion
 
@@ -24,7 +24,7 @@ public class SQLiteProfiledConnectionFactory : IDbConnectionFactory
     )
     {
         _connectionString = connectionString.ToString();
-        _dbProfiler = new(loggerFactory, isFullProvider);
+        _dbProfiler = new SQLiteLoggerDbProfiler(loggerFactory, isFullProvider);
     }
 
     #endregion

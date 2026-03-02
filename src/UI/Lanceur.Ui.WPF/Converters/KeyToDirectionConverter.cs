@@ -32,7 +32,7 @@ public class KeyToDirectionConverter : IValueConverter
          * Otherwise, it indicates navigation within the results, and executing
          * the command is the only behavior required.
          */
-        if (direction !=  Direction.None) { keyEventArgs.Handled = true; }
+        if (direction != Direction.None) { keyEventArgs.Handled = true; }
 
         return direction;
     }

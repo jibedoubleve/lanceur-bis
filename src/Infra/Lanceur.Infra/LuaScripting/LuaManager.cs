@@ -37,10 +37,10 @@ public class LuaManager : ILuaManager
     {
         if (script.Code.IsNullOrWhiteSpace())
         {
-            return new()
+            return new ScriptResult
             {
                 Code = script.Code ?? string.Empty,
-                Context = new()
+                Context = new ScriptContext
                 {
                     FileName = script.Context?.FileName ?? string.Empty,
                     Parameters = script.Context?.Parameters ?? string.Empty
@@ -64,17 +64,18 @@ public class LuaManager : ILuaManager
 
             return result[0] is not ScriptContext scriptContext
                 ? script.ToScriptResult()
-                : new()
+                : new ScriptResult
                 {
                     Code = script.Code,
-                    Context = new() { FileName = scriptContext.FileName, Parameters = scriptContext.Parameters },
+                    Context = new ScriptContext
+                        { FileName = scriptContext.FileName, Parameters = scriptContext.Parameters },
                     OutputContent = output.ToString()
                 };
         }
         catch (Exception ex)
         {
             _logger.LogTrace(ex, "Scripts: {Logger}", output.ToString());
-            return new() { Code = script.Code, Exception = ex, OutputContent = output.ToString() };
+            return new ScriptResult { Code = script.Code, Exception = ex, OutputContent = output.ToString() };
         }
     }
 

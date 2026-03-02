@@ -241,7 +241,10 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, _) => {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
 
-                foreach (var item in viewModel.Aliases) item.IsSelected = true;
+                foreach (var item in viewModel.Aliases)
+                {
+                    item.IsSelected = true;
+                }
 
                 await viewModel.MergeCommand.ExecuteAsync(null);
                 viewModel.Aliases.Count.ShouldBe(0);
@@ -350,7 +353,10 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, db) => {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
 
-                foreach (var item in viewModel.Aliases) item.IsSelected = true;
+                foreach (var item in viewModel.Aliases)
+                {
+                    item.IsSelected = true;
+                }
 
                 await viewModel.MergeCommand.ExecuteAsync(null);
 
@@ -464,7 +470,10 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             async (viewModel, db) => {
                 await viewModel.ShowDoubloonsCommand.ExecuteAsync(null);
 
-                foreach (var item in viewModel.Aliases) item.IsSelected = true;
+                foreach (var item in viewModel.Aliases)
+                {
+                    item.IsSelected = true;
+                }
 
                 await viewModel.MergeCommand.ExecuteAsync(null);
                 viewModel.Aliases.Count.ShouldBe(0);
@@ -557,8 +566,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task ShowAliasesWithoutNotes()
-    {
+    public async Task ShowAliasesWithoutNotes() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -568,11 +576,9 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             },
             Sql.Empty
         );
-    }
 
     [Fact]
-    public async Task ShowBrokenAliasesAsync()
-    {
+    public async Task ShowBrokenAliasesAsync() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -582,11 +588,9 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             },
             Sql.Empty
         );
-    }
 
     [Fact]
-    public async Task ShowDoubloons()
-    {
+    public async Task ShowDoubloons() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -596,7 +600,6 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             },
             Sql.Empty
         );
-    }
 
     [Theory]
     [MemberData(nameof(ShowInactiveAliasesSource))]
@@ -733,8 +736,7 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
     }
 
     [Fact]
-    public async Task ShowRestoreAlias()
-    {
+    public async Task ShowRestoreAlias() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -744,7 +746,6 @@ public class DataReconciliationViewModelShould : ViewModelTester<DataReconciliat
             },
             Sql.Empty
         );
-    }
 
     #endregion
 }

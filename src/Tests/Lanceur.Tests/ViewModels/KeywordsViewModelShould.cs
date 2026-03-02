@@ -95,8 +95,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     }
 
     [Fact]
-    public async Task CreateAliasWithLuaScript()
-    {
+    public async Task CreateAliasWithLuaScript() =>
         await TestViewModelAsync(
             async (viewModel, db) => {
                 // ARRANGE
@@ -125,7 +124,6 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             },
             Sql.Empty
         );
-    }
 
     [Fact]
     public async Task CreateAliasWorkOnSecondNavigation()
@@ -144,7 +142,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 // ACT
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null); // Simulate navigate to this page once
 
-                viewModel.CreateAliasCommand.Execute(new(cmdline));
+                viewModel.CreateAliasCommand.Execute(new AddAliasMessage(cmdline));
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
 
                 // ASSERT
@@ -326,9 +324,9 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
                 const string fileName = "SomeFileName";
 
                 // ACT
-                await viewModel.CreateNewAlias(name, fileName);               // Create alias
+                await viewModel.CreateNewAlias(name, fileName); // Create alias
                 await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null); // Delete alias
-                await viewModel.CreateNewAlias(name, fileName);               // Recreate the alias
+                await viewModel.CreateNewAlias(name, fileName); // Recreate the alias
 
                 // ASSERT
                 const string sql = """
@@ -500,8 +498,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     }
 
     [Fact]
-    public async Task UpdateAliasWithLuaScript()
-    {
+    public async Task UpdateAliasWithLuaScript() =>
         await TestViewModelAsync(
             async (viewModel, db) => {
                 // ARRANGE
@@ -535,7 +532,6 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
             },
             Sql.Empty
         );
-    }
 
     #endregion
 }

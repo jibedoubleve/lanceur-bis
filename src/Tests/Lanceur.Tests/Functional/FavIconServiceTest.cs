@@ -67,7 +67,7 @@ public class FavIconServiceTest
 
         // ASSERT
         await favIconDownloader.Received()
-                               .RetrieveAndSaveFavicon(new(asExpected), Arg.Any<string>());
+                               .RetrieveAndSaveFavicon(new Uri(asExpected), Arg.Any<string>());
     }
 
     #endregion

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Bogus;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel;
@@ -44,15 +45,15 @@ public class AliasStateTester
 
     #region Properties
 
-    private string Description { get;  }
+    private string Description { get; }
 
-    private string FileName { get;  }
-    private string LuaScript { get;  }
-    private string Name2 { get;  }
-    private string Name3 { get;  }
-    private string Parameters { get;  }
-    private string WorkingDirectory { get;  }
-    public string Name { get;  }
+    private string FileName { get; }
+    private string LuaScript { get; }
+    private string Name2 { get; }
+    private string Name3 { get; }
+    private string Parameters { get; }
+    private string WorkingDirectory { get; }
+    public string Name { get; }
 
     #endregion
 
@@ -83,7 +84,7 @@ public class AliasStateTester
         alias.StartMode = Constants.StartMode.Maximised;
         alias.IsExecutionConfirmationRequired = true;
         alias.LuaScript = LuaScript;
-        alias.AdditionalParameters = new(TestAdditionalParameter);
+        alias.AdditionalParameters = new ObservableCollection<AdditionalParameter>(TestAdditionalParameter);
     }
 
     #endregion

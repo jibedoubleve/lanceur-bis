@@ -16,7 +16,10 @@ public sealed class StaThreadRunner : IStaThreadRunner
     public StaThreadRunner()
     {
         var staThread = new Thread(() => {
-                foreach (var action in _threadQueue.GetConsumingEnumerable()) action.Invoke();
+                foreach (var action in _threadQueue.GetConsumingEnumerable())
+                {
+                    action.Invoke();
+                }
             }
         );
         staThread.SetApartmentState(ApartmentState.STA);

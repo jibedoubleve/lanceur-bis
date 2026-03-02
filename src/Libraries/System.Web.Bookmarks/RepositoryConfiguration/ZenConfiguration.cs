@@ -12,7 +12,7 @@ internal class ZenConfiguration : IGeckoBrowserConfiguration
     public string Database => @"%AppData%\zen\{0}\places.sqlite";
 
     /// <inheritdoc />
-    public string IniFilename =>  @"%AppData%\zen\profiles.ini";
+    public string IniFilename => @"%AppData%\zen\profiles.ini";
 
     #endregion
 }

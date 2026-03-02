@@ -11,8 +11,8 @@ public static class UriExtensions
     public static IEnumerable<Uri> GetFavicons(this Uri baseUri)
     {
         var uri = baseUri.GetAuthority();
-        yield return new(uri, "favicon.ico");
-        yield return new(uri, "favicon.png");
+        yield return new Uri(uri, "favicon.ico");
+        yield return new Uri(uri, "favicon.png");
     }
 
     public static Uri ToUriRelative(this string path) => path.ToUri(UriKind.Relative);

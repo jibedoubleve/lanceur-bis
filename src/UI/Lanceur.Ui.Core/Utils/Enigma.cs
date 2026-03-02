@@ -9,7 +9,7 @@ public class Enigma : IEnigma
     #region Methods
 
     /// <inheritdoc />
-    public  string Decrypt(string encryptedText)
+    public string Decrypt(string encryptedText)
     {
         var encryptedBytesFromDb = Convert.FromBase64String(encryptedText);
         var decryptedBytes = ProtectedData.Unprotect(encryptedBytesFromDb, null, DataProtectionScope.CurrentUser);
@@ -17,7 +17,7 @@ public class Enigma : IEnigma
     }
 
     /// <inheritdoc />
-    public  string Encrypt(string plainText)
+    public string Encrypt(string plainText)
     {
         var encryptedBytes = ProtectedData.Protect(
             Encoding.UTF8.GetBytes(plainText),

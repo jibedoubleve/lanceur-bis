@@ -25,7 +25,7 @@ public class CircularQueue<T> : IEnumerable<T>
     public CircularQueue(int maxSize)
     {
         _maxSize = maxSize;
-        _queue = new(maxSize);
+        _queue = new Queue<T>(maxSize);
     }
 
     #endregion

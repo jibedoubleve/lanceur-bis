@@ -1,4 +1,6 @@
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -57,11 +59,11 @@ public class IoCForStoresShould : TestBase
             ? null
             : new ApplicationSettings
             {
-                Stores = new()
+                Stores = new StoreSection
                 {
                     StoreShortcuts =
                     [
-                        new()
+                        new StoreShortcut
                         {
                             AliasOverride = aliasOverride,
                             StoreType = typeof(EverythingStore).ToString()
@@ -101,11 +103,11 @@ public class IoCForStoresShould : TestBase
             ? null
             : new ApplicationSettings
             {
-                Stores = new()
+                Stores = new StoreSection
                 {
                     StoreShortcuts =
                     [
-                        new()
+                        new StoreShortcut
                         {
                             AliasOverride = aliasOverride,
                             StoreType = typeof(EverythingStore).ToString()
@@ -191,7 +193,7 @@ public class IoCForStoresShould : TestBase
         {
             configuration.Application.Stores.StoreShortcuts =
             [
-                new() { StoreType =  typeof(EverythingStore).ToString(), AliasOverride = aliasOverride }
+                new StoreShortcut { StoreType = typeof(EverythingStore).ToString(), AliasOverride = aliasOverride }
             ];
             configuration.Save();
         }

@@ -33,7 +33,9 @@ public static class ServiceLoaderExtension
 
         serviceCollection.AddTransient(sp => new Lazy<ISearchService>(sp.GetRequiredService<ISearchService>));
         foreach (var type in found)
+        {
             serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(MacroQueryResult), type));
+        }
 
         return serviceCollection;
     }
@@ -63,7 +65,9 @@ public static class ServiceLoaderExtension
                          .ToList();
 
         foreach (var type in found)
+        {
             serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(SelfExecutableQueryResult), type));
+        }
 
         return serviceCollection;
     }
@@ -86,7 +90,9 @@ public static class ServiceLoaderExtension
                          .ToList();
 
         foreach (var type in found)
+        {
             serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IStoreService), type));
+        }
 
         return serviceCollection;
     }

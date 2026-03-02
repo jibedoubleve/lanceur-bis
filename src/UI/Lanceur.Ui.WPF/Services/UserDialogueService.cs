@@ -46,7 +46,7 @@ public class UserDialogueService : IUserDialogueService
         string title = "Question"
     )
         => await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
-            new(
+            new QuestionRequestMessage(
                 content,
                 title,
                 yesText,
@@ -70,7 +70,7 @@ public class UserDialogueService : IUserDialogueService
         }
 
         var isConfirmed = await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
-            new(
+            new QuestionRequestMessage(
                 content,
                 title,
                 yesText,

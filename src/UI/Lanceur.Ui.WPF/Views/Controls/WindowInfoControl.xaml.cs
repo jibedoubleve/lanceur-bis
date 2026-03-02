@@ -7,7 +7,7 @@ public partial class WindowInfoControl
 {
     #region Constructors
 
-    public WindowInfoControl() { InitializeComponent(); }
+    public WindowInfoControl() => InitializeComponent();
 
     #endregion
 }

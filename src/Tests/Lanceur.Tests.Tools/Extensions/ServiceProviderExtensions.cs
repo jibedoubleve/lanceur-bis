@@ -38,7 +38,7 @@ public static class ServiceProviderExtensions
     {
         serviceCollection.AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp
-                             => new(sp.GetService<IConnectionString>()!.ToString())
+                             => new SQLiteConnection(sp.GetService<IConnectionString>()!.ToString())
                          )
                          .AddSingleton(connectionManager);
         return serviceCollection;

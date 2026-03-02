@@ -32,7 +32,8 @@ public sealed partial class FavIconService : IFavIconService
 
     #region Methods
 
-    [GeneratedRegex("@.*@")] private static partial Regex IsMacroRegexBuilder();
+    [GeneratedRegex("@.*@")]
+    private static partial Regex IsMacroRegexBuilder();
 
     /// <inheritdoc />
     public async Task<string> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver)

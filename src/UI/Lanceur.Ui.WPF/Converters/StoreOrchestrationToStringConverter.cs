@@ -29,7 +29,10 @@ public class StoreOrchestrationToStringConverter : IValueConverter
     {
         if (value is not string storeOverride) { return Binding.DoNothing; }
 
-        foreach (var character in _toEscape) storeOverride = storeOverride.Replace(character, $"\\{character}");
+        foreach (var character in _toEscape)
+        {
+            storeOverride = storeOverride.Replace(character, $"\\{character}");
+        }
 
         return $@"^\s{{0,}}{storeOverride}.*";
     }

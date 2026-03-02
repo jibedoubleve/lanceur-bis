@@ -47,7 +47,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private int _notificationDisplayDuration;
     [ObservableProperty] private int _refreshRate;
     [ObservableProperty] private double _searchDelay;
-    [ObservableProperty] private  LogLevel _selectedLogLevel;
+    [ObservableProperty] private LogLevel _selectedLogLevel;
     [ObservableProperty] private bool _showAtStartup;
     [ObservableProperty] private bool _showLastQuery;
     [ObservableProperty] private bool _showResult;
@@ -100,7 +100,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IsSettingsButtonEnabled = featureFlags.IsFeatureFlagEnabled(Features.ShowSettingButton);
 
         // Setup behaviour on property changed
-        foreach (var flag in FeatureFlags) flag.PropertyChanged += OnPropertyChanged;
+        foreach (var flag in FeatureFlags)
+        {
+            flag.PropertyChanged += OnPropertyChanged;
+        }
+
         PropertyChanged += OnPropertyChanged;
     }
 
@@ -141,7 +145,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Store section
         BookmarkSourceBrowser = Configuration.Application.Stores.BookmarkSourceBrowser;
-        StoreShortcuts = new(Configuration.Application.Stores.StoreShortcuts);
+        StoreShortcuts = new ObservableCollection<StoreShortcut>(Configuration.Application.Stores.StoreShortcuts);
 
         // Everything Store
         var adapter = new EverythingQueryAdapter(Configuration.Application.Stores.EverythingQuerySuffix);
@@ -155,7 +159,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         WindowBackdropStyle = Configuration.Application.Window.BackdropStyle;
 
         // Feature flags
-        FeatureFlags = new(Configuration.Application.FeatureFlags);
+        FeatureFlags = new ObservableCollection<FeatureFlag>(Configuration.Application.FeatureFlags);
 
         // Resource Monitor
         CpuSmoothingIndex = Configuration.Application.ResourceMonitor.CpuSmoothingIndex;

@@ -68,14 +68,12 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     }
 
     /// <inheritdoc />
-    public void WithinTransaction(Action<IDbTransaction> action)
-    {
+    public void WithinTransaction(Action<IDbTransaction> action) =>
         WithinTransaction(tx => {
                 action(tx);
                 return default(object);
             }
         );
-    }
 
     /// <inheritdoc />
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)
@@ -100,7 +98,7 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     }
 
     /// <inheritdoc />
-    public TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext,  TContext> action, TContext context)
+    public TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext, TContext> action, TContext context)
     {
         lock (Locker)
         {

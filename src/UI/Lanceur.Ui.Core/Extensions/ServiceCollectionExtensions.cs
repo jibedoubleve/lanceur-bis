@@ -114,7 +114,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddConfigurationSections()
                          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
-                         .AddSingleton<SQLiteUpdater>(sp => new(
+                         .AddSingleton<SQLiteUpdater>(sp => new SQLiteUpdater(
                                  sp.GetService<IDataStoreVersionService>(),
                                  sp.GetService<ILoggerFactory>(),
                                  sp.GetService<IDbConnection>(),
@@ -128,7 +128,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IClipboardService, ClipboardService>()
                          .AddTransient<IAliasRepository, SQLiteAliasRepository>()
                          .AddTransient<IDbConnection, SQLiteConnection>(sp
-                             => new(sp.GetService<IConnectionString>()!.ToString())
+                             => new SQLiteConnection(sp.GetService<IConnectionString>()!.ToString())
                          )
                          .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
                          .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
@@ -144,7 +144,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IFavIconDownloader, FavIconDownloader>(sp => {
                                  var duration
                                      = sp.GetService<ISection<CachingSection>>()?.Value.ThumbnailCacheDuration ?? 30;
-                                 return new(
+                                 return new FavIconDownloader(
                                      sp.GetService<ILogger<FavIconDownloader>>(),
                                      sp.GetService<IMemoryCache>(),
                                      TimeSpan.FromMinutes(duration),

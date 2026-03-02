@@ -18,11 +18,11 @@ public class TextToParameterParser
         var parts = line.Split(",");
         if (parts.Length > 2)
         {
-            parameter = new();
+            parameter = new AdditionalParameter();
             return false;
         }
 
-        parameter =  new() { Name = parts[0].Trim(), Parameter = parts[1].Trim() };
+        parameter = new AdditionalParameter { Name = parts[0].Trim(), Parameter = parts[1].Trim() };
         return true;
     }
 

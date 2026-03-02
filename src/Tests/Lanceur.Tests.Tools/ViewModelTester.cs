@@ -35,7 +35,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
         DbSingleConnectionManager? connectionManager = null;
         try
         {
-            var connectionString = visitors?.OverridenConnectionString ??  ConnectionStringFactory.InMemory;
+            var connectionString = visitors?.OverridenConnectionString ?? ConnectionStringFactory.InMemory;
             connectionManager = GetConnectionManager(sqlBuilder ?? Sql.Empty, connectionString.ToString());
 
             var serviceCollection = new ServiceCollection().AddConfigurationSections()

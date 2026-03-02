@@ -33,7 +33,7 @@ public partial class ApplicationSettingsView
 
     #region Properties
 
-    private ApplicationSettingsViewModel ViewModel { get;  }
+    private ApplicationSettingsViewModel ViewModel { get; }
 
     #endregion
 

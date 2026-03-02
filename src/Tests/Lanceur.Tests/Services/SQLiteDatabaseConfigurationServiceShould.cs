@@ -183,7 +183,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 }
                 else { Assert.Fail("No feature flags"); }
 
-                assert.Current.Github.LastCheckedVersion.ShouldBe(new("1.2.3"));
+                assert.Current.Github.LastCheckedVersion.ShouldBe(new Version("1.2.3"));
                 assert.Current.Github.SnoozeVersionCheck.ShouldBe(true);
                 assert.Current.Github.Token.ShouldBe("123456789");
 
@@ -224,26 +224,22 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     }
 
     [Fact]
-    public void HaveDefaultHotKey()
-    {
+    public void HaveDefaultHotKey() =>
         WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.HotKey.ModifierKey.ShouldBe(3);
                 settings.HotKey.Key.ShouldBe(18);
             }
         );
-    }
 
     [Fact]
-    public void HaveDefaultPosition()
-    {
+    public void HaveDefaultPosition() =>
         WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.Window.Position.Left.ShouldBe(double.MaxValue);
                 settings.Window.Position.Top.ShouldBe(double.MaxValue);
             }
         );
-    }
 
     [Fact]
     public void HaveDefaultShowAtStartup()
@@ -275,22 +271,22 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         yield return
         [
-            new Action<ApplicationSettings>(cfg  =>  cfg.Caching.StoreCacheDuration = 99),
+            new Action<ApplicationSettings>(cfg => cfg.Caching.StoreCacheDuration = 99),
             new Action<ApplicationSettings>(cfg => cfg.Caching.StoreCacheDuration.ShouldBe(99))
         ];
         yield return
         [
-            new Action<ApplicationSettings>(cfg  =>  cfg.Caching.ThumbnailCacheDuration = 99),
+            new Action<ApplicationSettings>(cfg => cfg.Caching.ThumbnailCacheDuration = 99),
             new Action<ApplicationSettings>(cfg => cfg.Caching.ThumbnailCacheDuration.ShouldBe(99))
         ];
         yield return
         [
-            new Action<ApplicationSettings>(cfg  =>  cfg.Github.Tag = "hello world"),
+            new Action<ApplicationSettings>(cfg => cfg.Github.Tag = "hello world"),
             new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("hello world"))
         ];
         yield return
         [
-            new Action<ApplicationSettings>(cfg  =>  cfg.Github.Tag = cfg.Github.Tag),
+            new Action<ApplicationSettings>(cfg => cfg.Github.Tag = cfg.Github.Tag),
             new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("ungroomed"))
         ];
     }
@@ -299,8 +295,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     [Theory]
     [InlineData(1, 2)]
     [InlineData(10, 20)]
-    public void SaveHotKey(int modifierKey, int key)
-    {
+    public void SaveHotKey(int modifierKey, int key) =>
         WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.SetHotKey(key, modifierKey);
@@ -310,7 +305,6 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 settings.HotKey.Key.ShouldBe(key);
             }
         );
-    }
 
     [Fact]
     public void SaveJsonData()
@@ -328,8 +322,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
     [Theory]
     [InlineData(1.1d, 2.1d)]
-    public void SavePosition(double left, double top)
-    {
+    public void SavePosition(double left, double top) =>
         WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.Window.Position.Left = left;
@@ -342,7 +335,6 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 loaded.Window.Position.Top.ShouldBe(top);
             }
         );
-    }
 
     #endregion
 }

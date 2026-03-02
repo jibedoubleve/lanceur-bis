@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using Dapper;
 using Lanceur.Core.Mappers;
@@ -36,7 +37,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         ArgumentNullException.ThrowIfNull(logFactory);
 
         _logger = logFactory.GetLogger<SQLiteAliasRepository>();
-        _getAllAliasDbAction = new(manager);
+        _getAllAliasDbAction = new GetAllAliasDbAction(manager);
         _dbActionFactory = dbActionFactory;
     }
 
@@ -97,7 +98,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         results = results
                   .Where(e => !RegexSelectUrl.IsMatch(e.FileName)
                   ) // Excluding all aliases that serve as shortcuts for URLs
-                  .Where(e => !e.FileName.StartsWith("package:"))  // Excluding all packaged applications
+                  .Where(e => !e.FileName.StartsWith("package:")) // Excluding all packaged applications
                   .ToArray();
         return results.ToSelectableQueryResult();
     }
@@ -217,32 +218,32 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     /// <inheritdoc />
     public IEnumerable<string> GetExistingAliases(IEnumerable<string> names, long idAlias)
     {
-        const string  sql = """
-                            select an.name
-                            from 
-                                alias_name an
-                                inner join alias a on a.id = an.id_alias
-                            where 
-                                an.name in @names
-                                and a.deleted_at is null
-                                and an.id_alias != @idAlias
-                            """;
-        return Db.WithConnection(conn => conn.Query<string>(sql, new {   names, idAlias }));
+        const string sql = """
+                           select an.name
+                           from 
+                               alias_name an
+                               inner join alias a on a.id = an.id_alias
+                           where 
+                               an.name in @names
+                               and a.deleted_at is null
+                               and an.id_alias != @idAlias
+                           """;
+        return Db.WithConnection(conn => conn.Query<string>(sql, new { names, idAlias }));
     }
 
     /// <inheritdoc />
     public IEnumerable<string> GetExistingDeletedAliases(IEnumerable<string> aliasesToCheck, long idAlias)
     {
-        const string  sql = """
-                            select name
-                            from
-                                alias_name an
-                                inner join alias a on a.id = an.id_alias
-                            where 
-                                name in @names
-                                and a.deleted_at is not null
-                                and id_alias != @idAlias
-                            """;
+        const string sql = """
+                           select name
+                           from
+                               alias_name an
+                               inner join alias a on a.id = an.id_alias
+                           where 
+                               name in @names
+                               and a.deleted_at is not null
+                               and id_alias != @idAlias
+                           """;
         return Db.WithConnection(conn => conn.Query<string>(sql, new { names = aliasesToCheck, idAlias }));
     }
 
@@ -491,7 +492,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                 }
             );
 
-        alias.AdditionalParameters = new(parameters);
+        alias.AdditionalParameters = new ObservableCollection<AdditionalParameter>(parameters);
         alias.Synonyms = string.Join(", ", synonyms);
     }
 
@@ -539,7 +540,10 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
         => Db.WithinTransaction(tx => {
                 var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
                 _logger.LogInformation("Hard remove of {Count} alias(es) from database", list.Length);
-                foreach (var item in list) _dbActionFactory.AliasManagement.Remove(tx, item);
+                foreach (var item in list)
+                {
+                    _dbActionFactory.AliasManagement.Remove(tx, item);
+                }
             }
         );
 
@@ -587,7 +591,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                            where id in @selectedAliases;
                            """;
         var selectedAliases = aliases.Select(e => e.Id).ToArray();
-        Db.WithinTransaction(tx => tx.Connection!.Query(sql, new { selectedAliases  }));
+        Db.WithinTransaction(tx => tx.Connection!.Query(sql, new { selectedAliases }));
     }
 
     /// <inheritdoc />
@@ -607,7 +611,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias)
         => Db.WithinTransaction(
-            (tx, current) =>  _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref current),
+            (tx, current) => _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref current),
             alias
         );
 

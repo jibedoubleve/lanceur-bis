@@ -19,7 +19,8 @@ public partial class TextReplacement : IReplacement
 
     #region Methods
 
-    [GeneratedRegex(@"\$[Ii]\$")] private static partial Regex GetRegex();
+    [GeneratedRegex(@"\$[Ii]\$")]
+    private static partial Regex GetRegex();
 
     /// <inheritdoc />
     public string Replace(string newText, string replacement)

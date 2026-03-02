@@ -17,13 +17,13 @@ internal class DummyGeckoConfiguration : IGeckoBrowserConfiguration
     #region Properties
 
     /// <inheritdoc />
-    public string CacheKey { get;  }
+    public string CacheKey { get; }
 
     /// <inheritdoc />
-    public string Database { get;  }
+    public string Database { get; }
 
     /// <inheritdoc />
-    public string IniFilename { get;  }
+    public string IniFilename { get; }
 
     #endregion
 }

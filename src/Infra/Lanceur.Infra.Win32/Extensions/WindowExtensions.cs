@@ -23,7 +23,7 @@ public static class WindowExtensions
             ? (screenHeight - win.Height) / 2
             : topOffset;
 
-        return new(x, y);
+        return new Coordinate(x, y);
     }
 
 

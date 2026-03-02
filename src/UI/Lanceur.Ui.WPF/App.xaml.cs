@@ -114,8 +114,7 @@ public partial class App
         );
     }
 
-    private static void RegisterToastNotifications()
-    {
+    private static void RegisterToastNotifications() =>
         ToastNotificationManagerCompat.OnActivated += toastArgs => {
             var arguments = ToastArguments.Parse(toastArgs.Argument);
             if (arguments.Count == 0) { return; }
@@ -129,7 +128,7 @@ public partial class App
                     view.ExceptionTrace.Text = arguments["StackTrace"];
                     view.Show();
                 },
-                ToastNotificationArguments.ClickShowLogs  => ()
+                ToastNotificationArguments.ClickShowLogs => ()
                     => WindowsShell.StartExplorer(Paths.LogRepository),
                 // ---- Restart application ----
                 ToastNotificationArguments.ClickRestart => ()
@@ -141,7 +140,7 @@ public partial class App
                 ToastNotificationArguments.SkipVersion => () => {
                     var settings = Host.Services.GetRequiredService<IConfigurationFacade>();
                     settings.Application.Github.SnoozeVersionCheck = true;
-                    settings.Application.Github.LastCheckedVersion = new(arguments["Version"]);
+                    settings.Application.Github.LastCheckedVersion = new Version(arguments["Version"]);
                     settings.Save();
                 },
                 // ---- Navigate to Url ----
@@ -158,7 +157,6 @@ public partial class App
                 delegate{ action.Invoke(); }
             );
         };
-    }
 
     protected override void OnExit(ExitEventArgs e)
     {
@@ -220,7 +218,7 @@ public partial class App
         var hotKeyService = Ioc.Default.GetService<IHotKeyService>()!;
 
         var hk = new Conditional<HotKeySection>(
-            new((int)(ModifierKeys.Windows | ModifierKeys.Alt), (int)Key.P),
+            new HotKeySection((int)(ModifierKeys.Windows | ModifierKeys.Alt), (int)Key.P),
             hotKeyService.HotKey
         );
 

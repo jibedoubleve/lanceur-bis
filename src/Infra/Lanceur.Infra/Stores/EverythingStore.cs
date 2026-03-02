@@ -63,7 +63,7 @@ public class EverythingStore : Store, IStoreService
         var query = $"{cmdline.Parameters} {_settings.Value.EverythingQuerySuffix}";
         _logger.LogTrace("Everything query: {Query}", query);
 
-        var result =  _everythingApi.Search(query);
+        var result = _everythingApi.Search(query);
 
         if (result.HasError) { return DisplayQueryResult.SingleFromResult(result.ErrorMessage); }
 

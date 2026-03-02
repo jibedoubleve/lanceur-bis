@@ -62,7 +62,7 @@ public class ThumbnailServiceTest : TestBase
                  .BuildServiceProvider();
 
         var conn = sp.GetService<IDbConnectionManager>();
-        var repo =  sp.GetService<IAliasRepository>();
+        var repo = sp.GetService<IAliasRepository>();
         var strategy = sp.GetService<IThumbnailStrategy>();
 
         // ACT

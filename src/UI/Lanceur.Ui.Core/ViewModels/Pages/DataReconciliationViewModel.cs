@@ -196,7 +196,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         IEnumerable<SelectableAliasQueryResult> results;
         if (string.IsNullOrWhiteSpace(filter))
         {
-            Aliases = new(_buffer);
+            Aliases = new ObservableCollection<SelectableAliasQueryResult>(_buffer);
             return;
         }
 
@@ -206,7 +206,7 @@ public partial class DataReconciliationViewModel : ObservableObject
                 )
             )
         );
-        Aliases = new(results);
+        Aliases = new ObservableCollection<SelectableAliasQueryResult>(results);
     }
 
     [RelayCommand]
@@ -235,7 +235,10 @@ public partial class DataReconciliationViewModel : ObservableObject
         }
 
         var selected = Aliases.Where(e => e.Id == alias.Id);
-        foreach (var item in selected) item.IsSelected = true;
+        foreach (var item in selected)
+        {
+            item.IsSelected = true;
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanMerge))]
@@ -265,7 +268,7 @@ public partial class DataReconciliationViewModel : ObservableObject
          * raise a PropertyChanged event it'll be from the thread and will handled in the UI thread. This could lead to
          * a cross-thread exception...
          */
-        alias.AdditionalParameters = new(parameters);
+        alias.AdditionalParameters = new ObservableCollection<AdditionalParameter>(parameters);
         alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
 
         var dataContext = new DoubloonViewModel(parameters, alias.Synonyms);
@@ -313,7 +316,8 @@ public partial class DataReconciliationViewModel : ObservableObject
         await OnShowRestoreAliases();
     }
 
-    [RelayCommand] private void OnSelectionChanged() => this.NotifyCommandsUpdate();
+    [RelayCommand]
+    private void OnSelectionChanged() => this.NotifyCommandsUpdate();
 
     [RelayCommand]
     private async Task OnSetInactivityThreshold()
@@ -363,7 +367,8 @@ public partial class DataReconciliationViewModel : ObservableObject
 
 
     [RelayCommand]
-    private async Task OnShowAliasesWithoutNotes() => await OnShowAsync(ReportType.UnannotatedAliases, true);
+    private async Task OnShowAliasesWithoutNotes() =>
+        await OnShowAsync(ReportType.UnannotatedAliases, true);
 
     private async Task OnShowAsync(ReportType reportType, bool isDescriptionUpdated = false)
     {
@@ -388,7 +393,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             ReportType.UnannotatedAliases => _repository.GetAliasesWithoutNotes,
             ReportType.RestoreAlias       => _repository.GetDeletedAlias,
             ReportType.UnusedAliases      => _repository.GetUnusedAliases,
-            ReportType.InactiveAliases    => ()
+            ReportType.InactiveAliases => ()
                 => _repository.GetInactiveAliases(Reconciliation.InactivityThreshold, _today),
             ReportType.RarelyUsedAliases => () => _repository.GetRarelyUsedAliases(Reconciliation.LowUsageThreshold),
             _                            => throw new ArgumentOutOfRangeException($"Report '{reportType}' not found")
@@ -399,7 +404,7 @@ public partial class DataReconciliationViewModel : ObservableObject
             = Reconciliation.ReportsConfiguration.FirstOrDefault(e => e.ReportType == reportType)!;
 
         var aliases = await Task.Run(refreshAliases);
-        _buffer = new(aliases);
+        _buffer = new ObservableCollection<SelectableAliasQueryResult>(aliases);
         Aliases = _buffer;
 
         if (isDescriptionUpdated)
@@ -410,17 +415,23 @@ public partial class DataReconciliationViewModel : ObservableObject
         OnSelectionChanged();
     }
 
-    [RelayCommand] private async Task OnShowBrokenAliases() => await OnShowAsync(ReportType.BrokenAliases);
+    [RelayCommand]
+    private async Task OnShowBrokenAliases() => await OnShowAsync(ReportType.BrokenAliases);
 
-    [RelayCommand] private async Task OnShowDoubloons() => await OnShowAsync(ReportType.DoubloonAliases);
+    [RelayCommand]
+    private async Task OnShowDoubloons() => await OnShowAsync(ReportType.DoubloonAliases);
 
-    [RelayCommand] private async Task OnShowInactiveAliases() => await OnShowAsync(ReportType.InactiveAliases);
+    [RelayCommand]
+    private async Task OnShowInactiveAliases() => await OnShowAsync(ReportType.InactiveAliases);
 
-    [RelayCommand] private async Task OnShowRarelyUsedAliases() => await OnShowAsync(ReportType.RarelyUsedAliases);
+    [RelayCommand]
+    private async Task OnShowRarelyUsedAliases() => await OnShowAsync(ReportType.RarelyUsedAliases);
 
-    [RelayCommand] private async Task OnShowRestoreAliases() => await OnShowAsync(ReportType.RestoreAlias);
+    [RelayCommand]
+    private async Task OnShowRestoreAliases() => await OnShowAsync(ReportType.RestoreAlias);
 
-    [RelayCommand] private async Task OnShowUnusedAliases() => await OnShowAsync(ReportType.UnusedAliases);
+    [RelayCommand]
+    private async Task OnShowUnusedAliases() => await OnShowAsync(ReportType.UnusedAliases);
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private async Task OnUpdateDescription()

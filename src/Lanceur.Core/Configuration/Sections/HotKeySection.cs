@@ -17,12 +17,12 @@ public class HotKeySection
     /// <remarks>
     ///     Setter is used for serialization
     /// </remarks>
-    public int Key { get;  set; }
+    public int Key { get; set; }
 
     /// <remarks>
     ///     Setter is used for serialization
     /// </remarks>
-    public int ModifierKey { get;  set; }
+    public int ModifierKey { get; set; }
 
     #endregion
 

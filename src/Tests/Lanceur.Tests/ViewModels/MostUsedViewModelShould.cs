@@ -26,30 +26,28 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
 
     #region Methods
 
-    private static SqlBuilder BuildSqlBuilder()
-    {
-        return new SqlBuilder().AppendAlias(a =>
-                                   a.WithSynonyms("a")
-                                    .WithUsage(
-                                        "2025-01-01",
-                                        "2025-02-01",
-                                        "2025-03-01",
-                                        "2021-03-01",
-                                        "2022-03-01"
-                                    )
-                               )
-                               .AppendAlias(a =>
-                                   a.WithSynonyms("b")
-                                    .WithUsage(
-                                        "2024-01-01",
-                                        "2024-02-01",
-                                        "2024-03-01",
-                                        "2021-03-01",
-                                        "2022-03-01"
-                                    )
-                               )
-                               .AppendAlias(a => a.WithSynonyms("c"));
-    }
+    private static SqlBuilder BuildSqlBuilder() =>
+        new SqlBuilder().AppendAlias(a =>
+                            a.WithSynonyms("a")
+                             .WithUsage(
+                                 "2025-01-01",
+                                 "2025-02-01",
+                                 "2025-03-01",
+                                 "2021-03-01",
+                                 "2022-03-01"
+                             )
+                        )
+                        .AppendAlias(a =>
+                            a.WithSynonyms("b")
+                             .WithUsage(
+                                 "2024-01-01",
+                                 "2024-02-01",
+                                 "2024-03-01",
+                                 "2021-03-01",
+                                 "2022-03-01"
+                             )
+                        )
+                        .AppendAlias(a => a.WithSynonyms("c"));
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
@@ -68,7 +66,7 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
     [InlineData("All")]
     public async Task ShowAllUsageForAll(string filter)
     {
-        var visitor  = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         var sqlBuilder = BuildSqlBuilder();
 
         await TestViewModelAsync(
@@ -103,7 +101,7 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
 
                 // assert 
                 viewModel.Aliases.Count.ShouldBe(1);
-                Assert.All(viewModel.Aliases, alias =>  alias.Count.ShouldBe(3));
+                Assert.All(viewModel.Aliases, alias => alias.Count.ShouldBe(3));
             },
             sqlBuilder,
             visitors

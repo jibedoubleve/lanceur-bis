@@ -16,11 +16,13 @@ public static class LoggerExtensions
         var version = asm.GetName().Version;
 
         foreach (var attribute in attributes)
+        {
             switch (attribute)
             {
-                case AssemblyFileVersionAttribute fv:          fVer = fv; break;
+                case AssemblyFileVersionAttribute fv: fVer = fv; break;
                 case AssemblyInformationalVersionAttribute iv: iVer = iv; break;
             }
+        }
 
         logger.LogInformation(
             """

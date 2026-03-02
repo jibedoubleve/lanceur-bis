@@ -13,7 +13,7 @@ public class ViewFactory : IViewFactory
     public object CreateView(object viewModel)
         => viewModel switch
         {
-            null                                    => throw new ArgumentNullException(
+            null => throw new ArgumentNullException(
                 nameof(viewModel),
                 "The view model cannot be null."
             ),
@@ -23,7 +23,7 @@ public class ViewFactory : IViewFactory
             NumericSelectorViewModel vm             => new NumericSelectorControl(vm),
             ReportConfigurationViewModel vm         => new ReportConfigurationView(vm),
             UwpSelector vm                          => new UwpSelectorList(vm),
-            _                                       => throw new NotSupportedException(
+            _ => throw new NotSupportedException(
                 $"No control of type {viewModel.GetType().Name} is supported."
             )
         };

@@ -22,7 +22,7 @@ public class SqlAliasBuilder : SqlBuilderBase
         AppendAlias();
     }
 
-    private  SqlAliasBuilder() { }
+    private SqlAliasBuilder() { }
 
     #endregion
 
@@ -152,7 +152,10 @@ public class SqlAliasBuilder : SqlBuilderBase
             return this;
         }
 
-        foreach (var name in names) Sql.AppendLine(sql.Format(name, _idAlias));
+        foreach (var name in names)
+        {
+            Sql.AppendLine(sql.Format(name, _idAlias));
+        }
 
         return this;
     }

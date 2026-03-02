@@ -24,7 +24,10 @@ public partial class UsageCalendarView
 
             var days = referenceDate.GetDaysOfMonth();
             var history = viewModel.GetHistoryOfMonth(referenceDate).ToArray();
-            foreach (var item in history) days.Remove(item);
+            foreach (var item in history)
+            {
+                days.Remove(item);
+            }
 
             calendar.SelectedDate = SelectDate(history);
 
