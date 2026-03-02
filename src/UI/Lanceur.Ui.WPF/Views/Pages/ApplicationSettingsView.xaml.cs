@@ -42,9 +42,13 @@ public partial class ApplicationSettingsView
     private void OnClickDbPath(object sender, RoutedEventArgs e)
     {
         OpenFileDialog openFileDialog =
-            new() { InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Filter = "Database|*.db|SQLite database|*.sqlite|All files (*.*)|*.*" };
+            new()
+            {
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Filter = "Database|*.db|SQLite database|*.sqlite|All files (*.*)|*.*"
+            };
 
-        if (openFileDialog.ShowDialog() != true) return;
+        if (openFileDialog.ShowDialog() != true) { return; }
 
         if (!File.Exists(openFileDialog.FileName))
         {

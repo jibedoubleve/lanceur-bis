@@ -1,4 +1,3 @@
-
 using Xunit;
 
 namespace Lanceur.Tests.Tooling.Extensions;
@@ -9,9 +8,13 @@ public static class TestOutputHelperExtensions
 
     public static void Title(this ITestOutputHelper outputHelper, string output)
     {
-        outputHelper.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        outputHelper.WriteLine(
+            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        );
         outputHelper.WriteLine($"~~~ {output}");
-        outputHelper.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        outputHelper.WriteLine(
+            "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        );
     }
 
     #endregion

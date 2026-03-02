@@ -30,7 +30,12 @@ public static class WindowExtensions
     public static bool IsInScreen(this Window window)
     {
         // Obtain the dimensions and position of the window
-        var winRect = new Rect(window.Left, window.Top, window.ActualWidth, window.ActualHeight);
+        var winRect = new Rect(
+            window.Left,
+            window.Top,
+            window.ActualWidth,
+            window.ActualHeight
+        );
 
         // Check if the window is completely or partially off the screen
         return SystemParameters.WorkArea.Contains(winRect);

@@ -24,6 +24,7 @@ public class SQLiteLoggerDbProfiler : LoggerDbProfiler
     public override void ExecuteFinish(IDbCommand profiledDbCommand, SqlExecuteType executeType, DbDataReader reader)
     {
         if (DoFullLogging)
+        {
             Log(
                 profiledDbCommand,
                 (sql, parameters) => _logger.LogWarning(
@@ -33,17 +34,19 @@ public class SQLiteLoggerDbProfiler : LoggerDbProfiler
                     parameters
                 )
             );
+        }
     }
 
-    public override void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception) => Log(
-        profiledDbCommand,
-        (sql, parameters) => _logger.LogWarning(
-            Template,
-            "FAILURE",
-            sql,
-            parameters
-        )
-    );
+    public override void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception)
+        => Log(
+            profiledDbCommand,
+            (sql, parameters) => _logger.LogWarning(
+                Template,
+                "FAILURE",
+                sql,
+                parameters
+            )
+        );
 
     #endregion
 }

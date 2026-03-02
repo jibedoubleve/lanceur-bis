@@ -8,7 +8,7 @@ public class StoreOrchestrationToStringConverter : IValueConverter
     #region Fields
 
     /// <remarks>
-    /// The backslash should be the first item in the list otherwise it'll be escaped multiple times...
+    ///     The backslash should be the first item in the list otherwise it'll be escaped multiple times...
     /// </remarks>
     private readonly string[] _toEscape = ["\\", ".", "*", "+", "?", "{", "}", "[", "]", "(", ")", "`", "^", "$"];
 
@@ -18,7 +18,7 @@ public class StoreOrchestrationToStringConverter : IValueConverter
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not string storeOverride) return Binding.DoNothing;
+        if (value is not string storeOverride) { return Binding.DoNothing; }
 
         var result = storeOverride.Replace(@"^\s{0,}", "")
                                   .Replace(".*", "");
@@ -27,8 +27,8 @@ public class StoreOrchestrationToStringConverter : IValueConverter
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not string storeOverride) return Binding.DoNothing;
-        
+        if (value is not string storeOverride) { return Binding.DoNothing; }
+
         foreach (var character in _toEscape) storeOverride = storeOverride.Replace(character, $"\\{character}");
 
         return $@"^\s{{0,}}{storeOverride}.*";

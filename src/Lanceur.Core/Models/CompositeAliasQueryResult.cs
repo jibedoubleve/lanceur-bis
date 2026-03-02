@@ -6,11 +6,11 @@ public class CompositeAliasQueryResult : AliasQueryResult
 
     public CompositeAliasQueryResult(IEnumerable<AliasQueryResult> aliases) => Aliases = aliases;
 
-    #endregion Constructors
+    #endregion
 
     #region Properties
 
     public IEnumerable<AliasQueryResult> Aliases { get; }
 
-    #endregion Properties
+    #endregion
 }

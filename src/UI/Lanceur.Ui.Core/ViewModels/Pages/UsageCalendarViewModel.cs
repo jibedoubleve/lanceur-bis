@@ -18,10 +18,13 @@ public partial class UsageCalendarViewModel : ObservableObject
     private readonly IAliasRepository _aliasRepository;
     [ObservableProperty] private DateTime _displayDateEnd;
     [ObservableProperty] private DateTime _displayDateStart;
+
+    [ObservableProperty]
+    private string _displayDateTitle = DateTime.Today.ToString(DatePattern, CultureInfo.InvariantCulture);
+
     [ObservableProperty] private ObservableCollection<AliasUsageItem> _history = [];
 
     private readonly ILogger<UsageCalendarViewModel> _logger;
-    [ObservableProperty] private string _displayDateTitle = DateTime.Today.ToString(DatePattern, CultureInfo.InvariantCulture);
     private readonly IThumbnailService _thumbnailService;
 
     private const string DatePattern = "dddd dd MMMM yyyy";
@@ -66,18 +69,17 @@ public partial class UsageCalendarViewModel : ObservableObject
     [RelayCommand]
     private void OnLoadThumbnail(AliasUsageItem? usageItem)
     {
-        if (usageItem is null) return;
+        if (usageItem is null) { return; }
 
         var queryResult = usageItem.ToAliasQueryResult();
 
-        if (!queryResult.Thumbnail.IsNullOrEmpty()) return; /* Already loaded */
+        if (!queryResult.Thumbnail.IsNullOrEmpty()) { return; /* Already loaded */ }
 
         try
         {
             _thumbnailService.UpdateThumbnail(queryResult);
             foreach (var item in History)
-                if (item.Id == usageItem.Id)
-                    item.Thumbnail = queryResult.Thumbnail;
+                if (item.Id == usageItem.Id) { item.Thumbnail = queryResult.Thumbnail; }
         }
         catch (Exception ex)
         {
@@ -85,9 +87,10 @@ public partial class UsageCalendarViewModel : ObservableObject
         }
     }
 
-    public IEnumerable<DateTime> GetHistoryOfMonth(DateTime? selectedDay) => selectedDay is not null
-        ? _aliasRepository.GetDaysWithHistory(selectedDay.Value)
-        : [];
+    public IEnumerable<DateTime> GetHistoryOfMonth(DateTime? selectedDay)
+        => selectedDay is not null
+            ? _aliasRepository.GetDaysWithHistory(selectedDay.Value)
+            : [];
 
     #endregion
 }

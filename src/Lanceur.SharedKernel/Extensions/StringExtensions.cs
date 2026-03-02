@@ -4,13 +4,13 @@ public static class StringExtensions
 {
     #region Methods
 
+    public static string DefaultIfNullOrEmpty(this string value, string defaultValue)
+        => value.IsNullOrEmpty() ? defaultValue : value;
+
     public static string Format(this string format, params object[] args) => string.Format(format, args);
 
 
     public static bool IsNullOrEmpty(this string value) => string.IsNullOrEmpty(value);
-
-    public static string DefaultIfNullOrEmpty(this string value, string defaultValue)
-        => value.IsNullOrEmpty() ? defaultValue : value;
 
     public static bool IsNullOrWhiteSpace(this string value) => string.IsNullOrWhiteSpace(value);
 
@@ -18,14 +18,14 @@ public static class StringExtensions
 
     public static string JoinCsv(this string[] strings)
     {
-        if (strings is null) return string.Empty;
+        if (strings is null) { return string.Empty; }
 
         return string.Join(", ", strings);
     }
 
     public static string[] SplitCsv(this string str)
     {
-        if (str is null) return Array.Empty<string>();
+        if (str is null) { return Array.Empty<string>(); }
 
         return
             str.Split(",")

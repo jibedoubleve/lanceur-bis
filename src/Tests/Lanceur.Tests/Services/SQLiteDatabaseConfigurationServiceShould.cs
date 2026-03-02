@@ -6,10 +6,7 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
-using Lanceur.Tests.Tools.Logging;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -32,7 +29,10 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         using var c = BuildFreshDb();
         c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
+        var settingRepository = new SQLiteApplicationSettingsProvider(
+            scope,
+            CreateLogger<SQLiteApplicationSettingsProvider>()
+        );
         assert(settingRepository);
     }
 
@@ -40,7 +40,10 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     {
         using var c = BuildFreshDb();
         using var scope = new DbSingleConnectionManager(c);
-        var settingRepository = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
+        var settingRepository = new SQLiteApplicationSettingsProvider(
+            scope,
+            CreateLogger<SQLiteApplicationSettingsProvider>()
+        );
 
         update(settingRepository.Current);
 
@@ -69,8 +72,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                             { "FeatureFlags": [ { "Description": "Show CPU", "Enabled": false, "FeatureName": "ShowSystemUsage1", "Icon": "Gauge241" }, { "Description": "Enables administrator", "Enabled": true, "FeatureName": "AdminMode1", "Icon": "ShieldKeyhole241" } ] }
                             """;
         WithConfiguration(
-            repository =>
-            {
+            repository => {
                 var settings = repository.Current;
                 settings.FeatureFlags.Count().ShouldBe(5);
 
@@ -168,8 +170,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                             }
                             """;
         WithConfiguration(
-            assert =>
-            {
+            assert => {
                 assert.Current.Caching.StoreCacheDuration.ShouldBe(11);
                 assert.Current.Caching.ThumbnailCacheDuration.ShouldBe(12);
                 if (assert.Current.FeatureFlags.Any())
@@ -225,8 +226,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     [Fact]
     public void HaveDefaultHotKey()
     {
-        WithConfiguration(repository =>
-            {
+        WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.HotKey.ModifierKey.ShouldBe(3);
                 settings.HotKey.Key.ShouldBe(18);
@@ -237,8 +237,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     [Fact]
     public void HaveDefaultPosition()
     {
-        WithConfiguration(repository =>
-            {
+        WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.Window.Position.Left.ShouldBe(double.MaxValue);
                 settings.Window.Position.Top.ShouldBe(double.MaxValue);
@@ -302,8 +301,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     [InlineData(10, 20)]
     public void SaveHotKey(int modifierKey, int key)
     {
-        WithConfiguration(repository =>
-            {
+        WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.SetHotKey(key, modifierKey);
 
@@ -332,8 +330,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     [InlineData(1.1d, 2.1d)]
     public void SavePosition(double left, double top)
     {
-        WithConfiguration(repository =>
-            {
+        WithConfiguration(repository => {
                 var settings = repository.Current;
                 settings.Window.Position.Left = left;
                 settings.Window.Position.Top = top;

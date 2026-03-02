@@ -20,7 +20,7 @@ public partial class UsageCalendarView
 
         void RefreshBlackouts(DateTime? referenceDate, Calendar calendar)
         {
-            if (referenceDate is null) return;
+            if (referenceDate is null) { return; }
 
             var days = referenceDate.GetDaysOfMonth();
             var history = viewModel.GetHistoryOfMonth(referenceDate).ToArray();

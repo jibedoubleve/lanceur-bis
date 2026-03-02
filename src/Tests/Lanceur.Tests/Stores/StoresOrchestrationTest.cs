@@ -61,21 +61,18 @@ public class StoresOrchestrationTest
                          .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddLoggingForTests(_outputHelper)
-                         .AddMockSingleton<IMacroAliasExpanderService>((_, i) =>
-                             {
+                         .AddMockSingleton<IMacroAliasExpanderService>((_, i) => {
                                  i.Expand(Arg.Any<QueryResult[]>())
                                   .Returns(callInfo => callInfo.Arg<QueryResult[]>());
                                  return i;
                              }
                          )
-                         .AddMockSingleton<IAliasRepository>((_, i) =>
-                             {
+                         .AddMockSingleton<IAliasRepository>((_, i) => {
                                  i.Search(Arg.Any<string>()).Returns([]);
                                  return i;
                              }
                          )
-                         .AddMockSingleton<IConfigurationFacade>((_, i) =>
-                             {
+                         .AddMockSingleton<IConfigurationFacade>((_, i) => {
                                  i.Application.Returns(new ApplicationSettings());
                                  return i;
                              }

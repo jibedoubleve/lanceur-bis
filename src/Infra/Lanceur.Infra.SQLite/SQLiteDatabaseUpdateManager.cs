@@ -5,30 +5,38 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.SQLite;
 
-internal class SQLiteDatabaseUpdateManager 
+internal class SQLiteDatabaseUpdateManager
 {
     #region Fields
 
     private readonly DatabaseUpdater _dbUpdater;
     private readonly IDataStoreVersionService _versionService;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
-    public SQLiteDatabaseUpdateManager(IDataStoreVersionService versionService, IDbConnection db, Assembly asm, string pattern)
+    public SQLiteDatabaseUpdateManager(
+        IDataStoreVersionService versionService,
+        IDbConnection db,
+        Assembly asm,
+        string pattern
+    )
     {
         ArgumentNullException.ThrowIfNull(versionService);
         ArgumentNullException.ThrowIfNull(db);
         ArgumentNullException.ThrowIfNull(asm);
 
-        if (string.IsNullOrEmpty(db.ConnectionString)) throw new ArgumentNullException(nameof(db.ConnectionString), "ConnectionString should have a value");
+        if (string.IsNullOrEmpty(db.ConnectionString))
+        {
+            throw new ArgumentNullException(nameof(db.ConnectionString), "ConnectionString should have a value");
+        }
 
         _dbUpdater = new(db, asm, pattern);
         _versionService = versionService;
     }
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -42,5 +50,5 @@ internal class SQLiteDatabaseUpdateManager
 
     public void UpdateFromScratch() => _dbUpdater.UpdateFromScratch();
 
-    #endregion Methods
+    #endregion
 }

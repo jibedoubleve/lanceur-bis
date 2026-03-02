@@ -18,15 +18,17 @@ public static class ConditionalExecution
     /// <param name="serviceCollection">The context object passed to the functions.</param>
     /// <param name="onDebug">The function to execute in DEBUG mode.</param>
     /// <param name="onRelease">The function to execute in RELEASE mode.</param>
-    public static void Execute<TContext>(TContext serviceCollection, Action<TContext> onDebug, Action<TContext> onRelease)
+    public static void Execute<TContext>(
+        TContext serviceCollection,
+        Action<TContext> onDebug,
+        Action<TContext> onRelease
+    )
     {
         var isDebug = false;
         SetIfDebug(ref isDebug);
 
-        if (isDebug)
-            onDebug(serviceCollection);
-        else
-            onRelease(serviceCollection);
+        if (isDebug) { onDebug(serviceCollection); }
+        else { onRelease(serviceCollection); }
     }
 
     /// <summary>
@@ -39,30 +41,9 @@ public static class ConditionalExecution
         var isDebug = false;
         SetIfDebug(ref isDebug);
 
-        if (isDebug)
-            onDebug?.Invoke();
-        else
-            onRelease?.Invoke();
+        if (isDebug) { onDebug?.Invoke(); }
+        else { onRelease?.Invoke(); }
     }
-    
-    /// <summary>
-    ///     Executes one of the provided functions based if the current compilation mode is DEBUG.
-    /// </summary>
-    /// <param name="onDebug">The function to execute in DEBUG mode.</param>
-    public static void ExecuteOnDebug(Action onDebug)
-    {
-        var isDebug = false;
-        SetIfDebug(ref isDebug);
-
-        if (isDebug)
-            onDebug?.Invoke();
-    }
-
-    /// <summary>
-    ///     Executes the provided functions only if the current compilation mode is RELEASE.
-    /// </summary>
-    /// <param name="onRelease">The function to execute in RELEASE mode.</param>
-    public static void ExecuteOnRelease(Action onRelease) => Execute(() => { }, onRelease);
 
     /// <summary>
     ///     Executes one of the provided functions based on the current compilation mode and returns a value.
@@ -80,6 +61,24 @@ public static class ConditionalExecution
             ? onDebug()
             : onRelease();
     }
+
+    /// <summary>
+    ///     Executes one of the provided functions based if the current compilation mode is DEBUG.
+    /// </summary>
+    /// <param name="onDebug">The function to execute in DEBUG mode.</param>
+    public static void ExecuteOnDebug(Action onDebug)
+    {
+        var isDebug = false;
+        SetIfDebug(ref isDebug);
+
+        if (isDebug) { onDebug?.Invoke(); }
+    }
+
+    /// <summary>
+    ///     Executes the provided functions only if the current compilation mode is RELEASE.
+    /// </summary>
+    /// <param name="onRelease">The function to execute in RELEASE mode.</param>
+    public static void ExecuteOnRelease(Action onRelease) => Execute(() => { }, onRelease);
 
     #endregion
 }

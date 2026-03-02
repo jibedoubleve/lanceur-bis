@@ -30,8 +30,8 @@ public static class ServiceLoaderExtension
         var found = types.Where(t => t.GetCustomAttributes<MacroAttribute>().Any())
                          .Where(t => t.IsAssignableTo(typeof(MacroQueryResult)))
                          .ToList();
-        
-        serviceCollection.AddTransient(sp => new Lazy<ISearchService>(sp.GetRequiredService<ISearchService>)); 
+
+        serviceCollection.AddTransient(sp => new Lazy<ISearchService>(sp.GetRequiredService<ISearchService>));
         foreach (var type in found)
             serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(MacroQueryResult), type));
 
@@ -50,7 +50,10 @@ public static class ServiceLoaderExtension
     ///     the assembly where reserved aliases are discovered.
     /// </param>
     /// <returns>The service collection for method chaining.</returns>
-    public static IServiceCollection AddReservedAliasesServices(this IServiceCollection serviceCollection, Type assemblyMarker)
+    public static IServiceCollection AddReservedAliasesServices(
+        this IServiceCollection serviceCollection,
+        Type assemblyMarker
+    )
     {
         var asm = Assembly.GetAssembly(assemblyMarker);
         var types = asm?.GetTypes() ?? [];
@@ -58,10 +61,10 @@ public static class ServiceLoaderExtension
         var found = types.Where(t => t.GetCustomAttributes<ReservedAliasAttribute>().Any())
                          .Where(t => t.IsAssignableTo(typeof(SelfExecutableQueryResult)))
                          .ToList();
-        
+
         foreach (var type in found)
             serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(SelfExecutableQueryResult), type));
-        
+
         return serviceCollection;
     }
 

@@ -9,7 +9,7 @@ public interface IBookmarkRepository
     /// <summary>
     ///     Represent the name of the cache where the bookmarks are saved
     /// </summary>
-    public string CacheKey { get; }
+    string CacheKey { get; }
 
     #endregion
 
@@ -35,6 +35,15 @@ public interface IBookmarkRepository
     IEnumerable<Bookmark> GetBookmarks(string filter);
 
     /// <summary>
+    ///     Clears the cached bookmarks.
+    /// </summary>
+    /// <remarks>
+    ///     This method should be called when the bookmark data has changed externally,
+    ///     and the cache needs to be invalidated to ensure fresh data is retrieved.
+    /// </remarks>
+    void InvalidateCache();
+
+    /// <summary>
     ///     Determines whether the specified browser is installed on the system
     ///     and whether its bookmark configuration is accessible.
     /// </summary>
@@ -47,16 +56,6 @@ public interface IBookmarkRepository
     ///     or its bookmark configuration is missing or inaccessible.
     /// </remarks>
     bool IsBookmarkSourceAvailable();
-
-    /// <summary>
-    ///     Clears the cached bookmarks.
-    /// </summary>
-    /// <remarks>
-    ///     This method should be called when the bookmark data has changed externally,
-    ///     and the cache needs to be invalidated to ensure fresh data is retrieved.
-    /// </remarks>
-    void InvalidateCache();
-
 
     #endregion
 }

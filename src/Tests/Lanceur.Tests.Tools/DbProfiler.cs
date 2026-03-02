@@ -58,8 +58,7 @@ public class DbProfiler : IDbProfiler
     {
         Log(
             profiledDbCommand,
-            (sql, parameters) =>
-            {
+            (sql, parameters) => {
                 _outputHelper.WriteLine($"==== Finished executing command of type {executeType}.");
                 _outputHelper.WriteLine(Template, sql, string.Join(Environment.NewLine, parameters));
             }
@@ -70,24 +69,23 @@ public class DbProfiler : IDbProfiler
     {
         Log(
             profiledDbCommand,
-            (sql, parameters) =>
-            {
+            (sql, parameters) => {
                 _outputHelper.WriteLine($"==== Start executing command of type {executeType}.");
                 _outputHelper.WriteLine(Template, sql, string.Join(Environment.NewLine, parameters));
             }
         );
     }
 
-    public void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception) => Log(
-        profiledDbCommand,
-        (sql, parameters) =>
-        {
-            _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            _outputHelper.WriteLine(@"/!\/!\/!\  ERROR OCCURED /!\/!\/!\");
-            _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            _outputHelper.WriteLine(Template, sql, parameters);
-        }
-    );
+    public void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception)
+        => Log(
+            profiledDbCommand,
+            (sql, parameters) => {
+                _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                _outputHelper.WriteLine(@"/!\/!\/!\  ERROR OCCURED /!\/!\/!\");
+                _outputHelper.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                _outputHelper.WriteLine(Template, sql, parameters);
+            }
+        );
 
     public void ReaderFinish(IDataReader reader) { _outputHelper.WriteLine("Reader finished."); }
 

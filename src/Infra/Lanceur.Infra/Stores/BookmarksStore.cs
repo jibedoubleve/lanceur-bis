@@ -7,7 +7,6 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Extensions;
 using Lanceur.SharedKernel.Extensions;
-using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
 
@@ -53,10 +52,14 @@ public class BookmarksStore : Store, IStoreService
         var repository = _bookmarkRepositoryFactory.BuildBookmarkRepository(bookmarkSourceBrowser);
 
         if (!repository.IsBookmarkSourceAvailable())
+        {
             return DisplayQueryResult.SingleFromResult("The bookmark source is not available!");
+        }
 
         if (cmdline.Parameters.IsNullOrWhiteSpace())
+        {
             return DisplayQueryResult.SingleFromResult("Enter text to search in your browser's bookmarks...");
+        }
 
         return repository.GetBookmarks(cmdline.Parameters)
                          .Select(e => e.ToAliasQueryResult())

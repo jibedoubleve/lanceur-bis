@@ -6,5 +6,5 @@ public interface IElevated
 
     bool IsElevated { get; set; }
 
-    #endregion Properties
+    #endregion
 }

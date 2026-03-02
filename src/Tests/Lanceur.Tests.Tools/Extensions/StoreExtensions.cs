@@ -22,12 +22,13 @@ public static class StoreExtensions
             serviceCollection
                 .AddConfigurationSections()
                 .AddMockSingleton<IConfigurationFacade>((_, i) => {
-                    i.Application.Returns(
-                        configuration ??
-                        new ApplicationSettings { Caching = new(0, 0), Stores = new() }
-                    );
-                    return i;
-                });
+                        i.Application.Returns(
+                            configuration ??
+                            new ApplicationSettings { Caching = new(0, 0), Stores = new() }
+                        );
+                        return i;
+                    }
+                );
             return serviceCollection;
         }
 

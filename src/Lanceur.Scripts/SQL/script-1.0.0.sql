@@ -103,20 +103,20 @@ drop table alias_session;
 ----------------------------------------
 
 create view stat_usage_per_app_v as
-select id_alias        as id_alias,
+select id_alias as id_alias,
        count(id_alias) as count
 from alias_usage
 group by id_alias;
 
 create view stat_usage_per_day_v as
-select count(*)                         as exec_count,
+select count(*) as exec_count,
        strftime('%Y-%m-%d', time_stamp) as day
 from alias_usage
 group by strftime('%Y-%m-%d', time_stamp)
 order by time_stamp;
 
 create view stat_usage_per_month_v as
-select count(*)                         as exec_count,
+select count(*) as exec_count,
        strftime('%Y-%m-01', time_stamp) as month
 from alias_usage
 where strftime('%Y-%m-%d', time_stamp) < strftime('%Y-%m-01', date())

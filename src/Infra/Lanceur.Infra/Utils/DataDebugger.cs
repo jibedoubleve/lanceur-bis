@@ -11,7 +11,7 @@ public class Doubloon
     public int HashCode { get; init; }
     public string Name { get; init; }
 
-    #endregion Properties
+    #endregion
 }
 
 public static class DataDebugger
@@ -20,11 +20,20 @@ public static class DataDebugger
 
     public static IEnumerable<Doubloon> GetDoubloons(this IEnumerable<QueryResult> result)
     {
-        return result.GroupBy(r => r.GetHashCode(), r => new Doubloon { Name = r.Name, Description = r.Description, Content = r, HashCode = r.GetHashCode() })
+        return result.GroupBy(
+                         r => r.GetHashCode(),
+                         r => new Doubloon
+                         {
+                             Name = r.Name,
+                             Description = r.Description,
+                             Content = r,
+                             HashCode = r.GetHashCode()
+                         }
+                     )
                      .Where(gr => gr.Count() > 1)
                      .Select(gr => gr.Select(t => t).First())
                      .ToArray();
     }
 
-    #endregion Methods
+    #endregion
 }

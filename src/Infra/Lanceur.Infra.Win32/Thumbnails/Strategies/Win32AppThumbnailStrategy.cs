@@ -11,8 +11,9 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
 {
     #region Fields
 
-    private readonly IStaThreadRunner _staThreadRunner;
     private readonly IAliasManagementService _aliasManagementService;
+
+    private readonly IStaThreadRunner _staThreadRunner;
     private readonly Win32ThumbnailService _win32ThumbnailService;
 
     #endregion
@@ -36,10 +37,10 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
 
     public async Task UpdateThumbnailAsync(AliasQueryResult alias)
     {
-        if (File.Exists(alias.Thumbnail)) return;
+        if (File.Exists(alias.Thumbnail)) { return; }
 
         var imageSource = await _staThreadRunner.RunAsync(() => _win32ThumbnailService.GetThumbnail(alias.FileName));
-        if (imageSource is null) return;
+        if (imageSource is null) { return; }
 
         var thumbnailFileName = alias.FileName.GetThumbnailFileName();
         imageSource.CopyToImageRepository(thumbnailFileName);

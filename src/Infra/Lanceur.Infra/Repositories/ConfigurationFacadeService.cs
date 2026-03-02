@@ -5,11 +5,18 @@ namespace Lanceur.Infra.Repositories;
 
 public class ConfigurationFacadeService : IConfigurationFacade
 {
+    #region Events
+
+    /// <inheritdoc />
+    public event EventHandler Updated;
+
+    #endregion
+
     #region Fields
 
-    private readonly IInfrastructureSettingsProvider _infrastructureSettingsProvider;
-
     private readonly IApplicationSettingsProvider _applicationSettingsProvider;
+
+    private readonly IInfrastructureSettingsProvider _infrastructureSettingsProvider;
 
     #endregion
 
@@ -58,7 +65,4 @@ public class ConfigurationFacadeService : IConfigurationFacade
     }
 
     #endregion
-
-    /// <inheritdoc />
-    public event EventHandler Updated;
 }

@@ -13,8 +13,9 @@ public partial class KeywordsView
 {
     #region Fields
 
-    private readonly LuaEditorView _luaEditorView;
     private readonly ILogger<KeywordsView> _logger;
+
+    private readonly LuaEditorView _luaEditorView;
     private readonly IUserCommunicationService _userCommunicationService;
 
     #endregion
@@ -25,7 +26,8 @@ public partial class KeywordsView
         KeywordsViewModel viewModel,
         LuaEditorView luaEditorView,
         ILogger<KeywordsView> logger,
-        IUserCommunicationService userCommunicationService)
+        IUserCommunicationService userCommunicationService
+    )
     {
         _luaEditorView = luaEditorView;
         _logger = logger;
@@ -49,7 +51,7 @@ public partial class KeywordsView
     {
         try
         {
-            if (ViewModel.SelectedAlias is null) return;
+            if (ViewModel.SelectedAlias is null) { return; }
 
             _luaEditorView.LoadAlias(ViewModel.SelectedAlias);
 

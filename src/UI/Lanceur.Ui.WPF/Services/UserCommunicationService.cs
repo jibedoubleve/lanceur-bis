@@ -23,10 +23,10 @@ public class UserCommunicationService : IUserCommunicationService
     #region Properties
 
     /// <inheritdoc />
-    public IUserGlobalNotificationService GlobalNotifications { get; }
+    public IUserDialogueService Dialogues { get; }
 
     /// <inheritdoc />
-    public IUserDialogueService Dialogues { get; }
+    public IUserGlobalNotificationService GlobalNotifications { get; }
 
     /// <inheritdoc />
     public IUserNotificationService Notifications { get; }

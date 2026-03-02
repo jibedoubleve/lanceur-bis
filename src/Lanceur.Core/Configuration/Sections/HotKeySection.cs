@@ -14,7 +14,6 @@ public class HotKeySection
 
     #region Properties
 
-
     /// <remarks>
     ///     Setter is used for serialization
     /// </remarks>

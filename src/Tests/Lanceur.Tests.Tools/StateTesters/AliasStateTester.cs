@@ -1,7 +1,7 @@
 using Bogus;
-using Shouldly;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Tools.StateTesters;
@@ -10,7 +10,13 @@ public class AliasStateTester
 {
     #region Fields
 
-    public static readonly List<AdditionalParameter> TestAdditionalParameter = [new() { Name = "one", Parameter = "1" }, new() { Name = "two", Parameter = "2" }, new() { Name = "three", Parameter = "3" }, new() { Name = "four", Parameter = "4" }];
+    public static readonly List<AdditionalParameter> TestAdditionalParameter =
+    [
+        new() { Name = "one", Parameter = "1" },
+        new() { Name = "two", Parameter = "2" },
+        new() { Name = "three", Parameter = "3" },
+        new() { Name = "four", Parameter = "4" }
+    ];
 
     #endregion
 
@@ -38,14 +44,15 @@ public class AliasStateTester
 
     #region Properties
 
+    private string Description { get;  }
+
     private string FileName { get;  }
     private string LuaScript { get;  }
-    public string Name { get;  }
     private string Name2 { get;  }
     private string Name3 { get;  }
-    private string Description { get;  }
     private string Parameters { get;  }
     private string WorkingDirectory { get;  }
+    public string Name { get;  }
 
     #endregion
 
@@ -53,7 +60,7 @@ public class AliasStateTester
 
     public void AssertValues(AliasQueryResult? alias)
     {
-        if (alias is null) Assert.Fail($"{nameof(alias)} should not be null for assertion.");
+        if (alias is null) { Assert.Fail($"{nameof(alias)} should not be null for assertion."); }
 
         alias.FileName.ShouldBe(FileName);
         alias.LuaScript.ShouldBe(LuaScript);

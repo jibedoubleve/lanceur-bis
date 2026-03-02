@@ -73,7 +73,10 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
                     var order = jsonObject["date_last_used"]?.ToString() ?? "0";
 
                     if (name is not null && url is not null)
+                    {
                         results.Add(new() { Name = name, Url = url, SortKey = order });
+                    }
+
                     break;
                 }
             }
@@ -86,14 +89,14 @@ public class BlinkBrowserBookmarks : IBookmarkRepository
     {
         var bookmarks = _memoryCache.GetOrCreate(
             CacheKey,
-            IEnumerable<Bookmark> (_) =>
-            {
+            IEnumerable<Bookmark> (_) => {
                 var json = GetJson();
                 var node = JsonNode.Parse(json);
                 var results = new List<Bookmark>();
 
                 var startNode = node?["roots"]?["bookmark_bar"];
-                if (startNode is not null) FetchAll(startNode, results);
+                if (startNode is not null) { FetchAll(startNode, results); }
+
                 return results.OrderByDescending(e => e.SortKey);
             },
             CacheEntryOptions.Default

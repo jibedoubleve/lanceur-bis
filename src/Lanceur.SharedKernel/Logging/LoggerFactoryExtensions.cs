@@ -8,9 +8,7 @@ public static class LoggerFactoryExtensions
     #region Methods
 
     public static ILogger<T> GetLogger<T>(this ILoggerFactory loggerFactory)
-    {
-        return loggerFactory?.CreateLogger<T>() ?? new TraceLogger<T>();
-    }
+        => loggerFactory?.CreateLogger<T>() ?? new TraceLogger<T>();
 
     #endregion
 }

@@ -68,12 +68,12 @@ public partial class MostUsedViewModel : ObservableObject
 
         var aliases = await _cache.GetOrCreateAsync(
             CacheTag,
-            async Task<IEnumerable<UsageQueryResult>> (_) =>
-            {
+            async Task<IEnumerable<UsageQueryResult>> (_) => {
                 if (int.TryParse(SelectedYear, out var year))
-                    return await Task.Run(
-                        () =>   _repository.GetMostUsedAliasesByYear(year)
+                {
+                    return await Task.Run(() =>   _repository.GetMostUsedAliasesByYear(year)
                     );
+                }
 
                 return await Task.Run(() => _repository.GetMostUsedAliases());
             },

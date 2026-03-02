@@ -26,15 +26,17 @@ public static class ThumbnailExtensions
     /// <param name="fileName">The file name of the thumbnail</param>
     public static void CopyToImageRepository(this ImageSource imageSource, string fileName)
     {
-        if (fileName.IsNullOrWhiteSpace()) return;
+        if (fileName.IsNullOrWhiteSpace()) { return; }
 
         var destination = fileName.GetThumbnailAbsolutePath();
 
         lock (Locker)
         {
-            if (File.Exists(destination)) return;
-            if (!Directory.Exists(Paths.ImageRepository)) Directory.CreateDirectory(Paths.ImageRepository);
-            if (imageSource is not BitmapSource bitmapSource) return;
+            if (File.Exists(destination)) { return; }
+
+            if (!Directory.Exists(Paths.ImageRepository)) { Directory.CreateDirectory(Paths.ImageRepository); }
+
+            if (imageSource is not BitmapSource bitmapSource) { return; }
 
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
@@ -53,16 +55,18 @@ public static class ThumbnailExtensions
     /// <param name="fileName">The file name to assign to the thumbnail in the repository.</param>
     public static void CopyToImageRepository(this string imageSource, string fileName)
     {
-        if (fileName.IsNullOrWhiteSpace()) return;
-        if (imageSource.IsNullOrWhiteSpace()) return;
+        if (fileName.IsNullOrWhiteSpace()) { return; }
+
+        if (imageSource.IsNullOrWhiteSpace()) { return; }
 
         var destination = fileName.GetThumbnailAbsolutePath();
 
         lock (Locker)
         {
-            if (File.Exists(destination)) return;
-            if (!Directory.Exists(Paths.ImageRepository)) Directory.CreateDirectory(Paths.ImageRepository);
-            
+            if (File.Exists(destination)) { return; }
+
+            if (!Directory.Exists(Paths.ImageRepository)) { Directory.CreateDirectory(Paths.ImageRepository); }
+
             File.Copy(imageSource, destination, true);
         }
     }

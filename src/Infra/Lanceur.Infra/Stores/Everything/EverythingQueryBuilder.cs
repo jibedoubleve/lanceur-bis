@@ -10,6 +10,14 @@ public class EverythingQueryBuilder
 
     #region Methods
 
+    public string BuildQuery() => string.Join(" ", _prefixes).Trim();
+
+    public EverythingQueryBuilder ExcludeFilesInBin()
+    {
+        _prefixes.Add(EverythingModifiers.ExcludeFileInTrashBin);
+        return this;
+    }
+
     public EverythingQueryBuilder ExcludeHiddenFiles()
     {
         _prefixes.Add($"!{EverythingModifiers.IncludeHiddenFilesSwitch}");
@@ -27,14 +35,6 @@ public class EverythingQueryBuilder
         _prefixes.Add(EverythingModifiers.OnlyExecFilesSwitch);
         return this;
     }
-
-    public EverythingQueryBuilder ExcludeFilesInBin()
-    {
-        _prefixes.Add(EverythingModifiers.ExcludeFileInTrashBin);
-        return this;
-    }
-
-    public string BuildQuery() => string.Join(" ", _prefixes).Trim();
 
     #endregion
 }

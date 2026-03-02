@@ -45,7 +45,7 @@ public abstract class TestBase
     {
         get
         {
-            if (_loggerFactory != null) return _loggerFactory;
+            if (_loggerFactory != null) { return _loggerFactory; }
 
             var xunitLoggerOptions = new XUnitLoggerOptions();
             _loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder
@@ -76,14 +76,15 @@ public abstract class TestBase
         var updater = new DatabaseUpdater(db, ScriptRepository.Asm, ScriptRepository.DbScriptEmbeddedResourcePattern);
         updater.UpdateFromScratch();
 
-        if (!sql.IsNullOrEmpty()) db.Execute(sql!);
+        if (!sql.IsNullOrEmpty()) { db.Execute(sql!); }
 
         return db;
     }
 
     protected IDbConnection BuildConnection(string? connectionString = null)
     {
-        if (IsProfilingSql) SqlProfiler.IsActive = true;
+        if (IsProfilingSql) { SqlProfiler.IsActive = true; }
+
         var connection = new ProfiledDbConnection(
             new SQLiteConnection(connectionString ?? InMemoryConnectionString),
             SqlProfiler

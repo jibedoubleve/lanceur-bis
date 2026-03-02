@@ -8,5 +8,5 @@ public record EverythingResult
     public string Path { get; init; } = "";
     public ResultType ResultType { get; init; } = ResultType.File;
 
-    #endregion Properties
+    #endregion
 }

@@ -1,5 +1,5 @@
-using Shouldly;
 using Lanceur.SharedKernel.Utils;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;

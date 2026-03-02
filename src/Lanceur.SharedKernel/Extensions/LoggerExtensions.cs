@@ -8,9 +8,15 @@ public static class LoggerExtensions
 {
     #region Methods
 
-    private static void WarnIfSlow(ILogger logger, Type source, string memberName, TimeSpan elapsed, double executionThreshold)
+    private static void WarnIfSlow(
+        ILogger logger,
+        Type source,
+        string memberName,
+        TimeSpan elapsed,
+        double executionThreshold
+    )
     {
-        if (elapsed.TotalMilliseconds <= executionThreshold) return;
+        if (elapsed.TotalMilliseconds <= executionThreshold) { return; }
 
         logger.LogWarning(
             "Slow execution of {SourceFullName}.{CallerMemberName} in {ElapsedMilliseconds} milliseconds",
@@ -46,15 +52,14 @@ public static class LoggerExtensions
 
         return source is null
             ? Measurement.Empty
-            : TimeMeter.Measure(
-                timespan =>
-                    WarnIfSlow(
-                        logger,
-                        source.GetType(),
-                        callerMemberName,
-                        timespan,
-                        executionThreshold
-                    )
+            : TimeMeter.Measure(timespan =>
+                WarnIfSlow(
+                    logger,
+                    source.GetType(),
+                    callerMemberName,
+                    timespan,
+                    executionThreshold
+                )
             );
     }
 

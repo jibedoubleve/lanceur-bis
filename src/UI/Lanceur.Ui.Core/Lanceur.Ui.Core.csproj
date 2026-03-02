@@ -1,33 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
     <ItemGroup>
-        <InternalsVisibleTo Include="Lanceur.Tests" />
+        <InternalsVisibleTo Include="Lanceur.Tests"/>
     </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-    <PackageReference Include="Octokit" Version="14.0.0" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
-    <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
-    <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj" />
-    <ProjectReference Include="..\..\Infra\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj" />
-    <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj" />
-    <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="ViewModels\Pages\KeywordsViewModelExtensions.cs">
-      <DependentUpon>KeywordsViewModel.cs</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3"/>
+        <PackageReference Include="Octokit" Version="14.0.0"/>
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1"/>
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0"/>
+        <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj"/>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj"/>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj"/>
+        <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="ViewModels\Pages\KeywordsViewModelExtensions.cs">
+            <DependentUpon>KeywordsViewModel.cs</DependentUpon>
+        </Compile>
+    </ItemGroup>
 </Project>

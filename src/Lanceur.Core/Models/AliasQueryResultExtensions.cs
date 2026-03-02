@@ -16,14 +16,14 @@ public static class AliasQueryResultExtensions
     {
         synonyms ??= new List<string>();
         var lis = synonyms.ToList();
-        
+
         lis.Add(alias.Synonyms);
         var aggregation = string.Join(", ", lis)
-                           .Split(",")
-                           .Select(x => x.Trim())
-                           .Distinct()
-                           .ToArray();
-        
+                                .Split(",")
+                                .Select(x => x.Trim())
+                                .Distinct()
+                                .ToArray();
+
         alias.Synonyms = string.Join(",", aggregation);
     }
 
@@ -33,10 +33,8 @@ public static class AliasQueryResultExtensions
     /// <param name="alias">The alias ti check</param>
     /// <returns><c>True</c> if this is a packaged application; otherwise <c>False</c></returns>
     public static bool IsPackagedApplication(this AliasQueryResult alias)
-    {
-        return !alias.FileName.IsNullOrEmpty() 
-               && alias.FileName.StartsWith("package:", StringComparison.CurrentCultureIgnoreCase);
-    }
+        => !alias.FileName.IsNullOrEmpty() &&
+           alias.FileName.StartsWith("package:", StringComparison.CurrentCultureIgnoreCase);
 
     #endregion
 }

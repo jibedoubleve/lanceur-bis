@@ -10,14 +10,14 @@ public class InvertBooleanToVisibilityConverter : IValueConverter
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is bool boolean) return boolean ? Visibility.Collapsed : Visibility.Visible;
+        if (value is bool boolean) { return boolean ? Visibility.Collapsed : Visibility.Visible; }
 
         return Binding.DoNothing;
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is Visibility visibility) return visibility != Visibility.Visible;
+        if (value is Visibility visibility) { return visibility != Visibility.Visible; }
 
         return Binding.DoNothing;
     }

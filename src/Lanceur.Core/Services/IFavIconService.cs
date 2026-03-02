@@ -26,5 +26,5 @@ public interface IFavIconService
     /// </returns>
     Task<string> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver);
 
-    #endregion Methods
+    #endregion
 }

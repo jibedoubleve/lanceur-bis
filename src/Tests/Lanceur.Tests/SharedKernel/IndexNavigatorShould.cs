@@ -1,5 +1,5 @@
-﻿using Shouldly;
-using Lanceur.SharedKernel.Extensions;
+﻿using Lanceur.SharedKernel.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
@@ -49,7 +49,7 @@ public class IndexNavigatorShould
     [InlineData(5, 0)]
     public void GetNextIndex(int current, int next)
     {
-        var list = new List<int>()
+        var list = new List<int>
         {
             0,
             1,
@@ -60,62 +60,6 @@ public class IndexNavigatorShould
         };
 
         list[list.GetNextIndex(current)].ShouldBe(next);
-    }
-
-    [Theory]
-    [InlineData(-1, -1)]
-    [InlineData(0, 3)]
-    [InlineData(1, 4)]
-    [InlineData(2, 5)]
-    [InlineData(3, 6)]
-    [InlineData(4, 7)]
-    [InlineData(5, 0)]
-    [InlineData(6, 0)]
-    [InlineData(7, 0)]
-    public void GetNextPage_ReturnsExpectedIndex(int current, int next)
-    {
-        var list = new List<int>()
-        {
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
-        };
-
-        list.GetNextPage(current, 3)
-            .ShouldBe(next);
-    }
-    
-    [Theory]
-    [InlineData(-1, -1)]
-    [InlineData(0, 7)]
-    [InlineData(1, 7)]
-    [InlineData(2, 7)]
-    [InlineData(3, 0)]
-    [InlineData(4, 1)]
-    [InlineData(5, 2)]
-    [InlineData(6, 3)]
-    [InlineData(7, 4)]
-    public void GetPreviousPage_ReturnsExpectedIndex(int current, int previous)
-    {
-        var list = new List<int>()
-        {
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
-        };
-
-        list.GetPreviousPage(current, 3)
-            .ShouldBe(previous);
     }
 
     [Fact]
@@ -135,7 +79,7 @@ public class IndexNavigatorShould
     [InlineData(5, "zero")]
     public void GetNextItem(int next, string expected)
     {
-        var list = new List<string>()
+        var list = new List<string>
         {
             "zero",
             "un",
@@ -149,6 +93,34 @@ public class IndexNavigatorShould
     }
 
     [Theory]
+    [InlineData(-1, -1)]
+    [InlineData(0, 3)]
+    [InlineData(1, 4)]
+    [InlineData(2, 5)]
+    [InlineData(3, 6)]
+    [InlineData(4, 7)]
+    [InlineData(5, 0)]
+    [InlineData(6, 0)]
+    [InlineData(7, 0)]
+    public void GetNextPage_ReturnsExpectedIndex(int current, int next)
+    {
+        var list = new List<int>
+        {
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        };
+
+        list.GetNextPage(current, 3)
+            .ShouldBe(next);
+    }
+
+    [Theory]
     [InlineData(5, 4)]
     [InlineData(4, 3)]
     [InlineData(3, 2)]
@@ -157,7 +129,7 @@ public class IndexNavigatorShould
     [InlineData(0, 5)]
     public void GetPreviousIndex(int current, int previous)
     {
-        var list = new List<int>()
+        var list = new List<int>
         {
             0,
             1,
@@ -174,8 +146,7 @@ public class IndexNavigatorShould
     public void GetPreviousIndexWithEmptyList()
     {
         var list = new List<int>();
-        Should.Throw<IndexOutOfRangeException>(
-            () => list[list.GetPreviousIndex(0)]
+        Should.Throw<IndexOutOfRangeException>(() => list[list.GetPreviousIndex(0)]
         );
     }
 
@@ -199,6 +170,34 @@ public class IndexNavigatorShould
         };
 
         list.GetPreviousItem(next).ShouldBe(expected);
+    }
+
+    [Theory]
+    [InlineData(-1, -1)]
+    [InlineData(0, 7)]
+    [InlineData(1, 7)]
+    [InlineData(2, 7)]
+    [InlineData(3, 0)]
+    [InlineData(4, 1)]
+    [InlineData(5, 2)]
+    [InlineData(6, 3)]
+    [InlineData(7, 4)]
+    public void GetPreviousPage_ReturnsExpectedIndex(int current, int previous)
+    {
+        var list = new List<int>
+        {
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+        };
+
+        list.GetPreviousPage(current, 3)
+            .ShouldBe(previous);
     }
 
     [Fact]
@@ -249,5 +248,5 @@ public class IndexNavigatorShould
         subject.ShouldThrow<ArgumentOutOfRangeException>();
     }
 
-    #endregion Methods
+    #endregion
 }

@@ -1,11 +1,9 @@
 using Dapper;
 using Lanceur.Core.Configuration;
-using Shouldly;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
@@ -15,6 +13,7 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
@@ -29,21 +28,24 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
 
     #region Methods
 
-    protected override IServiceCollection ConfigureServices(IServiceCollection serviceCollection, ServiceVisitors visitors)
+    protected override IServiceCollection ConfigureServices(
+        IServiceCollection serviceCollection,
+        ServiceVisitors visitors
+    )
     {
         serviceCollection.AddMockSingleton<IAppRestartService>()
                          .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                          .AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
                          .AddSingleton<IInfrastructureSettingsProvider, MemoryInfrastructureSettingsProvider>()
                          .AddMockSingleton<IViewFactory>()
-                         .AddMockSingleton<IUserGlobalNotificationService>(
-                             (sp, i) => visitors?.VisitGlobalUserInteractionService?.Invoke(sp, i) ?? i
+                         .AddMockSingleton<IUserGlobalNotificationService>((sp, i)
+                             => visitors?.VisitGlobalUserInteractionService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IUserDialogueService>(
-                             (sp, i) => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
+                         .AddMockSingleton<IUserDialogueService>((sp, i)
+                             => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
                          )
-                         .AddMockSingleton<IUserNotificationService>(
-                             (sp, i) => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
+                         .AddMockSingleton<IUserNotificationService>((sp, i)
+                             => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>();
         return serviceCollection;
@@ -56,15 +58,13 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitGlobalUserInteractionService = (_, i) =>
-            {
+            VisitGlobalUserInteractionService = (_, i) => {
                 userInteractionService = i;
                 return i;
             }
         };
         TestViewModel(
-            (viewModel, _) =>
-            {
+            (viewModel, _) => {
                 // act
                 viewModel.DbPath = Guid.NewGuid().ToString();
 
@@ -84,15 +84,13 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitGlobalUserInteractionService = (_, i) =>
-            {
+            VisitGlobalUserInteractionService = (_, i) => {
                 userInteractionService = i;
                 return i;
             }
         };
         TestViewModel(
-            (viewModel, _) =>
-            {
+            (viewModel, _) => {
                 // arrange
 
                 // act
@@ -151,8 +149,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
                                      """;
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         TestViewModel(
-            (viewModel, db) =>
-            {
+            (viewModel, db) => {
                 // arrange
                 var sqlDefaultConfig = $"insert into settings(s_key, s_value) values ('json', '{defaultConfig}');";
                 db.WithConnection(t => t.Execute(sqlDefaultConfig));

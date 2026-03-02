@@ -30,7 +30,9 @@ public class SearchService : ISearchService
 
         _storeServices = storeServices.ToList();
         if (!_storeServices.Any())
+        {
             throw new ArgumentException("There are no store activated for the search service");
+        }
 
         _macroAliasExpanderService = macroAliasExpanderService;
         _orchestrator = orchestrator;
@@ -78,8 +80,9 @@ public class SearchService : ISearchService
     {
         using var measurement = _logger.WarnIfSlow(this);
 
-        if (doesReturnAllIfEmpty && query.IsEmpty()) return await GetAllAsync();
-        if (query.IsEmpty()) return new List<QueryResult>();
+        if (doesReturnAllIfEmpty && query.IsEmpty()) { return await GetAllAsync(); }
+
+        if (query.IsEmpty()) { return new List<QueryResult>(); }
 
         //Get the alive stores
         var aliveStores = _storeServices.Where(service => _orchestrator.IsAlive(service, query))
@@ -116,7 +119,7 @@ public class SearchService : ISearchService
         // If there's an exact match, promote
         // it to the top of the list.
         var match = orderedResults.FirstOrDefault(r => r.Name == query.Name);
-        if (match is not null) orderedResults.Move(match, 0);
+        if (match is not null) { orderedResults.Move(match, 0); }
 
         return !orderedResults.Any()
             ? DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline")

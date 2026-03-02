@@ -6,5 +6,5 @@ public interface IStringFormatter
 
     string Format(object value);
 
-    #endregion Methods
+    #endregion
 }

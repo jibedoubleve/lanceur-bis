@@ -53,10 +53,12 @@ public static class ProcessHelper
         catch (Win32Exception ex)
         {
             if (ex.ErrorCode.ToString("X") == "80004005")
+            {
                 throw new NotSupportedException(
                     "You don't have sufficient right to access the process. You probably must have administration rights for this application, which is not yet supported.",
                     ex
                 );
+            }
 
             throw new NotSupportedException($"Cannot find the executable path: {ex.Message}", ex);
         }

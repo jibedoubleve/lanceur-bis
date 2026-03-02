@@ -181,8 +181,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var c = new DbSingleConnectionManager(connection);
 
         // ACT
-        c.WithinTransaction(tx =>
-            {
+        c.WithinTransaction(tx => {
                 action.SaveOrUpdate(tx, ref alias1);
                 action.SaveOrUpdate(tx, ref alias2);
                 action.SaveOrUpdate(tx, ref alias3);
@@ -366,8 +365,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         // ARRANGE
         var name = Guid.NewGuid().ToString();
         var thumbnail = Guid.NewGuid().ToString();
-        var sql = new SqlBuilder().AppendAlias(a =>
-                                      {
+        var sql = new SqlBuilder().AppendAlias(a => {
                                           a.WithSynonyms(name)
                                            .WithThumbnail(thumbnail);
                                       }
@@ -401,8 +399,7 @@ public class SQLiteAliasRepositoryShould : TestBase
         var alias = BuildAlias();
 
         // ACT
-        c.WithinTransaction(tx =>
-            {
+        c.WithinTransaction(tx => {
                 action.SaveOrUpdate(tx, ref alias);
                 action.Remove(tx, alias);
             }
@@ -541,7 +538,8 @@ public class SQLiteAliasRepositoryShould : TestBase
 
         var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
                                                      .WithThumbnail(thumbnail)
-                                  ).ToSql();
+                                  )
+                                  .ToSql();
         connection.Execute(sql);
 
         // ACT

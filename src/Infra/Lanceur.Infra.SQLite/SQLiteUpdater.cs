@@ -32,7 +32,12 @@ public class SQLiteUpdater
     {
         _versionService = versionService;
         _logger = logFactory.GetLogger<SQLiteUpdater>();
-        _updater = new(versionService, dbConnection, assembly, pattern);
+        _updater = new(
+            versionService,
+            dbConnection,
+            assembly,
+            pattern
+        );
     }
 
     #endregion
@@ -43,11 +48,13 @@ public class SQLiteUpdater
     {
         var dir = dbPath.GetDirectoryName();
         if (dir is null)
+        {
             throw new DirectoryNotFoundException(
                 $"Failed to create the directory because the provided path is invalid or null. Path: [{dbPath}]"
             );
+        }
 
-        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+        if (!Directory.Exists(dir)) { Directory.CreateDirectory(dir); }
     }
 
 
@@ -72,13 +79,24 @@ public class SQLiteUpdater
             var latestVer = _updater.GetLatestVersion();
             var currentVer = _versionService.GetCurrentDbVersion();
 
-            if (_versionService.IsUpToDate(latestVer) == false)
+            if (!_versionService.IsUpToDate(latestVer))
             {
-                _logger.LogWarning("Database V.{CurrentVer} is out of date. Updating to V.{LatestVer}", currentVer, latestVer);
+                _logger.LogWarning(
+                    "Database V.{CurrentVer} is out of date. Updating to V.{LatestVer}",
+                    currentVer,
+                    latestVer
+                );
                 _updater.UpdateFrom(currentVer);
                 _updater.SetLatestVersion();
             }
-            else { _logger.LogInformation("Database V.{CurrentVer} is up to date. Latest script version is V.{LatestVer}", currentVer, latestVer); }
+            else
+            {
+                _logger.LogInformation(
+                    "Database V.{CurrentVer} is up to date. Latest script version is V.{LatestVer}",
+                    currentVer,
+                    latestVer
+                );
+            }
         }
     }
 

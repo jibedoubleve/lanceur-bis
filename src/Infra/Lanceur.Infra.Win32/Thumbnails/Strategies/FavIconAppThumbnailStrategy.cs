@@ -36,30 +36,30 @@ public class FavIconAppThumbnailStrategy : IThumbnailStrategy
 
     public async Task UpdateThumbnailAsync(AliasQueryResult alias)
     {
-        if (File.Exists(alias.Thumbnail)) return;
-        
+        if (File.Exists(alias.Thumbnail)) { return; }
+
         var thumbnail = await _favIconService.UpdateFaviconAsync(alias, ResolveCachePath);
-        if (thumbnail.IsNullOrEmpty()) return;
+        if (thumbnail.IsNullOrEmpty()) { return; }
 
         var res = string.Compare(
             alias.Thumbnail,
             thumbnail,
             StringComparison.InvariantCulture
         );
-        
+
         if (res == 0)
         {
             _logger.LogInformation("Thumbnail for alias {Name} is up to date. Update skipped.", alias.Name);
             return;
-        } 
+        }
 
         _logger.LogInformation(
             "Updating for alias {Alias} favicon from {Thumbnail} to {FavIconPath}",
-            alias.Name.DefaultIfNullOrEmpty("<empty>"), 
+            alias.Name.DefaultIfNullOrEmpty("<empty>"),
             alias.Thumbnail.DefaultIfNullOrEmpty("<empty>"),
             thumbnail.DefaultIfNullOrEmpty("<empty>")
         );
-        
+
         alias.Thumbnail = thumbnail;
         _aliasManagementService.UpdateThumbnail(alias);
 

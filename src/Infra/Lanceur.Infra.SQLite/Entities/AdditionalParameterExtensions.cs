@@ -8,16 +8,16 @@ public static class AdditionalParameterExtensions
     #region Methods
 
     public static IEnumerable<AdditionalParameterEntity>
-        ToEntity(this IEnumerable<AdditionalParameter> collection, long idAlias) => collection.Select(
-                                                                                                  item => new AdditionalParameterEntity
-                                                                                                  {
-                                                                                                      Id = item.Id,
-                                                                                                      IdAlias = idAlias,
-                                                                                                      Name = item.Name,
-                                                                                                      Parameter = item.Parameter
-                                                                                                  }
-                                                                                              )
-                                                                                              .ToList();
+        ToEntity(this IEnumerable<AdditionalParameter> collection, long idAlias)
+        => collection.Select(item => new AdditionalParameterEntity
+                         {
+                             Id = item.Id,
+                             IdAlias = idAlias,
+                             Name = item.Name,
+                             Parameter = item.Parameter
+                         }
+                     )
+                     .ToList();
 
     #endregion
 }

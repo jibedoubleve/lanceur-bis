@@ -38,7 +38,8 @@ public class ThumbnailServiceTest : TestBase
         // ARRANGE
         const string name = "alias_name";
         var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
-                                                     .WithThumbnail(oldValue))
+                                                     .WithThumbnail(oldValue)
+                                  )
                                   .ToSql();
 
         OutputHelper.WriteLine(sql);
@@ -51,22 +52,22 @@ public class ThumbnailServiceTest : TestBase
                  .AddSingleton<IDbActionFactory, DbActionFactory>()
                  .AddSingleton<IThumbnailStrategy, FavIconAppThumbnailStrategy>()
                  .AddSingleton<IAliasManagementService, AliasManagementService>()
-                 .AddMockSingleton<IFavIconService>((_, i) =>
-                 {
-                     i.UpdateFaviconAsync(Arg.Any<AliasQueryResult>(), Arg.Any<Func<string, string>>())
-                      .Returns(Task.FromResult(newValue));
-                     return i;
-                 })
+                 .AddMockSingleton<IFavIconService>((_, i) => {
+                         i.UpdateFaviconAsync(Arg.Any<AliasQueryResult>(), Arg.Any<Func<string, string>>())
+                          .Returns(Task.FromResult(newValue));
+                         return i;
+                     }
+                 )
                  .AddLoggingForTests(OutputHelper)
                  .BuildServiceProvider();
-        
+
         var conn = sp.GetService<IDbConnectionManager>();
         var repo =  sp.GetService<IAliasRepository>();
         var strategy = sp.GetService<IThumbnailStrategy>();
 
         // ACT
         var alias = repo.GetAll().Single();
-        
+
         await strategy.UpdateThumbnailAsync(alias);
 
         // ASSERT
@@ -79,13 +80,12 @@ public class ThumbnailServiceTest : TestBase
                             """;
         var aliases = conn.WithConnection(c => c.Query<AliasQueryResult>(sql2))
                           .ToList();
-        
+
         aliases.ShouldSatisfyAllConditions(
             a => a.Count.ShouldBe(1),
             a => a[0].Name.ShouldBe(name),
             a => a[0].Thumbnail.ShouldBe(newValue)
         );
-
     }
 
     [Fact]
@@ -145,11 +145,12 @@ public class ThumbnailServiceTest : TestBase
         thumbnailService.UpdateThumbnail(aliases.First());
 
         // ASSERT
-        connectionMgr.WithConnection(conn => 
-            (long)conn.ExecuteScalar("select count(*) from alias_argument")!
-        ).ShouldBe(6);
+        connectionMgr.WithConnection(conn =>
+                         (long)conn.ExecuteScalar("select count(*) from alias_argument")!
+                     )
+                     .ShouldBe(6);
     }
-    
+
     [Fact]
     public void When_searching_alias_Then_additional_are_not_loaded()
     {
@@ -159,7 +160,9 @@ public class ThumbnailServiceTest : TestBase
                                                      .WithAdditionalParameters(
                                                          ("name_0", "argument_0"),
                                                          ("name_1", "argument_1")
-                                                     )).ToSql();
+                                                     )
+                                  )
+                                  .ToSql();
 
         OutputHelper.WriteLine(sql);
 
@@ -184,7 +187,7 @@ public class ThumbnailServiceTest : TestBase
             a => a[0].AdditionalParameters.Count.ShouldBe(0)
         );
     }
-    
+
     [Fact]
     public void When_update_thumbnail_Then_it_is_saved_in_db()
     {
@@ -192,7 +195,7 @@ public class ThumbnailServiceTest : TestBase
         const string name = "alias_name";
         const string thumbnail = "thumbnail_name";
         var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name))
-                                                     .ToSql();
+                                  .ToSql();
 
         OutputHelper.WriteLine(sql);
 
@@ -212,7 +215,7 @@ public class ThumbnailServiceTest : TestBase
         var alias = dbRepository.Search(name).Single();
         alias.Thumbnail = thumbnail;
         dbRepository.UpdateThumbnail(alias);
-        
+
         var found = dbRepository.Search(name).Single();
 
         // ASSERT
@@ -220,8 +223,7 @@ public class ThumbnailServiceTest : TestBase
             f => f.Thumbnail.ShouldNotBeNullOrEmpty(),
             f => f.Thumbnail.ShouldBe(thumbnail)
         );
-
     }
-    
+
     #endregion
 }

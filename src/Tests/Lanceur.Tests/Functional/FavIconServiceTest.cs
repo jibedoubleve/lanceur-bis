@@ -1,5 +1,6 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Extensions;
 using NSubstitute;
 using Shouldly;
@@ -54,7 +55,7 @@ public class FavIconServiceTest
 
 
         // ACT
-        var manager = new Infra.Services.FavIconService(
+        var manager = new FavIconService(
             favIconDownloader
         );
         var alias = new AliasQueryResult { FileName = url };

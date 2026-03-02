@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-using Lanceur.Core;
+﻿using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -61,15 +59,13 @@ public class ReservedAliasStore : Store, IStoreService
 
     #region Methods
 
-
     private static IEnumerable<QueryResult> RefreshCounters(
         List<QueryResult> result,
         Dictionary<string, (long Id, int Count)> counters
     )
     {
-        var orderedResult = result.Select(alias =>
-            {
-                if (counters is null) return alias;
+        var orderedResult = result.Select(alias => {
+                if (counters is null) { return alias; }
 
                 var r = counters.Where(counter => counter.Key == alias.Name)
                                 .Select(a => a.Value)

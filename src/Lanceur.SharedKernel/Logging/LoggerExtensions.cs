@@ -32,8 +32,9 @@ public static class LoggerExtensions
     ///         When the scope is disposed, the correlation ID will no longer be included in subsequent log messages.
     ///     </example>
     /// </remarks>
-    public static IDisposable BeginCorrelatedLogs(this ILogger logger) => new LogScope(logger).Add("correlation-id", Guid.NewGuid().ToString())
-                                                                                              .BeginScope();
+    public static IDisposable BeginCorrelatedLogs(this ILogger logger)
+        => new LogScope(logger).Add("correlation-id", Guid.NewGuid().ToString())
+                               .BeginScope();
 
     /// <summary>
     ///     Begins a logging scope with a single key-value pair added to the scope context.
@@ -59,7 +60,8 @@ public static class LoggerExtensions
     /// </remarks>
     public static IDisposable BeginSingleScope(this ILogger logger, string key, object value)
     {
-        if (!key.StartsWith('@')) key = $"@{key}";
+        if (!key.StartsWith('@')) { key = $"@{key}"; }
+
         return new LogScope(logger).Add(key, value)
                                    .BeginScope();
     }

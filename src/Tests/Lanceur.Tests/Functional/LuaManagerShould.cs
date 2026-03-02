@@ -1,9 +1,9 @@
-using Shouldly;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;
@@ -20,6 +20,38 @@ public class LuaManagerShould
     #endregion
 
     #region Methods
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("dev", "output_dev")]
+    [InlineData("test", "output_test")]
+    [InlineData("prod", "output_prod")]
+    public void GetExpectedFileNameAfterScriptExecution(string parameter, string expectedFilename)
+    {
+        // arrange
+        const string luaScript = """
+                                 if context.Parameters == "dev" then
+                                     context.FileName = "output_dev"
+                                     return context
+                                 end
+                                 if context.Parameters == "test" then
+                                     context.FileName = "output_test"
+                                     return context
+                                 end
+                                 if context.Parameters == "prod" then
+                                     context.FileName = "output_prod"
+                                     return context
+                                 end
+                                 """;
+
+        var result = LuaManager.ExecuteScript(
+            new() { Code = luaScript, Context = new() { FileName = "", Parameters = parameter } }
+        );
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldBe(expectedFilename)
+        );
+    }
 
     [Theory]
     [InlineData("", "")]
@@ -52,38 +84,6 @@ public class LuaManagerShould
             r => r.ShouldNotBeNull(),
             r => r.Context.FileName.ShouldBe(url),
             r => r.Context.Parameters.ShouldBe(expectedParameter)
-        );
-    }
-    
-    [Theory]
-    [InlineData("", "")]
-    [InlineData("dev", "output_dev")]
-    [InlineData("test", "output_test")]
-    [InlineData("prod", "output_prod")]
-    public void GetExpectedFileNameAfterScriptExecution(string parameter, string expectedFilename)
-    {
-        // arrange
-        const string luaScript = """
-                                 if context.Parameters == "dev" then
-                                     context.FileName = "output_dev"
-                                     return context
-                                 end
-                                 if context.Parameters == "test" then
-                                     context.FileName = "output_test"
-                                     return context
-                                 end
-                                 if context.Parameters == "prod" then
-                                     context.FileName = "output_prod"
-                                     return context
-                                 end
-                                 """;
-
-        var result = LuaManager.ExecuteScript(
-            new() { Code = luaScript, Context = new() { FileName = "", Parameters = parameter } }
-        );
-        result.ShouldSatisfyAllConditions(
-            r => r.ShouldNotBeNull(),
-            r => r.Context.FileName.ShouldBe(expectedFilename)
         );
     }
 

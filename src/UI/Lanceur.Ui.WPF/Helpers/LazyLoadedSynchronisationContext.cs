@@ -2,7 +2,7 @@ namespace Lanceur.Ui.WPF.Helpers;
 
 public class LazyLoadedSynchronisationContext
 {
-    #region Methods
+    #region Properties
 
     /// <summary>
     ///     Lazily retrieves the application's synchronisation context.
@@ -10,9 +10,8 @@ public class LazyLoadedSynchronisationContext
     /// </summary>
     /// <returns>The application's synchronisation context.</returns>
     /// <exception cref="NullReferenceException">Thrown if the synchronisation context is not yet available.</exception>
-    public SynchronizationContext Current 
-        => App.UiContext 
-           ?? throw new InvalidOperationException("SynchronizationContext.Current is null.");
+    public SynchronizationContext Current
+        => App.UiContext ?? throw new InvalidOperationException("SynchronizationContext.Current is null.");
 
     #endregion
 }

@@ -11,13 +11,14 @@ public class CmdLineArgumentsToVisibility : IValueConverter
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not string str) return Binding.DoNothing;
+        if (value is not string str) { return Binding.DoNothing; }
 
         var cmdline = Cmdline.Parse(str);
         return cmdline.Parameters.Any() ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 
     #endregion
 }

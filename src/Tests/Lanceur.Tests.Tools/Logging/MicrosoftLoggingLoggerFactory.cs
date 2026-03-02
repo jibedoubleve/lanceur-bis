@@ -9,13 +9,13 @@ public class MicrosoftLoggingLoggerFactory : ILoggerFactory
 
     private readonly ITestOutputHelper _output;
 
-    #endregion Fields
+    #endregion
 
     #region Constructors
 
     public MicrosoftLoggingLoggerFactory(ITestOutputHelper output) => _output = output;
 
-    #endregion Constructors
+    #endregion
 
     #region Methods
 
@@ -25,5 +25,5 @@ public class MicrosoftLoggingLoggerFactory : ILoggerFactory
 
     public void Dispose() { }
 
-    #endregion Methods
+    #endregion
 }

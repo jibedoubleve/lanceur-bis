@@ -23,9 +23,10 @@ public partial class SettingsView : INavigationWindow
 {
     #region Fields
 
+    private readonly IConfigurationFacade _configuration;
+
     private readonly IContentDialogService _contentDialogService;
     private readonly ILogger<SettingsView> _logger;
-    private readonly IConfigurationFacade _configuration;
     private readonly ISnackbarService _snackbarService;
 
     #endregion
@@ -59,7 +60,10 @@ public partial class SettingsView : INavigationWindow
 
         WeakReferenceMessenger.Default.Register<SettingsView, NotificationMessage>(this, (_, m) => Notify(m));
         WeakReferenceMessenger.Default.Register<SettingsView, NavigationMessage>(this, (_, m) => NavigateTo(m));
-        WeakReferenceMessenger.Default.Register<SettingsView, QuestionRequestMessage>(this, (_, m) => m.Reply(HandleMessageBoxAsync(m)));
+        WeakReferenceMessenger.Default.Register<SettingsView, QuestionRequestMessage>(
+            this,
+            (_, m) => m.Reply(HandleMessageBoxAsync(m))
+        );
     }
 
     #endregion
@@ -80,12 +84,13 @@ public partial class SettingsView : INavigationWindow
         return result == ContentDialogResult.Primary;
     }
 
-    private static ControlAppearance MapAppearance(MessageLevel level) => level switch
-    {
-        MessageLevel.Success => ControlAppearance.Success,
-        MessageLevel.Warning => ControlAppearance.Caution,
-        _                    => throw new ArgumentOutOfRangeException(nameof(level), level, null)
-    };
+    private static ControlAppearance MapAppearance(MessageLevel level)
+        => level switch
+        {
+            MessageLevel.Success => ControlAppearance.Success,
+            MessageLevel.Warning => ControlAppearance.Caution,
+            _                    => throw new ArgumentOutOfRangeException(nameof(level), level, null)
+        };
 
     private static IconElement MapIcon(MessageLevel level)
     {
@@ -98,7 +103,8 @@ public partial class SettingsView : INavigationWindow
         return new SymbolIcon(icon);
     }
 
-    private void NavigateTo(NavigationMessage message) => PageNavigationView.Navigate(message.Value.ViewType, message.Value.DataContext);
+    private void NavigateTo(NavigationMessage message)
+        => PageNavigationView.Navigate(message.Value.ViewType, message.Value.DataContext);
 
     private void Notify(NotificationMessage message)
     {
@@ -107,7 +113,7 @@ public partial class SettingsView : INavigationWindow
             message.Value.Message,
             MapAppearance(message.Value.Level),
             MapIcon(message.Value.Level),
-           _configuration.Application.Window.NotificationDisplayDuration.Seconds()
+            _configuration.Application.Window.NotificationDisplayDuration.Seconds()
         );
     }
 
@@ -119,7 +125,7 @@ public partial class SettingsView : INavigationWindow
 
     private void OnKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape) Close();
+        if (e.Key == Key.Escape) { Close(); }
     }
 
     private void OnLoaded(object _, RoutedEventArgs e) => SystemThemeWatcher.Watch(this);
@@ -130,7 +136,8 @@ public partial class SettingsView : INavigationWindow
     /// <inheritdoc />
     public INavigationView GetNavigation() => PageNavigationView;
 
-    public void Navigate<T>(object? dataContext = null) where T : Page => PageNavigationView.Navigate(typeof(T), dataContext);
+    public void Navigate<T>(object? dataContext = null) where T : Page
+        => PageNavigationView.Navigate(typeof(T), dataContext);
 
     /// <inheritdoc />
     public bool Navigate(Type pageType)
@@ -144,10 +151,12 @@ public partial class SettingsView : INavigationWindow
     }
 
     /// <inheritdoc />
-    public void SetServiceProvider(IServiceProvider serviceProvider) => _logger.LogWarning("Method {Method} is not implemented", nameof(SetServiceProvider));
+    public void SetPageService(INavigationViewPageProvider navigationViewPageProvider)
+        => _logger.LogWarning("Method {Method} is not implemented", nameof(SetServiceProvider));
 
     /// <inheritdoc />
-    public void SetPageService(INavigationViewPageProvider navigationViewPageProvider) => _logger.LogWarning("Method {Method} is not implemented", nameof(SetServiceProvider));
+    public void SetServiceProvider(IServiceProvider serviceProvider)
+        => _logger.LogWarning("Method {Method} is not implemented", nameof(SetServiceProvider));
 
     /// <inheritdoc />
     public void ShowWindow() => Show();

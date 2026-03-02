@@ -1,5 +1,4 @@
 using System.Reflection;
-using Shouldly;
 using Lanceur.Core;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -25,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.UseCases;
@@ -58,15 +58,13 @@ public class AliasUseCases : TestBase
                          .AddMockSingleton<IUserNotificationService>()
                          .AddMockSingleton<IUserCommunicationService>()
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
-                         .AddMockSingleton<IExecutionService>((_, i) =>
-                             {
+                         .AddMockSingleton<IExecutionService>((_, i) => {
                                  i.ExecuteAsync(Arg.Any<ExecutionRequest>())
                                   .Returns(ExecutionResponse.NoResult);
                                  return i;
                              }
                          )
-                         .AddMockSingleton<ISearchServiceOrchestrator>((_, i) =>
-                             {
+                         .AddMockSingleton<ISearchServiceOrchestrator>((_, i) => {
                                  i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
                                   .Returns(true);
                                  return i;
@@ -75,8 +73,7 @@ public class AliasUseCases : TestBase
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()
                          .AddMockSingleton<IViewFactory>()
-                         .AddMockSingleton<IUserDialogueService>((_, i) =>
-                             {
+                         .AddMockSingleton<IUserDialogueService>((_, i) => {
                                  i.AskUserYesNoAsync(Arg.Any<string>())
                                   .Returns(true);
                                  return i;
@@ -85,12 +82,11 @@ public class AliasUseCases : TestBase
                          .AddMockSingleton<IPackagedAppSearchService>()
                          .AddSingleton<KeywordsViewModel>()
                          .AddSingleton<MainViewModel>();
-            
+
         // Register stores
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
 
         return serviceCollection.BuildServiceProvider();
-        
     }
 
     [Fact]
@@ -113,7 +109,7 @@ public class AliasUseCases : TestBase
         keywordsViewModel.CreateAliasCommand.Execute(null);
         var newAlias = keywordsViewModel.SelectedAlias;
 
-        if (newAlias is null) Assert.Fail("A default alias should be selected when creating a new alias");
+        if (newAlias is null) { Assert.Fail("A default alias should be selected when creating a new alias"); }
 
         var stateTester = new AliasStateTester();
         stateTester.UpdateValues(ref newAlias);
@@ -130,7 +126,7 @@ public class AliasUseCases : TestBase
 
         OutputHelper.WriteLine($"Type of first element in results is '{current.GetType()}'");
         OutputHelper.WriteLine($"{JsonConvert.SerializeObject(current, Formatting.Indented)}");
-        
+
         Assert.Multiple(
             () => mainViewModel.Results.ShouldNotBeNull(),
             () => stateTester.AssertValues(current as AliasQueryResult)

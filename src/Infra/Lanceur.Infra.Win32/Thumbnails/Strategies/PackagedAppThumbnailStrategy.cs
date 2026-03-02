@@ -9,8 +9,9 @@ public class PackagedAppThumbnailStrategy : IThumbnailStrategy
 {
     #region Fields
 
-    private readonly IPackagedAppSearchService _packagedAppSearchService;
     private readonly IAliasManagementService _aliasManagementService;
+
+    private readonly IPackagedAppSearchService _packagedAppSearchService;
 
     #endregion
 
@@ -31,13 +32,14 @@ public class PackagedAppThumbnailStrategy : IThumbnailStrategy
 
     public async Task UpdateThumbnailAsync(AliasQueryResult alias)
     {
-        if (File.Exists(alias.Thumbnail)) return;
-        if (!alias.IsPackagedApplication()) return;
+        if (File.Exists(alias.Thumbnail)) { return; }
+
+        if (!alias.IsPackagedApplication()) { return; }
 
         var app = await _packagedAppSearchService.GetByInstalledDirectoryAsync(alias.FileName);
         var response = app.FirstOrDefault();
 
-        if (response is null) return;
+        if (response is null) { return; }
 
         var thumbnailFileName = alias.FileName.GetThumbnailFileName();
         response.Logo.LocalPath.CopyToImageRepository(thumbnailFileName);

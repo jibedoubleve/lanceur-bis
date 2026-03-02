@@ -19,7 +19,11 @@ public class Enigma : IEnigma
     /// <inheritdoc />
     public  string Encrypt(string plainText)
     {
-        var encryptedBytes = ProtectedData.Protect(Encoding.UTF8.GetBytes(plainText), null, DataProtectionScope.CurrentUser);
+        var encryptedBytes = ProtectedData.Protect(
+            Encoding.UTF8.GetBytes(plainText),
+            null,
+            DataProtectionScope.CurrentUser
+        );
         return Convert.ToBase64String(encryptedBytes);
     }
 

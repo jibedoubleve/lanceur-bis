@@ -27,7 +27,7 @@ public class CalculatorStore : Store, IStoreService
     ) : base(orchestrationFactory)
     {
         ArgumentNullException.ThrowIfNull(calculator);
-        
+
         _logger = logger;
         _calculator = calculator;
     }

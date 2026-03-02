@@ -10,17 +10,23 @@ public class ViewFactory : IViewFactory
 {
     #region Methods
 
-    public object CreateView(object viewModel) => viewModel switch
-    {
-        null                                    => throw new ArgumentNullException(nameof(viewModel), "The view model cannot be null."),
-        AdditionalParameter vm                  => new AdditionalParameterView(vm),
-        StoreShortcut vm                        => new StoreShortcutControl(vm),
-        MultipleAdditionalParameterViewModel vm => new MultipleAdditionalParameterView(vm),
-        NumericSelectorViewModel vm             => new NumericSelectorControl(vm),
-        ReportConfigurationViewModel vm         => new ReportConfigurationView(vm),
-        UwpSelector vm                          => new UwpSelectorList(vm),
-        _                                       => throw new NotSupportedException($"No control of type {viewModel.GetType().Name} is supported.")
-    };
+    public object CreateView(object viewModel)
+        => viewModel switch
+        {
+            null                                    => throw new ArgumentNullException(
+                nameof(viewModel),
+                "The view model cannot be null."
+            ),
+            AdditionalParameter vm                  => new AdditionalParameterView(vm),
+            StoreShortcut vm                        => new StoreShortcutControl(vm),
+            MultipleAdditionalParameterViewModel vm => new MultipleAdditionalParameterView(vm),
+            NumericSelectorViewModel vm             => new NumericSelectorControl(vm),
+            ReportConfigurationViewModel vm         => new ReportConfigurationView(vm),
+            UwpSelector vm                          => new UwpSelectorList(vm),
+            _                                       => throw new NotSupportedException(
+                $"No control of type {viewModel.GetType().Name} is supported."
+            )
+        };
 
     #endregion
 }

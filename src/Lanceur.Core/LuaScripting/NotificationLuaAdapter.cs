@@ -15,7 +15,8 @@ public class NotificationLuaAdapter
 
     #region Constructors
 
-    public NotificationLuaAdapter(IUserGlobalNotificationService notificationService) => _notificationService = notificationService;
+    public NotificationLuaAdapter(IUserGlobalNotificationService notificationService)
+        => _notificationService = notificationService;
 
     #endregion
 
@@ -39,7 +40,8 @@ public class NotificationLuaAdapter
     /// </summary>
     /// <param name="message">The message to be displayed in the toast notification.</param>
     /// <param name="url">The URL to navigate to when the user clicks the "View Details" button.</param>
-    public  void InformationWithNavigation(string message, string url) => _notificationService.InformationWithNavigation(message, url);
+    public  void InformationWithNavigation(string message, string url)
+        => _notificationService.InformationWithNavigation(message, url);
 
     /// <summary>
     ///     Displays a notification to warn the user about a potential issue.

@@ -40,7 +40,8 @@ public static class CollectionExtensions
             if (oldIndex >= 0)
             {
                 list.RemoveAt(oldIndex);
-                if (newIndex > oldIndex) newIndex--;
+                if (newIndex > oldIndex) { newIndex--; }
+
                 list.Insert(newIndex, item);
             }
         }

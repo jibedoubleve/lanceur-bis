@@ -11,20 +11,20 @@ public class KeyToDirectionConverter : IValueConverter
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not KeyEventArgs keyEventArgs) return Binding.DoNothing;
+        if (value is not KeyEventArgs keyEventArgs) { return Binding.DoNothing; }
 
         var modifiers = Keyboard.Modifiers;
         var direction = (keyEventArgs.Key, modifiers) switch
         {
-            (Key.J, ModifierKeys.Control)  => Direction.Down,
-            (Key.L, ModifierKeys.Control)  => Direction.PageDown,
-            (Key.K, ModifierKeys.Control)  => Direction.Up,
-            (Key.H, ModifierKeys.Control)  => Direction.PageUp,
-            (Key.Up, _)       => Direction.Up,
-            (Key.Down, _)     => Direction.Down,
-            (Key.PageUp, _)   => Direction.PageUp,
-            (Key.PageDown, _) => Direction.PageDown,
-            _                 => Direction.None
+            (Key.J, ModifierKeys.Control) => Direction.Down,
+            (Key.L, ModifierKeys.Control) => Direction.PageDown,
+            (Key.K, ModifierKeys.Control) => Direction.Up,
+            (Key.H, ModifierKeys.Control) => Direction.PageUp,
+            (Key.Up, _)                   => Direction.Up,
+            (Key.Down, _)                 => Direction.Down,
+            (Key.PageUp, _)               => Direction.PageUp,
+            (Key.PageDown, _)             => Direction.PageDown,
+            _                             => Direction.None
         };
 
         /*
@@ -32,11 +32,13 @@ public class KeyToDirectionConverter : IValueConverter
          * Otherwise, it indicates navigation within the results, and executing
          * the command is the only behavior required.
          */
-        if (direction !=  Direction.None) keyEventArgs.Handled = true;
+        if (direction !=  Direction.None) { keyEventArgs.Handled = true; }
+
         return direction;
     }
 
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => throw new NotImplementedException();
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 
     #endregion
 }

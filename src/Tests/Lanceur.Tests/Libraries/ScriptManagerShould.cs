@@ -12,7 +12,9 @@ public class ScriptManagerShould
     private static readonly Assembly Asm = Assembly.GetExecutingAssembly();
 
     private const int Count = 3;
-    private const string Pattern = @"Lanceur\.Tests\.Libraries\.Scripts\.script-(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*.sql";
+
+    private const string Pattern
+        = @"Lanceur\.Tests\.Libraries\.Scripts\.script-(\d{1,3}\.{0,1}\d{1,3}\.{0,1}\d{0,3}).*.sql";
 
     #endregion
 

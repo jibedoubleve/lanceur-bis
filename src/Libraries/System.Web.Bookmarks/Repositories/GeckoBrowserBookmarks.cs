@@ -56,7 +56,7 @@ public class GeckoBrowserBookmarks : IBookmarkRepository
 
     private IEnumerable<Bookmark> FetchAll()
     {
-        if (_bookmarksPath.IsNullOrWhiteSpace()) return [];
+        if (_bookmarksPath.IsNullOrWhiteSpace()) { return []; }
 
         const string sql = """
                            select 

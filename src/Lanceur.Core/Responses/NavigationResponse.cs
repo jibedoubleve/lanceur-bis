@@ -9,5 +9,5 @@ public class NavigationResponse
     public QueryResult CurrentAlias { get; set; }
     public string Query { get; set; }
 
-    #endregion Properties
+    #endregion
 }

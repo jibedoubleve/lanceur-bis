@@ -19,18 +19,19 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
 {
     #region Fields
 
-    private static readonly object _monitor = new();
+    private static readonly Lock Locker = new();
 
     #endregion
 
     #region Constructors
 
-    public DbSingleConnectionManager(IDbConnection connection) => Connection =
-        connection ??
-        throw new ArgumentNullException(
-            nameof(connection),
-            "Cannot create a connection scope with an empty connection (NULL)."
-        );
+    public DbSingleConnectionManager(IDbConnection connection)
+        => Connection =
+            connection ??
+            throw new ArgumentNullException(
+                nameof(connection),
+                "Cannot create a connection scope with an empty connection (NULL)."
+            );
 
     #endregion
 
@@ -47,9 +48,10 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
     {
-        lock (_monitor)
+        lock (Locker)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             return action(Connection);
         }
     }
@@ -57,9 +59,10 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public void WithConnection(Action<IDbConnection> action)
     {
-        lock (_monitor)
+        lock (Locker)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             action(Connection);
         }
     }
@@ -67,8 +70,7 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public void WithinTransaction(Action<IDbTransaction> action)
     {
-        WithinTransaction(tx =>
-            {
+        WithinTransaction(tx => {
                 action(tx);
                 return default(object);
             }
@@ -78,9 +80,10 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)
     {
-        lock (_monitor)
+        lock (Locker)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
             try
             {
@@ -99,9 +102,10 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext,  TContext> action, TContext context)
     {
-        lock (_monitor)
+        lock (Locker)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
             try
             {
@@ -120,9 +124,10 @@ public sealed class DbSingleConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public void WithinTransaction<TContext>(Action<IDbTransaction, TContext> action, TContext context)
     {
-        lock (_monitor)
+        lock (Locker)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) { Connection.Open(); }
+
             using var tx = Connection.BeginTransaction(IsolationLevel.ReadCommitted);
             try
             {

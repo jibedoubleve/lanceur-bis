@@ -9,5 +9,5 @@ internal struct Wildcards
     public const string Url = "$w$";
     public const string WebClipboard = "$c$";
 
-    #endregion Fields
+    #endregion
 }

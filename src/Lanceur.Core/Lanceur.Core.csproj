@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3" />
-    <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
-    <PackageReference Include="Scrutor" Version="7.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Models\AliasQueryResultExtensions.cs">
-      <DependentUpon>AliasQueryResult.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Models\QueryResultExtensions.cs">
-      <DependentUpon>QueryResult.cs</DependentUpon>
-    </Compile>
-    <Compile Remove="Repositories\FeatureFlags\Features.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Repositories\FeatureFlags\" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Lanceur.Core.Plugins" Version="2.4.2"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3"/>
+        <PackageReference Include="Riok.Mapperly" Version="4.3.1"/>
+        <PackageReference Include="Scrutor" Version="7.0.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Models\AliasQueryResultExtensions.cs">
+            <DependentUpon>AliasQueryResult.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Models\QueryResultExtensions.cs">
+            <DependentUpon>QueryResult.cs</DependentUpon>
+        </Compile>
+        <Compile Remove="Repositories\FeatureFlags\Features.cs"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Repositories\FeatureFlags\"/>
+    </ItemGroup>
 </Project>

@@ -38,7 +38,7 @@ public class Conditional<T>
     #region Properties
 
     /// <summary>
-    /// Gets the value of the conditional
+    ///     Gets the value of the conditional
     /// </summary>
     public T Value => _value;
 
@@ -46,8 +46,7 @@ public class Conditional<T>
 
     #region Methods
 
-    [Conditional("DEBUG")]
-    private static void GetConditional(ref T result, T onDebug) => result = onDebug;
+    [Conditional("DEBUG")] private static void GetConditional(ref T result, T onDebug) => result = onDebug;
 
     public static implicit operator T(Conditional<T> src) => src.Value;
 

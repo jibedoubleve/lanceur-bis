@@ -10,5 +10,5 @@ public class AliasExecutionRequest
     public string Query { get; set; }
     public bool RunAsAdmin { get; set; }
 
-    #endregion Properties
+    #endregion
 }

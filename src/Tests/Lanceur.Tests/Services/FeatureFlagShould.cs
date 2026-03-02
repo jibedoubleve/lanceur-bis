@@ -1,8 +1,8 @@
-using Shouldly;
 using Lanceur.Core.Constants;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Services;

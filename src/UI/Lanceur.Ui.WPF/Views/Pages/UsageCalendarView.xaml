@@ -30,7 +30,7 @@
         </Grid.ColumnDefinitions>
         <StackPanel HorizontalAlignment="Center"
                     Margin="40 40 40 40">
-            <Calendar HorizontalAlignment="Left" x:Name="UsageCalendar" 
+            <Calendar HorizontalAlignment="Left" x:Name="UsageCalendar"
                       DisplayDateStart="{Binding DisplayDateStart}"
                       DisplayDateEnd="{Binding DisplayDateEnd}"
                       DisplayDate="{Binding DisplayDate}">

@@ -8,16 +8,15 @@ public interface IStoreService
     #region Properties
 
     /// <summary>
-    ///     Configuration of the orchestration.
-    /// </summary>
-    StoreOrchestration StoreOrchestration { get; }
-    
-    /// <summary>
-    /// Gets a value indicating whether the store's shortcut can be overridden 
-    /// by the user through the configuration settings.
+    ///     Gets a value indicating whether the store's shortcut can be overridden
+    ///     by the user through the configuration settings.
     /// </summary>
     bool IsOverridable { get; }
 
+    /// <summary>
+    ///     Configuration of the orchestration.
+    /// </summary>
+    StoreOrchestration StoreOrchestration { get; }
 
     #endregion
 

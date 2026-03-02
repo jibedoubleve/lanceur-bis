@@ -24,19 +24,14 @@ public static class ListExtensions
         ArgumentNullException.ThrowIfNull(toRemove);
 
         var listToRemove = toRemove.ToList();
-            
+
         //foreach (var item in toRemove) source.Remove(item);
         for (var i = 0; i < listToRemove.Count(); i++)
-        {
-            if (source.Contains(listToRemove[i]))
-            {
-                source.Remove(listToRemove[i]);
-            }
-        }
+            if (source.Contains(listToRemove[i])) { source.Remove(listToRemove[i]); }
     }
 
     /// <summary>
-    /// Removes all items from the list that satisfy the specified predicate.
+    ///     Removes all items from the list that satisfy the specified predicate.
     /// </summary>
     /// <param name="source">The list from which elements will be removed.</param>
     /// <param name="predicate">A function that determines whether an element should be removed.</param>
@@ -44,9 +39,7 @@ public static class ListExtensions
     public static void RemoveWhere<T>(this IList<T> source, Func<T, bool> predicate)
     {
         for (var i = 0; i < source.Count; ++i)
-        {
-            if (predicate(source[i])) source.RemoveAt(i);
-        }
+            if (predicate(source[i])) { source.RemoveAt(i); }
     }
 
     #endregion

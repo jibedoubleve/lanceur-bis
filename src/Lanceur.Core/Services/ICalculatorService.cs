@@ -5,6 +5,25 @@
 /// </summary>
 public interface ICalculatorService
 {
+    #region Properties
+
+    /// <summary>
+    ///     Gets a regular expression pattern used to validate mathematical expressions
+    ///     before evaluation. This pattern defines the allowed syntax and format
+    ///     for expressions that can be processed by the calculator.
+    /// </summary>
+    /// <remarks>
+    ///     The regex helps ensure that input expressions contain only supported
+    ///     mathematical operators, numbers, and valid syntax, reducing the risk of
+    ///     evaluation errors.
+    /// </remarks>
+    /// <returns>
+    ///     A string representing the regular expression pattern for expression validation.
+    /// </returns>
+    string ValidationRegex { get; }
+
+    #endregion
+
     #region Methods
 
     /// <summary>
@@ -20,19 +39,5 @@ public interface ICalculatorService
     /// </returns>
     (bool IsError, string Result) Evaluate(string expression);
 
-    /// <summary>
-    ///     Gets a regular expression pattern used to validate mathematical expressions
-    ///     before evaluation. This pattern defines the allowed syntax and format
-    ///     for expressions that can be processed by the calculator.
-    /// </summary>
-    /// <remarks>
-    ///     The regex helps ensure that input expressions contain only supported 
-    ///     mathematical operators, numbers, and valid syntax, reducing the risk of 
-    ///     evaluation errors.
-    /// </remarks>
-    /// <returns>
-    ///     A string representing the regular expression pattern for expression validation.
-    /// </returns>
-    string ValidationRegex { get; }
-    #endregion Methods
+    #endregion
 }

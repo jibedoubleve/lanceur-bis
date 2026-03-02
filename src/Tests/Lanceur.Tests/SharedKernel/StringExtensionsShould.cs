@@ -1,23 +1,11 @@
-﻿using Shouldly;
-using Lanceur.SharedKernel.Extensions;
+﻿using Lanceur.SharedKernel.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
 public class StringExtensionsShould
 {
-    #region Enums
-
-    public enum EnumValues
-    {
-        FirstValue,
-        SecondValue,
-        ThirdValue,
-        FourthValue
-    }
-
-    #endregion Enums
-
     #region Methods
 
     [Fact]
@@ -34,11 +22,23 @@ public class StringExtensionsShould
         s.ShouldBeNullOrEmpty();
     }
 
-    [Theory, InlineData("tostring", "tostring"), InlineData("tostring", "TOSTRING"), InlineData("tostring", "ToString"), InlineData("", ""), InlineData(null, null)]
+    [Theory]
+    [InlineData("tostring", "tostring")]
+    [InlineData("tostring", "TOSTRING")]
+    [InlineData("tostring", "ToString")]
+    [InlineData("", "")]
+    [InlineData(null, null)]
     public void ReturnLowerString(string expected, string actual) { actual.ToLowerString().ShouldBe(expected); }
 
-    [Theory, InlineData("firstvalue", EnumValues.FirstValue), InlineData("secondvalue", EnumValues.SecondValue), InlineData("thirdvalue", EnumValues.ThirdValue), InlineData("fourthvalue", EnumValues.FourthValue)]
-    public void ReturnLowerStringFromEnum(string expected, EnumValues actual) { actual.ToLowerString().ShouldBe(expected); }
+    [Theory]
+    [InlineData("firstvalue", EnumValues.FirstValue)]
+    [InlineData("secondvalue", EnumValues.SecondValue)]
+    [InlineData("thirdvalue", EnumValues.ThirdValue)]
+    [InlineData("fourthvalue", EnumValues.FourthValue)]
+    public void ReturnLowerStringFromEnum(string expected, EnumValues actual)
+    {
+        actual.ToLowerString().ShouldBe(expected);
+    }
 
     [Fact]
     public void ReturnTrueOnEmptyUsingNullOrWhiteSpace()
@@ -62,11 +62,27 @@ public class StringExtensionsShould
         s.ShouldBeNullOrWhiteSpace();
     }
 
-    [Theory, InlineData("un"), InlineData("deux")]
+    [Theory]
+    [InlineData("un")]
+    [InlineData("deux")]
     public void ReturnTrueOnTextUsingNullOrEmpty(string value) { value.ShouldNotBeNullOrEmpty(); }
 
-    [Theory, InlineData("un"), InlineData("deux")]
+    [Theory]
+    [InlineData("un")]
+    [InlineData("deux")]
     public void ReturnTrueOnTextUsingNullOrWhiteSpace(string value) { value.ShouldNotBeNullOrWhiteSpace(); }
 
-    #endregion Methods
+    #endregion
+
+    #region Enums
+
+    public enum EnumValues
+    {
+        FirstValue,
+        SecondValue,
+        ThirdValue,
+        FourthValue
+    }
+
+    #endregion Enums
 }

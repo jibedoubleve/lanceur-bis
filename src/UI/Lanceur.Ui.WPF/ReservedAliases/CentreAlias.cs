@@ -42,8 +42,7 @@ public class CentreAlias : SelfExecutableQueryResult
 
     private void Save(Coordinate coordinate)
     {
-        _appConfig!.Edit(s =>
-            {
+        _appConfig!.Edit(s => {
                 s.Window.Position.Left = coordinate.X;
                 s.Window.Position.Top = coordinate.Y;
             }

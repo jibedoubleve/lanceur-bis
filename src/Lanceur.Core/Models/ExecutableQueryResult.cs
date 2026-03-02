@@ -8,5 +8,5 @@ public abstract class ExecutableQueryResult : QueryResult, IExecutable
 
     public string Parameters { get; set; }
 
-    #endregion Properties
+    #endregion
 }
