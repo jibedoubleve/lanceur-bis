@@ -115,12 +115,6 @@ public partial class MainView
                 = enabled ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private void HandleSettingButton()
-    {
-        var enabled = _featureFlagService.IsEnabled(Features.ShowSettingButton);
-        SettingButton.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
-    }
-
     /// <remarks>
     ///     Handles the "Show Last Query" option when closing the window to prevent UI flickering.
     ///     Clearing the results when the window is transparent avoids an unsightly refresh effect
@@ -266,7 +260,6 @@ public partial class MainView
         _ = ViewModel.DisplayResultsIfAllowed();
 
         HandleCpuAndMemoryUsage();
-        HandleSettingButton();
 
         Visibility = Visibility.Visible;
         QueryTextBox.Focus();

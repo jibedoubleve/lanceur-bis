@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -63,8 +64,20 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
         var newFf = defaultFf.Where(f => config.FeatureFlags.All(c => c.FeatureName != f.FeatureName));
 
         currentFf.AddRange(newFf);
+
+        RemoveStaleFeatureFlags(currentFf);
+
         config.FeatureFlags = currentFf;
         return config;
+    }
+
+    private static void RemoveStaleFeatureFlags(List<FeatureFlag> currentFf)
+    {
+        var ffNames = Features.GetNames();
+        var toRemove = currentFf.Where(f => !ffNames.Contains(f.FeatureName))
+                                .ToArray();
+
+        foreach (var f in toRemove) { currentFf.Remove(f); }
     }
 
     /// <inheritdoc />

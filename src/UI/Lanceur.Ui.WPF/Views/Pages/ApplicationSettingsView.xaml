@@ -195,6 +195,36 @@
                     </StackPanel>
                 </ui:CardControl>
 
+                <ui:CardControl
+                    Margin="5,5,5,12"
+                    Icon="{ui:SymbolIcon Settings24}"
+                    ToolTip="Controls whether the settings button is visible in the search box.">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Show settings button in search box?" />
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ToggleSwitch
+                            IsChecked="{Binding IsSettingsButtonEnabled}"
+                            OffContent="No"
+                            OnContent="Yes" />
+                    </StackPanel>
+                </ui:CardControl>
+
+                <ui:CardControl
+                    Margin="5,5,5,12"
+                    Icon="{ui:SymbolIcon Pin24}"
+                    ToolTip="Keep the status bar visible at all times, even when there are no active results to display.">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Always show status bar" />
+                    </ui:CardControl.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ToggleSwitch
+                            IsChecked="{Binding IsStatusBarAlwaysVisible}"
+                            OffContent="No"
+                            OnContent="Yes" />
+                    </StackPanel>
+                </ui:CardControl>
+
                 <ui:TextBlock
                     Margin="{StaticResource RegionMargin}"
                     FontTypography="{StaticResource RegionFontTypography}"

@@ -85,6 +85,12 @@ public partial class MainViewModel : ObservableObject
 
     public bool ShowLastQuery => _stgSearchBox.Value.ShowLastQuery;
 
+    public bool ShowSettingsButton => _stgSearchBox.Value.IsSettingsButtonEnabled;
+
+    public bool ShowStatusBar =>
+        _stgSearchBox.Value.IsStatusBarAlwaysVisible
+        || Results.Count > 0;
+
     #endregion
 
     #region Methods
@@ -107,7 +113,7 @@ public partial class MainViewModel : ObservableObject
 
         var query = Cmdline.Parse(Query);
         var cmd = new Cmdline(SelectedResult.Name, query.Parameters);
-        WeakReferenceMessenger.Default.Send<SetQueryMessage>(new SetQueryMessage(cmd));
+        WeakReferenceMessenger.Default.Send(new SetQueryMessage(cmd));
     }
 
     [RelayCommand]
@@ -247,7 +253,13 @@ public partial class MainViewModel : ObservableObject
     public void RefreshSettings()
     {
         _stgSearchBox.Reload();
+
         WindowBackdropStyle = _stgWindow.Value.BackdropStyle;
+
+        // Now the values are refreshed, let's refresh the ui
+        OnPropertyChanged(nameof(ShowStatusBar));
+        OnPropertyChanged(nameof(ShowSettingsButton));
+
         _watchdog.ResetDelay(_stgSearchBox.Value.SearchDelay);
     }
 
