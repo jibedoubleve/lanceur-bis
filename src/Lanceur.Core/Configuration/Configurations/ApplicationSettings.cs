@@ -35,13 +35,6 @@ public class ApplicationSettings
             Enabled = false,
             Description = "Display additional parameter results without requiring ':' input",
             Icon = "PanelSeparateWindow20"
-        },
-        new()
-        {
-            FeatureName = Features.ShowSettingButton,
-            Enabled = true,
-            Description = "Display the settings button in Search Box",
-            Icon = "Settings20"
         }
     ];
 

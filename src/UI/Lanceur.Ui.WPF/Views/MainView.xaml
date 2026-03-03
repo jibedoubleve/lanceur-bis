@@ -80,7 +80,7 @@
                                 Command="{Binding ExecuteCommand}"
                                 CommandParameter="{StaticResource True}"
                                 Modifiers="Control" />
-                            <!-- This should open the source directory whenever possible -->
+                            <!--  This should open the source directory whenever possible  -->
                             <KeyBinding
                                 Key="Enter"
                                 Command="{Binding OpenDirectoryCommand}"
@@ -138,11 +138,12 @@
             <Separator
                 Grid.Row="2"
                 Margin="5,6,5,2"
-                Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}" />
+                Visibility="{Binding ShowStatusBar, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-            <Grid Grid.Row="3"
-                  Visibility="{Binding Results.Count, Converter={StaticResource IntegerToVisibilityConverter}}"
-                  Margin="0,0,15,6">
+            <Grid
+                Grid.Row="3"
+                Margin="0,0,15,6"
+                Visibility="{Binding ShowStatusBar, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
@@ -158,16 +159,18 @@
                            Tag="settings"
                            HorizontalContentAlignment="Stretch"
                            VerticalContentAlignment="Stretch"
-                           Background="Transparent">
+                           Background="Transparent"
+                           Visibility="{Binding ShowSettingsButton, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <DockPanel LastChildFill="True">
-                        <ui:SymbolIcon Symbol="Settings24"
-                                       DockPanel.Dock="Left"
+                        <ui:SymbolIcon DockPanel.Dock="Left"
                                        HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch" />
-                        <TextBlock Text="Settings"
-                                   Margin="5 0 0 0"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
+                                       VerticalAlignment="Stretch"
+                                       Symbol="Settings24" />
+                        <TextBlock
+                            Margin="5,0,0,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="Settings" />
                     </DockPanel>
                 </ui:Button>
 

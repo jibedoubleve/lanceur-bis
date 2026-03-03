@@ -40,6 +40,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isCtrl;
     [ObservableProperty] private bool _isResourceMonitorEnabled;
     [ObservableProperty] private bool _isSettingsButtonEnabled;
+    [ObservableProperty]private bool _isStatusBarAlwaysVisible;
     [ObservableProperty] private bool _isShift;
     [ObservableProperty] private bool _isWin;
     [ObservableProperty] private int _key;
@@ -97,7 +98,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         MapSettingsFromDbToUi();
         var featureFlags = Configuration.Application.FeatureFlags.ToArray();
         IsResourceMonitorEnabled = featureFlags.IsFeatureFlagEnabled(Features.ResourceDisplay);
-        IsSettingsButtonEnabled = featureFlags.IsFeatureFlagEnabled(Features.ShowSettingButton);
 
         // Setup behaviour on property changed
         foreach (var flag in FeatureFlags)
@@ -142,6 +142,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ShowAtStartup = Configuration.Application.SearchBox.ShowAtStartup;
         ShowLastQuery = Configuration.Application.SearchBox.ShowLastQuery;
         ToggleVisibility = Configuration.Application.SearchBox.ToggleVisibility;
+        
+        IsSettingsButtonEnabled = Configuration.Application.SearchBox.IsSettingsButtonEnabled;
+        IsStatusBarAlwaysVisible = Configuration.Application.SearchBox.IsStatusBarAlwaysVisible;
 
         // Store section
         BookmarkSourceBrowser = Configuration.Application.Stores.BookmarkSourceBrowser;
@@ -180,6 +183,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Configuration.Application.SearchBox.ShowAtStartup = ShowAtStartup;
         Configuration.Application.SearchBox.ShowLastQuery = ShowLastQuery;
         Configuration.Application.SearchBox.ToggleVisibility = ToggleVisibility;
+        
+        Configuration.Application.SearchBox.IsSettingsButtonEnabled = IsSettingsButtonEnabled;
+        Configuration.Application.SearchBox.IsStatusBarAlwaysVisible = IsStatusBarAlwaysVisible;
 
         // Store section
         Configuration.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
@@ -188,11 +194,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Everything Store
         var query = new EverythingQueryBuilder();
         if (ExcludeHiddenFilesWithEverything) { query.ExcludeHiddenFiles(); }
-
         if (ExcludeSystemFilesWithEverything) { query.ExcludeSystemFiles(); }
-
         if (IncludeOnlyExecFilesWithEverything) { query.OnlyExecFiles(); }
-
         if (ExcludeFilesInBinWithEverything) { query.ExcludeFilesInBin(); }
 
         Configuration.Application.Stores.EverythingQuerySuffix = query.BuildQuery();

@@ -42,5 +42,19 @@ public class SearchBoxSection
     /// <remarks> Default value is <c>True</c></remarks>
     public bool ToggleVisibility { get; set; } = true;
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether the settings button is visible in the search box.
+    /// </summary>
+    /// <remarks>Default value is <c>true</c>.</remarks>
+    public bool IsSettingsButtonEnabled { get; set; } = true;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the settings button remains visible at all times in the search box,
+    ///     regardless of whether results are currently displayed. Requires <see cref="IsSettingsButtonEnabled"/> to be
+    ///     <c>true</c>.
+    /// </summary>
+    /// <remarks>Default value is <c>true</c>.</remarks>
+    public bool IsStatusBarAlwaysVisible { get; set; } = true;
+
     #endregion
 }
