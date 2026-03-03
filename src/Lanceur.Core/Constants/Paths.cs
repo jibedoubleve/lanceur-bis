@@ -15,10 +15,10 @@ public static class Paths
     public static string ClefLogFile { get; } = @"%appdata%\probel\lanceur2\logs\clef\lanceur..clef".ExpandPath();
 
     public static string DebugClefLogFile { get; }
-        = @"%appdata%\probel\lanceur2\logs\debug\clef\lanceur..clef".ExpandPath();
+        = @"%appdata%\probel\lanceur2\debug\clef\lanceur..clef".ExpandPath();
 
     public static string DebugRawLogFile { get; }
-        = @"%appdata%\probel\lanceur2\logs\debug\log\lanceur..log".ExpandPath();
+        = @"%appdata%\probel\lanceur2\debug\log\lanceur..log".ExpandPath();
 
     public static string DefaultDb { get; } = @"%appdata%\probel\lanceur2\data.sqlite".ExpandPath();
     public static string ImageRepository { get; } = @"%appdata%\probel\lanceur2\thumbnails".ExpandPath();
