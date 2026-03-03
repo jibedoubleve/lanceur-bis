@@ -55,8 +55,10 @@
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Window" />
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Keyboard24}"
-                                ToolTipService.ToolTip="Defines the keyboard shortcut used to open the search interface and start searching aliases. Choose a key combination that does not conflict with system or application shortcuts.">
+                <ui:CardControl
+                    Margin="5,5,5,12"
+                    Icon="{ui:SymbolIcon Keyboard24}"
+                    ToolTipService.ToolTip="Defines the keyboard shortcut used to open the search interface and start searching aliases. Choose a key combination that does not conflict with system or application shortcuts.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Hot key" />
                     </ui:CardControl.Header>
@@ -77,35 +79,49 @@
                             Margin="0,0,5,0"
                             Content="Shift"
                             IsChecked="{Binding IsShift}" />
-                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}"
-                                  SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
+                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}" SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
                     </StackPanel>
                 </ui:CardControl>
 
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Color24}">
                     <ui:CardControl.ToolTip>
-                        <ToolTip HasDropShadow="True" MaxWidth="360" Placement="Mouse">
+                        <ToolTip
+                            MaxWidth="360"
+                            HasDropShadow="True"
+                            Placement="Mouse">
                             <StackPanel>
-                                <TextBlock Text="Glass Effect" FontWeight="Bold" Margin="0,0,0,4" />
-                                <TextBlock Text="Determines the visual material applied to the app background."
-                                           TextWrapping="Wrap" Margin="0,0,0,8" />
+                                <TextBlock
+                                    Margin="0,0,0,4"
+                                    FontWeight="Bold"
+                                    Text="Glass Effect" />
+                                <TextBlock
+                                    Margin="0,0,0,8"
+                                    Text="Determines the visual material applied to the app background."
+                                    TextWrapping="Wrap" />
 
-                                <TextBlock Text="• Mica — Subtle transparency with depth." TextWrapping="Wrap"
-                                           Margin="0,0,0,2" />
-                                <TextBlock Text="• Acrylic — Stronger blur and transparency for a dynamic look."
-                                           TextWrapping="Wrap" Margin="0,0,0,2" />
-                                <TextBlock Text="• Tab — Applies the effect only to tab surfaces." TextWrapping="Wrap"
-                                           Margin="0,0,0,2" />
-                                <TextBlock Text="• None — Disables all visual effects." TextWrapping="Wrap"
-                                           Margin="0,0,0,2" />
+                                <TextBlock
+                                    Margin="0,0,0,2"
+                                    Text="• Mica — Subtle transparency with depth."
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Margin="0,0,0,2"
+                                    Text="• Acrylic — Stronger blur and transparency for a dynamic look."
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Margin="0,0,0,2"
+                                    Text="• Tab — Applies the effect only to tab surfaces."
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Margin="0,0,0,2"
+                                    Text="• None — Disables all visual effects."
+                                    TextWrapping="Wrap" />
                             </StackPanel>
                         </ToolTip>
                     </ui:CardControl.ToolTip>
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Glass Effect" />
                     </ui:CardControl.Header>
-                    <ComboBox ItemsSource="{StaticResource WindowBackdropStyles}"
-                              SelectedItem="{Binding WindowBackdropStyle}" />
+                    <ComboBox ItemsSource="{StaticResource WindowBackdropStyles}" SelectedItem="{Binding WindowBackdropStyle}" />
 
                 </ui:CardControl>
 
@@ -116,22 +132,6 @@
                     <StackPanel Orientation="Horizontal">
                         <ui:ToggleSwitch
                             IsChecked="{Binding ShowAtStartup}"
-                            OffContent="No"
-                            OnContent="Yes" />
-                    </StackPanel>
-                </ui:CardControl>
-
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
-                    <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body" Text="Shortcut shows search; repeat hides" />
-                    </ui:CardControl.Header>
-                    <ui:CardControl.ToolTip>
-                        Shows the search box when the shortcut is used. Using the shortcut again hides it.
-                        Repeating the shortcut alternates between showing and hiding the search box.
-                    </ui:CardControl.ToolTip>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:ToggleSwitch
-                            IsChecked="{Binding ToggleVisibility}"
                             OffContent="No"
                             OnContent="Yes" />
                     </StackPanel>
@@ -170,11 +170,22 @@
                             OnContent="Show all results" />
                     </StackPanel>
                 </ui:CardControl>
+                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Shortcut shows search; repeat hides" />
+                    </ui:CardControl.Header>
+                    <ui:CardControl.ToolTip>Shows the search box when the shortcut is used. Using the shortcut again hides it. Repeating the shortcut alternates between showing and hiding the search box.</ui:CardControl.ToolTip>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ToggleSwitch
+                            IsChecked="{Binding ToggleVisibility}"
+                            OffContent="No"
+                            OnContent="Yes" />
+                    </StackPanel>
+                </ui:CardControl>
 
                 <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Search24}">
                     <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body"
-                                      Text="Should the last query be shown when the search opens?" />
+                        <ui:TextBlock FontTypography="Body" Text="Should the last query be shown when the search opens?" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:ToggleSwitch
@@ -218,8 +229,7 @@
                         <ui:TextBlock FontTypography="Body" Text="Source of the bookmarks" />
                     </ui:CardControl.Header>
                     <StackPanel>
-                        <ComboBox ItemsSource="{StaticResource Browsers}"
-                                  SelectedItem="{Binding BookmarkSourceBrowser}" />
+                        <ComboBox ItemsSource="{StaticResource Browsers}" SelectedItem="{Binding BookmarkSourceBrowser}" />
                     </StackPanel>
                 </ui:CardControl>
 
@@ -242,8 +252,7 @@
                     <StackPanel>
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body"
-                                              Text="Should hidden files be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body" Text="Should hidden files be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -255,8 +264,7 @@
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ShieldKeyhole24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body"
-                                              Text="Should system files be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body" Text="Should system files be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -268,8 +276,7 @@
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Run24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body"
-                                              Text="Should only executable files be included in the results?" />
+                                <ui:TextBlock FontTypography="Body" Text="Should only executable files be included in the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -281,8 +288,7 @@
 
                         <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Delete24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body"
-                                              Text="Should files in the Recycle Bin be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body" Text="Should files in the Recycle Bin be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -437,8 +443,7 @@
                     <ui:CardControl.ToolTip>
                         Enter the API token from your GitHub account. It is used, among other things, to create new issues.
                     </ui:CardControl.ToolTip>
-                    <ui:PasswordBox Password="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    PlaceholderText="Enter your API token" />
+                    <ui:PasswordBox Password="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter your API token" />
                 </ui:CardControl>
 
                 <!--  Resource monitor settings  -->
