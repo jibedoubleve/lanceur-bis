@@ -28,6 +28,7 @@ issue-labels-exclude:
 - wontfix
 - PR
 - cannot reproduce
+- skip-changelog
 issue-labels-alias:
     - name:    Documentation
       header:  Documentation
