@@ -2,6 +2,7 @@
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Utils;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
@@ -9,6 +10,7 @@ using Lanceur.Tests.Tools;
 using Newtonsoft.Json;
 using Shouldly;
 using Xunit;
+using Version = System.Version;
 
 namespace Lanceur.Tests.Services;
 
@@ -22,11 +24,13 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
 
     #region Methods
 
-    private void WithConfiguration(Action<IApplicationSettingsProvider> assert, string json = null)
+    private void WithConfiguration(Action<IApplicationSettingsProvider> assert, string json = null, IConnectionString connectionString = null)
     {
         var sql = $"insert into settings (s_key, s_value) values ('json', '{json}');";
-
-        using var c = BuildFreshDb();
+        
+        connectionString ??= ConnectionStringFactory.InMemory;
+        
+        using var c = BuildFreshDb(connectionString: connectionString);
         c.Execute(sql);
         using var scope = new DbSingleConnectionManager(c);
         var settingRepository = new SQLiteApplicationSettingsProvider(
@@ -68,26 +72,38 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     [Fact]
     public void DeserialiseFeatureFlags()
     {
-        const string json = """
-                            { "FeatureFlags": [ { "Description": "Show CPU", "Enabled": false, "FeatureName": "ShowSystemUsage1", "Icon": "Gauge241" }, { "Description": "Enables administrator", "Enabled": true, "FeatureName": "AdminMode1", "Icon": "ShieldKeyhole241" } ] }
-                            """;
-        WithConfiguration(
-            repository => {
-                var settings = repository.Current;
-                settings.FeatureFlags.Count().ShouldBe(5);
-
-                settings.FeatureFlags.ElementAt(0).Enabled.ShouldBeFalse();
-                settings.FeatureFlags.ElementAt(0).FeatureName.ShouldBe("ShowSystemUsage1");
-                settings.FeatureFlags.ElementAt(0).Icon.ShouldBe("Gauge241");
-                settings.FeatureFlags.ElementAt(0).Description.ShouldBe("Show CPU");
-
-                settings.FeatureFlags.ElementAt(1).Enabled.ShouldBeTrue();
-                settings.FeatureFlags.ElementAt(1).FeatureName.ShouldBe("AdminMode1");
-                settings.FeatureFlags.ElementAt(1).Icon.ShouldBe("ShieldKeyhole241");
-                settings.FeatureFlags.ElementAt(1).Description.ShouldBe("Enables administrator");
-            },
-            json
-        );
+        var description = Tools.Generators.Generate.Text();
+        var featureName = Features.GetNames().ElementAt(0);
+        var icon = Tools.Generators.Generate.Text();
+        
+        var json = $$"""
+                     {
+                         "FeatureFlags": [
+                             {
+                                 "Description": "{{description}}",
+                                 "Enabled": false,
+                                 "FeatureName": "{{featureName}}",
+                                 "Icon": "{{icon}}"
+                             },
+                             {
+                                 "Description": "Enables administrator",
+                                 "Enabled": true,
+                                 "FeatureName": "AdminMode1",
+                                 "Icon": "ShieldKeyhole241"
+                             }
+                         ]
+                     }
+                     """;
+        WithConfiguration(repository =>
+                repository.Current.FeatureFlags.ToList()
+                          .ShouldSatisfyAllConditions(
+                              ff => ff.Count.ShouldBe(2),
+                              ff => ff[0].Enabled.ShouldBeFalse(),
+                              ff => ff[0].FeatureName.ShouldBe(featureName),
+                              ff => ff[0].Icon.ShouldBe(icon),
+                              ff => ff[0].Description.ShouldBe(description)
+                          ),
+            json);
     }
 
     [Fact]
@@ -108,119 +124,126 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
     [Fact]
     public void HandleAllProperties()
     {
-        const string json = """
-                            {
-                                "Caching": {
-                                    "StoreCacheDuration": 11,
-                                    "ThumbnailCacheDuration": 12
-                                },
-                                "FeatureFlags": [
-                                    {
-                                        "Description": "aaabbcc",
-                                        "Enabled": true,
-                                        "FeatureName": "xxyyzz",
-                                        "Icon": "ggg"
-                                    }
-                                ],
-                                "Github": {
-                                    "LastCheckedVersion": "1.2.3",
-                                    "SnoozeVersionCheck": true,
-                                    "Token": "123456789"
-                                },
-                                "HotKey": {
-                                    "Key": 55,
-                                    "ModifierKey": 56
-                                },
-                                "Reconciliation": {
-                                    "InactivityThreshold": 99,
-                                    "LowUsageThreshold": 98
-                                },
-                                "ResourceMonitor": {
-                                    "CpuSmoothingIndex": 66,
-                                    "RefreshRate": 77
-                                },
-                                "SearchBox": {
-                                    "SearchDelay": 11.99,
-                                    "ShowAtStartup": false,
-                                    "ShowLastQuery": false,
-                                    "ShowResult": true
-                                },
-                                "Stores": {
-                                    "BookmarkSourceBrowser": "Edge",
-                                    "EverythingQuerySuffix": "eee",
-                                    "StoreShortcuts": [
-                                        {
-                                            "AliasOverride": "987654",
-                                            "StoreType": "LISBS"
-                                        },
-                                        {
-                                            "AliasOverride": "123456",
-                                            "StoreType": "LISES"
-                                        }
-                                    ]
-                                },
-                                "Window": {
-                                    "BackdropStyle": "Micass",
-                                    "NotificationDisplayDuration": 11,
-                                    "Position": {
-                                        "Left": 1.23456,
-                                        "Top": 2.45678
-                                    }
-                                }
-                            }
-                            """;
-        WithConfiguration(
-            assert => {
-                assert.Current.Caching.StoreCacheDuration.ShouldBe(11);
-                assert.Current.Caching.ThumbnailCacheDuration.ShouldBe(12);
-                if (assert.Current.FeatureFlags.Any())
-                {
-                    var ff = assert.Current.FeatureFlags.ElementAt(0);
-                    ff.Description.ShouldBe("aaabbcc");
-                    ff.Enabled.ShouldBe(true);
-                    ff.FeatureName.ShouldBe("xxyyzz");
-                    ff.Icon.ShouldBe("ggg");
-                }
-                else { Assert.Fail("No feature flags"); }
+        var features = Features.GetNames().ToList(); 
+        var description = Tools.Generators.Generate.Text();
+        var icon = Tools.Generators.Generate.Text();
+        
+        var json = $$"""
+                     {
+                         "Caching": {
+                             "StoreCacheDuration": 11,
+                             "ThumbnailCacheDuration": 12
+                         },
+                         "FeatureFlags": [
+                             {
+                                 "Description": "{{description}}",
+                                 "Enabled": true,
+                                 "FeatureName": "{{features[0]}}",
+                                 "Icon": "{{icon}}"
+                             }
+                         ],
+                         "Github": {
+                             "LastCheckedVersion": "1.2.3",
+                             "SnoozeVersionCheck": true,
+                             "Token": "123456789"
+                         },
+                         "HotKey": {
+                             "Key": 55,
+                             "ModifierKey": 56
+                         },
+                         "Reconciliation": {
+                             "InactivityThreshold": 99,
+                             "LowUsageThreshold": 98
+                         },
+                         "ResourceMonitor": {
+                             "CpuSmoothingIndex": 66,
+                             "RefreshRate": 77
+                         },
+                         "SearchBox": {
+                             "SearchDelay": 11.99,
+                             "ShowAtStartup": false,
+                             "ShowLastQuery": false,
+                             "ShowResult": true
+                         },
+                         "Stores": {
+                             "BookmarkSourceBrowser": "Edge",
+                             "EverythingQuerySuffix": "eee",
+                             "StoreShortcuts": [
+                                 {
+                                     "AliasOverride": "987654",
+                                     "StoreType": "LISBS"
+                                 },
+                                 {
+                                     "AliasOverride": "123456",
+                                     "StoreType": "LISES"
+                                 }
+                             ]
+                         },
+                         "Window": {
+                             "BackdropStyle": "Micass",
+                             "NotificationDisplayDuration": 11,
+                             "Position": {
+                                 "Left": 1.23456,
+                                 "Top": 2.45678
+                             }
+                         }
+                     }
+                     """;
+        WithConfiguration(assert =>
+                assert.Current.ShouldSatisfyAllConditions(
+                    a => a.Caching.StoreCacheDuration.ShouldBe(11),
+                    a => a.Caching.ThumbnailCacheDuration.ShouldBe(12),
+                    a => {
+                        if (a.FeatureFlags.Any())
+                        {
+                            var ff = assert.Current.FeatureFlags.ElementAt(0);
+                            ff.Description.ShouldBe(description);
+                            ff.Enabled.ShouldBe(true);
+                            ff.FeatureName.ShouldBe(features[0]);
+                            ff.Icon.ShouldBe(icon);
+                        }
+                        else { Assert.Fail("No feature flags"); }
+                    },
 
-                assert.Current.Github.LastCheckedVersion.ShouldBe(new Version("1.2.3"));
-                assert.Current.Github.SnoozeVersionCheck.ShouldBe(true);
-                assert.Current.Github.Token.ShouldBe("123456789");
+                    a => a.Github.LastCheckedVersion.ShouldBe(new Version("1.2.3")),
+                    a => a.Github.SnoozeVersionCheck.ShouldBe(true),
+                    a => a.Github.Token.ShouldBe("123456789"),
 
-                assert.Current.HotKey.Key.ShouldBe(55);
-                assert.Current.HotKey.ModifierKey.ShouldBe(56);
+                    a => a.HotKey.Key.ShouldBe(55),
+                    a => a.HotKey.ModifierKey.ShouldBe(56),
 
-                assert.Current.Reconciliation.InactivityThreshold.ShouldBe(99);
-                assert.Current.Reconciliation.LowUsageThreshold.ShouldBe(98);
+                    a => a.Reconciliation.InactivityThreshold.ShouldBe(99),
+                    a => a.Reconciliation.LowUsageThreshold.ShouldBe(98),
 
-                assert.Current.ResourceMonitor.CpuSmoothingIndex.ShouldBe(66);
-                assert.Current.ResourceMonitor.RefreshRate.ShouldBe(77);
+                    a => a.ResourceMonitor.CpuSmoothingIndex.ShouldBe(66),
+                    a => a.ResourceMonitor.RefreshRate.ShouldBe(77),
 
-                assert.Current.SearchBox.SearchDelay.ShouldBe(11.99);
-                assert.Current.SearchBox.ShowAtStartup.ShouldBe(false);
-                assert.Current.SearchBox.ShowLastQuery.ShouldBe(false);
-                assert.Current.SearchBox.ShowResult.ShouldBe(true);
+                    a => a.SearchBox.SearchDelay.ShouldBe(11.99),
+                    a => a.SearchBox.ShowAtStartup.ShouldBe(false),
+                    a => a.SearchBox.ShowLastQuery.ShouldBe(false),
+                    a => a.SearchBox.ShowResult.ShouldBe(true),
 
-                assert.Current.Stores.BookmarkSourceBrowser.ShouldBe("Edge");
-                assert.Current.Stores.EverythingQuerySuffix.ShouldBe("eee");
+                    a => a.Stores.BookmarkSourceBrowser.ShouldBe("Edge"),
+                    a => a.Stores.EverythingQuerySuffix.ShouldBe("eee"),
 
-                if (assert.Current.Stores.StoreShortcuts.Count() == 2)
-                {
-                    assert.Current.Stores.StoreShortcuts.ElementAt(0).AliasOverride.ShouldBe("987654");
-                    assert.Current.Stores.StoreShortcuts.ElementAt(0).StoreType.ShouldBe("LISBS");
+                    a => {
+                        if (a.Stores.StoreShortcuts.Count() == 2)
+                        {
+                            a.Stores.StoreShortcuts.ElementAt(0).AliasOverride.ShouldBe("987654");
+                            a.Stores.StoreShortcuts.ElementAt(0).StoreType.ShouldBe("LISBS");
 
-                    assert.Current.Stores.StoreShortcuts.ElementAt(1).AliasOverride.ShouldBe("123456");
-                    assert.Current.Stores.StoreShortcuts.ElementAt(1).StoreType.ShouldBe("LISES");
-                }
-                else { Assert.Fail("No store StoreShortcuts"); }
+                            a.Stores.StoreShortcuts.ElementAt(1).AliasOverride.ShouldBe("123456");
+                            a.Stores.StoreShortcuts.ElementAt(1).StoreType.ShouldBe("LISES");
+                        }
+                        else { Assert.Fail("No store StoreShortcuts"); }
+                    },
 
-                assert.Current.Window.BackdropStyle.ShouldBe("Micass");
-                assert.Current.Window.NotificationDisplayDuration.ShouldBe(11);
-                assert.Current.Window.Position.Left.ShouldBe(1.23456);
-                assert.Current.Window.Position.Top.ShouldBe(2.45678);
-            },
-            json
-        );
+                    a => a.Window.BackdropStyle.ShouldBe("Micass"),
+                    a => a.Window.NotificationDisplayDuration.ShouldBe(11),
+                    a => a.Window.Position.Left.ShouldBe(1.23456),
+                    a => a.Window.Position.Top.ShouldBe(2.45678)
+                ),
+            json);
     }
 
     [Fact]
@@ -286,7 +309,7 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
         ];
         yield return
         [
-            new Action<ApplicationSettings>(cfg => cfg.Github.Tag = cfg.Github.Tag),
+            new Action<ApplicationSettings>(_ => { }),
             new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("ungroomed"))
         ];
     }
@@ -335,6 +358,44 @@ public class SQLiteDatabaseConfigurationServiceShould : TestBase
                 loaded.Window.Position.Top.ShouldBe(top);
             }
         );
+    
+    [Fact]
+    public void When_deserialising_feature_flags_Then_obsoletes_are_deleted()
+    {
+        var features = Features.GetNames();
+        var json = $$"""
+                     {
+                         "FeatureFlags": [
+                             {
+                                 "Description": "{{Tools.Generators.Generate.Text()}}",
+                                 "Enabled": false,
+                                 "FeatureName": "{{Tools.Generators.Generate.Text()}}",
+                                 "Icon": "{{Tools.Generators.Generate.Text()}}"
+                             },
+                             {
+                                 "Description": "{{Tools.Generators.Generate.Text()}}",
+                                 "Enabled": true,
+                                 "FeatureName": "{{Tools.Generators.Generate.Text()}}",
+                                 "Icon": "{{Tools.Generators.Generate.Text()}}"
+                             },
+                             {
+                                 "Description": "{{Tools.Generators.Generate.Text()}}",
+                                 "Enabled": true,
+                                 "FeatureName": "{{Tools.Generators.Generate.Text()}}",
+                                 "Icon": "{{Tools.Generators.Generate.Text()}}"
+                             }
+                         ]
+                     }
+                     """;
+        WithConfiguration(repository =>
+                repository.Current.FeatureFlags.ToList()
+                          .ShouldSatisfyAllConditions(
+                              ff => ff.Count.ShouldBeGreaterThan(0),
+                              ff => ff.Select(f=>features.Contains(f.FeatureName))
+                                      .Count().ShouldBe(features.Count())
+                          ),
+            json);
+    }
 
     #endregion
 }
