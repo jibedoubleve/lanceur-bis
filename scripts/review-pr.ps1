@@ -105,7 +105,7 @@ Keep the review concise and actionable.
     }
 
     # ── 5. Save locally ─────────────────────────────────────────────────────
-    $reviewDir = Join-Path $PSScriptRoot ".." "_review"
+    $reviewDir = Join-Path (Split-Path $PSScriptRoot -Parent) "_review"
     if (-not (Test-Path $reviewDir)) {
         New-Item -ItemType Directory -Path $reviewDir -Force | Out-Null
     }
