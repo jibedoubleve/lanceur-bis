@@ -18,6 +18,19 @@
         <Thickness x:Key="RegionMargin">10,5,5,10</Thickness>
         <ui:FontTypography x:Key="RegionFontTypography">BodyStrong</ui:FontTypography>
 
+        <Style BasedOn="{StaticResource {x:Type ui:CardControl}}" TargetType="{x:Type ui:CardControl}">
+            <Setter Property="Margin" Value="5,5,15,0" />
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type ui:TextBox}}" TargetType="{x:Type ui:TextBox}">
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type ComboBox}}" TargetType="{x:Type ComboBox}">
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+        <Style BasedOn="{StaticResource {x:Type ui:PasswordBox}}" TargetType="{x:Type ui:PasswordBox}">
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+
         <!--  Data providers  -->
         <ObjectDataProvider
             x:Key="KeySource"
@@ -55,10 +68,7 @@
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Window" />
 
-                <ui:CardControl
-                    Margin="5,5,5,12"
-                    Icon="{ui:SymbolIcon Keyboard24}"
-                    ToolTipService.ToolTip="Defines the keyboard shortcut used to open the search interface and start searching aliases. Choose a key combination that does not conflict with system or application shortcuts.">
+                <ui:CardControl Icon="{ui:SymbolIcon Keyboard24}" ToolTipService.ToolTip="Defines the keyboard shortcut used to open the search interface and start searching aliases. Choose a key combination that does not conflict with system or application shortcuts.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Hot key" />
                     </ui:CardControl.Header>
@@ -83,7 +93,7 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Color24}">
+                <ui:CardControl Icon="{ui:SymbolIcon Color24}">
                     <ui:CardControl.ToolTip>
                         <ToolTip
                             MaxWidth="360"
@@ -125,7 +135,7 @@
 
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Glasses24}">
+                <ui:CardControl Icon="{ui:SymbolIcon Glasses24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Show search after Windows loads and Lanceur starts?" />
                     </ui:CardControl.Header>
@@ -137,7 +147,7 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ReadingList24}">
+                <ui:CardControl Icon="{ui:SymbolIcon ReadingList24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Notification Duration (in seconds)." />
                     </ui:CardControl.Header>
@@ -151,7 +161,7 @@
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Search box" />
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Timer24}">
+                <ui:CardControl Icon="{ui:SymbolIcon Timer24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Search Trigger Delay (ms)" />
                     </ui:CardControl.Header>
@@ -159,7 +169,7 @@
                     <ui:NumberBox Value="{Binding SearchDelay, UpdateSourceTrigger=PropertyChanged}" />
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ClipboardBulletListLtr20}">
+                <ui:CardControl Icon="{ui:SymbolIcon ClipboardBulletListLtr20}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="When search box becomes visible..." />
                     </ui:CardControl.Header>
@@ -170,7 +180,7 @@
                             OnContent="Show all results" />
                     </StackPanel>
                 </ui:CardControl>
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
+                <ui:CardControl Icon="{ui:SymbolIcon SlideHide24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Shortcut shows search; repeat hides" />
                     </ui:CardControl.Header>
@@ -183,7 +193,7 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Search24}">
+                <ui:CardControl Icon="{ui:SymbolIcon Search24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Should the last query be shown when the search opens?" />
                     </ui:CardControl.Header>
@@ -195,10 +205,7 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl
-                    Margin="5,5,5,12"
-                    Icon="{ui:SymbolIcon Settings24}"
-                    ToolTip="Controls whether the settings button is visible in the search box.">
+                <ui:CardControl Icon="{ui:SymbolIcon Settings24}" ToolTip="Controls whether the settings button is visible in the search box.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Show settings button in search box?" />
                     </ui:CardControl.Header>
@@ -210,10 +217,7 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl
-                    Margin="5,5,5,12"
-                    Icon="{ui:SymbolIcon Pin24}"
-                    ToolTip="Keep the status bar visible at all times, even when there are no active results to display.">
+                <ui:CardControl Icon="{ui:SymbolIcon Pin24}" ToolTip="Keep the status bar visible at all times, even when there are no active results to display.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Always show status bar" />
                     </ui:CardControl.Header>
@@ -225,24 +229,19 @@
                     </StackPanel>
                 </ui:CardControl>
 
+                <!--  DATA SOURCE  -->
                 <ui:TextBlock
                     Margin="{StaticResource RegionMargin}"
                     FontTypography="{StaticResource RegionFontTypography}"
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Data sources" />
 
-                <ui:CardControl
-                    Margin="5,0,5,12"
-                    Icon="{ui:SymbolIcon Database24}"
-                    ToolTip="This change will take effect until you restart the application or adjust it again here.">
+                <ui:CardControl Icon="{ui:SymbolIcon Database24}" ToolTip="This change will take effect until you restart the application or adjust it again here.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Database" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <ui:TextBox
-                            MinWidth="500"
-                            Margin="5"
-                            Text="{Binding DbPath}" />
+                        <ui:TextBox MinWidth="500" Text="{Binding DbPath}" />
                         <ui:Button
                             Margin="5,0,0,0"
                             Click="OnClickDbPath"
@@ -250,15 +249,12 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl
-                    Margin="5,0,5,12"
-                    Icon="{ui:SymbolIcon BookmarkSearch24}"
-                    ToolTip="Select the main browser to use for searching your bookmarks.">
+                <ui:CardControl Icon="{ui:SymbolIcon BookmarkSearch24}" ToolTip="Select the main browser to use for searching your bookmarks.">
 
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Source of the bookmarks" />
                     </ui:CardControl.Header>
-                    <StackPanel>
+                    <StackPanel Orientation="Horizontal">
                         <ComboBox ItemsSource="{StaticResource Browsers}" SelectedItem="{Binding BookmarkSourceBrowser}" />
                     </StackPanel>
                 </ui:CardControl>
@@ -268,10 +264,7 @@
                     FontTypography="{StaticResource RegionFontTypography}"
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Stores" />
-                <ui:CardExpander
-                    Margin="5,5,5,12"
-                    Icon="{ui:SymbolIcon DatabaseSearch24}"
-                    IsExpanded="True">
+                <ui:CardExpander Icon="{ui:SymbolIcon DatabaseSearch24}" IsExpanded="True">
                     <ui:CardExpander.Header>
                         <ui:TextBlock
                             Grid.Row="0"
@@ -280,7 +273,7 @@
                             Text="Everything Store Configuration" />
                     </ui:CardExpander.Header>
                     <StackPanel>
-                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon SlideHide24}">
+                        <ui:CardControl Icon="{ui:SymbolIcon SlideHide24}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" Text="Should hidden files be excluded from the results?" />
                             </ui:CardControl.Header>
@@ -292,7 +285,7 @@
                             </StackPanel>
                         </ui:CardControl>
 
-                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon ShieldKeyhole24}">
+                        <ui:CardControl Icon="{ui:SymbolIcon ShieldKeyhole24}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" Text="Should system files be excluded from the results?" />
                             </ui:CardControl.Header>
@@ -304,7 +297,7 @@
                             </StackPanel>
                         </ui:CardControl>
 
-                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Run24}">
+                        <ui:CardControl Icon="{ui:SymbolIcon Run24}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" Text="Should only executable files be included in the results?" />
                             </ui:CardControl.Header>
@@ -316,7 +309,7 @@
                             </StackPanel>
                         </ui:CardControl>
 
-                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Delete24}">
+                        <ui:CardControl Icon="{ui:SymbolIcon Delete24}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" Text="Should files in the Recycle Bin be excluded from the results?" />
                             </ui:CardControl.Header>
@@ -330,10 +323,7 @@
                     </StackPanel>
                 </ui:CardExpander>
 
-                <ui:CardExpander
-                    Margin="5,5,5,12"
-                    Icon="{ui:SymbolIcon ArrowUpRight24}"
-                    IsExpanded="True">
+                <ui:CardExpander Icon="{ui:SymbolIcon ArrowUpRight24}" IsExpanded="True">
                     <ui:CardExpander.Header>
                         <Grid>
                             <Grid.RowDefinitions>
@@ -411,10 +401,7 @@
                     Text="Feature flags" />
 
                 <!--  Feature flags  -->
-                <ui:CardExpander
-                    Margin="5,5,5,12"
-                    Icon="{ui:SymbolIcon FlagCheckered20}"
-                    IsExpanded="True">
+                <ui:CardExpander Icon="{ui:SymbolIcon FlagCheckered20}" IsExpanded="True">
                     <ui:CardExpander.Header>
                         <ui:TextBlock
                             Grid.Row="0"
@@ -425,7 +412,7 @@
                     <ItemsControl ItemsSource="{Binding FeatureFlags}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <ui:CardControl Margin="5,5,5,12">
+                                <ui:CardControl>
                                     <ui:CardControl.Icon>
                                         <ui:SymbolIcon Symbol="{Binding Icon}" />
                                     </ui:CardControl.Icon>
@@ -454,7 +441,7 @@
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Miscellaneous" />
 
-                <ui:CardControl Margin="5,0,5,12" Icon="{ui:SymbolIcon NoteBookError24}">
+                <ui:CardControl Icon="{ui:SymbolIcon NoteBookError24}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Minimum Log Detail" />
                     </ui:CardControl.Header>
@@ -466,7 +453,7 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Margin="5,0,5,12" Icon="{ui:SymbolIcon PersonKey20}">
+                <ui:CardControl Icon="{ui:SymbolIcon PersonKey20}">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="GitHub API Token" />
                     </ui:CardControl.Header>
@@ -478,7 +465,6 @@
 
                 <!--  Resource monitor settings  -->
                 <ui:CardExpander
-                    Margin="5,5,5,12"
                     Icon="{ui:SymbolIcon Gauge24}"
                     IsExpanded="True"
                     Visibility="{Binding IsResourceMonitorEnabled, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
@@ -491,7 +477,7 @@
                     </ui:CardExpander.Header>
 
                     <StackPanel>
-                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon Timer24}">
+                        <ui:CardControl Icon="{ui:SymbolIcon Timer24}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" Text="Refresh rate (ms)" />
                             </ui:CardControl.Header>
@@ -504,7 +490,7 @@
                                 Value="{Binding RefreshRate, UpdateSourceTrigger=PropertyChanged}" />
                         </ui:CardControl>
 
-                        <ui:CardControl Margin="5,5,5,12" Icon="{ui:SymbolIcon BezierCurveSquare20}">
+                        <ui:CardControl Icon="{ui:SymbolIcon BezierCurveSquare20}">
                             <ui:CardControl.Header>
                                 <ui:TextBlock FontTypography="Body" Text="CPU smoothing index" />
                             </ui:CardControl.Header>
