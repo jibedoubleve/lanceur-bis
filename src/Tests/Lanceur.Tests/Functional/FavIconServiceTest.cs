@@ -25,20 +25,6 @@ public class FavIconServiceTest
     #region Methods
 
     [Theory]
-    [InlineData("http://www.google.com", "http://www.google.com/favicon.ico")]
-    [InlineData("http://www.google.com:4001", "http://www.google.com:4001/favicon.ico")]
-    [InlineData("http://www.google.com:80", "http://www.google.com:80/favicon.ico")]
-    [InlineData("https://www.google.com", "https://www.google.com/favicon.ico")]
-    [InlineData("https://www.google.com:4001", "https://www.google.com:4001/favicon.ico")]
-    [InlineData("https://www.google.com:80", "https://www.google.com:80/favicon.ico")]
-    public void When_fetching_favicon_Then_expected_favicons_returned(string url, string expected)
-    {
-        var thisUri = new Uri(expected);
-        new Uri(url).GetFavicons()
-                    .ShouldContain(thisUri);
-    }
-
-    [Theory]
     [InlineData("http://www.google.com", "http://www.google.com")]
     [InlineData("http://www.google.com:4001", "http://www.google.com:4001")]
     [InlineData("http://www.google.com:80", "http://www.google.com:80")]

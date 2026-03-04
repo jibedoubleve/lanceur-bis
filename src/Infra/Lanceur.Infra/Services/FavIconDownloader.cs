@@ -1,4 +1,7 @@
 using System.Net;
+using Humanizer;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Caching.Memory;
@@ -6,11 +9,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
+/// <summary>
+///     Downloads and caches favicons for a given URL by querying multiple favicon providers
+///     (e.g. DuckDuckGo, Google) and falling back to manual file discovery.
+///     Failed attempts are recorded in a memory cache to avoid redundant retries
+///     until the configured retry delay has elapsed.
+/// </summary>
 public class FavIconDownloader : IFavIconDownloader
 {
     #region Fields
 
-    private readonly HttpClient _client;
     private readonly IMemoryCache _faviconCache;
     private readonly ILogger<FavIconDownloader> _logger;
     private readonly TimeSpan _retryDelay;
@@ -23,6 +31,8 @@ public class FavIconDownloader : IFavIconDownloader
         ["Manual (ico)"] = (IsManual: true, Url: "favicon.ico")
     };
 
+    private readonly IFavIconHttpClient _httpClient;
+
     #endregion
 
     #region Constructors
@@ -30,14 +40,14 @@ public class FavIconDownloader : IFavIconDownloader
     public FavIconDownloader(
         ILogger<FavIconDownloader> logger,
         IMemoryCache faviconCache,
-        TimeSpan retryDelay,
-        IHttpClientFactory httpClientFactory
+        ISection<CachingSection> settings,
+        IFavIconHttpClient httpClient
     )
     {
         _logger = logger;
         _faviconCache = faviconCache;
-        _retryDelay = retryDelay;
-        _client = httpClientFactory.CreateClient("favicon");
+        _httpClient = httpClient;
+        _retryDelay = settings.Value.ThumbnailCacheDuration.Minutes();
     }
 
     #endregion
@@ -92,7 +102,7 @@ public class FavIconDownloader : IFavIconDownloader
             try
             {
                 var requestUrl = GetFaviconUrl(url, faviconUrl);
-                var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUrl));
+                using var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUrl));
 
                 _logger.LogTrace(
                     "Checking favicon with {FavIconManager} - Status: {Status} - Host: {Host}",
