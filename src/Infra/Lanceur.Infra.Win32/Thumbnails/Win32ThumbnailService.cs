@@ -45,6 +45,8 @@ internal class Win32ThumbnailService
 
         try
         {
+            path = ResolveFullPath(path);
+            
             if (Directory.Exists(path))
             {
                 /* Directories can also have thumbnails instead of shell icons.
@@ -77,6 +79,36 @@ internal class Win32ThumbnailService
 
         //The value is returned even if null;
         return image;
+    }
+    
+    private static string ResolveFullPath(string path)
+    {
+        // Already absolute
+        if (Path.IsPathRooted(path)) { return path; }
+
+        // Search in PATH environment variable
+        var pathEnv = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+        var directories = pathEnv.Split(Path.PathSeparator);
+
+        foreach (var dir in directories)
+        {
+            // Try as-is
+            var candidate = Path.Combine(dir, path);
+            if (File.Exists(candidate)) { return candidate; }
+
+            // Try with common Windows executable extensions
+            foreach (var ext in new[] { ".exe", ".com", ".cmd", ".bat" })
+            {
+                if (!path.EndsWith(ext, StringComparison.OrdinalIgnoreCase))
+                {
+                    var candidateWithExt = candidate + ext;
+                    if (File.Exists(candidateWithExt)) { return candidateWithExt; }
+                }
+            }
+        }
+
+        // Return original if resolution fails — let downstream checks handle it
+        return path;
     }
 
     #endregion

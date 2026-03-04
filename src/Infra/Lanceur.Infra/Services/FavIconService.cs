@@ -43,7 +43,7 @@ public sealed partial class FavIconService : IFavIconService
         //   - no url is provided
         //   - alias is a Macro
         //   - Uri is malformed
-        if (url is null || IsMacroRegex.Match(url).Success || !Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        if (url.IsNullOrEmpty() || IsMacroRegex.Match(url).Success || !Uri.TryCreate(url, UriKind.Absolute, out var uri))
         {
             return null;
         }
@@ -53,8 +53,9 @@ public sealed partial class FavIconService : IFavIconService
         if (File.Exists(favIconPath)) { return favIconPath; }
 
         var uriAuthority = uri.GetAuthority();
+        if(uriAuthority is null) { return null; }
+        
         var success = await _favIconDownloader.RetrieveAndSaveFavicon(uriAuthority, favIconPath);
-
         return success ? favIconPath : null;
     }
 

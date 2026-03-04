@@ -138,20 +138,9 @@ public static class ServiceCollectionExtensions
                          .AddTransient<ILoggerFactory, LoggerFactory>()
                          .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                         .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IFavIconService, FavIconService>()
-                         .AddSingleton<IFavIconDownloader, FavIconDownloader>(sp => {
-                                 var duration
-                                     = sp.GetService<ISection<CachingSection>>()?.Value.ThumbnailCacheDuration ?? 30;
-                                 return new FavIconDownloader(
-                                     sp.GetService<ILogger<FavIconDownloader>>(),
-                                     sp.GetService<IMemoryCache>(),
-                                     TimeSpan.FromMinutes(duration),
-                                     sp.GetService<IHttpClientFactory>()
-                                 );
-                             }
-                         )
+                         .AddSingleton<IFavIconDownloader, FavIconDownloader>()
                          .AddTransient<IEverythingApi, EverythingApi>()
                          .AddTransient<IExecutionService, ExecutionService>()
                          .AddTransient<IWildcardService, ReplacementComposite>()
@@ -166,7 +155,9 @@ public static class ServiceCollectionExtensions
                          .AddHttpClient()
                          .RegisterInfrastructureSettingsProvider()
                          .AddThumbnailStrategies()
-                         .AddStaThreadRunner();
+                         .AddStaThreadRunner()
+                         .AddTransient<IThumbnailService, ThumbnailService>()
+                         .AddSingleton<IFavIconHttpClient, FavIconHttpClient>();
 
         return serviceCollection;
     }
