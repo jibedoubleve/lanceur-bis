@@ -47,7 +47,7 @@ public class FavIconDownloader : IFavIconDownloader
         _logger = logger;
         _faviconCache = faviconCache;
         _httpClient = httpClient;
-        _retryDelay = settings.Value.StoreCacheDuration.Minutes();
+        _retryDelay = settings.Value.ThumbnailCacheDuration.Minutes();
     }
 
     #endregion
@@ -102,7 +102,7 @@ public class FavIconDownloader : IFavIconDownloader
             try
             {
                 var requestUrl = GetFaviconUrl(url, faviconUrl);
-                var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUrl));
+                using var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUrl));
 
                 _logger.LogTrace(
                     "Checking favicon with {FavIconManager} - Status: {Status} - Host: {Host}",

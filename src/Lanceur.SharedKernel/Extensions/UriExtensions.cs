@@ -4,12 +4,6 @@ public static class UriExtensions
 {
     #region Methods
 
-    private static IEnumerable<Uri> GetFavIcons(this Uri uri)
-    {
-        yield return new Uri(uri, "favicon.ico");
-        yield return new Uri(uri, "favicon.png");
-    }
-
     private static Uri ToUri(this string path, UriKind kind) => new(path, kind);
 
     /// <summary>
@@ -27,14 +21,6 @@ public static class UriExtensions
         return leftPart.IsNullOrEmpty()
             ? null
             : new Uri(leftPart);
-    }
-
-    public static IEnumerable<Uri> GetFavicons(this Uri baseUri)
-    {
-        var uri = baseUri.GetAuthority();
-        return uri is not null
-            ? uri.GetFavIcons()
-            : throw new ArgumentException("The base uri must be valid.", nameof(baseUri));
     }
 
     public static Uri ToUriRelative(this string path) => path.ToUri(UriKind.Relative);

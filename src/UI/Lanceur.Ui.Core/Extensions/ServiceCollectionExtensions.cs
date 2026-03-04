@@ -136,7 +136,6 @@ public static class ServiceCollectionExtensions
                          .AddTransient<ISearchService, SearchService>()
                          .AddTransient<IMacroAliasExpanderService, MacroAliasExpanderService>()
                          .AddTransient<ILoggerFactory, LoggerFactory>()
-                         .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IFavIconService, FavIconService>()
