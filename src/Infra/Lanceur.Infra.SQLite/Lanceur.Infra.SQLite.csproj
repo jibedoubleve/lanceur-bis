@@ -16,4 +16,9 @@
         <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj"/>
         <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj"/>
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Repositories\SQLiteAliasRepository_private.cs">
+        <DependentUpon>SQLiteAliasRepository.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>

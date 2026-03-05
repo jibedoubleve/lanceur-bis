@@ -14,14 +14,7 @@ public enum Per
 public interface IAliasRepository
 {
     #region Methods
-
-    /// <summary>
-    ///     Retrieves additional parameters for the specified alias IDs.
-    /// </summary>
-    /// <param name="ids">A collection of alias IDs to retrieve additional parameters for.</param>
-    /// <returns>A collection of QueryResultAdditionalParameters containing the additional parameters for each specified ID.</returns>
-    IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids);
-
+    
     /// <summary>
     ///     Retrieves all aliases in the system that don't have associated notes or comments.
     /// </summary>
@@ -225,28 +218,13 @@ public interface IAliasRepository
     /// </summary>
     /// <param name="alias">The alias to hydrate</param>
     void HydrateAlias(AliasQueryResult alias);
-
-    /// <summary>
-    ///     Hydrate the macro with its <c>id</c> and <c>count</c>. This method will try to find the
-    ///     macro by using its name  that should be something like '@it_s_name@'
-    /// </summary>
-    /// <param name="alias">Macro to hydrate</param>
-    void HydrateMacro(QueryResult alias);
-
-    /// <summary>
-    ///     Moves the history from the specified aliases (identified by their primary keys)
-    ///     to the target alias identified by its primary key.
-    /// </summary>
-    /// <param name="fromAliases">A collection of primary keys representing the source aliases.</param>
-    /// <param name="toAlias">The primary key of the target alias to which the history will be moved.</param>
-    void MergeHistory(IEnumerable<long> fromAliases, long toAlias);
-
+    
     /// <summary>
     ///     Removes the specified aliases from the database.
     ///     This operation also deletes their usage history, additional parameters, and associated synonyms.
     /// </summary>
-    /// <param name="aliases">A collection of aliases to be removed.</param>
-    void Remove(IEnumerable<AliasQueryResult> aliases);
+    /// <param name="aliasIds">A collection of aliases id to be removed.</param>
+    void Remove(IEnumerable<long> aliasIds);
 
     /// <summary>
     ///     Marks the specified alias as removed from the repository.
@@ -357,5 +335,13 @@ public interface IAliasRepository
     /// </remarks>
     void UpdateThumbnail(AliasQueryResult alias);
 
+    /// <summary>
+    ///     Persists the merge of multiple aliases into a single target alias.
+    ///     The target alias is saved with its aggregated synonyms and additional parameters,
+    ///     then restored if previously deleted. The source aliases are permanently removed.
+    ///     This operation is irreversible and cannot be undone.
+    /// </summary>
+    /// <param name="fromAliases">The primary keys of the source aliases to be absorbed and permanently deleted.</param>
+    void Merge(IEnumerable<long> fromAliases);
     #endregion
 }

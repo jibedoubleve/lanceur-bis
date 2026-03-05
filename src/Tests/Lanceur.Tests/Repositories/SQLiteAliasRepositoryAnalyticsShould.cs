@@ -546,10 +546,5 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
         => Record.Exception(() => BuildRepository().HydrateAlias(new AliasQueryResult()))
                  .ShouldBeNull();
 
-    [Fact]
-    public void HydrateMacro()
-        => Record.Exception(() => BuildRepository().HydrateMacro(new AliasQueryResult()))
-                 .ShouldBeNull();
-
     #endregion
 }

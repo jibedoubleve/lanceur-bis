@@ -236,22 +236,18 @@ public class AliasDbAction
     }
 
     /// <summary>
-    ///     Permanently deletes the specified alias and all associated information from the database.
+    ///     Permanently deletes the specified alias and all its associated data from the database,
+    ///     including its usage history, additional parameters, and synonyms.
     ///     This operation is irreversible and cannot be undone.
     /// </summary>
-    /// <param name="tx">The database transaction used to execute the deletion operation.</param>
-    /// <param name="alias">The alias to be removed, encapsulated in an <see cref="AliasQueryResult" /> object.</param>
-    /// <exception cref="ArgumentNullException">
-    ///     Thrown when the <paramref name="tx" /> or <paramref name="alias" /> parameter is <c>null</c>.
-    /// </exception>
-    internal void Remove(IDbTransaction tx, AliasQueryResult alias)
+    /// <param name="tx">The database transaction used to execute the deletion.</param>
+    /// <param name="id">The primary key of the alias to permanently delete.</param>
+    internal void Remove(IDbTransaction tx, long id)
     {
-        if (alias == null) { throw new ArgumentNullException(nameof(alias), "Cannot delete NULL alias."); }
-
-        ClearAliasUsage(tx, alias.Id);
-        ClearAliasArgument(tx, alias.Id);
-        ClearAliasName(tx, alias.Id);
-        ClearAlias(tx, alias.Id);
+        ClearAliasUsage(tx, id);
+        ClearAliasArgument(tx, id);
+        ClearAliasName(tx, id);
+        ClearAlias(tx, id);
     }
 
     internal long SaveOrUpdate(IDbTransaction tx, ref AliasQueryResult alias)
