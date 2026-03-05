@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
@@ -22,17 +23,19 @@ public partial class DataReconciliationViewModel : ObservableObject
     [ObservableProperty] private ObservableCollection<SelectableAliasQueryResult> _aliases = new();
     private ObservableCollection<SelectableAliasQueryResult> _buffer = new();
     [ObservableProperty] private ReportConfiguration _currentReportConfiguration;
+    [ObservableProperty] private string _dateFormat;
     private readonly ILogger<DataReconciliationViewModel> _logger;
+    private readonly IWriteableSection<ReconciliationSection> _reconciliationSection;
     private readonly IReconciliationService _reconciliationService;
     [ObservableProperty] private ReportType _reportType = ReportType.None;
     private readonly IAliasRepository _repository;
-    private readonly IWriteableSection<ReconciliationSection> _settingsFacade;
     private readonly IThumbnailService _thumbnailService;
     [ObservableProperty] private string _title = string.Empty;
     private DateTime? _today;
     private readonly IUserDialogueService _userDialogue;
     private readonly IUserNotificationService _userNotification;
     private readonly IViewFactory _viewFactory;
+    private readonly ISection<WindowSection> _windowSection;
 
     #endregion
 
@@ -44,7 +47,8 @@ public partial class DataReconciliationViewModel : ObservableObject
         IUserCommunicationService interactions,
         IReconciliationService reconciliationService,
         IViewFactory viewFactory,
-        IWriteableSection<ReconciliationSection> settingsFacade,
+        IWriteableSection<ReconciliationSection> reconciliationSection,
+        ISection<WindowSection> windowSection,
         IThumbnailService thumbnailService
     )
     {
@@ -54,18 +58,20 @@ public partial class DataReconciliationViewModel : ObservableObject
         _userNotification = interactions.Notifications;
         _reconciliationService = reconciliationService;
         _viewFactory = viewFactory;
-        _settingsFacade = settingsFacade;
+        _reconciliationSection = reconciliationSection;
+        _windowSection = windowSection;
         _thumbnailService = thumbnailService;
+        _dateFormat = windowSection.Value.DateTimeFormat;
         _currentReportConfiguration =
-            _settingsFacade.Value.ReportsConfiguration
-                           .FirstOrDefault(e => e.ReportType == ReportType.RestoreAlias)!;
+            _reconciliationSection.Value.ReportsConfiguration
+                                  .FirstOrDefault(e => e.ReportType == ReportType.RestoreAlias)!;
     }
 
     #endregion
 
     #region Properties
 
-    private ReconciliationSection Reconciliation => _settingsFacade.Value;
+    private ReconciliationSection Reconciliation => _reconciliationSection.Value;
 
     #endregion
 
@@ -151,7 +157,7 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         if (!result.IsSuccess) { return; }
 
-        _settingsFacade.Save();
+        _reconciliationSection.Save();
         await OnShowAsync(ReportType);
     }
 
@@ -335,7 +341,7 @@ public partial class DataReconciliationViewModel : ObservableObject
         if (Reconciliation.InactivityThreshold != result.NumericValue)
         {
             Reconciliation.InactivityThreshold = result.NumericValue;
-            _settingsFacade.Save();
+            _reconciliationSection.Save();
             _logger.LogDebug("Inactivity threshold updated to {Months} months", result.NumericValue);
         }
 
@@ -358,13 +364,12 @@ public partial class DataReconciliationViewModel : ObservableObject
         if (Reconciliation.LowUsageThreshold != result.NumericValue)
         {
             Reconciliation.LowUsageThreshold = result.NumericValue;
-            _settingsFacade.Save();
+            _reconciliationSection.Save();
             _logger.LogDebug("Low Usage threshold updated to {Count}", result.NumericValue);
         }
 
         await OnShowRarelyUsedAliases();
     }
-
 
     [RelayCommand]
     private async Task OnShowAliasesWithoutNotes() =>
@@ -373,6 +378,7 @@ public partial class DataReconciliationViewModel : ObservableObject
     private async Task OnShowAsync(ReportType reportType, bool isDescriptionUpdated = false)
     {
         using var loading = _userNotification.TrackLoadingState();
+        RefreshSettings();
         Title = reportType switch
         {
             ReportType.DoubloonAliases    => "Doubloon Aliases",
@@ -447,6 +453,12 @@ public partial class DataReconciliationViewModel : ObservableObject
         _userNotification.Success($"Updated {selectedAliases.Length} selected aliases");
         _logger.LogInformation("Updated {Items} aliases", selectedAliases.Length);
         await OnShowAliasesWithoutNotes();
+    }
+
+    private void RefreshSettings()
+    {
+        _windowSection.Reload();
+        DateFormat = _windowSection.Value.DateTimeFormat;
     }
 
     /// <summary>

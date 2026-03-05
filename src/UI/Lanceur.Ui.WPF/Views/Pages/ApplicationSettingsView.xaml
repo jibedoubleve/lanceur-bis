@@ -53,6 +53,19 @@
             <sys:String>Chrome</sys:String>
             <sys:String>Edge</sys:String>
         </x:Array>
+
+        <x:Array x:Key="DateTimeFormats" Type="{x:Type ComboBoxItem}">
+            <ComboBoxItem Content="05/03/2026 14:30       (dd/MM/yyyy HH:mm)" Tag="dd/MM/yyyy HH:mm" />
+            <ComboBoxItem Content="05/03/2026 14:30:00    (dd/MM/yyyy HH:mm:ss)" Tag="dd/MM/yyyy HH:mm:ss" />
+            <ComboBoxItem Content="03/05/2026 14:30       (MM/dd/yyyy HH:mm)" Tag="MM/dd/yyyy HH:mm" />
+            <ComboBoxItem Content="2026-03-05 14:30       (yyyy-MM-dd HH:mm)" Tag="yyyy-MM-dd HH:mm" />
+            <ComboBoxItem Content="2026-03-05 14:30:00    (yyyy-MM-dd HH:mm:ss)" Tag="yyyy-MM-dd HH:mm:ss" />
+            <ComboBoxItem Content="05 Mar 2026 14:30      (dd MMM yyyy HH:mm)" Tag="dd MMM yyyy HH:mm" />
+            <ComboBoxItem Content="05 March 2026 14:30    (dd MMMM yyyy HH:mm)" Tag="dd MMMM yyyy HH:mm" />
+            <ComboBoxItem Content="05.03.2026 14:30       (dd.MM.yyyy HH:mm)" Tag="dd.MM.yyyy HH:mm" />
+            <ComboBoxItem Content="2026/03/05 14:30:00    (yyyy/MM/dd HH:mm:ss)" Tag="yyyy/MM/dd HH:mm:ss" />
+            <ComboBoxItem Content="05/03/2026 02:30 PM    (dd/MM/yyyy hh:mm tt)" Tag="dd/MM/yyyy hh:mm tt" />
+        </x:Array>
     </Page.Resources>
 
     <Grid>
@@ -62,6 +75,7 @@
         </Grid.RowDefinitions>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
             <StackPanel>
+                <!--  WINDOW section  -->
                 <ui:TextBlock
                     Margin="{StaticResource RegionMargin}"
                     FontTypography="{StaticResource RegionFontTypography}"
@@ -155,6 +169,19 @@
                     <ui:NumberBox Value="{Binding NotificationDisplayDuration, UpdateSourceTrigger=PropertyChanged}" />
                 </ui:CardControl>
 
+                <ui:CardControl Icon="{ui:SymbolIcon TimePicker24}">
+                    <ui:CardControl.ToolTip>Select the format used to display dates and times throughout the application (e.g. dd/MM/yyyy HH:mm).</ui:CardControl.ToolTip>
+                    <ui:CardControl.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Date &amp; Time Format" />
+                    </ui:CardControl.Header>
+                    <ComboBox
+                        ItemsSource="{StaticResource DateTimeFormats}"
+                        SelectedValue="{Binding DateTimeFormat}"
+                        SelectedValuePath="Tag" />
+
+                </ui:CardControl>
+
+                <!--  SEARCH BOX section  -->
                 <ui:TextBlock
                     Margin="{StaticResource RegionMargin}"
                     FontTypography="{StaticResource RegionFontTypography}"
