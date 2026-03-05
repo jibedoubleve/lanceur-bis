@@ -220,8 +220,6 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         if (queryResult is null) { return; }
 
-        if (!queryResult.Thumbnail.IsNullOrEmpty()) { return; /* Already loaded */ }
-
         try { _thumbnailService.UpdateThumbnail(queryResult); }
         catch (Exception ex)
         {
