@@ -170,7 +170,7 @@ public partial class App
         );
 
         Host.Services.GetRequiredService<ILogger<App>>()!
-            .LogInformation("Application has closed");
+            .LogInformation("=============== SHUTDOWN ===============");
     }
 
     protected override void OnStartup(StartupEventArgs e)
