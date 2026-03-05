@@ -14,48 +14,6 @@
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
-    <Page.Resources>
-        <ResourceDictionary>
-            <StackPanel
-                x:Key="MergeDialog"
-                Height="Auto"
-                VerticalAlignment="Center">
-
-                <ui:TextBlock Margin="5,5,5,15" FontTypography="BodyStrong">
-                    <Run Text="You can adjust the settings as necessary." />
-                    <LineBreak />
-                    <Run Text="Once you have made your modifications, click on 'Update changes' to apply the changes" />
-                </ui:TextBlock>
-
-                <Label Margin="0,10,0,0" Content="Alias names" />
-                <TextBox Text="{Binding Synonyms, UpdateSourceTrigger=PropertyChanged}" />
-
-                <Label
-                    Margin="0,10,0,0"
-                    Content="Parameters"
-                    Visibility="{Binding List, Converter={StaticResource EnumerableToVisibilityConverter}}" />
-                <DataGrid
-                    AutoGenerateColumns="False"
-                    CanUserAddRows="False"
-                    CanUserDeleteRows="False"
-                    CanUserReorderColumns="False"
-                    CanUserResizeColumns="True"
-                    ItemsSource="{Binding List}"
-                    Visibility="{Binding List, Converter={StaticResource EnumerableToVisibilityConverter}}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Width="*"
-                            Binding="{Binding Key}"
-                            Header="Key" />
-                        <DataGridTextColumn
-                            Width="3*"
-                            Binding="{Binding Value}"
-                            Header="Value" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </StackPanel>
-        </ResourceDictionary>
-    </Page.Resources>
     <interactivity:Interaction.Triggers>
         <interactivity:EventTrigger EventName="Loaded">
             <interactivity:InvokeCommandAction Command="{Binding ShowDoubloonsCommand}" />
@@ -120,7 +78,6 @@
             </MenuItem>
             <MenuItem
                 Command="{Binding MergeCommand}"
-                CommandParameter="{StaticResource MergeDialog}"
                 Header="Merge selected"
                 Icon="{ui:SymbolIcon Merge24}"
                 Visibility="{Binding ReportType, Converter={StaticResource ReportTypeToVisibilityConverter}, ConverterParameter=Merge}" />

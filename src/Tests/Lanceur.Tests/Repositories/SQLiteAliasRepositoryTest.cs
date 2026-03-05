@@ -157,7 +157,7 @@ public class SQLiteAliasRepositoryTest : TestBase
         var action = BuildAliasDbAction();
 
         // ACT
-        c.WithinTransaction(tx => action.Remove(tx, new AliasQueryResult { Id = 256 }));
+        c.WithinTransaction(tx => action.Remove(tx, 256L));
 
         // ASSERT
         const string sql2 = "select count(*) from alias where id = 256";
@@ -472,7 +472,7 @@ public class SQLiteAliasRepositoryTest : TestBase
         // ACT
         c.WithinTransaction(tx => {
                 action.SaveOrUpdate(tx, ref alias);
-                action.Remove(tx, alias);
+                action.Remove(tx, alias.Id);
             }
         );
 

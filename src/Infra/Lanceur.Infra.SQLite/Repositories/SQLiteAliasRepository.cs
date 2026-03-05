@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using Dapper;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
@@ -12,19 +11,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.Repositories;
 
-public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
+public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 {
-    #region Fields
-
-    private readonly IDbActionFactory _dbActionFactory;
-    private readonly GetAllAliasDbAction _getAllAliasDbAction;
-    private readonly ILogger<SQLiteAliasRepository> _logger;
-
-    private static readonly Regex RegexSelectUrl = new(
-        @"(www?|http?|https?|ftp):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(\.[a-zA-Z]{2,})?$"
-    );
-
-    #endregion
 
     #region Constructors
 
@@ -45,19 +33,41 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
     #region Methods
 
-    /// <inheritdoc />
-    public IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids)
+    /// <remarks>
+    ///     This methods is used for test purpose. It encapsulates an internal method.
+    /// </remarks>
+    internal IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids)
+        => Db.WithConnection(conn => GetAdditionalParameter(conn, ids));
+
+    /// <summary>
+    ///     Builds an in-memory alias that aggregates data from all specified aliases into the first one.
+    ///     The synonyms and additional parameters of all aliases are consolidated into the target alias.
+    ///     This method does not persist any changes — call the appropriate save method to commit the result.
+    /// </summary>
+    /// <param name="ids">
+    ///     The ids of the aliases to aggregate. The first id designates the target alias;
+    ///     the remaining ids provide the data to be aggregated into it.
+    /// </param>
+    /// <returns>
+    ///     The resulting <see cref="AliasQueryResult" /> with aggregated synonyms and additional parameters,
+    ///     ready to be persisted.
+    /// </returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="ids" /> is empty.</exception>
+    private AliasQueryResult AggregateIntoFirst(IEnumerable<long> ids)
     {
-        const string sql = """
-                           select 
-                           	id_alias as AliasId,
-                           	id       as Id,
-                           	name     as Name,
-                           	argument as Parameter
-                           from alias_argument	
-                           where id_alias in @ids
-                           """;
-        return Db.WithConnection(conn => conn.Query<AdditionalParameter>(sql, new { ids }));
+        ids = ids.ToArray();
+        if (!ids.Any()) { throw new ArgumentException("At least one id is expected", nameof(ids)); }
+
+        return Db.WithConnection(connection => {
+            var alias = GetById(connection, ids.First());
+            var parameters = GetAdditionalParameter(connection, ids);
+            var synonyms = GetSynonyms(connection, ids);
+            
+            alias.AddDistinctSynonyms(synonyms);
+            alias.AdditionalParameters = new ObservableCollection<AdditionalParameter>(parameters);
+            
+            return alias;
+        });
     }
 
     /// <inheritdoc />
@@ -96,7 +106,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
 
         results = results
-                  .Where(e => !RegexSelectUrl.IsMatch(e.FileName)
+                  .Where(e => !BuildRegexSelectUrl().IsMatch(e.FileName)
                   ) // Excluding all aliases that serve as shortcuts for URLs
                   .Where(e => !e.FileName.StartsWith("package:")) // Excluding all packaged applications
                   .ToArray();
@@ -150,7 +160,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 
     /// <inheritdoc />
     public AliasQueryResult GetById(long id)
-        => Db.WithConnection(conn => _dbActionFactory.AliasManagement.GetById(conn, id));
+        => Db.WithConnection(conn => GetById(conn, id));
 
     /// <inheritdoc />
     public IEnumerable<DateTime> GetDaysWithHistory(DateTime day)
@@ -453,8 +463,7 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
                             """;
         return Db.WithConnection(c => c.Query<AliasUsageItem>(sql, new { selectedDay }));
     }
-
-
+    
     /// <inheritdoc />
     public IEnumerable<int> GetYearsWithUsage()
     {
@@ -497,55 +506,22 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public void HydrateMacro(QueryResult alias)
-    {
-        const string sql = $"""
-                            select
-                            	a.id        as {nameof(QueryResult.Id)},
-                                count(a.id) as {nameof(QueryResult.Count)}
-                            from
-                            	alias a
-                                inner join alias_usage au on a.id = au.id_alias
-                            where
-                            	file_name like @name
-                            group by
-                            	a.id;
-                            """;
+    public void Merge(IEnumerable<long> fromAliases) =>
+        Db.WithinTransaction(tx => {
+            fromAliases = fromAliases.ToArray();
 
-        Db.WithConnection(conn => {
-                var item = conn.Query<dynamic>(sql, new { name = alias.Name }).FirstOrDefault();
+            var toAlias = AggregateIntoFirst(fromAliases);
+            MergeHistory(tx, fromAliases, toAlias.Id);
+            SaveOrUpdate(tx, ref toAlias);
+            Restore(tx, toAlias);
 
-                if (item is null) { return; }
-
-                alias.Id = item.Id;
-                alias.Count = (int)item.Count;
-            }
-        );
-    }
+            // Removed merged aliases...
+            var ids = fromAliases.Where(e => e != toAlias.Id);
+            Remove(tx, ids);
+        });
 
     /// <inheritdoc />
-    public void MergeHistory(IEnumerable<long> fromAliases, long toAlias)
-        => Db.WithinTransaction(tx => {
-                const string sql = """
-                                   update alias_usage 
-                                   set id_alias = @destinationId
-                                   where id_alias in @sourceIds
-                                   """;
-                tx.Connection!.Execute(sql, new { destinationId = toAlias, sourceIds = fromAliases });
-            }
-        );
-
-    /// <inheritdoc />
-    public void Remove(IEnumerable<AliasQueryResult> aliases)
-        => Db.WithinTransaction(tx => {
-                var list = aliases as AliasQueryResult[] ?? aliases.ToArray();
-                _logger.LogInformation("Hard remove of {Count} alias(es) from database", list.Length);
-                foreach (var item in list)
-                {
-                    _dbActionFactory.AliasManagement.Remove(tx, item);
-                }
-            }
-        );
+    public void Remove(IEnumerable<long> aliasIds) => Db.WithinTransaction(tx => Remove(tx, aliasIds));
 
     /// <inheritdoc />
     public void RemoveLogically(AliasQueryResult alias)
@@ -595,25 +571,15 @@ public class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
     }
 
     /// <inheritdoc />
-    public void Restore(AliasQueryResult alias)
-        => Db.WithinTransaction(tx => {
-                const string sql = """
-                                   update alias 
-                                   set
-                                        deleted_at = null,
-                                        hidden     = 0
-                                   where id = @id
-                                   """;
-                tx.Connection!.Execute(sql, new { id = alias.Id });
-            }
-        );
+    public void Restore(AliasQueryResult alias) => Db.WithinTransaction(tx => Restore(tx, alias));
 
     /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias)
-        => Db.WithinTransaction(
-            (tx, current) => _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref current),
-            alias
-        );
+    {
+        var local = alias;
+        Db.WithinTransaction(tx => SaveOrUpdate(tx, ref local));
+        alias = local;
+    }
 
     /// <inheritdoc />
     public void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases)

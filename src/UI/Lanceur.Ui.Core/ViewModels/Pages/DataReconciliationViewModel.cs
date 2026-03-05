@@ -246,61 +246,39 @@ public partial class DataReconciliationViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(CanMerge))]
-    private async Task OnMerge(object content)
+    private async Task OnMerge()
     {
         using var _ = _logger.BeginCorrelatedLogs();
 
-        var selectedAliases = GetSelectedAliases().ToList();
-        if (selectedAliases.Count == 0) { return; }
-
-
-        var (alias, parameters) = await Task.Run(() => {
-                var alias = _repository.GetById(selectedAliases.FirstOrDefault()!.Id);
-
-                _repository.MergeHistory(selectedAliases.Select(e => e.Id), alias.Id);
-
-                var parameters = _repository.GetAdditionalParameter(
-                                                selectedAliases.Select(item => item.Id)
-                                            )
-                                            .ToList();
-
-                return (alias, parameters);
-            }
-        );
-
-        /* To be thread safe, this code should NOT be in the upper Task. If AdditionalParameters and AddDistinctSynonyms
-         * raise a PropertyChanged event it'll be from the thread and will handled in the UI thread. This could lead to
-         * a cross-thread exception...
-         */
-        alias.AdditionalParameters = new ObservableCollection<AdditionalParameter>(parameters);
-        alias.AddDistinctSynonyms(selectedAliases.Select(e => e.Name));
-
-        var dataContext = new DoubloonViewModel(parameters, alias.Synonyms);
+        var selectedAliases = GetSelectedAliases();
+        if (selectedAliases.Length == 0) { return; }
+        
+        var selectedIds = selectedAliases.Select(e => e.Id).ToArray();
+        var aliasName = selectedAliases[0].Name;
+        
         var response = await _userDialogue.InteractAsync(
-            content,
-            "Update changes",
+            $"""
+             The selected aliases will be merged into '{aliasName}'.
+
+             The following data will be consolidated into the target alias:
+               • Names and synonyms
+               • Additional parameters
+
+             The source aliases will then be permanently deleted.
+             This action cannot be undone.
+             """,
+            "Confirm merge",
             ButtonLabels.Cancel,
-            "Merge aliases",
-            dataContext
+            "Merge aliases"
         );
         if (!response.IsConfirmed) { return; }
 
-        alias.Synonyms = dataContext.Synonyms;
-
-        await Task.Run(() => {
-                _repository.SaveOrUpdate(ref alias);
-                _repository.Restore(alias);
-            }
-        );
-
-        // Removing merged aliases
-        var toRemove = selectedAliases.Where(e => e.Id != alias.Id);
-        await Task.Run(() => _repository.Remove(toRemove));
+        await Task.Run(() => _repository.Merge(selectedIds));
 
         //Reload when finished
         await OnShowDoubloons();
 
-        _userNotification.Success($"Aliases merged into alias '{alias.Name}'.");
+        _userNotification.Success($"Aliases merged into alias '{aliasName}'.");
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
