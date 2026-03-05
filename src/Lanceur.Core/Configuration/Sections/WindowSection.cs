@@ -1,4 +1,6 @@
-﻿namespace Lanceur.Core.Configuration.Sections;
+﻿using System.Globalization;
+
+namespace Lanceur.Core.Configuration.Sections;
 
 public class WindowSection
 {
@@ -9,6 +11,14 @@ public class WindowSection
     ///     The default style is set to "Mica", which determines the window's visual appearance.
     /// </summary>
     public string BackdropStyle { get; set; } = "Mica";
+
+    /// <summary>
+    ///     Gets or sets the format string used to display dates in the UI.
+    ///     Accepts any format string valid for <see cref="DateTime.ToString(string)" />,
+    ///     such as <c>"dd/MM/yyyy"</c> or <c>"MM-dd-yyyy"</c>.
+    /// </summary>
+    public string DateTimeFormat { get; set; } =
+        $"{DateTimeFormatInfo.CurrentInfo.ShortDatePattern} {DateTimeFormatInfo.CurrentInfo.ShortTimePattern}";
 
     /// <summary>
     ///     Gets or sets the duration (in seconds) that the notification remains visible in the UI before disappearing.

@@ -2,11 +2,11 @@
     x:Class="Lanceur.Ui.WPF.Views.Pages.DataReconciliationView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     x:Name="Self"
     Title="DataReconciliationView"
     d:DesignHeight="800"
@@ -159,8 +159,7 @@
             PlaceholderText="Filter aliases...">
             <interactivity:Interaction.Triggers>
                 <interactivity:EventTrigger EventName="TextChanged">
-                    <interactivity:InvokeCommandAction Command="{Binding FilterAliasCommand}"
-                                                       CommandParameter="{Binding ElementName=FilterBox, Path=Text}" />
+                    <interactivity:InvokeCommandAction Command="{Binding FilterAliasCommand}" CommandParameter="{Binding ElementName=FilterBox, Path=Text}" />
                 </interactivity:EventTrigger>
             </interactivity:Interaction.Triggers>
         </ui:TextBox>
@@ -261,8 +260,14 @@
                                 <ui:TextBlock
                                     Margin="5,5,50,5"
                                     VerticalAlignment="Center"
-                                    FontTypography="BodyStrong"
-                                    Text="{Binding LastUsedAt}" />
+                                    FontTypography="BodyStrong">
+                                    <ui:TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource DateFormatConverter}">
+                                            <Binding Path="LastUsedAt" />
+                                            <Binding Path="DataContext.DateFormat" RelativeSource="{RelativeSource AncestorType=Page}" />
+                                        </MultiBinding>
+                                    </ui:TextBlock.Text>
+                                </ui:TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

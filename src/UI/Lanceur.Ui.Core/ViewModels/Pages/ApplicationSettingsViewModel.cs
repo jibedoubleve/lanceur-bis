@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -56,7 +57,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _toggleVisibility;
     private readonly IViewFactory _viewFactory;
     [ObservableProperty] private string _windowBackdropStyle = "Mica";
-
+    [ObservableProperty] private string _dateTimeFormat = ""; // Just to avoid warning, this prop is set in the Ctor
     #endregion
 
     #region Constructors
@@ -160,6 +161,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Window section
         NotificationDisplayDuration = Configuration.Application.Window.NotificationDisplayDuration;
         WindowBackdropStyle = Configuration.Application.Window.BackdropStyle;
+        DateTimeFormat = Configuration.Application.Window.DateTimeFormat;
 
         // Feature flags
         FeatureFlags = new ObservableCollection<FeatureFlag>(Configuration.Application.FeatureFlags);
@@ -203,6 +205,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Window section
         Configuration.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
         Configuration.Application.Window.BackdropStyle = WindowBackdropStyle;
+        Configuration.Application.Window.DateTimeFormat = DateTimeFormat;
 
         // Feature flags
         Configuration.Application.FeatureFlags = FeatureFlags;

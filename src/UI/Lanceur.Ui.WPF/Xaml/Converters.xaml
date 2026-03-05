@@ -26,4 +26,5 @@
     <conv:CounterToVisibilityConverter x:Key="CounterToVisibilityConverter" />
     <conv:StoreOrchestrationToStringConverter x:Key="StoreOrchestrationToStringConverter" />
     <conv:StoreTypeToStoreNameConverter x:Key="StoreTypeToStoreNameConverter" />
+    <conv:DateFormatConverter x:Key="DateFormatConverter" />
 </ResourceDictionary>
