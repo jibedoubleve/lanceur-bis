@@ -27,7 +27,7 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
     public async Task<IEnumerable<PackagedApp>> GetByInstalledDirectoryAsync(string fileName)
     {
         fileName = fileName.Replace("package:", "");
-        var installedDir = fileName.GetDirectoryName();
+        var installedDir = fileName.GetDirectoryName() ?? string.Empty;
 
         return await Task.Run(() => {
                 var userPackages = GetUserPackages();
@@ -97,7 +97,9 @@ public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPacka
     public async Task<bool> TryResolveDetailsAsync(AliasQueryResult queryResult)
     {
         ArgumentNullException.ThrowIfNull(queryResult);
-        var results = await GetByInstalledDirectoryAsync(queryResult.FileName);
+        if (queryResult.FileName.IsNullOrEmpty()) { return false; }
+
+        var results = await GetByInstalledDirectoryAsync(queryResult.FileName!);
         results = results.ToArray();
 
         if (!results.Any()) { return false; }

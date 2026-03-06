@@ -15,7 +15,7 @@ public static class UriExtensions
     ///     A <see cref="Uri" /> representing the authority (e.g. <c>https://example.com</c>),
     ///     or <c>null</c> if the authority part is empty.
     /// </returns>
-    public static Uri GetAuthority(this Uri baseUri)
+    public static Uri? GetAuthority(this Uri baseUri)
     {
         var leftPart = baseUri.GetLeftPart(UriPartial.Authority);
         return leftPart.IsNullOrEmpty()

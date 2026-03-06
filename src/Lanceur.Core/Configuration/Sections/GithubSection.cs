@@ -16,7 +16,11 @@ public class GithubSection
 {
     #region Constructors
 
-    public GithubSection() => Tag = "ungroomed";
+    public GithubSection()
+    {
+        Tag = "ungroomed";
+        LastCheckedVersion = new Version();
+    }
 
     #endregion
 
@@ -42,7 +46,7 @@ public class GithubSection
     /// <summary>
     ///     The token to use for actions that require privileges
     /// </summary>
-    public string Token { get; set; }
+    public string? Token { get; set; }
 
     #endregion
 }

@@ -26,8 +26,8 @@ public partial class WebTextReplacement : IReplacement
     /// <inheritdoc />
     public string Replace(string newText, string replacement)
     {
-        replacement ??= string.Empty;
         newText ??= string.Empty;
+        replacement ??= string.Empty;
 
         var webParam = WebUtility.UrlEncode(replacement).ToLower();
         return Regex.Replace(newText, webParam);

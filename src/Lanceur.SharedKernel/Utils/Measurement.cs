@@ -8,15 +8,15 @@ public sealed class Measurement : IDisposable
 
     private long _lastTick;
 
-    private readonly Action<TimeSpan> _log;
-    private readonly Action<TimeSpan> _splitLog;
+    private readonly Action<TimeSpan>? _log;
+    private readonly Action<TimeSpan>? _splitLog;
     private readonly long _startTick;
 
     #endregion
 
     #region Constructors
 
-    internal Measurement(Action<TimeSpan> log, Action<TimeSpan> splitLog)
+    internal Measurement(Action<TimeSpan>? log, Action<TimeSpan>? splitLog)
     {
         _log = log;
         _splitLog = splitLog;

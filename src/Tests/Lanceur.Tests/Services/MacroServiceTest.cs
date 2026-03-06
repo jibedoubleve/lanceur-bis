@@ -14,6 +14,7 @@ using Lanceur.Infra.Stores;
 using Lanceur.Infra.Utils;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.Macros;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +37,7 @@ public class MacroServiceTest : TestBase
 
     private ServiceProvider BuildMacroServiceProvider()
     {
-        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
+        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! };
         return new ServiceCollection().AddLoggingForTests(OutputHelper)
                                       .AddLogging()
                                       .AddMockSingleton<IAliasRepository>()
@@ -44,7 +45,7 @@ public class MacroServiceTest : TestBase
                                       .AddMockSingleton<IExecutionService>()
                                       .AddMockSingleton<ISearchService>()
                                       .AddSingleton(
-                                          new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) }
+                                          new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! }
                                       )
                                       .AddSingleton<MacroAliasExpanderService>()
                                       .AddSingleton(_ => asm)
@@ -72,7 +73,7 @@ public class MacroServiceTest : TestBase
                                                      .AddSingleton<MacroAliasExpanderService>()
                                                      .AddSingleton<MultiMacroTest>()
                                                      .BuildServiceProvider();
-        var macroMgr = serviceProvider.GetService<MacroAliasExpanderService>();
+        var macroMgr = serviceProvider.GetService<MacroAliasExpanderService>()!;
         var macro = new MultiMacroTest();
         var result = macroMgr.Expand(macro).First();
 
@@ -97,7 +98,7 @@ public class MacroServiceTest : TestBase
                                                      .AddSingleton<MacroAliasExpanderService>()
                                                      .BuildServiceProvider();
 
-        var expander = serviceProvider.GetService<MacroAliasExpanderService>();
+        var expander = serviceProvider.GetService<MacroAliasExpanderService>()!;
         var macro = new MultiMacroTest { Parameters = parameters };
         var handler = (SelfExecutableQueryResult)expander.Expand(macro).First();
 
@@ -130,7 +131,7 @@ public class MacroServiceTest : TestBase
         var serviceProvider = BuildMacroServiceProvider();
 
         // ACT
-        var output = serviceProvider.GetService<MacroAliasExpanderService>()
+        var output = serviceProvider.GetService<MacroAliasExpanderService>()!
                                     .Expand(queryResults)
                                     .ToArray();
         // ASSERT
@@ -166,7 +167,7 @@ public class MacroServiceTest : TestBase
                               .AddMacroServices()
                               .BuildServiceProvider();
 
-        var manager = serviceProvider.GetService<MacroAliasExpanderService>();
+        var manager = serviceProvider.GetService<MacroAliasExpanderService>()!;
         manager.MacroCount.ShouldBeGreaterThan(0);
     }
 
@@ -174,7 +175,7 @@ public class MacroServiceTest : TestBase
     public void When_loading_macros_Then_expected_amount_of_macro_found()
     {
         var serviceProvider = BuildMacroServiceProvider();
-        var macroService = serviceProvider.GetService<MacroAliasExpanderService>();
+        var macroService = serviceProvider.GetService<MacroAliasExpanderService>()!;
         macroService.MacroCount.ShouldBe(4);
     }
 
@@ -189,7 +190,7 @@ public class MacroServiceTest : TestBase
         ];
 
 
-        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro)) };
+        var asm = new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! };
         var serviceProvider = new ServiceCollection().AddMockSingleton<ILogger<MacroAliasExpanderService>>()
                                                      .AddMockSingleton<IAliasRepository>()
                                                      .AddLoggingForTests(OutputHelper)
@@ -198,7 +199,7 @@ public class MacroServiceTest : TestBase
                                                      .AddSingleton(
                                                          new AssemblySource
                                                          {
-                                                             MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
+                                                             MacroSource = Assembly.GetAssembly(typeof(MultiMacro))!
                                                          }
                                                      )
                                                      .AddSingleton<MacroAliasExpanderService>()
@@ -215,7 +216,7 @@ public class MacroServiceTest : TestBase
                                                      .AddMacroServices()
                                                      .BuildServiceProvider();
 
-        var output = serviceProvider.GetService<MacroAliasExpanderService>()
+        var output = serviceProvider.GetService<MacroAliasExpanderService>()!
                                     .Expand(queryResults)
                                     .ToArray();
 
@@ -242,7 +243,7 @@ public class MacroServiceTest : TestBase
         var composite = results.ElementAt(0) as CompositeAliasQueryResult;
         composite.ShouldSatisfyAllConditions(
             c => c.ShouldNotBeNull(),
-            c => c.Aliases.ElementAt(index).Delay.ShouldBe(delay)
+            c => c!.Aliases.ElementAt(index).Delay.ShouldBe(delay)
         );
     }
 
@@ -264,7 +265,7 @@ public class MacroServiceTest : TestBase
                                                      .AddSingleton(
                                                          new AssemblySource
                                                          {
-                                                             MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
+                                                             MacroSource = Assembly.GetAssembly(typeof(MultiMacro))!
                                                          }
                                                      )
                                                      .AddSingleton<MacroAliasExpanderService>()
@@ -280,7 +281,7 @@ public class MacroServiceTest : TestBase
                                                      .AddLogging()
                                                      .BuildServiceProvider();
 
-        var output = serviceProvider.GetService<MacroAliasExpanderService>()
+        var output = serviceProvider.GetService<MacroAliasExpanderService>()!
                                     .Expand(queryResults)
                                     .ToArray();
 

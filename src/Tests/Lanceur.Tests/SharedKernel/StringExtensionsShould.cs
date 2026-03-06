@@ -49,14 +49,14 @@ public class StringExtensionsShould
     [Fact]
     public void ReturnTrueOnNullUsingNullOrEmpty()
     {
-        string s = null;
+        string? s = null;
         s.ShouldBeNullOrEmpty();
     }
 
     [Fact]
     public void ReturnTrueOnNullUsingNullOrWhiteSpace()
     {
-        string s = null;
+        string? s = null;
         s.ShouldBeNullOrWhiteSpace();
     }
 

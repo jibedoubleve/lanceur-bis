@@ -6,7 +6,7 @@ public static class ServiceProviderExtensions
 {
     #region Methods
 
-    public static ISection<T> GetSection<T>(this IServiceProvider serviceProvider)
+    public static ISection<T>? GetSection<T>(this IServiceProvider serviceProvider)
         where T : class
         => serviceProvider.GetService<ISection<T>>();
 

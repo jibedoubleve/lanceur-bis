@@ -12,21 +12,21 @@ public class ThumbnailTest
 
     private static IEnumerable<object> SourceDestinationBitmapSource()
     {
-        yield return new object[] { null, Path.GetTempPath() };
-        yield return new object[] { new BitmapImage(), null };
-        yield return new object[] { null, null };
+        yield return new object?[] { null, Path.GetTempPath() };
+        yield return new object?[] { new BitmapImage(), null };
+        yield return new object?[] { null, null };
     }
 
     private static IEnumerable<object> SourceDestinationPathSource()
     {
-        yield return new object[] { null, Path.GetTempPath() };
-        yield return new object[] { Path.GetTempFileName(), null };
-        yield return new object[] { null, null };
+        yield return new object?[] { null, Path.GetTempPath() };
+        yield return new object?[] { Path.GetTempFileName(), null };
+        yield return new object?[] { null, null };
     }
 
     [Theory]
-    [InlineData((string)null)]
-    public void When_copy_thumbnail_to_ImageSourceRepository_Then_no_error(string destinationPath)
+    [InlineData((string?)null)]
+    public void When_copy_thumbnail_to_ImageSourceRepository_Then_no_error(string? destinationPath)
     {
         var thumbnailPath = new BitmapImage();
         var action = () => thumbnailPath.CopyToImageRepository(destinationPath);

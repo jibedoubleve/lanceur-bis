@@ -310,7 +310,7 @@ public partial class KeywordsViewModel : ObservableObject
     {
         if ((SelectedAlias?.Id ?? 0) == 0) { return; }
 
-        SelectedAlias = await Task.Run(() => _aliasManagementService.Hydrate(SelectedAlias));
+        SelectedAlias = await Task.Run(() => _aliasManagementService.Hydrate(SelectedAlias!));
         _logger.LogInformation("Loading alias {AliasName}", SelectedAlias.Name);
     }
 
@@ -374,7 +374,10 @@ public partial class KeywordsViewModel : ObservableObject
         var result = _validationService.IsValid(queryResult);
         if (!result.IsSuccess)
         {
-            _hubService.Notifications.Warning(result.ErrorContent, "Validation failed");
+            _hubService.Notifications.Warning(
+                result.ErrorContent ?? "An error occured",
+                "Validation failed"
+            );
             _logger.LogDebug("Validation failed for {AliasName}: {Errors}", queryResult!.Name, result.ErrorContent);
             _hubService.Notifications.Warning($"Alias validation failed:\n{result.ErrorContent}");
             return;

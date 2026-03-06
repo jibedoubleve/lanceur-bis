@@ -200,7 +200,7 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            var criterion = Cmdline.Parse(Query);
+            var criterion = Cmdline.Parse(Query ?? string.Empty);
 
             if (criterion.IsNullOrEmpty()) { Results.Clear(); }
 

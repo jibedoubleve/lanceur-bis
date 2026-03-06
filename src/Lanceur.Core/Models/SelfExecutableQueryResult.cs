@@ -12,9 +12,10 @@ public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfEx
         var type = GetType();
 
         Name = type.GetCustomAttribute<ReservedAliasAttribute>()?.Name ??
-               type.GetCustomAttribute<MacroAttribute>()?.Name;
+               type.GetCustomAttribute<MacroAttribute>()?.Name
+               ?? string.Empty;
 
-        Description = type.GetCustomAttribute<DescriptionAttribute>()?.Description;
+        Description = type.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
     }
 
     #endregion
@@ -27,7 +28,7 @@ public abstract class SelfExecutableQueryResult : ExecutableQueryResult, ISelfEx
 
     #region Methods
 
-    public abstract Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null);
+    public abstract Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null);
 
     #endregion
 }

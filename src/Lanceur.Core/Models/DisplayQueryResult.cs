@@ -2,30 +2,18 @@
 
 public class DisplayQueryResult : QueryResult
 {
-    #region Fields
-
-    private string _icon;
-
-    #endregion
-
     #region Constructors
 
-    public DisplayQueryResult(string name, string description = null, string iconKind = null)
+    public DisplayQueryResult(string name, string? description = null, string? iconKind = null)
     {
         Name = name;
-        Description = description;
-        _icon = iconKind;
+        Description = description ?? string.Empty;
+        if (iconKind is not null) { base.Icon = iconKind; }
     }
 
     #endregion
 
     #region Properties
-
-    public override string Icon
-    {
-        get => _icon;
-        set => _icon = value;
-    }
 
     /// <summary>
     ///     Gets a value indicating whether this <see cref="QueryResult" /> represents an actual result to display
@@ -40,7 +28,8 @@ public class DisplayQueryResult : QueryResult
 
     #region Methods
 
-    public static IEnumerable<QueryResult> SingleFromResult(string text, string subtext = null, string iconKind = null)
+    public static IEnumerable<QueryResult> SingleFromResult(
+        string text, string? subtext = null, string? iconKind = null)
         => new List<QueryResult> { new DisplayQueryResult(text, subtext, iconKind) };
 
     #endregion

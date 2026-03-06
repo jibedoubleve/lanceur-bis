@@ -17,12 +17,16 @@ public static partial class QueryResultExtensions
     private static partial Regex BuildFindMacroRegex();
 
     private static bool Is(this AliasQueryResult @this, CompositeMacros macro)
-        => @this.FileName.ToLower().Contains($"@{macro.ToLowerString()}@".ToLower());
+    {
+        var fileName = @this.FileName ?? string.Empty;
+        return fileName.Contains(
+            $"@{macro.ToLowerString()}@",
+            StringComparison.CurrentCultureIgnoreCase
+        );
+    }
 
     public static string GetMacroName(this AliasQueryResult @this)
     {
-        if (@this is null) { return string.Empty; }
-
         var matches = FindMacroRegex.Match(@this.FileName ?? string.Empty);
         var result = matches.Success ? matches.Groups[1].Value : string.Empty;
         return result.ToUpper();

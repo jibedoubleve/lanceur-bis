@@ -26,7 +26,7 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
 
     #region Methods
 
-    private SQLiteAliasRepository BuildRepository(string sql = null, IConnectionString connectionString = null)
+    private SQLiteAliasRepository BuildRepository(string? sql = null, IConnectionString? connectionString = null)
     {
         var connection = BuildFreshDb(sql, connectionString);
         var scope = new DbSingleConnectionManager(connection);

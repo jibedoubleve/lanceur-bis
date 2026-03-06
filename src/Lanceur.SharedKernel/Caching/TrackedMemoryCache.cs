@@ -3,6 +3,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.SharedKernel.Caching;
 
+/// <summary>
+///     A decorator around <see cref="IMemoryCache" /> that logs every cache operation
+///     (create, hit, miss, remove, dispose) using the injected <see cref="ILogger{TCategoryName}" />.
+/// </summary>
 public class TrackedMemoryCache : IMemoryCache
 {
     #region Fields
@@ -24,25 +28,38 @@ public class TrackedMemoryCache : IMemoryCache
 
     #region Methods
 
+    /// <summary>
+    ///     Creates a new cache entry for the specified <paramref name="key" /> and logs the operation at Debug level.
+    /// </summary>
     public ICacheEntry CreateEntry(object key)
     {
         _logger.LogDebug("Creating cache with key {Key}", key);
         return _memoryCache.CreateEntry(key);
     }
 
+    /// <summary>
+    ///     Disposes the underlying cache and logs the operation at Trace level.
+    /// </summary>
     public void Dispose()
     {
         _logger.LogTrace($"Disposing {nameof(TrackedMemoryCache)}");
         _memoryCache.Dispose();
     }
 
+    /// <summary>
+    ///     Removes the cache entry associated with the specified <paramref name="key" /> and logs the operation at Debug level.
+    /// </summary>
     public void Remove(object key)
     {
         _logger.LogDebug("Removing cache with key {Key}", key);
         _memoryCache.Remove(key);
     }
 
-    public bool TryGetValue(object key, out object value)
+    /// <summary>
+    ///     Attempts to retrieve the value for the specified <paramref name="key" />.
+    ///     Logs a Trace message on cache hit and a Debug message on cache miss.
+    /// </summary>
+    public bool TryGetValue(object key, out object? value)
     {
         var hasHit = _memoryCache.TryGetValue(key, out value);
         const string template = "{Hit} cache with key {Key}";

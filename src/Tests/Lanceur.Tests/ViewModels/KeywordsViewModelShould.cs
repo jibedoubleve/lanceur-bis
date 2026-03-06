@@ -35,7 +35,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors visitors
+        ServiceVisitors? visitors
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
@@ -302,7 +302,7 @@ public class KeywordsViewModelShould : ViewModelTester<KeywordsViewModel>
     [Fact]
     public async Task NotBeAbleToCreateAliasWithDeletedAliasName()
     {
-        IUserNotificationService userNotificationService = null;
+        IUserNotificationService userNotificationService = null!;
         var visitors = new ServiceVisitors
         {
             VisitUserNotificationService = (_, i) => {

@@ -51,7 +51,7 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors visitors
+        ServiceVisitors? visitors
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()

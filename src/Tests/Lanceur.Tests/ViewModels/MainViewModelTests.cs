@@ -53,7 +53,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors visitors
+        ServiceVisitors? visitors
     )
     {
         serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
@@ -131,7 +131,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
     [InlineData(new[] { false, true })]
     public void Check_configuration_ShowLastQuery(bool[] callsOfShowLastQuery)
     {
-        IConfigurationFacade configuration = null;
+        IConfigurationFacade configuration = null!;
         var visitors = new ServiceVisitors { VisitSettings = s => configuration = s };
         TestViewModel(
             (viewModel, _) => {
@@ -186,7 +186,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
     [Fact]
     public async Task Execute_alias()
     {
-        IProcessLauncher sut = null;
+        IProcessLauncher sut = null!;
         var visitors = new ServiceVisitors
         {
             VisitProcessLauncher = (_, i) => {

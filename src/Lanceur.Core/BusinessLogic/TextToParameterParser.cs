@@ -13,12 +13,12 @@ public class TextToParameterParser
 {
     #region Methods
 
-    private static bool TryParseLine(string line, out AdditionalParameter parameter)
+    private static bool TryParseLine(string line, out AdditionalParameter? parameter)
     {
         var parts = line.Split(",");
         if (parts.Length > 2)
         {
-            parameter = new AdditionalParameter();
+            parameter = null;
             return false;
         }
 
@@ -41,7 +41,7 @@ public class TextToParameterParser
         {
             if (!TryParseLine(line, out var parameter)) { return ParseResult.Failed(); }
 
-            parameters.Add(parameter);
+            parameters.Add(parameter!);
         }
 
         return ParseResult.Succeeded(parameters);
@@ -54,9 +54,9 @@ public record ParseResult
 {
     #region Constructors
 
-    private ParseResult(IEnumerable<AdditionalParameter> parameters, bool success)
+    private ParseResult(IEnumerable<AdditionalParameter>? parameters, bool success)
     {
-        Parameters = parameters;
+        Parameters = parameters ?? [];
         Success = success;
     }
 

@@ -35,11 +35,10 @@ public partial class RawClipboardReplacement : IReplacement
     private static partial Regex GetRegex();
 
     /// <inheritdoc />
-    public string Replace(string newText, string replacement)
+    public string Replace(string? newText, string? replacement)
     {
-        var clipboard = _clipboard.RetrieveText() ?? string.Empty;
         newText ??= string.Empty;
-
+        var clipboard = _clipboard.RetrieveText();
         return Regex.Replace(newText, clipboard);
     }
 

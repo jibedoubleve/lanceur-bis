@@ -43,8 +43,8 @@ public static class ServiceCollectionExtensions
                          .AddSingleton(
                              new AssemblySource
                              {
-                                 ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias)),
-                                 MacroSource = Assembly.GetAssembly(typeof(MultiMacro))
+                                 ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias))!,
+                                 MacroSource = Assembly.GetAssembly(typeof(MultiMacro))!
                              }
                          );
 

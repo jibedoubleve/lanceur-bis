@@ -113,7 +113,7 @@ public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliatio
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors visitors
+        ServiceVisitors? visitors
     )
     {
         serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)

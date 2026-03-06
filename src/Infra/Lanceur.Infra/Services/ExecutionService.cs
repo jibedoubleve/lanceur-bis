@@ -82,7 +82,10 @@ public class ExecutionService : IExecutionService
             return new ScriptResult
             {
                 Context = new ScriptContext
-                    { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
+                {
+                    FileName = query.FileName ?? string.Empty,
+                    Parameters = query.OriginatingQuery.Parameters
+                }
             };
         }
 
@@ -93,7 +96,10 @@ public class ExecutionService : IExecutionService
             {
                 Code = query.LuaScript ?? string.Empty,
                 Context = new ScriptContext
-                    { FileName = query.FileName, Parameters = query.OriginatingQuery.Parameters }
+                {
+                    FileName = query.FileName ?? string.Empty,
+                    Parameters = query.OriginatingQuery.Parameters
+                }
             }
         );
         using var __ = _logger.BeginSingleScope("ScriptResult", result);
@@ -144,7 +150,7 @@ public class ExecutionService : IExecutionService
         if (query.IsElevated || query.RunAs == Constants.RunAs.Admin)
         {
             psi.Verb = "runas";
-            _logger.LogGrantedLevel(query.FileName, "ADMIN");
+            _logger.LogGrantedLevel(query.FileName!, "ADMIN");
         }
 
         _process.Start(psi);
@@ -153,24 +159,22 @@ public class ExecutionService : IExecutionService
     private void ExecuteUwp(AliasQueryResult query)
     {
         // https://stackoverflow.com/questions/42521332/launching-a-windows-10-store-app-from-c-sharp-executable
-        var file = query.FileName.Replace("package:", @"shell:AppsFolder\");
-        var psi = new ProcessContext();
+        var file = query.FileName!.Replace("package:", @"shell:AppsFolder\");
+        var psi = query.IsElevated
+            ? new ProcessContext
+            {
+                FileName = file,
+                UseShellExecute = true, //https://stackoverflow.com/a/23199505/389529
+                Verb = "runas"
+            }
+            : new ProcessContext
+            {
+                FileName = "explorer.exe",
+                Arguments = file,
+                UseShellExecute = false
+            };
 
-        if (query.IsElevated)
-        {
-            psi.FileName = file;
-            psi.UseShellExecute = true; //https://stackoverflow.com/a/23199505/389529
-            psi.Verb = "runas";
-            _logger.LogGrantedLevel(query.FileName, "ADMIN");
-        }
-        else
-        {
-            psi.FileName = "explorer.exe";
-            psi.Arguments = file;
-            psi.UseShellExecute = false;
-            _logger.LogGrantedLevel(query.FileName, "regular user");
-        }
-
+        _logger.LogGrantedLevel(query.FileName, query.IsElevated ? "ADMIN" : "regular user");
         _logger.LogInformation("Run packaged application {File}", file);
         _process.Start(psi);
     }

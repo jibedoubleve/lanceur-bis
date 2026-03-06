@@ -1,11 +1,12 @@
 ﻿namespace Lanceur.Core.Models;
 
-public class AliasUsage
+public sealed record AliasUsage
 {
     #region Properties
 
     public int Count { get; set; }
-    public long Id { get; set; }
+    public required string Name { get; set; }
+    public required int Year { get; set; }
 
     #endregion
 }

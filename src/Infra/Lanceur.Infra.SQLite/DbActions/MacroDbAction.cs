@@ -38,13 +38,15 @@ public class MacroDbAction
     /// <returns>The hydrated <see cref="QueryResult" /> or <paramref name="item" /></returns>
     private AliasQueryResult Hydrate(IDbConnection connection, AliasQueryResult item)
     {
+        ArgumentNullException.ThrowIfNull(item);
+        
         _logger.BeginSingleScope("AliasToHydrate", item);
         if (!item.IsComposite()) { return item; }
 
         var action = _dbActionFactory.AliasManagement;
         var subAliases = new List<AliasQueryResult>();
 
-        var names = item?.Parameters?.Split("@") ?? [];
+        var names = item.Parameters?.Split("@") ?? [];
         var aliases = action.GetByNames(connection, names).ToArray();
 
         var delay = 0;
@@ -60,7 +62,7 @@ public class MacroDbAction
                         "Failed to create composite alias {CompositeAlias} because the alias {AliasName} " +
                         "is missing or has been deleted. To resolve this, remove the invalid aliases " +
                         "from the composite alias configuration.",
-                        item?.Name ?? "<NULL>",
+                        item.Name,
                         name
                     );
 
@@ -74,7 +76,7 @@ public class MacroDbAction
             }
         }
 
-        var result = item.ToAliasQueryResultComposite(subAliases);
+        var result = item!.ToAliasQueryResultComposite(subAliases);
         return result;
     }
 
@@ -96,7 +98,7 @@ public class MacroDbAction
         using var _ = _logger.WarnIfSlow(this);
         var list = new List<AliasQueryResult>(collection);
         var composites = list.Where(item => !item.FileName.IsNullOrEmpty())
-                             .Where(item => item.FileName.ToUpper().Contains("@MULTI@"))
+                             .Where(item => item.FileName?.ToUpper().Contains("@MULTI@") ?? false)
                              .Select(x => Hydrate(connection, x))
                              .ToArray();
 

@@ -62,7 +62,7 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors visitors
+        ServiceVisitors? visitors
     )
     {
         serviceCollection.AddTestOutputHelper(OutputHelper)

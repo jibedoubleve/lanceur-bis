@@ -43,7 +43,7 @@ public record Cmdline
     /// <returns>A <see cref="string" /> representation of the <paramref name="source" />.</returns>
     public static implicit operator string(Cmdline source) => source.ToString();
 
-    public static Cmdline Parse(string cmdline)
+    public static Cmdline Parse(string? cmdline)
     {
         cmdline = (cmdline ?? string.Empty).Trim();
 
@@ -74,7 +74,7 @@ public static class CmdLineExtension
 {
     #region Methods
 
-    public static bool IsEmpty(this Cmdline cmdline)
+    public static bool IsEmpty(this Cmdline? cmdline)
     {
         if (cmdline is null) { return true; }
 

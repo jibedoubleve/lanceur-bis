@@ -10,7 +10,7 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
 {
     #region Fields
 
-    private InfrastructureSettings _current;
+    private InfrastructureSettings? _current;
     private readonly string _filePath;
 
     private static readonly Lock Locker = new();
@@ -19,7 +19,7 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
 
     #region Constructors
 
-    public JsonInfrastructureSettingsProvider(string path = null)
+    public JsonInfrastructureSettingsProvider(string? path = null)
     {
         path ??= Paths.Settings;
         _filePath = path.ExpandPath();
@@ -35,7 +35,7 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
         {
             if (_current is null) { Load(); }
 
-            return _current;
+            return _current!;
         }
     }
 
@@ -59,7 +59,7 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
     {
         lock (Locker)
         {
-            InfrastructureSettings jsonConfiguration = null;
+            InfrastructureSettings? jsonConfiguration = null;
             if (File.Exists(_filePath))
             {
                 var output = File.ReadAllText(_filePath);

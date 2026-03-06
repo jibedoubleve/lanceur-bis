@@ -60,7 +60,7 @@ public class GithubIssueMacro : MacroQueryResult
             _settings
         );
 
-    public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+    public override async Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         if (cmdline == null || cmdline.IsNullOrEmpty() || !cmdline!.HasParameters)
         {
@@ -75,9 +75,9 @@ public class GithubIssueMacro : MacroQueryResult
             _notification.Warning(msg);
             return NoResult;
         }
-
+        
         _logger.LogInformation("Creating Github issue with cmdline: {Cmdline}", cmdline!.ToString());
-        await _githubService.CreateIssue(cmdline.Parameters, _enigma.Decrypt(_settings.Value.Token));
+        await _githubService.CreateIssue(cmdline.Parameters, _enigma.Decrypt(_settings.Value.Token!));
 
         return NoResult;
     }

@@ -24,7 +24,7 @@ public interface IFavIconService
     ///     The absolute path to the cached favicon file if the download succeeded;
     ///     <c>null</c> if <c>FileName</c> is not a URL, the favicon could not be found, or the download failed.
     /// </returns>
-    Task<string> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver);
+    Task<string?> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver);
 
     #endregion
 }

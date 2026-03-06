@@ -41,12 +41,11 @@ public abstract class LoggerDbProfiler : IDbProfiler
     public virtual void ExecuteFinish(
         IDbCommand profiledDbCommand,
         SqlExecuteType executeType,
-        DbDataReader reader
+        DbDataReader? reader
     ) { }
 
     public virtual void ExecuteStart(IDbCommand profiledDbCommand, SqlExecuteType executeType) { }
     public virtual void OnError(IDbCommand profiledDbCommand, SqlExecuteType executeType, Exception exception) { }
-
     public virtual void ReaderFinish(IDataReader reader) { }
 
     #endregion

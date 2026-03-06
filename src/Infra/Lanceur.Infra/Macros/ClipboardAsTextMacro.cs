@@ -31,7 +31,7 @@ public class ClipboardAsTextMacro : MacroQueryResult
 
     public override SelfExecutableQueryResult Clone() => new ClipboardAsTextMacro(_clipboard);
 
-    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         var text = _clipboard.RetrieveText();
         _clipboard.SaveText(text);

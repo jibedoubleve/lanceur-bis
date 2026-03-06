@@ -48,7 +48,7 @@ public class FavIconAppThumbnailStrategy : IThumbnailStrategy
         _logger.LogInformation(
             "Updating for alias {Alias} favicon from {Thumbnail} to {FavIconPath}",
             alias.Name.DefaultIfNullOrEmpty("<empty>"),
-            alias.Thumbnail.DefaultIfNullOrEmpty("<empty>"),
+            alias.Thumbnail?.DefaultIfNullOrEmpty("<empty>"),
             thumbnail.DefaultIfNullOrEmpty("<empty>")
         );
 

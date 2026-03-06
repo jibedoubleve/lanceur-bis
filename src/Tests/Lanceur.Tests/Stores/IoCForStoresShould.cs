@@ -86,7 +86,7 @@ public class IoCForStoresShould : TestBase
         var store = serviceProvider
                     .GetServices<IStoreService>()
                     .Single(x => x.GetType() == typeof(EverythingStore));
-        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>();
+        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
 
         // assert
         orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString))
@@ -129,7 +129,7 @@ public class IoCForStoresShould : TestBase
         var store = serviceProvider
                     .GetServices<IStoreService>()
                     .Single(x => x.GetType() == typeof(EverythingStore));
-        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>();
+        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
 
         // assert
         orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString))
@@ -154,8 +154,8 @@ public class IoCForStoresShould : TestBase
         var store = serviceProvider
                     .GetServices<IStoreService>()
                     .Single(x => x.GetType() == typeof(EverythingStore));
-        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>();
-        var configuration = serviceProvider.GetService<IConfigurationFacade>();
+        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
+        var configuration = serviceProvider.GetService<IConfigurationFacade>()!;
 
         // At this point, there's no configuration, we used the default config (hardcoded)
         orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString1)).ShouldBeTrue("Default values should be used");

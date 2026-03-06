@@ -43,9 +43,9 @@ public static class LoggerExtensions
     /// <returns>A <see cref="Measurement" /> object that logs the execution time when disposed.</returns>
     public static Measurement WarnIfSlow(
         this ILogger logger,
-        object source,
+        object? source,
         double executionThreshold = 100,
-        [CallerMemberName] string callerMemberName = null
+        [CallerMemberName] string? callerMemberName = null
     )
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -56,7 +56,7 @@ public static class LoggerExtensions
                 WarnIfSlow(
                     logger,
                     source.GetType(),
-                    callerMemberName,
+                    callerMemberName!,
                     timespan,
                     executionThreshold
                 )

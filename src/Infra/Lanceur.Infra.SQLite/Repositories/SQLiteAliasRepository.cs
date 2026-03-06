@@ -48,6 +48,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
     ///     The ids of the aliases to aggregate. The first id designates the target alias;
     ///     the remaining ids provide the data to be aggregated into it.
     /// </param>
+    /// <exception cref="ArgumentNullException"></exception>
     /// <returns>
     ///     The resulting <see cref="AliasQueryResult" /> with aggregated synonyms and additional parameters,
     ///     ready to be persisted.
@@ -59,7 +60,14 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
         if (!ids.Any()) { throw new ArgumentException("At least one id is expected", nameof(ids)); }
 
         return Db.WithConnection(connection => {
-            var alias = GetById(connection, ids.First());
+            var id = ids.First();
+            var alias = GetById(connection, id);
+
+            if (alias is null)
+            {
+                throw new InvalidOperationException($"The id {id} is does not exist in the database");
+            }
+            
             var parameters = GetAdditionalParameter(connection, ids);
             var synonyms = GetSynonyms(connection, ids);
             
@@ -106,9 +114,9 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
 
 
         results = results
-                  .Where(e => !BuildRegexSelectUrl().IsMatch(e.FileName)
+                  .Where(e => !BuildRegexSelectUrl().IsMatch(e.FileName ?? string.Empty)
                   ) // Excluding all aliases that serve as shortcuts for URLs
-                  .Where(e => !e.FileName.StartsWith("package:")) // Excluding all packaged applications
+                  .Where(e => !e.FileName?.StartsWith("package:") ?? false) // Excluding all packaged applications
                   .ToArray();
         return results.ToSelectableQueryResult();
     }
@@ -159,7 +167,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
     }
 
     /// <inheritdoc />
-    public AliasQueryResult GetById(long id)
+    public AliasQueryResult? GetById(long id)
         => Db.WithConnection(conn => GetById(conn, id));
 
     /// <inheritdoc />
@@ -327,35 +335,35 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
     }
 
     /// <inheritdoc />
-    public IEnumerable<UsageQueryResult> GetMostUsedAliases()
+    public IEnumerable<AliasUsage> GetMostUsedAliases()
     {
         const string sql = $"""
                             select
-                            	keywords   as {nameof(UsageQueryResult.Name)},
-                                exec_count as {nameof(UsageQueryResult.Count)}
+                            	keywords   as {nameof(AliasUsage.Name)},
+                                exec_count as {nameof(AliasUsage.Count)}
                             from
                                 stat_execution_count_v
                             order
                                 by exec_count desc
                             """;
-        return Db.WithConnection(conn => conn.Query<UsageQueryResult>(sql));
+        return Db.WithConnection(conn => conn.Query<AliasUsage>(sql));
     }
 
     /// <inheritdoc />
-    public IEnumerable<UsageQueryResult> GetMostUsedAliasesByYear(int year)
+    public IEnumerable<AliasUsage> GetMostUsedAliasesByYear(int year)
     {
         const string sql = $"""
                             select
-                            	keywords   as {nameof(UsageQueryResult.Name)},
-                                exec_count as {nameof(UsageQueryResult.Count)},
-                                year       as {nameof(UsageQueryResult.Year)}
+                            	keywords   as {nameof(AliasUsage.Name)},
+                                exec_count as {nameof(AliasUsage.Count)},
+                                year       as {nameof(AliasUsage.Year)}
                             from
                                 stat_execution_count_by_year_v
                             where year = @year
                             order
                                 by exec_count desc
                             """;
-        return Db.WithConnection(conn => conn.Query<UsageQueryResult>(sql, new { year = $"{year}" }));
+        return Db.WithConnection(conn => conn.Query<AliasUsage>(sql, new { year = $"{year}" }));
     }
 
     /// <inheritdoc />
@@ -519,9 +527,6 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
             var ids = fromAliases.Where(e => e != toAlias.Id);
             Remove(tx, ids);
         });
-
-    /// <inheritdoc />
-    public void Remove(IEnumerable<long> aliasIds) => Db.WithinTransaction(tx => Remove(tx, aliasIds));
 
     /// <inheritdoc />
     public void RemoveLogically(AliasQueryResult alias)

@@ -54,7 +54,12 @@ public class CalculatorStore : Store, IStoreService
         var (isError, result) = _calculator.Evaluate(cmdline.ToString());
 
         var returnResult
-            = new DisplayQueryResult(result, cmdline.ToString()) { Icon = "calculator", Count = int.MaxValue };
+            = new DisplayQueryResult(result, cmdline.ToString())
+            {
+                Icon = "Calculator24", 
+                Count = -1
+            };
+        
         return isError
             ? QueryResult.NoResult
             : returnResult.ToEnumerable();

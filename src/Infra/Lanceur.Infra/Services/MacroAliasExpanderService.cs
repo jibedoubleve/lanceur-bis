@@ -67,7 +67,7 @@ public class MacroAliasExpanderService : IMacroAliasExpanderService
                 "User has misconfigured a Macro with name {FileName}. Fix the name of the macro or remove the alias from the database",
                 alias.FileName
             );
-            return null;
+            return item;
         }
 
         var macro = foundMacro.Clone();

@@ -25,14 +25,19 @@ public class LogScope
         return this;
     }
 
-    public LogScope AddDestructured(string key, object value)
-    {
-        if (!key.StartsWith('@')) { key = $"@{key}"; }
-
-        return Add(key, value);
-    }
-
-    public IDisposable BeginScope() => _logger.BeginScope(_scope);
+    public IDisposable BeginScope() => _logger.BeginScope(_scope) ?? new Disposable();
 
     #endregion
+
+    private sealed class Disposable : IDisposable
+    {
+        #region Methods
+
+        public void Dispose()
+        {
+            /* This is a dummy IDisposable item */
+        }
+
+        #endregion
+    }
 }

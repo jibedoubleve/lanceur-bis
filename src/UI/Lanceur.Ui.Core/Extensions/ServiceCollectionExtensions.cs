@@ -115,9 +115,9 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IServiceProvider>(x => x)
                          .AddSingleton<SQLiteUpdater>(sp => new SQLiteUpdater(
-                                 sp.GetService<IDataStoreVersionService>(),
-                                 sp.GetService<ILoggerFactory>(),
-                                 sp.GetService<IDbConnection>(),
+                                 sp.GetService<IDataStoreVersionService>()!,
+                                 sp.GetService<ILoggerFactory>()!,
+                                 sp.GetService<IDbConnection>()!,
                                  ScriptRepository.Asm,
                                  ScriptRepository.DbScriptEmbeddedResourcePattern
                              )

@@ -39,9 +39,6 @@ public class AliasManagementService : IAliasManagementService
     }
 
     /// <inheritdoc />
-    public AliasQueryResult GetById(long id) => _repository.GetById(id);
-
-    /// <inheritdoc />
     public AliasQueryResult Hydrate(AliasQueryResult queryResult)
     {
         _repository.HydrateAlias(queryResult);

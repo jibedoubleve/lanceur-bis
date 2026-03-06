@@ -34,7 +34,7 @@ public class ReservedKeywordsStoreTest
 
     #region Methods
 
-    private ReservedAliasStore GetStore(IAliasRepository aliasRepository, Type type = null)
+    private ReservedAliasStore GetStore(IAliasRepository aliasRepository, Type? type = null)
     {
         type ??= typeof(NotExecutableTestAlias);
 
@@ -57,7 +57,7 @@ public class ReservedKeywordsStoreTest
                               .AddMockSingleton<IUserNotificationService>()
                               .BuildServiceProvider();
 
-        var store = serviceProvider.GetService<ReservedAliasStore>();
+        var store = serviceProvider.GetService<ReservedAliasStore>()!;
         return store;
     }
 

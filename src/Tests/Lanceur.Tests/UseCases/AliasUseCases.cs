@@ -96,8 +96,8 @@ public class AliasUseCases : TestBase
          * Arrange
          */
         var serviceProvider = BuildServiceProvider();
-        var keywordsViewModel = serviceProvider.GetService<KeywordsViewModel>();
-        var mainViewModel = serviceProvider.GetService<MainViewModel>();
+        var keywordsViewModel = serviceProvider.GetService<KeywordsViewModel>()!;
+        var mainViewModel = serviceProvider.GetService<MainViewModel>()!;
 
         /*
          * Act & Assert
@@ -137,6 +137,8 @@ public class AliasUseCases : TestBase
         /********************************/
         keywordsViewModel.SearchCommand.Execute(mainViewModel.SelectedResult!.Name);
         var aliasToUpdate = keywordsViewModel.SelectedAlias;
+
+        aliasToUpdate.ShouldNotBeNull();
 
         var stateTester2 = new AliasStateTester();
         stateTester2.UpdateValues(ref aliasToUpdate);

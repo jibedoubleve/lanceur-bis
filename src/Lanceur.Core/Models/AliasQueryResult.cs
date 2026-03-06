@@ -22,7 +22,10 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 
     public int Delay { get; set; }
 
-    public override string DescriptionDisplay => Description.IsNullOrEmpty() ? FileName : Description;
+    public override string DescriptionDisplay 
+        => Description.IsNullOrEmpty() 
+            ? FileName ?? string.Empty
+            : Description ?? string.Empty;
 
     public static AliasQueryResult EmptyForCreation => new() { Name = "new alias" };
 
@@ -35,7 +38,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     ///         after which this property will be declared as <c>string?</c>.
     ///     </para>
     /// </remarks>
-    public string FileName
+    public string? FileName
     {
         get;
         set => SetField(ref field, value);
@@ -63,7 +66,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     ///     Gets or sets a Lua script that will be executed
     ///     when user launch an alias
     /// </summary>
-    public string LuaScript
+    public string? LuaScript
     {
         get;
         set => SetField(ref field, value);
@@ -78,7 +81,7 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     ///     Get or set a string representing all the name this alias has.
     ///     It should be a coma separated list of names.
     /// </summary>
-    public string Synonyms
+    public string? Synonyms
     {
         get;
         set
@@ -91,17 +94,17 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
     /// <summary>
     ///     New synonyms added when updated
     /// </summary>
-    public string SynonymsToAdd => Synonyms.SplitCsv()
-                                           .Where(n => !SynonymsWhenLoaded.SplitCsv().Contains(n))
+    public string SynonymsToAdd => Synonyms?.SplitCsv()
+                                           .Where(n => !(SynonymsWhenLoaded ?? "").SplitCsv().Contains(n))
                                            .ToArray()
-                                           .JoinCsv();
+                                           .JoinCsv() ?? string.Empty;
 
     /// <summary>
     ///     Synonyms present when the entity was loaded
     /// </summary>
-    public string SynonymsWhenLoaded { get; set; }
+    public string? SynonymsWhenLoaded { get; set; }
 
-    public string WorkingDirectory { get; set; }
+    public string WorkingDirectory { get; set; } = string.Empty;
 
     #endregion
 

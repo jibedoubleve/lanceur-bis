@@ -8,7 +8,7 @@ public class ConfigurationFacadeService : IConfigurationFacade
     #region Events
 
     /// <inheritdoc />
-    public event EventHandler Updated;
+    public event EventHandler? Updated;
 
     #endregion
 

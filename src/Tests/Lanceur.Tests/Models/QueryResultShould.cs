@@ -22,7 +22,7 @@ public class QueryResultShould
     [Theory]
     [InlineData(null, "un", "un")]
     [InlineData("un", null, "un")]
-    [InlineData(null, null, null)]
+    [InlineData(null, null, "")]
     public void HaveFileNameAsDescriptionWhenNoDescription(string description, string fileName, string expected)
     {
         // ARRANGE

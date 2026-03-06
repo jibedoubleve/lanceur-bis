@@ -45,6 +45,11 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
             _logger.LogTrace("Thumbnail for alias {Name} is in cache. Update skipped.", alias.Name);
             return;
         }
+        if (alias.FileName is null)
+        {
+            _logger.LogInformation("Alias {Alias} does not have a file name.", alias.FileName);
+            return;
+        }
 
         var imageSource = await _staThreadRunner.RunAsync(() => _win32ThumbnailService.GetThumbnail(alias.FileName));
         if (imageSource is null)
@@ -53,9 +58,9 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
             return;
         }
 
-        var thumbnailFileName = alias.FileName.GetThumbnailFileName();
+        var thumbnailFileName = alias.FileName?.GetThumbnailFileName();
         imageSource.CopyToImageRepository(thumbnailFileName);
-        alias.Thumbnail = thumbnailFileName.GetThumbnailAbsolutePath();
+        alias.Thumbnail = thumbnailFileName?.GetThumbnailAbsolutePath();
         _aliasManagementService.UpdateThumbnail(alias);
     }
 

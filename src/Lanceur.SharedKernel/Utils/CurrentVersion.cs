@@ -58,7 +58,7 @@ public record CurrentVersion
     /// <returns>A <see cref="CurrentVersion" /> instance representing the assembly's version and commit.</returns>
     public static CurrentVersion FromAssembly(Assembly asm)
     {
-        var fullVer = FileVersionInfo.GetVersionInfo(asm.Location).ProductVersion;
+        var fullVer = FileVersionInfo.GetVersionInfo(asm.Location).ProductVersion ?? new Version().ToString();
         return FromFullVersion(fullVer);
     }
 

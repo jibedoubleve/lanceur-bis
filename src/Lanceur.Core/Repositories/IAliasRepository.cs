@@ -54,19 +54,6 @@ public interface IAliasRepository
     IEnumerable<SelectableAliasQueryResult> GetBrokenAliases();
 
     /// <summary>
-    ///     Retrieves an <see cref="AliasQueryResult" /> object based on its unique identifier.
-    /// </summary>
-    /// <param name="id">The unique identifier of the <see cref="AliasQueryResult" />. It must be greater than zero.</param>
-    /// <returns>
-    ///     An <see cref="AliasQueryResult" /> object that matches the specified <paramref name="id" />
-    ///     Returns null if no matching object is found.
-    /// </returns>
-    /// <exception cref="ArgumentException">
-    ///     Thrown when the <paramref name="id" /> is less than or equal to zero.
-    /// </exception>
-    AliasQueryResult GetById(long id);
-
-    /// <summary>
     ///     Returns all dates within the month of the specified day that contain historical records.
     /// </summary>
     /// <param name="day">
@@ -155,14 +142,14 @@ public interface IAliasRepository
     ///     Get list of all the aliases with count greater than 0
     /// </summary>
     /// <returns>The list of aliases</returns>
-    IEnumerable<UsageQueryResult> GetMostUsedAliases();
+    IEnumerable<AliasUsage> GetMostUsedAliases();
 
     /// <summary>
     ///     Retrieves the most used aliases for a given year.
     /// </summary>
     /// <param name="year">The year for which to retrieve alias usage statistics.</param>
-    /// <returns>A collection of <see cref="UsageQueryResult" /> representing the most used aliases for the specified year.</returns>
-    IEnumerable<UsageQueryResult> GetMostUsedAliasesByYear(int year);
+    /// <returns>A collection of <see cref="AliasUsage" /> representing the most used aliases for the specified year.</returns>
+    IEnumerable<AliasUsage> GetMostUsedAliasesByYear(int year);
 
     /// <summary>
     ///     Retrieves aliases that have been used fewer times than the specified threshold.
@@ -218,13 +205,6 @@ public interface IAliasRepository
     /// </summary>
     /// <param name="alias">The alias to hydrate</param>
     void HydrateAlias(AliasQueryResult alias);
-    
-    /// <summary>
-    ///     Removes the specified aliases from the database.
-    ///     This operation also deletes their usage history, additional parameters, and associated synonyms.
-    /// </summary>
-    /// <param name="aliasIds">A collection of aliases id to be removed.</param>
-    void Remove(IEnumerable<long> aliasIds);
 
     /// <summary>
     ///     Marks the specified alias as removed from the repository.

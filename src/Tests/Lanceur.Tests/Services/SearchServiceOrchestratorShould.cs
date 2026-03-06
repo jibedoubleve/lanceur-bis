@@ -81,7 +81,7 @@ public class SearchServiceOrchestratorShould
         storeService.StoreOrchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));
 
         var orchestrator = new SearchServiceOrchestrator(
-            sp.GetSection<StoreSection>()
+            sp.GetSection<StoreSection>()!
         );
 
         // act

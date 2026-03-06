@@ -14,7 +14,7 @@ public partial class MostUsedViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private ObservableCollection<UsageQueryResult> _aliases = [];
+    [ObservableProperty] private ObservableCollection<AliasUsage> _aliases = [];
     private readonly IMemoryCache _cache;
     private readonly ILogger<MostUsedViewModel> _logger;
     private readonly IAliasRepository _repository;
@@ -68,7 +68,7 @@ public partial class MostUsedViewModel : ObservableObject
 
         var aliases = await _cache.GetOrCreateAsync(
             CacheTag,
-            async Task<IEnumerable<UsageQueryResult>> (_) => {
+            async Task<IEnumerable<AliasUsage>> (_) => {
                 if (int.TryParse(SelectedYear, out var year))
                 {
                     return await Task.Run(() => _repository.GetMostUsedAliasesByYear(year)
@@ -80,7 +80,7 @@ public partial class MostUsedViewModel : ObservableObject
             CacheEntryOptions.Default
         );
 
-        Aliases = new ObservableCollection<UsageQueryResult>(aliases ?? []);
+        Aliases = new ObservableCollection<AliasUsage>(aliases ?? []);
     }
 
     #endregion

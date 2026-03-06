@@ -8,7 +8,9 @@ public static class FeatureFlagExtensions
 
     public static bool IsFeatureFlagEnabled(this IEnumerable<FeatureFlag> flags, string featureFlagName) =>
         flags.Any(e =>
-            e.FeatureName.Equals(featureFlagName, StringComparison.OrdinalIgnoreCase) && e.Enabled
+            e.FeatureName is not null
+            && e.FeatureName.Equals(featureFlagName, StringComparison.OrdinalIgnoreCase)
+            && e.Enabled
         );
 
     #endregion

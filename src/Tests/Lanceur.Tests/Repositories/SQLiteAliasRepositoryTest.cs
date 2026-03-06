@@ -27,7 +27,7 @@ public class SQLiteAliasRepositoryTest : TestBase
 
     #region Methods
 
-    private static AliasQueryResult BuildAlias(string name = null, RunAs runAs = RunAs.CurrentUser)
+    private static AliasQueryResult BuildAlias(string? name = null, RunAs runAs = RunAs.CurrentUser)
     {
         var faker = new Faker();
         name ??= faker.Lorem.Word();
@@ -44,7 +44,7 @@ public class SQLiteAliasRepositoryTest : TestBase
         };
     }
 
-    private AliasDbAction BuildAliasDbAction(ILoggerFactory loggerFactory = null)
+    private AliasDbAction BuildAliasDbAction(ILoggerFactory? loggerFactory = null)
     {
         var log = loggerFactory ?? CreateLoggerFactory();
         var action = new AliasDbAction(log);
@@ -94,12 +94,13 @@ public class SQLiteAliasRepositoryTest : TestBase
         // -- Find the alias
         var alias = c.WithConnection(conn => aliasSearch.Search(conn, "noname_1").SingleOrDefault());
         alias.ShouldSatisfyAllConditions(
-            a => a.Id.ShouldBe(1001, "this is the id of the alias to find"),
+            a => a.ShouldNotBeNull(),
+            a => a!.Id.ShouldBe(1001, "this is the id of the alias to find"),
             a => a.ShouldNotBeNull("the search matches one alias")
         );
 
         // -- Add new names to the alias and save it
-        alias.Synonyms += ", noname_4, noname_5";
+        alias!.Synonyms += ", noname_4, noname_5";
         var id = alias.Id;
         var outputId = c.WithinTransaction(tx => aliasAction.SaveOrUpdate(tx, ref alias));
         outputId.ShouldBe(id, "the alias has only be updated");
@@ -108,7 +109,7 @@ public class SQLiteAliasRepositoryTest : TestBase
         var found = c.WithConnection(conn => aliasSearch.Search(conn, "noname_1").SingleOrDefault());
         found.ShouldSatisfyAllConditions(
             f => f.ShouldNotBeNull(),
-            f => f.Synonyms.SplitCsv().Length.ShouldBe(5)
+            f => f!.Synonyms?.SplitCsv().Length.ShouldBe(5)
         );
     }
 
@@ -133,7 +134,7 @@ public class SQLiteAliasRepositoryTest : TestBase
         // ASSERT
         found.ShouldSatisfyAllConditions(
             f => f.ShouldNotBeNull(),
-            f => f.Name.ShouldBe("noname")
+            f => f!.Name.ShouldBe("noname")
         );
     }
 
@@ -528,7 +529,7 @@ public class SQLiteAliasRepositoryTest : TestBase
         // ASSERT
         found.ShouldSatisfyAllConditions(
             f => f.ShouldNotBeNull(),
-            f => f.Thumbnail.ShouldNotBeNullOrEmpty()
+            f => f!.Thumbnail.ShouldNotBeNullOrEmpty()
         );
     }
 
