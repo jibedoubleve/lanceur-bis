@@ -32,7 +32,8 @@ public class SQLiteFeatureFlagService : SQLiteRepositoryBase, IFeatureFlagServic
 
                 return json.IsNullOrEmpty()
                     ? new ApplicationSettings().FeatureFlags
-                    : JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json);
+                    : JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json)
+                    ?? [];
             }
         );
     }

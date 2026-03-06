@@ -22,12 +22,12 @@ public class TraceLogger : ILogger
         return method!.Name;
     }
 
-    private static void Write(Exception ex, string message, params object[] parameterValues)
+    private static void Write(Exception? ex, string message, params object?[]? parameterValues)
     {
         var name = GetCallerName();
 
         Trace.WriteLine(
-            $"[{name}] {message.Format(parameterValues)}{Environment.NewLine}{(ex is not null ? ex : string.Empty)}"
+            $"[{name}] {message.Format((parameterValues ?? [])!)}{Environment.NewLine}{(ex is not null ? ex : string.Empty)}"
         );
     }
 
@@ -39,11 +39,11 @@ public class TraceLogger : ILogger
         LogLevel logLevel,
         EventId eventId,
         TState state,
-        Exception exception,
-        Func<TState, Exception, string> formatter
+        Exception? exception,
+        Func<TState, Exception?, string> formatter
     )
     {
-        var parameters = new object[] { logLevel, eventId, state };
+        var parameters = new object?[] { logLevel, eventId, state };
         var message = formatter(state, exception);
         Write(exception, message, parameters);
     }

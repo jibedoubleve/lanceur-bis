@@ -15,7 +15,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
 {
     #region Fields
 
-    private ApplicationSettings _current;
+    private ApplicationSettings? _current;
 
     private readonly JsonSerializerSettings _jsonSettings
         = new() { ObjectCreationHandling = ObjectCreationHandling.Replace };
@@ -42,7 +42,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
         {
             if (_current is null) { Load(); }
 
-            return _current;
+            return _current!;
         }
     }
 
@@ -56,8 +56,6 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
     /// </summary>
     private static ApplicationSettings AddNewFeatureFlags(ApplicationSettings config)
     {
-        if (config is null) { return null; }
-
         var defaultFf = new ApplicationSettings().FeatureFlags; //Default featureFlags
         var currentFf = new List<FeatureFlag>(config.FeatureFlags);
 
@@ -99,13 +97,14 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
                            """;
         var json = Db.WithConnection(conn =>
             conn.Query<string>(sql)
-                .FirstOrDefault()
+                .FirstOrDefault() ?? string.Empty
         );
 
         _current = AddNewFeatureFlags(
             json.IsNullOrEmpty()
                 ? new ApplicationSettings()
-                : JsonConvert.DeserializeObject<ApplicationSettings>(json, _jsonSettings)
+                : JsonConvert.DeserializeObject<ApplicationSettings>(json, _jsonSettings) 
+                  ?? new ApplicationSettings()
         );
     }
 

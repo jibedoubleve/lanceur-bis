@@ -24,11 +24,11 @@ public static class ThumbnailExtensions
     /// </summary>
     /// <param name="imageSource">The image to copy into the repository</param>
     /// <param name="fileName">The file name of the thumbnail</param>
-    public static void CopyToImageRepository(this ImageSource imageSource, string fileName)
+    public static void CopyToImageRepository(this ImageSource imageSource, string? fileName)
     {
         if (fileName.IsNullOrWhiteSpace()) { return; }
 
-        var destination = fileName.GetThumbnailAbsolutePath();
+        var destination = fileName!.GetThumbnailAbsolutePath();
 
         lock (Locker)
         {

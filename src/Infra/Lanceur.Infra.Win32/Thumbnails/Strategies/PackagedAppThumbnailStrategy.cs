@@ -42,6 +42,12 @@ public class PackagedAppThumbnailStrategy : IThumbnailStrategy
             return;
         }
 
+        if (alias.FileName is null)
+        {
+            _logger.LogInformation("Alias {Alias} does not have a file name.", alias.FileName);
+            return;
+        }
+
         if (!alias.IsPackagedApplication()) { return; }
 
         var app = await _packagedAppSearchService.GetByInstalledDirectoryAsync(alias.FileName);
@@ -54,7 +60,7 @@ public class PackagedAppThumbnailStrategy : IThumbnailStrategy
         }
 
         var thumbnailFileName = alias.FileName.GetThumbnailFileName();
-        response.Logo.LocalPath.CopyToImageRepository(thumbnailFileName);
+        response.Logo?.LocalPath.CopyToImageRepository(thumbnailFileName);
         alias.Thumbnail = thumbnailFileName.GetThumbnailAbsolutePath();
         _aliasManagementService.UpdateThumbnail(alias);
     }

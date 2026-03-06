@@ -16,8 +16,7 @@ public static class AdditionalParameterExtensions
                              Name = item.Name,
                              Parameter = item.Parameter
                          }
-                     )
-                     .ToList();
+                     ).ToList();
 
     #endregion
 }

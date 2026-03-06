@@ -1,11 +1,11 @@
 ﻿namespace Lanceur.Core.Models;
 
-public class DataPoint<Tx, Ty>
+public record DataPoint<Tx, Ty>
 {
     #region Properties
 
-    public Tx X { get; set; }
-    public Ty Y { get; set; }
+    public required Tx X { get; init; }
+    public required Ty Y { get; init; }
 
     #endregion
 }

@@ -15,7 +15,7 @@ public class ExecutableTestAlias : MacroQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        Parameters = cmdline?.Parameters;
+        Parameters = cmdline?.Parameters ?? string.Empty;
         return NoResultAsync;
     }
 

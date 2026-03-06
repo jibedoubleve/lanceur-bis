@@ -1,4 +1,5 @@
 using Lanceur.Core.Models;
+using StartMode = Lanceur.SharedKernel.Constants.StartMode;
 
 namespace Lanceur.Core.Services;
 
@@ -43,16 +44,16 @@ public interface IProcessLauncher
     #endregion
 }
 
-public class ProcessContext
+public record ProcessContext
 {
     #region Properties
 
-    public string Arguments { get; set; }
-    public string FileName { get; set; }
-    public bool UseShellExecute { get; set; }
-    public string Verb { get; set; }
-    public SharedKernel.Constants.StartMode WindowStyle { get; set; }
-    public string WorkingDirectory { get; set; }
+    public string Arguments { get; set; } = string.Empty;
+    public required string FileName { get; set; }
+    public required bool UseShellExecute { get; set; }
+    public string Verb { get; set; } = string.Empty;
+    public StartMode WindowStyle { get; set; } = StartMode.Default;
+    public string WorkingDirectory { get; set; } = string.Empty;
 
     #endregion
 }

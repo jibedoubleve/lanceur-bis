@@ -121,7 +121,7 @@ public class SearchServiceTest : TestBase
 
 
         // ACT
-        var service = serviceProvider.GetService<SearchService>();
+        var service = serviceProvider.GetService<SearchService>()!;
         var result = (await service.SearchAsync(new Cmdline("z"))).ToArray();
 
         // ASSERT
@@ -149,7 +149,7 @@ public class SearchServiceTest : TestBase
         var parameters = results.Select(c => c.Parameters);
 
         //assert
-        parameters.ShouldNotContain((string)null);
+        parameters.ShouldNotContain((string?)null);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class SearchServiceTest : TestBase
                                                      .AddStoreServicesConfiguration()
                                                      .BuildServiceProvider();
         var query = new Cmdline("code");
-        var service = serviceProvider.GetService<SearchService>();
+        var service = serviceProvider.GetService<SearchService>()!;
 
         var result = (await service.SearchAsync(query)).ToArray();
 
@@ -253,7 +253,7 @@ public class SearchServiceTest : TestBase
           .AddSingleton<IDbActionFactory, DbActionFactory>()
           .AddMockSingleton<IThumbnailService>()
           .AddMockSingleton<IMacroAliasExpanderService>((sp, macroManager) => {
-                  var results = sp.GetService<IAliasRepository>()
+                  var results = sp.GetService<IAliasRepository>()!
                                   .Search(criterion)
                                   .ToList();
                   macroManager.Expand(Arg.Any<QueryResult[]>())
@@ -275,7 +275,7 @@ public class SearchServiceTest : TestBase
         var serviceProvider = sc.BuildServiceProvider();
 
         // ACT
-        var searchService = serviceProvider.GetService<ISearchService>();
+        var searchService = serviceProvider.GetService<ISearchService>()!;
         var result = (await searchService.SearchAsync(new Cmdline(criterion))).ToArray();
 
         // ASSERT

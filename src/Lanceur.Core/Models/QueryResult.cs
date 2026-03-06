@@ -31,13 +31,13 @@ public abstract class QueryResult : ObservableModel
         set => SetField(ref field, value);
     }
 
-    public string Description
+    public string? Description
     {
         get;
         set => SetField(ref field, value);
     }
 
-    public virtual string DescriptionDisplay => Description;
+    public virtual string DescriptionDisplay => Description ?? string.Empty;
 
     /// <summary>
     ///     Fall back for <see cref="Thumbnail" />. This property is expected to
@@ -81,7 +81,7 @@ public abstract class QueryResult : ObservableModel
     /// <summary>
     ///     Represents a thumbnail to display in the UI. Set to <c>null</c> to display the <see cref="Icon" /> instead.
     /// </summary>
-    public string Thumbnail
+    public string? Thumbnail
     {
         get;
         set

@@ -55,7 +55,7 @@ public class UserDialogueService : IUserDialogueService
         );
 
     ///<inheritdoc />
-    public async Task<(bool IsConfirmed, object DataContext)> InteractAsync(
+    public async Task<(bool IsConfirmed, object? DataContext)> InteractAsync(
         object content,
         string yesText = ButtonLabels.Apply,
         string noText = ButtonLabels.Cancel,
@@ -69,7 +69,7 @@ public class UserDialogueService : IUserDialogueService
             else { dataContext = d.DataContext; }
         }
 
-        var isConfirmed = await WeakReferenceMessenger.Default.Send<QuestionRequestMessage>(
+        var isConfirmed = await WeakReferenceMessenger.Default.Send(
             new QuestionRequestMessage(
                 content,
                 title,

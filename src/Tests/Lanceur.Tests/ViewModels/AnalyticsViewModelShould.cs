@@ -22,7 +22,7 @@ public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors visitors
+        ServiceVisitors? visitors
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()

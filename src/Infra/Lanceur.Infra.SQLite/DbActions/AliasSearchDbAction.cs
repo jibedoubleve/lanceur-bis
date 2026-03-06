@@ -30,7 +30,7 @@ public class AliasSearchDbAction
 
     internal IEnumerable<AliasQueryResult> Search(
         IDbConnection connection,
-        string name = null,
+        string? name = null,
         bool isReturnAllIfEmpty = false
     )
     {

@@ -22,7 +22,7 @@ public static class KeywordsViewModelExtensions
         if (aliases.Count == 0) { return null; }
 
         var id = selectedAlias?.Id ?? 0;
-        var name = selectedAlias?.Synonyms.SplitCsv().FirstOrDefault();
+        var name = selectedAlias?.Synonyms?.SplitCsv().FirstOrDefault();
         return id == 0
             ? aliases[0]
             : aliases.FirstOrDefault(e => e.Id == id && e.Name == name);
@@ -64,11 +64,14 @@ public static class KeywordsViewModelExtensions
     ///     alias is selected.
     /// </returns>
     public static AdditionalParameter? NewAdditionalParameter(this KeywordsViewModel keywordsViewModel)
-    {
-        if (keywordsViewModel.SelectedAlias is null) { return null; }
-
-        return new AdditionalParameter { AliasId = keywordsViewModel.SelectedAlias.Id };
-    }
+        => keywordsViewModel.SelectedAlias is null
+            ? null
+            : new AdditionalParameter
+            {
+                AliasId = keywordsViewModel.SelectedAlias.Id,
+                Name = keywordsViewModel.SelectedAlias.Name,
+                Parameter = keywordsViewModel.SelectedAlias.Parameters
+            };
 
     #endregion
 }

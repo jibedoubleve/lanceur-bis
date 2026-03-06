@@ -1,40 +1,31 @@
 namespace Lanceur.Core.Models;
 
-public class FeatureFlag : ObservableModel
+public sealed class FeatureFlag : ObservableModel
 {
-    #region Fields
-
-    private string _description;
-    private bool _enabled;
-    private string _featureName;
-    private string _icon;
-
-    #endregion
-
     #region Properties
 
-    public string Description
+    public required string Description
     {
-        get => _description;
-        set => SetField(ref _description, value);
+        get;
+        set => SetField(ref field, value);
     }
 
-    public bool Enabled
+    public required bool Enabled
     {
-        get => _enabled;
-        set => SetField(ref _enabled, value);
+        get => field;
+        set => SetField(ref field, value);
     }
 
-    public string FeatureName
+    public required string FeatureName
     {
-        get => _featureName;
-        set => SetField(ref _featureName, value);
+        get;
+        set => SetField(ref field, value);
     }
 
-    public string Icon
+    public required string Icon
     {
-        get => _icon;
-        set => SetField(ref _icon, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     #endregion

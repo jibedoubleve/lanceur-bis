@@ -50,7 +50,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
                                                            .AddDatabase(connectionManager);
 
             var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
-            viewModel = serviceProvider.GetService<TViewModel>() !;
+            viewModel = serviceProvider.GetService<TViewModel>()!;
             return connectionManager;
         }
         catch

@@ -48,7 +48,7 @@ public interface IUserDialogueService
     ///     - <c>IsConfirmed</c>: A boolean indicating whether the user confirmed (true) or canceled (false).
     ///     - <c>DataContext</c>: The provided or modified data context after the interaction.
     /// </returns>
-    Task<(bool IsConfirmed, object DataContext)> InteractAsync(
+    Task<(bool IsConfirmed, object? DataContext)> InteractAsync(
         object content,
         string yesText = "Apply",
         string noText = "Cancel",

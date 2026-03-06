@@ -83,6 +83,14 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
+    public static IServiceCollection AddMockLazySingleton<T>(
+        this IServiceCollection serviceCollection)
+        where T : class
+    {
+        serviceCollection.AddSingleton(new Lazy<T>(() => Substitute.For<T>()));
+        return serviceCollection;
+    }
+
     public static IServiceCollection AddTestOutputHelper(
         this IServiceCollection serviceCollection,
         ITestOutputHelper testOutputHelper

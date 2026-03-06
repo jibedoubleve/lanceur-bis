@@ -2,39 +2,30 @@ namespace Lanceur.Core.Models;
 
 public sealed class AdditionalParameter : ObservableModel
 {
-    #region Fields
-
-    private long _aliasId;
-    private long _id;
-    private string _name;
-    private string _parameter;
-
-    #endregion
-
     #region Properties
 
     public long AliasId
     {
-        get => _aliasId;
-        set => SetField(ref _aliasId, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     public long Id
     {
-        get => _id;
-        set => SetField(ref _id, value);
+        get;
+        set => SetField(ref field, value);
     }
 
-    public string Name
+    public required string Name
     {
-        get => _name;
-        set => SetField(ref _name, value);
+        get;
+        set => SetField(ref field, value);
     }
 
-    public string Parameter
+    public required string Parameter
     {
-        get => _parameter;
-        set => SetField(ref _parameter, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     #endregion

@@ -35,7 +35,7 @@ public class ObservableModel : INotifyPropertyChanged
     /// <param name="propertyName">
     ///     The name of the property that changed. Automatically supplied by the compiler if not explicitly provided.
     /// </param>
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
@@ -53,7 +53,7 @@ public class ObservableModel : INotifyPropertyChanged
     ///     <c>true</c> if the field was updated and the <see cref="PropertyChanged" /> event was raised;
     ///     <c>false</c> if the field already contained the specified value.
     /// </returns>
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) { return false; }
 
@@ -79,7 +79,7 @@ public class ObservableModel : INotifyPropertyChanged
 
     #region Events
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion Events
 }

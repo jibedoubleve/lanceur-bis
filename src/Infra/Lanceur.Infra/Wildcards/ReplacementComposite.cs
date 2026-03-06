@@ -45,6 +45,7 @@ public class ReplacementComposite : IReplacement, IWildcardService
         var result = _replacements.Aggregate(
             newText,
             (current, text) => text.Replace(current, replacement)
+                               ?? newText
         );
 
         _logger.LogTrace(
@@ -59,8 +60,11 @@ public class ReplacementComposite : IReplacement, IWildcardService
     /// <inheritdoc />
     public string ReplaceOrReplacementOnNull(string text, string replacement)
         => text.IsNullOrWhiteSpace()
-            ? replacement
-            : Replace(text, replacement);
+            ? replacement ?? string.Empty
+            : Replace(
+                text ?? string.Empty,
+                replacement ?? string.Empty
+            );
 
     #endregion
 }

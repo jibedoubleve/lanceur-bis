@@ -22,7 +22,7 @@ public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionServi
 
         return version.IsNullOrEmpty()
             ? new Version()
-            : new Version(version);
+            : new Version(version!);
     }
 
     public bool IsUpToDate(Version expectedVersion)
@@ -31,7 +31,7 @@ public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionServi
 
         var currentVersion = version.IsNullOrEmpty()
             ? new Version()
-            : new Version(version);
+            : new Version(version!);
 
         return expectedVersion <= currentVersion;
     }
@@ -41,6 +41,11 @@ public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionServi
     public void SetCurrentDbVersion(Version version) =>
         Db.WithinTransaction(tx => {
                 var exists = tx.Connection!.ExecuteScalar<int>(Sql.DbVersionCount) >= 1;
+                if (tx.Connection is null)
+                {
+                    throw new InvalidOperationException(
+                        "Cannot set the current version ot the application because no connection exists");
+                }
                 tx.Connection.Execute(exists ? Sql.UpdateDbVersion.Format(version) : Sql.SetDbVersion.Format(version));
             }
         );

@@ -91,12 +91,13 @@ public class LuaManagerShould
     public void NotCrashWhenScriptIsNull()
     {
         var result = LuaManager.ExecuteScript(
-            new Script { Code = null, Context = new ScriptContext { FileName = null, Parameters = null } }
+            new Script { Code = null, Context = new ScriptContext() }
         );
         result.ShouldSatisfyAllConditions(
             r => r.ShouldNotBeNull(),
-            r => r.Context.FileName.ShouldNotBeNull(),
-            r => r.Context.Parameters.ShouldNotBeNull()
+            r => r.Context.ShouldNotBeNull(),
+            r => r.Context!.FileName.ShouldNotBeNull(),
+            r => r.Context!.Parameters.ShouldNotBeNull()
         );
     }
 

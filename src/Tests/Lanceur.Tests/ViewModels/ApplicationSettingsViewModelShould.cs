@@ -32,7 +32,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors visitors
+        ServiceVisitors? visitors
     )
     {
         serviceCollection.AddMockSingleton<IAppRestartService>()
@@ -56,7 +56,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
     [Fact]
     public void AskRebootAfterDbPathChanged()
     {
-        IUserGlobalNotificationService userInteractionService = null;
+        IUserGlobalNotificationService userInteractionService = null!;
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
@@ -82,7 +82,7 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
     [Fact]
     public void AskRebootAfterShortcutChanged()
     {
-        IUserGlobalNotificationService userInteractionService = null;
+        IUserGlobalNotificationService userInteractionService = null!;
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,

@@ -86,13 +86,13 @@ public class CmdlineShould
     public void HaveEmptyNameByDefault() => Cmdline.Empty.Name.ShouldBeEmpty();
 
     [Fact]
-    public void HaveEmptyNameWhenCtorNull() => new Cmdline(null, null).Name.ShouldBeEmpty();
+    public void HaveEmptyNameWhenCtorNull() => Cmdline.Empty.Name.ShouldBeEmpty();
 
     [Fact]
     public void HaveEmptyParametersByDefault() => Cmdline.Empty.Parameters.ShouldBeEmpty();
 
     [Fact]
-    public void HaveEmptyParametersWhenCtorNull() => new Cmdline(null, null).Parameters.ShouldBeEmpty();
+    public void HaveEmptyParametersWhenCtorNull() => Cmdline.Empty.Parameters.ShouldBeEmpty();
 
     [Theory]
     [InlineData("cmd", "cmd")]

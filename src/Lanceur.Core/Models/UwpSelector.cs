@@ -1,21 +1,15 @@
 namespace Lanceur.Core.Models;
 
-public class UwpSelector : ObservableModel
+public sealed class UwpSelector : ObservableModel
 {
-    #region Fields
-
-    private PackagedApp _selectedPackagedApp;
-
-    #endregion
-
     #region Properties
 
-    public IEnumerable<PackagedApp> PackagedApps { get; set; }
+    public IEnumerable<PackagedApp>? PackagedApps { get; set; }
 
-    public PackagedApp SelectedPackagedApp
+    public PackagedApp? SelectedPackagedApp
     {
-        get => _selectedPackagedApp;
-        set => SetField(ref _selectedPackagedApp, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     #endregion

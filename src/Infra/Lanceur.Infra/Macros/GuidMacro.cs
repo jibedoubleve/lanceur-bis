@@ -2,7 +2,6 @@
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Macros;
 
@@ -13,17 +12,12 @@ public class GuidMacro : MacroQueryResult
     #region Fields
 
     private readonly IClipboardService _memoryMemento;
-    private readonly IServiceProvider _serviceProvider;
 
     #endregion
 
     #region Constructors
-
-    public GuidMacro(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-        _memoryMemento = serviceProvider.GetService<IClipboardService>();
-    }
+    
+    public GuidMacro(IClipboardService memoryMemento) => _memoryMemento = memoryMemento!;
 
     #endregion
 
@@ -35,9 +29,9 @@ public class GuidMacro : MacroQueryResult
 
     #region Methods
 
-    public override SelfExecutableQueryResult Clone() => new GuidMacro(_serviceProvider);
+    public override SelfExecutableQueryResult Clone() => new GuidMacro(_memoryMemento);
 
-    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline cmdline = null)
+    public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
         _memoryMemento.SaveText(Guid.NewGuid().ToString());
         return NoResultAsync;

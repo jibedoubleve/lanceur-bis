@@ -53,7 +53,7 @@ public class ThumbnailServiceTest : TestBase
                  .AddSingleton<IThumbnailStrategy, FavIconAppThumbnailStrategy>()
                  .AddSingleton<IAliasManagementService, AliasManagementService>()
                  .AddMockSingleton<IFavIconService>((_, i) => {
-                         i.UpdateFaviconAsync(Arg.Any<AliasQueryResult>(), Arg.Any<Func<string, string>>())
+                         i.UpdateFaviconAsync(Arg.Any<AliasQueryResult>(), Arg.Any<Func<string, string>>())!
                           .Returns(Task.FromResult(newValue));
                          return i;
                      }
@@ -61,9 +61,9 @@ public class ThumbnailServiceTest : TestBase
                  .AddLoggingForTests(OutputHelper)
                  .BuildServiceProvider();
 
-        var conn = sp.GetService<IDbConnectionManager>();
-        var repo = sp.GetService<IAliasRepository>();
-        var strategy = sp.GetService<IThumbnailStrategy>();
+        var conn = sp.GetService<IDbConnectionManager>()!;
+        var repo = sp.GetService<IAliasRepository>()!;
+        var strategy = sp.GetService<IThumbnailStrategy>()!;
 
         // ACT
         var alias = repo.GetAll().Single();
@@ -135,9 +135,9 @@ public class ThumbnailServiceTest : TestBase
                  .AddLoggingForTests(OutputHelper)
                  .BuildServiceProvider();
 
-        var dbRepository = sp.GetService<IAliasRepository>();
-        var thumbnailService = sp.GetService<IThumbnailService>();
-        var connectionMgr = sp.GetService<IDbConnectionManager>();
+        var dbRepository = sp.GetService<IAliasRepository>()!;
+        var thumbnailService = sp.GetService<IThumbnailService>()!;
+        var connectionMgr = sp.GetService<IDbConnectionManager>()!;
 
         var aliases = dbRepository.Search("a1");
 
@@ -146,9 +146,8 @@ public class ThumbnailServiceTest : TestBase
 
         // ASSERT
         connectionMgr.WithConnection(conn =>
-                         (long)conn.ExecuteScalar("select count(*) from alias_argument")!
-                     )
-                     .ShouldBe(6);
+            (long)conn.ExecuteScalar("select count(*) from alias_argument")!
+        ).ShouldBe(6);
     }
 
     [Fact]
@@ -176,7 +175,7 @@ public class ThumbnailServiceTest : TestBase
                  .AddLoggingForTests(OutputHelper)
                  .BuildServiceProvider();
 
-        var dbRepository = sp.GetService<IAliasRepository>();
+        var dbRepository = sp.GetService<IAliasRepository>()!;
 
         // ACT
         var aliasesLight = dbRepository.Search(name).ToList();
@@ -209,7 +208,7 @@ public class ThumbnailServiceTest : TestBase
                  .AddLoggingForTests(OutputHelper)
                  .BuildServiceProvider();
 
-        var dbRepository = sp.GetService<IAliasRepository>();
+        var dbRepository = sp.GetService<IAliasRepository>()!;
 
         // ACT
         var alias = dbRepository.Search(name).Single();

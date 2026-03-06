@@ -14,11 +14,11 @@ public static class AliasQueryResultExtensions
     /// <param name="synonyms">A collection of new synonyms to be added</param>
     public static void AddDistinctSynonyms(this AliasQueryResult alias, IEnumerable<string> synonyms)
     {
-        synonyms ??= new List<string>();
-        var lis = synonyms.ToList();
+        var synonymsList = synonyms.ToList();
 
-        lis.Add(alias.Synonyms);
-        var aggregation = string.Join(", ", lis)
+        if (!alias.Synonyms.IsNullOrEmpty()) { synonymsList.Add(alias.Synonyms!); }
+
+        var aggregation = string.Join(", ", synonymsList)
                                 .Split(",")
                                 .Select(x => x.Trim())
                                 .Distinct()
@@ -34,7 +34,7 @@ public static class AliasQueryResultExtensions
     /// <returns><c>True</c> if this is a packaged application; otherwise <c>False</c></returns>
     public static bool IsPackagedApplication(this AliasQueryResult alias)
         => !alias.FileName.IsNullOrEmpty() &&
-           alias.FileName.StartsWith("package:", StringComparison.CurrentCultureIgnoreCase);
+           (alias.FileName ?? "").StartsWith("package:", StringComparison.CurrentCultureIgnoreCase);
 
     #endregion
 }

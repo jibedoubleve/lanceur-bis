@@ -36,7 +36,7 @@ public class WebBookmarksShould
                                                      )
                                                      .AddTransient<IBookmarkRepository, BlinkBrowserBookmarks>()
                                                      .BuildServiceProvider();
-        var repository = serviceProvider.GetService<IBookmarkRepository>();
+        var repository = serviceProvider.GetService<IBookmarkRepository>()!;
 
         // ACT & ASSERT
         repository.GetBookmarks().ShouldBeEmpty();
@@ -53,7 +53,7 @@ public class WebBookmarksShould
                                                      )
                                                      .AddTransient<IBookmarkRepository, GeckoBrowserBookmarks>()
                                                      .BuildServiceProvider();
-        var repository = serviceProvider.GetService<IBookmarkRepository>();
+        var repository = serviceProvider.GetService<IBookmarkRepository>()!;
 
         // ACT & ASSERT
         repository.GetBookmarks().ShouldBeEmpty();

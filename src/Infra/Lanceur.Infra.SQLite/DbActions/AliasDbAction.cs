@@ -4,6 +4,7 @@ using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Sqlite.Entities;
+using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
@@ -32,7 +33,7 @@ public class AliasDbAction
     {
         const string sql = "delete from alias where id = @id";
 
-        var cnt = tx.Connection.ExecuteMany(sql, ids);
+        var cnt = tx.GetConnection().ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
         _logger.LogDebug(
             MessageRemovedRows,
@@ -46,7 +47,7 @@ public class AliasDbAction
     {
         const string sql = "delete from alias_argument where id_alias = @id";
 
-        var cnt = tx.Connection.ExecuteMany(sql, ids);
+        var cnt = tx.GetConnection().ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
         _logger.LogDebug(
             MessageRemovedRows,
@@ -60,7 +61,7 @@ public class AliasDbAction
     {
         const string sql = "delete from alias_name where id_alias = @id";
 
-        var cnt = tx.Connection.ExecuteMany(sql, ids);
+        var cnt = tx.GetConnection().ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
         _logger.LogDebug(
             MessageRemovedRows,
@@ -74,7 +75,7 @@ public class AliasDbAction
     {
         const string sql = "delete from alias_usage where id_alias = @id;";
 
-        var cnt = tx.Connection.ExecuteMany(sql, ids);
+        var cnt = tx.GetConnection().ExecuteMany(sql, ids);
         var idd = string.Join(", ", ids);
         _logger.LogDebug(
             MessageRemovedRows,
@@ -103,7 +104,7 @@ public class AliasDbAction
         var entities = parameters.ToEntity(idAlias).ToList();
         var addedRowsCount
             = entities.Sum(entity =>
-                tx.Connection.Execute(
+                tx.GetConnection().Execute(
                     sql2,
                     new { idAlias = entity.IdAlias, parameter = entity.Parameter, name = entity.Name }
                 )
@@ -128,7 +129,7 @@ public class AliasDbAction
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
 
-    internal AliasQueryResult GetById(IDbConnection connection, long id)
+    internal AliasQueryResult? GetById(IDbConnection connection, long id)
     {
         if (id <= 0) { throw new ArgumentException("The id of the alias should be greater than zero."); }
 
@@ -324,7 +325,7 @@ public class AliasDbAction
 
         // Remove 
         const string sqlDelete = "delete from alias_name where id_alias = @id;";
-        tx.Connection.Execute(sqlDelete, new { id });
+        tx.GetConnection().Execute(sqlDelete, new { id });
 
         // Add the updated synonyms 
         var names = alias.Synonyms ?? alias.Name ?? throw new ArgumentException("The alias to create has no name");
@@ -333,7 +334,7 @@ public class AliasDbAction
         const string sqlSynonyms = "insert into alias_name (id_alias, name) values (@id, @name)";
         foreach (var name in csv)
         {
-            tx.Connection.ExecuteScalar<long>(sqlSynonyms, new { id, name });
+            tx.GetConnection().ExecuteScalar<long>(sqlSynonyms, new { id, name });
         }
 
         // Additional parameters

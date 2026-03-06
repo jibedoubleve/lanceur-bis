@@ -9,8 +9,7 @@ public partial class MappingService
     #region Methods
 
     public partial void Rehydrate(AliasQueryResult src, AliasQueryResult dst);
-
-    /// <inheritdoc />
+    
     [MapperRequiredMapping(RequiredMappingStrategy.None)]
     public partial AliasQueryResult ToAliasQueryResult(AliasUsageItem source);
 

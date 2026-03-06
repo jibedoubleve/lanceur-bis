@@ -172,7 +172,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Miscellaneous
         var token = Configuration.Application.Github.Token;
-        ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : _enigma.Decrypt(token);
+        ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : _enigma.Decrypt(token!);
     }
 
     private void MapSettingsFromUiToDb()
@@ -231,7 +231,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         var view = _viewFactory.CreateView(storeShortcut);
         var storeName = storeShortcut.StoreType
-                                     .Replace("Lanceur.Infra.Stores.", "")
+                                     ?.Replace("Lanceur.Infra.Stores.", "")
                                      .Replace("Store", "");
 
         var savedAliasOverride = storeShortcut.AliasOverride;

@@ -1,18 +1,6 @@
 using Lanceur.Core.Models;
 
-namespace Lanceur.Infra.Utils;
-
-public class Doubloon
-{
-    #region Properties
-
-    public QueryResult Content { get; init; }
-    public string Description { get; init; }
-    public int HashCode { get; init; }
-    public string Name { get; init; }
-
-    #endregion
-}
+namespace Lanceur.Tests.Tools.Helpers;
 
 public static class DataDebugger
 {
@@ -32,6 +20,18 @@ public static class DataDebugger
               .Where(gr => gr.Count() > 1)
               .Select(gr => gr.Select(t => t).First())
               .ToArray();
+
+    #endregion
+}
+
+public class Doubloon
+{
+    #region Properties
+
+    public QueryResult? Content { get; init; }
+    public string? Description { get; init; }
+    public int HashCode { get; init; }
+    public string? Name { get; init; }
 
     #endregion
 }

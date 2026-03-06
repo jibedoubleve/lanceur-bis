@@ -26,7 +26,9 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
     #region Methods
 
     private void WithConfiguration(
-        Action<IApplicationSettingsProvider> assert, string json = null, IConnectionString connectionString = null)
+        Action<IApplicationSettingsProvider> assert, 
+        string? json = null, 
+        IConnectionString? connectionString = null)
     {
         var sql = $"insert into settings (s_key, s_value) values ('json', '{json}');";
 
@@ -172,8 +174,10 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
         settings.Current.SearchBox.ShowResult.ShouldBeFalse();
     }
 
-    [Fact]
-    public void When_updating_feature_flas_Then_json_is_updated()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void When_updating_feature_flas_Then_json_is_updated(bool isEnabled)
     {
         var description = Generate.Text();
         var featureName = Features.GetNames().ElementAt(0);
@@ -184,7 +188,7 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
                          "FeatureFlags": [
                              {
                                  "Description": "{{description}}",
-                                 "Enabled": false,
+                                 "Enabled": {{(isEnabled ? "true" : "false")}},
                                  "FeatureName": "{{featureName}}",
                                  "Icon": "{{icon}}"
                              },
@@ -198,13 +202,13 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
                      }
                      """;
         WithConfiguration(repository =>
-                repository.Current.FeatureFlags.ToList()
+                repository.Current.FeatureFlags
+                          .Single(f => f.FeatureName == featureName)
                           .ShouldSatisfyAllConditions(
-                              ff => ff.Count.ShouldBe(2),
-                              ff => ff[0].Enabled.ShouldBeFalse(),
-                              ff => ff[0].FeatureName.ShouldBe(featureName),
-                              ff => ff[0].Icon.ShouldBe(icon),
-                              ff => ff[0].Description.ShouldBe(description)
+                              ff => ff.Enabled.ShouldBe(isEnabled),
+                              ff => ff.FeatureName.ShouldBe(featureName),
+                              ff => ff.Icon.ShouldBe(icon),
+                              ff => ff.Description.ShouldBe(description)
                           ),
             json);
     }

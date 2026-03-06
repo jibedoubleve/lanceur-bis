@@ -9,7 +9,7 @@ public class ConfigurationSection<T> : IWriteableSection<T>
 {
     #region Fields
 
-    private T _cachedSection;
+    private T? _cachedSection;
 
     private readonly IConfigurationFacade _configuration;
 
@@ -32,7 +32,7 @@ public class ConfigurationSection<T> : IWriteableSection<T>
         get
         {
             _cachedSection ??= RebuildSection();
-            return _cachedSection;
+            return _cachedSection!;
         }
     }
 
@@ -40,13 +40,13 @@ public class ConfigurationSection<T> : IWriteableSection<T>
 
     #region Methods
 
-    private T RebuildSection()
+    private T? RebuildSection()
     {
         var app = _configuration.Application;
         return app.GetType()
                   .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                   .Where(p => typeof(T).IsAssignableFrom(p.PropertyType))
-                  .Select(p => (T)p.GetValue(app))
+                  .Select(p => (T?)p.GetValue(app))
                   .SingleOrDefault();
     }
 

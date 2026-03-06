@@ -36,14 +36,14 @@ public sealed partial class FavIconService : IFavIconService
     private static partial Regex IsMacroRegexBuilder();
 
     /// <inheritdoc />
-    public async Task<string> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver)
+    public async Task<string?> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver)
     {
         var url = alias.FileName;
         // You don't need to check favicon when
         //   - no url is provided
         //   - alias is a Macro
         //   - Uri is malformed
-        if (url.IsNullOrEmpty() || IsMacroRegex.Match(url).Success || !Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        if (url.IsNullOrEmpty() || IsMacroRegex.Match(url!).Success || !Uri.TryCreate(url, UriKind.Absolute, out var uri))
         {
             return null;
         }

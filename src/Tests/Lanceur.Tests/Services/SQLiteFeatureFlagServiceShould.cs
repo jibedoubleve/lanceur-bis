@@ -65,9 +65,9 @@ public class SQLiteFeatureFlagServiceShould : TestBase
 
         // assert
         settings.Current.FeatureFlags
-                .Single(e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.InvariantCultureIgnoreCase)
-                )
-                .Enabled.ShouldBe(value, "the new value changed");
+                .Single(
+                    e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.InvariantCultureIgnoreCase)
+                ).Enabled.ShouldBe(value, "the new value changed");
 
         const string sql = """
                            select s_value ->> '$.FeatureFlags' as FeatureFlag
@@ -75,7 +75,7 @@ public class SQLiteFeatureFlagServiceShould : TestBase
                            where s_key = 'json'
                            """;
         var json = conn.Query<string>(sql).Single();
-        var flags = JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json);
+        var flags = JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json)!;
 
         var flag = flags.SingleOrDefault(e => e.FeatureName.Equals(
                 Features.ResourceDisplay,

@@ -39,10 +39,8 @@ public partial class WebClipboardReplacement : IReplacement
     /// <inheritdoc />
     public string Replace(string newText, string replacement)
     {
-        var clipboard = _clipboard.RetrieveText() ?? string.Empty;
+        var clipboard = _clipboard.RetrieveText();
         clipboard = WebUtility.UrlEncode(clipboard).ToLower();
-
-        newText ??= string.Empty;
 
         return Regex.Replace(newText, clipboard);
     }

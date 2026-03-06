@@ -8,13 +8,6 @@ namespace Lanceur.Core;
 /// </summary>
 public class AssemblySource
 {
-    #region Fields
-
-    private readonly Assembly _macroSourceAsm;
-    private readonly Assembly _reservedKeywordsAsm;
-
-    #endregion
-
     #region Properties
 
     /// <summary>
@@ -23,8 +16,8 @@ public class AssemblySource
     /// </summary>
     public Assembly MacroSource
     {
-        get => _macroSourceAsm ?? Assembly.GetExecutingAssembly();
-        init => _macroSourceAsm = value;
+        get => field ?? Assembly.GetExecutingAssembly();
+        init;
     }
 
     /// <summary>
@@ -33,8 +26,8 @@ public class AssemblySource
     /// </summary>
     public Assembly ReservedKeywordSource
     {
-        get => _reservedKeywordsAsm ?? Assembly.GetExecutingAssembly();
-        init => _reservedKeywordsAsm = value;
+        get => field ?? Assembly.GetExecutingAssembly();
+        init;
     }
 
     #endregion

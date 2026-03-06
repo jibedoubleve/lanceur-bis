@@ -21,7 +21,7 @@ public class SQLiteLoggerDbProfiler : LoggerDbProfiler
 
     #region Methods
 
-    public override void ExecuteFinish(IDbCommand profiledDbCommand, SqlExecuteType executeType, DbDataReader reader)
+    public override void ExecuteFinish(IDbCommand profiledDbCommand, SqlExecuteType executeType, DbDataReader? reader)
     {
         if (DoFullLogging)
         {

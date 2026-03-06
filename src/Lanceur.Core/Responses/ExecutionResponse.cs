@@ -10,7 +10,7 @@ public class ExecutionResponse
 
     public static ExecutionResponse NoResult => new() { HasResult = false, Results = new List<QueryResult>() };
 
-    public IEnumerable<QueryResult> Results { get; set; }
+    public IEnumerable<QueryResult> Results { get; set; } = [];
 
     #endregion
 

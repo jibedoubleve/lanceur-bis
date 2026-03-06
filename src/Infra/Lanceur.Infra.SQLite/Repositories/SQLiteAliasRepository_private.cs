@@ -36,7 +36,7 @@ public partial class SQLiteAliasRepository
         return conn.Query<AdditionalParameter>(sql, new { ids });
     }
 
-    private AliasQueryResult GetById(IDbConnection conn, long id)
+    private AliasQueryResult? GetById(IDbConnection conn, long id)
         => _dbActionFactory.AliasManagement.GetById(conn, id);
 
     private static void MergeHistory(IDbTransaction tx, IEnumerable<long> fromAliases, long toAlias)

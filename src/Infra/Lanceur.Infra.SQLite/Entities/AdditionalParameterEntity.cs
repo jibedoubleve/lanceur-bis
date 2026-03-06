@@ -6,8 +6,8 @@ public class AdditionalParameterEntity
 
     public long Id { get; set; }
     public long IdAlias { get; set; }
-    public string Name { get; set; }
-    public string Parameter { get; set; }
+    public required string Name { get; set; }
+    public required string Parameter { get; set; }
 
     #endregion
 }

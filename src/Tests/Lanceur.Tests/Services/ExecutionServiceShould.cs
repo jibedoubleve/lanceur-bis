@@ -36,8 +36,8 @@ public class ExecutionServiceShould : TestBase
     #region Methods
 
     private ExecutionService CreateExecutionService(
-        IProcessLauncher processLauncher = null,
-        IClipboardService clipboardService = null
+        IProcessLauncher? processLauncher = null,
+        IClipboardService? clipboardService = null
     )
     {
         var executionService = new ExecutionService(
@@ -216,12 +216,12 @@ public class ExecutionServiceShould : TestBase
                                         .AddSingleton<GithubIssueMacro>()
                                         .BuildServiceProvider();
 
-        var macro = sp.GetService<GithubIssueMacro>();
+        var macro = sp.GetService<GithubIssueMacro>()!;
         var request = new ExecutionRequest(macro, cmdline);
 
         try
         {
-            var executionService = sp.GetService<IExecutionService>();
+            var executionService = sp.GetService<IExecutionService>()!;
             await executionService.ExecuteAsync(request);
         }
         catch (Exception ex) { Assert.Fail($"This should not throw an exception {ex.Message}"); }
@@ -240,16 +240,17 @@ public class ExecutionServiceShould : TestBase
         var cmdline = new Cmdline(cmd, parameters);
         var sp = new ServiceCollection()
                  .AddMockSingleton<IExecutionService>()
-                 .AddMockSingleton<ISearchService>()
+                 .AddMockLazySingleton<ISearchService>()
+                 .AddLoggingForTests(OutputHelper)
                  .BuildServiceProvider();
 
         var macro = new MultiMacro(
-            sp.GetService<IExecutionService>(),
-            sp.GetService<Lazy<ISearchService>>()
-        );
+            sp.GetService<IExecutionService>()!,
+            sp.GetService<Lazy<ISearchService>>()!,
+            sp.GetService<ILogger<MultiMacro>>()!);
 
-        try { await macro.ExecuteAsync(cmdline); }
-        catch (Exception) { Assert.Fail("This should not throw an exception"); }
+        var exception = await Record.ExceptionAsync(() => macro.ExecuteAsync(cmdline));
+        Assert.Null(exception);
     }
 
     [Theory]
@@ -263,11 +264,13 @@ public class ExecutionServiceShould : TestBase
                  .AddMockSingleton<IExecutionService>()
                  .AddMockSingleton<ISearchService>()
                  .AddMacroServices()
+                 .AddLoggingForTests(OutputHelper)
                  .BuildServiceProvider();
 
         var macro = new MultiMacro(
-            sp.GetService<IExecutionService>(),
-            sp.GetService<Lazy<ISearchService>>()
+            sp.GetService<IExecutionService>()!,
+            sp.GetService<Lazy<ISearchService>>()!,
+            sp.GetService<ILogger<MultiMacro>>()!
         );
         var request = new ExecutionRequest(macro, cmdline);
 

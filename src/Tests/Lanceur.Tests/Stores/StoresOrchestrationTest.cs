@@ -83,7 +83,7 @@ public class StoresOrchestrationTest
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, CalculatorStore>());
 
         var serviceProvider = serviceCollection.BuildServiceProvider();
-        var searchService = serviceProvider.GetService<ISearchService>();
+        var searchService = serviceProvider.GetService<ISearchService>()!;
 
         var result = await searchService.SearchAsync(Cmdline.Parse(query));
         result = result.ToArray();
@@ -110,7 +110,7 @@ public class StoresOrchestrationTest
                               .AddSingleton<IStoreService, CalculatorStore>()
                               .AddTestOutputHelper(_outputHelper)
                               .BuildServiceProvider();
-        var store = serviceProvider.GetService<IStoreService>();
+        var store = serviceProvider.GetService<IStoreService>()!;
 
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
         var results = store.Search(Cmdline.Parse(query)).ToList();
@@ -142,7 +142,7 @@ public class StoresOrchestrationTest
                               .AddSingleton<CalculatorStore>()
                               .AddTestOutputHelper(_outputHelper)
                               .BuildServiceProvider();
-        var store = serviceProvider.GetService<CalculatorStore>();
+        var store = serviceProvider.GetService<CalculatorStore>()!;
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -175,7 +175,7 @@ public class StoresOrchestrationTest
                                                      .AddTestOutputHelper(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
-        var store = serviceProvider.GetService<AdditionalParametersStore>();
+        var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -202,7 +202,7 @@ public class StoresOrchestrationTest
                                                      .AddStoreServicesMockContext()
                                                      .AddStoreServicesConfiguration()
                                                      .BuildServiceProvider();
-        var store = serviceProvider.GetService<EverythingStore>();
+        var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -231,7 +231,7 @@ public class StoresOrchestrationTest
                                                      .AddStoreServicesMockContext()
                                                      .AddStoreServices()
                                                      .BuildServiceProvider();
-        var store = serviceProvider.GetService<AdditionalParametersStore>();
+        var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -257,7 +257,7 @@ public class StoresOrchestrationTest
                                                      .AddTestOutputHelper(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
-        var store = serviceProvider.GetService<AliasStore>();
+        var store = serviceProvider.GetService<AliasStore>()!;
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -282,7 +282,7 @@ public class StoresOrchestrationTest
                               .AddSingleton<IStoreService, CalculatorStore>()
                               .AddTestOutputHelper(_outputHelper)
                               .BuildServiceProvider();
-        var store = serviceProvider.GetService<IStoreService>();
+        var store = serviceProvider.GetService<IStoreService>()!;
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -310,7 +310,7 @@ public class StoresOrchestrationTest
                                                      .AddStoreServicesMockContext()
                                                      .AddStoreServicesConfiguration()
                                                      .BuildServiceProvider();
-        var store = serviceProvider.GetService<EverythingStore>();
+        var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
@@ -337,7 +337,7 @@ public class StoresOrchestrationTest
                                                      .AddTestOutputHelper(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
-        var store = serviceProvider.GetService<ReservedAliasStore>();
+        var store = serviceProvider.GetService<ReservedAliasStore>()!;
 
         // ASSERT
         var regex = new Regex(store.StoreOrchestration.AlivePattern);
