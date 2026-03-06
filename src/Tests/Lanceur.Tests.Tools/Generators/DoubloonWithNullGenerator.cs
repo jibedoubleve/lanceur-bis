@@ -89,6 +89,36 @@ public class DoubloonWithNullGenerator : IEnumerable<object[]>
                                    .WithSynonyms("a2")
                 )
         ];
+        yield return
+        [
+            "Two doubloons with null run_as.",
+            2,
+            new SqlBuilder()
+                .AppendAlias(a => a.WithFileName(fileName)
+                                   .WithArguments(arguments)
+                                   .WithSynonyms("a1")
+                )
+                .AppendAlias(a => a.WithFileName(fileName)
+                                   .WithArguments(arguments)
+                                   .WithSynonyms("a2")
+                )
+        ];
+        yield return
+        [
+            "Two doubloons with null lua_script.",
+            2,
+            new SqlBuilder()
+                .AppendAlias(a => a.WithFileName(fileName)
+                                   .WithArguments(arguments)
+                                   .WithLuaScript(null)
+                                   .WithSynonyms("a1")
+                )
+                .AppendAlias(a => a.WithFileName(fileName)
+                                   .WithArguments(arguments)
+                                   .WithLuaScript(null)
+                                   .WithSynonyms("a2")
+                )
+        ];
     }
 
     #endregion
