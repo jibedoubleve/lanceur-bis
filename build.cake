@@ -34,7 +34,7 @@ var target          = Argument("target", "Default");
 var configuration   = Argument("configuration", "Release").ToLower();
 var verbosity       = Argument("verbosity", Verbosity.Minimal);
 
-var binDirectory    = $"./src/UI/Lanceur.Ui.WPF/bin/{configuration}/net9.0-windows10.0.19041.0/";
+var binDirectory    = $"./src/UI/Lanceur.Ui.WPF/bin/{configuration}/net9.0-windows10.0.19041.0/win-x64/publish/";
 var setupIconFile   = $"./src/UI/Lanceur.Ui.WPF/Assets/appIcon.ico";
 var publishDir      = "./Publish";
 var inno_setup      = "./setup.iss";
@@ -117,11 +117,11 @@ Task("restore")
 });
 
 Task("build")
-    .Does(() => {        
+    .Does(() => {
         DotNetTool(
             solution,
-            "build",
-            "--no-restore -c release"
+            "publish",
+            "--no-restore -c release -r win-x64"
         );
 });
 

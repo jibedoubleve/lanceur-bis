@@ -9,6 +9,7 @@
         <Company>JB Wautier</Company>
         <Product>Lanceur</Product>
         <LangVersion>latest</LangVersion>
+        <PublishReadyToRun>true</PublishReadyToRun>
     </PropertyGroup>
     <ItemGroup>
         <Page Update="Views\MainView.xaml">
