@@ -83,7 +83,8 @@ public static class ServiceCollectionExtensions
             () => ConfigureLog(Paths.ClefLogFile, Paths.RawLogFile)
         );
 
-        serviceCollection.AddLogging(builder => builder.AddSerilog(dispose: true));
+        serviceCollection.AddLogging(builder => builder.ClearProviders()
+                                                       .AddSerilog(dispose: true));
         Log.Logger = loggerCfg.CreateLogger();
 
         return serviceCollection;
