@@ -18,7 +18,8 @@ public class FavIconHttpClient : IFavIconHttpClient
     #region Methods
 
     /// <inheritdoc />
-    public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request) => HttpClient.SendAsync(request);
+    public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        => HttpClient.SendAsync(request, cancellationToken);
 
     #endregion
 }

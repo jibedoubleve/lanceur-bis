@@ -53,7 +53,10 @@ public class ThumbnailServiceTest : TestBase
                  .AddSingleton<IThumbnailStrategy, FavIconAppThumbnailStrategy>()
                  .AddSingleton<IAliasManagementService, AliasManagementService>()
                  .AddMockSingleton<IFavIconService>((_, i) => {
-                         i.UpdateFaviconAsync(Arg.Any<AliasQueryResult>(), Arg.Any<Func<string, string>>())!
+                         i.UpdateFaviconAsync(
+                              Arg.Any<AliasQueryResult>(),
+                              Arg.Any<Func<string, string>>(),
+                              Arg.Any<CancellationToken>())!
                           .Returns(Task.FromResult(newValue));
                          return i;
                      }
@@ -64,11 +67,12 @@ public class ThumbnailServiceTest : TestBase
         var conn = sp.GetService<IDbConnectionManager>()!;
         var repo = sp.GetService<IAliasRepository>()!;
         var strategy = sp.GetService<IThumbnailStrategy>()!;
+        using var source = new CancellationTokenSource();
 
         // ACT
         var alias = repo.GetAll().Single();
 
-        await strategy.UpdateThumbnailAsync(alias);
+        await strategy.UpdateThumbnailAsync(alias, source.Token);
 
         // ASSERT
         const string sql2 = """

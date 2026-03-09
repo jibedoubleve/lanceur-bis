@@ -14,9 +14,10 @@ public interface IStaThreadRunner : IDisposable
     ///     that completes with the function's result.
     /// </summary>
     /// <param name="func">The function to execute on the STA thread.</param>
+    /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <typeparam name="T">The return type of the function.</typeparam>
     /// <returns>A task that resolves to the function's return value, or faults if the function throws.</returns>
-    Task<T> RunAsync<T>(Func<T> func);
+    Task<T> RunAsync<T>(Func<T> func, CancellationToken cancellationToken);
 
     #endregion
 }

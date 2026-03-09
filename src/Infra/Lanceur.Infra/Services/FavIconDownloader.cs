@@ -20,6 +20,8 @@ public class FavIconDownloader : IFavIconDownloader
     #region Fields
 
     private readonly IMemoryCache _faviconCache;
+
+    private readonly IFavIconHttpClient _httpClient;
     private readonly ILogger<FavIconDownloader> _logger;
     private readonly TimeSpan _retryDelay;
 
@@ -30,8 +32,6 @@ public class FavIconDownloader : IFavIconDownloader
         ["Manual (png)"] = (IsManual: true, Url: "favicon.png"),
         ["Manual (ico)"] = (IsManual: true, Url: "favicon.ico")
     };
-
-    private readonly IFavIconHttpClient _httpClient;
 
     #endregion
 
@@ -89,7 +89,7 @@ public class FavIconDownloader : IFavIconDownloader
         return foundFavIcon;
     }
 
-    public async Task<bool> RetrieveAndSaveFavicon(Uri url, string outputPath)
+    public async Task<bool> RetrieveAndSaveFavicon(Uri url, string outputPath, CancellationToken cancellationToken)
     {
         if (_faviconCache.TryGetValue(url.ToString(), out _))
         {
@@ -102,7 +102,8 @@ public class FavIconDownloader : IFavIconDownloader
             try
             {
                 var requestUrl = GetFaviconUrl(url, faviconUrl);
-                using var response = await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUrl));
+                using var response =
+                    await _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUrl), cancellationToken);
 
                 _logger.LogTrace(
                     "Checking favicon with {FavIconManager} - Status: {Status} - Host: {Host}",

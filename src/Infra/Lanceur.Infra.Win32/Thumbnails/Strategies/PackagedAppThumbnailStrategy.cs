@@ -34,7 +34,7 @@ public class PackagedAppThumbnailStrategy : IThumbnailStrategy
 
     #region Methods
 
-    public async Task UpdateThumbnailAsync(AliasQueryResult alias)
+    public async Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
         if (File.Exists(alias.Thumbnail))
         {

@@ -1,4 +1,4 @@
-﻿using Lanceur.Core.Models;
+using Lanceur.Core.Models;
 
 namespace Lanceur.Core.Services;
 
@@ -20,11 +20,13 @@ public interface IFavIconService
     ///     A function that computes the absolute path on disk where the favicon will be cached,
     ///     given a raw file name (e.g. a hashed name).
     /// </param>
+    /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <returns>
     ///     The absolute path to the cached favicon file if the download succeeded;
     ///     <c>null</c> if <c>FileName</c> is not a URL, the favicon could not be found, or the download failed.
     /// </returns>
-    Task<string?> UpdateFaviconAsync(AliasQueryResult alias, Func<string, string> cachePathResolver);
+    Task<string?> UpdateFaviconAsync(
+        AliasQueryResult alias, Func<string, string> cachePathResolver, CancellationToken cancellationToken);
 
     #endregion
 }

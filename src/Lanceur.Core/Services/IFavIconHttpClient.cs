@@ -13,8 +13,9 @@ public interface IFavIconHttpClient
     ///     Send an HTTP request as an asynchronous operation.
     /// </summary>
     /// <param name="request">The HTTP request message to send.</param>
+    /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <returns>The task object representing the asynchronous operation.</returns>
-    Task<HttpResponseMessage> SendAsync(HttpRequestMessage request);
+    Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken);
 
     #endregion
 }

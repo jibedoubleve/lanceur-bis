@@ -38,7 +38,7 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
 
     #region Methods
 
-    public async Task UpdateThumbnailAsync(AliasQueryResult alias)
+    public async Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
         if (File.Exists(alias.Thumbnail))
         {
@@ -51,7 +51,10 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
             return;
         }
 
-        var imageSource = await _staThreadRunner.RunAsync(() => _win32ThumbnailService.GetThumbnail(alias.FileName));
+        var imageSource = await _staThreadRunner.RunAsync(
+            () => _win32ThumbnailService.GetThumbnail(alias.FileName),
+            cancellationToken
+        );
         if (imageSource is null)
         {
             _logger.LogTrace("Failed to download the thumbnail for alias {Name}.", alias.Name);

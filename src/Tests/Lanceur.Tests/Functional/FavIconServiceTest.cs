@@ -38,7 +38,7 @@ public class FavIconServiceTest
     {
         // ARRANGE
         var favIconDownloader = Substitute.For<IFavIconDownloader>();
-
+        var source = new CancellationTokenSource();
 
         // ACT
         var manager = new FavIconService(
@@ -48,12 +48,13 @@ public class FavIconServiceTest
 
         await manager.UpdateFaviconAsync(
             alias,
-            _ => Path.Combine(Path.GetTempPath(), Path.GetRandomFileName())
+            _ => Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
+            source.Token
         );
 
         // ASSERT
         await favIconDownloader.Received()
-                               .RetrieveAndSaveFavicon(new Uri(asExpected), Arg.Any<string>());
+                               .RetrieveAndSaveFavicon(new Uri(asExpected), Arg.Any<string>(), source.Token);
     }
 
     #endregion

@@ -35,14 +35,14 @@ public sealed class StaThreadRunner : IStaThreadRunner
     public void Dispose() => _threadQueue.CompleteAdding();
 
     /// <inheritdoc />
-    public Task<T> RunAsync<T>(Func<T> func)
+    public Task<T> RunAsync<T>(Func<T> func, CancellationToken cancellationToken)
     {
         var tcs = new TaskCompletionSource<T>();
         _threadQueue.Add(() => {
                 try { tcs.SetResult(func()); }
                 catch (Exception ex) { tcs.SetException(ex); }
-            }
-        );
+            },
+            cancellationToken);
         return tcs.Task;
     }
 
