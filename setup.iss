@@ -16,7 +16,7 @@
 #define ScheduledTaskName "Lanceur - Autorun at startup"
 
 [Setup]
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
@@ -63,7 +63,7 @@ Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; \
 
 [Run]
 Filename: "cmd"; \
-    Parameters: "/C schtasks /Create /F /SC ONLOGON /RL LIMITED /TN ""{#ScheduledTaskName}"" /TR ""'{app}\{#MyAppExeName}'"""; \     
+    Parameters: "/C schtasks /Create /F /SC ONLOGON /RL LIMITED /TN ""{#ScheduledTaskName}"" /TR ""'{app}\{#MyAppExeName}'"""; \
     Tasks: starts_cheduled_task; \
     Flags: runhidden
 
