@@ -34,7 +34,7 @@ public class FavIconAppThumbnailStrategy : IThumbnailStrategy
 
     #region Methods
 
-    public async Task UpdateThumbnailAsync(AliasQueryResult alias)
+    public async Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
         if (File.Exists(alias.Thumbnail))
         {
@@ -42,7 +42,7 @@ public class FavIconAppThumbnailStrategy : IThumbnailStrategy
             return;
         }
 
-        var thumbnail = await _favIconService.UpdateFaviconAsync(alias, ResolveCachePath);
+        var thumbnail = await _favIconService.UpdateFaviconAsync(alias, ResolveCachePath, cancellationToken);
         if (thumbnail.IsNullOrEmpty()) { return; }
 
         _logger.LogInformation(

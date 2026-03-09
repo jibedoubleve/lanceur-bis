@@ -8,9 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;
 
-public class ThumbnailService : IThumbnailService
+public sealed class ThumbnailService : IThumbnailService, IDisposable
 {
     #region Fields
+
+    private readonly CancellationTokenSource _cts = new();
 
     private readonly ILogger<ThumbnailService> _logger;
     private readonly IEnumerable<IThumbnailStrategy> _thumbnailStrategy;
@@ -45,6 +47,9 @@ public class ThumbnailService : IThumbnailService
         return false;
     }
 
+    /// <inheritdoc />
+    public void Dispose() => _cts.Dispose();
+
     /// <summary>
     ///     Starts a thread to refresh the thumbnails asynchronously. This method returns immediately after starting the
     ///     thread.
@@ -68,7 +73,12 @@ public class ThumbnailService : IThumbnailService
         {
             foreach (var strategy in _thumbnailStrategy)
             {
-                try { await strategy.UpdateThumbnailAsync(alias); }
+                try { await strategy.UpdateThumbnailAsync(alias, _cts.Token); }
+                catch (OperationCanceledException ex)
+                {
+                    _logger.LogDebug(ex, "Cancellation requested during thumbnail update of {AliasName}", alias.Name);
+                    break;
+                }
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "One thumbnail retrieve strategy failed: {Message}", ex.Message);
