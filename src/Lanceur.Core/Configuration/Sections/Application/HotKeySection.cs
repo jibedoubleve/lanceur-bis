@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Configuration.Sections;
 
-public class HotKeySection
+public record HotKeySection
 {
     #region Constructors
 
@@ -17,12 +17,12 @@ public class HotKeySection
     /// <remarks>
     ///     Setter is used for serialization
     /// </remarks>
-    public int Key { get; set; }
+    public int Key { get; }
 
     /// <remarks>
     ///     Setter is used for serialization
     /// </remarks>
-    public int ModifierKey { get; set; }
+    public int ModifierKey { get; }
 
     #endregion
 
