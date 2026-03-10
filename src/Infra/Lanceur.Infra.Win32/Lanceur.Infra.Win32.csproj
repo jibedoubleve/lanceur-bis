@@ -11,6 +11,6 @@
         <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="System.IO.Hashing" Version="10.0.3"/>
+        <PackageReference Include="System.IO.Hashing" Version="10.0.4"/>
     </ItemGroup>
 </Project>
