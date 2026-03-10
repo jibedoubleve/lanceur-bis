@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
@@ -262,15 +262,15 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     internal void SaveSettings()
     {
-        var hk = Configuration.Application.HotKey;
-        var hash = (hk.ModifierKey, hk.Key).GetHashCode();
-
-        hk.ModifierKey = GetHotKey();
-        hk.Key = Key;
+        var hash = Configuration.Application.HotKey.GetHashCode();
+        Configuration.Application.HotKey = new HotKeySection(
+            GetHotKey(),
+            Key
+        );
 
         List<bool> reboot =
         [
-            hash != (hk.ModifierKey, hk.Key).GetHashCode(),
+            hash != Configuration.Application.HotKey.GetHashCode(),
             Configuration.Local.DbPath != DbPath,
             Configuration.Local.MinimumLogLevel != SelectedLogLevel
         ];
