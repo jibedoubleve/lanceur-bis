@@ -20,16 +20,20 @@ public class ThumbnailPipelineSection
     /// <summary>
     ///     Gets or sets the behaviour when the channel has reached its maximum capacity.
     ///     Maps to <see cref="System.Threading.Channels.BoundedChannelFullMode" />.
-    ///     Accepted values: <c>"Wait"</c>, <c>"DropNewest"</c>, <c>"DropOldest"</c>, <c>"DropWrite"</c>.
-    ///     Defaults to <c>"Wait"</c>.
+    ///     Accepted values: <c>"DropNewest"</c>, <c>"DropOldest"</c>, <c>"DropWrite"</c>.
+    ///     Defaults to <c>"DropOldest"</c>.
     /// </summary>
-    public BoundedChannelFullMode ChannelFullMode { get; set; } = BoundedChannelFullMode.Wait;
+    /// <remarks>
+    ///     <c>"Wait"</c> is not supported: the pipeline uses <c>TryWrite</c>, which
+    ///     never blocks. When the channel is full, the item is silently dropped regardless of this setting.
+    /// </remarks>
+    public BoundedChannelFullMode ChannelFullMode { get; set; } = BoundedChannelFullMode.DropOldest;
 
     /// <summary>
     ///     Gets or sets the number of consumer tasks reading from the channel
     ///     and processing thumbnail updates concurrently.
     /// </summary>
-    public int MaxThreads { get; set; } = 10;
+    public int ConsumerCount { get; set; } = 4;
 
     #endregion
 }
