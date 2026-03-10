@@ -7,7 +7,7 @@ public static class ApplicationSettingsExtensions
     #region Methods
 
     public static void SetHotKey(this ApplicationSettings applicationSettings, int key, int modifierKey)
-        => applicationSettings.HotKey = new HotKeySection(key, modifierKey);
+        => applicationSettings.HotKey = new HotKeySection(modifierKey, key);
 
     #endregion
 }

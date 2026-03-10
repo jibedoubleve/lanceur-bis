@@ -223,8 +223,10 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
                 settings.SetHotKey(key, modifierKey);
 
                 repository.Save();
-                settings.HotKey.ModifierKey.ShouldBe(modifierKey);
-                settings.HotKey.Key.ShouldBe(key);
+                settings.ShouldSatisfyAllConditions(
+                    s => s.HotKey.ModifierKey.ShouldBe(modifierKey),
+                    s => s.HotKey.Key.ShouldBe(key)
+                );
             }
         );
 
