@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Core.Configuration;
 
+[Obsolete("Should be moved into tests tools")]
 public static class ServiceProviderExtensions
 {
     #region Methods

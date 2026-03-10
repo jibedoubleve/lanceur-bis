@@ -3,6 +3,7 @@ using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Lanceur.Infra.Repositories;
 
@@ -55,6 +56,7 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
         return File.Create(_filePath);
     }
 
+    /// <inheritdoc />
     public void Load()
     {
         lock (Locker)
@@ -63,13 +65,17 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
             if (File.Exists(_filePath))
             {
                 var output = File.ReadAllText(_filePath);
-                jsonConfiguration = JsonConvert.DeserializeObject<InfrastructureSettings>(output);
+                jsonConfiguration = JsonConvert.DeserializeObject<InfrastructureSettings>(
+                    output,
+                    new JsonSerializerSettings { Converters = { new StringEnumConverter() } }
+                );
             }
 
             _current = jsonConfiguration ?? new InfrastructureSettings();
         }
     }
 
+    /// <inheritdoc />
     public void Save()
     {
         lock (Locker)

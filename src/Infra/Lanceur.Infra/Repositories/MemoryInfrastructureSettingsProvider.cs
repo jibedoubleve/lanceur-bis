@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Configuration.Configurations;
+﻿using System.Diagnostics;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Repositories.Config;
 
 namespace Lanceur.Infra.Repositories;
@@ -25,15 +26,15 @@ public class MemoryInfrastructureSettingsProvider : IInfrastructureSettingsProvi
 
     #region Methods
 
-    public void Load()
-    {
+    /// <inheritdoc />
+    public void Load() =>
         // Does nothing, settings is already in memory
-    }
+        Debug.WriteLine("Using memory settings. Nothing will be loaded from file!");
 
-    public void Save()
-    {
+    /// <inheritdoc />
+    public void Save() =>
         // Does nothing, settings is already in memory
-    }
+        Debug.WriteLine("Using memory settings. Nothing will be saved into file!");
 
     #endregion
 }
