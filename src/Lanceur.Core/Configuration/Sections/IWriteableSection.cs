@@ -4,8 +4,17 @@ namespace Lanceur.Core.Configuration.Sections;
 ///     Represents a configuration section that can be persisted to its underlying storage.
 /// </summary>
 /// <typeparam name="T">The type of configuration data contained in the section.</typeparam>
-public interface IWriteableSection<out T> : ISection<T>
+public interface IWriteableSection<out T>
 {
+    #region Properties
+
+    /// <summary>
+    ///     Gets the current configuration data of this section.
+    /// </summary>
+    T Value { get; }
+
+    #endregion
+
     #region Methods
 
     /// <summary>
