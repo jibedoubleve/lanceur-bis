@@ -1,8 +1,8 @@
+using Lanceur.Core.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Lanceur.Core.Configuration;
+namespace Lanceur.Tests.Tools.Helpers;
 
-[Obsolete("Should be moved into tests tools")]
 public static class ServiceProviderExtensions
 {
     #region Methods

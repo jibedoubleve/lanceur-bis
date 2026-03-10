@@ -7,6 +7,7 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Converters;
 using Microsoft.Extensions.DependencyInjection;
