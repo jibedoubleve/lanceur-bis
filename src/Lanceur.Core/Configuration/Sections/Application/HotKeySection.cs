@@ -4,10 +4,10 @@ public record HotKeySection
 {
     #region Constructors
 
-    public HotKeySection(int modifier, int key)
+    public HotKeySection(int modifierKey, int key)
     {
         Key = key;
-        ModifierKey = modifier;
+        ModifierKey = modifierKey;
     }
 
     #endregion
