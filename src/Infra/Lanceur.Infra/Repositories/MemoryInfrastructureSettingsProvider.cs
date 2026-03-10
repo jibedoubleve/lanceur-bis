@@ -29,12 +29,12 @@ public class MemoryInfrastructureSettingsProvider : IInfrastructureSettingsProvi
     /// <inheritdoc />
     public void Load() =>
         // Does nothing, settings is already in memory
-        Debug.WriteLine("Using memory settings. Nothing will be loaded from file!");
+        Trace.TraceWarning("Using memory settings. Nothing will be loaded from file!");
 
     /// <inheritdoc />
     public void Save() =>
         // Does nothing, settings is already in memory
-        Debug.WriteLine("Using memory settings. Nothing will be saved into file!");
+        Trace.TraceWarning("Using memory settings. Nothing will be saved into file!");
 
     #endregion
 }

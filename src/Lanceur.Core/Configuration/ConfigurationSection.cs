@@ -4,7 +4,7 @@ using Lanceur.Core.Repositories.Config;
 
 namespace Lanceur.Core.Configuration;
 
-public class ConfigurationSection<T> : ISection<T>, IWriteableSection<T>
+public class ConfigurationSection<T> : IWriteableSection<T>
     where T : class
 {
     #region Fields

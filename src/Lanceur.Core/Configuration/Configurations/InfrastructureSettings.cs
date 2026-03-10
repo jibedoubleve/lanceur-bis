@@ -33,7 +33,7 @@ public class InfrastructureSettings
     ///     Gets or sets the thumbnail pipeline configuration section.
     ///     Controls the bounded channel capacity and full-mode behaviour used to queue thumbnail requests.
     /// </summary>
-    public ThumbnailPipelineSection ThumbnailPipelinePipeline { get; set; } = new();
+    public ThumbnailPipelineSection ThumbnailPipeline { get; set; } = new();
 
     #endregion
 }

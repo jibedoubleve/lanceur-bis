@@ -1,5 +1,6 @@
 using System.IO;
 using System.Threading.Channels;
+using ABI.Windows.ApplicationModel.Contacts;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Lanceur.Core.Models;
@@ -11,11 +12,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;
 
-public sealed class ThumbnailService : IThumbnailService, IDisposable
+public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
 {
     #region Fields
 
     private readonly Channel<AliasQueryResult> _channel;
+    private readonly Task[] _consumers;
     private readonly CancellationTokenSource _cts = new();
     private readonly ILogger<ThumbnailService> _logger;
     private readonly IEnumerable<IThumbnailStrategy> _thumbnailStrategy;
@@ -37,10 +39,10 @@ public sealed class ThumbnailService : IThumbnailService, IDisposable
         _channel = Channel.CreateBounded<AliasQueryResult>(
             new BoundedChannelOptions(s.ChannelCapacity) { FullMode = s.ChannelFullMode }
         );
-        foreach (var _ in Enumerable.Range(0, s.MaxThreads))
-        {
-            Task.Run(ConsumeAsync);
-        }
+
+        _consumers = Enumerable.Range(0, s.ConsumerCount)
+                               .Select(_ => Task.Run(ConsumeAsync))
+                               .ToArray();
     }
 
     #endregion
@@ -62,9 +64,16 @@ public sealed class ThumbnailService : IThumbnailService, IDisposable
 
     private async Task ConsumeAsync()
     {
-        await foreach (var alias in _channel.Reader.ReadAllAsync(_cts.Token))
+        try
         {
-            await RunStrategy(alias);
+            await foreach (var alias in _channel.Reader.ReadAllAsync(_cts.Token))
+            {
+                await RunStrategy(alias);
+            }
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogDebug(ex, "Cancellation requested during thumbnail consume");
         }
 
         return;
@@ -81,19 +90,21 @@ public sealed class ThumbnailService : IThumbnailService, IDisposable
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "One thumbnail retrieve strategy failed: {Message}", ex.Message);
+                    _logger.LogWarning(ex, "One thumbnail retrieve strategy failed");
                 }
             }
         }
     }
 
     /// <inheritdoc />
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _cts.Cancel();
+        await _cts.CancelAsync();
         _channel.Writer.TryComplete();
+        await Task.WhenAll(_consumers);
         _cts.Dispose();
     }
+
 
     /// <summary>
     ///     Starts a thread to refresh the thumbnails asynchronously. This method returns immediately after starting the
