@@ -8,10 +8,10 @@ public class FavIconHttpClient : IFavIconHttpClient
 {
     #region Fields
 
-    private static readonly HttpClient HttpClient = new(new SocketsHttpHandler
-    {
-        PooledConnectionIdleTimeout = 1.Minutes()
-    });
+    private static readonly SocketsHttpHandler SocketsHttpHandler =
+        new() { PooledConnectionIdleTimeout = 30.Seconds() };
+
+    private static readonly HttpClient HttpClient = new(SocketsHttpHandler) { Timeout = 5.Seconds() };
 
     #endregion
 
