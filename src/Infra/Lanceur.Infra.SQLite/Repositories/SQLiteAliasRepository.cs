@@ -3,6 +3,7 @@ using Dapper;
 using Lanceur.Core.Mappers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.SharedKernel.Extensions;
@@ -13,7 +14,6 @@ namespace Lanceur.Infra.SQLite.Repositories;
 
 public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasRepository
 {
-
     #region Constructors
 
     public SQLiteAliasRepository(
@@ -32,12 +32,6 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
     #endregion
 
     #region Methods
-
-    /// <remarks>
-    ///     This methods is used for test purpose. It encapsulates an internal method.
-    /// </remarks>
-    internal IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids)
-        => Db.WithConnection(conn => GetAdditionalParameter(conn, ids));
 
     /// <summary>
     ///     Builds an in-memory alias that aggregates data from all specified aliases into the first one.
@@ -67,16 +61,22 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
             {
                 throw new InvalidOperationException($"The id {id} is does not exist in the database");
             }
-            
+
             var parameters = GetAdditionalParameter(connection, ids);
             var synonyms = GetSynonyms(connection, ids);
-            
+
             alias.AddDistinctSynonyms(synonyms);
             alias.AdditionalParameters = new ObservableCollection<AdditionalParameter>(parameters);
-            
+
             return alias;
         });
     }
+
+    /// <remarks>
+    ///     This methods is used for test purpose. It encapsulates an internal method.
+    /// </remarks>
+    internal IEnumerable<AdditionalParameter> GetAdditionalParameter(IEnumerable<long> ids)
+        => Db.WithConnection(conn => GetAdditionalParameter(conn, ids));
 
     /// <inheritdoc />
     public IEnumerable<SelectableAliasQueryResult> GetAliasesWithoutNotes()
@@ -471,7 +471,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
                             """;
         return Db.WithConnection(c => c.Query<AliasUsageItem>(sql, new { selectedDay }));
     }
-    
+
     /// <inheritdoc />
     public IEnumerable<int> GetYearsWithUsage()
     {
@@ -527,6 +527,35 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
             var ids = fromAliases.Where(e => e != toAlias.Id);
             Remove(tx, ids);
         });
+
+    /// <inheritdoc/>
+    public void HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases)
+    {
+        const string sql = """
+                           select 
+                               file_name  as FileName,
+                               exec_count as Count
+                           from alias
+                           where file_name in @filenames
+                           """;
+        aliases = aliases.ToArray();
+        var steamGames = aliases.Where(x => x is { IsHidden: false, FileName: not null }
+                                            && x.IsSteamGame())
+                                .ToArray();
+
+        if (!steamGames.Any()) { return; }
+
+        var filenames = steamGames.Select(x => x.FileName).ToArray();
+        var toUpdate = Db.WithConnection(conn =>
+            conn.Query<AliasQueryResult>(sql, new { filenames }));
+
+        foreach (var item in toUpdate)
+        {
+            var alias = aliases.SingleOrDefault(x =>
+                                   x.FileName!.Equals(item.FileName, StringComparison.InvariantCultureIgnoreCase));
+            alias?.Count = item.Count;
+        }
+    }
 
     /// <inheritdoc />
     public void RemoveLogically(AliasQueryResult alias)

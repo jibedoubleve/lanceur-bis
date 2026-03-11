@@ -3,13 +3,14 @@ using Lanceur.Core.Models;
 
 namespace Lanceur.Infra.Stores;
 
+[Obsolete("Should be renamed as StoreBase to avoid issue with StoreAttribute")]
 public abstract class Store
 {
     #region Constructors
 
-    protected Store(IStoreOrchestrationFactory factory)
+    protected Store(IStoreOrchestrationFactory orchestrationFactory)
         => StoreOrchestrationFactory
-            = factory ??
+            = orchestrationFactory ??
               throw new NullReferenceException(
                   $"The {typeof(IStoreOrchestrationFactory)} should be configured in the IOC container."
               );

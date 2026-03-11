@@ -119,13 +119,18 @@ public class AliasDbAction
         }
     }
 
+    private static string? GetFileName(QueryResult alias) =>
+        alias is AliasQueryResult aqr
+            ? aqr.FileName
+            : null;
+
     internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
     {
         if (alias is not ExecutableQueryResult exec) { return; }
 
         var queryResult = exec.ToAliasQueryResult();
         queryResult.IsHidden = true;
-        queryResult.FileName = exec.Name; // By convention for builtin keyword
+        queryResult.FileName = GetFileName(alias) ?? exec.Name; // By convention for builtin keyword
         alias.Id = SaveOrUpdate(tx, ref queryResult);
     }
 

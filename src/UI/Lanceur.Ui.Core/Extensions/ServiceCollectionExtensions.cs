@@ -157,6 +157,7 @@ public static class ServiceCollectionExtensions
                          .AddThumbnailStrategies()
                          .AddStaThreadRunner()
                          .AddTransient<IThumbnailService, ThumbnailService>()
+                         .AddTransient<ISteamLibraryService, SteamLibraryService>()
                          .AddSingleton<IFavIconHttpClient, FavIconHttpClient>();
 
         return serviceCollection;
