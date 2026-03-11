@@ -41,6 +41,8 @@ public static class StoreExtensions
                 .AddMockSingleton<IBookmarkRepositoryFactory>()
                 .AddMockSingleton<ICalculatorService>()
                 .AddMockSingleton<AssemblySource>()
+                .AddMockSingleton<ISteamLibraryService>()
+                .AddMockSingleton<IAliasManagementService>()
                 .AddMockSingleton<IEverythingApi>();
             return serviceCollection;
         }

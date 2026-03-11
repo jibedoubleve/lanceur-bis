@@ -46,7 +46,7 @@ public class IoCForStoresShould : TestBase
         var stores = serviceProvider.GetServices<IStoreService>();
 
         // assert
-        stores.Count().ShouldBe(6);
+        stores.Count().ShouldBe(7);
     }
 
     [Theory]
