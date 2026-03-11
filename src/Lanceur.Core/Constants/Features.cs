@@ -8,6 +8,7 @@ public static class Features
 
     public const string AdditionalParameterAlwaysActive = "AdditionalParameterAlwaysActive";
     public const string ResourceDisplay = "ShowSystemUsage";
+    public const string SteamIntegration = "SteamLibraryGames";
 
     #endregion
 

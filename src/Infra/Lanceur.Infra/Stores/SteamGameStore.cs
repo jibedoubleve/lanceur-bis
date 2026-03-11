@@ -1,3 +1,4 @@
+using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -11,6 +12,7 @@ public class SteamGameStore : Store, IStoreService
     #region Fields
 
     private readonly IAliasManagementService _aliasManagementService;
+    private readonly IFeatureFlagService _featureFlagService;
 
     private readonly ISteamLibraryService _steamLibraryService;
 
@@ -22,11 +24,13 @@ public class SteamGameStore : Store, IStoreService
     public SteamGameStore(
         IStoreOrchestrationFactory orchestrationFactory,
         ISteamLibraryService steamLibraryService,
-        IAliasManagementService aliasManagementService
+        IAliasManagementService aliasManagementService,
+        IFeatureFlagService featureFlagService
     ) : base(orchestrationFactory)
     {
         _steamLibraryService = steamLibraryService;
         _aliasManagementService = aliasManagementService;
+        _featureFlagService = featureFlagService;
     }
 
     #endregion
@@ -37,7 +41,10 @@ public class SteamGameStore : Store, IStoreService
     public bool IsOverridable => true;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(@"^\s{0,}&.*");
+    public StoreOrchestration StoreOrchestration
+        => _featureFlagService.IsEnabled(Features.SteamIntegration)
+            ? StoreOrchestrationFactory.Exclusive(@"^\s{0,}&.*")
+            : StoreOrchestrationFactory.AlwaysInactive();
 
     #endregion
 
