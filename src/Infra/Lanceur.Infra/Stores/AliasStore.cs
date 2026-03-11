@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class AliasStore : Store, IStoreService
+public class AliasStore : StoreBase, IStoreService
 {
     #region Fields
 

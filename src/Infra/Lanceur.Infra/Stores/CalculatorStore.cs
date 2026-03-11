@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class CalculatorStore : Store, IStoreService
+public class CalculatorStore : StoreBase, IStoreService
 {
     #region Fields
 

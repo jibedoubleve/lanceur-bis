@@ -33,6 +33,10 @@ public class SteamGameStoreTest
                  .AddSingleton(steamService)
                  .AddSingleton(managementService)
                  .AddSingleton<SteamGameStore>()
+                 .AddMockSingleton<IFeatureFlagService>((_, i)=> {
+                     i.IsEnabled(Arg.Any<string>()).Returns(true);
+                     return i;
+                 })
                  .AddLoggingForTests(_output)
                  .BuildServiceProvider();
         return sp.GetRequiredService<SteamGameStore>();

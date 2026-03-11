@@ -17,7 +17,7 @@ public class StoreSection
 
     /// <summary>
     ///     Gets or sets the suffix appended to queries executed with the Everything search engine.
-    ///     This suffix can be used to modify search behavior, such as excluding system or hidden files.
+    ///     This suffix can be used to modify search behaviour, such as excluding system or hidden files.
     /// </summary>
     public string EverythingQuerySuffix { get; set; } = string.Empty;
 

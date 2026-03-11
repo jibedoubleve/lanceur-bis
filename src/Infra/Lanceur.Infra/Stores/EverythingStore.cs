@@ -12,15 +12,13 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class EverythingStore : Store, IStoreService
+public class EverythingStore : StoreBase, IStoreService
 {
     #region Fields
 
     private readonly IEverythingApi _everythingApi;
     private readonly ILogger<EverythingStore> _logger;
     private readonly ISection<StoreSection> _settings;
-
-    private const string SearchAlias = ":";
 
     #endregion
 
