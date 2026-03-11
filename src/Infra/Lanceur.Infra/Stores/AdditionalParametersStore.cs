@@ -43,7 +43,7 @@ public class AdditionalParametersStore : Store, IStoreService
 
     /// <inheritdoc />
     public StoreOrchestration StoreOrchestration
-        => _featureFlags?.IsEnabled(Features.AdditionalParameterAlwaysActive) ?? false
+        => _featureFlags.IsEnabled(Features.AdditionalParameterAlwaysActive)
             ? StoreOrchestrationFactory.SharedAlwaysActive()
             : StoreOrchestrationFactory.Shared(".*:.*");
 

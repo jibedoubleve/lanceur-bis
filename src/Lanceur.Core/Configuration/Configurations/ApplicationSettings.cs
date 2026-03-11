@@ -35,6 +35,13 @@ public class ApplicationSettings
             Enabled = false,
             Description = "Display additional parameter results without requiring ':' input",
             Icon = "PanelSeparateWindow20"
+        },
+        new()
+        {
+            FeatureName = Features.SteamIntegration,
+            Enabled = false,
+            Description = "Browse and launch games installed in the Steam library",
+            Icon = "Games24"
         }
     ];
 

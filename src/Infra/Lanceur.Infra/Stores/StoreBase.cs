@@ -3,12 +3,11 @@ using Lanceur.Core.Models;
 
 namespace Lanceur.Infra.Stores;
 
-[Obsolete("Should be renamed as StoreBase to avoid issue with StoreAttribute")]
-public abstract class Store
+public abstract class StoreBase
 {
     #region Constructors
 
-    protected Store(IStoreOrchestrationFactory orchestrationFactory)
+    protected StoreBase(IStoreOrchestrationFactory orchestrationFactory)
         => StoreOrchestrationFactory
             = orchestrationFactory ??
               throw new ArgumentException(
