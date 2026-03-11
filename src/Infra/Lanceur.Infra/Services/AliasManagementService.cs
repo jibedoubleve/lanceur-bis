@@ -1,6 +1,7 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
+using Lanceur.Core.Utils;
 
 namespace Lanceur.Infra.Services;
 
@@ -45,6 +46,10 @@ public class AliasManagementService : IAliasManagementService
         queryResult.MarkUnchanged();
         return queryResult;
     }
+
+    /// <inheritdoc />
+    public void HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases) 
+        => _repository.HydrateSteamGameUsage(aliases);
 
     /// <inheritdoc />
     public void SaveOrUpdate(ref AliasQueryResult alias)

@@ -14,7 +14,7 @@ public enum Per
 public interface IAliasRepository
 {
     #region Methods
-    
+
     /// <summary>
     ///     Retrieves all aliases in the system that don't have associated notes or comments.
     /// </summary>
@@ -207,6 +207,22 @@ public interface IAliasRepository
     void HydrateAlias(AliasQueryResult alias);
 
     /// <summary>
+    ///     Hydrates the execution counters of Steam game aliases from the database.
+    ///     Non-Steam aliases are ignored.
+    /// </summary>
+    /// <param name="aliases">The aliases to hydrate. Only Steam game aliases are updated.</param>
+    void HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases);
+
+    /// <summary>
+    ///     Persists the merge of multiple aliases into a single target alias.
+    ///     The target alias is saved with its aggregated synonyms and additional parameters,
+    ///     then restored if previously deleted. The source aliases are permanently removed.
+    ///     This operation is irreversible and cannot be undone.
+    /// </summary>
+    /// <param name="fromAliases">The primary keys of the source aliases to be absorbed and permanently deleted.</param>
+    void Merge(IEnumerable<long> fromAliases);
+
+    /// <summary>
     ///     Marks the specified alias as removed from the repository.
     ///     This is a logical removal; the alias remains in the database
     ///     but is flagged as deleted and excluded from subsequent queries.
@@ -315,13 +331,5 @@ public interface IAliasRepository
     /// </remarks>
     void UpdateThumbnail(AliasQueryResult alias);
 
-    /// <summary>
-    ///     Persists the merge of multiple aliases into a single target alias.
-    ///     The target alias is saved with its aggregated synonyms and additional parameters,
-    ///     then restored if previously deleted. The source aliases are permanently removed.
-    ///     This operation is irreversible and cannot be undone.
-    /// </summary>
-    /// <param name="fromAliases">The primary keys of the source aliases to be absorbed and permanently deleted.</param>
-    void Merge(IEnumerable<long> fromAliases);
     #endregion
 }

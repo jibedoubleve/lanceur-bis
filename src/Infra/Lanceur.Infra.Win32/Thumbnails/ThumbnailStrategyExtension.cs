@@ -1,4 +1,3 @@
-using Lanceur.Infra.Win32.Thumbnails.Strategies;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -10,12 +9,10 @@ public static class ThumbnailStrategyExtension
 
     public static IServiceCollection AddThumbnailStrategies(this IServiceCollection services)
     {
-        Type[] types =
-        [
-            typeof(FavIconAppThumbnailStrategy),
-            typeof(Win32AppThumbnailStrategy),
-            typeof(PackagedAppThumbnailStrategy)
-        ];
+        var assembly = typeof(ThumbnailStrategyExtension).Assembly;
+        var types = assembly.GetTypes()
+                            .Where(t => t is { IsClass: true, IsAbstract: false }
+                                        && t.IsAssignableTo(typeof(IThumbnailStrategy)));
 
         foreach (var type in types)
         {

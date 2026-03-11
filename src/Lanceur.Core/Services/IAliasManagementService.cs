@@ -39,6 +39,13 @@ public interface IAliasManagementService
     AliasQueryResult Hydrate(AliasQueryResult queryResult);
 
     /// <summary>
+    ///     Hydrates the execution counters of Steam game aliases from the database.
+    ///     Non-Steam aliases are ignored.
+    /// </summary>
+    /// <param name="aliases">The aliases to hydrate. Only Steam game aliases are updated.</param>
+    void HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases);
+
+    /// <summary>
     ///     Saves or updates the specified alias query result to the database. If the entity is newly created,
     ///     its Id is updated after saving.
     /// </summary>

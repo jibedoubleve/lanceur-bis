@@ -83,9 +83,8 @@ public class SetUsageDbAction
         //   * The alias is excluded from the history.
         //   * The counter is hidden from the user.
         if (alias.Count < 0) { return; }
-
-        var aliasDbAction = _dbActionFactory.AliasManagement;
-        if (alias.Id == 0) { aliasDbAction.CreateInvisible(tx, ref alias); }
+        if (alias.Id == 0) { _dbActionFactory.AliasManagement
+                                             .CreateInvisible(tx, ref alias); }
 
         AddHistory(tx, ref alias);
         UpdateCounter(tx, ref alias);
