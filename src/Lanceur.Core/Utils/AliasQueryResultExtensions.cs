@@ -7,7 +7,7 @@ public static partial class AliasQueryResultExtensions
 {
     #region Methods
 
-    [GeneratedRegex(@"steam://run/(\d*)")]
+    [GeneratedRegex(@"steam://run/(\d+)")]
     private static partial Regex SteamGameRegex();
 
     public static int GetSteamId(this AliasQueryResult alias)
