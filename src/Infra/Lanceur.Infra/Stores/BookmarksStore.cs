@@ -11,7 +11,7 @@ using Lanceur.SharedKernel.Extensions;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class BookmarksStore : Store, IStoreService
+public class BookmarksStore : StoreBase, IStoreService
 {
     #region Fields
 

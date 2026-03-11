@@ -7,13 +7,12 @@ using Lanceur.Core.Stores;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class SteamGameStore : Store, IStoreService
+public class SteamGameStore : StoreBase, IStoreService
 {
     #region Fields
 
     private readonly IAliasManagementService _aliasManagementService;
     private readonly IFeatureFlagService _featureFlagService;
-
     private readonly ISteamLibraryService _steamLibraryService;
 
     #endregion
