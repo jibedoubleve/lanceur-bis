@@ -1,7 +1,9 @@
 using System.Text.RegularExpressions;
 using Everything.Wrapper;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -108,6 +110,7 @@ public class StoresOrchestrationTest
                               .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                               .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                               .AddSingleton<IStoreService, CalculatorStore>()
+                              .AddMockSingleton<ISection<StoreSection>>()
                               .AddTestOutputHelper(_outputHelper)
                               .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>()!;
@@ -141,6 +144,7 @@ public class StoresOrchestrationTest
                               .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                               .AddSingleton<CalculatorStore>()
                               .AddTestOutputHelper(_outputHelper)
+                              .AddMockSingleton<ISection<StoreSection>>()
                               .BuildServiceProvider();
         var store = serviceProvider.GetService<CalculatorStore>()!;
 
@@ -280,6 +284,7 @@ public class StoresOrchestrationTest
                               .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                               .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                               .AddSingleton<IStoreService, CalculatorStore>()
+                              .AddMockSingleton<ISection<StoreSection>>()
                               .AddTestOutputHelper(_outputHelper)
                               .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>()!;

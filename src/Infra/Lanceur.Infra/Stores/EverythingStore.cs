@@ -18,7 +18,6 @@ public class EverythingStore : StoreBase, IStoreService
 
     private readonly IEverythingApi _everythingApi;
     private readonly ILogger<EverythingStore> _logger;
-    private readonly ISection<StoreSection> _settings;
 
     #endregion
 
@@ -28,13 +27,11 @@ public class EverythingStore : StoreBase, IStoreService
         IStoreOrchestrationFactory orchestrationFactory,
         ILogger<EverythingStore> logger,
         IEverythingApi everythingApi,
-        ISection<StoreSection> settings,
         ISection<StoreSection> storeSettings
     ) : base(orchestrationFactory, storeSettings)
     {
         _logger = logger;
         _everythingApi = everythingApi;
-        _settings = settings;
     }
 
     #endregion
@@ -59,7 +56,7 @@ public class EverythingStore : StoreBase, IStoreService
             return DisplayQueryResult.SingleFromResult("Enter text to search with Everything tool...");
         }
 
-        var query = $"{cmdline.Parameters} {_settings.Value.EverythingQuerySuffix}";
+        var query = $"{cmdline.Parameters} {StoreSettings.Value.EverythingQuerySuffix}";
         _logger.LogTrace("Everything query: {Query}", query);
 
         var result = _everythingApi.Search(query);

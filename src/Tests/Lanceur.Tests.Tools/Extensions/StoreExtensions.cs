@@ -1,6 +1,7 @@
 using System.Web.Bookmarks;
 using Everything.Wrapper;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Repositories;
@@ -14,39 +15,50 @@ namespace Lanceur.Tests.Tools.Extensions;
 
 public static class StoreExtensions
 {
-    extension(IServiceCollection serviceCollection)
+    #region Methods
+
+    public static IServiceCollection AddStoreServicesConfiguration(
+        this IServiceCollection serviceCollection,
+        ApplicationSettings? configuration = null)
     {
-        #region Methods
-
-        public IServiceCollection AddStoreServicesConfiguration(ApplicationSettings? configuration = null)
-        {
-            serviceCollection
-                .AddConfigurationSections()
-                .AddMockSingleton<IConfigurationFacade>((_, i) => {
-                        i.Application.Returns(
-                            configuration ??
-                            new ApplicationSettings { Caching = new CachingSection(0, 0), Stores = new StoreSection() }
-                        );
-                        return i;
-                    }
-                );
-            return serviceCollection;
-        }
-
-        public IServiceCollection AddStoreServicesMockContext()
-        {
-            serviceCollection
-                .AddMockSingleton<IAliasRepository>()
-                .AddMockSingleton<IFeatureFlagService>()
-                .AddMockSingleton<IBookmarkRepositoryFactory>()
-                .AddMockSingleton<ICalculatorService>()
-                .AddMockSingleton<AssemblySource>()
-                .AddMockSingleton<ISteamLibraryService>()
-                .AddMockSingleton<IAliasManagementService>()
-                .AddMockSingleton<IEverythingApi>();
-            return serviceCollection;
-        }
-
-        #endregion
+        serviceCollection
+            .AddConfigurationSections()
+            .AddMockSingleton<IConfigurationFacade>((_, i) => {
+                    i.Application.Returns(
+                        configuration ??
+                        new ApplicationSettings { Caching = new CachingSection(0, 0), Stores = new StoreSection() }
+                    );
+                    return i;
+                }
+            );
+        return serviceCollection;
     }
+
+    public static IServiceCollection AddStoreServicesMockContext(
+        this IServiceCollection serviceCollection,
+        Func<IServiceProvider, ISection<StoreSection>, ISection<StoreSection>> configurator)
+    {
+        serviceCollection
+            .AddMockSingleton<IAliasRepository>()
+            .AddMockSingleton<IFeatureFlagService>()
+            .AddMockSingleton<IBookmarkRepositoryFactory>()
+            .AddMockSingleton<ICalculatorService>()
+            .AddMockSingleton<AssemblySource>()
+            .AddMockSingleton<ISteamLibraryService>()
+            .AddMockSingleton<IAliasManagementService>()
+            .AddMockSingleton<IEverythingApi>()
+            .AddMockSingleton(configurator);
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddStoreServicesMockContext(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddStoreServicesMockContext((_, i) => {
+            i.Value.Returns(new StoreSection());
+            return i;
+        });
+        return serviceCollection;
+    }
+
+    #endregion
 }
