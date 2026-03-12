@@ -54,7 +54,7 @@ public class MacroServiceTest : TestBase
                                       .AddMockSingleton<IUserGlobalNotificationService>()
                                       .AddMockSingleton<IEnigma>()
                                       .AddMockSingleton<ISection<GithubSection>>()
-                                      .AddMacroServices()
+                                      .AddMacros()
                                       .BuildServiceProvider();
     }
 
@@ -164,7 +164,7 @@ public class MacroServiceTest : TestBase
                               .AddMockSingleton<IUserGlobalNotificationService>()
                               .AddMockSingleton<IEnigma>()
                               .AddMockSingleton<ISection<GithubSection>>()
-                              .AddMacroServices()
+                              .AddMacros()
                               .BuildServiceProvider();
 
         var manager = serviceProvider.GetService<MacroAliasExpanderService>()!;
@@ -213,7 +213,7 @@ public class MacroServiceTest : TestBase
                                                      .AddMockSingleton<IUserGlobalNotificationService>()
                                                      .AddMockSingleton<IEnigma>()
                                                      .AddMockSingleton<ISection<GithubSection>>()
-                                                     .AddMacroServices()
+                                                     .AddMacros()
                                                      .BuildServiceProvider();
 
         var output = serviceProvider.GetService<MacroAliasExpanderService>()!
@@ -271,7 +271,7 @@ public class MacroServiceTest : TestBase
                                                      .AddSingleton<MacroAliasExpanderService>()
                                                      .AddSingleton<AssemblySource>()
                                                      .AddLoggingForTests(OutputHelper)
-                                                     .AddMacroServices()
+                                                     .AddMacros()
                                                      .AddMockSingleton<IClipboardService>()
                                                      .AddMockSingleton<IGithubService>()
                                                      .AddMockSingleton<IUserGlobalNotificationService>()
@@ -340,7 +340,7 @@ public class MacroServiceTest : TestBase
                               .AddMockSingleton<IUserGlobalNotificationService>()
                               .AddMockSingleton<IEnigma>()
                               .AddMockSingleton<ISection<GithubSection>>()
-                              .AddMacroServices()
+                              .AddMacros()
                               .BuildServiceProvider();
 
 

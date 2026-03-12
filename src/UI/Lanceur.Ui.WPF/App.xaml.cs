@@ -8,6 +8,7 @@ using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.Macros;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.Infra.Stores;
@@ -46,9 +47,9 @@ public partial class App
                                    .Register("Control", "Lanceur.Ui.WPF")
                                    .AddServices()
                                    .AddWpfServices()
-                                   .AddStoreServices()
-                                   .AddReservedAliasesServices(typeof(AddAlias))
-                                   .AddMacroServices()
+                                   .AddStores()
+                                   .AddReservedAliases(typeof(AddAlias))
+                                   .AddMacros()
                                    .AddCommands()
                                    .AddConfiguration()
                                    .AddDatabaseServices()

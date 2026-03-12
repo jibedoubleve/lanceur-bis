@@ -10,6 +10,7 @@ using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling.ReservedAliases;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.ReservedAliases;
+using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -52,7 +53,7 @@ public class ReservedKeywordsStoreTest
                                   }
                               )
                               .AddSingleton<ReservedAliasStore>()
-                              .AddReservedAliasesServices(type)
+                              .AddReservedAliases(type)
                               .AddMockSingleton<IUserDialogueService>()
                               .AddMockSingleton<IUserNotificationService>()
                               .BuildServiceProvider();

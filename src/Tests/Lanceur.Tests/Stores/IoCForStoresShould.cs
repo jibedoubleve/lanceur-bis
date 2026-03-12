@@ -38,7 +38,7 @@ public class IoCForStoresShould : TestBase
         var serviceProvider = new ServiceCollection()
                               .AddTestOutputHelper(OutputHelper)
                               .AddStoreServicesConfiguration()
-                              .AddStoreServices()
+                              .AddStores()
                               .AddStoreServicesMockContext()
                               .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                               .BuildServiceProvider();
