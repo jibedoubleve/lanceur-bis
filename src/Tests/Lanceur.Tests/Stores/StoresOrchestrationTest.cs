@@ -229,7 +229,7 @@ public class StoresOrchestrationTest
                                                      .AddSingleton<AdditionalParametersStore>()
                                                      .AddTestOutputHelper(_outputHelper)
                                                      .AddStoreServicesMockContext()
-                                                     .AddStoreServices()
+                                                     .AddStores()
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 

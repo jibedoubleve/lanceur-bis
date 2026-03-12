@@ -263,7 +263,7 @@ public class ExecutionServiceShould : TestBase
         var sp = new ServiceCollection()
                  .AddMockSingleton<IExecutionService>()
                  .AddMockSingleton<ISearchService>()
-                 .AddMacroServices()
+                 .AddMacros()
                  .AddLoggingForTests(OutputHelper)
                  .BuildServiceProvider();
 
