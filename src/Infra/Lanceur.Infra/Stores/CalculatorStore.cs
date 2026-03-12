@@ -1,4 +1,6 @@
-﻿using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
@@ -23,8 +25,9 @@ public class CalculatorStore : StoreBase, IStoreService
     public CalculatorStore(
         IStoreOrchestrationFactory orchestrationFactory,
         ILogger<CalculatorStore> logger,
-        ICalculatorService calculator
-    ) : base(orchestrationFactory)
+        ICalculatorService calculator,
+        ISection<StoreSection> storeSettings
+    ) : base(orchestrationFactory, storeSettings)
     {
         ArgumentNullException.ThrowIfNull(calculator);
 

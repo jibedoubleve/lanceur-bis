@@ -18,6 +18,7 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
+using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Helpers;
 using Lanceur.Infra.Win32.Services;
@@ -158,6 +159,7 @@ public static class ServiceCollectionExtensions
                          .AddStaThreadRunner()
                          .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<ISteamLibraryService, SteamLibraryService>()
+                         .AddTransient<IStoreShortcutService, StoreShortcutService>()
                          .AddSingleton<IFavIconHttpClient, FavIconHttpClient>();
 
         return serviceCollection;

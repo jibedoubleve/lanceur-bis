@@ -1,4 +1,6 @@
-﻿using Lanceur.Core.Managers;
+﻿using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -23,8 +25,9 @@ public class AliasStore : StoreBase, IStoreService
     public AliasStore(
         IStoreOrchestrationFactory orchestrationFactory,
         IAliasRepository aliasRepository,
-        ILogger<AliasStore> logger
-    ) : base(orchestrationFactory)
+        ILogger<AliasStore> logger,
+        ISection<StoreSection> storeSettings
+    ) : base(orchestrationFactory, storeSettings)
     {
         _aliasRepository = aliasRepository;
         _logger = logger;

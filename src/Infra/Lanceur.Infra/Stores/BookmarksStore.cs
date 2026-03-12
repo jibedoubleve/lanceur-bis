@@ -10,13 +10,12 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.Stores;
 
-[Store]
+[Store(@"^\s{0,}/.*")]
 public class BookmarksStore : StoreBase, IStoreService
 {
     #region Fields
 
     private readonly IBookmarkRepositoryFactory _bookmarkRepositoryFactory;
-    private readonly ISection<StoreSection> _settings;
 
     #endregion
 
@@ -24,11 +23,10 @@ public class BookmarksStore : StoreBase, IStoreService
 
     public BookmarksStore(
         IStoreOrchestrationFactory orchestrationFactory,
-        ISection<StoreSection> settings,
-        IBookmarkRepositoryFactory bookmarkRepositoryFactory
-    ) : base(orchestrationFactory)
+        IBookmarkRepositoryFactory bookmarkRepositoryFactory,
+        ISection<StoreSection> storeSettings
+    ) : base(orchestrationFactory, storeSettings)
     {
-        _settings = settings;
         _bookmarkRepositoryFactory = bookmarkRepositoryFactory;
     }
 
@@ -39,7 +37,7 @@ public class BookmarksStore : StoreBase, IStoreService
     /// <inheritdoc />
     public bool IsOverridable => true;
 
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(@"^\s{0,}/.*");
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(DefaultShortcut);
 
     #endregion
 
@@ -48,7 +46,7 @@ public class BookmarksStore : StoreBase, IStoreService
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)
     {
-        var bookmarkSourceBrowser = _settings.Value.BookmarkSourceBrowser;
+        var bookmarkSourceBrowser = StoreSettings.Value.BookmarkSourceBrowser;
         var repository = _bookmarkRepositoryFactory.BuildBookmarkRepository(bookmarkSourceBrowser);
 
         if (!repository.IsBookmarkSourceAvailable())

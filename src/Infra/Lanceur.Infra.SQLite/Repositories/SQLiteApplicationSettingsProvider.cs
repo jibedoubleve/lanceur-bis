@@ -103,7 +103,7 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
         _current = AddNewFeatureFlags(
             json.IsNullOrEmpty()
                 ? new ApplicationSettings()
-                : JsonConvert.DeserializeObject<ApplicationSettings>(json, _jsonSettings) 
+                : JsonConvert.DeserializeObject<ApplicationSettings>(json, _jsonSettings)
                   ?? new ApplicationSettings()
         );
     }
@@ -111,18 +111,16 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
     /// <inheritdoc />
     public void Save()
     {
-        Db.WithConnection(conn => {
-                const string sql = """
-                                   insert into settings(s_key, s_value) values ('json', @json)
-                                   on conflict (s_key) do update 
-                                   set 
-                                   	s_value = @json
-                                   where s_key = 'json'
-                                   """;
-                var json = JsonConvert.SerializeObject(Current);
-                conn.Execute(sql, new { json });
-            }
-        );
+        const string sql = """
+                           insert into settings(s_key, s_value) values ('json', @json)
+                           on conflict (s_key) do update 
+                           set 
+                           	s_value = @json
+                           where s_key = 'json'
+                           """;
+        var json = JsonConvert.SerializeObject(Current);
+
+        Db.WithConnection(conn => conn.Execute(sql, new { json }));
         _logger.LogTrace("Saved settings in database.");
     }
 
