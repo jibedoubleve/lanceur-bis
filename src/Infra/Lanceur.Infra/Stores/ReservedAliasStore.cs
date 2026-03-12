@@ -1,4 +1,5 @@
-﻿using Lanceur.Core;
+﻿using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -22,23 +23,13 @@ public class ReservedAliasStore : StoreBase, IStoreService
 
     #region Constructors
 
-    /// <summary>
-    ///     Generate a new instance. Look into the Executing Assembly to find reserved aliases.
-    /// </summary>
-    /// <param name="orchestrationFactory">Service Provider used to inject dependencies</param>
-    /// <param name="aliasRepository">Repository of all the aliases</param>
-    /// <param name="logger">Used for logging</param>
-    /// <param name="reservedAliases">List of reserved aliases (builtin aliases)</param>
-    /// <exception cref="ArgumentNullException">If assembly source is null or no ReservedKeywordSource configured</exception>
-    /// <remarks>
-    ///     Each reserved alias should be decorated with <see cref="ReservedAliasAttribute" />
-    /// </remarks>
     public ReservedAliasStore(
         IStoreOrchestrationFactory orchestrationFactory,
         IAliasRepository aliasRepository,
         ILogger<ReservedAliasStore> logger,
-        IEnumerable<SelfExecutableQueryResult> reservedAliases
-    ) : base(orchestrationFactory)
+        IEnumerable<SelfExecutableQueryResult> reservedAliases,
+        ISection<StoreSection> storeSettings
+    ) : base(orchestrationFactory, storeSettings)
     {
         _aliasRepository = aliasRepository;
         _logger = logger;

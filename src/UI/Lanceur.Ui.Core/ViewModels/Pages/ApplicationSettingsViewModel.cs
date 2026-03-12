@@ -9,6 +9,7 @@ using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Stores;
 using Lanceur.Infra.Stores.Everything;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.IoC;
@@ -30,6 +31,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     [ObservableProperty] private int _cpuSmoothingIndex;
     [ObservableProperty] private string _dbPath = string.Empty;
     private readonly IEnigma _enigma;
+    private readonly IStoreShortcutService _storeShortcutService;
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
@@ -68,7 +70,8 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IAppRestartService appRestartService,
         IConfigurationFacade configuration,
         IViewFactory viewFactory,
-        IEnigma enigma
+        IEnigma enigma,
+        IStoreShortcutService storeShortcutService
     )
     {
         ArgumentNullException.ThrowIfNull(userCommunicationService);
@@ -83,6 +86,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         _configuration = configuration;
         _viewFactory = viewFactory;
         _enigma = enigma;
+        _storeShortcutService = storeShortcutService;
 
         // Hotkey
         var hk = _configuration.Application.HotKey;
@@ -149,7 +153,9 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         // Store section
         BookmarkSourceBrowser = Configuration.Application.Stores.BookmarkSourceBrowser;
-        StoreShortcuts = new ObservableCollection<StoreShortcut>(Configuration.Application.Stores.StoreShortcuts);
+
+        var shortcuts = _storeShortcutService.Resolve(Configuration.Application.Stores);
+        StoreShortcuts = new ObservableCollection<StoreShortcut>(shortcuts);
 
         // Everything Store
         var adapter = new EverythingQueryAdapter(Configuration.Application.Stores.EverythingQuerySuffix);

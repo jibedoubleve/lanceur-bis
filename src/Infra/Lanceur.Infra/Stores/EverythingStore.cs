@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
 
-[Store]
+[Store(@"^\s{0,}:.*")]
 public class EverythingStore : StoreBase, IStoreService
 {
     #region Fields
@@ -28,8 +28,9 @@ public class EverythingStore : StoreBase, IStoreService
         IStoreOrchestrationFactory orchestrationFactory,
         ILogger<EverythingStore> logger,
         IEverythingApi everythingApi,
-        ISection<StoreSection> settings
-    ) : base(orchestrationFactory)
+        ISection<StoreSection> settings,
+        ISection<StoreSection> storeSettings
+    ) : base(orchestrationFactory, storeSettings)
     {
         _logger = logger;
         _everythingApi = everythingApi;
@@ -44,7 +45,7 @@ public class EverythingStore : StoreBase, IStoreService
     public bool IsOverridable => true;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(@"^\s{0,}:.*");
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(DefaultShortcut);
 
     #endregion
 

@@ -1,3 +1,5 @@
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -6,7 +8,7 @@ using Lanceur.Core.Stores;
 
 namespace Lanceur.Infra.Stores;
 
-[Store]
+[Store(@"^\s{0,}&.*")]
 public class SteamGameStore : StoreBase, IStoreService
 {
     #region Fields
@@ -24,8 +26,9 @@ public class SteamGameStore : StoreBase, IStoreService
         IStoreOrchestrationFactory orchestrationFactory,
         ISteamLibraryService steamLibraryService,
         IAliasManagementService aliasManagementService,
-        IFeatureFlagService featureFlagService
-    ) : base(orchestrationFactory)
+        IFeatureFlagService featureFlagService,
+        ISection<StoreSection> storeSettings
+    ) : base(orchestrationFactory, storeSettings)
     {
         _steamLibraryService = steamLibraryService;
         _aliasManagementService = aliasManagementService;
@@ -42,7 +45,7 @@ public class SteamGameStore : StoreBase, IStoreService
     /// <inheritdoc />
     public StoreOrchestration StoreOrchestration
         => _featureFlagService.IsEnabled(Features.SteamIntegration)
-            ? StoreOrchestrationFactory.Exclusive(@"^\s{0,}&.*")
+            ? StoreOrchestrationFactory.Exclusive(DefaultShortcut)
             : StoreOrchestrationFactory.AlwaysInactive();
 
     #endregion

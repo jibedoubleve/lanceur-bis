@@ -1,3 +1,5 @@
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -26,8 +28,9 @@ public class AdditionalParametersStore : StoreBase, IStoreService
         IStoreOrchestrationFactory orchestrationFactory,
         IAliasRepository aliasService,
         ILogger<AdditionalParametersStore> logger,
-        IFeatureFlagService featureFlags
-    ) : base(orchestrationFactory)
+        IFeatureFlagService featureFlags,
+        ISection<StoreSection> storeSettings
+    ) : base(orchestrationFactory, storeSettings)
     {
         _aliasService = aliasService;
         _logger = logger;

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace Lanceur.Core.Models;
 
@@ -14,11 +15,19 @@ public class ObservableModel : INotifyPropertyChanged
 
     #endregion
 
+    #region Events
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    #endregion
+
     #region Properties
 
     /// <summary>
     ///     Gets a value indicating whether the object has been modified since its creation or the last reset.
     /// </summary>
+    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
     public bool IsDirty
     {
         get;
@@ -76,10 +85,4 @@ public class ObservableModel : INotifyPropertyChanged
     public void MarkUnchanged() => IsDirty = false;
 
     #endregion
-
-    #region Events
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    #endregion Events
 }

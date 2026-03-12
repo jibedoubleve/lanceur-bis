@@ -29,3 +29,22 @@ public class StoreSection
 
     #endregion
 }
+
+public static class StoreSectionExtension
+{
+    #region Methods
+
+    /// <summary>
+    ///     Returns the alias override configured for the specified store type,
+    ///     or an empty string if no override is defined.
+    /// </summary>
+    /// <param name="storeSection">The store configuration section containing the shortcut overrides.</param>
+    /// <param name="storeType">The store instance whose type is used to look up the override.</param>
+    /// <returns>The alias override for the store, or <see cref="string.Empty"/> if none is found.</returns>
+    public static string GetOverride(this StoreSection storeSection, object storeType) =>
+        storeSection.StoreShortcuts
+                    .FirstOrDefault(x => storeType.GetType().FullName!.Equals(x.StoreType))
+                    ?.AliasOverride ?? string.Empty;
+
+    #endregion
+}
