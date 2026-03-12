@@ -13,7 +13,7 @@ public partial class SteamLibraryService : ISteamLibraryService
 {
     #region Fields
 
-    private DateTime _lastCacheUpdate = DateTime.Now;
+    private DateTime _lastCacheUpdate = DateTime.MinValue;
 
     private readonly ILogger<SteamLibraryService> _logger;
     private readonly IMemoryCache _memoryCache;
@@ -79,6 +79,7 @@ public partial class SteamLibraryService : ISteamLibraryService
             entry => {
                 entry.AbsoluteExpirationRelativeToNow = 10.Seconds();
                 var libraries = new List<string>();
+                
                 foreach (Match m in KeyValuePattern().Matches(File.ReadAllText(vdf)))
                 {
                     _logger.LogDebug("Found library path: {LibraryPath}", m.Groups[1].Value);

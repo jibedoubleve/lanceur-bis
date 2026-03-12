@@ -1,6 +1,8 @@
 ﻿using System.Web.Bookmarks;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -52,6 +54,7 @@ public class ReservedKeywordsStoreTest
                                       return i;
                                   }
                               )
+                              .AddMockSingleton<ISection<StoreSection>>()
                               .AddSingleton<ReservedAliasStore>()
                               .AddReservedAliases(type)
                               .AddMockSingleton<IUserDialogueService>()

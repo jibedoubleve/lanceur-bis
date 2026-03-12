@@ -47,6 +47,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
                                                            .AddSingleton<IEnigma, Enigma>()
                                                            .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                                                            .AddReservedAliases(typeof(AddAlias))
+                                                           .AddMockSingleton<IStoreShortcutService>()
                                                            .AddDatabase(connectionManager);
 
             var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();

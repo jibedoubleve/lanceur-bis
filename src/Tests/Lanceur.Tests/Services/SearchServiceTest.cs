@@ -2,6 +2,8 @@
 using System.Data.SQLite;
 using Dapper;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -113,7 +115,8 @@ public class SearchServiceTest : TestBase
                          .AddSingleton<IDbConnection, SQLiteConnection>()
                          .AddSingleton<SearchService>()
                          .AddSingleton<AssemblySource>()
-                         .AddSingleton<IDbActionFactory, DbActionFactory>();
+                         .AddSingleton<IDbActionFactory, DbActionFactory>()
+                         .AddStoreServicesMockContext();
 
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
         serviceCollection.AddTestOutputHelper(OutputHelper);
@@ -269,8 +272,9 @@ public class SearchServiceTest : TestBase
                               .Returns(true);
                   return orchestrator;
               }
-          );
-        sc.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
+          )
+          .AddStoreServicesConfiguration()
+          .TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
 
         var serviceProvider = sc.BuildServiceProvider();
 

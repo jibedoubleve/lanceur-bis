@@ -15,12 +15,11 @@ public abstract class StoreBase
         IStoreOrchestrationFactory orchestrationFactory,
         ISection<StoreSection> storeSettings)
     {
+        ArgumentNullException.ThrowIfNull(orchestrationFactory);
+        ArgumentNullException.ThrowIfNull(storeSettings);
+
         StoreSettings = storeSettings;
-        StoreOrchestrationFactory
-            = orchestrationFactory ??
-              throw new ArgumentException(
-                  $"The {typeof(IStoreOrchestrationFactory)} should be configured in the IOC container."
-              );
+        StoreOrchestrationFactory = orchestrationFactory;
     }
 
     #endregion
@@ -28,8 +27,9 @@ public abstract class StoreBase
     #region Properties
 
     /// <summary>
-    ///     Returns the default shortcut defined for the macro. If no shortcut defined, then empty string
-    ///     is returned
+    ///     Returns the effective shortcut for this store. If a user-defined override is configured,
+    ///     it takes precedence over the default shortcut defined via <see cref="StoreAttribute" />.
+    ///     Returns an empty string if neither is defined.
     /// </summary>
     protected string DefaultShortcut
     {

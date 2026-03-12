@@ -1,3 +1,4 @@
+using Everything.Wrapper;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections;
@@ -14,6 +15,7 @@ using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using Shouldly;
 using Xunit;
 
@@ -52,7 +54,7 @@ public class IoCForStoresShould : TestBase
     [Theory]
     [InlineData(null, "pp hello world")] // null override, then use the default one
     [InlineData("^pp.*", ": hello world")]
-    public void UseDefaultShortcutWhenNoOverride(string aliasOverride, string cmdlineString)
+    public void UseDefaultShortcutWhenNoOverride(string? aliasOverride, string cmdlineString)
     {
         // arrange 
         var cfgOverride = aliasOverride is null
@@ -77,9 +79,22 @@ public class IoCForStoresShould : TestBase
                               .AddSingleton<IStoreService, EverythingStore>()
                               .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                               .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                              .AddStoreServicesMockContext()
                               .AddStoreServicesConfiguration(cfgOverride)
                               .AddTestOutputHelper(OutputHelper)
+                              .AddStoreServicesMockContext((_, i) => {
+                                  i.Value.Returns(new StoreSection
+                                  {
+                                      StoreShortcuts =
+                                      [
+                                          new StoreShortcut
+                                          {
+                                              AliasOverride = aliasOverride,
+                                              StoreType = typeof(EverythingStore).FullName
+                                          }
+                                      ]
+                                  });
+                                  return i;
+                              })
                               .BuildServiceProvider();
 
         // act
@@ -89,6 +104,8 @@ public class IoCForStoresShould : TestBase
         var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
 
         // assert
+        OutputHelper.WriteLine($"Alive pattern: '{store.StoreOrchestration.AlivePattern}'");
+        OutputHelper.WriteLine($"Cmdline      : {cmdlineString}");
         orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString))
                     .ShouldBeFalse();
     }
@@ -96,7 +113,7 @@ public class IoCForStoresShould : TestBase
     [Theory]
     [InlineData(null, ": hello world")] // null override, then use the default one
     [InlineData("^pp.*", "pp hello world")]
-    public void UseOverridenShortcutWhenConfigured(string aliasOverride, string cmdlineString)
+    public void UseOverridenShortcutWhenConfigured(string? aliasOverride, string cmdlineString)
     {
         // arrange 
         var cfgOverride = aliasOverride is null
@@ -121,7 +138,17 @@ public class IoCForStoresShould : TestBase
                               .AddSingleton<IStoreService, EverythingStore>()
                               .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                               .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                              .AddStoreServicesMockContext()
+                              .AddStoreServicesMockContext((_, i) => {
+                                  i.Value.Returns(new StoreSection()
+                                  {
+                                      StoreShortcuts = [new StoreShortcut
+                                      {
+                                          StoreType = typeof(EverythingStore).FullName,
+                                          AliasOverride = aliasOverride
+                                      }]
+                                  });
+                                  return i;
+                              })
                               .AddStoreServicesConfiguration(cfgOverride)
                               .BuildServiceProvider();
 
@@ -157,19 +184,23 @@ public class IoCForStoresShould : TestBase
         var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
         var configuration = serviceProvider.GetService<IConfigurationFacade>()!;
 
-        // At this point, there's no configuration, we used the default config (hardcoded)
-        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString1)).ShouldBeTrue("Default values should be used");
-
-        // Let's update the configuration and check whether it is taken into account
-        UpdateConfiguration(aliasOverride1);
-        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString2))
-                    .ShouldBeTrue("When updating from default values to new value");
-
-        // Let's do this again to be sure the update can be done multiple times
-        UpdateConfiguration(aliasOverride2);
-        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString3))
-                    .ShouldBeTrue("When updating from some values to updated values");
-
+        orchestrator.ShouldSatisfyAllConditions(
+            o =>
+                // "At this point, there's no configuration, we used the default config (hardcoded)"
+                o.IsAlive(store, Cmdline.Parse(cmdlineString1))
+                 .ShouldBeTrue("Default values should be used"),
+            o => {
+                // Let's update the configuration and check whether it is taken into account
+                UpdateConfiguration(aliasOverride1);
+                o.IsAlive(store, Cmdline.Parse(cmdlineString2))
+                 .ShouldBeTrue("When updating from default values to new value");
+            },
+            o => {
+                // Let's do this again to be sure the update can be done multiple times
+                UpdateConfiguration(aliasOverride2);
+                o.IsAlive(store, Cmdline.Parse(cmdlineString3))
+                 .ShouldBeTrue("When updating from some values to updated values");
+            });
         return;
 
         IServiceProvider ConfigureServices()
@@ -180,8 +211,7 @@ public class IoCForStoresShould : TestBase
                                     .AddSingleton<IStoreService, EverythingStore>()
                                     .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                                     .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                                    .AddStoreServicesMockContext()
-                                    .AddTestOutputHelper(OutputHelper);
+                                    .AddMockSingleton<IEverythingApi>(); // Real ISection<StoreSection> needed — don't use AddStoreServicesMockContext()
 
             serviceCollection.AddConfiguration() // Real configuration facility (not mocked)
                              .AddConfigurationSections()
@@ -193,7 +223,11 @@ public class IoCForStoresShould : TestBase
         {
             configuration.Application.Stores.StoreShortcuts =
             [
-                new StoreShortcut { StoreType = typeof(EverythingStore).ToString(), AliasOverride = aliasOverride }
+                new StoreShortcut
+                {
+                    StoreType = typeof(EverythingStore).ToString(),
+                    AliasOverride = aliasOverride
+                }
             ];
             configuration.Save();
         }
