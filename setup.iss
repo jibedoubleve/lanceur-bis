@@ -62,8 +62,8 @@ Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; \
     Flags: uninsdeletevalue
 
 [Run]
-Filename: "cmd"; \
-    Parameters: "/C schtasks /Create /F /SC ONLOGON /RL LIMITED /RU ""%USERNAME%"" /TN ""{#ScheduledTaskName}"" /TR ""{app}\{#MyAppExeName}"""; \
+Filename: "powershell"; \
+    Parameters: "-NonInteractive -ExecutionPolicy Bypass -WindowStyle Hidden -File ""{tmp}\create-scheduled-task.ps1"" -ExePath ""{app}\{#MyAppExeName}"" -TaskName ""{#ScheduledTaskName}"""; \
     Tasks: starts_cheduled_task; \
     Flags: runhidden
 
@@ -77,6 +77,7 @@ Filename: "cmd"; \
 [Files]
 Source: "{#BinDirectory}{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BinDirectory}*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "scripts\create-scheduled-task.ps1"; DestDir: "{tmp}"; Flags: deleteafterinstall; Tasks: starts_cheduled_task
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
