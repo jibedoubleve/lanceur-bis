@@ -63,7 +63,7 @@ Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; \
 
 [Run]
 Filename: "cmd"; \
-    Parameters: "/C schtasks /Create /F /SC ONLOGON /RL LIMITED /TN ""{#ScheduledTaskName}"" /TR ""'{app}\{#MyAppExeName}'"""; \
+    Parameters: "/C schtasks /Create /F /SC ONLOGON /RL LIMITED /RU ""%USERNAME%"" /TN ""{#ScheduledTaskName}"" /TR ""{app}\{#MyAppExeName}"""; \
     Tasks: starts_cheduled_task; \
     Flags: runhidden
 
