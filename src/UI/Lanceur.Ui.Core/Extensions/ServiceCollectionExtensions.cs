@@ -18,7 +18,6 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Helpers;
 using Lanceur.Infra.Win32.Services;
@@ -147,7 +146,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWildcardService, ReplacementComposite>()
                          .AddTransient<IReconciliationService, ReconciliationService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
-                         .AddTransient<IFeatureFlagService, SQLiteFeatureFlagService>()
+                         .AddTransient<IFeatureFlagService, FeatureFlagService>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
                          .AddTransientConditional<IProcessLauncher, ProcessLauncherNoOp, ProcessLauncherWin32>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
@@ -160,6 +159,8 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<ISteamLibraryService, SteamLibraryService>()
                          .AddTransient<IStoreShortcutService, StoreShortcutService>()
+                         .AddTransient<IFeatureFlagService, FeatureFlagService>()
+                         .AddTransient<IFeatureFlagRepository, SQLiteFeatureFlagRepository>()
                          .AddSingleton<IFavIconHttpClient, FavIconHttpClient>();
 
         return serviceCollection;

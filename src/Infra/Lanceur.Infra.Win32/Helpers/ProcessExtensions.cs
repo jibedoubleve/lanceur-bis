@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Lanceur.Core.Utils;
+namespace Lanceur.Infra.Win32.Helpers;
 
 internal static class ProcessExtensions
 {

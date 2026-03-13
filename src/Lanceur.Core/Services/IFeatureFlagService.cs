@@ -10,14 +10,6 @@ public interface IFeatureFlagService
     #region Methods
 
     /// <summary>
-    ///     Retrieves a list of all feature flags along with their states.
-    /// </summary>
-    /// <returns>
-    ///     An <see cref="IEnumerable{T}" /> of <see cref="FeatureFlag" /> representing all feature flags.
-    /// </returns>
-    IEnumerable<FeatureFlag> GetFeatureFlags();
-
-    /// <summary>
     ///     Checks whether a specified feature flag is enabled.
     /// </summary>
     /// <param name="featureName">The name of the feature flag to check.</param>

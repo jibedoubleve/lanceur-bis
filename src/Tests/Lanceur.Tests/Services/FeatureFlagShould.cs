@@ -1,4 +1,5 @@
 using Lanceur.Core.Constants;
+using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
@@ -22,8 +23,8 @@ public class FeatureFlagShould : TestBase
     {
         var conn = BuildFreshDb();
         var scope = new DbSingleConnectionManager(conn);
-
-        var settings = new SQLiteFeatureFlagService(scope);
+        var ffRepository = new SQLiteFeatureFlagRepository(scope);
+        var settings = new FeatureFlagService(ffRepository);
 
         settings.IsEnabled(Features.ResourceDisplay).ShouldBeTrue();
     }
