@@ -14,6 +14,7 @@ using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.Infra.Stores;
 using Lanceur.Infra.Win32.Helpers;
 using Lanceur.SharedKernel.IoC;
+using Lanceur.SharedKernel.Logging;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Extensions;
@@ -245,7 +246,9 @@ public partial class App
         /* Check if new Version
          */
         logger.LogInformation("Checking updates...");
-        _ = Host.Services.GetRequiredService<IReleaseService>().CheckAndNotifyAsync();
+        _ = Host.Services.GetRequiredService<IReleaseService>()
+                .CheckAndNotifyAsync()
+                .LogOnFaulted(logger, "En error occured while checking update.");
 
         base.OnStartup(e);
         UiContext = SynchronizationContext.Current!;

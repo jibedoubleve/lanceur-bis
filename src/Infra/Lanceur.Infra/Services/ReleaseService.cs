@@ -51,7 +51,7 @@ public sealed class ReleaseService : IReleaseService
             return;
         }
 
-        // A new version has been release, notify user...
+        // A new version has been released, notify user...
         
         _logger.LogDebug("New version available. Version {Version}", version);
         _notification.NotifyNewVersionAvailable(version);

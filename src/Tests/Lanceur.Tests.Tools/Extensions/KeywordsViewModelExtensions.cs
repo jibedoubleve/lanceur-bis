@@ -19,6 +19,10 @@ public static class KeywordsViewModelExtensions
         await viewModel.SaveCurrentAliasCommand.ExecuteAsync(null); // Save the changes
     }
 
+    /// <summary>
+    ///     Prepares the view model for alias creation by triggering the create command
+    ///     and setting the alias properties without saving.
+    /// </summary>
     public static void PrepareAliasForCreation(
         this KeywordsViewModel viewModel,
         string name,

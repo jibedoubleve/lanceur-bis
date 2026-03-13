@@ -40,9 +40,16 @@ public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
             new BoundedChannelOptions(s.ChannelCapacity) { FullMode = s.ChannelFullMode }
         );
 
+        /* WARNING: consumer tasks are fire-and-forget. If a consumer crashes, it is not restarted.
+         * If all consumers crash, the service becomes a zombie: the queue keeps accepting requests
+         * but nothing processes them. Exceptions are only surfaced at Dispose() via WhenAll.
+         */
         _consumers = Enumerable.Range(0, s.ConsumerCount)
-                               .Select(_ => Task.Run(ConsumeAsync))
-                               .ToArray();
+                               .Select(_ => Task.Run(ConsumeAsync)
+                                                .LogOnFaulted(
+                                                    _logger,
+                                                    "One of the thread of the thumbnail service thread pool crashed!"
+                                                )).ToArray();
     }
 
     #endregion
