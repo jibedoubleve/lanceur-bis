@@ -33,7 +33,7 @@ public class TrackedMemoryCache : IMemoryCache
     /// </summary>
     public ICacheEntry CreateEntry(object key)
     {
-        _logger.LogDebug("Creating cache with key {Key}", key);
+        _logger.LogTrace("Cache: Creating cache with key {Key}", key);
         return _memoryCache.CreateEntry(key);
     }
 
@@ -42,7 +42,7 @@ public class TrackedMemoryCache : IMemoryCache
     /// </summary>
     public void Dispose()
     {
-        _logger.LogTrace($"Disposing {nameof(TrackedMemoryCache)}");
+        _logger.LogTrace($"Cache: Disposing {nameof(TrackedMemoryCache)}");
         _memoryCache.Dispose();
     }
 
@@ -51,7 +51,7 @@ public class TrackedMemoryCache : IMemoryCache
     /// </summary>
     public void Remove(object key)
     {
-        _logger.LogDebug("Removing cache with key {Key}", key);
+        _logger.LogTrace("Cache: Removing cache with key {Key}", key);
         _memoryCache.Remove(key);
     }
 
@@ -62,10 +62,10 @@ public class TrackedMemoryCache : IMemoryCache
     public bool TryGetValue(object key, out object? value)
     {
         var hasHit = _memoryCache.TryGetValue(key, out value);
-        const string template = "{Hit} cache with key {Key}";
+        const string template = "Cache: {Hit} cache with key {Key}";
 
         if (hasHit) { _logger.LogTrace(template, "Hit", key); }
-        else { _logger.LogDebug(template, "Miss", key); }
+        else { _logger.LogTrace(template, "Miss", key); }
 
         return hasHit;
     }
