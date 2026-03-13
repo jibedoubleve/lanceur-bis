@@ -1,5 +1,6 @@
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Services;
 using Octokit;
 

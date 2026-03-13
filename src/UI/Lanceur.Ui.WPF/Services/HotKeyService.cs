@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Repositories.Config;
 using Microsoft.Extensions.Logging;
 using NHotkey;

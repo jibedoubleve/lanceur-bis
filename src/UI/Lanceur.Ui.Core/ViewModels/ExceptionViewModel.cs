@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 
 namespace Lanceur.Ui.Core.ViewModels;
 

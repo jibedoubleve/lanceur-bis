@@ -1,5 +1,6 @@
 using System.Reflection;
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
