@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Lanceur.Core.Configuration.Sections;
+namespace Lanceur.Core.Configuration.Sections.Application;
 
 public class WindowSection
 {

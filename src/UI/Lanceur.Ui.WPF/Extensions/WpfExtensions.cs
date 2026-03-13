@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 
 namespace Lanceur.Ui.WPF.Extensions;
 

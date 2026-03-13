@@ -1,4 +1,5 @@
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 using NHotkey;
 
 namespace Lanceur.Ui.WPF.Services;

@@ -1,6 +1,6 @@
 using Lanceur.Core.Models;
 
-namespace Lanceur.Core.Configuration.Sections;
+namespace Lanceur.Core.Configuration.Sections.Application;
 
 /// <summary>
 ///     Represents a section of the store configuration, providing properties

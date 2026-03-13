@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Utils;

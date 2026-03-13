@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
