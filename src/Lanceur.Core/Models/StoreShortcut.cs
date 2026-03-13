@@ -1,6 +1,4 @@
-using Lanceur.Core.Models;
-
-namespace Lanceur.Core.Configuration;
+namespace Lanceur.Core.Models;
 
 public class StoreShortcut : ObservableModel
 {

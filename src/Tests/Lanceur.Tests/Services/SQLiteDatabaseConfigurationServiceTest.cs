@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Utils;
@@ -220,7 +221,7 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
     public void When_updating_HotKey_Then_it_is_saved_in_db(int modifierKey, int key) =>
         WithConfiguration(repository => {
                 var settings = repository.Current;
-                settings.SetHotKey(key, modifierKey);
+                settings.HotKey = new HotKeySection(modifierKey, key);
 
                 repository.Save();
                 settings.ShouldSatisfyAllConditions(

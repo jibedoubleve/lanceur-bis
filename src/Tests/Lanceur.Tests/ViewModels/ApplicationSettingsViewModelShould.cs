@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Dapper;
 using Lanceur.Core.Configuration;
+using Lanceur.Core.Models;
 using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;

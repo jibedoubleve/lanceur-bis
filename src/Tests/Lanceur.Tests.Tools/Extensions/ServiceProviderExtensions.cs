@@ -6,6 +6,7 @@ using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
