@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Extensions;
 using Lanceur.SharedKernel.Utils;
@@ -31,11 +30,10 @@ public partial class MainView
     #region Fields
 
     private readonly IComputerInfoService _computerInfoService;
-    private readonly IConfigurationFacade _configuration;
 
-    private readonly IApplicationSettingsProvider _databaseConfig;
     private readonly IFeatureFlagService _featureFlagService;
     private readonly ILogger<MainView> _logger;
+    private readonly MainViewSections _sections;
     private readonly IServiceProvider _serviceProvider;
 
     #endregion
@@ -46,28 +44,23 @@ public partial class MainView
         MainViewModel viewModel,
         ILogger<MainView> logger,
         IServiceProvider serviceProvider,
-        IConfigurationFacade configuration,
         IHotKeyService hotKeyService,
-        IApplicationSettingsProvider databaseConfig,
         IComputerInfoService computerInfoService,
-        IFeatureFlagService featureFlagService
+        IFeatureFlagService featureFlagService,
+        MainViewSections sections
     )
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewModel);
-        ArgumentNullException.ThrowIfNull(serviceProvider);
-        ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(hotKeyService);
-        ArgumentNullException.ThrowIfNull(databaseConfig);
         ArgumentNullException.ThrowIfNull(computerInfoService);
         ArgumentNullException.ThrowIfNull(featureFlagService);
 
         _logger = logger;
         _serviceProvider = serviceProvider;
-        _configuration = configuration;
-        _databaseConfig = databaseConfig;
         _computerInfoService = computerInfoService;
         _featureFlagService = featureFlagService;
+        _sections = sections;
 
         InitializeComponent();
         DataContext = viewModel;
@@ -99,7 +92,7 @@ public partial class MainView
         if (enabled)
         {
             _ = _computerInfoService.StartMonitoring(
-                _configuration.Application.ResourceMonitor.RefreshRate.Milliseconds(),
+                _sections.ResourceMonitor.RefreshRate.Milliseconds(),
                 t => {
                     Application.Current.Dispatcher.Invoke(() => {
                             CpuProgressBar.Value = t.CpuLoad;
@@ -131,7 +124,7 @@ public partial class MainView
 
     private void OnClickDarkTheme(object sender, RoutedEventArgs e)
     {
-        var windowBackdropType = _configuration.Application.Window.BackdropStyle.ToWindowBackdropType();
+        var windowBackdropType = _sections.Window.BackdropStyle.ToWindowBackdropType();
         _logger.LogDebug(
             "Change theme to {Theme} and backdrop type {BackdropType}",
             ApplicationTheme.Dark,
@@ -142,7 +135,7 @@ public partial class MainView
 
     private void OnClickLightTheme(object sender, RoutedEventArgs e)
     {
-        var windowBackdropType = _configuration.Application.Window.BackdropStyle.ToWindowBackdropType();
+        var windowBackdropType = _sections.Window.BackdropStyle.ToWindowBackdropType();
         _logger.LogDebug(
             "Change theme to {Theme} and backdrop type {BackdropType}",
             ApplicationTheme.Light,
@@ -168,7 +161,7 @@ public partial class MainView
 
         SystemThemeWatcher.Watch(
             this,
-            _configuration.Application.Window.BackdropStyle.ToWindowBackdropType()
+            _sections.Window.BackdropStyle.ToWindowBackdropType()
         );
 
         SetWindowPosition();
@@ -182,14 +175,14 @@ public partial class MainView
 
     private void OnMouseUp(object _, MouseButtonEventArgs e)
     {
-        var coordinate = _databaseConfig.Current.Window.Position;
+        var coordinate = _sections.Window.Position;
 
         if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) { return; }
 
         _logger.LogDebug("Save new coordinate ({Top},{Left})", Top, Left);
         coordinate.Top = Top;
         coordinate.Left = Left;
-        _databaseConfig.Save();
+        _sections.SaveWindowSection();
     }
 
     private void OnPreviewKeyDown(object _, KeyEventArgs e)
@@ -232,7 +225,7 @@ public partial class MainView
 
     private void SetWindowPosition(Coordinate? coordinate = null)
     {
-        coordinate ??= _databaseConfig!.Current.Window.Position.ToCoordinate();
+        coordinate ??= _sections.Window.Position.ToCoordinate();
 
         if (coordinate.IsEmpty) { this.SetDefaultPosition(); }
         else { this.SetPosition(coordinate); }
@@ -253,7 +246,7 @@ public partial class MainView
         // HACK: Settings take effect only after closing the window.  
         // When changing settings, the previous ones persist until the window is hidden at least once.  
         // This ensures the window is cleared immediately if settings are updated.  
-        if (!_configuration.Application.SearchBox.ShowLastQuery) { ViewModel.Clear(); }
+        if (!_sections.SearchBox.ShowLastQuery) { ViewModel.Clear(); }
 
         ViewModel.RefreshSettings();
 
@@ -275,7 +268,7 @@ public partial class MainView
 
     public void OnShowWindow(object? _, HotkeyEventArgs? e)
     {
-        if (_configuration.Application.SearchBox.ToggleVisibility && Visibility == Visibility.Visible) { HideWindow(); }
+        if (_sections.SearchBox.ToggleVisibility && Visibility == Visibility.Visible) { HideWindow(); }
         else { ShowWindow(); }
 
         e?.Handled = true;

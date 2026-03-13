@@ -2,8 +2,9 @@ using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core;
+using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Win32.Extensions;
 using Lanceur.Ui.Core.Messages;
 using Microsoft.Extensions.Logging;
@@ -17,17 +18,18 @@ public class CentreAlias : SelfExecutableQueryResult
 {
     #region Fields
 
-    private readonly IApplicationSettingsProvider? _appConfig;
     private readonly ILogger<CentreAlias> _logger;
+
+    private readonly IWriteableSection<WindowSection> _settings;
 
     #endregion
 
     #region Constructors
 
-    public CentreAlias(ILoggerFactory loggerFactory, IApplicationSettingsProvider appConfig)
+    public CentreAlias(ILoggerFactory loggerFactory, IWriteableSection<WindowSection> settings)
     {
         _logger = loggerFactory.CreateLogger<CentreAlias>();
-        _appConfig = appConfig;
+        _settings = settings;
     }
 
     #endregion
@@ -40,12 +42,12 @@ public class CentreAlias : SelfExecutableQueryResult
 
     #region Methods
 
-    private void Save(Coordinate coordinate) =>
-        _appConfig!.Edit(s => {
-                s.Window.Position.Left = coordinate.X;
-                s.Window.Position.Top = coordinate.Y;
-            }
-        );
+    private void Save(Coordinate coordinate)
+    {
+        _settings.Value.Position.Left = coordinate.X;
+        _settings.Value.Position.Top = coordinate.Y;
+        _settings.Save();
+    }
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
