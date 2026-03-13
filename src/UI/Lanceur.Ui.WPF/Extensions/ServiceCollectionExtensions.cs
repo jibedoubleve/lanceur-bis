@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddSingleton<IReleaseService, ReleaseService>()
                          .AddTransient<LazyLoadedSynchronisationContext>()
+                         .AddTransient<MainViewSections>()
                          .AddSingletonConditional<IAppRestartService, AppRestartDummyService, AppRestartService>()
                          .AddSingleton(
                              new AssemblySource
