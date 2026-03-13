@@ -1,3 +1,5 @@
+using Lanceur.Core.Models;
+
 namespace Lanceur.Core.Configuration.Sections;
 
 /// <summary>

@@ -1,5 +1,5 @@
-using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Models;
 
 namespace Lanceur.Core.Services;
 

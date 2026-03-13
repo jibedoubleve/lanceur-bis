@@ -1,4 +1,5 @@
 ﻿using Lanceur.Core.Configuration;
+using Lanceur.Core.Models;
 
 namespace Lanceur.Ui.WPF.Views.Controls;
 
