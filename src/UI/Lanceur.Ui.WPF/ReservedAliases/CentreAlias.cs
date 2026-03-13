@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;

@@ -2,19 +2,15 @@ using System.Text.RegularExpressions;
 using Everything.Wrapper;
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
-using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -54,7 +50,7 @@ public class StoresOrchestrationTest
     public async Task When_making_calculation_Then_Orchestrator_choose_calculation_store(string query, string expected)
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddConfigurationSections()
+        serviceCollection.AddMockConfigurationSections()
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton<AliasStore>()
                          .AddLogging()
@@ -72,11 +68,6 @@ public class StoresOrchestrationTest
                          )
                          .AddMockSingleton<IAliasRepository>((_, i) => {
                                  i.Search(Arg.Any<string>()).Returns([]);
-                                 return i;
-                             }
-                         )
-                         .AddMockSingleton<IConfigurationFacade>((_, i) => {
-                                 i.Application.Returns(new ApplicationSettings());
                                  return i;
                              }
                          );

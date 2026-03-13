@@ -3,10 +3,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Macros;
@@ -18,6 +17,7 @@ using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Logging;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
+using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Services;
@@ -51,7 +51,6 @@ public partial class App
                                    .AddStores()
                                    .AddReservedAliases(typeof(AddAlias))
                                    .AddMacros()
-                                   .AddConfiguration()
                                    .AddDatabaseServices()
                                    .AddLoggers();
                        }
@@ -139,9 +138,9 @@ public partial class App
                     => WindowsShell.StartExplorer(Paths.ReleasesUrl),
                 // ---- Skip current version ----
                 ToastNotificationArguments.SkipVersion => () => {
-                    var settings = Host.Services.GetRequiredService<IConfigurationFacade>();
-                    settings.Application.Github.SnoozeVersionCheck = true;
-                    settings.Application.Github.LastCheckedVersion = new Version(arguments["Version"]);
+                    var settings = Host.Services.GetRequiredService<IWriteableSection<GithubSection>>();
+                    settings.Value.SnoozeVersionCheck = true;
+                    settings.Value.LastCheckedVersion = new Version(arguments["Version"]);
                     settings.Save();
                 },
                 // ---- Navigate to Url ----

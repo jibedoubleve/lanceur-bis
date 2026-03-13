@@ -1,33 +1,41 @@
 ﻿using Lanceur.Core.Configuration.Sections.Infrastructure;
-using Lanceur.Core.Constants;
-using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Core.Configuration.Configurations;
 
 /// <summary>
-///     Represents the configuration settings for the application.
+///     Represents the infrastructure-level configuration settings (database, logging, pipelines).
 /// </summary>
 public class InfrastructureSettings
 {
     #region Properties
 
     /// <summary>
-    ///     Gets or sets the file system path to the SQLite database.
-    ///     Defaults to <c>"%appdata%\probel\lanceur2\data.sqlite"</c>.
+    ///     Migration-only setter: forwards the legacy flat <c>DbPath</c> value found in older JSON configs
+    ///     to <see cref="Database" />.<see cref="DatabaseSection.DbPath" />.
+    ///     The property is setter-only so Newtonsoft.Json never writes it back;
+    ///     subsequent saves use the nested <c>Database.DbPath</c> location exclusively.
     /// </summary>
-    public string DbPath { get; set; } = Paths.DefaultDb;
+    [Obsolete("Use Database.DbPath. This property exists only for JSON migration.")]
+    public string? DbPath
+    {
+        set { if (!string.IsNullOrEmpty(value)) Database.DbPath = value; }
+    }
 
     /// <summary>
-    ///     Gets or sets the minimum <see cref="LogLevel" /> to be recorded by the logging system.
-    ///     Defaults to <see cref="Microsoft.Extensions.Logging.LogLevel.Information" />.
+    ///     Gets or sets the database configuration (connection path, etc.).
     /// </summary>
-    public LogLevel MinimumLogLevel { get; set; } = LogLevel.Information;
+    public DatabaseSection Database { get; set; } = new();
 
     /// <summary>
-    ///     Gets or sets the telemetry configuration section.
-    ///     Provides options for enabling and customizing telemetry collection.
+    ///     Gets or sets the logging configuration (minimum log level, etc.).
     /// </summary>
-    public TelemetrySection Telemetry { get; set; } = new();
+    public LoggingSection Logging { get; set; } = new();
+    
+    /// <summary>
+    ///     Gets or sets the thumbnail pipeline configuration.
+    ///     Provides options to control the behaviour of the pipeline channel and the number of concurrent consumers.
+    /// </summary>
+    public ThumbnailPipelineSection ThumbnailPipeline { get; set; } = new();
 
     #endregion
 }

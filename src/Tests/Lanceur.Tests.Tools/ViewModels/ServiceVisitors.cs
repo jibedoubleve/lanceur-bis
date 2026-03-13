@@ -1,6 +1,6 @@
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.Repositories;
 using Lanceur.Ui.Core.Utils;
 
 namespace Lanceur.Tests.Tools.ViewModels;
@@ -19,7 +19,8 @@ public class ServiceVisitors
         VisitGlobalUserInteractionService { get; init; }
 
     public Func<IServiceProvider, IProcessLauncher, IProcessLauncher>? VisitProcessLauncher { get; init; }
-    public Action<IConfigurationFacade>? VisitSettings { get; init; }
+    
+    public Action<MemoryApplicationSettingsProvider>? VisitApplicationSettingsProvider { get; init; }
 
     public Func<IServiceProvider, IUserDialogueService, IUserDialogueService>? VisitUserInteractionService
     {

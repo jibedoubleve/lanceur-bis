@@ -1,8 +1,7 @@
 using System.Collections.ObjectModel;
 using Dapper;
-using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.Repositories;
@@ -37,9 +36,8 @@ public class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSet
     )
     {
         serviceCollection.AddMockSingleton<IAppRestartService>()
-                         .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
-                         .AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
-                         .AddSingleton<IInfrastructureSettingsProvider, MemoryInfrastructureSettingsProvider>()
+                         .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
+                         .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
                          .AddMockSingleton<IViewFactory>()
                          .AddMockSingleton<IUserGlobalNotificationService>((sp, i)
                              => visitors?.VisitGlobalUserInteractionService?.Invoke(sp, i) ?? i

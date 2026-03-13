@@ -1,4 +1,5 @@
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
 
@@ -8,7 +9,7 @@ public static class InfrastructureSettingsExtension
 {
     #region Methods
 
-    public static LogEventLevel GetMinimumLogLevel(this InfrastructureSettings stg) =>
+    public static LogEventLevel GetMinimumLogLevel(this LoggingSection stg) =>
         stg.MinimumLogLevel switch
         {
             LogLevel.Trace       => LogEventLevel.Verbose,

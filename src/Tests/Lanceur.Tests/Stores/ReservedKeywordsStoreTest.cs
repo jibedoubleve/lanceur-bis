@@ -2,12 +2,10 @@
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling.ReservedAliases;
@@ -45,21 +43,17 @@ public class ReservedKeywordsStoreTest
         var serviceProvider = new ServiceCollection()
                               .AddSingleton(new AssemblySource { ReservedKeywordSource = type.Assembly })
                               .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
-                              .AddSingleton(Substitute.For<IApplicationSettingsProvider>())
+                              .AddSingleton(Substitute.For<ISettingsProvider<ApplicationSettings>>())
                               .AddSingleton(aliasRepository)
-                              .AddTestOutputHelper(_output)
-                              .AddLoggingForTests(_output)
-                              .AddMockSingleton<IBookmarkRepositoryFactory>()
-                              .AddMockSingleton<IConfigurationFacade>((_, i) => {
-                                      i.Application.Returns(new ApplicationSettings());
-                                      return i;
-                                  }
-                              )
-                              .AddMockSingleton<ISection<StoreSection>>()
                               .AddSingleton<ReservedAliasStore>()
-                              .AddReservedAliases(type)
+                              .AddMockSingleton<IBookmarkRepositoryFactory>()
                               .AddMockSingleton<IUserDialogueService>()
                               .AddMockSingleton<IUserNotificationService>()
+                              .AddMockSingleton<IWriteableSection<WindowSection>>()
+                              .AddTestOutputHelper(_output)
+                              .AddLoggingForTests(_output)
+                              .AddReservedAliases(type)
+                              .AddMockConfigurationSections()
                               .BuildServiceProvider();
 
         var store = serviceProvider.GetService<ReservedAliasStore>()!;

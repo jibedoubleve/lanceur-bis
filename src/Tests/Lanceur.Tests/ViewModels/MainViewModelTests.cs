@@ -7,8 +7,8 @@ using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
@@ -56,8 +56,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
         ServiceVisitors? visitors
     )
     {
-        serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg))
-                         .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
+        serviceCollection.AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton(
                              new AssemblySource
                              {
@@ -69,7 +68,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<IMacroAliasExpanderService, MacroAliasExpanderService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
-                         .AddMockSingleton<IApplicationSettingsProvider>()
+                         .AddMockSingleton<ISettingsProvider<ApplicationSettings>>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IUserDialogueService>()
                          .AddMockSingleton<IUserNotificationService>()
@@ -108,10 +107,7 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
 
         var visitors = new ServiceVisitors
         {
-            VisitSettings = settings => {
-                var application = new ApplicationSettings { SearchBox = { ShowResult = showAllResults } };
-                settings.Application.Returns(application);
-            }
+            VisitApplicationSettingsProvider = s => s.Current.SearchBox.ShowResult = showAllResults
         };
         await TestViewModelAsync(
             async (viewModel, _) => {
@@ -131,14 +127,15 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
     [InlineData(new[] { false, true })]
     public void Check_configuration_ShowLastQuery(bool[] callsOfShowLastQuery)
     {
-        IConfigurationFacade configuration = null!;
-        var visitors = new ServiceVisitors { VisitSettings = s => configuration = s };
+        MemoryApplicationSettingsProvider config = null!;
+
+        var visitors = new ServiceVisitors { VisitApplicationSettingsProvider = c => config = c };
         TestViewModel(
             (viewModel, _) => {
                 Assert.All(
                     callsOfShowLastQuery.Select((expected, i) => (expected, i)),
                     t => {
-                        configuration.Application.SearchBox.ShowLastQuery = t.expected;
+                        config.Current.SearchBox.ShowLastQuery = t.expected;
                         viewModel.ShowLastQuery.ShouldBe(t.expected, $"this is the call n° {t.i + 1} of the test");
                     }
                 );
@@ -158,9 +155,9 @@ public class MainViewModelTests : ViewModelTester<MainViewModel>
         var visitors = new ServiceVisitors
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitSettings = s => {
-                s.Application.SearchBox.ShowLastQuery = true;
-                s.Application.SearchBox.ShowResult = true;
+            VisitApplicationSettingsProvider = s => {
+                s.Current.SearchBox.ShowLastQuery = true;
+                s.Current.SearchBox.ShowResult = true;
             }
         };
         await TestViewModelAsync(

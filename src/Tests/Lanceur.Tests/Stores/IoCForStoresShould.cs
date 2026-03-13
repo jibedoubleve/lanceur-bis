@@ -1,11 +1,9 @@
 using Everything.Wrapper;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
@@ -15,6 +13,7 @@ using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Ui.Core.Extensions;
+using Lanceur.Ui.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Shouldly;
@@ -140,13 +139,16 @@ public class IoCForStoresShould : TestBase
                               .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                               .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                               .AddStoreServicesMockContext((_, i) => {
-                                  i.Value.Returns(new StoreSection()
+                                  i.Value.Returns(new StoreSection
                                   {
-                                      StoreShortcuts = [new StoreShortcut
-                                      {
-                                          StoreType = typeof(EverythingStore).FullName,
-                                          AliasOverride = aliasOverride
-                                      }]
+                                      StoreShortcuts =
+                                      [
+                                          new StoreShortcut
+                                          {
+                                              StoreType = typeof(EverythingStore).FullName,
+                                              AliasOverride = aliasOverride
+                                          }
+                                      ]
                                   });
                                   return i;
                               })
@@ -183,7 +185,7 @@ public class IoCForStoresShould : TestBase
                     .GetServices<IStoreService>()
                     .Single(x => x.GetType() == typeof(EverythingStore));
         var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
-        var configuration = serviceProvider.GetService<IConfigurationFacade>()!;
+        var section = serviceProvider.GetService<IWriteableSection<StoreSection>>()!;
 
         orchestrator.ShouldSatisfyAllConditions(
             o =>
@@ -204,25 +206,22 @@ public class IoCForStoresShould : TestBase
             });
         return;
 
-        IServiceProvider ConfigureServices()
-        {
-            var serviceCollection = new ServiceCollection()
-                                    .AddTestOutputHelper(OutputHelper)
-                                    .AddSingleton<IDbConnectionManager>(connectionManager)
-                                    .AddSingleton<IStoreService, EverythingStore>()
-                                    .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-                                    .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                                    .AddMockSingleton<IEverythingApi>(); // Real ISection<StoreSection> needed — don't use AddStoreServicesMockContext()
-
-            serviceCollection.AddConfiguration() // Real configuration facility (not mocked)
-                             .AddConfigurationSections()
-                             .AddSingleton<IInfrastructureSettingsProvider, MemoryInfrastructureSettingsProvider>();
-            return serviceCollection.BuildServiceProvider();
-        }
+        IServiceProvider ConfigureServices() =>
+            new ServiceCollection()
+                .AddTransient<IGithubService, GithubService>()
+                .AddSingleton<IDbConnectionManager>(connectionManager)
+                .AddSingleton<IStoreService, EverythingStore>()
+                .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+                .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
+                .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
+                .AddMockSingleton<IEverythingApi>()
+                .AddTestOutputHelper(OutputHelper)
+                .AddConfigurationSections()
+                .BuildServiceProvider();
 
         void UpdateConfiguration(string aliasOverride)
         {
-            configuration.Application.Stores.StoreShortcuts =
+            section.Value.StoreShortcuts =
             [
                 new StoreShortcut
                 {
@@ -230,7 +229,7 @@ public class IoCForStoresShould : TestBase
                     AliasOverride = aliasOverride
                 }
             ];
-            configuration.Save();
+            section.Save();
         }
     }
 

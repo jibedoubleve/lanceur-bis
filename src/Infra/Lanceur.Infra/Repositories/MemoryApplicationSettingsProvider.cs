@@ -1,40 +1,23 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Repositories;
 
 /// <summary>
-///     An in-memory implementation of <see cref="ISettingsProvider{T}" /> for <see cref="InfrastructureSettings" />.
+///     An in-memory implementation of <see cref="ISettingsProvider{T}" /> for <see cref="ApplicationSettings" />.
 ///     Configuration is never persisted: <see cref="Load" /> and <see cref="Save" /> are no-ops that emit a trace warning.
-///     Defaults the database path to a debug SQLite file on the desktop.
 ///     Intended for use in tests and debug scenarios where file I/O is undesirable.
 /// </summary>
-public sealed class MemoryInfrastructureSettingsProvider : ISettingsProvider<InfrastructureSettings>
+public sealed class MemoryApplicationSettingsProvider : ISettingsProvider<ApplicationSettings>
 {
-    #region Fields
-
-    private static readonly InfrastructureSettings Configuration = new()
-    {
-        Database = new DatabaseSection
-        {
-            DbPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                @"lanceur\debug.sqlite"
-            )
-        }
-    };
-
-    #endregion
-
     #region Properties
 
     /// <inheritdoc />
     object ISettingsProvider.Current => Current;
 
     /// <inheritdoc />
-    public InfrastructureSettings Current => Configuration;
+    public ApplicationSettings Current { get; } = new();
 
     #endregion
 

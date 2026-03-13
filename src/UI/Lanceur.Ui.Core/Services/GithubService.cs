@@ -35,7 +35,7 @@ public class GithubService : IGithubService
     private static string Url(int number) => $"{GithubUrl}{number}";
 
     /// <inheritdoc />
-    public async Task CreateIssue(string title, string token)
+    public async Task CreateIssueAsync(string title, string token)
     {
         var issue = new NewIssue(title) { Labels = { _tag } };
         _client.Credentials = new Credentials(token);

@@ -1,10 +1,8 @@
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
-using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
-using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.ReservedAliases;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,16 +36,17 @@ public abstract class ViewModelTester<TViewModel> : TestBase
             var connectionString = visitors?.OverridenConnectionString ?? ConnectionStringFactory.InMemory;
             connectionManager = GetConnectionManager(sqlBuilder ?? Sql.Empty, connectionString.ToString());
 
-            var serviceCollection = new ServiceCollection().AddConfigurationSections()
-                                                           .AddSingleton<TViewModel>()
+            var serviceCollection = new ServiceCollection().AddSingleton<TViewModel>()
+                                                           .AddSingleton<IEnigma, Enigma>()
+                                                           .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
+                                                           .AddMockSingleton<IStoreShortcutService>()
+                                                           .AddMockConfigurationSections(
+                                                               visitors?.VisitApplicationSettingsProvider)
                                                            .AddLogging(builder =>
                                                                builder.AddXUnit(OutputHelper)
                                                                       .SetMinimumLevel(LogLevel.Trace)
                                                            )
-                                                           .AddSingleton<IEnigma, Enigma>()
-                                                           .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                                                            .AddReservedAliases(typeof(AddAlias))
-                                                           .AddMockSingleton<IStoreShortcutService>()
                                                            .AddDatabase(connectionManager);
 
             var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();

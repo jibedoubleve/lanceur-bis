@@ -1,21 +1,22 @@
 ﻿namespace Lanceur.Core.Services;
 
 /// <summary>
-///     Defines a contract for managing application settings of type <typeparamref name="TConfig" />.
+///     Non-generic base contract for settings providers.
+///     Exposes <see cref="Current" /> as <see cref="object" /> to allow uniform enumeration
+///     (e.g. in <c>Section&lt;T&gt;</c>) without knowing the concrete configuration type.
 /// </summary>
-/// <typeparam name="TConfig">The type of configuration object. Must be a reference type with a parameterless constructor.</typeparam>
-public interface ISettingsProvider<out TConfig>
-    where TConfig : class, new()
+public interface ISettingsProvider
 {
     #region Properties
 
     /// <summary>
-    ///     Gets the current configuration instance.
+    ///     Gets the current configuration instance as an untyped object.
     /// </summary>
     /// <value>
-    ///     The current configuration object of type <typeparamref name="TConfig" />.
+    ///     The current configuration object. Cast to the expected type or use
+    ///     <see cref="ISettingsProvider{TConfig}.Current" /> for a typed alternative.
     /// </value>
-    TConfig Current { get; }
+    object Current { get; }
 
     #endregion
 
@@ -38,6 +39,27 @@ public interface ISettingsProvider<out TConfig>
     ///     persistence layer).
     /// </remarks>
     void Save();
+
+    #endregion
+}
+
+/// <summary>
+///     Defines a contract for managing application settings of type <typeparamref name="TConfig" />.
+/// </summary>
+/// <typeparam name="TConfig">The type of configuration object. Must be a reference type with a parameterless constructor.</typeparam>
+public interface ISettingsProvider<out TConfig> : ISettingsProvider
+    where TConfig : class, new()
+{
+    #region Properties
+
+    /// <summary>
+    ///     Gets the current configuration instance as <typeparamref name="TConfig" />.
+    ///     Hides <see cref="ISettingsProvider.Current" /> to provide a strongly-typed alternative.
+    /// </summary>
+    /// <value>
+    ///     The current configuration object of type <typeparamref name="TConfig" />.
+    /// </value>
+    new TConfig Current { get; }
 
     #endregion
 }
