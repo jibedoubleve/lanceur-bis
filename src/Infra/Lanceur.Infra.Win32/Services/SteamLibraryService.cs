@@ -79,10 +79,10 @@ public partial class SteamLibraryService : ISteamLibraryService
             entry => {
                 entry.AbsoluteExpirationRelativeToNow = 10.Seconds();
                 var libraries = new List<string>();
-                
+
                 foreach (Match m in KeyValuePattern().Matches(File.ReadAllText(vdf)))
                 {
-                    _logger.LogDebug("Found library path: {LibraryPath}", m.Groups[1].Value);
+                    _logger.LogDebug("Found Steam library path: {LibraryPath}", m.Groups[1].Value);
                     libraries.Add(Path.Combine(m.Groups[1].Value.Replace(@"\\", @"\"), SteamApps));
                 }
 
@@ -104,20 +104,27 @@ public partial class SteamLibraryService : ISteamLibraryService
     [GeneratedRegex(@"""path""\s+""(.+?)""")]
     private static partial Regex KeyValuePattern();
 
+    private void TryInvalidateCache(string[] libraries)
+    {
+        var invalidateCache = libraries.Any(path => {
+            var lastWrite = Directory.GetLastWriteTime(path);
+            return lastWrite > _lastCacheUpdate;
+        });
+        
+        if (invalidateCache)
+        {
+            _logger.LogDebug("Invalidating Steam library cache");
+            _lastCacheUpdate = DateTime.Now;
+            _memoryCache.Remove(CacheKeyGames);
+        }
+    }
+
     /// <inheritdoc />
     public IEnumerable<SteamGame> GetGames()
     {
         var libraries = GetLibraryPaths().ToArray();
 
-        var invalidateCache = libraries.Any(path => {
-            var lastWrite = Directory.GetLastWriteTime(path);
-            return lastWrite > _lastCacheUpdate;
-        });
-        if (invalidateCache)
-        {
-            _lastCacheUpdate = DateTime.Now;
-            _memoryCache.Remove(CacheKeyGames);
-        }
+        TryInvalidateCache(libraries);
 
         return _memoryCache.GetOrCreate(CacheKeyGames,
             _ => {
@@ -127,6 +134,7 @@ public partial class SteamLibraryService : ISteamLibraryService
                     games.AddRange(GetGames(repoPath));
                 }
 
+                _logger.LogDebug("Adding {GameCount} Steam games in cache", games.Count);
                 return games;
             }) ?? Enumerable.Empty<SteamGame>();
     }

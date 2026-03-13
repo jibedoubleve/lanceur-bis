@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Lanceur.Core.Constants;
+using Lanceur.Core.Models;
 using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.Win32.Extensions;
@@ -19,16 +20,34 @@ public static class ThumbnailExtensions
     #region Methods
 
     /// <summary>
-    ///     Copy the image source into the thumbnail repository. If the
-    ///     thumbnail already exits, nothing happens.
+    ///     Computes a deterministic hash-based file name from the specified text.
+    ///     Uses XxHash64 to produce a unique, collision-resistant name suitable
+    ///     for use as a thumbnail file name in the image repository.
     /// </summary>
-    /// <param name="imageSource">The image to copy into the repository</param>
-    /// <param name="fileName">The file name of the thumbnail</param>
-    public static void CopyToImageRepository(this ImageSource imageSource, string? fileName)
+    /// <param name="source">The text to hash (e.g. a file path or any unique identifier).</param>
+    /// <returns>
+    ///     A file name in the form <c>{hash:x16}.png</c>.
+    /// </returns>
+    private static string ComputeHash(this string source)
     {
-        if (fileName.IsNullOrWhiteSpace()) { return; }
+        var bytes = Encoding.UTF8.GetBytes(source);
+        var hash = XxHash64.HashToUInt64(bytes);
+        return $"{hash:x16}.png";
+    }
 
-        var destination = fileName!.GetThumbnailAbsolutePath();
+    /// <summary>
+    ///     Copies the image source into the thumbnail repository.
+    ///     Does nothing if <paramref name="outputPath" /> is null, empty, or does not resolve
+    ///     to a path within <see cref="Paths.ImageRepository" />, or if the thumbnail already exists.
+    /// </summary>
+    /// <param name="imageSource">The image to save into the repository.</param>
+    /// <param name="outputPath">The thumbnail file name (without directory).</param>
+    public static void CopyToImageRepository(this ImageSource imageSource, string? outputPath)
+    {
+        if (outputPath.IsNullOrWhiteSpace()) { return; }
+
+        var destination = Path.Combine(Paths.ImageRepository, outputPath!);
+        if (!destination.StartsWith(Paths.ImageRepository)) { return; }
 
         lock (Locker)
         {
@@ -48,55 +67,55 @@ public static class ThumbnailExtensions
 
     /// <summary>
     ///     Copies the image located at the specified path into the thumbnail repository.
-    ///     If a thumbnail with the same name already exists, the method does nothing.
-    ///     No copy occurs if the image source or the file name is null, empty, or whitespace.
+    ///     Does nothing if <paramref name="outputPath" /> or <paramref name="imageSource" />
+    ///     is null, empty, or whitespace, or if the thumbnail already exists.
     /// </summary>
-    /// <param name="imageSource">The full path of the source image to copy.</param>
-    /// <param name="fileName">The file name to assign to the thumbnail in the repository.</param>
-    public static void CopyToImageRepository(this string imageSource, string fileName)
+    /// <param name="imageSource">The absolute path of the source image to copy.</param>
+    /// <param name="outputPath">The absolute destination path within <see cref="Paths.ImageRepository" />.</param>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if <paramref name="outputPath" /> does not point to <see cref="Paths.ImageRepository" />,
+    ///     to prevent accidental writes outside the thumbnail repository.
+    /// </exception>
+    public static void CopyToImageRepository(this string imageSource, string outputPath)
     {
-        if (fileName.IsNullOrWhiteSpace()) { return; }
+        if (outputPath.IsNullOrWhiteSpace()) { return; }
 
         if (imageSource.IsNullOrWhiteSpace()) { return; }
 
-        var destination = fileName.GetThumbnailAbsolutePath();
+        if (!outputPath.StartsWith(Paths.ImageRepository))
+        {
+            throw new InvalidOperationException(
+                $"Cannot save the thumbnail to this repository: {outputPath}!"
+            );
+        }
 
         lock (Locker)
         {
-            if (File.Exists(destination)) { return; }
+            if (File.Exists(outputPath)) { return; }
 
             if (!Directory.Exists(Paths.ImageRepository)) { Directory.CreateDirectory(Paths.ImageRepository); }
 
-            File.Copy(imageSource, destination, true);
+            File.Copy(imageSource, outputPath, true);
         }
     }
 
     /// <summary>
-    ///     Resolves the absolute path of a thumbnail file in the image repository.
+    ///     Resolves the absolute path of the thumbnail for the specified alias.
+    ///     The path is derived by hashing <see cref="AliasQueryResult.FileName" /> via <see cref="ComputeHash" />
+    ///     and combining the result with <see cref="Paths.ImageRepository" />.
+    ///     Returns <see cref="string.Empty" /> if <see cref="AliasQueryResult.FileName" /> is null or whitespace.
     /// </summary>
-    /// <param name="fileName">The thumbnail file name (without directory).</param>
+    /// <param name="alias">The alias for which to resolve the thumbnail absolute path.</param>
     /// <returns>
-    ///     The absolute path to the thumbnail file, combining <see cref="Paths.ImageRepository" />
-    ///     with <paramref name="fileName" />.
+    ///     The absolute path to the thumbnail file, or <see cref="string.Empty" />
+    ///     if the alias has no file name.
     /// </returns>
-    public static string GetThumbnailAbsolutePath(this string fileName)
-        => Path.Combine(Paths.ImageRepository, fileName);
-
-    /// <summary>
-    ///     Computes a deterministic file name for the thumbnail associated with the specified input.
-    ///     The name is derived by hashing the input using XxHash64, ensuring a unique and
-    ///     collision-resistant file name within the thumbnail repository.
-    /// </summary>
-    /// <param name="path">The file name or path used as input to generate the thumbnail file name.</param>
-    /// <returns>
-    ///     A file name (without directory) in the form <c>{hash:x16}.png</c>,
-    ///     using the XxHash64 hash of <paramref name="path" />.
-    /// </returns>
-    public static string GetThumbnailFileName(this string path)
+    public static string GetThumbnailAbsolutePath(this AliasQueryResult alias)
     {
-        var bytes = Encoding.UTF8.GetBytes(path);
-        var hash = XxHash64.HashToUInt64(bytes);
-        return $"{hash:x16}.png";
+        var fileName = alias.FileName.IsNullOrWhiteSpace()
+            ? string.Empty
+            : alias.FileName!.ComputeHash();
+        return Path.Combine(Paths.ImageRepository, fileName);
     }
 
     #endregion

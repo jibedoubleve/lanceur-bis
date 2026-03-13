@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails.Strategies;
 
-public class SteamLibraryAppThumbnailStrategy : IThumbnailStrategy
+public class SteamLibraryAppThumbnailStrategy : ThumbnailStrategy
 {
     #region Fields
 
@@ -25,12 +25,19 @@ public class SteamLibraryAppThumbnailStrategy : IThumbnailStrategy
     public SteamLibraryAppThumbnailStrategy(
         IFavIconHttpClient httpClient,
         ILogger<SteamLibraryAppThumbnailStrategy> logger,
-        IAliasManagementService aliasManagementService)
+        IAliasManagementService aliasManagementService) : base(logger)
     {
         _httpClient = httpClient;
         _logger = logger;
         _aliasManagementService = aliasManagementService;
     }
+
+    #endregion
+
+    #region Properties
+
+    /// <inheritdoc />
+    public override int Priority => 300;
 
     #endregion
 
@@ -48,7 +55,7 @@ public class SteamLibraryAppThumbnailStrategy : IThumbnailStrategy
             var bytes = await response.Content.ReadAsByteArrayAsync();
             if (bytes.Length == 0)
             {
-                _logger.LogInformation("Cannot save thumbnail, response from favicon url is empty.");
+                _logger.LogInformation("Cannot save thumbnail, response from Steam url is empty.");
                 return false;
             }
 
@@ -56,13 +63,16 @@ public class SteamLibraryAppThumbnailStrategy : IThumbnailStrategy
             foundFavIcon = true;
             return true;
         }
-        catch (Exception ex) { _logger.LogWarning(ex, "Failed to save favicon into {OutputPath}.", outputPath); }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to save Steam thumbnail into {OutputPath}.", outputPath);
+        }
 
         return foundFavIcon;
     }
 
     /// <inheritdoc />
-    public async Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    protected override async Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
         if (!alias.IsSteamGame()) { return; }
 
@@ -78,7 +88,7 @@ public class SteamLibraryAppThumbnailStrategy : IThumbnailStrategy
 
         if (response.StatusCode != HttpStatusCode.OK) { return; }
 
-        var thumbnail = ResolveCachePath(alias.FileName!);
+        var thumbnail = alias.GetThumbnailAbsolutePath();
 
         if (!File.Exists(thumbnail) && !await SaveThumbnailAsync(response, thumbnail)) { return; }
 
@@ -86,8 +96,6 @@ public class SteamLibraryAppThumbnailStrategy : IThumbnailStrategy
         _aliasManagementService.UpdateThumbnail(alias);
 
         return;
-
-        string ResolveCachePath(string p) => p.GetThumbnailFileName().GetThumbnailAbsolutePath();
 
         string GetThumbnailUrl(int appId) =>
             $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/capsule_sm_120.jpg";

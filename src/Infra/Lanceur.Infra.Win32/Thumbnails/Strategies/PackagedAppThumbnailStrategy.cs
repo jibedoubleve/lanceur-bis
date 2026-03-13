@@ -1,4 +1,3 @@
-using System.IO;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Extensions;
@@ -6,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails.Strategies;
 
-public class PackagedAppThumbnailStrategy : IThumbnailStrategy
+public class PackagedAppThumbnailStrategy : ThumbnailStrategy
 {
     #region Fields
 
@@ -23,7 +22,7 @@ public class PackagedAppThumbnailStrategy : IThumbnailStrategy
         IPackagedAppSearchService packagedAppSearchService,
         IAliasManagementService aliasManagementService,
         ILogger<PackagedAppThumbnailStrategy> logger
-    )
+    ) : base(logger)
     {
         _packagedAppSearchService = packagedAppSearchService;
         _aliasManagementService = aliasManagementService;
@@ -32,25 +31,20 @@ public class PackagedAppThumbnailStrategy : IThumbnailStrategy
 
     #endregion
 
+    #region Properties
+
+    /// <inheritdoc />
+    public override int Priority => 200;
+
+    #endregion
+
     #region Methods
 
-    public async Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    protected override async Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
-        if (File.Exists(alias.Thumbnail))
-        {
-            _logger.LogTrace("Thumbnail for alias {Name} is in cache. Update skipped.", alias.Name);
-            return;
-        }
-
-        if (alias.FileName is null)
-        {
-            _logger.LogInformation("Alias {Alias} does not have a file name.", alias.FileName);
-            return;
-        }
-
         if (!alias.IsPackagedApplication()) { return; }
 
-        var app = await _packagedAppSearchService.GetByInstalledDirectoryAsync(alias.FileName);
+        var app = await _packagedAppSearchService.GetByInstalledDirectoryAsync(alias.FileName!);
         var response = app.FirstOrDefault();
 
         if (response is null)
@@ -59,9 +53,9 @@ public class PackagedAppThumbnailStrategy : IThumbnailStrategy
             return;
         }
 
-        var thumbnailFileName = alias.FileName.GetThumbnailFileName();
-        response.Logo?.LocalPath.CopyToImageRepository(thumbnailFileName);
-        alias.Thumbnail = thumbnailFileName.GetThumbnailAbsolutePath();
+        var thumbnailAbsolutePath = alias.GetThumbnailAbsolutePath();
+        response.Logo.LocalPath.CopyToImageRepository(thumbnailAbsolutePath);
+        alias.Thumbnail = thumbnailAbsolutePath;
         _aliasManagementService.UpdateThumbnail(alias);
     }
 
