@@ -11,6 +11,15 @@ namespace Lanceur.Core.BusinessLogic;
 /// </summary>
 public class TextToParameterParser
 {
+    #region Fields
+
+    /// <summary>
+    ///     All newline formats supported.
+    /// </summary>
+    private static readonly string[] NewLines = ["\r\n", "\n"];
+
+    #endregion
+
     #region Methods
 
     private static bool TryParseLine(string line, out AdditionalParameter? parameter)
@@ -37,7 +46,7 @@ public class TextToParameterParser
     public ParseResult Parse(string text)
     {
         var parameters = new List<AdditionalParameter>();
-        foreach (var line in text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var line in text.Split(NewLines, StringSplitOptions.RemoveEmptyEntries))
         {
             if (!TryParseLine(line, out var parameter)) { return ParseResult.Failed(); }
 
