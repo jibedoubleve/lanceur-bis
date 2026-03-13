@@ -1,4 +1,3 @@
-using System.IO;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Extensions;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails.Strategies;
 
-public class Win32AppThumbnailStrategy : IThumbnailStrategy
+public class Win32AppThumbnailStrategy : ThumbnailStrategy
 {
     #region Fields
 
@@ -26,7 +25,7 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
         ILoggerFactory loggerFactory,
         IAliasManagementService aliasManagementService,
         ILogger<Win32AppThumbnailStrategy> logger
-    )
+    ) : base(logger)
     {
         _staThreadRunner = staThreadRunner;
         _aliasManagementService = aliasManagementService;
@@ -36,23 +35,19 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
 
     #endregion
 
+    #region Properties
+
+    /// <inheritdoc />
+    public override int Priority => 100;
+
+    #endregion
+
     #region Methods
 
-    public async Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    protected override async Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
-        if (File.Exists(alias.Thumbnail))
-        {
-            _logger.LogTrace("Thumbnail for alias {Name} is in cache. Update skipped.", alias.Name);
-            return;
-        }
-        if (alias.FileName is null)
-        {
-            _logger.LogInformation("Alias {Alias} does not have a file name.", alias.FileName);
-            return;
-        }
-
         var imageSource = await _staThreadRunner.RunAsync(
-            () => _win32ThumbnailService.GetThumbnail(alias.FileName),
+            () => _win32ThumbnailService.GetThumbnail(alias.FileName!),
             cancellationToken
         );
         if (imageSource is null)
@@ -61,9 +56,8 @@ public class Win32AppThumbnailStrategy : IThumbnailStrategy
             return;
         }
 
-        var thumbnailFileName = alias.FileName?.GetThumbnailFileName();
-        imageSource.CopyToImageRepository(thumbnailFileName);
-        alias.Thumbnail = thumbnailFileName?.GetThumbnailAbsolutePath();
+        alias.Thumbnail = alias.GetThumbnailAbsolutePath();
+        imageSource.CopyToImageRepository(alias.Thumbnail);
         _aliasManagementService.UpdateThumbnail(alias);
     }
 

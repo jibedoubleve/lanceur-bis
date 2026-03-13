@@ -1,6 +1,5 @@
 using System.IO;
 using System.Threading.Channels;
-using ABI.Windows.ApplicationModel.Contacts;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Lanceur.Core.Models;
@@ -20,7 +19,7 @@ public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
     private readonly Task[] _consumers;
     private readonly CancellationTokenSource _cts = new();
     private readonly ILogger<ThumbnailService> _logger;
-    private readonly IEnumerable<IThumbnailStrategy> _thumbnailStrategy;
+    private readonly IEnumerable<IThumbnailStrategy> _orderedThumbnailStrategies;
 
     #endregion
 
@@ -28,11 +27,13 @@ public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
 
     public ThumbnailService(
         ILoggerFactory loggerFactory,
-        IEnumerable<IThumbnailStrategy> thumbnailStrategy,
+        IEnumerable<IThumbnailStrategy> thumbnailStrategies,
         ISection<ThumbnailPipelineSection> section
     )
     {
-        _thumbnailStrategy = thumbnailStrategy;
+        _orderedThumbnailStrategies = thumbnailStrategies
+                                      .OrderBy(s => s.Priority)
+                                      .ToArray();
         _logger = loggerFactory.GetLogger<ThumbnailService>();
 
         var s = section.Value;
@@ -87,7 +88,7 @@ public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
 
         async Task RunStrategy(AliasQueryResult alias)
         {
-            foreach (var strategy in _thumbnailStrategy)
+            foreach (var strategy in _orderedThumbnailStrategies)
             {
                 try { await strategy.UpdateThumbnailAsync(alias, _cts.Token); }
                 catch (OperationCanceledException ex)

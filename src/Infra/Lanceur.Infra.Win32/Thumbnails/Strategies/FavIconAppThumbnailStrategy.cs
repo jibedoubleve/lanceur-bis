@@ -1,4 +1,3 @@
-using System.IO;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Extensions;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails.Strategies;
 
-public class FavIconAppThumbnailStrategy : IThumbnailStrategy
+public class FavIconAppThumbnailStrategy : ThumbnailStrategy
 {
     #region Fields
 
@@ -23,7 +22,7 @@ public class FavIconAppThumbnailStrategy : IThumbnailStrategy
         IFavIconService favIconService,
         ILogger<FavIconAppThumbnailStrategy> logger,
         IAliasManagementService aliasManagementService
-    )
+    ) : base(logger)
     {
         _favIconService = favIconService;
         _logger = logger;
@@ -34,15 +33,13 @@ public class FavIconAppThumbnailStrategy : IThumbnailStrategy
 
     #region Methods
 
-    public async Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    protected override async Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
-        if (File.Exists(alias.Thumbnail))
-        {
-            _logger.LogTrace("Thumbnail for alias {Name} is in cache. Update skipped.", alias.Name);
-            return;
-        }
-
-        var thumbnail = await _favIconService.UpdateFaviconAsync(alias, ResolveCachePath, cancellationToken);
+        var thumbnail = await _favIconService.UpdateFaviconAsync(
+            alias,
+            _ => alias.GetThumbnailAbsolutePath(),
+            cancellationToken
+        );
         if (thumbnail.IsNullOrEmpty()) { return; }
 
         _logger.LogInformation(
@@ -54,10 +51,6 @@ public class FavIconAppThumbnailStrategy : IThumbnailStrategy
 
         alias.Thumbnail = thumbnail;
         _aliasManagementService.UpdateThumbnail(alias);
-
-        return;
-
-        string ResolveCachePath(string p) => p.GetThumbnailFileName().GetThumbnailAbsolutePath();
     }
 
     #endregion

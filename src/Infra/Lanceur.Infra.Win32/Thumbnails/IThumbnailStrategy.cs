@@ -9,6 +9,16 @@ namespace Lanceur.Infra.Win32.Thumbnails;
 /// </summary>
 public interface IThumbnailStrategy
 {
+    #region Properties
+
+    /// <summary>
+    ///     Determines the execution order of this strategy in the pipeline.
+    ///     A lower value means the strategy is executed earlier.
+    /// </summary>
+    int Priority { get; }
+
+    #endregion
+
     #region Methods
 
     /// <summary>
