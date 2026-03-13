@@ -28,24 +28,23 @@ public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
     public ThumbnailService(
         ILoggerFactory loggerFactory,
         IEnumerable<IThumbnailStrategy> thumbnailStrategies,
-        ISection<ThumbnailPipelineSection> section
-    )
+        ISection<ThumbnailPipelineSection> section)
     {
         _orderedThumbnailStrategies = thumbnailStrategies
                                       .OrderBy(s => s.Priority)
                                       .ToArray();
         _logger = loggerFactory.GetLogger<ThumbnailService>();
 
-        var s = section.Value;
+        var stg = section.Value;
         _channel = Channel.CreateBounded<AliasQueryResult>(
-            new BoundedChannelOptions(s.ChannelCapacity) { FullMode = s.ChannelFullMode }
+            new BoundedChannelOptions(stg.ChannelCapacity) { FullMode = stg.ChannelFullMode }
         );
 
         /* WARNING: consumer tasks are fire-and-forget. If a consumer crashes, it is not restarted.
          * If all consumers crash, the service becomes a zombie: the queue keeps accepting requests
          * but nothing processes them. Exceptions are only surfaced at Dispose() via WhenAll.
          */
-        _consumers = Enumerable.Range(0, s.ConsumerCount)
+        _consumers = Enumerable.Range(0, stg.ConsumerCount)
                                .Select(_ => Task.Run(ConsumeAsync)
                                                 .LogOnFaulted(
                                                     _logger,

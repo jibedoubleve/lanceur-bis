@@ -1,16 +1,17 @@
 using System.Data;
 using System.Data.SQLite;
-using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using ScottPlot;
 using Xunit;
 
 namespace Lanceur.Tests.Tools.Extensions;
@@ -18,19 +19,6 @@ namespace Lanceur.Tests.Tools.Extensions;
 public static class ServiceProviderExtensions
 {
     #region Methods
-
-    public static IServiceCollection AddApplicationSettings(
-        this IServiceCollection serviceCollection,
-        Action<IConfigurationFacade>? setupAction = null
-    )
-    {
-        var settings = Substitute.For<IConfigurationFacade>();
-        settings.Application.Returns(new NoCacheApplicationSettings());
-
-        serviceCollection.AddSingleton(settings);
-        setupAction?.Invoke(settings);
-        return serviceCollection;
-    }
 
     public static IServiceCollection AddDatabase(
         this IServiceCollection serviceCollection,
@@ -53,6 +41,31 @@ public static class ServiceProviderExtensions
         var factory = new MicrosoftLoggingLoggerFactory(outputHelper);
         serviceCollection.AddSingleton<ILoggerFactory>(factory);
         serviceCollection.AddLogging();
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddMockConfigurationSections(
+        this IServiceCollection serviceCollection,
+        Action<MemoryApplicationSettingsProvider>? setupApplicationSettings = null)
+    {
+        var applicationSettingsProvider = new MemoryApplicationSettingsProvider();
+        var infrastructureSettingsProvider = new MemoryInfrastructureSettingsProvider();
+
+        setupApplicationSettings?.Invoke(applicationSettingsProvider);
+
+        applicationSettingsProvider.Current.Github.Token = Generate.RandomString(15);
+
+        return serviceCollection.AddSingleton(typeof(IWriteableSection<>), typeof(Section<>))
+                                .AddSingleton(typeof(ISection<>), typeof(ForwardingSection<>))
+                                .AddMockSingleton<ISettingsProvider>((_, _) => applicationSettingsProvider)
+                                .AddMockSingleton<ISettingsProvider>((_, _) => infrastructureSettingsProvider);
+    }
+
+    public static IServiceCollection AddMockLazySingleton<T>(
+        this IServiceCollection serviceCollection)
+        where T : class
+    {
+        serviceCollection.AddSingleton(new Lazy<T>(() => Substitute.For<T>()));
         return serviceCollection;
     }
 
@@ -81,14 +94,6 @@ public static class ServiceProviderExtensions
         where T : class
     {
         serviceCollection.AddSingleton(Substitute.For<T>());
-        return serviceCollection;
-    }
-
-    public static IServiceCollection AddMockLazySingleton<T>(
-        this IServiceCollection serviceCollection)
-        where T : class
-    {
-        serviceCollection.AddSingleton(new Lazy<T>(() => Substitute.For<T>()));
         return serviceCollection;
     }
 

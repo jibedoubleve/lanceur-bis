@@ -1,4 +1,7 @@
-﻿using Lanceur.Core.Repositories.Config;
+﻿using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections.Infrastructure;
+using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
@@ -17,21 +20,23 @@ public class ConnectionString : BaseConnectionString, IConnectionString
     #region Constructors
 
     // TODO: STG-Provide settings instead of service
-    public ConnectionString(IInfrastructureSettingsProvider infrastructureSettings, ILogger<ConnectionString> logger)
+    public ConnectionString(
+        ISection<DatabaseSection> databaseSection,
+        ILogger<ConnectionString> logger)
     {
-        ArgumentNullException.ThrowIfNull(infrastructureSettings);
+        ArgumentNullException.ThrowIfNull(databaseSection);
         ArgumentNullException.ThrowIfNull(logger);
 
-        if (infrastructureSettings?.Current.DbPath.IsNullOrWhiteSpace() ?? false)
+        if (databaseSection.Value.DbPath.IsNullOrWhiteSpace())
         {
             throw new ArgumentNullException(
-                nameof(infrastructureSettings.Current.DbPath),
+                nameof(databaseSection.Value.DbPath),
                 "Database path should have a value"
             );
         }
 
         _logger = logger;
-        var s = infrastructureSettings!.Current;
+        var s = databaseSection.Value;
         _dbPath = s.DbPath.ExpandPath();
     }
 

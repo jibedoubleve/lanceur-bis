@@ -1,6 +1,6 @@
 using Dapper;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -116,11 +116,9 @@ public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliatio
         ServiceVisitors? visitors
     )
     {
-        serviceCollection.AddApplicationSettings(stg => visitors?.VisitSettings?.Invoke(stg)
-                         )
-                         .AddMockSingleton<IViewFactory>()
+        serviceCollection.AddMockSingleton<IViewFactory>()
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
-                         .AddMockSingleton<IApplicationSettingsProvider>()
+                         .AddMockSingleton<ISettingsProvider<ApplicationSettings>>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddSingleton<IReconciliationService, ReconciliationService>()
                          .AddSingleton<IPackagedAppSearchService, PackagedAppSearchService>()
@@ -215,7 +213,7 @@ public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliatio
                  .Returns(true);
                 return i;
             },
-            VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 2
+            VisitApplicationSettingsProvider = settings => settings.Current.Reconciliation.InactivityThreshold = 2
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -261,7 +259,7 @@ public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliatio
                  .Returns(true);
                 return i;
             },
-            VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 10
+            VisitApplicationSettingsProvider = settings => settings.Current.Reconciliation.LowUsageThreshold = 10
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -438,7 +436,7 @@ public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliatio
                  .Returns(true);
                 return i;
             },
-            VisitSettings = settings => settings.Application.Reconciliation.LowUsageThreshold = 3
+            VisitApplicationSettingsProvider = settings => settings.Current.Reconciliation.LowUsageThreshold = 3
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -713,7 +711,7 @@ public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliatio
                  .Returns(true);
                 return i;
             },
-            VisitSettings = settings => settings.Application.Reconciliation.InactivityThreshold = 1
+            VisitApplicationSettingsProvider = settings => settings.Current.Reconciliation.InactivityThreshold = 1
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")

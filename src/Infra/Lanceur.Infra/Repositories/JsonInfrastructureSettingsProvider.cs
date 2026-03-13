@@ -1,13 +1,13 @@
 ﻿using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Constants;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Lanceur.Infra.Repositories;
 
-public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvider
+public class JsonInfrastructureSettingsProvider : ISettingsProvider<InfrastructureSettings>
 {
     #region Fields
 
@@ -30,6 +30,10 @@ public class JsonInfrastructureSettingsProvider : IInfrastructureSettingsProvide
 
     #region Properties
 
+    /// <inheritdoc />
+    object ISettingsProvider.Current => Current;
+
+    /// <inheritdoc />
     public InfrastructureSettings Current
     {
         get

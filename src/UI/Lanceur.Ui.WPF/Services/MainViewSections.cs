@@ -22,7 +22,6 @@ public class MainViewSections
         _windowSection = windowSection;
         SearchBox = searchBoxSection.Value;
         ResourceMonitor = resourceMonitorSection.Value;
-        _windowSection = windowSection;
     }
 
     #endregion

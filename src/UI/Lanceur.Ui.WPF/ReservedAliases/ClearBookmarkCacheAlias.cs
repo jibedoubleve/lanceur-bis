@@ -1,8 +1,9 @@
 using System.ComponentModel;
 using System.Web.Bookmarks;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.WPF.ReservedAliases;
@@ -14,9 +15,8 @@ public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
     #region Fields
 
     private readonly IBookmarkRepository _bookmarks;
-    private readonly IConfigurationFacade _configuration;
-
     private readonly ILogger<ClearBookmarkCacheAlias> _logger;
+    private readonly ISection<StoreSection> _storeSection;
 
     #endregion
 
@@ -25,12 +25,12 @@ public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
     public ClearBookmarkCacheAlias(
         ILoggerFactory loggerFactory,
         IBookmarkRepositoryFactory bookmarkRepositoryFactory,
-        IConfigurationFacade configuration
+        ISection<StoreSection> storeSection
     )
     {
-        _configuration = configuration;
+        _storeSection = storeSection;
         _bookmarks = bookmarkRepositoryFactory.BuildBookmarkRepository(
-            configuration.Application.Stores.BookmarkSourceBrowser
+            storeSection.Value.BookmarkSourceBrowser
         );
         _logger = loggerFactory.CreateLogger<ClearBookmarkCacheAlias>();
     }
@@ -49,7 +49,7 @@ public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
     {
         _logger.LogInformation(
             "Clearing bookmarks cache for {Browser}",
-            _configuration.Application.Stores.BookmarkSourceBrowser
+            _storeSection.Value.BookmarkSourceBrowser
         );
 
         _bookmarks.InvalidateCache();

@@ -1,8 +1,8 @@
 using System.Reflection;
 using Lanceur.Core;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Responses;
 using Lanceur.Core.Services;
@@ -47,13 +47,12 @@ public class AliasUseCases : TestBase
         serviceCollection.AddConfigurationSections()
                          .AddLogging(builder => builder.AddXUnit(OutputHelper))
                          .AddDatabase(db)
-                         .AddApplicationSettings()
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                          .AddSingleton(new AssemblySource { MacroSource = Assembly.GetExecutingAssembly() })
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<IMacroAliasExpanderService, MacroAliasExpanderService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
-                         .AddMockSingleton<IApplicationSettingsProvider>()
+                         .AddMockSingleton<ISettingsProvider<ApplicationSettings>>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IUserNotificationService>()
                          .AddMockSingleton<IUserCommunicationService>()

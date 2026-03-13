@@ -3,12 +3,9 @@ using Everything.Wrapper;
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
@@ -23,15 +20,15 @@ public static class StoreExtensions
         ApplicationSettings? configuration = null)
     {
         serviceCollection
-            .AddConfigurationSections()
-            .AddMockSingleton<IConfigurationFacade>((_, i) => {
-                    i.Application.Returns(
-                        configuration ??
-                        new ApplicationSettings { Caching = new CachingSection(0, 0), Stores = new StoreSection() }
-                    );
-                    return i;
-                }
-            );
+            .AddMockConfigurationSections(s => {
+                s.Current.Caching = configuration is null 
+                    ? new CachingSection(0, 0) 
+                    : configuration.Caching;
+                
+                s.Current.Stores = configuration is null 
+                    ? new StoreSection() 
+                    : configuration.Stores;
+            });
         return serviceCollection;
     }
 

@@ -1,4 +1,4 @@
-namespace Lanceur.Core.Configuration.Sections;
+namespace Lanceur.Core.Configuration;
 
 /// <summary>
 ///     Represents a configuration section that can be persisted to its underlying storage.
