@@ -6,7 +6,6 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.Utils;
-using Lanceur.Ui.WPF.Commands;
 using Lanceur.Ui.WPF.Helpers;
 using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Services;
@@ -19,12 +18,6 @@ namespace Lanceur.Ui.WPF.Extensions;
 public static class ServiceCollectionExtensions
 {
     #region Methods
-
-    public static IServiceCollection AddCommands(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddTransient<UpdateNotification>();
-        return serviceCollection;
-    }
 
     public static IServiceCollection AddWpfServices(this IServiceCollection serviceCollection)
     {
