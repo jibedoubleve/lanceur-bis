@@ -28,12 +28,6 @@ public class InfrastructureSettings
     ///     Provides options for enabling and customizing telemetry collection.
     /// </summary>
     public TelemetrySection Telemetry { get; set; } = new();
-    
-    /// <summary>
-    ///     Gets or sets the thumbnail pipeline configuration section.
-    ///     Controls the bounded channel capacity and full-mode behaviour used to queue thumbnail requests.
-    /// </summary>
-    public ThumbnailPipelineSection ThumbnailPipeline { get; set; } = new();
 
     #endregion
 }
