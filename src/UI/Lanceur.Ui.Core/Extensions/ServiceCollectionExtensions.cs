@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
         var telemetry = settingsProvider.Current.Telemetry;
 
         var logEventLevel = new Conditional<LogEventLevel>(
-            LogEventLevel.Debug,
+            LogLevelUtil.GetLevel(),
             minLogLevel
         );
         var levelSwitch = new LoggingLevelSwitch(logEventLevel);
