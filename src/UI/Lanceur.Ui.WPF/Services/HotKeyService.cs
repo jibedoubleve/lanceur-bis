@@ -1,7 +1,6 @@
 using System.Windows.Input;
-using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
-using Lanceur.Core.Repositories.Config;
 using Microsoft.Extensions.Logging;
 using NHotkey;
 using NHotkey.Wpf;
@@ -13,7 +12,8 @@ public class HotKeyService : IHotKeyService
 {
     #region Fields
 
-    private readonly IApplicationSettingsProvider _applicationSettingsProvider;
+    private readonly ISection<HotKeySection> _hotkeySection;
+
 
     private readonly ILogger<HotKeyService> _logger;
 
@@ -21,17 +21,17 @@ public class HotKeyService : IHotKeyService
 
     #region Constructors
 
-    public HotKeyService(ILogger<HotKeyService> logger, IApplicationSettingsProvider applicationSettingsProvider)
+    public HotKeyService(ILogger<HotKeyService> logger, ISection<HotKeySection> hotkeySection)
     {
         _logger = logger;
-        _applicationSettingsProvider = applicationSettingsProvider;
+        _hotkeySection = hotkeySection;
     }
 
     #endregion
 
     #region Properties
 
-    public HotKeySection HotKey => _applicationSettingsProvider.Current.HotKey;
+    public HotKeySection HotKey => _hotkeySection.Value;
 
     #endregion
 
