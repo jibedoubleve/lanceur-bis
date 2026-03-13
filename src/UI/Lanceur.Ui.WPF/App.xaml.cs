@@ -16,7 +16,6 @@ using Lanceur.Infra.Win32.Helpers;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
-using Lanceur.Ui.WPF.Commands;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Services;
@@ -40,7 +39,7 @@ public partial class App
     private static readonly IHost Host
         = Microsoft.Extensions.Hosting.Host
                    .CreateDefaultBuilder()
-                   .ConfigureServices((context, services) => {
+                   .ConfigureServices((_, services) => {
                            services.AddTrackedMemoryCache()
                                    .RegisterView("Lanceur.Ui.WPF")
                                    .RegisterViewModel("Lanceur.Ui.Core")
@@ -50,7 +49,6 @@ public partial class App
                                    .AddStores()
                                    .AddReservedAliases(typeof(AddAlias))
                                    .AddMacros()
-                                   .AddCommands()
                                    .AddConfiguration()
                                    .AddDatabaseServices()
                                    .AddLoggers();
@@ -188,6 +186,7 @@ public partial class App
 
         /* Only one instance allowed in prod...
          */
+        logger.LogInformation("Checking single instance constraint via semaphore...");
         ConditionalExecution.ExecuteOnRelease(() => {
                 if (SingleInstance.WaitOne()) { return; }
 
@@ -245,23 +244,8 @@ public partial class App
 
         /* Check if new Version
          */
-        var settings = Host.Services.GetRequiredService<IConfigurationFacade>()!;
-        _ = Host.Services.GetRequiredService<IReleaseService>()
-                .HasUpdateAsync()
-                .ContinueWith(
-                    context => {
-                        if (!context.Result.HasUpdate || settings.Application.Github.SnoozeVersionCheck) { return; }
-
-                        // A new version has been release, notify user...
-                        Host.Services.GetService<UpdateNotification>()!
-                            .Notify(context.Result.Version);
-                    },
-                    TaskContinuationOptions.OnlyOnRanToCompletion
-                )
-                .ContinueWith(
-                    context => { logger.LogWarning(context.Exception, "En error occured while checking update."); },
-                    TaskContinuationOptions.OnlyOnFaulted
-                );
+        logger.LogInformation("Checking updates...");
+        _ = Host.Services.GetRequiredService<IReleaseService>().CheckAndNotifyAsync();
 
         base.OnStartup(e);
         UiContext = SynchronizationContext.Current!;
