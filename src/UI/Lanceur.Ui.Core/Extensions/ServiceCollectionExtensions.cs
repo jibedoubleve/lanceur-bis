@@ -3,17 +3,13 @@ using System.Data.SQLite;
 using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
-using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Constants;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.LuaScripting;
-using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -45,20 +41,11 @@ public static class ServiceCollectionExtensions
 {
     #region Methods
 
-    public static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection)
-        => serviceCollection.AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
-                            .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
-                            .AddTransient<IGithubService, GithubService>();
-
-    public static IServiceCollection AddConfigurationSections(this IServiceCollection serviceCollection)
-        => serviceCollection.AddSingleton(typeof(ISection<>), typeof(ConfigurationSection<>))
-                            .AddSingleton(typeof(IWriteableSection<>), typeof(ConfigurationSection<>));
-
     public static IServiceCollection AddLoggers(
         this IServiceCollection serviceCollection
     )
     {
-        var settingsProvider = InfrastructureSettingsProviderFactory.GetInstance();
+        var settingsProvider = SettingsProviderFactory.GetInfrastructureSettingsProvider();
         settingsProvider.Load();
 
         var minLogLevel = settingsProvider.Current.GetMinimumLogLevel();
@@ -153,7 +140,6 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<ILuaManager, LuaManager>()
                          .AddSingleton<IEnigma, Enigma>()
                          .AddHttpClient()
-                         .RegisterInfrastructureSettingsProvider()
                          .AddThumbnailStrategies()
                          .AddStaThreadRunner()
                          .AddTransient<IThumbnailService, ThumbnailService>()

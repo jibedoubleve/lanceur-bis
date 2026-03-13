@@ -2,12 +2,9 @@
 using System.Data.SQLite;
 using Dapper;
 using Lanceur.Core;
-using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -249,7 +246,6 @@ public class SearchServiceTest : TestBase
         sc.AddDatabase(conn)
           .AddLogging(builder => builder.AddXUnit(OutputHelper))
           .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-          .AddMockSingleton<IConfigurationFacade>()
           .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
           .AddSingleton(_testLoggerFactory)
           .AddSingleton<ISearchService, SearchService>()

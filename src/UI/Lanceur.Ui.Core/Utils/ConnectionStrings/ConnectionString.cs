@@ -1,4 +1,5 @@
-﻿using Lanceur.Core.Repositories.Config;
+﻿using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,7 @@ public class ConnectionString : BaseConnectionString, IConnectionString
     #region Constructors
 
     // TODO: STG-Provide settings instead of service
-    public ConnectionString(IInfrastructureSettingsProvider infrastructureSettings, ILogger<ConnectionString> logger)
+    public ConnectionString(ISettingsProvider<InfrastructureSettings> infrastructureSettings, ILogger<ConnectionString> logger)
     {
         ArgumentNullException.ThrowIfNull(infrastructureSettings);
         ArgumentNullException.ThrowIfNull(logger);

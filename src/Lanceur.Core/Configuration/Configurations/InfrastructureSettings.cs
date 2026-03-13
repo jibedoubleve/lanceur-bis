@@ -25,9 +25,15 @@ public class InfrastructureSettings
 
     /// <summary>
     ///     Gets or sets the telemetry configuration section.
-    ///     Provides options for enabling and customizing telemetry collection.
+    ///     Provides options for enabling and customising telemetry collection.
     /// </summary>
     public TelemetrySection Telemetry { get; set; } = new();
+    
+    /// <summary>
+    ///     Gets or sets the thumbnail pipeline configuration.
+    ///     Provides options to control the behaviour of the pipeline channel and the number of concurrent consumers.
+    /// </summary>
+    public ThumbnailPipelineSection ThumbnailPipeline { get; set; } = new();
 
     #endregion
 }

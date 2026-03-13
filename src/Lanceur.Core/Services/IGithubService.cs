@@ -9,7 +9,7 @@ public interface IGithubService
     /// </summary>
     /// <param name="title">The title of the issue to create.</param>
     /// <param name="token">The personal access token used for authentication with the GitHub API.</param>
-    Task CreateIssue(string title, string token);
+    Task CreateIssueAsync(string title, string token);
 
     /// <summary>
     ///     Retrieves the latest version tag from the GitHub repository's releases.

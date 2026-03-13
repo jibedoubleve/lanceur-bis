@@ -1,11 +1,9 @@
 using Everything.Wrapper;
-using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
@@ -183,7 +181,7 @@ public class IoCForStoresShould : TestBase
                     .GetServices<IStoreService>()
                     .Single(x => x.GetType() == typeof(EverythingStore));
         var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
-        var configuration = serviceProvider.GetService<IConfigurationFacade>()!;
+        var section = serviceProvider.GetService<IWriteableSection<StoreSection>>()!;
 
         orchestrator.ShouldSatisfyAllConditions(
             o =>
@@ -216,13 +214,13 @@ public class IoCForStoresShould : TestBase
 
             serviceCollection.AddConfiguration() // Real configuration facility (not mocked)
                              .AddConfigurationSections()
-                             .AddSingleton<IInfrastructureSettingsProvider, MemoryInfrastructureSettingsProvider>();
+                             .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>();
             return serviceCollection.BuildServiceProvider();
         }
 
         void UpdateConfiguration(string aliasOverride)
         {
-            configuration.Application.Stores.StoreShortcuts =
+            section.Value.StoreShortcuts =
             [
                 new StoreShortcut
                 {
@@ -230,7 +228,7 @@ public class IoCForStoresShould : TestBase
                     AliasOverride = aliasOverride
                 }
             ];
-            configuration.Save();
+            section.Save();
         }
     }
 

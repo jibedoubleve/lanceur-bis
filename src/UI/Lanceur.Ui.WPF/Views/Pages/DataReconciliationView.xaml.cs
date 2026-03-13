@@ -1,7 +1,6 @@
 using System.ComponentModel;
-using Lanceur.Core.Configuration.Sections;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Helpers;
@@ -21,10 +20,10 @@ public partial class DataReconciliationView
 
     public DataReconciliationView(
         DataReconciliationViewModel viewModel,
-        IConfigurationFacade configuration
+        ISection<ReconciliationSection> reconciliationSection
     )
     {
-        _reportConfigurations = configuration.Application.Reconciliation.ReportsConfiguration;
+        _reportConfigurations = reconciliationSection.Value.ReportsConfiguration;
         DataContext = viewModel;
         viewModel.PropertyChanged += OnViewModelReportTypeChanged;
         InitializeComponent();

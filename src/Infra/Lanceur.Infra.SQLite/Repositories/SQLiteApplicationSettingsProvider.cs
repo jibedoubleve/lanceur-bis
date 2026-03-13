@@ -2,7 +2,7 @@
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
@@ -10,8 +10,10 @@ using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite.Repositories;
 
-/// <inheritdoc cref="IApplicationSettingsProvider" />
-public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicationSettingsProvider
+/// <inheritdoc cref="ISettingsProvider{TConfig}
+/// 
+/// <ApplicationSettings>" />
+public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, ISettingsProvider<ApplicationSettings>
 {
     #region Fields
 
@@ -36,6 +38,10 @@ public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IApplicat
 
     #region Properties
 
+    /// <inheritdoc />
+    object ISettingsProvider.Current => Current;
+
+    /// <inheritdoc />
     public ApplicationSettings Current
     {
         get

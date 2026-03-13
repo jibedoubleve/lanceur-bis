@@ -1,5 +1,5 @@
 using Dapper;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.Repositories;
@@ -67,10 +67,9 @@ public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewMo
     {
         serviceCollection.AddTestOutputHelper(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
-                         .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
-                         .AddSingleton<IInfrastructureSettingsProvider, MemoryInfrastructureSettingsProvider>()
-                         .AddSingleton<IApplicationSettingsProvider, SQLiteApplicationSettingsProvider>()
+                         .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
+                         .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
                          .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IUserNotificationService>()
                          .AddMockSingleton<IAppRestartService>()

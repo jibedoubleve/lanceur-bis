@@ -78,7 +78,7 @@ public class GithubIssueMacro : MacroQueryResult
         }
         
         _logger.LogInformation("Creating Github issue with cmdline: {Cmdline}", cmdline!.ToString());
-        await _githubService.CreateIssue(cmdline.Parameters, _enigma.Decrypt(_settings.Value.Token!));
+        await _githubService.CreateIssueAsync(cmdline.Parameters, _enigma.Decrypt(_settings.Value.Token!));
 
         return NoResult;
     }

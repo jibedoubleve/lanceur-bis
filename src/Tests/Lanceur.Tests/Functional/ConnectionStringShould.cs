@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Microsoft.Extensions.Logging;
@@ -55,7 +55,7 @@ public class ConnectionStringShould
     public void NotThrowErrorWhenFileDoesNotExist()
     {
         // Arrange
-        var config = Substitute.For<IInfrastructureSettingsProvider>();
+        var config = Substitute.For<ISettingsProvider<InfrastructureSettings>>();
         config.Current.Returns(new InfrastructureSettings { DbPath = "lkj" });
         var cs = new ConnectionString(config, CreateLogger());
 
@@ -71,7 +71,7 @@ public class ConnectionStringShould
     {
         // Arrange
         var file = CreateTemporaryFile();
-        var config = Substitute.For<IInfrastructureSettingsProvider>();
+        var config = Substitute.For<ISettingsProvider<InfrastructureSettings>>();
         config.Current.Returns(new InfrastructureSettings { DbPath = file });
         var cs = new ConnectionString(config, CreateLogger());
 

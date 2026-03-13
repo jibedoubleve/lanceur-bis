@@ -1,7 +1,8 @@
 using System.Windows;
 using System.Windows.Input;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Infra.Win32.Helpers;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Extensions;
@@ -16,7 +17,7 @@ public partial class ExceptionView
 {
     #region Fields
 
-    private readonly IConfigurationFacade _configuration;
+    private readonly ISection<WindowSection> _windowSection;
 
     #endregion
 
@@ -24,13 +25,12 @@ public partial class ExceptionView
 
     public ExceptionView(
         ExceptionViewModel viewModel,
-        IConfigurationFacade configuration
-    )
+        ISection<WindowSection> windowSection)
     {
+        _windowSection = windowSection;
         DataContext = viewModel;
 
         InitializeComponent();
-        _configuration = configuration;
     }
 
     #endregion
@@ -47,7 +47,7 @@ public partial class ExceptionView
     private void OnLoaded(object _, RoutedEventArgs e) =>
         SystemThemeWatcher.Watch(
             this,
-            _configuration.Application.Window.BackdropStyle.ToWindowBackdropType()
+            _windowSection.Value.BackdropStyle.ToWindowBackdropType()
         );
 
     private void OnOpenLogs(object sender, RoutedEventArgs e) => WindowsShell.StartExplorer(Paths.LogRepository);

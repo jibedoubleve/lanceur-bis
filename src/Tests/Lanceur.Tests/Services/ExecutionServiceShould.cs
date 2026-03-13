@@ -2,21 +2,17 @@
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Macros;
-using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
-using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Generators;
 using Lanceur.Tests.Tools.Launchers;
-using Lanceur.Ui.Core.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -183,14 +179,12 @@ public class ExecutionServiceShould : TestBase
     [InlineData("issue", "with some text as parameters")]
     public async Task When_executing_macro_with_parameters_Then_parameters_are_used(string cmd, string parameters)
     {
+        // ARRANGE
         var cmdline = new Cmdline(cmd, parameters);
-
         var githubService = Substitute.For<IGithubService>();
-        var sp = new ServiceCollection().AddConfigurationSections()
-                                        .AddTestOutputHelper(OutputHelper)
-                                        .AddSingleton<IConfigurationFacade, ConfigurationFacadeService>()
-                                        .AddMockSingleton<IInfrastructureSettingsProvider>()
-                                        .AddMockSingleton<IApplicationSettingsProvider>((_, i) => {
+        var sp = new ServiceCollection().AddTestOutputHelper(OutputHelper)
+                                        .AddMockSingleton<ISettingsProvider<InfrastructureSettings>>()
+                                        .AddMockSingleton<ISettingsProvider<ApplicationSettings>>((_, i) => {
                                                 var config = new ApplicationSettings
                                                 {
                                                     Github = { Token = Generate.Text() }
@@ -214,23 +208,23 @@ public class ExecutionServiceShould : TestBase
                                         .AddMockSingleton<IUserGlobalNotificationService>()
                                         .AddMockSingleton<IEnigma>()
                                         .AddSingleton<GithubIssueMacro>()
+                                        .AddMockConfigurationSections()
                                         .BuildServiceProvider();
 
         var macro = sp.GetService<GithubIssueMacro>()!;
         var request = new ExecutionRequest(macro, cmdline);
+        var executionService = sp.GetService<IExecutionService>()!;
 
-        try
-        {
-            var executionService = sp.GetService<IExecutionService>()!;
-            await executionService.ExecuteAsync(request);
-        }
-        catch (Exception ex) { Assert.Fail($"This should not throw an exception {ex.Message}"); }
-
+        // ACT
+        await executionService.ExecuteAsync(request);
+        
+        // ASSERT
         await githubService.Received()
-                           .CreateIssue(
+                           .CreateIssueAsync(
                                Arg.Is<string>(s => string.Equals(s, parameters)),
                                Arg.Any<string>()
                            );
+
     }
 
     [Theory]

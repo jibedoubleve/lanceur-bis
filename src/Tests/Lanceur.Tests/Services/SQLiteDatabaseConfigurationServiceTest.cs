@@ -1,9 +1,8 @@
 ﻿using Dapper;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
@@ -28,7 +27,7 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
     #region Methods
 
     private void WithConfiguration(
-        Action<IApplicationSettingsProvider> assert, 
+        Action<ISettingsProvider<ApplicationSettings>> assert, 
         string? json = null, 
         IConnectionString? connectionString = null)
     {

@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
+using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -39,7 +39,7 @@ public class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
-                         .AddMockSingleton<IApplicationSettingsProvider>()
+                         .AddMockSingleton<ISettingsProvider<ApplicationSettings>>()
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()
                          .AddMockSingleton<IUserGlobalNotificationService>()

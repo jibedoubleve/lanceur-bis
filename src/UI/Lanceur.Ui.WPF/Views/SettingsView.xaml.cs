@@ -4,7 +4,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
-using Lanceur.Core.Repositories.Config;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
@@ -23,11 +24,10 @@ public partial class SettingsView : INavigationWindow
 {
     #region Fields
 
-    private readonly IConfigurationFacade _configuration;
-
     private readonly IContentDialogService _contentDialogService;
     private readonly ILogger<SettingsView> _logger;
     private readonly ISnackbarService _snackbarService;
+    private readonly ISection<WindowSection> _windowSection;
 
     #endregion
 
@@ -39,8 +39,7 @@ public partial class SettingsView : INavigationWindow
         ISnackbarService snackbarService,
         IServiceProvider serviceProvider,
         ILogger<SettingsView> logger,
-        IConfigurationFacade configuration
-    )
+        ISection<WindowSection> windowSection)
     {
         ArgumentNullException.ThrowIfNull(contentDialogService);
         ArgumentNullException.ThrowIfNull(snackbarService);
@@ -54,7 +53,7 @@ public partial class SettingsView : INavigationWindow
         _contentDialogService = contentDialogService;
         _snackbarService = snackbarService;
         _logger = logger;
-        _configuration = configuration;
+        _windowSection = windowSection;
         contentDialogService.SetDialogHost(ContentPresenterForDialogs);
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
 
@@ -112,7 +111,7 @@ public partial class SettingsView : INavigationWindow
             message.Value.Message,
             MapAppearance(message.Value.Level),
             MapIcon(message.Value.Level),
-            _configuration.Application.Window.NotificationDisplayDuration.Seconds()
+            _windowSection.Value.NotificationDisplayDuration.Seconds()
         );
 
     private void OnClosing(object? sender, CancelEventArgs e)

@@ -4,13 +4,10 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
-using Lanceur.Core.Repositories.Config;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Stores;
 using Lanceur.Infra.Stores.Everything;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.IoC;
@@ -28,11 +25,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     [ObservableProperty] private string _apiToken = string.Empty;
     [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
-    [ObservableProperty] private IConfigurationFacade _configuration;
     [ObservableProperty] private int _cpuSmoothingIndex;
     [ObservableProperty] private string _dbPath = string.Empty;
     private readonly IEnigma _enigma;
     private readonly IStoreShortcutService _storeShortcutService;
+    private readonly ISettingsProviderFacade _configuration;
     [ObservableProperty] private bool _excludeFilesInBinWithEverything;
     [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
     [ObservableProperty] private bool _excludeSystemFilesWithEverything;
@@ -69,25 +66,22 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IUserCommunicationService userCommunicationService,
         ILogger<ApplicationSettingsViewModel> logger,
         IAppRestartService appRestartService,
-        IConfigurationFacade configuration,
         IViewFactory viewFactory,
         IEnigma enigma,
-        IStoreShortcutService storeShortcutService
-    )
+        IStoreShortcutService storeShortcutService,
+        ISettingsProviderFacade configuration)
     {
         ArgumentNullException.ThrowIfNull(userCommunicationService);
-        ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(appRestartService);
-        ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(viewFactory);
 
 
         _hubService = userCommunicationService;
         _logger = logger;
-        _configuration = configuration;
         _viewFactory = viewFactory;
         _enigma = enigma;
         _storeShortcutService = storeShortcutService;
+        _configuration = configuration;
 
         // Hotkey
         var hk = _configuration.Application.HotKey;
@@ -98,11 +92,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Key = hk.Key;
 
         // Logging
-        SelectedLogLevel = _configuration.Local.MinimumLogLevel;
+        SelectedLogLevel = _configuration.Infrastructure.MinimumLogLevel;
 
         // Miscellaneous
         MapSettingsFromDbToUi();
-        var featureFlags = Configuration.Application.FeatureFlags.ToArray();
+        var featureFlags = _configuration.Application.FeatureFlags.ToArray();
         IsResourceMonitorEnabled = featureFlags.IsFeatureFlagEnabled(Features.ResourceDisplay);
 
         // Setup behaviour on property changed
@@ -140,65 +134,65 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     private void MapSettingsFromDbToUi()
     {
-        DbPath = Configuration.Local.DbPath;
+        DbPath = _configuration.Infrastructure.DbPath;
 
         // Search box section
-        SearchDelay = Configuration.Application.SearchBox.SearchDelay;
-        ShowResult = Configuration.Application.SearchBox.ShowResult;
-        ShowAtStartup = Configuration.Application.SearchBox.ShowAtStartup;
-        ShowLastQuery = Configuration.Application.SearchBox.ShowLastQuery;
-        ToggleVisibility = Configuration.Application.SearchBox.ToggleVisibility;
+        SearchDelay = _configuration.Application.SearchBox.SearchDelay;
+        ShowResult = _configuration.Application.SearchBox.ShowResult;
+        ShowAtStartup = _configuration.Application.SearchBox.ShowAtStartup;
+        ShowLastQuery = _configuration.Application.SearchBox.ShowLastQuery;
+        ToggleVisibility = _configuration.Application.SearchBox.ToggleVisibility;
         
-        IsSettingsButtonEnabled = Configuration.Application.SearchBox.IsSettingsButtonEnabled;
-        IsStatusBarAlwaysVisible = Configuration.Application.SearchBox.IsStatusBarAlwaysVisible;
+        IsSettingsButtonEnabled = _configuration.Application.SearchBox.IsSettingsButtonEnabled;
+        IsStatusBarAlwaysVisible = _configuration.Application.SearchBox.IsStatusBarAlwaysVisible;
 
         // Store section
-        BookmarkSourceBrowser = Configuration.Application.Stores.BookmarkSourceBrowser;
+        BookmarkSourceBrowser = _configuration.Application.Stores.BookmarkSourceBrowser;
 
-        var shortcuts = _storeShortcutService.Resolve(Configuration.Application.Stores);
+        var shortcuts = _storeShortcutService.Resolve(_configuration.Application.Stores);
         StoreShortcuts = new ObservableCollection<StoreShortcut>(shortcuts);
 
         // Everything Store
-        var adapter = new EverythingQueryAdapter(Configuration.Application.Stores.EverythingQuerySuffix);
+        var adapter = new EverythingQueryAdapter(_configuration.Application.Stores.EverythingQuerySuffix);
         ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
         ExcludeSystemFilesWithEverything = adapter.IsSystemFilesExcluded;
         IncludeOnlyExecFilesWithEverything = adapter.SelectOnlyExecutable;
         ExcludeFilesInBinWithEverything = adapter.IsFilesInTrashBinExcluded;
 
         // Window section
-        NotificationDisplayDuration = Configuration.Application.Window.NotificationDisplayDuration;
-        WindowBackdropStyle = Configuration.Application.Window.BackdropStyle;
-        DateTimeFormat = Configuration.Application.Window.DateTimeFormat;
+        NotificationDisplayDuration = _configuration.Application.Window.NotificationDisplayDuration;
+        WindowBackdropStyle = _configuration.Application.Window.BackdropStyle;
+        DateTimeFormat = _configuration.Application.Window.DateTimeFormat;
 
         // Feature flags
-        FeatureFlags = new ObservableCollection<FeatureFlag>(Configuration.Application.FeatureFlags);
+        FeatureFlags = new ObservableCollection<FeatureFlag>(_configuration.Application.FeatureFlags);
 
         // Resource Monitor
-        CpuSmoothingIndex = Configuration.Application.ResourceMonitor.CpuSmoothingIndex;
-        RefreshRate = Configuration.Application.ResourceMonitor.RefreshRate;
+        CpuSmoothingIndex = _configuration.Application.ResourceMonitor.CpuSmoothingIndex;
+        RefreshRate = _configuration.Application.ResourceMonitor.RefreshRate;
 
         // Miscellaneous
-        var token = Configuration.Application.Github.Token;
+        var token = _configuration.Application.Github.Token;
         ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : _enigma.Decrypt(token!);
     }
 
     private void MapSettingsFromUiToDb()
     {
-        Configuration.Local.DbPath = DbPath;
+        _configuration.Infrastructure.DbPath = DbPath;
 
         // Search box section
-        Configuration.Application.SearchBox.SearchDelay = SearchDelay;
-        Configuration.Application.SearchBox.ShowResult = ShowResult;
-        Configuration.Application.SearchBox.ShowAtStartup = ShowAtStartup;
-        Configuration.Application.SearchBox.ShowLastQuery = ShowLastQuery;
-        Configuration.Application.SearchBox.ToggleVisibility = ToggleVisibility;
+        _configuration.Application.SearchBox.SearchDelay = SearchDelay;
+        _configuration.Application.SearchBox.ShowResult = ShowResult;
+        _configuration.Application.SearchBox.ShowAtStartup = ShowAtStartup;
+        _configuration.Application.SearchBox.ShowLastQuery = ShowLastQuery;
+        _configuration.Application.SearchBox.ToggleVisibility = ToggleVisibility;
         
-        Configuration.Application.SearchBox.IsSettingsButtonEnabled = IsSettingsButtonEnabled;
-        Configuration.Application.SearchBox.IsStatusBarAlwaysVisible = IsStatusBarAlwaysVisible;
+        _configuration.Application.SearchBox.IsSettingsButtonEnabled = IsSettingsButtonEnabled;
+        _configuration.Application.SearchBox.IsStatusBarAlwaysVisible = IsStatusBarAlwaysVisible;
 
         // Store section
-        Configuration.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
-        Configuration.Application.Stores.StoreShortcuts = StoreShortcuts.ToArray();
+        _configuration.Application.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
+        _configuration.Application.Stores.StoreShortcuts = StoreShortcuts.ToArray();
 
         // Everything Store
         var query = new EverythingQueryBuilder();
@@ -207,23 +201,23 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (IncludeOnlyExecFilesWithEverything) { query.OnlyExecFiles(); }
         if (ExcludeFilesInBinWithEverything) { query.ExcludeFilesInBin(); }
 
-        Configuration.Application.Stores.EverythingQuerySuffix = query.BuildQuery();
+        _configuration.Application.Stores.EverythingQuerySuffix = query.BuildQuery();
 
         // Window section
-        Configuration.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
-        Configuration.Application.Window.BackdropStyle = WindowBackdropStyle;
-        Configuration.Application.Window.DateTimeFormat = DateTimeFormat;
+        _configuration.Application.Window.NotificationDisplayDuration = NotificationDisplayDuration;
+        _configuration.Application.Window.BackdropStyle = WindowBackdropStyle;
+        _configuration.Application.Window.DateTimeFormat = DateTimeFormat;
 
         // Feature flags
-        Configuration.Application.FeatureFlags = FeatureFlags;
+        _configuration.Application.FeatureFlags = FeatureFlags;
         IsResourceMonitorEnabled = FeatureFlags.IsFeatureFlagEnabled(Features.ResourceDisplay);
 
         // Resource Monitor
-        Configuration.Application.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
-        Configuration.Application.ResourceMonitor.RefreshRate = RefreshRate;
+        _configuration.Application.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
+        _configuration.Application.ResourceMonitor.RefreshRate = RefreshRate;
 
         // Miscellaneous
-        Configuration.Application.Github.Token
+        _configuration.Application.Github.Token
             = ApiToken.IsNullOrWhiteSpace() ? string.Empty : _enigma.Encrypt(ApiToken);
     }
 
@@ -269,22 +263,22 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     internal void SaveSettings()
     {
-        var hash = Configuration.Application.HotKey.GetHashCode();
-        Configuration.Application.HotKey = new HotKeySection(
+        var hash = _configuration.Application.HotKey.GetHashCode();
+        _configuration.Application.HotKey = new HotKeySection(
             GetHotKey(),
             Key
         );
 
         List<bool> reboot =
         [
-            hash != Configuration.Application.HotKey.GetHashCode(),
-            Configuration.Local.DbPath != DbPath,
-            Configuration.Local.MinimumLogLevel != SelectedLogLevel
+            hash != _configuration.Application.HotKey.GetHashCode(),
+            _configuration.Infrastructure.DbPath != DbPath,
+            _configuration.Infrastructure.MinimumLogLevel != SelectedLogLevel
         ];
 
         MapSettingsFromUiToDb();
-        Configuration.Local.MinimumLogLevel = SelectedLogLevel;
-        Configuration.Save();
+        _configuration.Infrastructure.MinimumLogLevel = SelectedLogLevel;
+        _configuration.Save();
 
         var needRestart = reboot.Any(r => r);
 
