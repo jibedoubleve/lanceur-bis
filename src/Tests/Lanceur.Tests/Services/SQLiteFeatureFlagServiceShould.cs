@@ -1,6 +1,7 @@
 using Dapper;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
+using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
@@ -31,7 +32,8 @@ public class SQLiteFeatureFlagServiceShould : TestBase
         var logger = CreateLogger<SQLiteApplicationSettingsProvider>();
 
         var settings = new SQLiteApplicationSettingsProvider(scope, logger);
-        var featureFlag = new SQLiteFeatureFlagService(scope);
+        var ffRepository = new SQLiteFeatureFlagRepository(scope);
+        var featureFlag = new FeatureFlagService(ffRepository);
 
         settings.Current.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
         settings.Current.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");

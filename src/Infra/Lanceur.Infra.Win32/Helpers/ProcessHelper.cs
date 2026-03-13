@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Lanceur.Core.Utils;
+namespace Lanceur.Infra.Win32.Helpers;
 
 public static class ProcessHelper
 {

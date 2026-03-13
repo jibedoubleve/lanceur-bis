@@ -5,7 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Lanceur.Core.Services;
-using Lanceur.Core.Utils;
+using Lanceur.Infra.Win32.Helpers;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.WPF.Views.Controls;
