@@ -131,7 +131,7 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
         var stg = new JsonInfrastructureSettingsProvider(file);
         File.Delete(file);
 
-        var value = stg.Current.DbPath;
+        var value = stg.Current.Database.DbPath;
 
         value.ShouldBe(Paths.DefaultDb);
     }
@@ -235,7 +235,16 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
     public void When_updating_json_Then_it_is_saved_in_db()
     {
         var file = Path.GetTempFileName();
-        var stg = new JsonInfrastructureSettingsProvider(file) { Current = { DbPath = "un_deux_trois" } };
+        var stg = new JsonInfrastructureSettingsProvider(file)
+        {
+            Current =
+            {
+                Database =
+                {
+                    DbPath = "un_deux_trois"
+                }
+            }
+        };
 
         stg.Save();
 
@@ -268,10 +277,10 @@ public class SQLiteDatabaseConfigurationServiceTest : TestBase
         var stg = new JsonInfrastructureSettingsProvider(file);
         var expected = "undeuxtrois";
 
-        stg.Current.DbPath = expected;
+        stg.Current.Database.DbPath = expected;
         stg.Save();
 
-        var actual = stg.Current.DbPath;
+        var actual = stg.Current.Database.DbPath;
 
         actual.ShouldBe(expected);
     }

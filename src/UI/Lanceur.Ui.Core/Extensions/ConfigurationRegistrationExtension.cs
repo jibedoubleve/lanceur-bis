@@ -16,7 +16,6 @@ public static class ConfigurationRegistrationExtension
     public static IServiceCollection AddConfigurationSections(this IServiceCollection serviceCollection)
         => serviceCollection.AddSingleton(typeof(ISection<>), typeof(Section<>))
                             .AddSettingsProviders()
-                            .AddSingleton<ISettingsProviderFacade, SettingsProviderFacade>()
                             .AddSingleton(typeof(IWriteableSection<>), typeof(Section<>));
 
     #endregion

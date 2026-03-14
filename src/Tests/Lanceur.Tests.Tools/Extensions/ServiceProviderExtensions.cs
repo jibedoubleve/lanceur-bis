@@ -1,7 +1,6 @@
 using System.Data;
 using System.Data.SQLite;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
@@ -58,7 +57,6 @@ public static class ServiceProviderExtensions
 
         return serviceCollection.AddSingleton(typeof(ISection<>), typeof(Section<>))
                                 .AddSingleton(typeof(IWriteableSection<>), typeof(Section<>))
-                                .AddSingleton<ISettingsProviderFacade, SettingsProviderFacade>()
                                 .AddMockSingleton<ISettingsProvider>((_, _) => applicationSettingsProvider)
                                 .AddMockSingleton<ISettingsProvider>((_, _) => infrastructureSettingsProvider);
     }

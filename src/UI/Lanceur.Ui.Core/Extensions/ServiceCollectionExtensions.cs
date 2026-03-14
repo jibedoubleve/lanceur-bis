@@ -48,8 +48,8 @@ public static class ServiceCollectionExtensions
         var settingsProvider = SettingsProviderFactory.GetInfrastructureSettingsProvider();
         settingsProvider.Load();
 
-        var minLogLevel = settingsProvider.Current.GetMinimumLogLevel();
-        var telemetry = settingsProvider.Current.Telemetry;
+        var minLogLevel = settingsProvider.Current.Logging.GetMinimumLogLevel();
+        var logging = settingsProvider.Current.Logging;
 
         var logEventLevel = new Conditional<LogEventLevel>(
             LogLevelUtil.GetLevel(),
@@ -78,7 +78,7 @@ public static class ServiceCollectionExtensions
 
         void ConfigureLog(string clefFile, string logFile)
         {
-            if (telemetry.IsClefEnabled)
+            if (logging.IsClefEnabled)
                 // Clef file, easier to import into SEQ
             {
                 loggerCfg.WriteTo.File(

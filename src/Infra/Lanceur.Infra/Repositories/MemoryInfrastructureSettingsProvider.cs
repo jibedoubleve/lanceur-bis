@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Repositories;
@@ -16,10 +17,13 @@ public sealed class MemoryInfrastructureSettingsProvider : ISettingsProvider<Inf
 
     private static readonly InfrastructureSettings Configuration = new()
     {
-        DbPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-            @"lanceur\debug.sqlite"
-        )
+        Database = new DatabaseSection
+        {
+            DbPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                @"lanceur\debug.sqlite"
+            )
+        }
     };
 
     #endregion

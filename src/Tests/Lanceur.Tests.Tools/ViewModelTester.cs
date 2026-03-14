@@ -36,17 +36,17 @@ public abstract class ViewModelTester<TViewModel> : TestBase
             var connectionString = visitors?.OverridenConnectionString ?? ConnectionStringFactory.InMemory;
             connectionManager = GetConnectionManager(sqlBuilder ?? Sql.Empty, connectionString.ToString());
 
-            var serviceCollection = new ServiceCollection().AddMockConfigurationSections(
+            var serviceCollection = new ServiceCollection().AddSingleton<TViewModel>()
+                                                           .AddSingleton<IEnigma, Enigma>()
+                                                           .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
+                                                           .AddMockSingleton<IStoreShortcutService>()
+                                                           .AddMockConfigurationSections(
                                                                visitors?.VisitApplicationSettingsProvider)
-                                                           .AddSingleton<TViewModel>()
                                                            .AddLogging(builder =>
                                                                builder.AddXUnit(OutputHelper)
                                                                       .SetMinimumLevel(LogLevel.Trace)
                                                            )
-                                                           .AddSingleton<IEnigma, Enigma>()
-                                                           .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                                                            .AddReservedAliases(typeof(AddAlias))
-                                                           .AddMockSingleton<IStoreShortcutService>()
                                                            .AddDatabase(connectionManager);
 
             var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();

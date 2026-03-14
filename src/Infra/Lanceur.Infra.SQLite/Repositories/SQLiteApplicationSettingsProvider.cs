@@ -10,9 +10,7 @@ using Newtonsoft.Json;
 
 namespace Lanceur.Infra.SQLite.Repositories;
 
-/// <inheritdoc cref="ISettingsProvider{TConfig}
-/// 
-/// <ApplicationSettings>" />
+/// <inheritdoc cref="ISettingsProvider{ApplicationSettings}" />
 public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, ISettingsProvider<ApplicationSettings>
 {
     #region Fields
