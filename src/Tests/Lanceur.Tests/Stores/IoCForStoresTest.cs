@@ -5,7 +5,6 @@ using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Stores;
@@ -32,7 +31,7 @@ public class IoCForStoresShould : TestBase
     #region Methods
 
     [Fact]
-    public void RegisterAllStores()
+    public void When_loading_all_stores_Then_all_are_loaded_automatically()
     {
         // arrange
 
@@ -54,7 +53,7 @@ public class IoCForStoresShould : TestBase
     [Theory]
     [InlineData(null, "pp hello world")] // null override, then use the default one
     [InlineData("^pp.*", ": hello world")]
-    public void UseDefaultShortcutWhenNoOverride(string? aliasOverride, string cmdlineString)
+    public void When_no_shortcut_override_defined_Then_default_are_used(string? aliasOverride, string cmdlineString)
     {
         // arrange 
         var cfgOverride = aliasOverride is null
@@ -113,7 +112,8 @@ public class IoCForStoresShould : TestBase
     [Theory]
     [InlineData(null, ": hello world")] // null override, then use the default one
     [InlineData("^pp.*", "pp hello world")]
-    public void UseOverridenShortcutWhenConfigured(string? aliasOverride, string cmdlineString)
+    public void When_override_defined_Then_they_are_used_instead_of_defaults(
+        string? aliasOverride, string cmdlineString)
     {
         // arrange 
         var cfgOverride = aliasOverride is null
@@ -167,7 +167,7 @@ public class IoCForStoresShould : TestBase
     }
 
     [Fact]
-    public void UseOverridenShortcutWhenUpdated()
+    public void When_overriden_shortcut_update_Then_updated_values_are_used()
     {
         // arrange
         const string aliasOverride1 = "^pp.*";
@@ -213,7 +213,6 @@ public class IoCForStoresShould : TestBase
                 .AddSingleton<IStoreService, EverythingStore>()
                 .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                 .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
-                .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
                 .AddMockSingleton<IEverythingApi>()
                 .AddTestOutputHelper(OutputHelper)
                 .AddConfigurationSections()
