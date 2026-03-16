@@ -20,11 +20,11 @@ using Xunit;
 
 namespace Lanceur.Tests.Stores;
 
-public class IoCForStoresShould : TestBase
+public class IoCForStoresTest : TestBase
 {
     #region Constructors
 
-    public IoCForStoresShould(ITestOutputHelper output) : base(output) { }
+    public IoCForStoresTest(ITestOutputHelper output) : base(output) { }
 
     #endregion
 
