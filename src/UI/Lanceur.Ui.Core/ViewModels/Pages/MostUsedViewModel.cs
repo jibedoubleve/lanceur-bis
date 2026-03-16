@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ public partial class MostUsedViewModel : ObservableObject
 
     [ObservableProperty] private ObservableCollection<AliasUsage> _aliases = [];
     private readonly IMemoryCache _cache;
+    private readonly IThumbnailService _thumbnailService;
     private readonly ILogger<MostUsedViewModel> _logger;
     private readonly IAliasRepository _repository;
     [ObservableProperty] private string? _selectedYear;
@@ -25,10 +27,20 @@ public partial class MostUsedViewModel : ObservableObject
 
     #region Constructors
 
-    public MostUsedViewModel(ILogger<MostUsedViewModel> logger, IAliasRepository repository, IMemoryCache cache)
+    public MostUsedViewModel(
+        ILogger<MostUsedViewModel> logger,
+        IAliasRepository repository,
+        IMemoryCache cache,
+        IThumbnailService thumbnailService)
     {
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(repository);
+        ArgumentNullException.ThrowIfNull(cache);
+        ArgumentNullException.ThrowIfNull(thumbnailService);
+        
         _repository = repository;
         _cache = cache;
+        _thumbnailService = thumbnailService;
         _logger = logger;
     }
 
@@ -61,6 +73,18 @@ public partial class MostUsedViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void OnLoadThumbnail(QueryResult? queryResult)
+    {
+        if (queryResult is null) { return; }
+
+        try { _thumbnailService.UpdateThumbnail(queryResult); }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to load thumbnail for alias id {IdAlias}", queryResult.Id);
+        }
+    }
+
+    [RelayCommand]
     private async Task OnRefreshAliases()
     {
         using var _ = _logger.WarnIfSlow(this);
@@ -71,8 +95,7 @@ public partial class MostUsedViewModel : ObservableObject
             async Task<IEnumerable<AliasUsage>> (_) => {
                 if (int.TryParse(SelectedYear, out var year))
                 {
-                    return await Task.Run(() => _repository.GetMostUsedAliasesByYear(year)
-                    );
+                    return await Task.Run(() => _repository.GetMostUsedAliasesByYear(year));
                 }
 
                 return await Task.Run(() => _repository.GetMostUsedAliases());

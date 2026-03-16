@@ -1,5 +1,7 @@
+using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Tests.Tools;
+using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.ViewModels.Pages;
@@ -55,6 +57,7 @@ public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
+                         .AddMockSingleton<IThumbnailService>()
                          .AddSingleton<IMemoryCache, MemoryCache>();
         return serviceCollection;
     }

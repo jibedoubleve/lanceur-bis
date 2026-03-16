@@ -2,6 +2,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Humanizer;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.WPF.Helpers;
@@ -76,10 +77,11 @@ public class ToastUserNotificationService : IUserGlobalNotificationService
     public void Error(string message, Exception ex)
     {
         var icon = GetIconUri(Level.Error);
+        const int maxLength = 8192;
         var btnError = new ToastButton().SetContent("Show Error")
                                         .AddArgument("Type", ToastNotificationArguments.ClickShowError)
                                         .AddArgument("Message", message)
-                                        .AddArgument("StackTrace", ex.ToString());
+                                        .AddArgument("StackTrace", ex.ToString().Truncate(maxLength));
 
         var btnLogs = new ToastButton().SetContent("Show Logs")
                                        .AddArgument("Type", ToastNotificationArguments.ClickShowLogs);
