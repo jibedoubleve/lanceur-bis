@@ -52,7 +52,6 @@ public class AliasUseCases : TestBase
                          .AddSingleton<ISearchService, SearchService>()
                          .AddSingleton<IMacroAliasExpanderService, MacroAliasExpanderService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
-                         .AddMockSingleton<ISettingsProvider<ApplicationSettings>>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddMockSingleton<IUserNotificationService>()
                          .AddMockSingleton<IUserCommunicationService>()
