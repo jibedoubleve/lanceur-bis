@@ -65,7 +65,7 @@ public class SteamGameStore : StoreBase, IStoreService
                                Description = "Steam library game",
                                FileName = x.ToSteamUrl()
                            }).ToList();
-        _aliasManagementService.HydrateSteamGameUsage(results);
+        results = _aliasManagementService.HydrateSteamGameUsage(results).ToList();
         var res = results.OrderByDescending(x => x.Count)
                          .ThenBy(x => x.Name);
         return res;

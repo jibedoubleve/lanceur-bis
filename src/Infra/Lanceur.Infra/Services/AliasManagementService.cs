@@ -48,7 +48,7 @@ public class AliasManagementService : IAliasManagementService
     }
 
     /// <inheritdoc />
-    public void HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases) 
+    public IEnumerable<AliasQueryResult> HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases) 
         => _repository.HydrateSteamGameUsage(aliases);
 
     /// <inheritdoc />

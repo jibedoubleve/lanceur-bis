@@ -529,7 +529,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
         });
 
     /// <inheritdoc/>
-    public void HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases)
+    public IEnumerable<AliasQueryResult> HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases)
     {
         const string sql = """
                            select 
@@ -543,7 +543,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
                                             && x.IsSteamGame())
                                 .ToArray();
 
-        if (!steamGames.Any()) { return; }
+        if (!steamGames.Any()) { return aliases; }
 
         var filenames = steamGames.Select(x => x.FileName).ToArray();
         var toUpdate = Db.WithConnection(conn =>
@@ -555,6 +555,8 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
                                    x.FileName!.Equals(item.FileName, StringComparison.InvariantCultureIgnoreCase));
             alias?.Count = item.Count;
         }
+        return aliases; 
+            
     }
 
     /// <inheritdoc />
