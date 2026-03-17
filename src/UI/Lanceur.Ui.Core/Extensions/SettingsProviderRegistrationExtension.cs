@@ -52,11 +52,13 @@ public static class SettingsProviderFactory
     public static IServiceCollection AddSettingsProviders(this IServiceCollection services)
     {
         services
-            .AddSingleton<ISettingsProvider, SQLiteApplicationSettingsProvider>()
+            .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
+            .AddSingleton<ISettingsProvider>(sp => sp.GetRequiredService<ISettingsProvider<ApplicationSettings>>())
             .AddSingletonConditional<
-                ISettingsProvider,
+                ISettingsProvider<InfrastructureSettings>,
                 MemoryInfrastructureSettingsProvider,
-                JsonInfrastructureSettingsProvider>();
+                JsonInfrastructureSettingsProvider>()
+            .AddSingleton<ISettingsProvider>(sp => sp.GetRequiredService<ISettingsProvider<InfrastructureSettings>>());
         return services;
     }
 

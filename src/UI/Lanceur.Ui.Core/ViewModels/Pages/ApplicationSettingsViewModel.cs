@@ -75,8 +75,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         ISettingsProvider<InfrastructureSettings> infraSettings)
     {
         ArgumentNullException.ThrowIfNull(userCommunicationService);
+        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(appRestartService);
         ArgumentNullException.ThrowIfNull(viewFactory);
+        ArgumentNullException.ThrowIfNull(enigma);
+        ArgumentNullException.ThrowIfNull(storeShortcutService);
+        ArgumentNullException.ThrowIfNull(appSettings);
+        ArgumentNullException.ThrowIfNull(infraSettings);
 
 
         _hubService = userCommunicationService;
