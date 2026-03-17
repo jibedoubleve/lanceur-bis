@@ -1,5 +1,4 @@
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -29,15 +28,19 @@ public class SteamGameStoreTest
 
     #region Methods
 
-    private SteamGameStore GetStore(ISteamLibraryService steamService, IAliasManagementService managementService)
+    private SteamGameStore GetStore(ISteamLibraryService steamService, IAliasManagementService? managementService = null)
     {
+        managementService ??= Substitute.For<IAliasManagementService>();
+        managementService.HydrateSteamGameUsage(Arg.Any<IEnumerable<AliasQueryResult>>())
+                         .Returns(x => x.Arg<IEnumerable<AliasQueryResult>>());
+
         var sp = new ServiceCollection()
                  .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                  .AddSingleton(steamService)
-                 .AddSingleton(managementService)
                  .AddSingleton<SteamGameStore>()
+                 .AddSingleton(managementService)
                  .AddMockSingleton<ISection<StoreSection>>()
-                 .AddMockSingleton<IFeatureFlagService>((_, i)=> {
+                 .AddMockSingleton<IFeatureFlagService>((_, i) => {
                      i.IsEnabled(Arg.Any<string>()).Returns(true);
                      return i;
                  })
@@ -70,7 +73,7 @@ public class SteamGameStoreTest
 
     [Theory]
     [InlineData("&", 3)] // No parameter → return all
-    [InlineData("&half", 1)] // Shoulf return "Half-Life 2"
+    [InlineData("&half", 1)] // Should return "Half-Life 2"
     [InlineData("&HALF", 1)] // Case-insensitive
     [InlineData("&zzz", 0)] // No result
     public void When_search_Then_results_are_filtered_by_parameter(string cmd, int expected)
