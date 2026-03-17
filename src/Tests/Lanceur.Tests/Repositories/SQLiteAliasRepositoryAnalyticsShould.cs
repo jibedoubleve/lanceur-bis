@@ -1,3 +1,4 @@
+using Dapper;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Utils;
@@ -13,19 +14,59 @@ using Xunit;
 namespace Lanceur.Tests.Repositories;
 
 /// <summary>
-///     These tests are designed to detect SQL errors.
-///     Consider them as a health check for SQL queries in AliasRepository.
+///     Tests for the analytics and reporting queries of <see cref="SQLiteAliasRepository" />.
+///     These tests verify that queries return correct data based on usage history, doubloons, activity, and alias state.
 /// </summary>
-public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
+public class SQLiteAliasRepositoryAnalyticsShould : TestBase
 {
     #region Constructors
 
-    public SQLiteAliasRepositoryQueryShouldBeValid(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public SQLiteAliasRepositoryAnalyticsShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
     #region Methods
 
+    
+    [Fact]
+    public void When_SetUsage_called_twice_with_same_fileName_Then_no_doubloon_is_created()
+    {
+        // arrange
+        var connectionManager = new DbSingleConnectionManager(
+            BuildFreshDb()
+        );
+        var loggerFactory = CreateLoggerFactory();
+        var dbActionFactory = new DbActionFactory(loggerFactory);
+
+        var alias = new AliasQueryResult()
+        {
+            Id = 0,
+            Name = "test-alias",
+            FileName = "some\\path\\tool.exe",
+            Count = 0
+        } as QueryResult;
+
+        // act — simulate two consecutive executions of the same alias with Id == 0
+        connectionManager.WithinTransaction((tx) => {
+            var setUsage = new SetUsageDbAction(dbActionFactory);
+            setUsage.SetUsage(tx, ref alias);
+        });
+
+         alias.Id = 0; // reset as if resolved again without the id
+
+         connectionManager.WithinTransaction(tx => {
+             var setUsage = new SetUsageDbAction(dbActionFactory);
+             setUsage.SetUsage(tx, ref alias);
+         });
+
+        // assert — only one alias row should exist for that file_name
+        var count = connectionManager.Connection.ExecuteScalar<int>(
+            "select count(*) from alias where file_name = @fileName",
+            new { fileName = "some\\path\\tool.exe" }
+        );
+        count.ShouldBe(1);
+    }
+    
     private SQLiteAliasRepository BuildRepository(string? sql = null, IConnectionString? connectionString = null)
     {
         var connection = BuildFreshDb(sql, connectionString);
@@ -423,7 +464,6 @@ public class SQLiteAliasRepositoryQueryShouldBeValid : TestBase
     public void GetHiddenCounters()
         => Record.Exception(() => BuildRepository().GetHiddenCounters())
                  .ShouldBeNull();
-
 
     [Fact]
     public void GetInactiveAliases()
