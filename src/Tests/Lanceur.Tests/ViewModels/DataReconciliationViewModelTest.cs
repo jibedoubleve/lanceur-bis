@@ -101,6 +101,46 @@ public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliatio
                      .WithLuaScript("return version_b")
                      .WithSynonyms("a2"))
         ];
+        yield return
+        [
+            "Two hidden Steam aliases with same file_name — should be doubloons",
+            2,
+            new SqlBuilder()
+                .AppendAlias(a =>
+                    a.WithFileName("steam://rungameid/440")
+                     .WithHiddenFlag()
+                     .WithSynonyms("half-life-2-a"))
+                .AppendAlias(a =>
+                    a.WithFileName("steam://rungameid/440")
+                     .WithHiddenFlag()
+                     .WithSynonyms("half-life-2-b"))
+        ];
+        yield return
+        [
+            "Two hidden Steam aliases with different file_names — should NOT be doubloons",
+            0,
+            new SqlBuilder()
+                .AppendAlias(a =>
+                    a.WithFileName("steam://rungameid/440")
+                     .WithHiddenFlag()
+                     .WithSynonyms("half-life-2"))
+                .AppendAlias(a =>
+                    a.WithFileName("steam://rungameid/730")
+                     .WithHiddenFlag()
+                     .WithSynonyms("counter-strike-2"))
+        ];
+        yield return
+        [
+            "Two non-hidden Steam aliases with same file_name — should be doubloons",
+            2,
+            new SqlBuilder()
+                .AppendAlias(a =>
+                    a.WithFileName("steam://rungameid/440")
+                     .WithSynonyms("half-life-2-a"))
+                .AppendAlias(a =>
+                    a.WithFileName("steam://rungameid/440")
+                     .WithSynonyms("half-life-2-b"))
+        ];
     }
 
     private static IEnumerable<object[]> ShowInactiveAliasesSource()
