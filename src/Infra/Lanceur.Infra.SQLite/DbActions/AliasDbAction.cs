@@ -352,5 +352,48 @@ public class AliasDbAction
         return alias.Id;
     }
 
+    /// <summary>
+    ///     Tries to find the alias id based on the <c>file_name</c>.
+    ///     If the query returns more than one result, or zero result, the method fails by returning <c>false</c>
+    ///     and sets <paramref name="id" /> to <c>0</c>.
+    /// </summary>
+    /// <param name="conn">The database connection used to execute the query.</param>
+    /// <param name="alias">The alias whose <c>file_name</c> is used to search for the id.</param>
+    /// <param name="id">
+    ///     When this method returns <c>true</c>, contains the id of the matching alias;
+    ///     otherwise, <c>0</c>.
+    /// </param>
+    /// <returns>
+    ///     <c>true</c> if exactly one alias was found; <c>false</c> if none or more than one were found,
+    ///     or if the alias has no <c>file_name</c>.
+    /// </returns>
+    internal bool TryFindId(IDbConnection conn, QueryResult alias, out long id)
+    {
+        const string sql = "select id from alias where file_name = @fileName;";
+        var fileName = GetFileName(alias);
+
+        if (fileName.IsNullOrEmpty())
+        {
+            id = 0;
+            return false;
+        }
+
+        var result = conn.Query<long>(sql, new { fileName }).ToList();
+
+        switch (result.Count)
+        {
+            case 0:
+                id = 0;
+                return false;
+            case 1:
+                id = result[0];
+                return true;
+            default:
+                _logger.LogWarning("Doubloons detected for alias with file name '{FileName}'", fileName);
+                id = 0;
+                return false;
+        }
+    }
+
     #endregion
 }
