@@ -128,7 +128,8 @@ public class AliasUseCases : TestBase
 
         Assert.Multiple(
             () => mainViewModel.Results.ShouldNotBeNull(),
-            () => stateTester.AssertValues(current as AliasQueryResult)
+            () => current.ShouldBeOfType<AliasQueryResult>(),
+            () => stateTester.AssertValues((AliasQueryResult)current)
         );
 
         /********************************/
@@ -152,7 +153,8 @@ public class AliasUseCases : TestBase
 
         Assert.Multiple(
             () => mainViewModel.SelectedResult.ShouldNotBeNull(),
-            () => stateTester2.AssertValues(keywordsViewModel.SelectedAlias)
+            () => keywordsViewModel.SelectedAlias.ShouldNotBeNull(),
+            () => stateTester2.AssertValues(keywordsViewModel.SelectedAlias!)
         );
     }
 
