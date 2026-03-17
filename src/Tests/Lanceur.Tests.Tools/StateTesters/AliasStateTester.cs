@@ -3,7 +3,6 @@ using Bogus;
 using Lanceur.Core.Models;
 using Lanceur.SharedKernel;
 using Shouldly;
-using Xunit;
 
 namespace Lanceur.Tests.Tools.StateTesters;
 
@@ -59,18 +58,17 @@ public class AliasStateTester
 
     #region Methods
 
-    public void AssertValues(AliasQueryResult? alias)
-    {
-        if (alias is null) { Assert.Fail($"{nameof(alias)} should not be null for assertion."); }
-
-        alias.FileName.ShouldBe(FileName);
-        alias.LuaScript.ShouldBe(LuaScript);
-        alias.Name.ShouldBe(Name);
-        alias.DescriptionDisplay.ShouldBe(Description);
-        alias.Parameters.ShouldBe(Parameters);
-        alias.WorkingDirectory.ShouldBe(WorkingDirectory);
-        alias.Description.ShouldBe(Description);
-    }
+    public void AssertValues(AliasQueryResult alias)
+        => alias.ShouldSatisfyAllConditions(
+            a => a.ShouldNotBeNull(),
+            a => a.FileName.ShouldBe(FileName),
+            a => a.LuaScript.ShouldBe(LuaScript),
+            a => a.Name.ShouldBe(Name),
+            a => a.DescriptionDisplay.ShouldBe(Description),
+            a => a.Parameters.ShouldBe(Parameters),
+            a => a.WorkingDirectory.ShouldBe(WorkingDirectory),
+            a => a.Description.ShouldBe(Description)
+        );
 
     public void UpdateValues(ref AliasQueryResult alias)
     {
