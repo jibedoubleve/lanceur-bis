@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -6,10 +7,13 @@ using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
+using Lanceur.Core.Services;
 using Lanceur.SharedKernel.IoC;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.Helpers;
+using Lanceur.Ui.WPF.Views.Controls;
 using Microsoft.Extensions.Logging;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
@@ -25,6 +29,7 @@ public partial class SettingsView : INavigationWindow
     #region Fields
 
     private readonly IContentDialogService _contentDialogService;
+    private readonly IUserCommunicationService _hub;
     private readonly ILogger<SettingsView> _logger;
     private readonly ISnackbarService _snackbarService;
     private readonly ISection<WindowSection> _windowSection;
@@ -39,7 +44,8 @@ public partial class SettingsView : INavigationWindow
         ISnackbarService snackbarService,
         IServiceProvider serviceProvider,
         ILogger<SettingsView> logger,
-        ISection<WindowSection> windowSection)
+        ISection<WindowSection> windowSection,
+        IUserCommunicationService hub)
     {
         ArgumentNullException.ThrowIfNull(viewModel);
         ArgumentNullException.ThrowIfNull(contentDialogService);
@@ -57,6 +63,7 @@ public partial class SettingsView : INavigationWindow
         _snackbarService = snackbarService;
         _logger = logger;
         _windowSection = windowSection;
+        _hub = hub;
         contentDialogService.SetDialogHost(ContentPresenterForDialogs);
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
 
@@ -67,6 +74,12 @@ public partial class SettingsView : INavigationWindow
             (_, m) => m.Reply(HandleMessageBoxAsync(m))
         );
     }
+
+    #endregion
+
+    #region Properties
+
+    private SettingsViewModel? ViewModel => DataContext as SettingsViewModel;
 
     #endregion
 
@@ -116,6 +129,20 @@ public partial class SettingsView : INavigationWindow
             MapIcon(message.Value.Level),
             _windowSection.Value.NotificationDisplayDuration.Seconds()
         );
+
+    private async void OnClickAbout(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            _hub.Notifications.DisableLoadingState();
+            var currentVersion = CurrentVersion.FromAssembly(
+                Assembly.GetExecutingAssembly()
+            );
+
+            await _hub.Dialogues.ShowAsync("Lanceur - Version", new VersionView(currentVersion));
+        }
+        catch (Exception ex) { _logger.LogWarning(ex, "Cannot display version information. An error occured"); }
+    }
 
     private void OnClosing(object? sender, CancelEventArgs e)
     {
