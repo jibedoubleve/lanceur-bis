@@ -8,7 +8,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("stat")]
 [Description("Shows analytics about the usage of Lanceur")]
-public class SettingsViewModel : SelfExecutableQueryResult
+public class AnalyticsAlias : SelfExecutableQueryResult
 {
     #region Fields
 
@@ -18,7 +18,7 @@ public class SettingsViewModel : SelfExecutableQueryResult
 
     #region Constructors
 
-    public SettingsViewModel(IServiceProvider serviceProvider) => _navigator = new PageNavigator(serviceProvider);
+    public AnalyticsAlias(IServiceProvider serviceProvider) => _navigator = new PageNavigator(serviceProvider);
 
     #endregion
 
