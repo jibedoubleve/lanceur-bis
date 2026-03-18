@@ -142,6 +142,44 @@ public sealed class SearchServiceTest : TestBase
     }
 
     [Fact]
+    public async Task When_query_contains_previous_but_does_not_start_with_it_Then_stores_are_queried_again()
+    {
+        // ARRANGE
+        // Regression: old code used Contains() instead of StartsWith(),
+        // so "barfoo".Contains("foo") incorrectly triggered pruning.
+        var store = BuildStoreServiceWithResults([]);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("app", "foo"));
+        await service.SearchAsync(result, new Cmdline("app", "barfoo"));
+
+        // ASSERT
+        store.Received(2).Search(Arg.Any<Cmdline>());
+    }
+
+    [Fact]
+    public async Task When_query_follows_empty_query_Then_stores_are_queried_again()
+    {
+        // ARRANGE
+        // Regression: old code did not guard against an empty _lastQuery,
+        // so any query after an empty one incorrectly triggered pruning
+        // because every string Contains("").
+        var store = BuildStoreServiceWithResults([]);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("app", "foo"));
+        await service.SearchAsync(result, Cmdline.Empty);
+        await service.SearchAsync(result, new Cmdline("app", "bar"));
+
+        // ASSERT
+        store.Received(2).Search(Arg.Any<Cmdline>());
+    }
+
+    [Fact]
     public async Task When_query_refines_previous_Then_non_matching_results_are_pruned()
     {
         // ARRANGE
