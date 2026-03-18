@@ -54,6 +54,10 @@
                     Content="Settings"
                     Icon="{ui:SymbolIcon Settings24}"
                     TargetPageType="{x:Type pages:ApplicationSettingsView}" />
+                <ui:NavigationViewItem
+                    Content="About"
+                    Icon="{ui:SymbolIcon Info24}"
+                    Click="OnClickAbout" />
             </ui:NavigationView.FooterMenuItems>
             <ui:NavigationView.ContentOverlay>
                 <Grid>
@@ -61,6 +65,9 @@
                 </Grid>
             </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
-        <ui:ContentDialogHost x:Name="ContentPresenterForDialogs" Grid.RowSpan="2" Grid.Row="0" />
+        <ui:ContentDialogHost
+            x:Name="ContentPresenterForDialogs"
+            Grid.Row="0"
+            Grid.RowSpan="2" />
     </Grid>
 </ui:FluentWindow>
