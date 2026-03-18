@@ -81,7 +81,7 @@ public abstract class ThumbnailStrategy : IThumbnailStrategy
 
         bool ResolveCachePathExists(out string path)
         {
-            path = alias.GetThumbnailAbsolutePath();
+            path = alias.ResolveThumbnailAbsolutePath();
             var pathExits = File.Exists(path);
             _logger.LogTrace("Thumbnail strategy: Resolved cache path {Path} {Exists}.",
                 path,

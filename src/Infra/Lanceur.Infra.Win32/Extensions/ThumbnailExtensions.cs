@@ -110,7 +110,7 @@ public static class ThumbnailExtensions
     ///     The absolute path to the thumbnail file, or <see cref="string.Empty" />
     ///     if the alias has no file name.
     /// </returns>
-    public static string GetThumbnailAbsolutePath(this AliasQueryResult alias)
+    public static string ResolveThumbnailAbsolutePath(this AliasQueryResult alias)
     {
         var fileName = alias.FileName.IsNullOrWhiteSpace()
             ? string.Empty

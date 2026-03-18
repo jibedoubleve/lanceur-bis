@@ -37,7 +37,7 @@ public class FavIconAppThumbnailStrategy : ThumbnailStrategy
     {
         var thumbnail = await _favIconService.UpdateFaviconAsync(
             alias,
-            _ => alias.GetThumbnailAbsolutePath(),
+            _ => alias.ResolveThumbnailAbsolutePath(),
             cancellationToken
         );
         if (thumbnail.IsNullOrEmpty()) { return; }

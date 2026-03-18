@@ -56,7 +56,7 @@ public class Win32AppThumbnailStrategy : ThumbnailStrategy
             return;
         }
 
-        alias.Thumbnail = alias.GetThumbnailAbsolutePath();
+        alias.Thumbnail = alias.ResolveThumbnailAbsolutePath();
         imageSource.CopyToImageRepository(alias.Thumbnail);
         _aliasManagementService.UpdateThumbnail(alias);
     }
