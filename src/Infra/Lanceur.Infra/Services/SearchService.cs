@@ -82,7 +82,7 @@ public class SearchService : ISearchService
 
         if (doesReturnAllIfEmpty && query.IsEmpty()) { return await GetAllAsync(); }
 
-        if (query.IsEmpty()) { return new List<QueryResult>(); }
+        if (query.IsEmpty()) { return []; }
 
         //Get the alive stores
         var aliveStores = _storeServices.Where(service => _orchestrator.IsAlive(service, query))

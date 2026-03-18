@@ -53,7 +53,7 @@ public class PackagedAppThumbnailStrategy : ThumbnailStrategy
             return;
         }
 
-        var thumbnailAbsolutePath = alias.GetThumbnailAbsolutePath();
+        var thumbnailAbsolutePath = alias.ResolveThumbnailAbsolutePath();
         response.Logo.LocalPath.CopyToImageRepository(thumbnailAbsolutePath);
         alias.Thumbnail = thumbnailAbsolutePath;
         _aliasManagementService.UpdateThumbnail(alias);

@@ -88,7 +88,7 @@ public class SteamLibraryAppThumbnailStrategy : ThumbnailStrategy
 
         if (response.StatusCode != HttpStatusCode.OK) { return; }
 
-        var thumbnail = alias.GetThumbnailAbsolutePath();
+        var thumbnail = alias.ResolveThumbnailAbsolutePath();
 
         if (!File.Exists(thumbnail) && !await SaveThumbnailAsync(response, thumbnail)) { return; }
 
