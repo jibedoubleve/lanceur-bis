@@ -240,7 +240,7 @@ public partial class MainViewModel : ObservableObject
         {
             if (_stgSearchBox.Value.ShowResult && Query.IsNullOrWhiteSpace())
             {
-                var results = await Task.Run(() => _searchService.SearchAsync(Cmdline.Empty, true));
+                var results = await _searchService.SearchAsync(Cmdline.Empty, true);
                 Results = new ObservableCollection<QueryResult>(results);
             }
         }
