@@ -79,11 +79,11 @@ public class StoresOrchestrationTest
         var serviceProvider = serviceCollection.BuildServiceProvider();
         var searchService = serviceProvider.GetService<ISearchService>()!;
 
-        var result = await searchService.SearchAsync(Cmdline.Parse(query));
-        result = result.ToArray();
+        List<QueryResult> result = [];
+        await searchService.SearchAsync(result, Cmdline.Parse(query));
         result.ShouldSatisfyAllConditions(
-            r => r.Count().ShouldBe(1),
-            r => r.ElementAt(0).Name.ShouldBe(expected)
+            r => r.Count.ShouldBe(1),
+            r => r[0].Name.ShouldBe(expected)
         );
     }
 

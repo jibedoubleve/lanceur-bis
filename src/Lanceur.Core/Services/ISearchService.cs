@@ -16,12 +16,12 @@ public interface ISearchService
     Task<IEnumerable<QueryResult>> GetAllAsync();
 
     /// <summary>
-    ///     Executes a search query across all registered stores.
+    ///     Executes a search query across all registered stores and populates the provided collection with the results.
     /// </summary>
+    /// <param name="destination">The collection to populate with search results.</param>
     /// <param name="query">The search query parameters.</param>
     /// <param name="doesReturnAllIfEmpty">If true, returns all available results when the query is empty.</param>
-    /// <returns>A task that resolves to a collection of search results.</returns>
-    Task<IEnumerable<QueryResult>> SearchAsync(Cmdline query, bool doesReturnAllIfEmpty = false);
+    Task SearchAsync(IList<QueryResult> destination, Cmdline query, bool doesReturnAllIfEmpty = false);
 
     #endregion
 }

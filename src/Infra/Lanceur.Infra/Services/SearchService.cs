@@ -10,6 +10,8 @@ public class SearchService : ISearchService
 {
     #region Fields
 
+    private Cmdline? _lastQuery;
+
     private readonly ILogger<SearchService> _logger;
     private readonly IMacroAliasExpanderService _macroAliasExpanderService;
     private readonly ISearchServiceOrchestrator _orchestrator;
@@ -43,6 +45,21 @@ public class SearchService : ISearchService
 
     #region Methods
 
+    private void PruneResults(IList<QueryResult> destination, Cmdline query)
+    {
+        var toDelete = destination.Where(item =>
+            !item.Name.StartsWith(query.Parameters, StringComparison.InvariantCultureIgnoreCase)
+        ).ToArray();
+
+        _logger.LogTrace(
+            "Prune {ItemCount} result(s) for {Query}",
+            toDelete.Length,
+            query
+        );
+        
+        destination.RemoveMultiple(toDelete);
+    }
+
     private IEnumerable<QueryResult> FormatForDisplay(QueryResult[] collection)
     {
         collection ??= [];
@@ -62,28 +79,8 @@ public class SearchService : ISearchService
             : DisplayQueryResult.NoResultFound;
     }
 
-    /// <inheritdoc />
-    public async Task<IEnumerable<QueryResult>> GetAllAsync()
+    private async Task SearchInStoreAsync(IList<QueryResult> destination, Cmdline query)
     {
-        using var measurement = _logger.WarnIfSlow(this);
-
-        var tasks = _storeServices.Select(store => Task.Run(store.GetAll));
-        var results = (await Task.WhenAll(tasks))
-                      .SelectMany(x => x)
-                      .ToArray();
-
-        return FormatForDisplay(results);
-    }
-
-    /// <inheritdoc />
-    public async Task<IEnumerable<QueryResult>> SearchAsync(Cmdline query, bool doesReturnAllIfEmpty = false)
-    {
-        using var measurement = _logger.WarnIfSlow(this);
-
-        if (doesReturnAllIfEmpty && query.IsEmpty()) { return await GetAllAsync(); }
-
-        if (query.IsEmpty()) { return []; }
-
         //Get the alive stores
         var aliveStores = _storeServices.Where(service => _orchestrator.IsAlive(service, query))
                                         .ToArray();
@@ -124,9 +121,62 @@ public class SearchService : ISearchService
         var match = orderedResults.FirstOrDefault(r => r.Name == query.Name);
         if (match is not null) { orderedResults.Move(match, 0); }
 
-        return !orderedResults.Any()
-            ? DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline")
-            : orderedResults;
+        if (orderedResults.Count == 0)
+        {
+            destination.ReplaceWith(
+                DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline")
+            );
+        }
+        else { destination.ReplaceWith(orderedResults); }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<QueryResult>> GetAllAsync()
+    {
+        using var measurement = _logger.WarnIfSlow(this);
+
+        var tasks = _storeServices.Select(store => Task.Run(store.GetAll));
+        var results = (await Task.WhenAll(tasks))
+                      .SelectMany(x => x)
+                      .ToArray();
+
+        return FormatForDisplay(results);
+    }
+
+    /// <inheritdoc />
+    public async Task SearchAsync(IList<QueryResult> destination, Cmdline query, bool doesReturnAllIfEmpty = false)
+    {
+        using var measurement = _logger.WarnIfSlow(this);
+
+        if (doesReturnAllIfEmpty && query.IsEmpty())
+        {
+            destination.ReplaceWith(
+                await GetAllAsync()
+            );
+            return;
+        }
+
+        if (query.IsEmpty()) { destination.Clear(); }
+
+        if (_lastQuery is not null 
+            && query.Parameters.Contains(_lastQuery.Parameters, StringComparison.CurrentCultureIgnoreCase))
+        {
+            _logger.LogTrace(
+                "Query {NewQuery} refines {OldQuery}; pruning existing results instead of searching stores",
+                query.Parameters,
+                _lastQuery.Parameters
+            );
+            PruneResults(destination, query);
+            return;
+        }
+
+        _logger.LogTrace(
+            "Execute a full search for query {Query}",
+            query
+        );
+        await SearchInStoreAsync(destination, query);
+
+        _lastQuery = query;
     }
 
     #endregion

@@ -205,8 +205,7 @@ public partial class MainViewModel : ObservableObject
 
             if (criterion.IsNullOrEmpty()) { Results.Clear(); }
 
-            var results = await _searchService.SearchAsync(criterion, DoesReturnAllIfEmpty);
-            Results = new ObservableCollection<QueryResult>(results);
+            await _searchService.SearchAsync(Results, criterion, DoesReturnAllIfEmpty);
             SelectedResult = Results.FirstOrDefault()!;
             Suggestion = GetSuggestion(criterion.Name, SelectedResult);
 
@@ -240,8 +239,7 @@ public partial class MainViewModel : ObservableObject
         {
             if (_stgSearchBox.Value.ShowResult && Query.IsNullOrWhiteSpace())
             {
-                var results = await _searchService.SearchAsync(Cmdline.Empty, true);
-                Results = new ObservableCollection<QueryResult>(results);
+                await _searchService.SearchAsync(Results, Cmdline.Empty, true);
             }
         }
         catch (Exception ex)

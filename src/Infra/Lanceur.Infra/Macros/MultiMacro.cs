@@ -41,7 +41,8 @@ public class MultiMacro : MacroQueryResult
 
     private async Task<AliasQueryResult?> GetAlias(Cmdline cmdline)
     {
-        var t = await _searchService.Value.SearchAsync(cmdline);
+        List<QueryResult> t = [];
+        await _searchService.Value.SearchAsync(t, cmdline);
         var macro = t.FirstOrDefault();
 
         if (macro is null)
