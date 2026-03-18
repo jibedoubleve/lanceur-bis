@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Everything.Wrapper;
 
-public class ResultSet : IEnumerable<EverythingResult>
+public sealed class ResultSet : IEnumerable<EverythingResult>
 {
     #region Fields
 

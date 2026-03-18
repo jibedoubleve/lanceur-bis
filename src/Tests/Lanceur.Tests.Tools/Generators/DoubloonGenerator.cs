@@ -3,7 +3,7 @@ using Lanceur.Tests.Tools.SQL;
 
 namespace Lanceur.Tests.Tools.Generators;
 
-public class DoubloonGenerator : IEnumerable<object[]>
+public sealed class DoubloonGenerator : IEnumerable<object[]>
 {
     #region Fields
 

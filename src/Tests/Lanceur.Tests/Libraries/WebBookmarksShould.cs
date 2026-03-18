@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Repositories;
 
-public class WebBookmarksShould
+public sealed class WebBookmarksShould
 {
     #region Fields
 

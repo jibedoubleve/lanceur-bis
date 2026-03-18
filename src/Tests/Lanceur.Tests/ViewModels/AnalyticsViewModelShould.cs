@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
+public sealed class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
 {
     #region Constructors
 

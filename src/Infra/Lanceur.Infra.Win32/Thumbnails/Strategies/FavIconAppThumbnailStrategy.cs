@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails.Strategies;
 
-public class FavIconAppThumbnailStrategy : ThumbnailStrategy
+public sealed class FavIconAppThumbnailStrategy : ThumbnailStrategy
 {
     #region Fields
 

@@ -26,7 +26,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class SearchServiceTest : TestBase
+public sealed class SearchServiceTest : TestBase
 {
     #region Fields
 

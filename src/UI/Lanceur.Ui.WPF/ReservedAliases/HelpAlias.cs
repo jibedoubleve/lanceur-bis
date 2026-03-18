@@ -7,7 +7,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("help")]
 [Description("Open help page")]
-public class HelpAlias : SelfExecutableQueryResult
+public sealed class HelpAlias : SelfExecutableQueryResult
 {
     #region Fields
 

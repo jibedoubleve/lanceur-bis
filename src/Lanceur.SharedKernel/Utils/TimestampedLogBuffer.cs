@@ -5,7 +5,7 @@ namespace Lanceur.SharedKernel.Utils;
 /// <summary>
 ///     Captures timestamped log output into an in-memory buffer.
 /// </summary>
-public class TimestampedLogBuffer
+public sealed class TimestampedLogBuffer
 {
     #region Fields
 

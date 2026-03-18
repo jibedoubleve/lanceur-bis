@@ -8,7 +8,7 @@ using NHotkey.Wpf;
 namespace Lanceur.Ui.WPF.Services;
 
 /// <inheritdoc />
-public class HotKeyService : IHotKeyService
+public sealed class HotKeyService : IHotKeyService
 {
     #region Fields
 

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;
 
-public class AppRestartDummyService : IAppRestartService
+public sealed class AppRestartDummyService : IAppRestartService
 {
     #region Fields
 

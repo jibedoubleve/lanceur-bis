@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class EverythingQueryBuilderShould
+public sealed class EverythingQueryBuilderShould
 {
     #region Methods
 

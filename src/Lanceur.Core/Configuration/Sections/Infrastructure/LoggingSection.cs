@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Core.Configuration.Sections.Infrastructure;
 
-public class LoggingSection
+public sealed class LoggingSection
 {
     #region Properties
 

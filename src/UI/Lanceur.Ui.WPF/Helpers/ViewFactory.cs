@@ -6,7 +6,7 @@ using Lanceur.Ui.WPF.Views.Controls;
 
 namespace Lanceur.Ui.WPF.Helpers;
 
-public class ViewFactory : IViewFactory
+public sealed class ViewFactory : IViewFactory
 {
     #region Methods
 

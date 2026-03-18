@@ -26,7 +26,7 @@ using MacroAliasExpanderService = Lanceur.Infra.Services.MacroAliasExpanderServi
 
 namespace Lanceur.Tests.Services;
 
-public class MacroServiceTest : TestBase
+public sealed class MacroServiceTest : TestBase
 {
     #region Constructors
 

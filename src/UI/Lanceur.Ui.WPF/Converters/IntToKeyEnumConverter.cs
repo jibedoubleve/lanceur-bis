@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class IntToKeyEnumConverter : IValueConverter
+public sealed class IntToKeyEnumConverter : IValueConverter
 {
     #region Methods
 

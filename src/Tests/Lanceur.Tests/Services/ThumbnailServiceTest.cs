@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class ThumbnailServiceTest : TestBase
+public sealed class ThumbnailServiceTest : TestBase
 {
     #region Constructors
 

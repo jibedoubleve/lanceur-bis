@@ -2,7 +2,7 @@ using Lanceur.Core.Constants;
 
 namespace Lanceur.Core.Configuration.Sections.Infrastructure;
 
-public class DatabaseSection
+public sealed class DatabaseSection
 {
     #region Properties
 

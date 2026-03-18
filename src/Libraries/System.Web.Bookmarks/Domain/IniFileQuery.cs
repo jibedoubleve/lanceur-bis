@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Domain;
 
-public class IniFileQuery
+public sealed class IniFileQuery
 {
     #region Fields
 

@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Responses;
 
-public class PackageResponse
+public sealed class PackageResponse
 {
     #region Constructors
 

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Libraries;
 
-public class ScriptManagerShould
+public sealed class ScriptManagerShould
 {
     #region Fields
 

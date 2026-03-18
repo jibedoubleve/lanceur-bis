@@ -4,7 +4,7 @@ using Lanceur.Core.Models;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class SetUsageDbAction
+public sealed class SetUsageDbAction
 {
     #region Fields
 

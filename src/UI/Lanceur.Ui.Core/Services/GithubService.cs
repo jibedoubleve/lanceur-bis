@@ -6,7 +6,7 @@ using Octokit;
 
 namespace Lanceur.Ui.Core.Services;
 
-public class GithubService : IGithubService
+public sealed class GithubService : IGithubService
 {
     #region Fields
 

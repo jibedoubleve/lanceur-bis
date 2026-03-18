@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Responses;
 
-public class AliasResponse
+public sealed class AliasResponse
 {
     #region Properties
 

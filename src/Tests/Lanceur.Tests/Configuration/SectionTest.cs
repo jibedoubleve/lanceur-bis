@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Configuration;
 
-public class SectionTest
+public sealed class SectionTest
 {
     #region Methods
 

@@ -8,7 +8,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("setup")]
 [Description("Open the setup page")]
-public class SetupAlias : SelfExecutableQueryResult
+public sealed class SetupAlias : SelfExecutableQueryResult
 {
     #region Fields
 

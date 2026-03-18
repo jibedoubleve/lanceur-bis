@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
 
-public class ConnectionString : BaseConnectionString, IConnectionString
+public sealed class ConnectionString : BaseConnectionString, IConnectionString
 {
     #region Fields
 

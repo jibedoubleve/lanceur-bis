@@ -8,7 +8,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("logs")]
 [Description("Open the directory containing the log files")]
-public class ShowLogs : SelfExecutableQueryResult
+public sealed class ShowLogs : SelfExecutableQueryResult
 {
     #region Properties
 

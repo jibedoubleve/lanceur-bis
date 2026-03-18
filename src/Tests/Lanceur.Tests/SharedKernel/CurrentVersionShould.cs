@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
-public class CurrentVersionShould
+public sealed class CurrentVersionShould
 {
     #region Methods
 

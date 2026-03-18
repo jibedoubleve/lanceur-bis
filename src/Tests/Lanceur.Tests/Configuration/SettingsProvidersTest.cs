@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Configuration;
 
-public class SettingsProvidersTest : TestBase
+public sealed class SettingsProvidersTest : TestBase
 {
     #region Constructors
 

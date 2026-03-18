@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class ReplacementShould : TestBase
+public sealed class ReplacementShould : TestBase
 {
     #region Constructors
 

@@ -5,7 +5,7 @@ using Lanceur.Ui.Core.Messages;
 
 namespace Lanceur.Ui.WPF.Services;
 
-public class UserNotificationService : IUserNotificationService
+public sealed class UserNotificationService : IUserNotificationService
 {
     #region Methods
 
@@ -29,7 +29,7 @@ public class UserNotificationService : IUserNotificationService
 
     #endregion
 
-    private class WaitScope : IDisposable
+    private sealed class WaitScope : IDisposable
     {
         #region Fields
 

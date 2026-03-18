@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class SQLiteFeatureFlagServiceShould : TestBase
+public sealed class SQLiteFeatureFlagServiceShould : TestBase
 {
     #region Constructors
 

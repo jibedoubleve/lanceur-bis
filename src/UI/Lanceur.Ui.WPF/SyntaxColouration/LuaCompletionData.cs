@@ -5,7 +5,7 @@ using ICSharpCode.AvalonEdit.Editing;
 
 namespace Lanceur.Ui.WPF.SyntaxColouration;
 
-public class LuaCompletionData : ICompletionData
+public sealed class LuaCompletionData : ICompletionData
 {
     #region Constructors
 

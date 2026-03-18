@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class DivideByConverter : IValueConverter
+public sealed class DivideByConverter : IValueConverter
 {
     #region Properties
 

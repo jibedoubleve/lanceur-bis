@@ -10,7 +10,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("version")]
 [Description("Indicates the version of the application")]
-public class VersionAlias : SelfExecutableQueryResult
+public sealed class VersionAlias : SelfExecutableQueryResult
 {
     #region Fields
 

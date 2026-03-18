@@ -8,7 +8,7 @@ using NLua;
 
 namespace Lanceur.Infra.LuaScripting;
 
-public class LuaManager : ILuaManager
+public sealed class LuaManager : ILuaManager
 {
     #region Fields
 

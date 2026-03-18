@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class InvertReportTypeToVisibilityConverter : IValueConverter
+public sealed class InvertReportTypeToVisibilityConverter : IValueConverter
 {
     #region Fields
 

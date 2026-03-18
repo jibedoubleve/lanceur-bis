@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Lanceur.Tests.Tools.Logging;
 
-public class TestOutputHelperDisposable : IDisposable
+public sealed class TestOutputHelperDisposable : IDisposable
 {
     #region Fields
 

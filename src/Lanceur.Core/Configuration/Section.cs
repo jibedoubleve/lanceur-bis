@@ -18,7 +18,7 @@ namespace Lanceur.Core.Configuration;
 ///         an <see cref="InvalidOperationException" /> is thrown.
 ///     </para>
 /// </remarks>
-public class Section<T> : IWriteableSection<T>
+public sealed class Section<T> : IWriteableSection<T>
     where T : class
 {
     #region Fields

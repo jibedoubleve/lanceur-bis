@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Thumbnails.Strategies;
 
-public class PackagedAppThumbnailStrategy : ThumbnailStrategy
+public sealed class PackagedAppThumbnailStrategy : ThumbnailStrategy
 {
     #region Fields
 

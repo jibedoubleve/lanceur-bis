@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Wildcards;
 
-public class ReplacementComposite : IReplacement, IWildcardService
+public sealed class ReplacementComposite : IReplacement, IWildcardService
 {
     #region Fields
 

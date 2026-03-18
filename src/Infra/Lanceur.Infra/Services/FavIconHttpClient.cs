@@ -4,7 +4,7 @@ using Lanceur.Core.Services;
 namespace Lanceur.Infra.Services;
 
 /// <inheritdoc />
-public class FavIconHttpClient : IFavIconHttpClient
+public sealed class FavIconHttpClient : IFavIconHttpClient
 {
     #region Fields
 

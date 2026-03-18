@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Models;
 
-public class DisplayQueryResult : QueryResult
+public sealed class DisplayQueryResult : QueryResult
 {
     #region Constructors
 

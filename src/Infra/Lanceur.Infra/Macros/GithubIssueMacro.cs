@@ -11,7 +11,7 @@ namespace Lanceur.Infra.Macros;
 
 [Macro("github_issue")]
 [Description("Create a new Github issue on lanceur-bis project")]
-public class GithubIssueMacro : MacroQueryResult
+public sealed class GithubIssueMacro : MacroQueryResult
 {
     #region Fields
 

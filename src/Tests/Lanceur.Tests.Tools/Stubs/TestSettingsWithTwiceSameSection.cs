@@ -2,7 +2,7 @@ using Lanceur.Core.Configuration.Sections.Infrastructure;
 
 namespace Lanceur.Tests.Tools.Stubs;
 
-public class TestSettingsWithTwiceSameSection
+public sealed class TestSettingsWithTwiceSameSection
 {
     #region Properties
 

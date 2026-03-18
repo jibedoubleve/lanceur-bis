@@ -10,7 +10,7 @@ namespace Lanceur.Tests.Tools.ReservedAliases;
 [ReservedAlias(Names.Name2)]
 [Description("To be a keyword, you should be executable")]
 [DebuggerDisplay("Name: {Name}")]
-public class NotExecutableTestAlias : QueryResult
+public sealed class NotExecutableTestAlias : QueryResult
 {
     #region Constructors
 

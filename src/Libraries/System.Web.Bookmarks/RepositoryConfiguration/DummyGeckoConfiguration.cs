@@ -1,7 +1,7 @@
 namespace System.Web.Bookmarks.RepositoryConfiguration;
 
 /// <inheritdoc />
-internal class DummyGeckoConfiguration : IGeckoBrowserConfiguration
+internal sealed class DummyGeckoConfiguration : IGeckoBrowserConfiguration
 {
     #region Constructors
 

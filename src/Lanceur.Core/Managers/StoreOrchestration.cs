@@ -1,6 +1,6 @@
 namespace Lanceur.Core.Managers;
 
-public class StoreOrchestration
+public sealed class StoreOrchestration
 {
     #region Constructors
 

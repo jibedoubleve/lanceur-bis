@@ -9,7 +9,7 @@ namespace Lanceur.Core.BusinessLogic;
 ///     Where <c>name</c> is the parameter's name and <c>content</c> is its associated value.
 ///     If a line contains invalid data, such as multiple commas, it will be ignored.
 /// </summary>
-public class TextToParameterParser
+public sealed class TextToParameterParser
 {
     #region Fields
 

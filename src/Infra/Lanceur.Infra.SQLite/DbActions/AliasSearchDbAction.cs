@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class AliasSearchDbAction
+public sealed class AliasSearchDbAction
 {
     #region Fields
 

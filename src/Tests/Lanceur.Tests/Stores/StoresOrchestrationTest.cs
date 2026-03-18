@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Stores;
 
-public class StoresOrchestrationTest
+public sealed class StoresOrchestrationTest
 {
     #region Fields
 

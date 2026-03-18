@@ -4,7 +4,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-internal class HistoryDbAction
+internal sealed class HistoryDbAction
 {
     #region Fields
 

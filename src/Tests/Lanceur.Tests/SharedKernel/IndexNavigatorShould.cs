@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
-public class IndexNavigatorShould
+public sealed class IndexNavigatorShould
 {
     #region Methods
 

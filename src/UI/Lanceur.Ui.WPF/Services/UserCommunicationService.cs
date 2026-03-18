@@ -3,7 +3,7 @@ using Lanceur.Core.Services;
 namespace Lanceur.Ui.WPF.Services;
 
 /// <inheritdoc />
-public class UserCommunicationService : IUserCommunicationService
+public sealed class UserCommunicationService : IUserCommunicationService
 {
     #region Constructors
 

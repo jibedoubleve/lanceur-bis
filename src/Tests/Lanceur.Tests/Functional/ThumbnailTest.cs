@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class ThumbnailTest
+public sealed class ThumbnailTest
 {
     #region Methods
 

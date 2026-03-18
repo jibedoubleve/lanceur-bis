@@ -1,7 +1,7 @@
 ﻿namespace Lanceur.Core.Stores;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class StoreAttribute : Attribute
+public sealed class StoreAttribute : Attribute
 {
     #region Constructors
 

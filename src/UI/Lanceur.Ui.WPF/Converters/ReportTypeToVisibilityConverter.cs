@@ -16,7 +16,7 @@ public enum ActionOnAlias
     LowUsageSelector
 }
 
-public class ReportTypeToVisibilityConverter : IValueConverter
+public sealed class ReportTypeToVisibilityConverter : IValueConverter
 {
     #region Methods
 

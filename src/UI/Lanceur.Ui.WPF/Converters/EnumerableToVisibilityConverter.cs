@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class EnumerableToVisibilityConverter : IValueConverter
+public sealed class EnumerableToVisibilityConverter : IValueConverter
 {
     #region Methods
 

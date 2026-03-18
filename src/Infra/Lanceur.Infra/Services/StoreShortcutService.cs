@@ -8,7 +8,7 @@ using Lanceur.Core.Stores;
 namespace Lanceur.Infra.Services;
 
 /// <inheritdoc />
-public class StoreShortcutService : IStoreShortcutService
+public sealed class StoreShortcutService : IStoreShortcutService
 {
     #region Fields
 

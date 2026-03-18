@@ -23,7 +23,7 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
+public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
 {
     #region Constructors
 

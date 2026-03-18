@@ -4,7 +4,7 @@ namespace Lanceur.Core.Configuration;
 ///     An <see cref="ISection{T}" /> that delegates to an <see cref="IWriteableSection{T}" />,
 ///     ensuring both share the same underlying <see cref="Section{T}" /> instance.
 /// </summary>
-public class ForwardingSection<T> : ISection<T> where T : class
+public sealed class ForwardingSection<T> : ISection<T> where T : class
 {
     private readonly IWriteableSection<T> _inner;
 

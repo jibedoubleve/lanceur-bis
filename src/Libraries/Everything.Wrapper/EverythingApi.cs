@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Everything.Wrapper;
 
-public class EverythingApi : IEverythingApi
+public sealed class EverythingApi : IEverythingApi
 {
     #region Fields
 

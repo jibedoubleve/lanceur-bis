@@ -5,7 +5,7 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.Services;
 
-public class ReconciliationService : IReconciliationService
+public sealed class ReconciliationService : IReconciliationService
 {
     #region Fields
 

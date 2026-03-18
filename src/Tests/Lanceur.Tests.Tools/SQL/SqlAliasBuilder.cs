@@ -6,7 +6,7 @@ using Lanceur.Tests.Tools.Generators;
 
 namespace Lanceur.Tests.Tools.SQL;
 
-public class SqlAliasBuilder : SqlBuilderBase
+public sealed class SqlAliasBuilder : SqlBuilderBase
 {
     #region Fields
 

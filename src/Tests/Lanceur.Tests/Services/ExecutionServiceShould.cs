@@ -21,7 +21,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class ExecutionServiceShould : TestBase
+public sealed class ExecutionServiceShould : TestBase
 {
     #region Constructors
 

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Models;
 
-public class QueryResultShould
+public sealed class QueryResultShould
 {
     #region Methods
 
@@ -63,7 +63,7 @@ public class QueryResultShould
 
     #region Classes
 
-    private class TestQueryResult : QueryResult { }
+    private sealed class TestQueryResult : QueryResult { }
 
     #endregion Classes
 }

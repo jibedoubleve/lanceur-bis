@@ -6,7 +6,7 @@ using Shouldly;
 
 namespace Lanceur.Tests.Tools.StateTesters;
 
-public class AliasStateTester
+public sealed class AliasStateTester
 {
     #region Fields
 

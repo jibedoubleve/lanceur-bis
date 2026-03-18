@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class CalculatorServiceShould
+public sealed class CalculatorServiceShould
 {
     #region Fields
 

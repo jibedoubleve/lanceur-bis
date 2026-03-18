@@ -3,7 +3,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Ui.Core.Services;
 
-public class ClipboardService : IClipboardService
+public sealed class ClipboardService : IClipboardService
 {
     #region Methods
 

@@ -5,7 +5,7 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class StringToVisibilityConverter : IValueConverter
+public sealed class StringToVisibilityConverter : IValueConverter
 {
     #region Methods
 

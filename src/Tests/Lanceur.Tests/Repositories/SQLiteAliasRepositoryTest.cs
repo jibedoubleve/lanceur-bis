@@ -17,7 +17,7 @@ using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Tests.Repositories;
 
-public class SQLiteAliasRepositoryTest : TestBase
+public sealed class SQLiteAliasRepositoryTest : TestBase
 {
     #region Constructors
 

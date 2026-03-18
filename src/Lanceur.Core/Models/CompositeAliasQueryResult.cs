@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Models;
 
-public class CompositeAliasQueryResult : AliasQueryResult
+public sealed class CompositeAliasQueryResult : AliasQueryResult
 {
     #region Constructors
 

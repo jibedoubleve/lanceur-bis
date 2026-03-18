@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class MacroDbAction
+public sealed class MacroDbAction
 {
     #region Fields
 

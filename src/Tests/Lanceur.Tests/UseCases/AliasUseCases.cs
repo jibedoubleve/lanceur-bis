@@ -29,7 +29,7 @@ using Xunit;
 
 namespace Lanceur.Tests.UseCases;
 
-public class AliasUseCases : TestBase
+public sealed class AliasUseCases : TestBase
 {
     #region Constructors
 

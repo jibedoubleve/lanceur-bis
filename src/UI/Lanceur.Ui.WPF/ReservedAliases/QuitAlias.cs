@@ -9,7 +9,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("quit")]
 [Description("Quit lanceur")]
-public class QuitAlias : SelfExecutableQueryResult
+public sealed class QuitAlias : SelfExecutableQueryResult
 {
     #region Fields
 

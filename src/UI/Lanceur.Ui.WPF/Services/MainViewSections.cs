@@ -4,7 +4,7 @@ using Lanceur.Core.Configuration.Sections.Application;
 
 namespace Lanceur.Ui.WPF.Services;
 
-public class MainViewSections
+public sealed class MainViewSections
 {
     #region Fields
 

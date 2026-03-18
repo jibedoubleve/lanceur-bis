@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Configuration.Sections.Application;
 
-public class PositionSection
+public sealed class PositionSection
 {
     #region Properties
 

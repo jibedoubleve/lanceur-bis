@@ -1,6 +1,6 @@
 namespace Lanceur.Infra.Stores.Everything;
 
-public class EverythingQueryAdapter
+public sealed class EverythingQueryAdapter
 {
     #region Fields
 

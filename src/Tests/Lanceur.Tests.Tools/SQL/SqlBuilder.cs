@@ -1,6 +1,6 @@
 namespace Lanceur.Tests.Tools.SQL;
 
-public class SqlBuilder : SqlBuilderBase
+public sealed class SqlBuilder : SqlBuilderBase
 {
     #region Properties
 

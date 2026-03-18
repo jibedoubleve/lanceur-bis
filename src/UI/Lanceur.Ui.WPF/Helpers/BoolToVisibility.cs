@@ -2,7 +2,7 @@ using System.Windows;
 
 namespace Lanceur.Ui.WPF.Helpers;
 
-public class BoolToVisibility(bool value)
+public sealed class BoolToVisibility(bool value)
 {
     #region Fields
 

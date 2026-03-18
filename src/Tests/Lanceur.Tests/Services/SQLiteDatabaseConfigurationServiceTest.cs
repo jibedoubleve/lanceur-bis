@@ -16,7 +16,7 @@ using Version = System.Version;
 
 namespace Lanceur.Tests.Services;
 
-public class SQLiteDatabaseConfigurationServiceTest : TestBase
+public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
 {
     #region Constructors
 

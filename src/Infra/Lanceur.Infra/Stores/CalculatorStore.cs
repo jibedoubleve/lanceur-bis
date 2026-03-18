@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class CalculatorStore : StoreBase, IStoreService
+public sealed class CalculatorStore : StoreBase, IStoreService
 {
     #region Fields
 

@@ -1,6 +1,6 @@
 namespace Lanceur.Ui.Core.Utils.Watchdogs;
 
-public class TestWatchdog : IWatchdog
+public sealed class TestWatchdog : IWatchdog
 {
     #region Fields
 

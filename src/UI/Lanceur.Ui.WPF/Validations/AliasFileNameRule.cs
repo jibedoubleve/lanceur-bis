@@ -5,7 +5,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Ui.WPF.Validations;
 
-public class AliasFileNameRule : ValidationRule
+public sealed class AliasFileNameRule : ValidationRule
 {
     #region Fields
 

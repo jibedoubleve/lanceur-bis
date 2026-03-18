@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class DataReconciliationViewModelTest : ViewModelTester<DataReconciliationViewModel>
+public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconciliationViewModel>
 {
     #region Constructors
 

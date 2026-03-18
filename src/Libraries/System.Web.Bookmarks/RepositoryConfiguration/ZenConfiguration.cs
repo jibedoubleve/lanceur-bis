@@ -1,7 +1,7 @@
 namespace System.Web.Bookmarks.RepositoryConfiguration;
 
 /// <inheritdoc />
-internal class ZenConfiguration : IGeckoBrowserConfiguration
+internal sealed class ZenConfiguration : IGeckoBrowserConfiguration
 {
     #region Properties
 

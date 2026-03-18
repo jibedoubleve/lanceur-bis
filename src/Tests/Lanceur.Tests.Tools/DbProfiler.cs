@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Tools;
 
-public class DbProfiler : IDbProfiler
+public sealed class DbProfiler : IDbProfiler
 {
     #region Fields
 

@@ -5,7 +5,7 @@ namespace Lanceur.Core.LuaScripting;
 /// <summary>
 ///     Adapter that gives notification feature that can be used in Lua scripts
 /// </summary>
-public class NotificationLuaAdapter
+public sealed class NotificationLuaAdapter
 {
     #region Fields
 

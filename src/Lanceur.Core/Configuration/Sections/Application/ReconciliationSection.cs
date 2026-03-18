@@ -6,7 +6,7 @@ namespace Lanceur.Core.Configuration.Sections.Application;
 /// <summary>
 ///     Represents configuration settings used by the reconciliation tools.
 /// </summary>
-public class ReconciliationSection
+public sealed class ReconciliationSection
 {
     #region Constructors
 
@@ -123,7 +123,7 @@ public class ReconciliationSection
     #endregion
 }
 
-public class ReportConfiguration(ReportType reportType, ColumnsConfiguration columnsVisibility) : ObservableModel
+public sealed class ReportConfiguration(ReportType reportType, ColumnsConfiguration columnsVisibility) : ObservableModel
 {
     #region Fields
 
@@ -149,7 +149,7 @@ public class ReportConfiguration(ReportType reportType, ColumnsConfiguration col
     #endregion
 }
 
-public class ColumnsConfiguration : ObservableModel
+public sealed class ColumnsConfiguration : ObservableModel
 {
     #region Fields
 

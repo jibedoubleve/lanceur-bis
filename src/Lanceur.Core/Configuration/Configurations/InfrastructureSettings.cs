@@ -5,7 +5,7 @@ namespace Lanceur.Core.Configuration.Configurations;
 /// <summary>
 ///     Represents the infrastructure-level configuration settings (database, logging, pipelines).
 /// </summary>
-public class InfrastructureSettings
+public sealed class InfrastructureSettings
 {
     #region Properties
 

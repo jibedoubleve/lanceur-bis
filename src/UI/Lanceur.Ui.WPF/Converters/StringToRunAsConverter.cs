@@ -4,7 +4,7 @@ using static Lanceur.SharedKernel.Constants;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class StringToRunAsConverter : IValueConverter
+public sealed class StringToRunAsConverter : IValueConverter
 {
     #region Methods
 

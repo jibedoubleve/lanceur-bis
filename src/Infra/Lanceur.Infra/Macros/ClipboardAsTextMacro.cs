@@ -7,7 +7,7 @@ namespace Lanceur.Infra.Macros;
 
 [Macro("clipboard_as_text")]
 [Description("Remove formatting from clipboard.")]
-public class ClipboardAsTextMacro : MacroQueryResult
+public sealed class ClipboardAsTextMacro : MacroQueryResult
 {
     #region Fields
 

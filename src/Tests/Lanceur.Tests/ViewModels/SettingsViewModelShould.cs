@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewModel>
+public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewModel>
 {
     #region Constructors
 

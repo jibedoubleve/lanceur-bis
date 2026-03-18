@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
-public class CircularQueueShould
+public sealed class CircularQueueShould
 {
     #region Methods
 

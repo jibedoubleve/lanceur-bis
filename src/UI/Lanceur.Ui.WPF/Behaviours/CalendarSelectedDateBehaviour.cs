@@ -5,7 +5,7 @@ using Microsoft.Xaml.Behaviors;
 
 namespace Lanceur.Ui.WPF.Behaviours;
 
-public class CalendarSelectedDateBehaviour : Behavior<Calendar>
+public sealed class CalendarSelectedDateBehaviour : Behavior<Calendar>
 {
     #region Fields
 

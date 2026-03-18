@@ -7,7 +7,7 @@ namespace Lanceur.SharedKernel.Caching;
 ///     A decorator around <see cref="IMemoryCache" /> that logs every cache operation
 ///     (create, hit, miss, remove, dispose) using the injected <see cref="ILogger{TCategoryName}" />.
 /// </summary>
-public class TrackedMemoryCache : IMemoryCache
+public sealed class TrackedMemoryCache : IMemoryCache
 {
     #region Fields
 

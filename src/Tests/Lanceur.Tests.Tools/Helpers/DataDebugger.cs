@@ -24,7 +24,7 @@ public static class DataDebugger
     #endregion
 }
 
-public class Doubloon
+public sealed class Doubloon
 {
     #region Properties
 

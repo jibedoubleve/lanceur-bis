@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
-public class StringExtensionsShould
+public sealed class StringExtensionsShould
 {
     #region Methods
 

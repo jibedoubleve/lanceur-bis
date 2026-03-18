@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class CounterToVisibilityConverter : IValueConverter
+public sealed class CounterToVisibilityConverter : IValueConverter
 {
     #region Methods
 
