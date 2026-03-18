@@ -41,9 +41,12 @@ public partial class SettingsView : INavigationWindow
         ILogger<SettingsView> logger,
         ISection<WindowSection> windowSection)
     {
+        ArgumentNullException.ThrowIfNull(viewModel);
         ArgumentNullException.ThrowIfNull(contentDialogService);
         ArgumentNullException.ThrowIfNull(snackbarService);
         ArgumentNullException.ThrowIfNull(serviceProvider);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(windowSection);
 
         DataContext = viewModel;
 
