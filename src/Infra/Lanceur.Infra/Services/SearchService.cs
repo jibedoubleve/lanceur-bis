@@ -45,19 +45,41 @@ public sealed class SearchService : ISearchService
 
     #region Methods
 
-    private void PruneResults(IList<QueryResult> destination, Cmdline query)
+    private async Task DispatchSearchAsync(IList<QueryResult> destination, Cmdline query, bool doesReturnAllIfEmpty)
     {
-        var toDelete = destination.Where(item =>
-            !item.Name.StartsWith(query.Parameters, StringComparison.InvariantCultureIgnoreCase)
-        ).ToArray();
+        using var measurement = _logger.WarnIfSlow(this);
+        if (doesReturnAllIfEmpty && query.IsEmpty())
+        {
+            destination.ReplaceWith(
+                await GetAllAsync()
+            );
+            return;
+        }
+
+        if (query.IsEmpty())
+        {
+            destination.Clear();
+            return;
+        }
+        
+        if (_lastQuery is not null
+            && !_lastQuery.IsEmpty()
+            && query.ToString().StartsWith(_lastQuery.ToString(), StringComparison.CurrentCultureIgnoreCase))
+        {
+            _logger.LogTrace(
+                "Query {NewQuery} refines {OldQuery}; pruning existing results instead of searching stores",
+                query.Parameters,
+                _lastQuery.Parameters
+            );
+            PruneResults(destination, query);
+            return;
+        }
 
         _logger.LogTrace(
-            "Prune {ItemCount} result(s) for {Query}",
-            toDelete.Length,
+            "Execute a full search for query {Query}",
             query
         );
-        
-        destination.RemoveMultiple(toDelete);
+        await SearchInStoreAsync(destination, query);
     }
 
     private IEnumerable<QueryResult> FormatForDisplay(QueryResult[] collection)
@@ -77,6 +99,21 @@ public sealed class SearchService : ISearchService
         return collection.Length != 0
             ? orderedResults
             : DisplayQueryResult.NoResultFound;
+    }
+
+    private void PruneResults(IList<QueryResult> destination, Cmdline query)
+    {
+        var toDelete = destination.Where(item =>
+            !item.Name.StartsWith(query.Parameters, StringComparison.InvariantCultureIgnoreCase)
+        ).ToArray();
+
+        _logger.LogTrace(
+            "Prune {ItemCount} result(s) for {Query}",
+            toDelete.Length,
+            query
+        );
+
+        destination.RemoveMultiple(toDelete);
     }
 
     private async Task SearchInStoreAsync(IList<QueryResult> destination, Cmdline query)
@@ -146,36 +183,7 @@ public sealed class SearchService : ISearchService
     /// <inheritdoc />
     public async Task SearchAsync(IList<QueryResult> destination, Cmdline query, bool doesReturnAllIfEmpty = false)
     {
-        using var measurement = _logger.WarnIfSlow(this);
-
-        if (doesReturnAllIfEmpty && query.IsEmpty())
-        {
-            destination.ReplaceWith(
-                await GetAllAsync()
-            );
-            return;
-        }
-
-        if (query.IsEmpty()) { destination.Clear(); }
-
-        if (_lastQuery is not null 
-            && query.Parameters.Contains(_lastQuery.Parameters, StringComparison.CurrentCultureIgnoreCase))
-        {
-            _logger.LogTrace(
-                "Query {NewQuery} refines {OldQuery}; pruning existing results instead of searching stores",
-                query.Parameters,
-                _lastQuery.Parameters
-            );
-            PruneResults(destination, query);
-            return;
-        }
-
-        _logger.LogTrace(
-            "Execute a full search for query {Query}",
-            query
-        );
-        await SearchInStoreAsync(destination, query);
-
+        await DispatchSearchAsync(destination, query, doesReturnAllIfEmpty);
         _lastQuery = query;
     }
 
