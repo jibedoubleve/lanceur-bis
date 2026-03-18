@@ -122,11 +122,12 @@ public class SearchServiceTest : TestBase
 
         // ACT
         var service = serviceProvider.GetService<SearchService>()!;
-        var result = (await service.SearchAsync(new Cmdline("z"))).ToArray();
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("z"));
 
         // ASSERT
         Assert.Multiple(
-            () => result.Length.ShouldBeGreaterThan(0),
+            () => result.Count.ShouldBeGreaterThan(0),
             () => result[0].Name.ShouldBe("No result found")
         );
     }
@@ -169,10 +170,11 @@ public class SearchServiceTest : TestBase
         var query = new Cmdline("code");
         var service = serviceProvider.GetService<SearchService>()!;
 
-        var result = (await service.SearchAsync(query)).ToArray();
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, query);
 
         result.ShouldSatisfyAllConditions(
-            r => r.Length.ShouldBe(1),
+            r => r.Count.ShouldBe(1),
             r => r[0].IsResult.ShouldBeFalse()
         );
     }
@@ -276,11 +278,12 @@ public class SearchServiceTest : TestBase
 
         // ACT
         var searchService = serviceProvider.GetService<ISearchService>()!;
-        var result = (await searchService.SearchAsync(new Cmdline(criterion))).ToArray();
+        List<QueryResult> result = [];
+        await searchService.SearchAsync(result, new Cmdline(criterion));
 
         // ASSERT
         result.ShouldSatisfyAllConditions(
-            r => r.Length.ShouldBe(2),
+            r => r.Count.ShouldBe(2),
             r => r[0].Name.ShouldBe("u")
         );
     }

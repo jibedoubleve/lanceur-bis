@@ -42,5 +42,24 @@ public static class ListExtensions
             if (predicate(source[i])) { source.RemoveAt(i); }
     }
 
+    /// <summary>
+    ///     Replaces all items in the list with the specified collection.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the list.</typeparam>
+    /// <param name="source">The list to replace. This must not be null.</param>
+    /// <param name="toReplace">The collection of items to populate the list with. This must not be null.</param>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when <paramref name="source" /> or <paramref name="toReplace" /> is
+    ///     null.
+    /// </exception>
+    public static void ReplaceWith<T>(this IList<T> source, IEnumerable<T> toReplace)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(toReplace);
+        
+        source.Clear();
+        source.AddRange(toReplace);
+    }
+
     #endregion
 }
