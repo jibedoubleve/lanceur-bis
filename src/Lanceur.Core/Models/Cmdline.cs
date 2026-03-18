@@ -74,12 +74,16 @@ public static class CmdLineExtension
 {
     #region Methods
 
+    /// <summary>
+    ///     Determines whether the specified <see cref="Cmdline" /> is empty or null.
+    /// </summary>
+    /// <param name="cmdline">The <see cref="Cmdline" /> instance to check.</param>
+    /// <returns>
+    ///     <c>true</c> if <paramref name="cmdline" /> is null or its string representation is empty; otherwise,
+    ///     <c>false</c>.
+    /// </returns>
     public static bool IsEmpty(this Cmdline? cmdline)
-    {
-        if (cmdline is null) { return true; }
-
-        return cmdline.Name.IsNullOrEmpty() && !cmdline.HasParameters;
-    }
+        => cmdline is null || string.IsNullOrEmpty(cmdline);
 
     #endregion
 }
