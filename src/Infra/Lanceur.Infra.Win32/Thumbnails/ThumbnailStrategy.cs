@@ -38,10 +38,15 @@ public abstract class ThumbnailStrategy : IThumbnailStrategy
     /// </remarks>
     /// <param name="alias">The alias for which to update the thumbnail.</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
-    protected abstract Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken);
+    /// <returns>
+    ///     <c>true</c> if the thumbnail was resolved (already cached or successfully fetched),
+    ///     allowing the caller to skip remaining strategies; <c>false</c> if this strategy
+    ///     could not resolve the thumbnail and the next strategy should be tried.
+    /// </returns>
+    protected abstract Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public async Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    public async Task<bool> UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
         _logger.LogTrace("Executing thumbnail strategy {Strategy} for alias {Alias}",
             GetType().FullName,
@@ -55,7 +60,7 @@ public abstract class ThumbnailStrategy : IThumbnailStrategy
                 alias.Name,
                 alias.Thumbnail
             );
-            return;
+            return true;
         }
 
         if (ResolveCachePathExists(out var path))
@@ -66,18 +71,16 @@ public abstract class ThumbnailStrategy : IThumbnailStrategy
                 path
             );
             alias.Thumbnail ??=  path;
-            return;
+            return true;
         }
 
         if (alias.FileName is null)
         {
             _logger.LogInformation("Alias {Alias} does not have a file name.", alias.Name);
-            return;
+            return true;
         }
 
-        await UpdateThumbnailCoreAsync(alias, cancellationToken);
-
-        return;
+        return await UpdateThumbnailCoreAsync(alias, cancellationToken);
 
         bool ResolveCachePathExists(out string path)
         {

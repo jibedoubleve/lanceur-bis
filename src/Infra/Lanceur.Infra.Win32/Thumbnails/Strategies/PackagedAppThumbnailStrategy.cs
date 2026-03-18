@@ -40,9 +40,10 @@ public class PackagedAppThumbnailStrategy : ThumbnailStrategy
 
     #region Methods
 
-    protected override async Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    protected override async Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
-        if (!alias.IsPackagedApplication()) { return; }
+        if (!alias.IsPackagedApplication()) { return false; }
 
         var app = await _packagedAppSearchService.GetByInstalledDirectoryAsync(alias.FileName!);
         var response = app.FirstOrDefault();
@@ -50,13 +51,14 @@ public class PackagedAppThumbnailStrategy : ThumbnailStrategy
         if (response is null)
         {
             _logger.LogTrace("Failed to download the thumbnail for alias {Name}.", alias.Name);
-            return;
+            return true;
         }
 
         var thumbnailAbsolutePath = alias.ResolveThumbnailAbsolutePath();
         response.Logo.LocalPath.CopyToImageRepository(thumbnailAbsolutePath);
         alias.Thumbnail = thumbnailAbsolutePath;
         _aliasManagementService.UpdateThumbnail(alias);
+        return true;
     }
 
     #endregion

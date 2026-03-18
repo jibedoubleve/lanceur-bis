@@ -89,7 +89,11 @@ public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
         {
             foreach (var strategy in _orderedThumbnailStrategies)
             {
-                try { await strategy.UpdateThumbnailAsync(alias, _cts.Token); }
+                try
+                {
+                    var isResolved = await strategy.UpdateThumbnailAsync(alias, _cts.Token);
+                    if (isResolved) { break; }
+                }
                 catch (OperationCanceledException ex)
                 {
                     _logger.LogDebug(ex, "Cancellation requested during thumbnail update of {AliasName}", alias.Name);
