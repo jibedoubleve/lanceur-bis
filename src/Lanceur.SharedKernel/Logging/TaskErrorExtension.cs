@@ -11,10 +11,15 @@ public static class TaskErrorExtension
         ILogger logger,
         string message,
         params object?[] args)
-        => task.ContinueWith(
-            context => logger.LogWarning(context.Exception, message, args),
+    {
+        task.ContinueWith(
+            context => {
+                logger.LogWarning(context.Exception, message, args);
+            },
             TaskContinuationOptions.OnlyOnFaulted
         );
+        return task;
+    }
 
     #endregion
 }
