@@ -10,7 +10,7 @@ using Lanceur.Core.Stores;
 namespace Lanceur.Infra.Stores;
 
 [Store(@"^\s{0,}&.*")]
-public class SteamGameStore : StoreBase, IStoreService
+public sealed class SteamGameStore : StoreBase, IStoreService
 {
     #region Fields
 

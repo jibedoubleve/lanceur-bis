@@ -15,7 +15,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("centre")]
 [Description("Centre Lanceur in the middle of the screen.")]
-public class CentreAlias : SelfExecutableQueryResult
+public sealed class CentreAlias : SelfExecutableQueryResult
 {
     #region Fields
 

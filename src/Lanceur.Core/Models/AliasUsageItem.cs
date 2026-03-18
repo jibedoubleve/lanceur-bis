@@ -1,6 +1,6 @@
 namespace Lanceur.Core.Models;
 
-public class AliasUsageItem : ObservableModel
+public sealed class AliasUsageItem : ObservableModel
 {
     #region Properties
 

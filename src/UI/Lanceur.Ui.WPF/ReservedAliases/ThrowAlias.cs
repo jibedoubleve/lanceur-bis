@@ -11,7 +11,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 /// </summary>
 [ReservedAlias("throw")]
 [Description("Throws an unexpected exception")]
-public class ThrowAlias : SelfExecutableQueryResult
+public sealed class ThrowAlias : SelfExecutableQueryResult
 {
     #region Properties
 

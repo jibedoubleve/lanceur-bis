@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class StoreTypeToStoreNameConverter : IValueConverter
+public sealed class StoreTypeToStoreNameConverter : IValueConverter
 {
     #region Methods
 

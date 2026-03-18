@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Tools.Logging;
 
-public class TestOutputHelperDecoratorForMicrosoftLogging<T> : BaseTestOutputHelperDecorator, ILogger<T>
+public sealed class TestOutputHelperDecoratorForMicrosoftLogging<T> : BaseTestOutputHelperDecorator, ILogger<T>
 {
     #region Fields
 
@@ -43,7 +43,7 @@ public class TestOutputHelperDecoratorForMicrosoftLogging<T> : BaseTestOutputHel
     #endregion
 }
 
-public class TestOutputHelperDecoratorForMicrosoftLogging : BaseTestOutputHelperDecorator, ILogger
+public sealed class TestOutputHelperDecoratorForMicrosoftLogging : BaseTestOutputHelperDecorator, ILogger
 {
     #region Constructors
 

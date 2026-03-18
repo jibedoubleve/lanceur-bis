@@ -4,7 +4,7 @@ using Humanizer;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class TextToTruncatedTextConverter : IValueConverter
+public sealed class TextToTruncatedTextConverter : IValueConverter
 {
     #region Fields
 

@@ -3,7 +3,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Ui.WPF.Services;
 
-public class ComputerInfoService : IComputerInfoService
+public sealed class ComputerInfoService : IComputerInfoService
 {
     #region Properties
 

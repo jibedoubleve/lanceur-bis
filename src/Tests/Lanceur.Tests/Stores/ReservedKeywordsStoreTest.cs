@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Stores;
 
-public class ReservedKeywordsStoreTest
+public sealed class ReservedKeywordsStoreTest
 {
     #region Fields
 

@@ -6,7 +6,7 @@ using StackExchange.Profiling.Data;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
-public class SQLiteProfiledConnectionFactory : IDbConnectionFactory
+public sealed class SQLiteProfiledConnectionFactory : IDbConnectionFactory
 {
     #region Fields
 

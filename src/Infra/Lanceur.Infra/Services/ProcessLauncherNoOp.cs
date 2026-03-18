@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
-public class ProcessLauncherNoOp : IProcessLauncher
+public sealed class ProcessLauncherNoOp : IProcessLauncher
 {
     #region Fields
 

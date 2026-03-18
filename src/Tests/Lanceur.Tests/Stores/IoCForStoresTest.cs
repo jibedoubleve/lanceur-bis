@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Stores;
 
-public class IoCForStoresTest : TestBase
+public sealed class IoCForStoresTest : TestBase
 {
     #region Constructors
 

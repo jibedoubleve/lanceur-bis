@@ -1,7 +1,7 @@
 ﻿namespace Lanceur.Core;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class MacroAttribute : Attribute
+public sealed class MacroAttribute : Attribute
 {
     #region Fields
 

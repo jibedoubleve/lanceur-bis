@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Responses;
 
-public class ExecutionResponse
+public sealed class ExecutionResponse
 {
     #region Properties
 

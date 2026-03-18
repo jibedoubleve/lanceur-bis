@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class LuaManagerShould
+public sealed class LuaManagerShould
 {
     #region Properties
 

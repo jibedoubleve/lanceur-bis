@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.LuaScripting;
 
-public class ScriptContext
+public sealed class ScriptContext
 {
     #region Properties
 

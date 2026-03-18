@@ -12,7 +12,7 @@ using Lanceur.SharedKernel.Extensions;
 namespace Lanceur.Infra.Stores;
 
 [Store(@"^\s{0,}/.*")]
-public class BookmarksStore : StoreBase, IStoreService
+public sealed class BookmarksStore : StoreBase, IStoreService
 {
     #region Fields
 

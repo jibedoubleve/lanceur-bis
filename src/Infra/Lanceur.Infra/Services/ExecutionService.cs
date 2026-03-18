@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
-public class ExecutionService : IExecutionService
+public sealed class ExecutionService : IExecutionService
 {
     #region Fields
 

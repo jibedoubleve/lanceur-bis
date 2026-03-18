@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Win32.Thumbnails;
 
 /// <summary>
-///     This class is responsible for loading the thumbnail of a Win32 application (not a packaged app) or a directory.
+///     This sealed class is responsible for loading the thumbnail of a Win32 application (not a packaged app) or a directory.
 ///     It provides functionality to retrieve and display preview images associated with executable files or folder
 ///     contents.
 /// </summary>
-internal class Win32ThumbnailService
+internal sealed class Win32ThumbnailService
 
 {
     #region Fields

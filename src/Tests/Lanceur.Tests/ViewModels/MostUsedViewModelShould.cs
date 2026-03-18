@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
+public sealed class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
 {
     #region Fields
 

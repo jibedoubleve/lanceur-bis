@@ -1,6 +1,6 @@
 namespace Lanceur.Core.Configuration.Sections.Application;
 
-public class SearchBoxSection
+public sealed class SearchBoxSection
 {
     #region Properties
 

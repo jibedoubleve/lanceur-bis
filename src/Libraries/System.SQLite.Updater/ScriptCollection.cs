@@ -2,7 +2,7 @@
 
 namespace System.SQLite.Updater;
 
-public class ScriptCollection : IEnumerable<string>
+public sealed class ScriptCollection : IEnumerable<string>
 {
     #region Fields
 

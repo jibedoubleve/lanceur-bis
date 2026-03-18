@@ -30,7 +30,7 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public class MainViewModelTests : ViewModelTester<MainViewModel>
+public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 {
     #region Constructors
 

@@ -5,7 +5,7 @@ using Lanceur.Ui.Core;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class KeyToDirectionConverter : IValueConverter
+public sealed class KeyToDirectionConverter : IValueConverter
 {
     #region Methods
 

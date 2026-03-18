@@ -5,7 +5,7 @@ using Lanceur.Core.Models;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class CmdLineArgumentsToVisibility : IValueConverter
+public sealed class CmdLineArgumentsToVisibility : IValueConverter
 {
     #region Methods
 

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class ReservedAliasStore : StoreBase, IStoreService
+public sealed class ReservedAliasStore : StoreBase, IStoreService
 {
     #region Fields
 

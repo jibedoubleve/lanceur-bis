@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class DateFormatConverter : IMultiValueConverter
+public sealed class DateFormatConverter : IMultiValueConverter
 {
     #region Methods
 

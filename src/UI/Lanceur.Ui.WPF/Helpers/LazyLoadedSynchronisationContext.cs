@@ -1,6 +1,6 @@
 namespace Lanceur.Ui.WPF.Helpers;
 
-public class LazyLoadedSynchronisationContext
+public sealed class LazyLoadedSynchronisationContext
 {
     #region Properties
 

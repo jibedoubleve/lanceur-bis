@@ -8,7 +8,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("stat")]
 [Description("Shows analytics about the usage of Lanceur")]
-public class AnalyticsAlias : SelfExecutableQueryResult
+public sealed class AnalyticsAlias : SelfExecutableQueryResult
 {
     #region Fields
 

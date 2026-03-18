@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class SearchServiceOrchestratorShould
+public sealed class SearchServiceOrchestratorShould
 {
     #region Methods
 

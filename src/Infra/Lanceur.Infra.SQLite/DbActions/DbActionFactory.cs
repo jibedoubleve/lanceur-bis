@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-internal class DbActionFactory : IDbActionFactory
+internal sealed class DbActionFactory : IDbActionFactory
 {
     #region Fields
 

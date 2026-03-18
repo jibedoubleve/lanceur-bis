@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store(@"^\s{0,}:.*")]
-public class EverythingStore : StoreBase, IStoreService
+public sealed class EverythingStore : StoreBase, IStoreService
 {
     #region Fields
 

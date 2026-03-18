@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Repositories;
 
-public class BlinkBrowserBookmarks : IBookmarkRepository
+public sealed class BlinkBrowserBookmarks : IBookmarkRepository
 {
     #region Fields
 

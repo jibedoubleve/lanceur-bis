@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Factories;
 
-public class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
+public sealed class BookmarkRepositoryFactory : IBookmarkRepositoryFactory
 {
     #region Fields
 

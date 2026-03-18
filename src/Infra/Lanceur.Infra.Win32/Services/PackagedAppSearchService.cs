@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;
 
-public class PackagedAppSearchService : AbstractPackagedAppSearchService, IPackagedAppSearchService
+public sealed class PackagedAppSearchService : AbstractPackagedAppSearchService, IPackagedAppSearchService
 {
     #region Fields
 

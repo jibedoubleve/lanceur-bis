@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class TextToParameterParserShould
+public sealed class TextToParameterParserShould
 {
     #region Methods
 

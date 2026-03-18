@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class ConnectionStringShould
+public sealed class ConnectionStringShould
 {
     #region Fields
 

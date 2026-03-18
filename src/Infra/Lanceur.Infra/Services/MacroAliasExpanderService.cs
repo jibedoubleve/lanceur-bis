@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Services;
 
 /// <inheritdoc />
-public class MacroAliasExpanderService : IMacroAliasExpanderService
+public sealed class MacroAliasExpanderService : IMacroAliasExpanderService
 {
     #region Fields
 

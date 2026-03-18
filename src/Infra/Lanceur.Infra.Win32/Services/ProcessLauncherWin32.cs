@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;
 
-public class ProcessLauncherWin32 : IProcessLauncher
+public sealed class ProcessLauncherWin32 : IProcessLauncher
 {
     #region Fields
 

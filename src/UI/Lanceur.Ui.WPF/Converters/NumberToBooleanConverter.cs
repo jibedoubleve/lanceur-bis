@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class NumberToBooleanConverter : IValueConverter
+public sealed class NumberToBooleanConverter : IValueConverter
 {
     #region Methods
 

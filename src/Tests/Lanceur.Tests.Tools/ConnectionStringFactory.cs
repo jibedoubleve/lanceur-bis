@@ -37,7 +37,7 @@ public static class ConnectionStringFactory
 
     #endregion
 
-    private class ConnectionString : IConnectionString
+    private sealed class ConnectionString : IConnectionString
     {
         #region Fields
 

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class ClipboardServiceShould
+public sealed class ClipboardServiceShould
 {
     #region Fields
 

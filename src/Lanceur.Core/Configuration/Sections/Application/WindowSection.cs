@@ -2,7 +2,7 @@
 
 namespace Lanceur.Core.Configuration.Sections.Application;
 
-public class WindowSection
+public sealed class WindowSection
 {
     #region Properties
 

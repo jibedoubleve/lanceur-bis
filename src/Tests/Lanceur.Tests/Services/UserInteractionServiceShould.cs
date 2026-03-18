@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class UserInteractionServiceShould : IDisposable
+public sealed class UserInteractionServiceShould : IDisposable
 {
     #region Methods
 

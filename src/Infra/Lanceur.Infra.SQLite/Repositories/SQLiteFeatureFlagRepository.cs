@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace Lanceur.Infra.SQLite.Repositories;
 
 /// <inheritdoc cref="IFeatureFlagRepository" />
-public class SQLiteFeatureFlagRepository : SQLiteRepositoryBase, IFeatureFlagRepository
+public sealed class SQLiteFeatureFlagRepository : SQLiteRepositoryBase, IFeatureFlagRepository
 {
     #region Constructors
 

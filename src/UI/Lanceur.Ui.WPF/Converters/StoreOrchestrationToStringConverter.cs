@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class StoreOrchestrationToStringConverter : IValueConverter
+public sealed class StoreOrchestrationToStringConverter : IValueConverter
 {
     #region Fields
 

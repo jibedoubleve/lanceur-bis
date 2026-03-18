@@ -12,7 +12,7 @@ public static class GithubSectionExtensions
     #endregion
 }
 
-public class GithubSection
+public sealed class GithubSection
 {
     #region Constructors
 

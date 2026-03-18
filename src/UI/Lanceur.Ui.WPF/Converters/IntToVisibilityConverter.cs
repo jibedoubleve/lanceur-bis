@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-internal class IntToVisibilityConverter : IValueConverter
+internal sealed class IntToVisibilityConverter : IValueConverter
 {
     #region Methods
 

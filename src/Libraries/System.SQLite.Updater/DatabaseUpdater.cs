@@ -4,7 +4,7 @@ using Dapper;
 
 namespace System.SQLite.Updater;
 
-public class DatabaseUpdater
+public sealed class DatabaseUpdater
 {
     #region Fields
 

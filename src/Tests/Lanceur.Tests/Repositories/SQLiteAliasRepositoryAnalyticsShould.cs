@@ -17,7 +17,7 @@ namespace Lanceur.Tests.Repositories;
 ///     Tests for the analytics and reporting queries of <see cref="SQLiteAliasRepository" />.
 ///     These tests verify that queries return correct data based on usage history, doubloons, activity, and alias state.
 /// </summary>
-public class SQLiteAliasRepositoryAnalyticsShould : TestBase
+public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
 {
     #region Constructors
 

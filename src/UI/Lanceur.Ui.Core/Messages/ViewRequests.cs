@@ -4,18 +4,18 @@ using Lanceur.Ui.Core.Constants;
 
 namespace Lanceur.Ui.Core.Messages;
 
-public class KeepAliveMessage(bool value) : ValueChangedMessage<bool>(value);
+public sealed class KeepAliveMessage(bool value) : ValueChangedMessage<bool>(value);
 
-public class SetQueryMessage(string value) : ValueChangedMessage<string>(value);
+public sealed class SetQueryMessage(string value) : ValueChangedMessage<string>(value);
 
-public class SaveAliasMessage(AliasQueryResult alias) : ValueChangedMessage<AliasQueryResult>(alias);
+public sealed class SaveAliasMessage(AliasQueryResult alias) : ValueChangedMessage<AliasQueryResult>(alias);
 
-public class ChangeCoordinateMessage(Coordinate value) : ValueChangedMessage<Coordinate>(value);
+public sealed class ChangeCoordinateMessage(Coordinate value) : ValueChangedMessage<Coordinate>(value);
 
 /*
  * MESSAGE BOX MESSAGES
  */
-public class QuestionRequestMessage(
+public sealed class QuestionRequestMessage(
     object content,
     string title = "Question",
     string yesTextMessage = ButtonLabels.Yes,
@@ -41,11 +41,11 @@ public class QuestionRequestMessage(
  */
 public enum MessageLevel { Success, Warning }
 
-public class NotificationMessage((MessageLevel Level, string Title, string Message) value)
+public sealed class NotificationMessage((MessageLevel Level, string Title, string Message) value)
     : ValueChangedMessage<(MessageLevel Level, string Title, string Message)>(value);
 
 /*
  * NAVIGATION
  */
-public class NavigationMessage((Type ViewType, object? DataContext) value)
+public sealed class NavigationMessage((Type ViewType, object? DataContext) value)
     : ValueChangedMessage<(Type ViewType, object? DataContext)>(value);

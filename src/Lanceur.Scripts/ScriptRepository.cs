@@ -3,7 +3,7 @@
 namespace Lanceur.Scripts;
 
 /// <summary>
-///     This class serves the sole purpose of returning the assembly where the SQL scripts are defined.
+///     This sealed class serves the sole purpose of returning the assembly where the SQL scripts are defined.
 ///     It is used by the Database Update Manager to locate and load SQL scripts.
 /// </summary>
 public static class ScriptRepository
@@ -22,7 +22,7 @@ public static class ScriptRepository
     #region Properties
 
     /// <summary>
-    ///     Gets the assembly where this class is defined.
+    ///     Gets the assembly where this sealed class is defined.
     /// </summary>
     public static Assembly Asm => typeof(ScriptRepository).Assembly;
 

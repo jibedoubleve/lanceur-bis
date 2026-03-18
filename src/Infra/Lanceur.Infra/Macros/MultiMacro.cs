@@ -9,7 +9,7 @@ namespace Lanceur.Infra.Macros;
 
 [Macro("multi")]
 [Description("Allow to start multiple alias at once")]
-public class MultiMacro : MacroQueryResult
+public sealed class MultiMacro : MacroQueryResult
 {
     #region Fields
 

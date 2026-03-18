@@ -1,6 +1,6 @@
 namespace Lanceur.Core.Configuration.Sections.Application;
 
-public class ResourceMonitorSection
+public sealed class ResourceMonitorSection
 {
     #region Constructors
 

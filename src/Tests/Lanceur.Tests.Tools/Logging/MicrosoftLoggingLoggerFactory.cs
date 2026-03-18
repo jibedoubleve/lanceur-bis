@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Tools.Logging;
 
-public class MicrosoftLoggingLoggerFactory : ILoggerFactory
+public sealed class MicrosoftLoggingLoggerFactory : ILoggerFactory
 {
     #region Fields
 

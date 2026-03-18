@@ -5,7 +5,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-internal class GetAllAliasDbAction
+internal sealed class GetAllAliasDbAction
 {
     #region Fields
 

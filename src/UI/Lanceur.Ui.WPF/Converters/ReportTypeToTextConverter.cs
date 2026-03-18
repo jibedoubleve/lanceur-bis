@@ -4,7 +4,7 @@ using Lanceur.Core.Constants;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class ReportTypeToTextConverter : IValueConverter
+public sealed class ReportTypeToTextConverter : IValueConverter
 {
     #region Methods
 

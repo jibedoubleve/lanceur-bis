@@ -5,7 +5,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.SQLite;
 
-internal class SQLiteDatabaseUpdateManager
+internal sealed class SQLiteDatabaseUpdateManager
 {
     #region Fields
 

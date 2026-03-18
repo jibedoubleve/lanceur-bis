@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.SharedKernel.Logging;
 
-public class LogScope
+public sealed class LogScope
 {
     #region Fields
 

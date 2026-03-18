@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 namespace Lanceur.Infra.SQLite.Repositories;
 
 /// <inheritdoc cref="ISettingsProvider{ApplicationSettings}" />
-public class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, ISettingsProvider<ApplicationSettings>
+public sealed class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, ISettingsProvider<ApplicationSettings>
 {
     #region Fields
 

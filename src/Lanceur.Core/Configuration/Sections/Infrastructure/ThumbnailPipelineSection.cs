@@ -6,7 +6,7 @@ namespace Lanceur.Core.Configuration.Sections.Infrastructure;
 ///     Configuration section for the thumbnail update pipeline.
 ///     Controls the behaviour of the bounded channel used to queue thumbnail requests.
 /// </summary>
-public class ThumbnailPipelineSection
+public sealed class ThumbnailPipelineSection
 {
     #region Properties
 

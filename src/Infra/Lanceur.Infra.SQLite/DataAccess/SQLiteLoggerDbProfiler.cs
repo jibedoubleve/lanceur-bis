@@ -5,7 +5,7 @@ using StackExchange.Profiling.Data;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
-public class SQLiteLoggerDbProfiler : LoggerDbProfiler
+public sealed class SQLiteLoggerDbProfiler : LoggerDbProfiler
 {
     #region Fields
 

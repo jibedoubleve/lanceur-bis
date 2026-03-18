@@ -1,7 +1,7 @@
 namespace Lanceur.Core.Managers;
 
 /// <inheritdoc />
-public class StoreOrchestrationFactory : IStoreOrchestrationFactory
+public sealed class StoreOrchestrationFactory : IStoreOrchestrationFactory
 {
     #region Methods
 

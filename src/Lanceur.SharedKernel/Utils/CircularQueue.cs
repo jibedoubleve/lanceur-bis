@@ -7,7 +7,7 @@ namespace Lanceur.SharedKernel.Utils;
 ///     When the maximum size is reached, adding a new item will remove the oldest item.
 /// </summary>
 /// <typeparam name="T">The type of elements in the queue.</typeparam>
-public class CircularQueue<T> : IEnumerable<T>
+public sealed class CircularQueue<T> : IEnumerable<T>
 {
     #region Fields
 
@@ -19,7 +19,7 @@ public class CircularQueue<T> : IEnumerable<T>
     #region Constructors
 
     /// <summary>
-    ///     Initializes a new instance of the CircularQueue class with the specified maximum size.
+    ///     Initializes a new instance of the CircularQueue sealed class with the specified maximum size.
     /// </summary>
     /// <param name="maxSize">The maximum number of elements the queue can hold.</param>
     public CircularQueue(int maxSize)

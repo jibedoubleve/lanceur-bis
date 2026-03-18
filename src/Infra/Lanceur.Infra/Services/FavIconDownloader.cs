@@ -16,7 +16,7 @@ namespace Lanceur.Infra.Services;
 ///     Failed attempts are recorded in a memory cache to avoid redundant retries
 ///     until the configured retry delay has elapsed.
 /// </summary>
-public class FavIconDownloader : IFavIconDownloader
+public sealed class FavIconDownloader : IFavIconDownloader
 {
     #region Fields
 

@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store]
-public class AdditionalParametersStore : StoreBase, IStoreService
+public sealed class AdditionalParametersStore : StoreBase, IStoreService
 {
     #region Fields
 

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Ui;
 
-public class ConverterShould
+public sealed class ConverterShould
 {
     #region Methods
 
@@ -28,7 +28,7 @@ public class ConverterShould
 
     #endregion
 
-    private class DataConvertStoreTypeAsExpected : IEnumerable<object[]>
+    private sealed class DataConvertStoreTypeAsExpected : IEnumerable<object[]>
     {
         #region Methods
 

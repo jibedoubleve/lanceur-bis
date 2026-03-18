@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.DbActions;
 
-public class AliasSaveDbAction
+public sealed class AliasSaveDbAction
 {
     #region Fields
 

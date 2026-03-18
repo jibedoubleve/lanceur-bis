@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Models;
 
-public class QueryResultMacroShould
+public sealed class QueryResultMacroShould
 {
     #region Methods
 

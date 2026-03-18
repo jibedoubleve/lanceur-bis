@@ -10,7 +10,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("add")]
 [Description("Add a new alias")]
-public class AddAlias : SelfExecutableQueryResult
+public sealed class AddAlias : SelfExecutableQueryResult
 {
     #region Fields
 

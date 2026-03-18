@@ -4,9 +4,9 @@ namespace Lanceur.Core;
 
 /// <summary>
 ///     Represents a source for assemblies that contain macros and reserved keywords.
-///     This class provides access to two specific assemblies: macros, reserved keywords...
+///     This sealed class provides access to two specific assemblies: macros, reserved keywords...
 /// </summary>
-public class AssemblySource
+public record AssemblySource
 {
     #region Properties
 

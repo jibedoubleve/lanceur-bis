@@ -7,7 +7,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Lanceur.Infra.Repositories;
 
-public class JsonInfrastructureSettingsProvider : ISettingsProvider<InfrastructureSettings>
+public sealed class JsonInfrastructureSettingsProvider : ISettingsProvider<InfrastructureSettings>
 {
     #region Fields
 

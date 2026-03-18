@@ -5,7 +5,7 @@ using Lanceur.Core.Utils;
 
 namespace Lanceur.Infra.Services;
 
-public class AliasManagementService : IAliasManagementService
+public sealed class AliasManagementService : IAliasManagementService
 {
     #region Fields
 

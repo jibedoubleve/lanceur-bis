@@ -9,7 +9,7 @@ namespace Lanceur.SharedKernel.Utils;
 ///     Returns a different value depending on whether the DEBUG symbol is defined.
 /// </returns>
 /// <typeparam name="T">The type of the value to return</typeparam>
-public class Conditional<T>
+public sealed class Conditional<T>
 {
     #region Fields
 

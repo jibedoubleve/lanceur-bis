@@ -3,7 +3,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Services;
 
-public class FeatureFlagService : IFeatureFlagService
+public sealed class FeatureFlagService : IFeatureFlagService
 {
     #region Fields
 

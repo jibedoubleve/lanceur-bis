@@ -5,7 +5,7 @@ using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-internal class DebugToVisibilityConverter : IValueConverter
+internal sealed class DebugToVisibilityConverter : IValueConverter
 {
     #region Fields
 

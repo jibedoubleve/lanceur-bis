@@ -12,12 +12,12 @@ using Xunit;
 
 namespace Lanceur.Tests.Stores;
 
-public class StoreShortcutServiceTest
+public sealed class StoreShortcutServiceTest
 {
     #region Stubs
 
     [Store("overridable")]
-    private class OverridableStore : IStoreService
+    private sealed class OverridableStore : IStoreService
     {
         #region Properties
 
@@ -35,7 +35,7 @@ public class StoreShortcutServiceTest
     }
 
     [Store("non-overridable")]
-    private class NonOverridableStore : IStoreService
+    private sealed class NonOverridableStore : IStoreService
     {
         #region Properties
 
@@ -53,7 +53,7 @@ public class StoreShortcutServiceTest
     }
 
     [Store("overridable-2")]
-    private class AnotherOverridableStore : IStoreService
+    private sealed class AnotherOverridableStore : IStoreService
     {
         #region Properties
 

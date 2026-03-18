@@ -7,7 +7,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Services;
 
-public class SearchServiceOrchestrator : ISearchServiceOrchestrator
+public sealed class SearchServiceOrchestrator : ISearchServiceOrchestrator
 {
     #region Fields
 

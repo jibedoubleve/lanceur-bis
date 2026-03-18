@@ -3,7 +3,7 @@ using Humanizer;
 
 namespace Lanceur.Ui.Core.Utils.Watchdogs;
 
-public class Watchdog : IWatchdog
+public sealed class Watchdog : IWatchdog
 {
     #region Fields
 
@@ -14,7 +14,7 @@ public class Watchdog : IWatchdog
     #region Constructors
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Watchdog" /> class with a countdown duration and an action to execute.
+    ///     Initializes a new instance of the <see cref="Watchdog" /> sealed class with a countdown duration and an action to execute.
     /// </summary>
     /// <param name="interval">The duration of the interval in milliseconds.</param>
     /// <param name="action">The action to execute when the countdown reaches zero.</param>

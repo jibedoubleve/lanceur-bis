@@ -6,7 +6,7 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.SQLite;
 
-public class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionService
+public sealed class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersionService
 {
     #region Constructors
 

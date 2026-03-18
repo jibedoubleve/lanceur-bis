@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Stores;
 
-public class SteamGameStoreTest
+public sealed class SteamGameStoreTest
 {
     #region Fields
 

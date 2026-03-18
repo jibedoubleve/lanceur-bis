@@ -7,7 +7,7 @@ namespace Lanceur.Tests.Tools.ReservedAliases;
 
 [ReservedAlias(Names.Name1)]
 [Description("description")]
-public class ExecutableTestAlias : MacroQueryResult
+public sealed class ExecutableTestAlias : MacroQueryResult
 {
     #region Methods
 

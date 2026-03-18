@@ -4,7 +4,7 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class InvertPlotTypeToBooleanConverter : IValueConverter
+public sealed class InvertPlotTypeToBooleanConverter : IValueConverter
 {
     #region Methods
 

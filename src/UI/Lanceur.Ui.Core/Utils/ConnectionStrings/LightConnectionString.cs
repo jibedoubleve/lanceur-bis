@@ -3,7 +3,7 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
 
-public class LightConnectionString : BaseConnectionString, IConnectionString
+public sealed class LightConnectionString : BaseConnectionString, IConnectionString
 {
     #region Fields
 

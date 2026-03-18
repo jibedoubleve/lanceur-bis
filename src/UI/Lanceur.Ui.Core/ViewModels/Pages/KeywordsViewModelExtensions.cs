@@ -51,7 +51,7 @@ public static class KeywordsViewModelExtensions
     }
 
     /// <summary>
-    ///     Creates a new instance of the <see cref="AdditionalParameter" /> class using the
+    ///     Creates a new instance of the <see cref="AdditionalParameter" /> sealed class using the
     ///     <see cref="KeywordsViewModel.SelectedAlias" /> from the provided <paramref name="keywordsViewModel" />.
     ///     This method pre-fills the object with the AliasId based on the selected alias if available.
     /// </summary>

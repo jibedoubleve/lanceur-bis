@@ -9,7 +9,7 @@ namespace Lanceur.Tests.Tools.ViewModels;
 ///     Manages a collection of visitor functions that allow users to configure
 ///     custom behaviour for the <c>serviceProvider</c> with specific types.
 /// </summary>
-public class ServiceVisitors
+public sealed class ServiceVisitors
 {
     #region Properties
 

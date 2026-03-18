@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.WPF.Helpers;
 
-public class PageNavigator
+public sealed class PageNavigator
 {
     #region Fields
 

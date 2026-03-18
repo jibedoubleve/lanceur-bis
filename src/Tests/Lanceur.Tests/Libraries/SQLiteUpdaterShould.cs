@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Libraries;
 
-public class SQLiteUpdaterShould : TestBase
+public sealed class SQLiteUpdaterShould : TestBase
 {
     #region Fields
 

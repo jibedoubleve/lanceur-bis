@@ -10,7 +10,7 @@ namespace Lanceur.Ui.WPF.ReservedAliases;
 
 [ReservedAlias("clrbm")]
 [Description("Clears or invalidates the bookmark cache to ensure fresh data.")]
-public class ClearBookmarkCacheAlias : SelfExecutableQueryResult
+public sealed class ClearBookmarkCacheAlias : SelfExecutableQueryResult
 {
     #region Fields
 

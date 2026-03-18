@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Services;
 
 /// <inheritdoc />
-public class SearchService : ISearchService
+public sealed class SearchService : ISearchService
 {
     #region Fields
 

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Lanceur.SharedKernel.Logging;
 
-public class TraceLoggerScope : IDisposable
+public sealed class TraceLoggerScope : IDisposable
 {
     #region Fields
 

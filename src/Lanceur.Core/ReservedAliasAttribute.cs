@@ -1,7 +1,7 @@
 ﻿namespace Lanceur.Core;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class ReservedAliasAttribute : Attribute
+public sealed class ReservedAliasAttribute : Attribute
 {
     #region Constructors
 

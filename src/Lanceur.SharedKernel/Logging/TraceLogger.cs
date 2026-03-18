@@ -62,4 +62,4 @@ public class TraceLogger : ILogger
 ///     This is an implementation to allow getting logger with the
 ///     generics
 /// </remarks>
-public class TraceLogger<TSource> : TraceLogger, ILogger<TSource> { }
+public sealed class TraceLogger<TSource> : TraceLogger, ILogger<TSource> { }

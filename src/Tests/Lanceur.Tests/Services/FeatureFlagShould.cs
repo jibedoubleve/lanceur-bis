@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public class FeatureFlagShould : TestBase
+public sealed class FeatureFlagShould : TestBase
 {
     #region Constructors
 

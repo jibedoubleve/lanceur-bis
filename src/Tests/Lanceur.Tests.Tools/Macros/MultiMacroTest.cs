@@ -6,7 +6,7 @@ namespace Lanceur.Tests.Tools.Macros;
 
 [Macro("multi")]
 [Description("Allow to start multiple alias at once")]
-public class MultiMacroTest : MacroQueryResult
+public sealed class MultiMacroTest : MacroQueryResult
 {
     #region Methods
 

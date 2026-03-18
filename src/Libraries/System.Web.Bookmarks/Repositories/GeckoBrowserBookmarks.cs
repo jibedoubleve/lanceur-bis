@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace System.Web.Bookmarks.Repositories;
 
-public class GeckoBrowserBookmarks : IBookmarkRepository
+public sealed class GeckoBrowserBookmarks : IBookmarkRepository
 {
     #region Fields
 

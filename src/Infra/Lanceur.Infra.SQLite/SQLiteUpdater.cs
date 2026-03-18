@@ -8,9 +8,9 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.SQLite;
 
 /// <summary>
-///     This class is responsible for ensuring that the SQLite database is updated to the latest version.
+///     This sealed class is responsible for ensuring that the SQLite database is updated to the latest version.
 /// </summary>
-public class SQLiteUpdater
+public sealed class SQLiteUpdater
 {
     #region Fields
 

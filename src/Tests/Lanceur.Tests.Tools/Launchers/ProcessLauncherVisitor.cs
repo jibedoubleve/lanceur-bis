@@ -4,7 +4,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Tests.Tools.Launchers;
 
-public class ProcessLauncherVisitor : IProcessLauncher
+public sealed class ProcessLauncherVisitor : IProcessLauncher
 {
     #region Fields
 

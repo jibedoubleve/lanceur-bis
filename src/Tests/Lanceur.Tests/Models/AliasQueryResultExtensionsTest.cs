@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Models;
 
-public class AliasQueryResultExtensionsTest
+public sealed class AliasQueryResultExtensionsTest
 {
     #region Methods
 

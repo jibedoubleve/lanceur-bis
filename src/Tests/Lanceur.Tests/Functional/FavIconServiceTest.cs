@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public class FavIconServiceTest
+public sealed class FavIconServiceTest
 {
     #region Fields
 

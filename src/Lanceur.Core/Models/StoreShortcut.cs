@@ -1,6 +1,6 @@
 namespace Lanceur.Core.Models;
 
-public class StoreShortcut : ObservableModel
+public sealed class StoreShortcut : ObservableModel
 {
 
     #region Properties

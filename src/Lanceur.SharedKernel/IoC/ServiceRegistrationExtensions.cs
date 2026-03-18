@@ -8,7 +8,7 @@ namespace Lanceur.SharedKernel.IoC;
 /// <summary>
 ///     Provides extension methods for the <see cref="IServiceCollection" /> interface to facilitate the registration
 ///     of types for dependency injection based on their names and assembly metadata.
-///     This class contains methods to register types that end with a specified suffix (e.g., "ViewModel") as either
+///     This sealed class contains methods to register types that end with a specified suffix (e.g., "ViewModel") as either
 ///     transient or singleton instances, depending on whether they are decorated with the
 ///     <see cref="SingletonAttribute" />.
 /// </summary>

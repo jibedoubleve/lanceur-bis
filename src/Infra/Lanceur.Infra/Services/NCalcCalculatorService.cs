@@ -6,7 +6,7 @@ using NCalc;
 namespace Lanceur.Infra.Services;
 
 /// <inheritdoc />
-public class NCalcCalculatorService : ICalculatorService
+public sealed class NCalcCalculatorService : ICalculatorService
 {
     #region Fields
 

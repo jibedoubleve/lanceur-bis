@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Repositories;
 
-public class SQLiteVersionServiceShould : TestBase
+public sealed class SQLiteVersionServiceShould : TestBase
 {
     #region Constructors
 

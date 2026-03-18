@@ -5,7 +5,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Infra.Win32.Services;
 
-public class AppRestartService : IAppRestartService
+public sealed class AppRestartService : IAppRestartService
 {
     #region Fields
 

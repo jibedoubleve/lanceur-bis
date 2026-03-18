@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Models;
 
-public class SelectableAliasQueryResult : AliasQueryResult
+public sealed class SelectableAliasQueryResult : AliasQueryResult
 {
     #region Properties
 

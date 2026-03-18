@@ -6,7 +6,7 @@ namespace Lanceur.Core.Configuration.Sections.Application;
 ///     Represents a section of the store configuration, providing properties
 ///     for managing browser bookmark retrieval settings.
 /// </summary>
-public class StoreSection
+public sealed class StoreSection
 {
     #region Properties
 

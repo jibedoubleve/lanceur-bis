@@ -21,7 +21,7 @@ internal static class AliasValidationRulesExtensions
     #endregion
 }
 
-public class AliasValidationService : IAliasValidationService
+public sealed class AliasValidationService : IAliasValidationService
 {
     #region Fields
 

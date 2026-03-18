@@ -4,7 +4,7 @@ using Lanceur.Core.Services;
 
 namespace Lanceur.Ui.Core.Utils;
 
-public class Enigma : IEnigma
+public sealed class Enigma : IEnigma
 {
     #region Methods
 

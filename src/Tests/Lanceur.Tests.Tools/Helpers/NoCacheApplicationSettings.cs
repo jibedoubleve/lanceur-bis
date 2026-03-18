@@ -6,7 +6,7 @@ namespace Lanceur.Tests.Tools.Helpers;
 ///     Represents the configuration settings for the application with no cache as default.
 ///     These settings are stored directly within the database and define key behaviours and preferences.
 /// </summary>
-internal class NoCacheApplicationSettings : ApplicationSettings
+internal sealed class NoCacheApplicationSettings : ApplicationSettings
 {
     #region Constructors
 

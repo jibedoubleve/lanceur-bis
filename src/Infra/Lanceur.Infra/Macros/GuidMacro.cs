@@ -7,7 +7,7 @@ namespace Lanceur.Infra.Macros;
 
 [Macro("guid")]
 [Description("Creates a guid and save it into the clipboard")]
-public class GuidMacro : MacroQueryResult
+public sealed class GuidMacro : MacroQueryResult
 {
     #region Fields
 

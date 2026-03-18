@@ -1,6 +1,6 @@
 namespace System.Web.Bookmarks.RepositoryConfiguration;
 
-internal class DummyBlinkConfiguration : IBlinkBrowserConfiguration
+internal sealed class DummyBlinkConfiguration : IBlinkBrowserConfiguration
 {
     #region Properties
 

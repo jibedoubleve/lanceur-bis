@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Models;
 
-public class CmdlineShould
+public sealed class CmdlineShould
 {
     #region Methods
 

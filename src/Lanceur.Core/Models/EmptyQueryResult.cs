@@ -1,3 +1,3 @@
 ﻿namespace Lanceur.Core.Models;
 
-public class EmptyQueryResult : QueryResult { }
+public sealed class EmptyQueryResult : QueryResult { }

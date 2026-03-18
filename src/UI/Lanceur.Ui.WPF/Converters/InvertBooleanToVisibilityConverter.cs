@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace Lanceur.Ui.WPF.Converters;
 
-public class InvertBooleanToVisibilityConverter : IValueConverter
+public sealed class InvertBooleanToVisibilityConverter : IValueConverter
 {
     #region Methods
 

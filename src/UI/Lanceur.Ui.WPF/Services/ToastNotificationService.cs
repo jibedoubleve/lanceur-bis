@@ -10,7 +10,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Lanceur.Ui.WPF.Services;
 
-public class ToastUserNotificationService : IUserGlobalNotificationService
+public sealed class ToastUserNotificationService : IUserGlobalNotificationService
 {
     #region Fields
 
