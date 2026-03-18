@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Concurrent;
+using System.Data;
 using System.Data.SQLite;
 using Dapper;
 using Lanceur.Core;
@@ -19,6 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using OpenTK.Graphics.OpenGL;
 using Shouldly;
 using Xunit;
 
@@ -51,6 +53,153 @@ public class SearchServiceTest : TestBase
     #endregion
 
     #region Methods
+
+    #region Helpers for incremental filtering tests
+
+    private static IStoreService BuildStoreServiceWithResults(
+        IEnumerable<QueryResult> searchResults,
+        IEnumerable<QueryResult>? getAllResults = null
+    )
+    {
+        var store = Substitute.For<IStoreService>();
+        store.StoreOrchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
+        store.Search(Arg.Any<Cmdline>()).Returns(searchResults);
+        store.GetAll().Returns(getAllResults ?? []);
+        return store;
+    }
+
+    private SearchService BuildSearchServiceForIncrementalFilterTest(IStoreService storeService)
+    {
+        var sc = new ServiceCollection();
+        sc.AddTestOutputHelper(OutputHelper)
+          .AddMockSingleton<IMacroAliasExpanderService>((_, mock) => {
+              mock.Expand(Arg.Any<QueryResult[]>()).Returns(x => x.Arg<QueryResult[]>());
+              return mock;
+          })
+          .AddMockSingleton<ISearchServiceOrchestrator>((_, mock) => {
+              mock.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>()).Returns(true);
+              return mock;
+          })
+          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+          .AddTransient<SearchService>();
+        sc.AddSingleton(storeService);
+        return sc.BuildServiceProvider().GetRequiredService<SearchService>();
+    }
+
+    #endregion
+
+    [Fact]
+    public async Task When_first_search_Then_stores_are_queried()
+    {
+        // ARRANGE
+        var store = BuildStoreServiceWithResults([]);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("app", "fo"));
+
+        // ASSERT
+        store.Received(1).Search(Arg.Any<Cmdline>());
+    }
+
+    [Fact]
+    public async Task When_query_refines_previous_Then_stores_are_not_queried_again()
+    {
+        // ARRANGE
+        QueryResult[] storeResults =
+        [
+            new AliasQueryResult { Name = "foo" },
+            new AliasQueryResult { Name = "foobar" },
+            new AliasQueryResult { Name = "baz" }
+        ];
+        var store = BuildStoreServiceWithResults(storeResults);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("app", "f"));
+        await service.SearchAsync(result, new Cmdline("app", "fo"));
+
+        // ASSERT
+        store.Received(1).Search(Arg.Any<Cmdline>());
+    }
+
+    [Fact]
+    public async Task When_query_is_different_from_previous_Then_stores_are_queried_again()
+    {
+        // ARRANGE
+        var store = BuildStoreServiceWithResults([]);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("app", "fo"));
+        await service.SearchAsync(result, new Cmdline("app", "bar"));
+
+        // ASSERT
+        store.Received(2).Search(Arg.Any<Cmdline>());
+    }
+
+    [Fact]
+    public async Task When_query_refines_previous_Then_non_matching_results_are_pruned()
+    {
+        // ARRANGE
+        QueryResult[] storeResults =
+        [
+            new AliasQueryResult { Name = "foo" },
+            new AliasQueryResult { Name = "foobar" },
+            new AliasQueryResult { Name = "baz" }
+        ];
+        var store = BuildStoreServiceWithResults(storeResults);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("app", "f"));
+        await service.SearchAsync(result, new Cmdline("app", "foo"));
+
+        // ASSERT
+        result.ShouldSatisfyAllConditions(
+            r => r.Count.ShouldBe(2),
+            r => r.ShouldAllBe(x => x.Name.StartsWith("foo"))
+        );
+    }
+
+    [Fact]
+    public async Task When_query_is_empty_Then_previous_results_are_removed_from_destination()
+    {
+        // ARRANGE
+        var store = BuildStoreServiceWithResults([]);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
+        List<QueryResult> result = [new AliasQueryResult { Name = "existing" }];
+
+        // ACT
+        await service.SearchAsync(result, Cmdline.Empty);
+
+        // ASSERT
+        result.ShouldNotContain(x => x.Name == "existing");
+    }
+
+    [Fact]
+    public async Task When_query_is_empty_and_doesReturnAllIfEmpty_Then_all_results_are_returned()
+    {
+        // ARRANGE
+        QueryResult[] allResults =
+        [
+            new AliasQueryResult { Name = "foo" },
+            new AliasQueryResult { Name = "bar" }
+        ];
+        var store = BuildStoreServiceWithResults([], allResults);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, Cmdline.Empty, doesReturnAllIfEmpty: true);
+
+        // ASSERT
+        result.Count.ShouldBe(2);
+    }
 
     [Fact]
     public void When_alias_has_negative_counter_Then_usage_is_ignored()
