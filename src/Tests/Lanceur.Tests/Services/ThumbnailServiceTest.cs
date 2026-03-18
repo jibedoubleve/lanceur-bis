@@ -1,4 +1,6 @@
 using Dapper;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -6,6 +8,7 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
+using Lanceur.Infra.Win32.Services;
 using Lanceur.Infra.Win32.Thumbnails;
 using Lanceur.Infra.Win32.Thumbnails.Strategies;
 using Lanceur.Tests.Tools;
@@ -155,6 +158,40 @@ public class ThumbnailServiceTest : TestBase
             a => a.Count.ShouldBe(1),
             a => a[0].AdditionalParameters.Count.ShouldBe(0)
         );
+    }
+
+    [Fact]
+    public async Task When_strategy_resolves_thumbnail_Then_remaining_strategies_are_skipped()
+    {
+        // ARRANGE
+        var alias = new AliasQueryResult { FileName = "some_file_that_does_not_exist.exe" };
+        var processed = new TaskCompletionSource();
+
+        var first = Substitute.For<IThumbnailStrategy>();
+        var second = Substitute.For<IThumbnailStrategy>();
+        var third = Substitute.For<IThumbnailStrategy>();
+
+        first.Priority.Returns(0);
+        first.UpdateThumbnailAsync(Arg.Any<AliasQueryResult>(), Arg.Any<CancellationToken>())
+             .Returns(_ => {
+                 processed.TrySetResult();
+                 return Task.FromResult(true);
+             });
+        second.Priority.Returns(1);
+        third.Priority.Returns(2);
+
+        var section = Substitute.For<ISection<ThumbnailPipelineSection>>();
+        section.Value.Returns(new ThumbnailPipelineSection { ConsumerCount = 1 });
+
+        await using var service = new ThumbnailService(LoggerFactory, [first, second, third], section);
+
+        // ACT
+        service.UpdateThumbnail(alias);
+        await processed.Task;
+
+        // ASSERT
+        await second.DidNotReceive().UpdateThumbnailAsync(Arg.Any<AliasQueryResult>(), Arg.Any<CancellationToken>());
+        await third.DidNotReceive().UpdateThumbnailAsync(Arg.Any<AliasQueryResult>(), Arg.Any<CancellationToken>());
     }
 
     [Theory]
