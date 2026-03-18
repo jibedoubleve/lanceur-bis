@@ -33,14 +33,15 @@ public class FavIconAppThumbnailStrategy : ThumbnailStrategy
 
     #region Methods
 
-    protected override async Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    protected override async Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
         var thumbnail = await _favIconService.UpdateFaviconAsync(
             alias,
             _ => alias.ResolveThumbnailAbsolutePath(),
             cancellationToken
         );
-        if (thumbnail.IsNullOrEmpty()) { return; }
+        if (thumbnail.IsNullOrEmpty()) { return false; }
 
         _logger.LogInformation(
             "Updating for alias {Alias} favicon from {Thumbnail} to {FavIconPath}",
@@ -51,6 +52,7 @@ public class FavIconAppThumbnailStrategy : ThumbnailStrategy
 
         alias.Thumbnail = thumbnail;
         _aliasManagementService.UpdateThumbnail(alias);
+        return true;
     }
 
     #endregion

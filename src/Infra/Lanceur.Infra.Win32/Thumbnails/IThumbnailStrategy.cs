@@ -23,11 +23,15 @@ public interface IThumbnailStrategy
 
     /// <summary>
     ///     Updates the thumbnail associated with the specified alias.
-    ///     If the thumbnail is already cached, the update may be skipped.
     /// </summary>
     /// <param name="alias">The alias whose thumbnail needs to be updated.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
-    Task UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken);
+    /// <returns>
+    ///     <c>true</c> if the thumbnail was resolved (already cached or successfully fetched),
+    ///     allowing the caller to skip remaining strategies; <c>false</c> if this strategy
+    ///     could not resolve the thumbnail and the next strategy should be tried.
+    /// </returns>
+    Task<bool> UpdateThumbnailAsync(AliasQueryResult alias, CancellationToken cancellationToken);
 
     #endregion
 }

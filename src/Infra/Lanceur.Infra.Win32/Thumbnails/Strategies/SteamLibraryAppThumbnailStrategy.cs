@@ -72,9 +72,9 @@ public class SteamLibraryAppThumbnailStrategy : ThumbnailStrategy
     }
 
     /// <inheritdoc />
-    protected override async Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    protected override async Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
-        if (!alias.IsSteamGame()) { return; }
+        if (!alias.IsSteamGame()) { return false; }
 
         var url = GetThumbnailUrl(alias.GetSteamId());
         using var response =
@@ -86,16 +86,16 @@ public class SteamLibraryAppThumbnailStrategy : ThumbnailStrategy
             url
         );
 
-        if (response.StatusCode != HttpStatusCode.OK) { return; }
+        if (response.StatusCode != HttpStatusCode.OK) { return true; }
 
         var thumbnail = alias.ResolveThumbnailAbsolutePath();
 
-        if (!File.Exists(thumbnail) && !await SaveThumbnailAsync(response, thumbnail)) { return; }
+        if (!File.Exists(thumbnail) && !await SaveThumbnailAsync(response, thumbnail)) { return  true; }
 
         alias.Thumbnail = thumbnail;
         _aliasManagementService.UpdateThumbnail(alias);
 
-        return;
+        return true;
 
         string GetThumbnailUrl(int appId) =>
             $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/capsule_sm_120.jpg";

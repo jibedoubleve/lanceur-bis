@@ -44,7 +44,8 @@ public class Win32AppThumbnailStrategy : ThumbnailStrategy
 
     #region Methods
 
-    protected override async Task UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    /// <inheritdoc/>
+    protected override async Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
     {
         var imageSource = await _staThreadRunner.RunAsync(
             () => _win32ThumbnailService.GetThumbnail(alias.FileName!),
@@ -52,13 +53,14 @@ public class Win32AppThumbnailStrategy : ThumbnailStrategy
         );
         if (imageSource is null)
         {
-            _logger.LogTrace("Failed to download the thumbnail for alias {Name}.", alias.Name);
-            return;
+            _logger.LogTrace("Failed to fetch the thumbnail in disk for alias {Name}.", alias.Name);
+            return false;
         }
 
         alias.Thumbnail = alias.ResolveThumbnailAbsolutePath();
         imageSource.CopyToImageRepository(alias.Thumbnail);
         _aliasManagementService.UpdateThumbnail(alias);
+        return true;
     }
 
     #endregion
