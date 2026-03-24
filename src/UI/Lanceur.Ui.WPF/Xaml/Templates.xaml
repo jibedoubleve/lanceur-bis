@@ -10,16 +10,15 @@
             <b:Interaction.Triggers>
                 <!--  When the item becomes visible, load the thumbnail  -->
                 <b:EventTrigger EventName="Loaded">
-                    <b:InvokeCommandAction Command="{Binding DataContext.LoadThumbnailCommand, ElementName=Result}"
-                                           CommandParameter="{Binding}" />
+                    <b:InvokeCommandAction Command="{Binding DataContext.LoadThumbnailCommand, ElementName=Result}" CommandParameter="{Binding}" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
             <DockPanel>
                 <Border Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
                         <Image
-                            MinWidth="{StaticResource DefaultIconSize}"
                             Height="{StaticResource DefaultIconSize}"
+                            MinWidth="{StaticResource DefaultIconSize}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Source="{Binding Thumbnail, TargetNullValue={x:Null}, FallbackValue={x:Null}}"
@@ -45,8 +44,7 @@
                             Opacity="{StaticResource PrimaryTextOpacity}"
                             Text="{Binding Name}" />
                     </StackPanel>
-                    <DockPanel Margin="12,0,15,0"
-                               Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <DockPanel Margin="12,0,15,0" Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ui:TextBlock
                             FontTypography="Body"
                             Foreground="{DynamicResource TextFillColorTertiaryBrush}"
@@ -70,8 +68,7 @@
             <b:Interaction.Triggers>
                 <!--  When the item becomes visible, load the thumbnail  -->
                 <b:EventTrigger EventName="Loaded">
-                    <b:InvokeCommandAction Command="{Binding DataContext.LoadThumbnailCommand, ElementName=AliasList}"
-                                           CommandParameter="{Binding}" />
+                    <b:InvokeCommandAction Command="{Binding DataContext.LoadThumbnailCommand, ElementName=AliasList}" CommandParameter="{Binding}" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
             <DockPanel>
@@ -82,19 +79,19 @@
                     Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
                         <Image
-                            Width="{StaticResource SmallIconSize}"
-                            Height="{StaticResource SmallIconSize}"
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Source="{Binding Thumbnail, TargetNullValue={x:Null}, FallbackValue={x:Null}}"
                             Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
                         <ui:SymbolIcon
-                            Width="{StaticResource SmallIconSize}"
-                            Height="{StaticResource SmallIconSize}"
+                            Width="{StaticResource DefaultIconSize}"
+                            Height="{StaticResource DefaultIconSize}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Filled="False"
-                            FontSize="20"
+                            FontSize="30"
                             Symbol="{Binding Icon}"
                             Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
                     </Grid>

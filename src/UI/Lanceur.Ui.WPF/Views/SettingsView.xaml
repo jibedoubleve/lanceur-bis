@@ -6,7 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:Lanceur.Ui.WPF.Views.Pages"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    Title="Lanceur"
+    Title="Lanceur - Settings"
+    x:Name="Self"
     Width="1920"
     Height="1080"
     ExtendsContentIntoTitleBar="True"
@@ -22,16 +23,19 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ui:TitleBar
-            Title="Lanceur - Settings"
-            Height="30"
-            DockPanel.Dock="Top" />
-        <ui:NavigationView x:Name="PageNavigationView" Grid.Row="1">
+        <ui:NavigationView x:Name="PageNavigationView"
+                           Grid.Row="0"
+                           Grid.RowSpan="2"
+                           OpenPaneLength="250"
+                           IsBackButtonVisible="Visible"
+                           IsPaneToggleVisible="False"
+                           TitleBar="{Binding ElementName=TitleBar, Mode=OneWay}">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Content="Keywords"
                     Icon="{ui:SymbolIcon Keyboard24}"
                     TargetPageType="{x:Type pages:KeywordsView}" />
+                <ui:NavigationViewItemSeparator />
                 <ui:NavigationViewItem
                     Content="Data Reconciliation"
                     Icon="{ui:SymbolIcon Database24}"
@@ -65,6 +69,14 @@
                 </Grid>
             </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
+        <ui:TitleBar
+            x:Name="TitleBar"
+            Title="{Binding ElementName=Self, Path=Title}"
+            Grid.Row="0">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="../Assets/appIcon.ico" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
         <ui:ContentDialogHost
             x:Name="ContentPresenterForDialogs"
             Grid.Row="0"
