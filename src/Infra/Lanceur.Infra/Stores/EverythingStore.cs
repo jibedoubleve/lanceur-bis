@@ -1,6 +1,5 @@
 using Everything.Wrapper;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -39,15 +38,18 @@ public sealed class EverythingStore : StoreBase, IStoreService
 
     #region Properties
 
-    /// <inheritdoc />
-    public bool IsOverridable => true;
+    /// <inheritdoc cref="IStoreService.IsOverridable"/>
+    public override bool IsOverridable => true;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(DefaultShortcut);
+    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(Shortcut);
 
     #endregion
 
     #region Methods
+
+    /// <inheritdoc cref="CanPruneResult" />
+    public override bool CanPruneResult(Cmdline previous, Cmdline current) => false;
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)

@@ -29,8 +29,7 @@ public interface IStoreOrchestrationFactory
 
     /// <summary>
     ///     Create an orchestrator that allows the store to run with all the
-    ///     other search that can occur at the same time. Furthermore, this
-    ///     store will never be idle
+    ///     other search that can occur at the same time. 
     /// </summary>
     /// <returns>An Orchestrator</returns>
     StoreOrchestration SharedAlwaysActive();

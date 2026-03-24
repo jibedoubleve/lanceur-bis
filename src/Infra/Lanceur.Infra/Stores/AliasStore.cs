@@ -1,5 +1,4 @@
 ﻿using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -38,8 +37,8 @@ public sealed class AliasStore : StoreBase, IStoreService
 
     #region Properties
 
-    /// <inheritdoc />
-    public bool IsOverridable => false;
+    /// <inheritdoc cref="IStoreService.IsOverridable"/>
+    public override bool IsOverridable => false;
 
     /// <inheritdoc />
     public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.SharedAlwaysActive();

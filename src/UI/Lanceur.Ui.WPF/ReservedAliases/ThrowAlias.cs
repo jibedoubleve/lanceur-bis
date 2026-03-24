@@ -22,7 +22,7 @@ public sealed class ThrowAlias : SelfExecutableQueryResult
     #region Methods
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
-        => throw new NotImplementedException("Some unexpected exception");
+        => throw new NotSupportedException("Some unexpected exception");
 
     #endregion
 }
