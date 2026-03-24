@@ -1,5 +1,6 @@
+using System.Text.RegularExpressions;
+using Humanizer;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
@@ -12,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
 
-[Store]
+[Store("(.*):(.*)")]
 public sealed class AdditionalParametersStore : StoreBase, IStoreService
 {
     #region Fields
@@ -36,27 +37,72 @@ public sealed class AdditionalParametersStore : StoreBase, IStoreService
         _aliasService = aliasService;
         _logger = logger;
         _featureFlags = featureFlags;
+
+        ShortcutRegex = new Lazy<Regex>(() => new Regex(Shortcut, RegexOptions.Compiled, 250.Milliseconds()));
     }
 
     #endregion
 
     #region Properties
 
-    /// <inheritdoc />
-    public bool IsOverridable => false;
+    private Lazy<Regex> ShortcutRegex { get; }
+
+    /// <inheritdoc cref="IStoreService.IsOverridable" />
+    public override bool IsOverridable => false;
 
     /// <inheritdoc />
     public StoreOrchestration StoreOrchestration
         => _featureFlags.IsEnabled(Features.AdditionalParameterAlwaysActive)
             ? StoreOrchestrationFactory.SharedAlwaysActive()
-            : StoreOrchestrationFactory.Shared(".*:.*");
+            : StoreOrchestrationFactory.Shared(Shortcut);
 
     #endregion
 
     #region Methods
 
+    private bool IsRefinementOf(string value, string check)
+        => !IsUnfiltered(check)
+           && check.StartsWith(value, StringComparison.InvariantCultureIgnoreCase);
+
+    private bool IsRefinementOf(QueryResult query, string value)
+        => IsRefinementOf(value, query.Name);
+
+
+    private bool IsUnfiltered(Cmdline previous)
+    {
+        var splits = ShortcutRegex.Value.Match(previous);
+
+        if (!splits.Success) { return false; }
+
+        return splits.Groups[2].Value.Length == 0;
+    }
+
+    private static string SelectProperty(Cmdline cmdline) => cmdline.Name;
+
+    /// <inheritdoc cref="CanPruneResult" />
+    public override bool CanPruneResult(Cmdline previous, Cmdline current)
+    {
+        if (SelectProperty(current).Length == 0) { return false; }
+
+        return OverrideCanPruneResult(
+            previous,
+            current,
+            SelectProperty,
+            IsRefinementOf
+        );
+    }
+
     /// <inheritdoc cref="IStoreService.GetAll" />
     public override IEnumerable<QueryResult> GetAll() => _aliasService.GetAllAliasWithAdditionalParameters();
+
+    public override int PruneResult(IList<QueryResult> destination, Cmdline previous, Cmdline current)
+        => OverridePruneResult(
+            destination,
+            previous,
+            current,
+            SelectProperty,
+            IsRefinementOf
+        );
 
     /// <inheritdoc />
     public IEnumerable<QueryResult> Search(Cmdline cmdline)

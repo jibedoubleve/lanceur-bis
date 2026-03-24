@@ -9,8 +9,11 @@ public record Cmdline
 
     public Cmdline(string name, string parameters = "")
     {
-        Name = (name ?? "").Trim();
-        Parameters = (parameters ?? "").Trim();
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        Name = name.Trim();
+        Parameters = parameters.Trim();
 
         if (Name.Contains(' '))
         {
@@ -26,7 +29,7 @@ public record Cmdline
 
     public bool HasParameters => !Parameters.IsNullOrEmpty();
 
-    public string Name { get; init; }
+    public string Name { get; }
     public string Parameters { get; }
 
     #endregion
@@ -42,6 +45,14 @@ public record Cmdline
     /// <param name="source">The <see cref="Cmdline" /> object to be converted to a string.</param>
     /// <returns>A <see cref="string" /> representation of the <paramref name="source" />.</returns>
     public static implicit operator string(Cmdline source) => source.ToString();
+
+    /// <summary>
+    ///     Implicitly converts a <see cref="string" /> to a <see cref="Cmdline" /> by invoking
+    ///     <see cref="Parse" />.
+    /// </summary>
+    /// <param name="source">The string to parse into a <see cref="Cmdline" />.</param>
+    /// <returns>A <see cref="Cmdline" /> parsed from <paramref name="source" />.</returns>
+    public static implicit operator Cmdline(string source) => Parse(source);
 
     public static Cmdline Parse(string? cmdline)
     {
@@ -65,7 +76,7 @@ public record Cmdline
         );
     }
 
-    public override string ToString() => $"{Name ?? string.Empty} {Parameters ?? string.Empty}".Trim();
+    public override string ToString() => $"{Name} {Parameters}".Trim();
 
     #endregion
 }

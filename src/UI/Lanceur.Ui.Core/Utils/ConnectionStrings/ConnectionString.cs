@@ -19,7 +19,6 @@ public sealed class ConnectionString : BaseConnectionString, IConnectionString
 
     #region Constructors
 
-    // TODO: STG-Provide settings instead of service
     public ConnectionString(
         ISection<DatabaseSection> databaseSection,
         ILogger<ConnectionString> logger)

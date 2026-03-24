@@ -40,8 +40,8 @@ public sealed class CalculatorStore : StoreBase, IStoreService
 
     #region Properties
 
-    /// <inheritdoc />
-    public bool IsOverridable => false;
+    /// <inheritdoc cref="IStoreService.IsOverridable"/>
+    public override bool IsOverridable => false;
 
     /// <inheritdoc />
     public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Shared(_calculator.ValidationRegex);
@@ -68,6 +68,18 @@ public sealed class CalculatorStore : StoreBase, IStoreService
             ? QueryResult.NoResult
             : returnResult.ToEnumerable();
     }
+
+    /// <inheritdoc cref="CanPruneResult" />
+    public override bool CanPruneResult(Cmdline previous, Cmdline current) => false;
+
+    /// <inheritdoc cref="CanPruneResult" />
+    /// <remarks>
+    ///     Always returns <c>0</c> — pruning is meaningless here because each expression evaluation
+    ///     produces a single, self-contained result (the computed value or an error message) that is
+    ///     unrelated to the previous result. <see cref="CanPruneResult" /> already prevents this
+    ///     method from being called in normal operation.
+    /// </remarks>
+    public override int PruneResult(IList<QueryResult> destination, Cmdline? previous, Cmdline current) => 0;
 
     #endregion
 }
