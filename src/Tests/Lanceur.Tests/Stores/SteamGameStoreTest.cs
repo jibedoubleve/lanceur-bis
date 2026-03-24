@@ -28,7 +28,8 @@ public sealed class SteamGameStoreTest
 
     #region Methods
 
-    private SteamGameStore GetStore(ISteamLibraryService steamService, IAliasManagementService? managementService = null)
+    private SteamGameStore GetStore(
+        ISteamLibraryService steamService, IAliasManagementService? managementService = null)
     {
         managementService ??= Substitute.For<IAliasManagementService>();
         managementService.HydrateSteamGameUsage(Arg.Any<IEnumerable<AliasQueryResult>>())
@@ -39,7 +40,10 @@ public sealed class SteamGameStoreTest
                  .AddSingleton(steamService)
                  .AddSingleton<SteamGameStore>()
                  .AddSingleton(managementService)
-                 .AddMockSingleton<ISection<StoreSection>>()
+                 .AddMockSingleton<ISection<StoreSection>>((_, i) => {
+                     i.Value.Returns(new StoreSection());
+                     return i;
+                 })
                  .AddMockSingleton<IFeatureFlagService>((_, i) => {
                      i.IsEnabled(Arg.Any<string>()).Returns(true);
                      return i;
@@ -55,6 +59,32 @@ public sealed class SteamGameStoreTest
         service.GetGames().Returns(games);
         return service;
     }
+
+    [Fact]
+    public void When_canPrune_with_contains_semantics_Then_non_prefix_substring_refinement_is_recognised()
+    {
+        // ARRANGE
+        var games = new SteamGame[]
+        {
+            new(440, "Half-Life 2"), // contains "li" AND "half-li" → kept after both searches
+            new(100, "Real Life Simulator"), // contains "li" but NOT "half-li" → pruned at step 2
+            new(200, "Portal") // contains "al" but NOT "li" → excluded from step 1
+        };
+        var store = GetStore(SteamServiceWith(games), Substitute.For<IAliasManagementService>());
+
+        var previousQuery = Cmdline.Parse("& li");
+        var refinedQuery = Cmdline.Parse("& half-li");
+
+        // "half-li" contains "li" as a substring → pruning is valid for Contains semantics
+        // But CanPruneResult uses StartsWith: "half-li".StartsWith("li") == false → BUG
+        store.CanPruneResult(previousQuery, refinedQuery)
+             .ShouldBeTrue();
+    }
+
+    [Fact]
+    public void When_previous_query_has_no_parameter_Then_CanPruneResult_allows_refinement()
+        => GetStore(SteamServiceWith()).CanPruneResult(Cmdline.Parse("&"), Cmdline.Parse("& a"))
+                                       .ShouldBeTrue();
 
     [Fact]
     public void When_search_Then_hydrate_usage_is_called()

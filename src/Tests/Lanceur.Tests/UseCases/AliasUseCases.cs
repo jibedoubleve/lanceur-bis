@@ -1,6 +1,5 @@
 using System.Reflection;
 using Lanceur.Core;
-using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
@@ -22,7 +21,6 @@ using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -88,7 +86,7 @@ public sealed class AliasUseCases : TestBase
     }
 
     [Fact]
-    public async Task When_creating_and_updating_alias_Then_no_error()
+    public async Task When_creating_and_updating_alias_Then_alias_is_created_and_updated()
     {
         /*
          * Arrange
@@ -109,26 +107,25 @@ public sealed class AliasUseCases : TestBase
 
         if (newAlias is null) { Assert.Fail("A default alias should be selected when creating a new alias"); }
 
-        var stateTester = new AliasStateTester();
-        stateTester.UpdateValues(ref newAlias);
+        newAlias.SetRandomState();
         await keywordsViewModel.SaveCurrentAliasCommand.ExecuteAsync(null);
 
         /********************************/
         OutputHelper.Title("2: Search the alias and find it");
         /********************************/
-        mainViewModel.Query = stateTester.Name;
+        mainViewModel.Query = newAlias.Name;
         await mainViewModel.SearchCommand.ExecuteAsync(null);
 
-        var current = mainViewModel.Results![0];
-        mainViewModel.Results!.Count.ShouldBeGreaterThan(0);
+        var current = mainViewModel.Results[0];
+        mainViewModel.Results!.Count.ShouldBe(1);
 
         OutputHelper.WriteLine($"Type of first element in results is '{current.GetType()}'");
-        OutputHelper.WriteLine($"{JsonConvert.SerializeObject(current, Formatting.Indented)}");
+        OutputHelper.WriteAlias(current);
 
         Assert.Multiple(
             () => mainViewModel.Results.ShouldNotBeNull(),
             () => current.ShouldBeOfType<AliasQueryResult>(),
-            () => stateTester.AssertValues((AliasQueryResult)current)
+            () => newAlias.ShouldHaveState(current)
         );
 
         /********************************/
@@ -139,21 +136,23 @@ public sealed class AliasUseCases : TestBase
 
         aliasToUpdate.ShouldNotBeNull();
 
-        var stateTester2 = new AliasStateTester();
-        stateTester2.UpdateValues(ref aliasToUpdate);
+        var state = AliasBuilder.BuildRandomAlias();
+        aliasToUpdate.CopyState(state);
 
         await keywordsViewModel.SaveCurrentAliasCommand.ExecuteAsync(null);
 
         /********************************/
         OutputHelper.Title("4: Search the alias and check the values are updated");
         /********************************/
-        mainViewModel.Query = stateTester.Name;
+        mainViewModel.Query = state.Name;
         await mainViewModel.SearchCommand.ExecuteAsync(null);
 
         Assert.Multiple(
-            () => mainViewModel.SelectedResult.ShouldNotBeNull(),
             () => keywordsViewModel.SelectedAlias.ShouldNotBeNull(),
-            () => stateTester2.AssertValues(keywordsViewModel.SelectedAlias!)
+            () => keywordsViewModel.SelectedAlias!.ShouldHaveState(state),
+            () => mainViewModel.SelectedResult.ShouldNotBeNull(),
+            () => mainViewModel.SelectedResult.ShouldBeOfType<AliasQueryResult>(),
+            () => mainViewModel.SelectedResult.ShouldHaveState(state)
         );
     }
 

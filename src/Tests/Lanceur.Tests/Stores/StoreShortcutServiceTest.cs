@@ -1,12 +1,9 @@
-using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Core.Stores;
 using Lanceur.Infra.Services;
-using Lanceur.Infra.Stores;
 using Shouldly;
 using Xunit;
 
@@ -28,7 +25,9 @@ public sealed class StoreShortcutServiceTest
 
         #region Methods
 
+        public bool CanPruneResult(Cmdline? previous, Cmdline current) => false;
         public IEnumerable<QueryResult> GetAll() => [];
+        public int PruneResult(IList<QueryResult> destination, Cmdline? previous, Cmdline current) => 0;
         public IEnumerable<QueryResult> Search(Cmdline cmdline) => [];
 
         #endregion
@@ -46,7 +45,9 @@ public sealed class StoreShortcutServiceTest
 
         #region Methods
 
+        public bool CanPruneResult(Cmdline? previous, Cmdline current) => false;
         public IEnumerable<QueryResult> GetAll() => [];
+        public int PruneResult(IList<QueryResult> destination, Cmdline? previous, Cmdline current) => 0;
         public IEnumerable<QueryResult> Search(Cmdline cmdline) => [];
 
         #endregion
@@ -64,7 +65,9 @@ public sealed class StoreShortcutServiceTest
 
         #region Methods
 
+        public bool CanPruneResult(Cmdline? previous, Cmdline current) => false;
         public IEnumerable<QueryResult> GetAll() => [];
+        public int PruneResult(IList<QueryResult> destination, Cmdline? previous, Cmdline current) => 0;
         public IEnumerable<QueryResult> Search(Cmdline cmdline) => [];
 
         #endregion
