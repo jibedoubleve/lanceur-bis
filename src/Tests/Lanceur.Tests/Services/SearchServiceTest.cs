@@ -1,8 +1,9 @@
-﻿using System.Collections.Concurrent;
-using System.Data;
+﻿using System.Data;
 using System.Data.SQLite;
 using Dapper;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -16,11 +17,11 @@ using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
+using Lanceur.Tests.Tools.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using OpenTK.Graphics.OpenGL;
 using Shouldly;
 using Xunit;
 
@@ -113,7 +114,13 @@ public sealed class SearchServiceTest : TestBase
             new AliasQueryResult { Name = "foobar" },
             new AliasQueryResult { Name = "baz" }
         ];
-        var store = BuildStoreServiceWithResults(storeResults);
+        var store = new TestStore(
+            new StoreOrchestrationFactory(),
+            Substitute.For<ISection<StoreSection>>(),
+            cmdline => cmdline.Parameters
+        );
+        store.SeedResultSet(storeResults);
+        
         var service = BuildSearchServiceForIncrementalFilterTest(store);
 
         // ACT
@@ -122,7 +129,7 @@ public sealed class SearchServiceTest : TestBase
         await service.SearchAsync(result, new Cmdline("app", "fo"));
 
         // ASSERT
-        store.Received(1).Search(Arg.Any<Cmdline>());
+        store.SearchCallCount.ShouldBe(1);
     }
 
     [Fact]
@@ -145,8 +152,6 @@ public sealed class SearchServiceTest : TestBase
     public async Task When_query_contains_previous_but_does_not_start_with_it_Then_stores_are_queried_again()
     {
         // ARRANGE
-        // Regression: old code used Contains() instead of StartsWith(),
-        // so "barfoo".Contains("foo") incorrectly triggered pruning.
         var store = BuildStoreServiceWithResults([]);
         var service = BuildSearchServiceForIncrementalFilterTest(store);
 
@@ -165,7 +170,7 @@ public sealed class SearchServiceTest : TestBase
         // ARRANGE
         // Regression: old code did not guard against an empty _lastQuery,
         // so any query after an empty one incorrectly triggered pruning
-        // because every string Contains("").
+        // because every string Contains("") or StartsWith("").
         var store = BuildStoreServiceWithResults([]);
         var service = BuildSearchServiceForIncrementalFilterTest(store);
 
@@ -189,7 +194,13 @@ public sealed class SearchServiceTest : TestBase
             new AliasQueryResult { Name = "foobar" },
             new AliasQueryResult { Name = "baz" }
         ];
-        var store = BuildStoreServiceWithResults(storeResults);
+        var store = new TestStore(
+            new StoreOrchestrationFactory(),
+            Substitute.For<ISection<StoreSection>>(),
+            cmdline => cmdline.Parameters
+        );
+        store.SeedResultSet(storeResults);
+        
         var service = BuildSearchServiceForIncrementalFilterTest(store);
 
         // ACT
@@ -305,8 +316,7 @@ public sealed class SearchServiceTest : TestBase
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
         serviceCollection.AddTestOutputHelper(OutputHelper);
         var serviceProvider = serviceCollection.BuildServiceProvider();
-
-
+        
         // ACT
         var service = serviceProvider.GetService<SearchService>()!;
         List<QueryResult> result = [];
