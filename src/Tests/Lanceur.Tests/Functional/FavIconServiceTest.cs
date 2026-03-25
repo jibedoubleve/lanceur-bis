@@ -2,6 +2,7 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Extensions;
+using Lanceur.Tests.Tools.Helpers;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -48,7 +49,7 @@ public sealed class FavIconServiceTest
 
         await manager.UpdateFaviconAsync(
             alias,
-            _ => Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
+            _ => Path.Combine(Path.GetTempPath(), Any.AbsolutePath()),
             source.Token
         );
 

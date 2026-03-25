@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Tests.Tooling.ReservedAliases;
-using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 
 namespace Lanceur.Tests.Tools.ReservedAliases;
 
@@ -14,7 +14,7 @@ public sealed class NotExecutableTestAlias : QueryResult
 {
     #region Constructors
 
-    public NotExecutableTestAlias(IServiceProvider _) => Name = Generate.Text(8);
+    public NotExecutableTestAlias(IServiceProvider _) => Name = Any.String(8);
 
     #endregion
 }

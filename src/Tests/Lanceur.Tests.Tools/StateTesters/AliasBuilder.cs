@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
 using Bogus;
 using Lanceur.Core.Models;
+using Lanceur.Tests.Tools.Helpers;
 using Newtonsoft.Json;
-using ScottPlot;
 using Shouldly;
 using Xunit;
 
@@ -16,10 +16,10 @@ public static class AliasBuilder
     {
         AdditionalParameter[] additionalParameters =
         [
-            new() { Name = faker.Lorem.Word() + "_" + Generate.RandomString(8), Parameter = "1" },
-            new() { Name = faker.Lorem.Word() + "_" + Generate.RandomString(8), Parameter = "2" },
-            new() { Name = faker.Lorem.Word() + "_" + Generate.RandomString(8), Parameter = "3" },
-            new() { Name = faker.Lorem.Word() + "_" + Generate.RandomString(8), Parameter = "4" }
+            new() { Name = faker.Lorem.Word() + "_" + Any.String(8), Parameter = "1" },
+            new() { Name = faker.Lorem.Word() + "_" + Any.String(8), Parameter = "2" },
+            new() { Name = faker.Lorem.Word() + "_" + Any.String(8), Parameter = "3" },
+            new() { Name = faker.Lorem.Word() + "_" + Any.String(8), Parameter = "4" }
         ];
         return additionalParameters;
     }
@@ -28,9 +28,9 @@ public static class AliasBuilder
     {
         string[] names =
         [
-            Generate.RandomString(8) + "_" + faker.Lorem.Word(),
-            Generate.RandomString(8) + "_" + faker.Lorem.Word(),
-            Generate.RandomString(8) + "_" + faker.Lorem.Word()
+            Any.String(8) + "_" + faker.Lorem.Word(),
+            Any.String(8) + "_" + faker.Lorem.Word(),
+            Any.String(8) + "_" + faker.Lorem.Word()
         ];
         return names;
     }

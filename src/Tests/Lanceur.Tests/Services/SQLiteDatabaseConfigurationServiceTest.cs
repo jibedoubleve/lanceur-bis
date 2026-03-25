@@ -8,7 +8,7 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
-using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 using Newtonsoft.Json;
 using Shouldly;
 using Xunit;
@@ -94,22 +94,22 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
                      {
                          "FeatureFlags": [
                              {
-                                 "Description": "{{Generate.Text()}}",
+                                 "Description": "{{Any.String(10)}}",
                                  "Enabled": false,
-                                 "FeatureName": "{{Generate.Text()}}",
-                                 "Icon": "{{Generate.Text()}}"
+                                 "FeatureName": "{{Any.String(10)}}",
+                                 "Icon": "{{Any.String(10)}}"
                              },
                              {
-                                 "Description": "{{Generate.Text()}}",
+                                 "Description": "{{Any.String(10)}}",
                                  "Enabled": true,
-                                 "FeatureName": "{{Generate.Text()}}",
-                                 "Icon": "{{Generate.Text()}}"
+                                 "FeatureName": "{{Any.String(10)}}",
+                                 "Icon": "{{Any.String(10)}}"
                              },
                              {
-                                 "Description": "{{Generate.Text()}}",
+                                 "Description": "{{Any.String(10)}}",
                                  "Enabled": true,
-                                 "FeatureName": "{{Generate.Text()}}",
-                                 "Icon": "{{Generate.Text()}}"
+                                 "FeatureName": "{{Any.String(10)}}",
+                                 "Icon": "{{Any.String(10)}}"
                              }
                          ]
                      }
@@ -180,9 +180,9 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
     [InlineData(true)]
     public void When_updating_feature_flas_Then_json_is_updated(bool isEnabled)
     {
-        var description = Generate.Text();
+        var description = Any.String(10);
         var featureName = Features.GetNames().ElementAt(0);
-        var icon = Generate.Text();
+        var icon = Any.String(10);
 
         var section = new ApplicationSettings();
         var fFlag = section.FeatureFlags
@@ -286,8 +286,8 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
     public void When_updating_values_in_settings_Then_retrieving_updated_values()
     {
         var features = Features.GetNames().ToList();
-        var description = Generate.Text();
-        var icon = Generate.Text();
+        var description = Any.String(10);
+        var icon = Any.String(10);
 
         var json = $$"""
                      {
