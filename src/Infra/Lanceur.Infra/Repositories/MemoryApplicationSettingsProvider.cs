@@ -14,10 +14,10 @@ public sealed class MemoryApplicationSettingsProvider : ISettingsProvider<Applic
     #region Properties
 
     /// <inheritdoc />
-    object ISettingsProvider.Current => Current;
+    object ISettingsProvider.Value => Value;
 
     /// <inheritdoc />
-    public ApplicationSettings Current { get; } = new();
+    public ApplicationSettings Value { get; } = new();
 
     #endregion
 

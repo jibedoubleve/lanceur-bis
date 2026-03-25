@@ -35,11 +35,11 @@ public sealed class SQLiteFeatureFlagServiceShould : TestBase
         var ffRepository = new SQLiteFeatureFlagRepository(scope);
         var featureFlag = new FeatureFlagService(ffRepository);
 
-        settings.Current.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
-        settings.Current.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");
+        settings.Value.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
+        settings.Value.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");
 
         // act
-        settings.Current.FeatureFlags.ElementAt(0).Enabled = value;
+        settings.Value.FeatureFlags.ElementAt(0).Enabled = value;
         settings.Save();
 
         // assert
@@ -58,15 +58,15 @@ public sealed class SQLiteFeatureFlagServiceShould : TestBase
         var logger = CreateLogger<SQLiteApplicationSettingsProvider>();
         var settings = new SQLiteApplicationSettingsProvider(scope, logger);
 
-        settings.Current.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
-        settings.Current.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");
+        settings.Value.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
+        settings.Value.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");
 
         // act
-        settings.Current.FeatureFlags.ElementAt(0).Enabled = value;
+        settings.Value.FeatureFlags.ElementAt(0).Enabled = value;
         settings.Save();
 
         // assert
-        settings.Current.FeatureFlags
+        settings.Value.FeatureFlags
                 .Single(
                     e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.InvariantCultureIgnoreCase)
                 ).Enabled.ShouldBe(value, "the new value changed");

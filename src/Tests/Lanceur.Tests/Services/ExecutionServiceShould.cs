@@ -189,7 +189,7 @@ public sealed class ExecutionServiceShould : TestBase
                                                 {
                                                     Github = { Token = Generate.Text() }
                                                 };
-                                                i.Current.Returns(config);
+                                                i.Value.Returns(config);
                                                 return i;
                                             }
                                         )

@@ -59,15 +59,15 @@ public sealed class Section<T> : IWriteableSection<T>
 
     #region Methods
 
-    private static T? RebuildSectionGroup(ISettingsProvider src)
+    private static T? RebuildCurrentSection(ISettingsProvider src)
     {
         // get all the properties of the section (not static and public) 
-        var properties = src.Current.GetType()
+        var properties = src.Value.GetType()
                             .GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
         // Select the property that matches the type T
         var result = properties.Where(p => typeof(T).IsAssignableFrom(p.PropertyType))
-                               .Select(p => (T?)p.GetValue(src.Current))
+                               .Select(p => (T?)p.GetValue(src.Value))
                                .SingleOrDefault();
         return result;
     }
@@ -80,10 +80,9 @@ public sealed class Section<T> : IWriteableSection<T>
     ///     per provider. Duplicate registrations indicate a misconfiguration and will throw.
     /// </remarks>
     private T? RebuildSections()
-        => _settingsProviders.Select(RebuildSectionGroup)
+        => _settingsProviders.Select(RebuildCurrentSection)
                              .OfType<T>()
                              .SingleOrDefault(); // Intentional: ambiguous config is a programming error
-
 
     /// <inheritdoc />
     public void Reload()

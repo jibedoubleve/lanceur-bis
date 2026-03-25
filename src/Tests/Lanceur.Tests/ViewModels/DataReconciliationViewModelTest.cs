@@ -253,7 +253,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                  .Returns(true);
                 return i;
             },
-            VisitApplicationSettingsProvider = settings => settings.Current.Reconciliation.InactivityThreshold = 2
+            VisitApplicationSettingsProvider = settings => settings.Value.Reconciliation.InactivityThreshold = 2
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -299,7 +299,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                  .Returns(true);
                 return i;
             },
-            VisitApplicationSettingsProvider = settings => settings.Current.Reconciliation.LowUsageThreshold = 10
+            VisitApplicationSettingsProvider = settings => settings.Value.Reconciliation.LowUsageThreshold = 10
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -476,7 +476,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                  .Returns(true);
                 return i;
             },
-            VisitApplicationSettingsProvider = settings => settings.Current.Reconciliation.LowUsageThreshold = 3
+            VisitApplicationSettingsProvider = settings => settings.Value.Reconciliation.LowUsageThreshold = 3
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -751,7 +751,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                  .Returns(true);
                 return i;
             },
-            VisitApplicationSettingsProvider = settings => settings.Current.Reconciliation.InactivityThreshold = 1
+            VisitApplicationSettingsProvider = settings => settings.Value.Reconciliation.InactivityThreshold = 1
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")

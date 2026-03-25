@@ -107,7 +107,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 
         var visitors = new ServiceVisitors
         {
-            VisitApplicationSettingsProvider = s => s.Current.SearchBox.ShowResult = showAllResults
+            VisitApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showAllResults
         };
         await TestViewModelAsync(
             async (viewModel, _) => {
@@ -135,7 +135,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                 Assert.All(
                     callsOfShowLastQuery.Select((expected, i) => (expected, i)),
                     t => {
-                        config.Current.SearchBox.ShowLastQuery = t.expected;
+                        config.Value.SearchBox.ShowLastQuery = t.expected;
                         viewModel.ShowLastQuery.ShouldBe(t.expected, $"this is the call n° {t.i + 1} of the test");
                     }
                 );
@@ -156,8 +156,8 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
             VisitApplicationSettingsProvider = s => {
-                s.Current.SearchBox.ShowLastQuery = true;
-                s.Current.SearchBox.ShowResult = true;
+                s.Value.SearchBox.ShowLastQuery = true;
+                s.Value.SearchBox.ShowResult = true;
             }
         };
         await TestViewModelAsync(

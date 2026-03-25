@@ -31,10 +31,10 @@ public sealed class MemoryInfrastructureSettingsProvider : ISettingsProvider<Inf
     #region Properties
 
     /// <inheritdoc />
-    object ISettingsProvider.Current => Current;
+    object ISettingsProvider.Value => Value;
 
     /// <inheritdoc />
-    public InfrastructureSettings Current => Configuration;
+    public InfrastructureSettings Value => Configuration;
 
     #endregion
 

@@ -48,8 +48,8 @@ public static class ServiceCollectionExtensions
         var settingsProvider = SettingsProviderFactory.GetInfrastructureSettingsProvider();
         settingsProvider.Load();
 
-        var minLogLevel = settingsProvider.Current.Logging.GetMinimumLogLevel();
-        var logging = settingsProvider.Current.Logging;
+        var minLogLevel = settingsProvider.Value.Logging.GetMinimumLogLevel();
+        var logging = settingsProvider.Value.Logging;
 
         var logEventLevel = new Conditional<LogEventLevel>(
             LogLevelUtil.GetLevel(),

@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -175,13 +176,13 @@ public partial class MainView
 
     private void OnMouseUp(object _, MouseButtonEventArgs e)
     {
-        var coordinate = _sections.Window.Position;
+        if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(_sections.Window.Position))
+        {
+            return;
+        }
 
-        if (e.ChangedButton != MouseButton.Left || this.IsAtPosition(coordinate)) { return; }
-
-        _logger.LogDebug("Save new coordinate ({Top},{Left})", Top, Left);
-        coordinate.Top = Top;
-        coordinate.Left = Left;
+        _logger.LogTrace("Saving new coordinate ({Top},{Left})", Top, Left);
+        _sections.Window.SetPosition(Left, Top);
         _sections.SaveWindowSection();
     }
 
