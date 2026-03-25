@@ -1,7 +1,5 @@
 ﻿using Dapper;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Constants;
-using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Extensions;
@@ -15,12 +13,14 @@ public sealed class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IS
 {
     #region Fields
 
-    private ApplicationSettings? _current;
-
-    private readonly JsonSerializerSettings _jsonSettings
-        = new() { ObjectCreationHandling = ObjectCreationHandling.Replace };
-
     private readonly ILogger<SQLiteApplicationSettingsProvider> _logger;
+
+    private static readonly JsonSerializerSettings SerializerSettings =
+        new() { ObjectCreationHandling = ObjectCreationHandling.Replace };
+
+    private bool _settingsLoaded;
+
+    private readonly ApplicationSettings _value = new();
 
     #endregion
 
@@ -44,9 +44,12 @@ public sealed class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IS
     {
         get
         {
-            if (_current is null) { Load(); }
+            if (_settingsLoaded) { return _value; }
 
-            return _current!;
+            Load();
+            _settingsLoaded = true;
+
+            return _value!;
         }
     }
 
@@ -68,12 +71,15 @@ public sealed class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IS
                 .FirstOrDefault() ?? string.Empty
         );
 
-        var value = json.IsNullOrEmpty()
-            ? new ApplicationSettings()
-            : JsonConvert.DeserializeObject<ApplicationSettings>(json, _jsonSettings)
-              ?? new ApplicationSettings();
-        value.AddNewFeatureFlags();
-        _current = value;
+        if (json.IsNullOrEmpty())
+        {
+            _logger.LogWarning("No settings found in the database. Skipping settings load.");
+            return;
+        }
+
+        _value.Stores.StoreShortcuts = [];
+        JsonConvert.PopulateObject(json, _value, SerializerSettings);
+        _value.AddNewFeatureFlags();
     }
 
     /// <inheritdoc />
