@@ -1,4 +1,4 @@
-using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Shouldly;
 
@@ -30,7 +30,7 @@ public static class KeywordsViewModelExtensions
         string? luaScript = null
     )
     {
-        fileName ??= Generate.Text();
+        fileName ??= Any.String(10);
 
         // --- Create a new alias
         viewModel.CreateAliasCommand.Execute(null); // Prepare alias for creation

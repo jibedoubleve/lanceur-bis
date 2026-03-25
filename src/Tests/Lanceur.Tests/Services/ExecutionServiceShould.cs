@@ -11,7 +11,7 @@ using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
-using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.Launchers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -187,7 +187,7 @@ public sealed class ExecutionServiceShould : TestBase
                                         .AddMockSingleton<ISettingsProvider<ApplicationSettings>>((_, i) => {
                                                 var config = new ApplicationSettings
                                                 {
-                                                    Github = { Token = Generate.Text() }
+                                                    Github = { Token = Any.String(10) }
                                                 };
                                                 i.Value.Returns(config);
                                                 return i;

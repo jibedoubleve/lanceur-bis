@@ -1,6 +1,6 @@
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 
 namespace Lanceur.Tests.Tools;
 
@@ -23,7 +23,7 @@ public static class ConnectionStringFactory
 
             var path = Path.Join(
                                desktop,
-                               $"Output_Test_Database__{DateTime.Now:yyyy-MM-dd_HH-mm-ss_}{Generate.Text(8)}.sqlite"
+                               $"Output_Test_Database__{DateTime.Now:yyyy-MM-dd_HH-mm-ss_}{Any.String(8)}.sqlite"
                            )
                            .ToSQLiteConnectionString();
             return new ConnectionString(path);

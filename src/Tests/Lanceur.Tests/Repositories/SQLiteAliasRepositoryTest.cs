@@ -7,7 +7,7 @@ using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tools;
-using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.SQL;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -311,7 +311,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     public void When_create_invisible_alias_Then_invisible_alias_creates_in_db()
     {
         // ARRANGE
-        var aliasName = Generate.Text();
+        var aliasName = Any.String(10);
 
         var connection = BuildFreshDb();
         var service = BuildDataService(connection);
@@ -374,7 +374,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     public void When_creating_invisible_alias_Then_invisible_alias_created_in_db()
     {
         // ARRANGE
-        var aliasName = Generate.Text();
+        var aliasName = Any.String(10);
         var connection = BuildFreshDb(connectionString: ConnectionStringFactory.InMemory);
         var action = BuildAliasDbAction();
         var db = new DbSingleConnectionManager(connection);
@@ -489,8 +489,8 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     public void When_retrieving_alias_from_names_Then_alias_contains_thumbnails()
     {
         // ARRANGE
-        var name = Generate.Text();
-        var thumbnail = Generate.Text();
+        var name = Any.String(10);
+        var thumbnail = Any.String(10);
         var sql = new SqlBuilder().AppendAlias(a => {
             a.WithSynonyms(name)
              .WithThumbnail(thumbnail);
@@ -516,7 +516,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     public void When_retrieving_alias_Then_alias_contains_thumbnail()
     {
         // ARRANGE
-        var thumbnail = Generate.Text();
+        var thumbnail = Any.String(10);
         var sql = new SqlBuilder().AppendAlias(a => { a.WithThumbnail(thumbnail); }).ToSql();
 
         var connection = BuildFreshDb(sql);
@@ -538,14 +538,14 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     {
         // ARRANGE
 
-        var name = Generate.Text();
-        var thumbnail = Generate.Text();
+        var name = Any.String(10);
+        var thumbnail = Any.String(10);
 
         var sql = new SqlBuilder()
                   .AppendAlias(a => a.WithSynonyms(name)
                                      .WithThumbnail(thumbnail))
-                  .AppendAlias(a => a.WithSynonyms(Generate.Text()))
-                  .AppendAlias(a => a.WithSynonyms(Generate.Text()))
+                  .AppendAlias(a => a.WithSynonyms(Any.String(10)))
+                  .AppendAlias(a => a.WithSynonyms(Any.String(10)))
                   .ToSql();
 
         var connection = BuildFreshDb(sql);
@@ -568,15 +568,15 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     public void When_search_by_name_with_additional_parameters_Then_thumbnail_is_set()
     {
         // ARRANGE
-        var name = Generate.Text();
-        var thumbnail = Generate.Text();
+        var name = Any.String(10);
+        var thumbnail = Any.String(10);
 
         var sql = new SqlBuilder()
                   .AppendAlias(a => a.WithSynonyms(name)
                                      .WithThumbnail(thumbnail)
-                                     .WithAdditionalParameters((Generate.Text(), Generate.Text())))
-                  .AppendAlias(a => a.WithSynonyms(Generate.Text()))
-                  .AppendAlias(a => a.WithSynonyms(Generate.Text()))
+                                     .WithAdditionalParameters((Any.String(10), Any.String(10))))
+                  .AppendAlias(a => a.WithSynonyms(Any.String(10)))
+                  .AppendAlias(a => a.WithSynonyms(Any.String(10)))
                   .ToSql();
 
         var connection = BuildFreshDb(sql);

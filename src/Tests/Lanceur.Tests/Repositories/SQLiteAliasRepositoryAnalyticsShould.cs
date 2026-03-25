@@ -6,7 +6,7 @@ using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
-using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.SQL;
 using Shouldly;
 using Xunit;
@@ -343,14 +343,14 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
                      .AppendAlias(a => a.WithFileName(name)
                                         .WithArguments(name)
                                         .WithCount(count)
-                                        .WithLuaScript(Generate.Text())
+                                        .WithLuaScript(Any.String(10))
                                         .WithUsage(date1, date2)
                                         .WithSynonyms(name)
                      )
                      .AppendAlias(a => a.WithFileName(name)
                                         .WithArguments(name)
                                         .WithCount(count)
-                                        .WithLuaScript(Generate.Text())
+                                        .WithLuaScript(Any.String(10))
                                         .WithUsage(date1, date2)
                                         .WithSynonyms(name)
                      )
@@ -405,14 +405,14 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
                                   .AppendAlias(a => a.WithFileName(name)
                                                      .WithArguments(name)
                                                      .WithCount(count)
-                                                     .WithLuaScript(Generate.Text())
+                                                     .WithLuaScript(Any.String(10))
                                                      .WithUsage(date1, date2)
                                                      .WithSynonyms(name)
                                   )
                                   .AppendAlias(a => a.WithFileName(name)
                                                      .WithArguments(name)
                                                      .WithCount(count)
-                                                     .WithLuaScript(Generate.Text())
+                                                     .WithLuaScript(Any.String(10))
                                                      .WithUsage(date1, date2)
                                                      .WithSynonyms(name)
                                   )

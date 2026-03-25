@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Text;
 using Lanceur.SharedKernel;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 
 namespace Lanceur.Tests.Tools.SQL;
 
@@ -33,12 +33,12 @@ public sealed class SqlAliasBuilder : SqlBuilderBase
     {
         const string sql = "insert into alias (id, file_name) values ({0}, '{1}');";
         Sql.AppendLine("-----------------------------------------------------------");
-        Sql.AppendLine(sql.Format(_idAlias, Generate.Text()));
+        Sql.AppendLine(sql.Format(_idAlias, Any.String(10)));
     }
 
     public SqlAliasBuilder WithAdditionalParameters(params (string Name, string Argument)[] parameters)
     {
-        if (parameters.Length == 0) { parameters = [($"{Generate.Text()}", $"{Generate.Text()}")]; }
+        if (parameters.Length == 0) { parameters = [($"{Any.String(10)}", $"{Any.String(10)}")]; }
 
         foreach (var parameter in parameters)
         {
@@ -121,7 +121,7 @@ public sealed class SqlAliasBuilder : SqlBuilderBase
 
     public SqlAliasBuilder WithRandomFileName()
     {
-        WithFileName(Generate.FilName());
+        WithFileName(Any.AbsolutePath());
         return this;
     }
 
@@ -145,7 +145,7 @@ public sealed class SqlAliasBuilder : SqlBuilderBase
 
         if (names.Length == 0)
         {
-            Sql.AppendLine(sql.Format(Generate.Text(), _idAlias));
+            Sql.AppendLine(sql.Format(Any.String(10), _idAlias));
             return this;
         }
 

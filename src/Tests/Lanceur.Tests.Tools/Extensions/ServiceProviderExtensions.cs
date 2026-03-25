@@ -7,11 +7,11 @@ using Lanceur.Core.Utils;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using ScottPlot;
 using Xunit;
 
 namespace Lanceur.Tests.Tools.Extensions;
@@ -53,7 +53,7 @@ public static class ServiceProviderExtensions
 
         setupApplicationSettings?.Invoke(applicationSettingsProvider);
 
-        applicationSettingsProvider.Value.Github.Token = Generate.RandomString(15);
+        applicationSettingsProvider.Value.Github.Token = Any.String(15);
 
         return serviceCollection.AddSingleton(typeof(IWriteableSection<>), typeof(Section<>))
                                 .AddSingleton(typeof(ISection<>), typeof(ForwardingSection<>))

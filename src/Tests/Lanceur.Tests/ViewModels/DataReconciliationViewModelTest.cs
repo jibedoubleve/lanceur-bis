@@ -10,6 +10,7 @@ using Lanceur.SharedKernel;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Generators;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
@@ -548,8 +549,8 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 return i;
             }
         };
-        var fileName = Generate.Text();
-        var arguments = Generate.Text();
+        var fileName = Any.String(10);
+        var arguments = Any.String(10);
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithFileName(fileName)
                                             .WithArguments(arguments)
@@ -587,8 +588,8 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     [Fact]
     public async Task When_merged_aliases_Then_all_the_correlated_tables_are_updated()
     {
-        var fileName = Generate.Text();
-        var arguments = Generate.Text();
+        var fileName = Any.String(10);
+        var arguments = Any.String(10);
         var now = DateTime.Now;
         var timeOffset = 0;
 
@@ -796,8 +797,8 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     public async Task When_searching_doubloons_then_doubloons_are_showed()
     {
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
-        var fileName = Generate.Text();
-        var arguments = Generate.Text();
+        var fileName = Any.String(10);
+        var arguments = Any.String(10);
 
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithFileName(fileName)
