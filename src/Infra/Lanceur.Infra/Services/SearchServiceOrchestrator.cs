@@ -26,8 +26,6 @@ public sealed class SearchServiceOrchestrator : ISearchServiceOrchestrator
     /// <inheritdoc />
     public bool IsAlive(IStoreService storeService, Cmdline query)
     {
-        if (storeService is null) { return false; }
-
         _settings.Reload();
         var storeOverride = _settings.Value.StoreShortcuts
                                      .FirstOrDefault(x => x.StoreType == storeService.GetType().ToString());

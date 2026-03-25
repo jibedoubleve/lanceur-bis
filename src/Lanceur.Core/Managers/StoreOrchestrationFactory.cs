@@ -6,7 +6,7 @@ public sealed class StoreOrchestrationFactory : IStoreOrchestrationFactory
     #region Methods
 
     /// <inheritdoc />
-    public StoreOrchestration AlwaysInactive() => new("(?!)", true);
+    public StoreOrchestration AlwaysInactive() => new("(?!)", false);
 
     /// <inheritdoc />
     public StoreOrchestration Exclusive(string alivePattern) => new(alivePattern, true);

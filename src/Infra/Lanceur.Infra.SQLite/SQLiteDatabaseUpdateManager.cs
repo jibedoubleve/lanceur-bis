@@ -45,8 +45,6 @@ internal sealed class SQLiteDatabaseUpdateManager
 
     public void SetLatestVersion() => _versionService.SetCurrentDbVersion(_dbUpdater.MaxVersion());
 
-    public void UpdateFrom(string version) => UpdateFrom(new Version(version));
-
     public void UpdateFrom(Version version) => _dbUpdater.UpdateFrom(version);
 
     public void UpdateFromScratch() => _dbUpdater.UpdateFromScratch();
