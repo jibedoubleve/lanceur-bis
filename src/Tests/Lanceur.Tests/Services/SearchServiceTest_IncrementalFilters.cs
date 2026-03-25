@@ -336,11 +336,10 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
 
         return new SteamGameStore(
             new StoreOrchestrationFactory(),
+            storeSection,
             steamService,
             managementService,
-            featureFlags,
-            storeSection
-        );
+            featureFlags);
     }
 
     private static AdditionalParametersStore BuildAdditionalParametersStore()
@@ -561,10 +560,10 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         storeSection.Value.Returns(new StoreSection());
 
         var store = new SteamGameStore(new StoreOrchestrationFactory(),
+            storeSection,
             steamService,
             managementService,
-            featureFlags,
-            storeSection);
+            featureFlags);
         var service = BuildSearchService(store);
 
         // ACT

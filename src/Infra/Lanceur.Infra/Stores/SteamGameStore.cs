@@ -26,12 +26,15 @@ public sealed class SteamGameStore : StoreBase, IStoreService
     /// <inheritdoc />
     public SteamGameStore(
         IStoreOrchestrationFactory orchestrationFactory,
+        ISection<StoreSection> storeSettings,
         ISteamLibraryService steamLibraryService,
         IAliasManagementService aliasManagementService,
-        IFeatureFlagService featureFlagService,
-        ISection<StoreSection> storeSettings
-    ) : base(orchestrationFactory, storeSettings)
+        IFeatureFlagService featureFlagService) : base(orchestrationFactory, storeSettings)
     {
+        ArgumentNullException.ThrowIfNull(steamLibraryService);
+        ArgumentNullException.ThrowIfNull(aliasManagementService);
+        ArgumentNullException.ThrowIfNull(featureFlagService);
+
         _steamLibraryService = steamLibraryService;
         _aliasManagementService = aliasManagementService;
         _featureFlagService = featureFlagService;
