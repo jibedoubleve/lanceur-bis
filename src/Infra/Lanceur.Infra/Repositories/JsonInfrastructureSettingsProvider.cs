@@ -31,10 +31,10 @@ public sealed class JsonInfrastructureSettingsProvider : ISettingsProvider<Infra
     #region Properties
 
     /// <inheritdoc />
-    object ISettingsProvider.Current => Current;
+    object ISettingsProvider.Value => Value;
 
     /// <inheritdoc />
-    public InfrastructureSettings Current
+    public InfrastructureSettings Value
     {
         get
         {

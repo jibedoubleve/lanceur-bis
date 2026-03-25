@@ -26,9 +26,28 @@ public sealed class WindowSection
     public int NotificationDisplayDuration { get; set; } = 10;
 
     /// <summary>
-    ///     Gets or sets the position of the window when it is displayed on the screen.
+    ///     Gets or sets the last known position of the window on the screen.
+    ///     Defaults to <see cref="double.MaxValue" /> for both axes, which indicates that no position
+    ///     has been saved yet and the window should be placed at its default position.
     /// </summary>
+    /// <remarks>
+    ///     The setter is required for JSON deserialisation. Use <see cref="WindowSectionExtensions.SetPosition" />
+    ///     to update the position at runtime.
+    /// </remarks>
     public PositionSection Position { get; set; } = new() { Left = double.MaxValue, Top = double.MaxValue };
+
+    #endregion
+}
+
+public static class WindowSectionExtensions
+{
+    #region Methods
+
+    public static void SetPosition(this WindowSection section, double left, double top)
+    {
+        section.Position.Left = left;
+        section.Position.Top = top;
+    }
 
     #endregion
 }

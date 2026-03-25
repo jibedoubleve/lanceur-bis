@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     Non-generic base contract for settings providers.
-///     Exposes <see cref="Current" /> as <see cref="object" /> to allow uniform enumeration
+///     Exposes <see cref="Value" /> as <see cref="object" /> to allow uniform enumeration
 ///     (e.g. in <c>Section&lt;T&gt;</c>) without knowing the concrete configuration type.
 /// </summary>
 public interface ISettingsProvider
@@ -14,9 +14,9 @@ public interface ISettingsProvider
     /// </summary>
     /// <value>
     ///     The current configuration object. Cast to the expected type or use
-    ///     <see cref="ISettingsProvider{TConfig}.Current" /> for a typed alternative.
+    ///     <see cref="ISettingsProvider{TConfig}.Value" /> for a typed alternative.
     /// </value>
-    object Current { get; }
+    object Value { get; }
 
     #endregion
 
@@ -27,7 +27,7 @@ public interface ISettingsProvider
     /// </summary>
     /// <remarks>
     ///     This method reads the configuration from its source (such as disk, memory, or another persistence layer)
-    ///     and updates the <see cref="Current" /> property.
+    ///     and updates the <see cref="Value" /> property.
     /// </remarks>
     void Load();
 
@@ -54,12 +54,12 @@ public interface ISettingsProvider<out TConfig> : ISettingsProvider
 
     /// <summary>
     ///     Gets the current configuration instance as <typeparamref name="TConfig" />.
-    ///     Hides <see cref="ISettingsProvider.Current" /> to provide a strongly-typed alternative.
+    ///     Hides <see cref="ISettingsProvider.Value" /> to provide a strongly-typed alternative.
     /// </summary>
     /// <value>
     ///     The current configuration object of type <typeparamref name="TConfig" />.
     /// </value>
-    new TConfig Current { get; }
+    new TConfig Value { get; }
 
     #endregion
 }

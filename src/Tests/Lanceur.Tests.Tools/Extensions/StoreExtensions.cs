@@ -21,11 +21,11 @@ public static class StoreExtensions
     {
         serviceCollection
             .AddMockConfigurationSections(s => {
-                s.Current.Caching = configuration is null 
+                s.Value.Caching = configuration is null 
                     ? new CachingSection(0, 0) 
                     : configuration.Caching;
                 
-                s.Current.Stores = configuration is null 
+                s.Value.Stores = configuration is null 
                     ? new StoreSection() 
                     : configuration.Stores;
             });

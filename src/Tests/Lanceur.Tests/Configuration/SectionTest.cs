@@ -47,8 +47,8 @@ public sealed class SectionTest
         var testProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<TestSettingsWithTwiceSameSection>>();
         var infraProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<InfrastructureSettings>>();
 
-        testProvider.Current.Returns(testSettings);
-        infraProvider.Current.Returns(infraSettings);
+        testProvider.Value.Returns(testSettings);
+        infraProvider.Value.Returns(infraSettings);
 
         var section = new Section<DatabaseSection>([
             testProvider,
@@ -72,8 +72,8 @@ public sealed class SectionTest
         var appProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<TestSettingsWithTwiceSameSection>>();
         var infraProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<InfrastructureSettings>>();
 
-        appProvider.Current.Returns(appSettings);
-        infraProvider.Current.Returns(infraSettings);
+        appProvider.Value.Returns(appSettings);
+        infraProvider.Value.Returns(infraSettings);
         var section = new Section<object>([
             appProvider,
             infraProvider
@@ -96,8 +96,8 @@ public sealed class SectionTest
         var appProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<TestSettingsWithTwiceSameSection>>();
         var infraProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<InfrastructureSettings>>();
 
-        appProvider.Current.Returns(appSettings);
-        infraProvider.Current.Returns(infraSettings);
+        appProvider.Value.Returns(appSettings);
+        infraProvider.Value.Returns(infraSettings);
         
         // arrange
         var section = new Section<SearchBoxSection>([

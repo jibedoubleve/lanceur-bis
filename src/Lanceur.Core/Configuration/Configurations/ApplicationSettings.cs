@@ -1,4 +1,3 @@
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
@@ -87,6 +86,36 @@ public class ApplicationSettings
     ///     This includes dimensions, position, and other display-related preferences.
     /// </summary>
     public WindowSection Window { get; set; } = new();
+
+    #endregion
+}
+
+public static class ApplicationSettingsExtensions
+{
+    #region Methods
+
+    private static void RemoveStaleFeatureFlags(List<FeatureFlag> currentFf)
+    {
+        var ffNames = Features.GetNames();
+        var toRemove = currentFf.Where(f => !ffNames.Contains(f.FeatureName))
+                                .ToArray();
+
+        foreach (var f in toRemove) { currentFf.Remove(f); }
+    }
+
+    public static void AddNewFeatureFlags(this ApplicationSettings config)
+    {
+        var defaultFf = new ApplicationSettings().FeatureFlags; //Default featureFlags
+        var currentFf = new List<FeatureFlag>(config.FeatureFlags);
+
+        var newFf = defaultFf.Where(f => config.FeatureFlags.All(c => c.FeatureName != f.FeatureName));
+
+        currentFf.AddRange(newFf);
+
+        RemoveStaleFeatureFlags(currentFf);
+
+        config.FeatureFlags = currentFf;
+    }
 
     #endregion
 }

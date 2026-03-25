@@ -53,7 +53,7 @@ public static class ServiceProviderExtensions
 
         setupApplicationSettings?.Invoke(applicationSettingsProvider);
 
-        applicationSettingsProvider.Current.Github.Token = Generate.RandomString(15);
+        applicationSettingsProvider.Value.Github.Token = Generate.RandomString(15);
 
         return serviceCollection.AddSingleton(typeof(IWriteableSection<>), typeof(Section<>))
                                 .AddSingleton(typeof(ISection<>), typeof(ForwardingSection<>))

@@ -54,12 +54,12 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
             CreateLogger<SQLiteApplicationSettingsProvider>()
         );
 
-        update(settingRepository.Current);
+        update(settingRepository.Value);
 
         settingRepository.Save();
         settingRepository.Load();
 
-        assert(settingRepository.Current);
+        assert(settingRepository.Value);
     }
 
     public static IEnumerable<object[]> HaveUpdatedPropertyFeed()
@@ -115,7 +115,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
                      }
                      """;
         WithConfiguration(repository =>
-                repository.Current.FeatureFlags.ToList()
+                repository.Value.FeatureFlags.ToList()
                           .ShouldSatisfyAllConditions(
                               ff => ff.Count.ShouldBeGreaterThan(0),
                               ff => ff.Select(f => features.Contains(f.FeatureName))
@@ -131,7 +131,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
         var stg = new JsonInfrastructureSettingsProvider(file);
         File.Delete(file);
 
-        var value = stg.Current.Database.DbPath;
+        var value = stg.Value.Database.DbPath;
 
         value.ShouldBe(Paths.DefaultDb);
     }
@@ -139,7 +139,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
     [Fact]
     public void When_retrieving_default_settings_Then_default_position_has_the_expected_value() =>
         WithConfiguration(repository => {
-                var settings = repository.Current;
+                var settings = repository.Value;
                 settings.Window.Position.Left.ShouldBe(double.MaxValue);
                 settings.Window.Position.Top.ShouldBe(double.MaxValue);
             }
@@ -148,7 +148,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
     [Fact]
     public void When_retrieving_default_settings_Then_HotKey_has_the_expected_value() =>
         WithConfiguration(repository => {
-                var settings = repository.Current;
+                var settings = repository.Value;
                 settings.HotKey.ModifierKey.ShouldBe(3);
                 settings.HotKey.Key.ShouldBe(18);
             }
@@ -161,7 +161,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
         using var scope = new DbSingleConnectionManager(c);
         var settings = new SQLiteApplicationSettingsProvider(scope, CreateLogger<SQLiteApplicationSettingsProvider>());
 
-        settings.Current.SearchBox.ShowAtStartup.ShouldBeTrue();
+        settings.Value.SearchBox.ShowAtStartup.ShouldBeTrue();
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
         var logger = CreateLogger<SQLiteApplicationSettingsProvider>();
         var settings = new SQLiteApplicationSettingsProvider(scope, logger);
 
-        settings.Current.SearchBox.ShowResult.ShouldBeFalse();
+        settings.Value.SearchBox.ShowResult.ShouldBeFalse();
     }
 
     [Theory]
@@ -203,7 +203,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
                      }
                      """;
         WithConfiguration(repository =>
-                repository.Current.FeatureFlags
+                repository.Value.FeatureFlags
                           .Single(f => f.FeatureName == featureName)
                           .ShouldSatisfyAllConditions(
                               ff => ff.Enabled.ShouldBe(isEnabled),
@@ -220,7 +220,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
     [InlineData(10, 20)]
     public void When_updating_HotKey_Then_it_is_saved_in_db(int modifierKey, int key) =>
         WithConfiguration(repository => {
-                var settings = repository.Current;
+                var settings = repository.Value;
                 settings.HotKey = new HotKeySection(modifierKey, key);
 
                 repository.Save();
@@ -237,7 +237,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
         var file = Path.GetTempFileName();
         var stg = new JsonInfrastructureSettingsProvider(file)
         {
-            Current =
+            Value =
             {
                 Database =
                 {
@@ -248,7 +248,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
 
         stg.Save();
 
-        var asThisJson = JsonConvert.SerializeObject(stg.Current);
+        var asThisJson = JsonConvert.SerializeObject(stg.Value);
         var json = File.ReadAllText(file);
 
         json.ShouldBe(asThisJson);
@@ -258,13 +258,13 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
     [InlineData(1.1d, 2.1d)]
     public void When_updating_position_Then_it_is_saved_in_db(double left, double top) =>
         WithConfiguration(repository => {
-                var settings = repository.Current;
+                var settings = repository.Value;
                 settings.Window.Position.Left = left;
                 settings.Window.Position.Top = top;
 
                 repository.Save();
 
-                var loaded = repository.Current;
+                var loaded = repository.Value;
                 loaded.Window.Position.Left.ShouldBe(left);
                 loaded.Window.Position.Top.ShouldBe(top);
             }
@@ -277,10 +277,10 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
         var stg = new JsonInfrastructureSettingsProvider(file);
         var expected = "undeuxtrois";
 
-        stg.Current.Database.DbPath = expected;
+        stg.Value.Database.DbPath = expected;
         stg.Save();
 
-        var actual = stg.Current.Database.DbPath;
+        var actual = stg.Value.Database.DbPath;
 
         actual.ShouldBe(expected);
     }
@@ -360,13 +360,13 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
                      }
                      """;
         WithConfiguration(assert =>
-                assert.Current.ShouldSatisfyAllConditions(
+                assert.Value.ShouldSatisfyAllConditions(
                     a => a.Caching.StoreCacheDuration.ShouldBe(11),
                     a => a.Caching.ThumbnailCacheDuration.ShouldBe(12),
                     a => {
                         if (a.FeatureFlags.Any())
                         {
-                            var ff = assert.Current.FeatureFlags.ElementAt(0);
+                            var ff = assert.Value.FeatureFlags.ElementAt(0);
                             ff.Description.ShouldBe(description);
                             ff.Enabled.ShouldBe(true);
                             ff.FeatureName.ShouldBe(features[0]);
