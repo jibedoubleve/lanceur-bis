@@ -27,8 +27,8 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
     #region Methods
 
     private void WithConfiguration(
-        Action<ISettingsProvider<ApplicationSettings>> assert, 
-        string? json = null, 
+        Action<ISettingsProvider<ApplicationSettings>> assert,
+        string? json = null,
         IConnectionString? connectionString = null)
     {
         var sql = $"insert into settings (s_key, s_value) values ('json', '{json}');";
@@ -184,30 +184,21 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
         var featureName = Features.GetNames().ElementAt(0);
         var icon = Generate.Text();
 
-        var json = $$"""
-                     {
-                         "FeatureFlags": [
-                             {
-                                 "Description": "{{description}}",
-                                 "Enabled": {{(isEnabled ? "true" : "false")}},
-                                 "FeatureName": "{{featureName}}",
-                                 "Icon": "{{icon}}"
-                             },
-                             {
-                                 "Description": "Enables administrator",
-                                 "Enabled": true,
-                                 "FeatureName": "AdminMode1",
-                                 "Icon": "ShieldKeyhole241"
-                             }
-                         ]
-                     }
-                     """;
+        var section = new ApplicationSettings();
+        var fFlag = section.FeatureFlags
+                       .Single(f => f.FeatureName == Features.AdditionalParameterAlwaysActive);
+
+        fFlag.Description = description;
+        fFlag.Enabled = isEnabled;
+        fFlag.Icon = icon;
+
+        var json = JsonConvert.SerializeObject(section);
         WithConfiguration(repository =>
                 repository.Value.FeatureFlags
                           .Single(f => f.FeatureName == featureName)
                           .ShouldSatisfyAllConditions(
                               ff => ff.Enabled.ShouldBe(isEnabled),
-                              ff => ff.FeatureName.ShouldBe(featureName),
+                              ff => ff.FeatureName.ShouldBe(Features.AdditionalParameterAlwaysActive),
                               ff => ff.Icon.ShouldBe(icon),
                               ff => ff.Description.ShouldBe(description)
                           ),
