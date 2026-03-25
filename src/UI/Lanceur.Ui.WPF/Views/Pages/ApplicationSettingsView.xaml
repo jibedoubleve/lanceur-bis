@@ -250,7 +250,7 @@
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:ToggleSwitch
-                            IsChecked="{Binding IsStatusBarAlwaysVisible}"
+                            IsChecked="{Binding IsStatusBarAlwaysVisible, UpdateSourceTrigger=PropertyChanged}"
                             OffContent="No"
                             OnContent="Yes" />
                     </StackPanel>
