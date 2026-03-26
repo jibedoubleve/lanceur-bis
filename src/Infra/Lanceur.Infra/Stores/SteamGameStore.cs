@@ -46,10 +46,10 @@ public sealed class SteamGameStore : StoreBase, IStoreService
 
     #region Properties
 
+    private Lazy<Regex> ShortcutRegex { get; }
+
     /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => true;
-
-    public Lazy<Regex> ShortcutRegex { get; }
 
     /// <inheritdoc />
     public StoreOrchestration StoreOrchestration
