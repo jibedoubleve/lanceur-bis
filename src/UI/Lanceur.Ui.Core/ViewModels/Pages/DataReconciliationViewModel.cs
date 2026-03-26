@@ -82,15 +82,13 @@ public partial class DataReconciliationViewModel : ObservableObject
     {
         if (!HasSelection()) { return false; }
 
-        return GetSelectedAliases()
-               .Select(e => e.FileName)
-               .Distinct()
-               .Count() ==
-               1;
+        return GetSelectedAliases().Select(e => e.FileName)
+                                   .Distinct()
+                                   .Count() == 1;
     }
 
 
-    private async Task<(bool IsSuccess, IEnumerable<ReportConfiguration>? Configuration)> GetReportConfiguration(
+    private async Task<(bool IsSuccess, ICollection<ReportConfiguration>? Configuration)> GetReportConfiguration(
         string label,
         string tooltip,
         IEnumerable<ReportConfiguration> configuration,
@@ -158,6 +156,7 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         if (!result.IsSuccess) { return; }
 
+        _reconciliationSection.Value.ReportsConfiguration = result.Configuration!;
         _reconciliationSection.Save();
         await OnShowAsync(ReportType);
     }
