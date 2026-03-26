@@ -125,72 +125,55 @@ public sealed class ReconciliationSection
 
 public sealed class ReportConfiguration(ReportType reportType, ColumnsConfiguration columnsVisibility) : ObservableModel
 {
-    #region Fields
-
-    private ColumnsConfiguration _columnsVisibility = columnsVisibility;
-    private ReportType _reportType = reportType;
-
-    #endregion
-
     #region Properties
 
     public ColumnsConfiguration ColumnsVisibility
     {
-        get => _columnsVisibility;
-        set => SetField(ref _columnsVisibility, value);
-    }
+        get;
+        set => SetField(ref field, value);
+    } = columnsVisibility;
 
     public ReportType ReportType
     {
-        get => _reportType;
-        set => SetField(ref _reportType, value);
-    }
+        get;
+        set => SetField(ref field, value);
+    } = reportType;
 
     #endregion
 }
 
 public sealed class ColumnsConfiguration : ObservableModel
 {
-    #region Fields
-
-    private bool _fileName;
-    private bool _lastUsed;
-    private bool _parameters;
-    private bool _proposedDescription;
-    private bool _usageCount;
-
-    #endregion
-
     #region Properties
 
     public bool FileName
     {
-        get => _fileName;
-        set => SetField(ref _fileName, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     public bool LastUsed
     {
-        get => _lastUsed;
-        set => SetField(ref _lastUsed, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     public bool Parameters
     {
-        get => _parameters;
-        set => SetField(ref _parameters, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     public bool ProposedDescription
     {
-        get => _proposedDescription;
-        set => SetField(ref _proposedDescription, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     public bool UsageCount
     {
-        get => _usageCount;
-        set => SetField(ref _usageCount, value);
+        get;
+        set => SetField(ref field, value);
     }
 
     #endregion
