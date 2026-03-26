@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
+using Humanizer;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -25,16 +25,11 @@ public sealed class SearchServiceOrchestrator : ISearchServiceOrchestrator
 
     /// <inheritdoc />
     public bool IsAlive(IStoreService storeService, Cmdline query)
-    {
-        _settings.Reload();
-        var storeOverride = _settings.Value.StoreShortcuts
-                                     .FirstOrDefault(x => x.StoreType == storeService.GetType().ToString());
-
-        var regex = new Regex(storeOverride?.AliasOverride ?? storeService.StoreOrchestration.AlivePattern);
-
-        var isAlive = regex.IsMatch(query.Name);
-        return isAlive;
-    }
+        => new Regex(
+            storeService.StoreOrchestration.AlivePattern,
+            RegexOptions.Compiled,
+            200.Milliseconds()
+        ).IsMatch(query.Name);
 
     #endregion
 }
