@@ -124,5 +124,22 @@ public sealed class SettingsProvidersTest : TestBase
             );
         });
 
+    [Fact]
+    public void When_settings_are_reloaded_multiple_times_Then_feature_flags_are_not_duplicated()
+        => WithConfiguration<WindowSection>((_, provider) => {
+            // arrange — prime the cache and save initial state to DB
+            var initialCount = provider.Value.FeatureFlags.Count();
+            provider.Save();
+
+            // act — reload multiple times (each Load() was accumulating flags before the fix)
+            provider.Load();
+            provider.Load();
+            provider.Load();
+
+            // assert
+            provider.Value.FeatureFlags.Count()
+                    .ShouldBe(initialCount, "FeatureFlags must not accumulate on repeated Load() calls");
+        });
+
     #endregion
 }

@@ -42,6 +42,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
             scope,
             CreateLogger<SQLiteApplicationSettingsProvider>()
         );
+        settingRepository.Load();
         assert(settingRepository);
     }
 
@@ -186,7 +187,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
 
         var section = new ApplicationSettings();
         var fFlag = section.FeatureFlags
-                       .Single(f => f.FeatureName == Features.AdditionalParameterAlwaysActive);
+                       .Single(f => f.FeatureName == featureName);
 
         fFlag.Description = description;
         fFlag.Enabled = isEnabled;
@@ -198,7 +199,6 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
                           .Single(f => f.FeatureName == featureName)
                           .ShouldSatisfyAllConditions(
                               ff => ff.Enabled.ShouldBe(isEnabled),
-                              ff => ff.FeatureName.ShouldBe(Features.AdditionalParameterAlwaysActive),
                               ff => ff.Icon.ShouldBe(icon),
                               ff => ff.Description.ShouldBe(description)
                           ),
