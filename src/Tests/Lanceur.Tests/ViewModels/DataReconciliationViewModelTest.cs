@@ -1,7 +1,10 @@
 using Dapper;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections.Application;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
@@ -14,6 +17,7 @@ using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.Core.ViewModels.Controls;
 using Lanceur.Ui.Core.ViewModels.Pages;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -157,7 +161,9 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         ServiceVisitors? visitors
     )
     {
-        serviceCollection.AddMockSingleton<IViewFactory>()
+        serviceCollection.AddMockSingleton<IViewFactory>((sp, i)
+                             => visitors?.VisitViewFactory?.Invoke(sp, i) ?? i
+                         )
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddMockSingleton<ISettingsProvider<ApplicationSettings>>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
@@ -348,6 +354,45 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(expectedCount);
             },
             sqlBuilder,
+            visitors
+        );
+    }
+
+    [Fact]
+    public async Task When_configuring_report_Then_new_configuration_is_saved()
+    {
+        MemoryApplicationSettingsProvider? capturedProvider = null;
+
+        var visitors = new ServiceVisitors
+        {
+            VisitApplicationSettingsProvider = provider => capturedProvider = provider,
+            VisitViewFactory = (_, _) => new ReportConfigurationStubViewFactory(),
+            VisitUserInteractionService = (_, i) => {
+                i.AskUserYesNoAsync(
+                    Arg.Any<object>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>()
+                ).Returns(true);
+                return i;
+            }
+        };
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // arrange — navigate to RestoreAlias report first so ReportType is not None
+                await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null);
+
+                // act — user opens the config dialogue and changes FileName visibility
+                await viewModel.ConfigureReportCommand.ExecuteAsync(null);
+
+                // assert — the new configuration must have been assigned before Save() was called
+                capturedProvider!.Value.Reconciliation.ReportsConfiguration
+                                 .First(e => e.ReportType == ReportType.RestoreAlias)
+                                 .ColumnsVisibility.FileName
+                                 .ShouldBeFalse("new configuration returned by the dialog must be persisted");
+            },
+            Sql.Empty,
             visitors
         );
     }
@@ -889,4 +934,31 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     }
 
     #endregion
+
+    private sealed class ReportConfigurationStubViewFactory : IViewFactory
+    {
+        #region Methods
+
+        public object CreateView(object viewModel)
+        {
+            if (viewModel is not ReportConfigurationViewModel vm)
+            {
+                return new object();
+            }
+
+            // Simulate the user replacing the RestoreAlias config entry:
+            // FileName was true → user sets it to false
+            var idx = vm.Configurations
+                        .Select((c, i) => (c, i))
+                        .First(x => x.c.ReportType == ReportType.RestoreAlias).i;
+            vm.Configurations[idx] = new ReportConfiguration(
+                ReportType.RestoreAlias,
+                new ColumnsConfiguration { FileName = false }
+            );
+
+            return new object();
+        }
+
+        #endregion
+    }
 }
