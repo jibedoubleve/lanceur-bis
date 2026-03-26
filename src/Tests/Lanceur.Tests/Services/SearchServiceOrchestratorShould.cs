@@ -1,8 +1,11 @@
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
+using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
+using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Ui.WPF.Converters;
@@ -79,6 +82,56 @@ public sealed class SearchServiceOrchestratorShould
         // act
         orchestrator.IsAlive(storeService, Cmdline.Parse(cmd))
                     .ShouldBe(expected);
+    }
+
+    /// <summary>
+    ///     Reproduces bug #1361: when <see cref="SteamGameStore" /> has its feature flag disabled
+    ///     but a shortcut override exists in DB settings, <see cref="SearchServiceOrchestrator.IsAlive" />
+    ///     incorrectly uses the override pattern instead of respecting the <c>AlwaysInactive</c>
+    ///     constraint returned by <see cref="SteamGameStore.StoreOrchestration" />.
+    /// </summary>
+    [Fact]
+    public void When_store_is_always_inactive_but_shortcut_override_exists_in_settings_Then_store_should_be_inactive()
+    {
+        // arrange
+        var featureFlags = Substitute.For<IFeatureFlagService>();
+        featureFlags.IsEnabled(Features.SteamIntegration).Returns(false);   // feature flag OFF
+
+        var store = new SteamGameStore(
+            new StoreOrchestrationFactory(),
+            new StaticSection(new StoreSection()),
+            Substitute.For<ISteamLibraryService>(),
+            Substitute.For<IAliasManagementService>(),
+            featureFlags
+        );
+
+        // A shortcut override for SteamGameStore is present in settings (e.g. saved earlier by the user)
+        var section = new StaticSection(new StoreSection
+        {
+            StoreShortcuts =
+            [
+                new StoreShortcut
+                {
+                    StoreType     = store.GetType().ToString(),
+                    AliasOverride = @"^\s{0,}&.*"   // matches "&steam", "&portal", etc.
+                }
+            ]
+        });
+
+        var orchestrator = new SearchServiceOrchestrator(section);
+
+        // act — query starts with "&", which matches the override pattern
+        var result = orchestrator.IsAlive(store, Cmdline.Parse("&steam"));
+
+        // assert — AlwaysInactive must win: the disabled feature flag takes precedence over any stored shortcut
+        result.ShouldBeFalse();
+    }
+
+    // Wraps a StoreSection value without any persistence logic
+    private sealed class StaticSection(StoreSection value) : ISection<StoreSection>
+    {
+        public StoreSection Value => value;
+        public void Reload() { }
     }
 
     #endregion
