@@ -103,18 +103,33 @@ public static class ApplicationSettingsExtensions
         foreach (var f in toRemove) { currentFf.Remove(f); }
     }
 
-    public static void AddNewFeatureFlags(this ApplicationSettings config)
+    /// <summary>
+    ///     Synchronises the feature flags in <paramref name="config" /> with the current set of known flags:
+    ///     <list type="bullet">
+    ///         <item>Flags present in code but missing from the database are added (new features).</item>
+    ///         <item>Flags present in the database but no longer in code are removed (removed features).</item>
+    ///         <item>Flags already in the database are left untouched (user preferences preserved).</item>
+    ///     </list>
+    /// </summary>
+    /// <remarks>
+    ///     The result is assigned as a <c>FeatureFlag[]</c> (array) on purpose. Keeping it as an array
+    ///     prevents Newtonsoft.Json from appending items on subsequent <c>PopulateObject</c> calls
+    ///     (arrays are fixed-size, so Newtonsoft replaces them rather than merging into them).
+    ///     Changing <c>ToArray()</c> to <c>ToList()</c> would reintroduce a duplication bug on reload.
+    /// </remarks>
+    public static void ReconcileFeatureFlags(this ApplicationSettings config)
     {
-        var defaultFf = new ApplicationSettings().FeatureFlags; //Default featureFlags
+        var defaultFf = new ApplicationSettings().FeatureFlags;
         var currentFf = new List<FeatureFlag>(config.FeatureFlags);
 
+        // Add flags that exist in code but are not yet in the database
         var newFf = defaultFf.Where(f => config.FeatureFlags.All(c => c.FeatureName != f.FeatureName));
-
         currentFf.AddRange(newFf);
 
+        // Remove flags that no longer exist in code
         RemoveStaleFeatureFlags(currentFf);
 
-        config.FeatureFlags = currentFf;
+        config.FeatureFlags = currentFf.ToArray();
     }
 
     #endregion

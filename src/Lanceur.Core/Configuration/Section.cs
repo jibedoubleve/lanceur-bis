@@ -39,21 +39,10 @@ public sealed class Section<T> : IWriteableSection<T>
 
     /// <inheritdoc />
     public T Value
-    {
-        get
-        {
-            _value ??= RebuildSections();
-
-            if (_value is null)
-            {
-                throw new InvalidOperationException(
-                    $"No configuration section of type '{typeof(T).Name}' was found. " +
-                    "Ensure it is registered in a settings provider.");
-            }
-
-            return _value;
-        }
-    }
+        => RebuildSections()
+           ?? throw new InvalidOperationException(
+               $"No configuration section of type '{typeof(T).Name}' was found. " +
+               "Ensure it is registered in a settings provider.");
 
     #endregion
 
