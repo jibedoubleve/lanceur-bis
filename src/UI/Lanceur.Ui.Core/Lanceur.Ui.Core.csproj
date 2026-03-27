@@ -9,7 +9,7 @@
         <InternalsVisibleTo Include="Lanceur.Tests"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5"/>
         <PackageReference Include="Octokit" Version="14.0.0"/>
         <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1"/>
