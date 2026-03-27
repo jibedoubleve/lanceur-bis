@@ -25,8 +25,6 @@ public sealed class Section<T> : IWriteableSection<T>
 
     private readonly IEnumerable<ISettingsProvider> _settingsProviders;
 
-    private T? _value;
-
     #endregion
 
     #region Constructors
@@ -80,8 +78,6 @@ public sealed class Section<T> : IWriteableSection<T>
         {
             provider.Load();
         }
-
-        _value = null; // Invalidate cache so Value re-resolves on next access
     }
 
     /// <inheritdoc />
