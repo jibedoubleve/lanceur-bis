@@ -398,6 +398,41 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     }
 
     [Fact]
+    public async Task When_configuring_report_is_cancelled_Then_configuration_is_not_mutated()
+    {
+        MemoryApplicationSettingsProvider? capturedProvider = null;
+
+        var visitors = new ServiceVisitors
+        {
+            VisitApplicationSettingsProvider = provider => capturedProvider = provider,
+            VisitViewFactory = (_, _) => new ReportConfigurationMutatingStubViewFactory(),
+            VisitUserInteractionService = (_, i) => {
+                i.AskUserYesNoAsync(
+                    Arg.Any<object>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>()
+                ).Returns(false);
+                return i;
+            }
+        };
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null);
+                await viewModel.ConfigureReportCommand.ExecuteAsync(null);
+
+                capturedProvider!.Value.Reconciliation.ReportsConfiguration
+                                 .First(e => e.ReportType == ReportType.RestoreAlias)
+                                 .ColumnsVisibility.FileName
+                                 .ShouldBeTrue("cancelling the dialog must not mutate the in-memory configuration");
+            },
+            Sql.Empty,
+            visitors
+        );
+    }
+
+    [Fact]
     public async Task When_delete_permanently_alias_Then_all_correlated_data_is_deleted()
     {
         var visitors = new ServiceVisitors
@@ -934,6 +969,31 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     }
 
     #endregion
+
+    /// <summary>
+    ///     Simulates the user modifying a property on an existing <see cref="ReportConfiguration" />
+    ///     (as the real UI does via data binding). Used to verify that cancelling the dialog
+    ///     does not mutate the in-memory configuration through shared object references.
+    /// </summary>
+    private sealed class ReportConfigurationMutatingStubViewFactory : IViewFactory
+    {
+        #region Methods
+
+        public object CreateView(object viewModel)
+        {
+            if (viewModel is not ReportConfigurationViewModel vm) return new object();
+
+            // Simulate the user toggling a checkbox on the existing ColumnsConfiguration:
+            // FileName was true → user sets it to false (without replacing the object)
+            vm.Configurations
+              .First(c => c.ReportType == ReportType.RestoreAlias)
+              .ColumnsVisibility.FileName = false;
+
+            return new object();
+        }
+
+        #endregion
+    }
 
     private sealed class ReportConfigurationStubViewFactory : IViewFactory
     {
