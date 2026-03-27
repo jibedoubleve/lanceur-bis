@@ -15,9 +15,6 @@ public sealed class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IS
 
     private readonly ILogger<SQLiteApplicationSettingsProvider> _logger;
 
-    private static readonly JsonSerializerSettings SerializerSettings =
-        new() { ObjectCreationHandling = ObjectCreationHandling.Replace };
-
     private bool _settingsLoaded;
 
     private readonly ApplicationSettings _value = new();
@@ -77,9 +74,9 @@ public sealed class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IS
             return;
         }
 
-        _value.Stores.StoreShortcuts = [];
-        JsonConvert.PopulateObject(json, _value, SerializerSettings);
-        _value.AddNewFeatureFlags();
+        JsonConvert.PopulateObject(json, _value);
+
+        _value.ReconcileFeatureFlags();
     }
 
     /// <inheritdoc />

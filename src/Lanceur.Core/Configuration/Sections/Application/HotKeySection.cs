@@ -17,12 +17,12 @@ public record HotKeySection
     /// <remarks>
     ///     Setter is used for serialization
     /// </remarks>
-    public int Key { get; }
+    public int Key { get; set; }
 
     /// <remarks>
     ///     Setter is used for serialization
     /// </remarks>
-    public int ModifierKey { get; }
+    public int ModifierKey { get; set; }
 
     #endregion
 
