@@ -27,7 +27,7 @@ public partial class ReportConfigurationViewModel : ObservableObject
         ReportType currentReport
     )
     {
-        Configurations = new ObservableCollection<ReportConfiguration>(configurations);
+        Configurations = new ObservableCollection<ReportConfiguration>(configurations.Select(c => c.Clone()));
         SelectedConfiguration = Configurations.FirstOrDefault(e => e.ReportType == currentReport)!;
         Label = label;
         ToolTip = toolTip;

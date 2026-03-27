@@ -123,6 +123,21 @@ public sealed class ReconciliationSection
     #endregion
 }
 
+public static class ReconciliationSectionExtensions
+{
+    public static ReportConfiguration Clone(this ReportConfiguration c) 
+        => new(
+            c.ReportType,
+            new ColumnsConfiguration
+            {
+                FileName = c.ColumnsVisibility.FileName,
+                LastUsed = c.ColumnsVisibility.LastUsed,
+                Parameters = c.ColumnsVisibility.Parameters,
+                ProposedDescription = c.ColumnsVisibility.ProposedDescription,
+                UsageCount = c.ColumnsVisibility.UsageCount
+
+            });
+}
 public sealed class ReportConfiguration(ReportType reportType, ColumnsConfiguration columnsVisibility) : ObservableModel
 {
     #region Properties
