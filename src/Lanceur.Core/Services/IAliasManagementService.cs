@@ -55,7 +55,7 @@ public interface IAliasManagementService
     ///     The alias query result object to be saved or updated. The Id will be updated if
     ///     the entity is newly created in the database.
     /// </param>
-    void SaveOrUpdate(ref AliasQueryResult alias);
+    void SaveOrUpdate(AliasQueryResult alias);
 
     /// <summary>
     ///     Updates only the thumbnail property of the specified alias in the database.

@@ -124,14 +124,14 @@ public sealed class AliasDbAction
             ? aqr.FileName
             : null;
 
-    internal void CreateInvisible(IDbTransaction tx, ref QueryResult alias)
+    internal void CreateInvisible(IDbTransaction tx, QueryResult alias)
     {
         if (alias is not ExecutableQueryResult exec) { return; }
 
         var queryResult = exec.ToAliasQueryResult();
         queryResult.IsHidden = true;
         queryResult.FileName = GetFileName(alias) ?? exec.Name; // By convention for builtin keyword
-        alias.Id = SaveOrUpdate(tx, ref queryResult);
+        alias.Id = SaveOrUpdate(tx, queryResult);
     }
 
     internal AliasQueryResult? GetById(IDbConnection connection, long id)
@@ -256,7 +256,7 @@ public sealed class AliasDbAction
         ClearAlias(tx, id);
     }
 
-    internal long SaveOrUpdate(IDbTransaction tx, ref AliasQueryResult alias)
+    internal long SaveOrUpdate(IDbTransaction tx, AliasQueryResult alias)
     {
         const string sqlAlias = """
                                 update alias

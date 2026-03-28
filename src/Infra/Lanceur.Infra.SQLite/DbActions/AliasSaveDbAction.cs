@@ -27,7 +27,7 @@ public sealed class AliasSaveDbAction
 
     #region Methods
 
-    public void SaveOrUpdate(IDbTransaction tx, ref AliasQueryResult alias)
+    public void SaveOrUpdate(IDbTransaction tx, AliasQueryResult alias)
     {
         ArgumentNullException.ThrowIfNull(alias);
         ArgumentNullException.ThrowIfNull(alias.Synonyms);
@@ -37,7 +37,7 @@ public sealed class AliasSaveDbAction
 
         using var _ = _logger.BeginSingleScope("UpdatedAlias", alias);
 
-        _dbActionFactory.AliasManagement.SaveOrUpdate(tx, ref alias);
+        _dbActionFactory.AliasManagement.SaveOrUpdate(tx, alias);
 
         // Reset state after save
         alias.SynonymsWhenLoaded = alias.Synonyms;
@@ -47,8 +47,7 @@ public sealed class AliasSaveDbAction
     {
         foreach (var alias in aliases)
         {
-            var a = alias;
-            SaveOrUpdate(tx, ref a);
+            SaveOrUpdate(tx, alias);
         }
     }
 

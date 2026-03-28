@@ -388,7 +388,7 @@ public partial class KeywordsViewModel : ObservableObject
         await _packagedAppSearchService.TryResolveDetailsAsync(queryResult);
 
         var alias = queryResult;
-        await Task.Run(() => _aliasManagementService.SaveOrUpdate(ref alias));
+        await Task.Run(() => _aliasManagementService.SaveOrUpdate(alias));
         _hubService.Notifications.Success($"Alias '{alias.Name}' updated.", "Alias saved.");
     }
 

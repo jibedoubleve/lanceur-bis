@@ -71,8 +71,8 @@ public partial class SQLiteAliasRepository
         tx.Connection!.Execute(sql, new { id = alias.Id });
     }
 
-    private void SaveOrUpdate(IDbTransaction tx, ref AliasQueryResult alias) =>
-        _dbActionFactory.SaveManagement.SaveOrUpdate(tx, ref alias);
+    private void SaveOrUpdate(IDbTransaction tx, AliasQueryResult alias) =>
+        _dbActionFactory.SaveManagement.SaveOrUpdate(tx, alias);
 
     private static string[] GetSynonyms(IDbConnection conn, IEnumerable<long> ids)
     {

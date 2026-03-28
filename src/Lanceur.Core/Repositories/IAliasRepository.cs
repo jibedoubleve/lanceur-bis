@@ -274,7 +274,7 @@ public interface IAliasRepository
     /// </summary>
     /// <param name="alias">The alias to create or update.</param>
     /// <returns>The ID of the created or updated alias.</returns>
-    void SaveOrUpdate(ref AliasQueryResult alias);
+    void SaveOrUpdate(AliasQueryResult alias);
 
     /// <summary>
     ///     Updates the database by applying the specified alias changes.

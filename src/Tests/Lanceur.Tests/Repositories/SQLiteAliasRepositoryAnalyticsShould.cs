@@ -49,14 +49,14 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
         // act — simulate two consecutive executions of the same alias with Id == 0
         connectionManager.WithinTransaction((tx) => {
             var setUsage = new SetUsageDbAction(dbActionFactory);
-            setUsage.SetUsage(tx, ref alias);
+            setUsage.SetUsage(tx, alias);
         });
 
          alias.Id = 0; // reset as if resolved again without the id
 
          connectionManager.WithinTransaction(tx => {
              var setUsage = new SetUsageDbAction(dbActionFactory);
-             setUsage.SetUsage(tx, ref alias);
+             setUsage.SetUsage(tx, alias);
          });
 
         // assert — only one alias row should exist for that file_name
