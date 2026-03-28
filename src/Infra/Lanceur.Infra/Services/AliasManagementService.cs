@@ -52,9 +52,9 @@ public sealed class AliasManagementService : IAliasManagementService
         => _repository.HydrateSteamGameUsage(aliases);
 
     /// <inheritdoc />
-    public void SaveOrUpdate(ref AliasQueryResult alias)
+    public void SaveOrUpdate(AliasQueryResult alias)
     {
-        _repository.SaveOrUpdate(ref alias);
+        _repository.SaveOrUpdate(alias);
         alias.MarkUnchanged();
     }
 

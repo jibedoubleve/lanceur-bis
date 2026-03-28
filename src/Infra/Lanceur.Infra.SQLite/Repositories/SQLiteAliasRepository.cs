@@ -520,7 +520,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
 
             var toAlias = AggregateIntoFirst(fromAliases);
             MergeHistory(tx, fromAliases, toAlias.Id);
-            SaveOrUpdate(tx, ref toAlias);
+            SaveOrUpdate(tx, toAlias);
             Restore(tx, toAlias);
 
             // Removed merged aliases...
@@ -610,12 +610,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
     public void Restore(AliasQueryResult alias) => Db.WithinTransaction(tx => Restore(tx, alias));
 
     /// <inheritdoc />
-    public void SaveOrUpdate(ref AliasQueryResult alias)
-    {
-        var local = alias;
-        Db.WithinTransaction(tx => SaveOrUpdate(tx, ref local));
-        alias = local;
-    }
+    public void SaveOrUpdate(AliasQueryResult alias) => Db.WithinTransaction(tx => SaveOrUpdate(tx, alias));
 
     /// <inheritdoc />
     public void SaveOrUpdate(IEnumerable<AliasQueryResult> aliases)
@@ -636,22 +631,19 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
 
     /// <inheritdoc />
     public void SetUsage(QueryResult alias)
-        => Db.WithinTransaction(tx => {
-                if (alias is null)
-                {
-                    _logger.LogWarning("Impossible to set usage: alias is null");
-                    return;
-                }
-
+    {
+        ArgumentNullException.ThrowIfNull(alias);
+        Db.WithinTransaction(tx => {
                 if (alias.Name.IsNullOrEmpty())
                 {
                     _logger.LogWarning("Impossible to set usage: alias name is empty. Alias: {@Alias}", alias);
                     return;
                 }
 
-                _dbActionFactory.UsageManagement.SetUsage(tx, ref alias);
+                _dbActionFactory.UsageManagement.SetUsage(tx, alias);
             }
         );
+    }
 
     /// <inheritdoc />
     public void UpdateThumbnail(AliasQueryResult alias)

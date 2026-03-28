@@ -20,7 +20,7 @@ public sealed class SetUsageDbAction
 
     #region Methods
 
-    private void AddHistory(IDbTransaction tx, ref QueryResult alias)
+    private void AddHistory(IDbTransaction tx, QueryResult alias)
     {
         const string sql = """
                            insert into alias_usage (
@@ -52,7 +52,7 @@ public sealed class SetUsageDbAction
     ///     A reference to the QueryResult object whose count property will be updated with the retrieved
     ///     value.
     /// </param>
-    private static void UpdateCounter(IDbTransaction tx, ref QueryResult alias)
+    private static void UpdateCounter(IDbTransaction tx, QueryResult alias)
     {
         const string sql = "select count(*) from alias_usage where id_alias = @id;";
         var count = tx.Connection!.ExecuteScalar<int>(sql, new { id = alias.Id });
@@ -74,7 +74,7 @@ public sealed class SetUsageDbAction
     /// </remarks>
     /// <param name="tx">The database transaction context.</param>
     /// <param name="alias">The QueryResult object representing the alias to be updated. Must not be null.</param>
-    internal void SetUsage(IDbTransaction tx, ref QueryResult alias)
+    internal void SetUsage(IDbTransaction tx, QueryResult alias)
     {
         ArgumentNullException.ThrowIfNull(alias);
 
@@ -89,13 +89,13 @@ public sealed class SetUsageDbAction
             if (!_dbActionFactory.AliasManagement.TryFindId(tx.Connection!, alias, out var id))
             {
                 _dbActionFactory.AliasManagement
-                                .CreateInvisible(tx, ref alias);
+                                .CreateInvisible(tx, alias);
             }
             else { alias.Id = id; }
         }
 
-        AddHistory(tx, ref alias);
-        UpdateCounter(tx, ref alias);
+        AddHistory(tx, alias);
+        UpdateCounter(tx, alias);
     }
 
     #endregion

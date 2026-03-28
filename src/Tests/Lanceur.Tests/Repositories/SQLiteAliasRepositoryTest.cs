@@ -102,7 +102,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         // -- Add new names to the alias and save it
         alias!.Synonyms += ", noname_4, noname_5";
         var id = alias.Id;
-        var outputId = c.WithinTransaction(tx => aliasAction.SaveOrUpdate(tx, ref alias));
+        var outputId = c.WithinTransaction(tx => aliasAction.SaveOrUpdate(tx, alias));
         outputId.ShouldBe(id, "the alias has only be updated");
 
         // -- Retrieve back the alias and check the names
@@ -268,7 +268,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         // ACT
         alias.AdditionalParameters.Add(new AdditionalParameter
             { AliasId = 1, Name = "someName", Parameter = "someParameter" });
-        dbAction.SaveOrUpdate(connection.BeginTransaction(), ref alias);
+        dbAction.SaveOrUpdate(connection.BeginTransaction(), alias);
 
         // ASSERT
         const string sqlCount = "select count(*) from alias_argument";
@@ -284,7 +284,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
 
         const string name = "admin";
         var alias = BuildAlias(name, RunAs.Admin);
-        service.SaveOrUpdate(ref alias);
+        service.SaveOrUpdate(alias);
 
         const string sql = """
                            select 
@@ -319,7 +319,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         var alias1 = BuildAlias(aliasName);
 
         // ACT
-        service.SaveOrUpdate(ref alias1);
+        service.SaveOrUpdate(alias1);
 
         var sut = service.GetById(alias1.Id);
 
@@ -354,9 +354,9 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         var alias3 = BuildAlias(name3);
 
         // ACT
-        service.SaveOrUpdate(ref alias1);
-        service.SaveOrUpdate(ref alias2);
-        service.SaveOrUpdate(ref alias3);
+        service.SaveOrUpdate(alias1);
+        service.SaveOrUpdate(alias2);
+        service.SaveOrUpdate(alias3);
 
         //ASSERT
         const string sql2 = "select count(*) from alias;";
@@ -379,7 +379,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         var action = BuildAliasDbAction();
         var db = new DbSingleConnectionManager(connection);
         QueryResult alias1 = new AliasQueryResult { Name = aliasName };
-        db.WithinTransaction(tx => action.CreateInvisible(tx, ref alias1));
+        db.WithinTransaction(tx => action.CreateInvisible(tx, alias1));
 
         // ACT
         var sut = db.WithConnection(conn => action.GetById(conn, alias1.Id));
@@ -413,9 +413,9 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
 
         // ACT
         c.WithinTransaction(tx => {
-                action.SaveOrUpdate(tx, ref alias1);
-                action.SaveOrUpdate(tx, ref alias2);
-                action.SaveOrUpdate(tx, ref alias3);
+                action.SaveOrUpdate(tx, alias1);
+                action.SaveOrUpdate(tx, alias2);
+                action.SaveOrUpdate(tx, alias3);
             }
         );
 
@@ -444,9 +444,9 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         var alias3 = BuildAlias("three");
 
         // ACT
-        service.SaveOrUpdate(ref alias1);
-        service.SaveOrUpdate(ref alias2);
-        service.SaveOrUpdate(ref alias3);
+        service.SaveOrUpdate(alias1);
+        service.SaveOrUpdate(alias2);
+        service.SaveOrUpdate(alias3);
         service.RemoveLogically(alias1);
 
         //ASSERT
@@ -472,7 +472,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
 
         // ACT
         c.WithinTransaction(tx => {
-                action.SaveOrUpdate(tx, ref alias);
+                action.SaveOrUpdate(tx, alias);
                 action.Remove(tx, alias.Id);
             }
         );
