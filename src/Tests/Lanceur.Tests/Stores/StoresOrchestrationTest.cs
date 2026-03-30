@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Everything.Wrapper;
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
@@ -106,13 +105,11 @@ public sealed class StoresOrchestrationTest
                               .AddTestOutputHelper(_outputHelper)
                               .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>()!;
-
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
         var results = store.Search(Cmdline.Parse(query)).ToList();
 
         // ASSERT
         Assert.Multiple(
-            () => regex.IsMatch(query).ShouldBeTrue(),
+            () => store.StoreOrchestration.AlivePattern.IsMatch(query).ShouldBeTrue(),
             () => results.ShouldSatisfyAllConditions(
                 r => r.Count.ShouldBeGreaterThan(0),
                 r => r[0].Name.ShouldBe(result)
@@ -141,8 +138,8 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<CalculatorStore>()!;
 
         // ASSERT
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).ShouldBeFalse();
+        store.StoreOrchestration.AlivePattern
+             .IsMatch(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -174,8 +171,8 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).ShouldBeFalse();
+        store.StoreOrchestration.AlivePattern
+             .IsMatch(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -201,8 +198,8 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).ShouldBeFalse();
+        store.StoreOrchestration.AlivePattern
+             .IsMatch(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -230,8 +227,8 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.AlivePattern
+             .IsMatch(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -256,8 +253,8 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AliasStore>()!;
 
         // ASSERT
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.AlivePattern
+             .IsMatch(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -282,8 +279,8 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<IStoreService>()!;
 
         // ASSERT
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.AlivePattern
+             .IsMatch(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -310,8 +307,8 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.AlivePattern
+             .IsMatch(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -337,8 +334,8 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<ReservedAliasStore>()!;
 
         // ASSERT
-        var regex = new Regex(store.StoreOrchestration.AlivePattern);
-        regex.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.AlivePattern
+             .IsMatch(query).ShouldBeTrue();
     }
 
     #endregion

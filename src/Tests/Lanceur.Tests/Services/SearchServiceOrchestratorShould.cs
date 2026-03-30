@@ -22,20 +22,15 @@ public sealed class SearchServiceOrchestratorShould
     #region Methods
 
     [Theory]
-    [InlineData(".", @"^\s{0,}\..*")]
-    [InlineData("", @"^\s{0,}.*")]
-    [InlineData("m", @"^\s{0,}m.*")]
-    public void ConvertBackDotAsValueNotOperator(string input, string output)
+    [InlineData(".")]
+    [InlineData("")]
+    [InlineData("m")]
+    public void ConvertBackDotAsValueNotOperator(string input)
     {
         var converter = new StoreOrchestrationToStringConverter();
 
-        converter.ConvertBack(
-                     input,
-                     null!,
-                     null,
-                     null!
-                 )
-                 .ShouldBe(output);
+        converter.ConvertBack(input, null!, null, null!)
+                 .ShouldBe(input);
     }
 
     [Theory]
@@ -46,12 +41,7 @@ public sealed class SearchServiceOrchestratorShould
     {
         var converter = new StoreOrchestrationToStringConverter();
 
-        converter.Convert(
-                     input,
-                     null!,
-                     null,
-                     null!
-                 )
+        converter.Convert(input, null!, null, null!)
                  .ShouldBe(output);
     }
 
