@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Humanizer;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
@@ -13,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
 
-[Store("(.*):(.*)")]
+[Store(":")]
 public sealed class AdditionalParametersStore : StoreBase, IStoreService
 {
     #region Fields
@@ -38,7 +37,9 @@ public sealed class AdditionalParametersStore : StoreBase, IStoreService
         _logger = logger;
         _featureFlags = featureFlags;
 
-        ShortcutRegex = new Lazy<Regex>(() => new Regex(Shortcut, RegexOptions.Compiled, 250.Milliseconds()));
+        ShortcutRegex =
+            new Lazy<Regex>(() =>
+                new Regex(ShortcutRegexString, RegexOptions.Compiled, TimeSpan.FromMilliseconds(200)));
     }
 
     #endregion
@@ -47,6 +48,8 @@ public sealed class AdditionalParametersStore : StoreBase, IStoreService
 
     private Lazy<Regex> ShortcutRegex { get; }
 
+    private string ShortcutRegexString => $"(.*){Shortcut}(.*)";
+
     /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => false;
 
@@ -54,7 +57,7 @@ public sealed class AdditionalParametersStore : StoreBase, IStoreService
     public StoreOrchestration StoreOrchestration
         => _featureFlags.IsEnabled(Features.AdditionalParameterAlwaysActive)
             ? StoreOrchestrationFactory.SharedAlwaysActive()
-            : StoreOrchestrationFactory.Shared(Shortcut);
+            : StoreOrchestrationFactory.Shared(ShortcutRegexString);
 
     #endregion
 

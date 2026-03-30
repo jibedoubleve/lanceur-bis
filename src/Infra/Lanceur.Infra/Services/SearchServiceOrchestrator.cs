@@ -25,11 +25,7 @@ public sealed class SearchServiceOrchestrator : ISearchServiceOrchestrator
 
     /// <inheritdoc />
     public bool IsAlive(IStoreService storeService, Cmdline query)
-        => new Regex(
-            storeService.StoreOrchestration.AlivePattern,
-            RegexOptions.Compiled,
-            200.Milliseconds()
-        ).IsMatch(query.Name);
+        => storeService.StoreOrchestration.AlivePattern.IsMatch(query.Name);
 
     #endregion
 }

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Stores;
 
-[Store(@"^\s{0,}:.*")]
+[Store(":")]
 public sealed class EverythingStore : StoreBase, IStoreService
 {
     #region Fields

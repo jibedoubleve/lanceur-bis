@@ -5,19 +5,14 @@ namespace Lanceur.Ui.WPF.Converters;
 
 public sealed class StoreOrchestrationToStringConverter : IValueConverter
 {
-    #region Fields
-
-    /// <remarks>
-    ///     The backslash should be the first item in the list otherwise it'll be escaped multiple times...
-    /// </remarks>
-    private readonly string[] _toEscape = ["\\", ".", "*", "+", "?", "{", "}", "[", "]", "(", ")", "`", "^", "$"];
-
-    #endregion
-
     #region Methods
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
+        /* Kept for backward compatibility: shortcuts were previously stored with a full regex
+         * (e.g. "^\s{0,}.*value.*"), but now only the plain shortcut string is stored.
+         * Strip the legacy regex fragments before returning the value.
+         */
         if (value is not string storeOverride) { return Binding.DoNothing; }
 
         var result = storeOverride.Replace(@"^\s{0,}", "")
@@ -25,17 +20,7 @@ public sealed class StoreOrchestrationToStringConverter : IValueConverter
         return result.Replace("\\", "");
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (value is not string storeOverride) { return Binding.DoNothing; }
-
-        foreach (var character in _toEscape)
-        {
-            storeOverride = storeOverride.Replace(character, $"\\{character}");
-        }
-
-        return $@"^\s{{0,}}{storeOverride}.*";
-    }
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => value;
 
     #endregion
 }

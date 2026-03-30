@@ -44,26 +44,6 @@ public sealed class ConverterShould
     }
 
     [Theory]
-    [InlineData("&", "& half-life", "half-life")]
-    [InlineData("&", "&", "")]
-    [InlineData("!", "! foo", "foo")]
-    public void When_ConvertBack_Then_capture_group_extracts_parameter(
-        string shortcut, string fullQuery, string expectedCapture)
-    {
-        // ARRANGE
-        var converter = new StoreOrchestrationToStringConverter();
-        var pattern = converter.ConvertBack(shortcut, typeof(string), null, CultureInfo.CurrentCulture) as string;
-        pattern.ShouldNotBeNull();
-
-        // ACT
-        var match = Regex.Match(fullQuery, pattern);
-
-        // ASSERT — Groups[1] must contain the text after the shortcut
-        match.Success.ShouldBeTrue();
-        match.Groups[1].Value.Trim().ShouldBe(expectedCapture);
-    }
-
-    [Theory]
     [InlineData("&")]
     [InlineData("!")]
     [InlineData(".")]

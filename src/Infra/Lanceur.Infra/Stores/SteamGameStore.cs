@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using Humanizer;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
@@ -10,7 +9,7 @@ using Lanceur.Core.Stores;
 
 namespace Lanceur.Infra.Stores;
 
-[Store(@"^\s{0,}&(.*)")]
+[Store("&")]
 public sealed class SteamGameStore : StoreBase, IStoreService
 {
     #region Fields
@@ -38,15 +37,11 @@ public sealed class SteamGameStore : StoreBase, IStoreService
         _steamLibraryService = steamLibraryService;
         _aliasManagementService = aliasManagementService;
         _featureFlagService = featureFlagService;
-
-        ShortcutRegex = new Lazy<Regex>(() => new Regex(Shortcut, RegexOptions.Compiled, 250.Milliseconds()));
     }
 
     #endregion
 
     #region Properties
-
-    private Lazy<Regex> ShortcutRegex { get; }
 
     /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => true;
@@ -70,14 +65,6 @@ public sealed class SteamGameStore : StoreBase, IStoreService
     private static bool IsRefinementOf(string candidate, string searchKey)
         => candidate.Contains(searchKey, StringComparison.InvariantCultureIgnoreCase);
 
-    private bool IsUnfiltered(string previous)
-    {
-        var splits = ShortcutRegex.Value.Match(previous);
-
-        if (!splits.Success) { return false; }
-
-        return splits.Groups[1].Value.Length == 0;
-    }
 
     private static string PropertySelector(Cmdline query) => query.Parameters;
 
@@ -87,7 +74,7 @@ public sealed class SteamGameStore : StoreBase, IStoreService
             previous,
             current,
             candidate => candidate.Parameters,
-            (p, c) => IsRefinementOf(c, p) && !IsUnfiltered(p)
+            (p, c) => IsRefinementOf(c, p)
         );
 
     /// <inheritdoc cref="PruneResult" />

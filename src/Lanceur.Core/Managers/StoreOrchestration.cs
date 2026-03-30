@@ -1,12 +1,20 @@
+using System.Text.RegularExpressions;
+
 namespace Lanceur.Core.Managers;
 
 public sealed class StoreOrchestration
 {
     #region Constructors
 
-    internal StoreOrchestration(string alivePattern, bool idleOthers)
+    internal StoreOrchestration(Regex alivePattern, bool idleOthers)
     {
         AlivePattern = alivePattern;
+        IdleOthers = idleOthers;
+    }
+
+    internal StoreOrchestration(string alivePattern, bool idleOthers)
+    {
+        AlivePattern = AsRegex(alivePattern);
         IdleOthers = idleOthers;
     }
 
@@ -21,7 +29,7 @@ public sealed class StoreOrchestration
     /// <returns>
     ///     The regex to apply to determine whether the service should be executed.
     /// </returns>
-    public string AlivePattern { get; }
+    public Regex AlivePattern { get; }
 
     /// <summary>
     ///     This means the current store will silence all the other search
@@ -30,6 +38,17 @@ public sealed class StoreOrchestration
     ///     <c>True</c> all other search won't occur; otherwise <c>False</c>
     /// </returns>
     public bool IdleOthers { get; }
+
+    #endregion
+
+    #region Methods
+
+    private static Regex AsRegex(string pattern)
+        => new(
+            $@"(^\s*){pattern}(.*)",
+            RegexOptions.Compiled,
+            TimeSpan.FromMilliseconds(200)
+        );
 
     #endregion
 }
