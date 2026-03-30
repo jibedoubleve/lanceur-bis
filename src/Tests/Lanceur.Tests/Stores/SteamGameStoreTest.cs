@@ -29,11 +29,26 @@ public sealed class SteamGameStoreTest
     #region Methods
 
     private SteamGameStore GetStore(
-        ISteamLibraryService steamService, IAliasManagementService? managementService = null)
+        ISteamLibraryService steamService,
+        IAliasManagementService? managementService = null,
+        string? shortcutOverride = null)
     {
         managementService ??= Substitute.For<IAliasManagementService>();
         managementService.HydrateSteamGameUsage(Arg.Any<IEnumerable<AliasQueryResult>>())
                          .Returns(x => x.Arg<IEnumerable<AliasQueryResult>>());
+
+        var storeSection = new StoreSection();
+        if (shortcutOverride is not null)
+        {
+            storeSection.StoreShortcuts =
+            [
+                new StoreShortcut
+                {
+                    StoreType    = typeof(SteamGameStore).FullName,
+                    AliasOverride = shortcutOverride
+                }
+            ];
+        }
 
         var sp = new ServiceCollection()
                  .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
@@ -41,7 +56,7 @@ public sealed class SteamGameStoreTest
                  .AddSingleton<SteamGameStore>()
                  .AddSingleton(managementService)
                  .AddMockSingleton<ISection<StoreSection>>((_, i) => {
-                     i.Value.Returns(new StoreSection());
+                     i.Value.Returns(storeSection);
                      return i;
                  })
                  .AddMockSingleton<IFeatureFlagService>((_, i) => {
@@ -85,6 +100,43 @@ public sealed class SteamGameStoreTest
     public void When_previous_query_has_no_parameter_Then_CanPruneResult_allows_refinement()
         => GetStore(SteamServiceWith()).CanPruneResult(Cmdline.Parse("&"), Cmdline.Parse("& a"))
                                        .ShouldBeTrue();
+
+    // --- Regression tests for issue #1362 ---
+    // When the shortcut is user-overridden it is persisted via StoreOrchestrationToStringConverter.ConvertBack,
+    // which was producing ^\s{0,}\&.* (no capture group).
+    // IsUnfiltered() reads Groups[1] to decide whether the query carries a parameter;
+    // without the capture group, Groups[1] is always empty and IsUnfiltered() always returns true,
+    // so CanPruneResult() always returns false — the store never prunes, triggering a full re-search.
+
+    [Fact]
+    public void When_shortcut_is_overridden_without_capture_group_Then_CanPruneResult_is_false_for_filtered_query()
+    {
+        // ARRANGE — simulate a shortcut stored by the buggy ConvertBack (no capture group)
+        const string storedShortcutWithoutCaptureGroup = @"^\s{0,}\&.*";
+        var store = GetStore(SteamServiceWith(), shortcutOverride: storedShortcutWithoutCaptureGroup);
+
+        var previous = Cmdline.Parse("& half");
+        var current  = Cmdline.Parse("& half-life");
+
+        // ACT & ASSERT — "half-life" contains "half" → pruning should be allowed.
+        // With the bug, IsUnfiltered("& half") incorrectly returns true because Groups[1] is always
+        // empty when there is no capture group, so CanPruneResult returns false.
+        store.CanPruneResult(previous, current).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void When_shortcut_is_overridden_with_capture_group_Then_CanPruneResult_allows_pruning()
+    {
+        // ARRANGE — shortcut stored by the fixed ConvertBack (with capture group)
+        const string storedShortcutWithCaptureGroup = @"^\s{0,}\&(.*)";
+        var store = GetStore(SteamServiceWith(), shortcutOverride: storedShortcutWithCaptureGroup);
+
+        var previous = Cmdline.Parse("& half");
+        var current  = Cmdline.Parse("& half-life");
+
+        // ACT & ASSERT — pruning must be allowed: "half-life" is a refinement of "half"
+        store.CanPruneResult(previous, current).ShouldBeTrue();
+    }
 
     [Fact]
     public void When_search_Then_hydrate_usage_is_called()
