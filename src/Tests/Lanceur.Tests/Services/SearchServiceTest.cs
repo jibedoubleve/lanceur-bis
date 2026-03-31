@@ -77,10 +77,6 @@ public sealed class SearchServiceTest : TestBase
               mock.Expand(Arg.Any<QueryResult[]>()).Returns(x => x.Arg<QueryResult[]>());
               return mock;
           })
-          .AddMockSingleton<ISearchServiceOrchestrator>((_, mock) => {
-              mock.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>()).Returns(true);
-              return mock;
-          })
           .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
           .AddTransient<SearchService>();
         sc.AddSingleton(storeService);
@@ -304,7 +300,6 @@ public sealed class SearchServiceTest : TestBase
                          )
                          .AddSingleton<ILoggerFactory, LoggerFactory>()
                          .AddSingleton<IMacroAliasExpanderService, MacroAliasExpanderService>()
-                         .AddSingleton(Substitute.For<ISearchServiceOrchestrator>())
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
                          .AddSingleton<IDbConnection, SQLiteConnection>()
@@ -359,8 +354,6 @@ public sealed class SearchServiceTest : TestBase
                                                      .AddSingleton<IStoreService, EverythingStore>()
                                                      .AddSingleton<IStoreOrchestrationFactory,
                                                          StoreOrchestrationFactory>()
-                                                     .AddSingleton<ISearchServiceOrchestrator,
-                                                         SearchServiceOrchestrator>()
                                                      .AddStoreServicesMockContext()
                                                      .AddStoreServicesConfiguration()
                                                      .BuildServiceProvider();
@@ -457,15 +450,6 @@ public sealed class SearchServiceTest : TestBase
                   macroManager.Expand(Arg.Any<QueryResult[]>())
                               .Returns(results);
                   return macroManager;
-              }
-          )
-          .AddMockSingleton<ISearchServiceOrchestrator>((_, orchestrator) => {
-                  orchestrator.IsAlive(
-                                  Arg.Any<IStoreService>(),
-                                  Arg.Any<Cmdline>()
-                              )
-                              .Returns(true);
-                  return orchestrator;
               }
           )
           .AddStoreServicesConfiguration()

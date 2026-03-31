@@ -77,7 +77,6 @@ public sealed class IoCForStoresTest : TestBase
                               .AddTestOutputHelper(OutputHelper)
                               .AddSingleton<IStoreService, EverythingStore>()
                               .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-                              .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                               .AddStoreServicesConfiguration(cfgOverride)
                               .AddTestOutputHelper(OutputHelper)
                               .AddStoreServicesMockContext((_, i) => {
@@ -100,11 +99,10 @@ public sealed class IoCForStoresTest : TestBase
         var store = serviceProvider
                     .GetServices<IStoreService>()
                     .Single(x => x is EverythingStore);
-        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
 
         // assert
         OutputHelper.WriteLine($"Cmdline      : {cmdlineString}");
-        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString))
+        store.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString))
                     .ShouldBeFalse();
     }
 
@@ -136,7 +134,6 @@ public sealed class IoCForStoresTest : TestBase
                               .AddTestOutputHelper(OutputHelper)
                               .AddSingleton<IStoreService, EverythingStore>()
                               .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-                              .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                               .AddStoreServicesMockContext((_, i) => {
                                   i.Value.Returns(new StoreSection
                                   {
@@ -158,10 +155,9 @@ public sealed class IoCForStoresTest : TestBase
         var store = serviceProvider
                     .GetServices<IStoreService>()
                     .Single(x => x is EverythingStore);
-        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
 
         // assert
-        orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString))
+        store.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString))
                     .ShouldBeTrue();
     }
 
@@ -183,24 +179,23 @@ public sealed class IoCForStoresTest : TestBase
         var store = serviceProvider
                     .GetServices<IStoreService>()
                     .Single(x => x is EverythingStore);
-        var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
         var section = serviceProvider.GetService<IWriteableSection<StoreSection>>()!;
 
-        orchestrator.ShouldSatisfyAllConditions(
-            o =>
+        store.ShouldSatisfyAllConditions(
+            s =>
                 // "At this point, there's no configuration, we used the default config (hardcoded)"
-                o.IsAlive(store, Cmdline.Parse(cmdlineString1))
+                s.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString1))
                  .ShouldBeTrue("Default values should be used"),
-            o => {
+            s => {
                 // Let's update the configuration and check whether it is taken into account
                 UpdateConfiguration(aliasOverride1);
-                o.IsAlive(store, Cmdline.Parse(cmdlineString2))
+                s.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString2))
                  .ShouldBeTrue("When updating from default values to new value");
             },
-            o => {
+            s => {
                 // Let's do this again to be sure the update can be done multiple times
                 UpdateConfiguration(aliasOverride2);
-                o.IsAlive(store, Cmdline.Parse(cmdlineString3))
+                s.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString3))
                  .ShouldBeTrue("When updating from some values to updated values");
             });
         return;
@@ -211,7 +206,6 @@ public sealed class IoCForStoresTest : TestBase
                 .AddSingleton<IDbConnectionManager>(connectionManager)
                 .AddSingleton<IStoreService, EverythingStore>()
                 .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-                .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                 .AddMockSingleton<IEverythingApi>()
                 .AddTestOutputHelper(OutputHelper)
                 .AddConfigurationSections()

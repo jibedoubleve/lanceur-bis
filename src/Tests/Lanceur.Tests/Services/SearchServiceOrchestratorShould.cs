@@ -74,12 +74,8 @@ public sealed class SearchServiceOrchestratorShould
         var storeService = Substitute.For<IStoreService>();
         storeService.StoreOrchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));
 
-        var orchestrator = new SearchServiceOrchestrator(
-            sp.GetSection<StoreSection>()!
-        );
-
         // act
-        orchestrator.IsAlive(storeService, Cmdline.Parse(cmd))
+        storeService.StoreOrchestration.IsAlive(Cmdline.Parse(cmd))
                     .ShouldBe(expected);
     }
 
@@ -117,10 +113,8 @@ public sealed class SearchServiceOrchestratorShould
             ]
         });
 
-        var orchestrator = new SearchServiceOrchestrator(section);
-
         // act — query starts with "&", which matches the override pattern
-        var result = orchestrator.IsAlive(store, Cmdline.Parse("&steam"));
+        var result = store.StoreOrchestration.IsAlive(Cmdline.Parse("&steam"));
 
         // assert — AlwaysInactive must win: the disabled feature flag takes precedence over any stored shortcut
         result.ShouldBeFalse();
