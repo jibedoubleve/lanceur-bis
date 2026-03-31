@@ -46,15 +46,24 @@ public sealed class SearchServiceOrchestratorShould
     }
 
     [Theory]
-    [InlineData("m", "^\\s{0,}\\..*", false)]
-    [InlineData(".", "^\\s{0,}\\..*", true)]
-    [InlineData("m", "^\\s{0,}m.*", true)]
-    [InlineData("mm", "^\\s{0,}m.*", true)]
-    [InlineData("    mm", "^\\s{0,}m.*", true)]
-    [InlineData("dm", "^\\s{0,}m.*", false)]
-    [InlineData("/", "^\\s{0,}/.*", true)]
-    //--
-    [InlineData(".somest", "^\\s{0,}\\..*", true)]
+    [InlineData("m", ".", false)]
+    [InlineData("dm", "m", false)]
+    [InlineData(".", ".", true)]
+    [InlineData("m", "m", true)]
+    [InlineData("mm", "m", true)]
+    [InlineData("    mm", "m", true)]
+    [InlineData("/", "/", true)]
+    [InlineData(".somest", ".", true)]
+    //-- With params
+    [InlineData("m --with parameters", ".", false)]
+    [InlineData("dm --with parameters", "m", false)]
+    [InlineData(". --with parameters", ".", true)]
+    [InlineData("m --with parameters", "m", true)]
+    [InlineData("mm --with parameters", "m", true)]
+    [InlineData("    mm             --with parameters", "m", true)]
+    [InlineData("/ --with parameters", "/", true)]
+    [InlineData("/--with parameters", "/", true)]
+    [InlineData(".somest", ".", true)]
     public void SelectExpectedCmdlines(string cmd, string regex, bool expected)
     {
         // arrange

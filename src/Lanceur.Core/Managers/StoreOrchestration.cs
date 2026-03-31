@@ -4,23 +4,7 @@ namespace Lanceur.Core.Managers;
 
 public sealed class StoreOrchestration
 {
-    #region Constructors
-
-    internal StoreOrchestration(Regex alivePattern, bool idleOthers)
-    {
-        AlivePattern = alivePattern;
-        IdleOthers = idleOthers;
-    }
-
-    internal StoreOrchestration(string alivePattern, bool idleOthers)
-    {
-        AlivePattern = AsRegex(alivePattern);
-        IdleOthers = idleOthers;
-    }
-
-    #endregion
-
-    #region Properties
+    #region Fields
 
     /// <summary>
     ///     This is the regex to apply on the query to determine whether the search should be
@@ -29,7 +13,27 @@ public sealed class StoreOrchestration
     /// <returns>
     ///     The regex to apply to determine whether the service should be executed.
     /// </returns>
-    public Regex AlivePattern { get; }
+    private readonly Regex _aliveRegex;
+
+    #endregion
+
+    #region Constructors
+
+    internal StoreOrchestration(string alivePattern, bool idleOthers)
+    {
+        _aliveRegex = AsRegex(alivePattern);
+        IdleOthers = idleOthers;
+    }
+
+    internal StoreOrchestration(Regex aliveRegex, bool idleOthers)
+    {
+        _aliveRegex = aliveRegex;
+        IdleOthers = idleOthers;
+    }
+
+    #endregion
+
+    #region Properties
 
     /// <summary>
     ///     This means the current store will silence all the other search
@@ -45,10 +49,12 @@ public sealed class StoreOrchestration
 
     private static Regex AsRegex(string pattern)
         => new(
-            $@"(^\s*){pattern}(.*)",
+            $@"(^\s*){Regex.Escape(pattern)}(.*)",
             RegexOptions.Compiled,
             TimeSpan.FromMilliseconds(200)
         );
+
+    public bool IsMatch(string query) => _aliveRegex.IsMatch(query);
 
     #endregion
 }

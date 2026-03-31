@@ -47,7 +47,7 @@ public abstract class StoreBase
             return attribute?.DefaultShortcut ?? string.Empty;
         }
     }
-    
+
     protected IStoreOrchestrationFactory StoreOrchestrationFactory { get; }
 
     protected ISection<StoreSection> StoreSettings { get; }

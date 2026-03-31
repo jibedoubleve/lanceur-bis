@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Lanceur.Core.Services;
 using Microsoft.Extensions.Logging;
 using NCalc;
@@ -6,7 +7,7 @@ using NCalc;
 namespace Lanceur.Infra.Services;
 
 /// <inheritdoc />
-public sealed class NCalcCalculatorService : ICalculatorService
+public sealed partial class NCalcCalculatorService : ICalculatorService
 {
     #region Fields
 
@@ -39,10 +40,12 @@ public sealed class NCalcCalculatorService : ICalculatorService
     ///                          IEEERemainder | Ln | Log | Log10 | Max | Min | Pow | Round |
     ///                          Sign | Sin | Sqrt | Tan | Truncate | in | if | ifs
     /// </code>
-    public string ValidationRegex => """
-                                     (?i)^(?=.*\d)\s*\(?\s*(?:\d+|Abs|Acos|Asin|Atan|Ceiling|Cos|Exp|Floor|IEEERemainder|Ln|Log|Log10|Max|Min|Pow|Round|Sign|Sin|Sqrt|Tan|Truncate|in|if|ifs)\b
-                                     """;
+    public Regex ValidationRegex => GetValidationRegex();
 
+    [GeneratedRegex("""
+                    (?i)^(?=.*\d)\s*\(?\s*(?:\d+|Abs|Acos|Asin|Atan|Ceiling|Cos|Exp|Floor|IEEERemainder|Ln|Log|Log10|Max|Min|Pow|Round|Sign|Sin|Sqrt|Tan|Truncate|in|if|ifs)\b
+                    """)]
+    private static partial Regex GetValidationRegex();
     #endregion
 
     #region Methods

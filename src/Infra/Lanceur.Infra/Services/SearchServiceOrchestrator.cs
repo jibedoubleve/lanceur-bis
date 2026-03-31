@@ -25,7 +25,7 @@ public sealed class SearchServiceOrchestrator : ISearchServiceOrchestrator
 
     /// <inheritdoc />
     public bool IsAlive(IStoreService storeService, Cmdline query)
-        => storeService.StoreOrchestration.AlivePattern.IsMatch(query.Name);
+        => storeService.StoreOrchestration.IsMatch(query.Name);
 
     #endregion
 }

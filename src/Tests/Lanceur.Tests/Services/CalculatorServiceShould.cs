@@ -77,7 +77,7 @@ public sealed class CalculatorServiceShould
     {
         var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
-        var regex = new Regex(calculator!.ValidationRegex);
+        var regex = calculator!.ValidationRegex;
         regex.IsMatch(expression).ShouldBeTrue();
     }
 
@@ -90,7 +90,7 @@ public sealed class CalculatorServiceShould
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
 
 
-        var regex = new Regex(calculator!.ValidationRegex);
+        var regex = calculator!.ValidationRegex;
 
         _output.WriteLine($"Expression: {operation}");
         regex.IsMatch(operation).ShouldBeFalse("'operation' is invalid");
@@ -141,7 +141,7 @@ public sealed class CalculatorServiceShould
 
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
 
-        var regex = new Regex(calculator!.ValidationRegex);
+        var regex = calculator!.ValidationRegex;
 
         _output.WriteLine($"Expression: {operation}");
         regex.IsMatch(operation).ShouldBeTrue("'operation' is valid");

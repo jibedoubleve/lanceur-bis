@@ -101,13 +101,6 @@ public sealed class SteamGameStoreTest
         => GetStore(SteamServiceWith()).CanPruneResult(Cmdline.Parse("&"), Cmdline.Parse("& a"))
                                        .ShouldBeTrue();
 
-    // --- Regression tests for issue #1362 ---
-    // When the shortcut is user-overridden it is persisted via StoreOrchestrationToStringConverter.ConvertBack,
-    // which was producing ^\s{0,}\&.* (no capture group).
-    // IsUnfiltered() reads Groups[1] to decide whether the query carries a parameter;
-    // without the capture group, Groups[1] is always empty and IsUnfiltered() always returns true,
-    // so CanPruneResult() always returns false — the store never prunes, triggering a full re-search.
-
     [Fact]
     public void When_shortcut_is_overridden_without_capture_group_Then_CanPruneResult_is_false_for_filtered_query()
     {
