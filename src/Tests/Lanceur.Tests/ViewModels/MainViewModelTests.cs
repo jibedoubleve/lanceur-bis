@@ -82,13 +82,8 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                          .AddMockSingleton<IProcessLauncher>((sp, i)
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
-                         .AddSingleton<IExecutionService, ExecutionService>()
-                         .AddMockSingleton<ISearchServiceOrchestrator>((_, i) => {
-                                 i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
-                                  .Returns(true);
-                                 return i;
-                             }
-                         );
+                         .AddSingleton<IExecutionService, ExecutionService>();
+        
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, ReservedAliasStore>());
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, CalculatorStore>());

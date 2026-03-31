@@ -39,34 +39,16 @@ public sealed class CalculatorStore : StoreBase, IStoreService
 
     #region Properties
 
-    /// <inheritdoc cref="IStoreService.IsOverridable"/>
+    /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => false;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Shared(_calculator.ValidationRegex);
+    public StoreOrchestration StoreOrchestration
+        => StoreOrchestrationFactory.SharedOnFullQuery(_calculator.ValidationRegex);
 
     #endregion
 
     #region Methods
-
-    /// <inheritdoc />
-    public IEnumerable<QueryResult> Search(Cmdline cmdline)
-    {
-        using var time = _logger.WarnIfSlow(this);
-
-        var (isError, result) = _calculator.Evaluate(cmdline.ToString());
-
-        var returnResult
-            = new DisplayQueryResult(result, cmdline.ToString())
-            {
-                Icon = "Calculator24", 
-                Count = -1
-            };
-        
-        return isError
-            ? QueryResult.NoResult
-            : returnResult.ToEnumerable();
-    }
 
     /// <inheritdoc cref="CanPruneResult" />
     public override bool CanPruneResult(Cmdline previous, Cmdline current) => false;
@@ -79,6 +61,25 @@ public sealed class CalculatorStore : StoreBase, IStoreService
     ///     method from being called in normal operation.
     /// </remarks>
     public override int PruneResult(IList<QueryResult> destination, Cmdline? previous, Cmdline current) => 0;
+
+    /// <inheritdoc />
+    public IEnumerable<QueryResult> Search(Cmdline cmdline)
+    {
+        using var time = _logger.WarnIfSlow(this);
+
+        var (isError, result) = _calculator.Evaluate(cmdline.ToString());
+
+        var returnResult
+            = new DisplayQueryResult(result, cmdline.ToString())
+            {
+                Icon = "Calculator24",
+                Count = -1
+            };
+
+        return isError
+            ? QueryResult.NoResult
+            : returnResult.ToEnumerable();
+    }
 
     #endregion
 }

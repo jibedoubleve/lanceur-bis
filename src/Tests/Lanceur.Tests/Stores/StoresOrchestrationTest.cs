@@ -56,7 +56,6 @@ public sealed class StoresOrchestrationTest
                          .AddSingleton<CalculatorStore>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ISearchService, SearchService>()
-                         .AddSingleton<ISearchServiceOrchestrator, SearchServiceOrchestrator>()
                          .AddMockSingleton<IThumbnailService>()
                          .AddLoggingForTests(_outputHelper)
                          .AddMockSingleton<IMacroAliasExpanderService>((_, i) => {
@@ -109,7 +108,7 @@ public sealed class StoresOrchestrationTest
 
         // ASSERT
         Assert.Multiple(
-            () => store.StoreOrchestration.IsMatch(query).ShouldBeTrue(),
+            () => store.StoreOrchestration.IsAlive(query).ShouldBeTrue(),
             () => results.ShouldSatisfyAllConditions(
                 r => r.Count.ShouldBeGreaterThan(0),
                 r => r[0].Name.ShouldBe(result)
@@ -138,7 +137,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<CalculatorStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsMatch(query).ShouldBeFalse();
+        store.StoreOrchestration.IsAlive(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -170,7 +169,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsMatch(query).ShouldBeFalse();
+        store.StoreOrchestration.IsAlive(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -196,7 +195,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsMatch(query).ShouldBeFalse();
+        store.StoreOrchestration.IsAlive(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -224,7 +223,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -249,7 +248,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AliasStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -274,7 +273,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<IStoreService>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -301,7 +300,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -327,7 +326,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<ReservedAliasStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsMatch(query).ShouldBeTrue();
+        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
     }
 
     #endregion

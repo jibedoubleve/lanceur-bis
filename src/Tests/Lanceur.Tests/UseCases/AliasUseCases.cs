@@ -60,12 +60,6 @@ public sealed class AliasUseCases : TestBase
                                  return i;
                              }
                          )
-                         .AddMockSingleton<ISearchServiceOrchestrator>((_, i) => {
-                                 i.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>())
-                                  .Returns(true);
-                                 return i;
-                             }
-                         )
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()
                          .AddMockSingleton<IViewFactory>()

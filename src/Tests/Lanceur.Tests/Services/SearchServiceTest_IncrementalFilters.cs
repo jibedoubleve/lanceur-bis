@@ -285,21 +285,11 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     }
 
     private SearchService BuildSearchService(params IStoreService[] storeServices)
-        => BuildSearchService(null, storeServices);
-
-    private SearchService BuildSearchService(
-        Action<ISearchServiceOrchestrator>? configureOrchestrator,
-        params IStoreService[] storeServices)
     {
         var sc = new ServiceCollection();
         sc.AddTestOutputHelper(OutputHelper)
           .AddMockSingleton<IMacroAliasExpanderService>((_, mock) => {
               mock.Expand(Arg.Any<QueryResult[]>()).Returns(x => x.Arg<QueryResult[]>());
-              return mock;
-          })
-          .AddMockSingleton<ISearchServiceOrchestrator>((_, mock) => {
-              mock.IsAlive(Arg.Any<IStoreService>(), Arg.Any<Cmdline>()).Returns(true);
-              configureOrchestrator?.Invoke(mock);
               return mock;
           })
           .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
@@ -379,11 +369,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         sharedStore.SeedResultSet([new AliasQueryResult { Name = "foo" }]);
 
         // Exclusive store is NOT alive for a normal query (no "&" prefix)
-        var service = BuildSearchService(
-            orchestrator => orchestrator.IsAlive(exclusiveStore, Arg.Any<Cmdline>()).Returns(false),
-            exclusiveStore,
-            sharedStore
-        );
+        var service = BuildSearchService(exclusiveStore, sharedStore);
 
         // ACT
         List<QueryResult> result = [];

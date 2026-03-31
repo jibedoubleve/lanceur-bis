@@ -14,7 +14,6 @@ public sealed class SearchService : ISearchService
 
     private readonly ILogger<SearchService> _logger;
     private readonly IMacroAliasExpanderService _macroAliasExpanderService;
-    private readonly ISearchServiceOrchestrator _orchestrator;
     private readonly IReadOnlyCollection<IStoreService> _storeServices;
 
     #endregion
@@ -24,8 +23,7 @@ public sealed class SearchService : ISearchService
     public SearchService(
         IEnumerable<IStoreService> storeServices,
         IMacroAliasExpanderService macroAliasExpanderService,
-        ILogger<SearchService> logger,
-        ISearchServiceOrchestrator orchestrator
+        ILogger<SearchService> logger
     )
     {
         ArgumentNullException.ThrowIfNull(storeServices);
@@ -37,7 +35,6 @@ public sealed class SearchService : ISearchService
         }
 
         _macroAliasExpanderService = macroAliasExpanderService;
-        _orchestrator = orchestrator;
         _logger = logger;
     }
 
@@ -111,7 +108,7 @@ public sealed class SearchService : ISearchService
     }
 
     private IStoreService[] GetAliveStores(Cmdline query)
-        => _storeServices.Where(service => _orchestrator.IsAlive(service, query))
+        => _storeServices.Where(service => service.StoreOrchestration.IsAlive(query))
                          .ToArray();
 
     private void PruneResults(IList<QueryResult> destination, Cmdline previousQuery, Cmdline currentQuery)

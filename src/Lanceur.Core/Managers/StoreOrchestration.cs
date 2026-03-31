@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Lanceur.Core.Models;
 
 namespace Lanceur.Core.Managers;
 
@@ -15,18 +16,18 @@ public sealed class StoreOrchestration
     /// </returns>
     private readonly Regex _aliveRegex;
 
+    private readonly Func<Cmdline, string> _selector;
+
     #endregion
 
     #region Constructors
 
-    internal StoreOrchestration(string alivePattern, bool idleOthers)
-    {
-        _aliveRegex = AsRegex(alivePattern);
-        IdleOthers = idleOthers;
-    }
+    internal StoreOrchestration(string alivePattern, bool idleOthers, Func<Cmdline, string>? selector = null)
+        : this(AsRegex(alivePattern), idleOthers, selector) { }
 
-    internal StoreOrchestration(Regex aliveRegex, bool idleOthers)
+    internal StoreOrchestration(Regex aliveRegex, bool idleOthers, Func<Cmdline, string>? selector = null)
     {
+        _selector = selector ?? (c => c.Name);
         _aliveRegex = aliveRegex;
         IdleOthers = idleOthers;
     }
@@ -54,7 +55,15 @@ public sealed class StoreOrchestration
             TimeSpan.FromMilliseconds(200)
         );
 
-    public bool IsMatch(string query) => _aliveRegex.IsMatch(query);
+    /// <summary>
+    ///     Determines whether this store should handle the given query by matching
+    ///     the alive pattern against <see cref="Cmdline.Name" /> only — parameters are intentionally excluded
+    ///     to prevent false positives when a parameter value happens to contain the store's trigger character.
+    /// </summary>
+    /// <param name="query">The parsed command line whose <see cref="Cmdline.Name" /> is evaluated.</param>
+    /// <returns><c>true</c> if the store should be activated for this query; otherwise <c>false</c>.</returns>
+    public bool IsAlive(Cmdline query) 
+        => _aliveRegex.IsMatch(_selector(query));
 
     #endregion
 }

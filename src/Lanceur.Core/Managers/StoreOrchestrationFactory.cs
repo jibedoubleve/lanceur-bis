@@ -14,9 +14,10 @@ public sealed class StoreOrchestrationFactory : IStoreOrchestrationFactory
     public StoreOrchestration Exclusive(string alivePattern) => new(alivePattern, true);
 
     /// <inheritdoc />
-    public StoreOrchestration Shared(string alivePattern) => new(alivePattern, false);
-
     public StoreOrchestration Shared(Regex alivePattern) => new(alivePattern, false);
+
+    /// <inheritdoc />
+    public StoreOrchestration SharedOnFullQuery(Regex alivePattern) => new(alivePattern, false, c => c.ToString());
 
     /// <inheritdoc />
     public StoreOrchestration SharedAlwaysActive() => new(string.Empty, false);
