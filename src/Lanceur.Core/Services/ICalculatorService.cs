@@ -1,4 +1,6 @@
-﻿namespace Lanceur.Core.Services;
+﻿using System.Text.RegularExpressions;
+
+namespace Lanceur.Core.Services;
 
 /// <summary>
 ///     Provides methods for evaluating mathematical expressions and validating their correctness.
@@ -20,7 +22,7 @@ public interface ICalculatorService
     /// <returns>
     ///     A string representing the regular expression pattern for expression validation.
     /// </returns>
-    string ValidationRegex { get; }
+    Regex ValidationRegex { get; }
 
     #endregion
 

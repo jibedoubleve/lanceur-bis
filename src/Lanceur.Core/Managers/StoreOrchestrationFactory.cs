@@ -16,7 +16,6 @@ public sealed class StoreOrchestrationFactory : IStoreOrchestrationFactory
     /// <inheritdoc />
     public StoreOrchestration Shared(string alivePattern) => new(alivePattern, false);
 
-    /// <inheritdoc />
     public StoreOrchestration Shared(Regex alivePattern) => new(alivePattern, false);
 
     /// <inheritdoc />

@@ -99,11 +99,10 @@ public sealed class IoCForStoresTest : TestBase
         // act
         var store = serviceProvider
                     .GetServices<IStoreService>()
-                    .Single(x => x.GetType() == typeof(EverythingStore));
+                    .Single(x => x is EverythingStore);
         var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
 
         // assert
-        OutputHelper.WriteLine($"Alive pattern: '{store.StoreOrchestration.AlivePattern}'");
         OutputHelper.WriteLine($"Cmdline      : {cmdlineString}");
         orchestrator.IsAlive(store, Cmdline.Parse(cmdlineString))
                     .ShouldBeFalse();
@@ -111,7 +110,7 @@ public sealed class IoCForStoresTest : TestBase
 
     [Theory]
     [InlineData(null, ": hello world")] // null override, then use the default one
-    [InlineData("^pp.*", "pp hello world")]
+    [InlineData("pp", "pp hello world")]
     public void When_override_defined_Then_they_are_used_instead_of_defaults(
         string? aliasOverride, string cmdlineString)
     {
@@ -158,7 +157,7 @@ public sealed class IoCForStoresTest : TestBase
         // act
         var store = serviceProvider
                     .GetServices<IStoreService>()
-                    .Single(x => x.GetType() == typeof(EverythingStore));
+                    .Single(x => x is EverythingStore);
         var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
 
         // assert
@@ -170,8 +169,8 @@ public sealed class IoCForStoresTest : TestBase
     public void When_overriden_shortcut_update_Then_updated_values_are_used()
     {
         // arrange
-        const string aliasOverride1 = "^pp.*";
-        const string aliasOverride2 = "^éé.*";
+        const string aliasOverride1 = "pp";
+        const string aliasOverride2 = "éé";
 
         const string cmdlineString1 = ": hello world";
         const string cmdlineString2 = "pp hello world";
@@ -183,7 +182,7 @@ public sealed class IoCForStoresTest : TestBase
         // act
         var store = serviceProvider
                     .GetServices<IStoreService>()
-                    .Single(x => x.GetType() == typeof(EverythingStore));
+                    .Single(x => x is EverythingStore);
         var orchestrator = serviceProvider.GetService<ISearchServiceOrchestrator>()!;
         var section = serviceProvider.GetService<IWriteableSection<StoreSection>>()!;
 

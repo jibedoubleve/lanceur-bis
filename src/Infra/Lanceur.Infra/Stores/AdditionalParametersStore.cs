@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Lanceur.Infra.Stores;
 
 [Store(":")]
-public sealed class AdditionalParametersStore : StoreBase, IStoreService
+public sealed partial class AdditionalParametersStore : StoreBase, IStoreService
 {
     #region Fields
 
@@ -36,19 +36,14 @@ public sealed class AdditionalParametersStore : StoreBase, IStoreService
         _aliasService = aliasService;
         _logger = logger;
         _featureFlags = featureFlags;
-
-        ShortcutRegex =
-            new Lazy<Regex>(() =>
-                new Regex(ShortcutRegexString, RegexOptions.Compiled, TimeSpan.FromMilliseconds(200)));
     }
 
     #endregion
 
     #region Properties
 
-    private Lazy<Regex> ShortcutRegex { get; }
-
-    private string ShortcutRegexString => $"(.*){Shortcut}(.*)";
+    [GeneratedRegex("(.*):(.*)")]
+    private static partial Regex GetShortcutRegex();
 
     /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => false;
@@ -57,23 +52,23 @@ public sealed class AdditionalParametersStore : StoreBase, IStoreService
     public StoreOrchestration StoreOrchestration
         => _featureFlags.IsEnabled(Features.AdditionalParameterAlwaysActive)
             ? StoreOrchestrationFactory.SharedAlwaysActive()
-            : StoreOrchestrationFactory.Shared(ShortcutRegexString);
+            : StoreOrchestrationFactory.Shared(GetShortcutRegex());
 
     #endregion
 
     #region Methods
 
-    private bool IsRefinementOf(string value, string check)
+    private static bool IsRefinementOf(string value, string check)
         => !IsUnfiltered(check)
            && check.StartsWith(value, StringComparison.InvariantCultureIgnoreCase);
 
-    private bool IsRefinementOf(QueryResult query, string value)
+    private static bool IsRefinementOf(QueryResult query, string value)
         => IsRefinementOf(value, query.Name);
 
 
-    private bool IsUnfiltered(Cmdline previous)
+    private static bool IsUnfiltered(Cmdline previous)
     {
-        var splits = ShortcutRegex.Value.Match(previous);
+        var splits = GetShortcutRegex().Match(previous);
 
         if (!splits.Success) { return false; }
 
