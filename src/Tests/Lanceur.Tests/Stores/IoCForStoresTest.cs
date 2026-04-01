@@ -102,7 +102,7 @@ public sealed class IoCForStoresTest : TestBase
 
         // assert
         OutputHelper.WriteLine($"Cmdline      : {cmdlineString}");
-        store.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString))
+        store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString))
                     .ShouldBeFalse();
     }
 
@@ -157,7 +157,7 @@ public sealed class IoCForStoresTest : TestBase
                     .Single(x => x is EverythingStore);
 
         // assert
-        store.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString))
+        store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString))
                     .ShouldBeTrue();
     }
 
@@ -184,18 +184,18 @@ public sealed class IoCForStoresTest : TestBase
         store.ShouldSatisfyAllConditions(
             s =>
                 // "At this point, there's no configuration, we used the default config (hardcoded)"
-                s.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString1))
+                s.Orchestration.IsAlive(Cmdline.Parse(cmdlineString1))
                  .ShouldBeTrue("Default values should be used"),
             s => {
                 // Let's update the configuration and check whether it is taken into account
                 UpdateConfiguration(aliasOverride1);
-                s.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString2))
+                s.Orchestration.IsAlive(Cmdline.Parse(cmdlineString2))
                  .ShouldBeTrue("When updating from default values to new value");
             },
             s => {
                 // Let's do this again to be sure the update can be done multiple times
                 UpdateConfiguration(aliasOverride2);
-                s.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString3))
+                s.Orchestration.IsAlive(Cmdline.Parse(cmdlineString3))
                  .ShouldBeTrue("When updating from some values to updated values");
             });
         return;

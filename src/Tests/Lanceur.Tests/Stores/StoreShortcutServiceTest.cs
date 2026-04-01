@@ -19,7 +19,7 @@ public sealed class StoreShortcutServiceTest
         #region Properties
 
         public bool IsOverridable => true;
-        public StoreOrchestration StoreOrchestration => null!;
+        public StoreOrchestration Orchestration => null!;
 
         #endregion
 
@@ -39,7 +39,7 @@ public sealed class StoreShortcutServiceTest
         #region Properties
 
         public bool IsOverridable => false;
-        public StoreOrchestration StoreOrchestration => null!;
+        public StoreOrchestration Orchestration => null!;
 
         #endregion
 
@@ -59,7 +59,7 @@ public sealed class StoreShortcutServiceTest
         #region Properties
 
         public bool IsOverridable => true;
-        public StoreOrchestration StoreOrchestration => null!;
+        public StoreOrchestration Orchestration => null!;
 
         #endregion
 

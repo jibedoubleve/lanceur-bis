@@ -35,7 +35,7 @@ public sealed class BookmarksStore : StoreBase, IStoreService
     /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => true;
 
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(Shortcut);
+    public StoreOrchestration Orchestration => StoreOrchestrationFactory.Exclusive(Shortcut);
 
     #endregion
 

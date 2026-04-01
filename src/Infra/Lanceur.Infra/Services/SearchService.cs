@@ -108,14 +108,14 @@ public sealed class SearchService : ISearchService
     }
 
     private IStoreService[] GetAliveStores(Cmdline query)
-        => _storeServices.Where(service => service.StoreOrchestration.IsAlive(query))
+        => _storeServices.Where(service => service.Orchestration.IsAlive(query))
                          .ToArray();
 
     private void PruneResults(IList<QueryResult> destination, Cmdline previousQuery, Cmdline currentQuery)
     {
         var stores = GetAliveStores(currentQuery);
 
-        var idle = stores.FirstOrDefault(s => s.StoreOrchestration.IdleOthers);
+        var idle = stores.FirstOrDefault(s => s.Orchestration.IdleOthers);
         if (idle is not null)
         {
             stores = [idle];
@@ -138,9 +138,9 @@ public sealed class SearchService : ISearchService
         // I've got a service that idles all the others, then
         // I execute the search for this one only
         var tasks = new List<Task<IEnumerable<QueryResult>>>();
-        if (aliveStores.Any(x => x.StoreOrchestration.IdleOthers))
+        if (aliveStores.Any(x => x.Orchestration.IdleOthers))
         {
-            var store = aliveStores.First(x => x.StoreOrchestration.IdleOthers);
+            var store = aliveStores.First(x => x.Orchestration.IdleOthers);
             tasks.Add(Task.Run(() => store.Search(query)));
         }
         else // No store that idles all the other stores, execute aggregated search

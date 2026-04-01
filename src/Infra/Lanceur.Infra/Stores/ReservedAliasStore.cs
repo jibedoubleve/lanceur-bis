@@ -45,7 +45,7 @@ public sealed class ReservedAliasStore : StoreBase, IStoreService
     public override bool IsOverridable => false;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.SharedAlwaysActive();
+    public StoreOrchestration Orchestration => StoreOrchestrationFactory.SharedAlwaysActive();
 
     #endregion
 

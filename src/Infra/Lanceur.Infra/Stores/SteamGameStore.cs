@@ -47,7 +47,7 @@ public sealed class SteamGameStore : StoreBase, IStoreService
     public override bool IsOverridable => true;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration
+    public StoreOrchestration Orchestration
         => _featureFlagService.IsEnabled(Features.SteamIntegration)
             ? StoreOrchestrationFactory.Exclusive(Shortcut)
             : StoreOrchestrationFactory.AlwaysInactive();

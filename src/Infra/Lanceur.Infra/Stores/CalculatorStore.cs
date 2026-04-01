@@ -43,7 +43,7 @@ public sealed class CalculatorStore : StoreBase, IStoreService
     public override bool IsOverridable => false;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration
+    public StoreOrchestration Orchestration
         => StoreOrchestrationFactory.SharedOnFullQuery(_calculator.ValidationRegex);
 
     #endregion
