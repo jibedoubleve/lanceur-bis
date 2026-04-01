@@ -63,7 +63,7 @@ public sealed class SearchServiceTest : TestBase
     )
     {
         var store = Substitute.For<IStoreService>();
-        store.StoreOrchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
+        store.Orchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
         store.Search(Arg.Any<Cmdline>()).Returns(searchResults);
         store.GetAll().Returns(getAllResults ?? []);
         return store;

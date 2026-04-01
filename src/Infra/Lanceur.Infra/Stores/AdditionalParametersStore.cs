@@ -49,7 +49,7 @@ public sealed partial class AdditionalParametersStore : StoreBase, IStoreService
     public override bool IsOverridable => false;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration
+    public StoreOrchestration Orchestration
         => _featureFlags.IsEnabled(Features.AdditionalParameterAlwaysActive)
             ? StoreOrchestrationFactory.SharedAlwaysActive()
             : StoreOrchestrationFactory.Shared(GetShortcutRegex());

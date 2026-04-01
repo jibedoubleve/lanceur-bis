@@ -84,7 +84,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         pruningStore.SeedResultSet([new AliasQueryResult { Name = "foo" }]);
 
         var noPruneStore = Substitute.For<IStoreService>();
-        noPruneStore.StoreOrchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
+        noPruneStore.Orchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
         noPruneStore.CanPruneResult(Arg.Any<Cmdline>(), Arg.Any<Cmdline>()).Returns(false);
         noPruneStore.Search(Arg.Any<Cmdline>()).Returns([]);
 
@@ -278,7 +278,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     )
     {
         var store = Substitute.For<IStoreService>();
-        store.StoreOrchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
+        store.Orchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
         store.Search(Arg.Any<Cmdline>()).Returns(searchResults);
         store.GetAll().Returns(getAllResults ?? []);
         return store;
@@ -362,7 +362,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
 
         // ARRANGE
         var exclusiveStore = Substitute.For<IStoreService>();
-        exclusiveStore.StoreOrchestration.Returns(new StoreOrchestrationFactory().Exclusive("&"));
+        exclusiveStore.Orchestration.Returns(new StoreOrchestrationFactory().Exclusive("&"));
         exclusiveStore.Search(Arg.Any<Cmdline>()).Returns([]);
 
         var sharedStore = BuildTestStore();
@@ -388,7 +388,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         var exclusiveResult = new AliasQueryResult { Name = aliasName };
 
         var exclusiveStore = Substitute.For<IStoreService>();
-        exclusiveStore.StoreOrchestration.Returns(orchFactory.Exclusive("&"));
+        exclusiveStore.Orchestration.Returns(orchFactory.Exclusive("&"));
         exclusiveStore.CanPruneResult(Arg.Any<Cmdline>(), Arg.Any<Cmdline>()).Returns(true);
         exclusiveStore.PruneResult(Arg.Any<IList<QueryResult>>(), Arg.Any<Cmdline>(), Arg.Any<Cmdline>()).Returns(0);
         exclusiveStore.Search(Arg.Any<Cmdline>()).Returns([exclusiveResult]);
@@ -397,7 +397,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         // PruneResult returns 10 (non-zero) as a canary: if it were called, it would wrongly
         // remove results from the exclusive store and the final count assertion would fail.
         var sharedStore = Substitute.For<IStoreService>();
-        sharedStore.StoreOrchestration.Returns(orchFactory.SharedAlwaysActive());
+        sharedStore.Orchestration.Returns(orchFactory.SharedAlwaysActive());
         sharedStore.CanPruneResult(Arg.Any<Cmdline>(), Arg.Any<Cmdline>()).Returns(true);
         sharedStore.PruneResult(Arg.Any<IList<QueryResult>>(), Arg.Any<Cmdline>(), Arg.Any<Cmdline>()).Returns(10);
         sharedStore.Search(Arg.Any<Cmdline>()).Returns([new AliasQueryResult { Name = "should_not_be_there" }]);

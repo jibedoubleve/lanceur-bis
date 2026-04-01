@@ -16,7 +16,7 @@ public interface IStoreService
     /// <summary>
     ///     Configuration of the orchestration.
     /// </summary>
-    StoreOrchestration StoreOrchestration { get; }
+    StoreOrchestration Orchestration { get; }
 
     #endregion
 

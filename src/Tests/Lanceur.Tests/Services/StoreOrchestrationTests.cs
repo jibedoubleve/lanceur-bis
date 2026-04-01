@@ -47,10 +47,10 @@ public sealed class StoreOrchestrationTests
             .AddMockConfigurationSections()
             .BuildServiceProvider();
         var storeService = Substitute.For<IStoreService>();
-        storeService.StoreOrchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));
+        storeService.Orchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));
 
         // act
-        storeService.StoreOrchestration.IsAlive(Cmdline.Parse(cmd))
+        storeService.Orchestration.IsAlive(Cmdline.Parse(cmd))
                     .ShouldBe(expected);
     }
 
@@ -100,7 +100,7 @@ public sealed class StoreOrchestrationTests
         );
 
         // act — query starts with "&", which matches the override pattern
-        var result = store.StoreOrchestration.IsAlive(Cmdline.Parse("&steam"));
+        var result = store.Orchestration.IsAlive(Cmdline.Parse("&steam"));
 
         // assert — AlwaysInactive must win: the disabled feature flag takes precedence over any stored shortcut
         result.ShouldBeFalse();

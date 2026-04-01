@@ -108,7 +108,7 @@ public sealed class StoresOrchestrationTest
 
         // ASSERT
         Assert.Multiple(
-            () => store.StoreOrchestration.IsAlive(query).ShouldBeTrue(),
+            () => store.Orchestration.IsAlive(query).ShouldBeTrue(),
             () => results.ShouldSatisfyAllConditions(
                 r => r.Count.ShouldBeGreaterThan(0),
                 r => r[0].Name.ShouldBe(result)
@@ -137,7 +137,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<CalculatorStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsAlive(query).ShouldBeFalse();
+        store.Orchestration.IsAlive(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -169,7 +169,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsAlive(query).ShouldBeFalse();
+        store.Orchestration.IsAlive(query).ShouldBeFalse();
     }
     
     [Theory]
@@ -191,7 +191,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT — must check only the Name, not the full cmdline string
-        store.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString)).ShouldBeFalse();
+        store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString)).ShouldBeFalse();
     }
 
     [Theory]
@@ -217,7 +217,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsAlive(query).ShouldBeFalse();
+        store.Orchestration.IsAlive(query).ShouldBeFalse();
     }
 
     [Theory]
@@ -245,7 +245,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
+        store.Orchestration.IsAlive(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -270,7 +270,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<AliasStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
+        store.Orchestration.IsAlive(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -295,7 +295,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<IStoreService>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
+        store.Orchestration.IsAlive(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -322,7 +322,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
+        store.Orchestration.IsAlive(query).ShouldBeTrue();
     }
 
     [Theory]
@@ -348,7 +348,7 @@ public sealed class StoresOrchestrationTest
         var store = serviceProvider.GetService<ReservedAliasStore>()!;
 
         // ASSERT
-        store.StoreOrchestration.IsAlive(query).ShouldBeTrue();
+        store.Orchestration.IsAlive(query).ShouldBeTrue();
     }
 
     #endregion

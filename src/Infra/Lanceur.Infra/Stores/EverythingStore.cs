@@ -42,7 +42,7 @@ public sealed class EverythingStore : StoreBase, IStoreService
     public override bool IsOverridable => true;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.Exclusive(Shortcut);
+    public StoreOrchestration Orchestration => StoreOrchestrationFactory.Exclusive(Shortcut);
 
     #endregion
 

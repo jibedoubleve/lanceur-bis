@@ -41,7 +41,7 @@ public sealed class AliasStore : StoreBase, IStoreService
     public override bool IsOverridable => false;
 
     /// <inheritdoc />
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.SharedAlwaysActive();
+    public StoreOrchestration Orchestration => StoreOrchestrationFactory.SharedAlwaysActive();
 
     #endregion
 

@@ -33,7 +33,7 @@ public class TestStore : StoreBase, IStoreService
     public override bool IsOverridable => true;
 
     public int SearchCallCount { get; private set; }
-    public StoreOrchestration StoreOrchestration => StoreOrchestrationFactory.SharedAlwaysActive();
+    public StoreOrchestration Orchestration => StoreOrchestrationFactory.SharedAlwaysActive();
 
     #endregion
 
