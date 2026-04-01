@@ -4,10 +4,8 @@ using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
-using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Ui.WPF.Converters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -17,33 +15,9 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public sealed class SearchServiceOrchestratorShould
+public sealed class StoreOrchestrationTests
 {
     #region Methods
-
-    [Theory]
-    [InlineData(".")]
-    [InlineData("")]
-    [InlineData("m")]
-    public void ConvertBackDotAsValueNotOperator(string input)
-    {
-        var converter = new StoreOrchestrationToStringConverter();
-
-        converter.ConvertBack(input, null!, null, null!)
-                 .ShouldBe(input);
-    }
-
-    [Theory]
-    [InlineData(@"^\s{0,}\..*", ".")]
-    [InlineData(@"^\s{0,}.*", "")]
-    [InlineData(@"^\s{0,}m.*", "m")]
-    public void ConvertDotAsValueNotOperator(string input, string output)
-    {
-        var converter = new StoreOrchestrationToStringConverter();
-
-        converter.Convert(input, null!, null, null!)
-                 .ShouldBe(output);
-    }
 
     [Theory]
     [InlineData("m", ".", false)]
@@ -64,13 +38,14 @@ public sealed class SearchServiceOrchestratorShould
     [InlineData("/ --with parameters", "/", true)]
     [InlineData("/--with parameters", "/", true)]
     [InlineData(".somest", ".", true)]
-    public void SelectExpectedCmdlines(string cmd, string regex, bool expected)
+    public void When_checking_store_is_alive_Then_it_is_alive_or_not_as_expected(
+        string cmd, string regex, bool expected)
     {
         // arrange
-        var sp = new ServiceCollection()
-                 .AddLogging(builder => builder.AddXUnit())
-                 .AddMockConfigurationSections()
-                 .BuildServiceProvider();
+        new ServiceCollection()
+            .AddLogging(builder => builder.AddXUnit())
+            .AddMockConfigurationSections()
+            .BuildServiceProvider();
         var storeService = Substitute.For<IStoreService>();
         storeService.StoreOrchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));
 
@@ -79,18 +54,42 @@ public sealed class SearchServiceOrchestratorShould
                     .ShouldBe(expected);
     }
 
-    /// <summary>
-    ///     Reproduces bug #1361: when <see cref="SteamGameStore" /> has its feature flag disabled
-    ///     but a shortcut override exists in DB settings, <see cref="SearchServiceOrchestrator.IsAlive" />
-    ///     incorrectly uses the override pattern instead of respecting the <c>AlwaysInactive</c>
-    ///     constraint returned by <see cref="SteamGameStore.StoreOrchestration" />.
-    /// </summary>
+    [Theory]
+    [InlineData(".")]
+    [InlineData("")]
+    [InlineData("m")]
+    public void When_convert_back_value_Then_same_value_returned(string input)
+    {
+        var converter = new StoreOrchestrationToStringConverter();
+
+        converter.ConvertBack(input,
+                     null!,
+                     null,
+                     null!)
+                 .ShouldBe(input);
+    }
+
+    [Theory]
+    [InlineData(@"^\s{0,}\..*", ".")]
+    [InlineData(@"^\s{0,}.*", "")]
+    [InlineData(@"^\s{0,}m.*", "m")]
+    public void When_converting_old_regex_Then_shortcut_is_returned_for_retro_compatibility(string input, string output)
+    {
+        var converter = new StoreOrchestrationToStringConverter();
+
+        converter.Convert(input,
+                     null!,
+                     null,
+                     null!)
+                 .ShouldBe(output);
+    }
+    
     [Fact]
     public void When_store_is_always_inactive_but_shortcut_override_exists_in_settings_Then_store_should_be_inactive()
     {
         // arrange
         var featureFlags = Substitute.For<IFeatureFlagService>();
-        featureFlags.IsEnabled(Features.SteamIntegration).Returns(false);   // feature flag OFF
+        featureFlags.IsEnabled(Features.SteamIntegration).Returns(false); // feature flag OFF
 
         var store = new SteamGameStore(
             new StoreOrchestrationFactory(),
@@ -100,19 +99,6 @@ public sealed class SearchServiceOrchestratorShould
             featureFlags
         );
 
-        // A shortcut override for SteamGameStore is present in settings (e.g. saved earlier by the user)
-        var section = new StaticSection(new StoreSection
-        {
-            StoreShortcuts =
-            [
-                new StoreShortcut
-                {
-                    StoreType     = store.GetType().ToString(),
-                    AliasOverride = @"^\s{0,}&.*"   // matches "&steam", "&portal", etc.
-                }
-            ]
-        });
-
         // act — query starts with "&", which matches the override pattern
         var result = store.StoreOrchestration.IsAlive(Cmdline.Parse("&steam"));
 
@@ -120,12 +106,21 @@ public sealed class SearchServiceOrchestratorShould
         result.ShouldBeFalse();
     }
 
+    #endregion
+
     // Wraps a StoreSection value without any persistence logic
     private sealed class StaticSection(StoreSection value) : ISection<StoreSection>
     {
-        public StoreSection Value => value;
-        public void Reload() { }
-    }
+        #region Properties
 
-    #endregion
+        public StoreSection Value => value;
+
+        #endregion
+
+        #region Methods
+
+        public void Reload() { }
+
+        #endregion
+    }
 }
