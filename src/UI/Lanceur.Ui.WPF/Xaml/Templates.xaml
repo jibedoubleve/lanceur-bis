@@ -73,9 +73,9 @@
             </b:Interaction.Triggers>
             <DockPanel>
                 <Border
-                    Width="{StaticResource SmallIconContainerSize}"
-                    Height="{StaticResource SmallIconContainerSize}"
-                    Margin="5,0,0,0"
+                    Width="{StaticResource DefaultIconSize}"
+                    Height="{StaticResource DefaultIconSize}"
+                    Margin="5"
                     Visibility="{Binding IsResult, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <Grid>
                         <Image
