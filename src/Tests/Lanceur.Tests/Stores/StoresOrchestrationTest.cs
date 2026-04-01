@@ -171,6 +171,28 @@ public sealed class StoresOrchestrationTest
         // ASSERT
         store.StoreOrchestration.IsAlive(query).ShouldBeFalse();
     }
+    
+    [Theory]
+    [InlineData("sqlite foo:bar")]
+    [InlineData("notepad c:/users/docs")]
+    [InlineData("hello --flag:value")]
+    public void When_cmdline_name_has_no_colon_but_params_do_Then_additional_params_store_is_not_alive(string cmdlineString)
+    {
+        // ARRANGE
+        var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
+                                                     .AddSingleton<IStoreOrchestrationFactory>(
+                                                         new StoreOrchestrationFactory()
+                                                     )
+                                                     .AddSingleton(AliasRepository)
+                                                     .AddSingleton<AdditionalParametersStore>()
+                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddStoreServicesMockContext()
+                                                     .BuildServiceProvider();
+        var store = serviceProvider.GetService<AdditionalParametersStore>()!;
+
+        // ASSERT — must check only the Name, not the full cmdline string
+        store.StoreOrchestration.IsAlive(Cmdline.Parse(cmdlineString)).ShouldBeFalse();
+    }
 
     [Theory]
     [InlineData("undeux")]
