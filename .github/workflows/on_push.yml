@@ -31,4 +31,20 @@ jobs:
           CAKE_PUBLIC_GITHUB_TOKEN: ${{secrets.CAKE_PUBLIC_GITHUB_TOKEN}}
           CAKE_PUBLIC_GITHUB_USERNAME: ${{secrets.CAKE_PUBLIC_GITHUB_USERNAME}}
         with:
-          target: github
+          target: github       
+  todo:
+      runs-on: ubuntu-latest
+      permissions:
+          contents: write
+          issues: write
+          pull-requests: write
+      steps:
+          - name: Get the sources
+            uses: actions/checkout@v6
+  
+          - name: TODO to Issue
+            uses: alstr/todo-to-issue-action@64aca8fda7023259aada83ba44ad988c4c443657
+            with:
+                IDENTIFIERS: '[{"name": "TODO", "labels": ["ungroomed"]}]'
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
