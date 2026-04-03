@@ -101,7 +101,7 @@ public sealed class StoresOrchestrationTest
                               .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                               .AddSingleton<IStoreService, CalculatorStore>()
                               .AddMockSingleton<ISection<StoreSection>>()
-                              .AddTestOutputHelper(_outputHelper)
+                              .AddLoggingForTests(_outputHelper)
                               .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>()!;
         var results = store.Search(Cmdline.Parse(query)).ToList();
@@ -131,7 +131,7 @@ public sealed class StoresOrchestrationTest
                               .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
                               .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                               .AddSingleton<CalculatorStore>()
-                              .AddTestOutputHelper(_outputHelper)
+                              .AddLoggingForTests(_outputHelper)
                               .AddMockSingleton<ISection<StoreSection>>()
                               .BuildServiceProvider();
         var store = serviceProvider.GetService<CalculatorStore>()!;
@@ -157,13 +157,13 @@ public sealed class StoresOrchestrationTest
     public void When_not_searching_for_additional_parameters_Then_this_store_is_not_used(string query)
     {
         // ACT
-        var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
+        var serviceProvider = new ServiceCollection().AddLoggingForTests(_outputHelper)
                                                      .AddSingleton<IStoreOrchestrationFactory>(
                                                          new StoreOrchestrationFactory()
                                                      )
                                                      .AddSingleton(AliasRepository)
                                                      .AddSingleton<AdditionalParametersStore>()
-                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddLoggingForTests(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
@@ -185,7 +185,7 @@ public sealed class StoresOrchestrationTest
                                                      )
                                                      .AddSingleton(AliasRepository)
                                                      .AddSingleton<AdditionalParametersStore>()
-                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddLoggingForTests(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
@@ -210,7 +210,7 @@ public sealed class StoresOrchestrationTest
                                                      )
                                                      .AddSingleton(Substitute.For<IEverythingApi>())
                                                      .AddSingleton<EverythingStore>()
-                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddLoggingForTests(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .AddStoreServicesConfiguration()
                                                      .BuildServiceProvider();
@@ -238,7 +238,7 @@ public sealed class StoresOrchestrationTest
                                                      )
                                                      .AddSingleton(AliasRepository)
                                                      .AddSingleton<AdditionalParametersStore>()
-                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddLoggingForTests(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .AddStores()
                                                      .BuildServiceProvider();
@@ -264,7 +264,7 @@ public sealed class StoresOrchestrationTest
                                                      )
                                                      .AddSingleton(LoggerFactory)
                                                      .AddSingleton<AliasStore>()
-                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddLoggingForTests(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<AliasStore>()!;
@@ -290,7 +290,7 @@ public sealed class StoresOrchestrationTest
                               .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                               .AddSingleton<IStoreService, CalculatorStore>()
                               .AddMockSingleton<ISection<StoreSection>>()
-                              .AddTestOutputHelper(_outputHelper)
+                              .AddLoggingForTests(_outputHelper)
                               .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>()!;
 
@@ -315,7 +315,7 @@ public sealed class StoresOrchestrationTest
                                                      )
                                                      .AddSingleton(LoggerFactory)
                                                      .AddSingleton<EverythingStore>()
-                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddLoggingForTests(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .AddStoreServicesConfiguration()
                                                      .BuildServiceProvider();
@@ -342,7 +342,7 @@ public sealed class StoresOrchestrationTest
                                                      .AddSingleton(AliasRepository)
                                                      .AddSingleton(LoggerFactory)
                                                      .AddSingleton<ReservedAliasStore>()
-                                                     .AddTestOutputHelper(_outputHelper)
+                                                     .AddLoggingForTests(_outputHelper)
                                                      .AddStoreServicesMockContext()
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<ReservedAliasStore>()!;
