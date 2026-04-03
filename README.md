@@ -8,6 +8,12 @@
 > - 📖 **User Manual:** [Read it here](https://jibedoubleve.github.io/lanceur-bis/)  
 > - 🛠️ **Technical Documentation:** [Explore it here](https://github.com/jibedoubleve/lanceur-bis/wiki)  
 
+## Installation
+
+```powershell
+winget install jbwautier.lanceur
+```
+
 ## What is Lanceur?
 
 ![Lanceur](./docs/assets/images/usermanual/search.png)
