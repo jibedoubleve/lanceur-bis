@@ -182,7 +182,7 @@ public sealed class ExecutionServiceShould : TestBase
         // ARRANGE
         var cmdline = new Cmdline(cmd, parameters);
         var githubService = Substitute.For<IGithubService>();
-        var sp = new ServiceCollection().AddTestOutputHelper(OutputHelper)
+        var sp = new ServiceCollection().AddLoggingForTests(OutputHelper)
                                         .AddMockSingleton<ISettingsProvider<InfrastructureSettings>>()
                                         .AddMockSingleton<ISettingsProvider<ApplicationSettings>>((_, i) => {
                                                 var config = new ApplicationSettings

@@ -287,7 +287,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     private SearchService BuildSearchService(params IStoreService[] storeServices)
     {
         var sc = new ServiceCollection();
-        sc.AddTestOutputHelper(OutputHelper)
+        sc.AddLoggingForTests(OutputHelper)
           .AddMockSingleton<IMacroAliasExpanderService>((_, mock) => {
               mock.Expand(Arg.Any<QueryResult[]>()).Returns(x => x.Arg<QueryResult[]>());
               return mock;

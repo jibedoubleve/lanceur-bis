@@ -72,7 +72,7 @@ public sealed class SearchServiceTest : TestBase
     private SearchService BuildSearchServiceForIncrementalFilterTest(IStoreService storeService)
     {
         var sc = new ServiceCollection();
-        sc.AddTestOutputHelper(OutputHelper)
+        sc.AddLoggingForTests(OutputHelper)
           .AddMockSingleton<IMacroAliasExpanderService>((_, mock) => {
               mock.Expand(Arg.Any<QueryResult[]>()).Returns(x => x.Arg<QueryResult[]>());
               return mock;
@@ -294,7 +294,7 @@ public sealed class SearchServiceTest : TestBase
 
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddMockSingleton<IThumbnailService>()
-                         .AddTestOutputHelper(OutputHelper)
+                         .AddLoggingForTests(OutputHelper)
                          .AddSingleton<IStoreOrchestrationFactory>(
                              new StoreOrchestrationFactory()
                          )
@@ -309,7 +309,7 @@ public sealed class SearchServiceTest : TestBase
                          .AddStoreServicesMockContext();
 
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
-        serviceCollection.AddTestOutputHelper(OutputHelper);
+        serviceCollection.AddLoggingForTests(OutputHelper);
         var serviceProvider = serviceCollection.BuildServiceProvider();
         
         // ACT
@@ -349,7 +349,7 @@ public sealed class SearchServiceTest : TestBase
     public async Task When_search_has_no_result_Then_result_is_informational_QueryResult()
     {
         var serviceProvider = new ServiceCollection().AddMockSingleton<IMacroAliasExpanderService>()
-                                                     .AddTestOutputHelper(OutputHelper)
+                                                     .AddLoggingForTests(OutputHelper)
                                                      .AddTransient<SearchService>()
                                                      .AddSingleton<IStoreService, EverythingStore>()
                                                      .AddSingleton<IStoreOrchestrationFactory,

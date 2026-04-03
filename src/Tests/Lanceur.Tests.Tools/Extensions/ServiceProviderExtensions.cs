@@ -33,17 +33,6 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddLoggingForTests(
-        this IServiceCollection serviceCollection,
-        ITestOutputHelper outputHelper
-    )
-    {
-        var factory = new MicrosoftLoggingLoggerFactory(outputHelper);
-        serviceCollection.AddSingleton<ILoggerFactory>(factory);
-        serviceCollection.AddLogging();
-        return serviceCollection;
-    }
-
     public static IServiceCollection AddMockConfigurationSections(
         this IServiceCollection serviceCollection,
         Action<MemoryApplicationSettingsProvider>? setupApplicationSettings = null)
@@ -97,14 +86,15 @@ public static class ServiceProviderExtensions
         return serviceCollection;
     }
 
-    public static IServiceCollection AddTestOutputHelper(
+    public static IServiceCollection AddLoggingForTests(
         this IServiceCollection serviceCollection,
         ITestOutputHelper testOutputHelper
     )
     {
         serviceCollection.AddSingleton(typeof(ILogger<>), typeof(TestOutputHelperDecoratorForMicrosoftLogging<>))
                          .AddSingleton(testOutputHelper)
-                         .AddSingleton<ILoggerFactory, MicrosoftLoggingLoggerFactory>();
+                         .AddSingleton<ILoggerFactory, MicrosoftLoggingLoggerFactory>()
+                         .AddLogging();
         return serviceCollection;
     }
 
