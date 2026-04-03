@@ -65,7 +65,7 @@ public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSetting
         ServiceVisitors? visitors
     )
     {
-        serviceCollection.AddTestOutputHelper(OutputHelper)
+        serviceCollection.AddLoggingForTests(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()

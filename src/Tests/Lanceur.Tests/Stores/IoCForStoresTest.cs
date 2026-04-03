@@ -37,7 +37,7 @@ public sealed class IoCForStoresTest : TestBase
 
 
         var serviceProvider = new ServiceCollection()
-                              .AddTestOutputHelper(OutputHelper)
+                              .AddLoggingForTests(OutputHelper)
                               .AddStoreServicesConfiguration()
                               .AddStores()
                               .AddStoreServicesMockContext()
@@ -74,11 +74,10 @@ public sealed class IoCForStoresTest : TestBase
             };
 
         var serviceProvider = new ServiceCollection()
-                              .AddTestOutputHelper(OutputHelper)
+                              .AddLoggingForTests(OutputHelper)
                               .AddSingleton<IStoreService, EverythingStore>()
                               .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                               .AddStoreServicesConfiguration(cfgOverride)
-                              .AddTestOutputHelper(OutputHelper)
                               .AddStoreServicesMockContext((_, i) => {
                                   i.Value.Returns(new StoreSection
                                   {
@@ -131,7 +130,7 @@ public sealed class IoCForStoresTest : TestBase
             };
 
         var serviceProvider = new ServiceCollection()
-                              .AddTestOutputHelper(OutputHelper)
+                              .AddLoggingForTests(OutputHelper)
                               .AddSingleton<IStoreService, EverythingStore>()
                               .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                               .AddStoreServicesMockContext((_, i) => {
@@ -207,7 +206,7 @@ public sealed class IoCForStoresTest : TestBase
                 .AddSingleton<IStoreService, EverythingStore>()
                 .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                 .AddMockSingleton<IEverythingApi>()
-                .AddTestOutputHelper(OutputHelper)
+                .AddLoggingForTests(OutputHelper)
                 .AddConfigurationSections()
                 .BuildServiceProvider();
 

@@ -50,7 +50,6 @@ public sealed class ReservedKeywordsStoreTest
                               .AddMockSingleton<IUserDialogueService>()
                               .AddMockSingleton<IUserNotificationService>()
                               .AddMockSingleton<IWriteableSection<WindowSection>>()
-                              .AddTestOutputHelper(_output)
                               .AddLoggingForTests(_output)
                               .AddReservedAliases(type)
                               .AddMockConfigurationSections()
