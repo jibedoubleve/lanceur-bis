@@ -1,7 +1,9 @@
 ﻿using System.Text.RegularExpressions;
 using Lanceur.Infra.Services;
 using Lanceur.SharedKernel.Logging;
+using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
@@ -75,7 +77,10 @@ public sealed class CalculatorServiceShould
     [InlineData(" 0")]
     public void HandleNumbers_NCalc(string expression)
     {
-        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
+        var sp = new ServiceCollection().AddLoggingForTests(_output)
+                                        .AddSingleton<NCalcCalculatorService>()
+                                        .BuildServiceProvider();
+        var calculator = sp.GetService<NCalcCalculatorService>();   
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
         var regex = calculator!.ValidationRegex;
         regex.IsMatch(expression).ShouldBeTrue();
@@ -85,7 +90,10 @@ public sealed class CalculatorServiceShould
     [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
     public void NotValidateExpressionWhenNoNumberInIt(string operation)
     {
-        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
+        var sp = new ServiceCollection().AddLoggingForTests(_output)
+                                        .AddSingleton<NCalcCalculatorService>()
+                                        .BuildServiceProvider();
+        var calculator = sp.GetService<NCalcCalculatorService>();  
 
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
 
@@ -100,13 +108,15 @@ public sealed class CalculatorServiceShould
     [InlineData("lkj")]
     public void ReturnResultOnError(string expression)
     {
-        var calculator = new NCalcCalculatorService(
-            new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output)
-        );
+        var sp = new ServiceCollection().AddLoggingForTests(_output)
+                                        .AddSingleton<NCalcCalculatorService>()
+                                        .BuildServiceProvider();
+        var calculator = sp.GetService<NCalcCalculatorService>();
 
         calculator.ShouldSatisfyAllConditions(
-            c => c.Evaluate(expression).IsError.ShouldBeTrue(),
-            c => c.Evaluate(expression).Result.ShouldNotBeNull()
+            c=> c.ShouldNotBeNull(),
+            c => c!.Evaluate(expression).IsError.ShouldBeTrue(),
+            c => c!.Evaluate(expression).Result.ShouldNotBeNull()
         );
     }
 
@@ -135,7 +145,10 @@ public sealed class CalculatorServiceShould
     [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
     public void ValidateExpressionWhenNumberInIt(string operation)
     {
-        var calculator = new NCalcCalculatorService(_testLoggerFactory.GetLogger<NCalcCalculatorService>());
+        var sp = new ServiceCollection().AddLoggingForTests(_output)
+                                        .AddSingleton<NCalcCalculatorService>()
+                                        .BuildServiceProvider();
+        var calculator = sp.GetService<NCalcCalculatorService>();  
 
         operation = $"{operation} 4"; // An calculation is only triggered when there's a number.
 

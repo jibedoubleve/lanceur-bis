@@ -24,7 +24,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
     {
         ArgumentNullException.ThrowIfNull(logFactory);
 
-        _logger = logFactory.GetLogger<SQLiteAliasRepository>();
+        _logger = logFactory.CreateLogger<SQLiteAliasRepository>();
         _getAllAliasDbAction = new GetAllAliasDbAction(manager);
         _dbActionFactory = dbActionFactory;
     }

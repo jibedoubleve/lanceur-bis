@@ -31,7 +31,7 @@ public sealed class SQLiteUpdater
     )
     {
         _versionService = versionService;
-        _logger = logFactory.GetLogger<SQLiteUpdater>();
+        _logger = logFactory.CreateLogger<SQLiteUpdater>();
         _updater = new SQLiteDatabaseUpdateManager(
             versionService,
             dbConnection,
