@@ -29,7 +29,7 @@ public sealed class BlinkBrowserBookmarks : IBookmarkRepository
         ArgumentNullException.ThrowIfNull(loggerFactory);
         ArgumentNullException.ThrowIfNull(configuration);
 
-        _logger = loggerFactory.GetLogger<BlinkBrowserBookmarks>();
+        _logger = loggerFactory.CreateLogger<BlinkBrowserBookmarks>();
         _memoryCache = memoryCache;
 
         Path = configuration.Path;

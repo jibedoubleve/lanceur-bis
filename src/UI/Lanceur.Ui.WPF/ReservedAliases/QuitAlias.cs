@@ -19,7 +19,7 @@ public sealed class QuitAlias : SelfExecutableQueryResult
 
     #region Constructors
 
-    public QuitAlias(ILoggerFactory loggerFactory) => _logger = loggerFactory.GetLogger<QuitAlias>();
+    public QuitAlias(ILoggerFactory loggerFactory) => _logger = loggerFactory.CreateLogger<QuitAlias>();
 
     #endregion
 

@@ -23,7 +23,7 @@ public sealed class AliasDbAction
 
     #region Constructors
 
-    internal AliasDbAction(ILoggerFactory logFactory) => _logger = logFactory.GetLogger<AliasDbAction>();
+    internal AliasDbAction(ILoggerFactory logFactory) => _logger = logFactory.CreateLogger<AliasDbAction>();
 
     #endregion
 

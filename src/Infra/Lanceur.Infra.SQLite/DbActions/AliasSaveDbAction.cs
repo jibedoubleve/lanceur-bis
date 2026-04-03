@@ -20,7 +20,7 @@ public sealed class AliasSaveDbAction
     public AliasSaveDbAction(IDbActionFactory dbActionFactory, ILoggerFactory factory)
     {
         _dbActionFactory = dbActionFactory;
-        _logger = factory.GetLogger<AliasSaveDbAction>();
+        _logger = factory.CreateLogger<AliasSaveDbAction>();
     }
 
     #endregion

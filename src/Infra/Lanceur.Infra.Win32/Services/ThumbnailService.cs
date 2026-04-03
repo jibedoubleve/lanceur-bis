@@ -33,7 +33,7 @@ public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
         _orderedThumbnailStrategies = thumbnailStrategies
                                       .OrderBy(s => s.Priority)
                                       .ToArray();
-        _logger = loggerFactory.GetLogger<ThumbnailService>();
+        _logger = loggerFactory.CreateLogger<ThumbnailService>();
 
         var stg = section.Value;
         _channel = Channel.CreateBounded<AliasQueryResult>(

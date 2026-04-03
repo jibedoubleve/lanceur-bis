@@ -36,7 +36,7 @@ public sealed class ExecutionService : IExecutionService
         IProcessLauncher processLauncher
     )
     {
-        _logger = logFactory.GetLogger<ExecutionService>();
+        _logger = logFactory.CreateLogger<ExecutionService>();
         _wildcardService = wildcardService;
         _aliasRepository = aliasRepository;
         _luaManager = luaManager;

@@ -17,7 +17,8 @@ public sealed class PackagedAppSearchService : AbstractPackagedAppSearchService,
 
     #region Constructors
 
-    public PackagedAppSearchService(ILoggerFactory factory) => _logger = factory.GetLogger<PackagedAppSearchService>();
+    public PackagedAppSearchService(ILoggerFactory factory)
+        => _logger = factory.CreateLogger<PackagedAppSearchService>();
 
     #endregion
 

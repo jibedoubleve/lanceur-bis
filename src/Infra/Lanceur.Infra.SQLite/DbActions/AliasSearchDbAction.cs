@@ -21,7 +21,7 @@ public sealed class AliasSearchDbAction
     internal AliasSearchDbAction(ILoggerFactory logFactory, IDbActionFactory dbActionFactory)
     {
         _dbActionFactory = dbActionFactory;
-        _logger = logFactory.GetLogger<AliasSearchDbAction>();
+        _logger = logFactory.CreateLogger<AliasSearchDbAction>();
     }
 
     #endregion
