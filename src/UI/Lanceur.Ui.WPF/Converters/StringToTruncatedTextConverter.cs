@@ -30,8 +30,8 @@ public sealed class TextToTruncatedTextConverter : IValueConverter
         return Binding.DoNothing;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) 
+        => Binding.DoNothing;
 
     #endregion
 }

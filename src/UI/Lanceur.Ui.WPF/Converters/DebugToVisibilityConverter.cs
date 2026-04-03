@@ -19,7 +19,7 @@ internal sealed class DebugToVisibilityConverter : IValueConverter
         => value is Visibility ? _conditional : Binding.DoNothing;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => Binding.DoNothing;
 
     #endregion
 }

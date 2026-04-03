@@ -18,10 +18,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
 
     #region Methods
 
-    public void Dispose()
-    {
-        // TODO release managed resources here
-    }
+    public void Dispose() { /* Release managed resources here */ }
 
     /// <inheritdoc />
     public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)

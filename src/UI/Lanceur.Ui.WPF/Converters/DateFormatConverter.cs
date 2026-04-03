@@ -12,8 +12,8 @@ public sealed class DateFormatConverter : IMultiValueConverter
             ? dateTime.ToString(format)
             : Binding.DoNothing;
 
-    public object?[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture) =>
-        throw new NotImplementedException();
+    public object?[] ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture)
+        => targetTypes.Select(_ => Binding.DoNothing).ToArray();
 
     #endregion
 }
