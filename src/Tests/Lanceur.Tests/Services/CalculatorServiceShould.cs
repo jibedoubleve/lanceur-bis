@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Lanceur.Infra.Services;
-using Lanceur.SharedKernel.Logging;
+﻿using Lanceur.Infra.Services;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,17 +13,11 @@ public sealed class CalculatorServiceShould
 
     private readonly ITestOutputHelper _output;
 
-    private readonly MicrosoftLoggingLoggerFactory _testLoggerFactory;
-
     #endregion
 
     #region Constructors
 
-    public CalculatorServiceShould(ITestOutputHelper output)
-    {
-        _output = output;
-        _testLoggerFactory = new MicrosoftLoggingLoggerFactory(output);
-    }
+    public CalculatorServiceShould(ITestOutputHelper output) => _output = output;
 
     #endregion
 
@@ -80,7 +72,7 @@ public sealed class CalculatorServiceShould
         var sp = new ServiceCollection().AddLoggingForTests(_output)
                                         .AddSingleton<NCalcCalculatorService>()
                                         .BuildServiceProvider();
-        var calculator = sp.GetService<NCalcCalculatorService>();   
+        var calculator = sp.GetService<NCalcCalculatorService>();
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
         var regex = calculator!.ValidationRegex;
         regex.IsMatch(expression).ShouldBeTrue();
@@ -93,7 +85,7 @@ public sealed class CalculatorServiceShould
         var sp = new ServiceCollection().AddLoggingForTests(_output)
                                         .AddSingleton<NCalcCalculatorService>()
                                         .BuildServiceProvider();
-        var calculator = sp.GetService<NCalcCalculatorService>();  
+        var calculator = sp.GetService<NCalcCalculatorService>();
 
         _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
 
@@ -114,7 +106,7 @@ public sealed class CalculatorServiceShould
         var calculator = sp.GetService<NCalcCalculatorService>();
 
         calculator.ShouldSatisfyAllConditions(
-            c=> c.ShouldNotBeNull(),
+            c => c.ShouldNotBeNull(),
             c => c!.Evaluate(expression).IsError.ShouldBeTrue(),
             c => c!.Evaluate(expression).Result.ShouldNotBeNull()
         );
@@ -148,7 +140,7 @@ public sealed class CalculatorServiceShould
         var sp = new ServiceCollection().AddLoggingForTests(_output)
                                         .AddSingleton<NCalcCalculatorService>()
                                         .BuildServiceProvider();
-        var calculator = sp.GetService<NCalcCalculatorService>();  
+        var calculator = sp.GetService<NCalcCalculatorService>();
 
         operation = $"{operation} 4"; // An calculation is only triggered when there's a number.
 
