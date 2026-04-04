@@ -1,0 +1,2 @@
+- [:uk: English](/)
+- [:fr: Français](/fr/)
