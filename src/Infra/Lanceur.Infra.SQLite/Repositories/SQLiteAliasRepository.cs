@@ -340,7 +340,9 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
         const string sql = $"""
                             select
                             	keywords   as {nameof(AliasUsage.Name)},
-                                exec_count as {nameof(AliasUsage.Count)}
+                                exec_count as {nameof(AliasUsage.Count)},
+                                thumbnail  as {nameof(AliasUsage.Thumbnail)},
+                                icon       as {nameof(AliasUsage.Icon)}
                             from
                                 stat_execution_count_v
                             order
@@ -356,6 +358,8 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
                             select
                             	keywords   as {nameof(AliasUsage.Name)},
                                 exec_count as {nameof(AliasUsage.Count)},
+                                thumbnail  as {nameof(AliasUsage.Thumbnail)},
+                                icon       as {nameof(AliasUsage.Icon)},
                                 year       as {nameof(AliasUsage.Year)}
                             from
                                 stat_execution_count_by_year_v

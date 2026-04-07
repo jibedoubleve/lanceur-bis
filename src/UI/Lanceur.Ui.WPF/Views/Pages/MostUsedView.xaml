@@ -96,18 +96,24 @@
                 <DataGridTemplateColumn Width="60">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Border
-                                Width="{StaticResource SmallIconContainerSize}"
-                                Height="{StaticResource SmallIconContainerSize}"
-                                Background="{ui:ThemeResource AccentTextFillColorTertiaryBrush}"
-                                CornerRadius="8">
+                            <Border Width="{StaticResource DefaultIconSize}"
+                                    Height="{StaticResource DefaultIconSize}"
+                                    ClipToBounds="True"
+                                    CornerRadius="8">
                                 <Grid>
                                     <ui:SymbolIcon
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Filled="False"
-                                        Foreground="{StaticResource TextFillColorPrimaryBrush}"
-                                        Symbol="Rocket24" />
+                                        FontSize="{StaticResource DefaultIconSize}"
+                                        Symbol="{Binding Icon}"
+                                        Visibility="{Binding Thumbnail, Converter={StaticResource InvertNullToVisibilityConverter}}" />
+                                    <Image
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Stretch="Uniform"
+                                        Source="{Binding Thumbnail, TargetNullValue={x:Null}, FallbackValue={x:Null}}"
+                                        Visibility="{Binding Thumbnail, Converter={StaticResource NullToVisibilityConverter}}" />
                                 </Grid>
                             </Border>
                         </DataTemplate>

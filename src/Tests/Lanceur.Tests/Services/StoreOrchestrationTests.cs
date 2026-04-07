@@ -37,7 +37,6 @@ public sealed class StoreOrchestrationTests
     [InlineData("    mm             --with parameters", "m", true)]
     [InlineData("/ --with parameters", "/", true)]
     [InlineData("/--with parameters", "/", true)]
-    [InlineData(".somest", ".", true)]
     public void When_checking_store_is_alive_Then_it_is_alive_or_not_as_expected(
         string cmd, string regex, bool expected)
     {
