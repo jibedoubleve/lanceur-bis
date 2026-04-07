@@ -11,7 +11,6 @@
     d:DesignHeight="800"
     d:DesignWidth="800"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
     <Page.Resources>
         <conv:DivideByConverter x:Key="DivideBy200Converter" Divider="200" />
@@ -59,7 +58,8 @@
             GridLinesVisibility="Vertical"
             HeadersVisibility="none"
             ItemsSource="{Binding Source={StaticResource AliasCollectionViewSource}}"
-            VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+            VirtualizingPanel.VirtualizationMode="Recycling">
             <DataGrid.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.ContainerStyle>
