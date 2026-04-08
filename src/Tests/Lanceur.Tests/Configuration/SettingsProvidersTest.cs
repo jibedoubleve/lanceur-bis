@@ -48,11 +48,12 @@ public sealed class SettingsProvidersTest : TestBase
         services.AddSettingsProviders();
 
         // assert
-        services.Any(d => d.ServiceType == typeof(ISettingsProvider<ApplicationSettings>))
-                .ShouldBeTrue("ISettingsProvider<ApplicationSettings> should be registered");
-
-        services.Any(d => d.ServiceType == typeof(ISettingsProvider<InfrastructureSettings>))
-                .ShouldBeTrue("ISettingsProvider<InfrastructureSettings> should be registered");
+        services.ShouldSatisfyAllConditions(
+            s => s.Any(d => d.ServiceType == typeof(ISettingsProvider<ApplicationSettings>))
+                  .ShouldBeTrue("ISettingsProvider<ApplicationSettings> should be registered"),
+            s => s.Any(d => d.ServiceType == typeof(ISettingsProvider<InfrastructureSettings>))
+                  .ShouldBeTrue("ISettingsProvider<InfrastructureSettings> should be registered")
+        );
     }
 
     [Fact]
