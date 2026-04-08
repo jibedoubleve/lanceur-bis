@@ -74,29 +74,6 @@ public static class ServiceRegistrationExtensions
         );
         return services;
     }
-    /// <summary>
-    ///     Registers a service with a <c>Singleton</c> lifetime using runtime <see cref="Type" /> objects,
-    ///     choosing the implementation type based on the build configuration (Debug or Release).
-    ///     This non-generic overload is intended for open generic registrations where the type parameters
-    ///     are not known at compile time.
-    /// </summary>
-    /// <param name="services">The service collection to which the service is added.</param>
-    /// <param name="service">The service type (interface or base type) to register.</param>
-    /// <param name="debugImplementation">The implementation type to use in Debug builds.</param>
-    /// <param name="releaseImplementation">The implementation type to use in Release builds.</param>
-    /// <returns>The same <see cref="IServiceCollection" /> instance, for chaining.</returns>
-    public static IServiceCollection TryAddEnumerableConditional(
-        this IServiceCollection services, Type service, Type debugImplementation, Type releaseImplementation
-    )
-    {
-        ConditionalExecution.Execute(
-            services,
-            onDebug => onDebug.TryAddEnumerable(ServiceDescriptor.Singleton(service, debugImplementation)),
-            onRelease => onRelease.TryAddEnumerable(ServiceDescriptor.Singleton(service, releaseImplementation))
-        );
-        return services;
-    }
-
 
     /// <summary>
     ///     Registers a service with a <c>Transient</c> lifetime, choosing the implementation type
