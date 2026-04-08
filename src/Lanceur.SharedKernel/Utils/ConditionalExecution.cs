@@ -16,11 +16,11 @@ public static class ConditionalExecution
     ///     Executes one of the provided functions based on the current compilation mode.
     /// </summary>
     /// <typeparam name="TContext">The type of the context passed to the functions.</typeparam>
-    /// <param name="serviceCollection">The context object passed to the functions.</param>
+    /// <param name="context">The context object passed to the functions.</param>
     /// <param name="onDebug">The function to execute in DEBUG mode.</param>
     /// <param name="onRelease">The function to execute in RELEASE mode.</param>
     public static void Execute<TContext>(
-        TContext serviceCollection,
+        TContext context,
         Action<TContext> onDebug,
         Action<TContext> onRelease
     )
@@ -28,8 +28,8 @@ public static class ConditionalExecution
         var isDebug = false;
         SetIfDebug(ref isDebug);
 
-        if (isDebug) { onDebug(serviceCollection); }
-        else { onRelease(serviceCollection); }
+        if (isDebug) { onDebug(context); }
+        else { onRelease(context); }
     }
 
     /// <summary>
