@@ -1,10 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections.Infrastructure;
-using Lanceur.Core.Services;
+using Lanceur.Infra.SQLite.ConnectionStrings;
 using Lanceur.Tests.Tools.Logging;
-using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;

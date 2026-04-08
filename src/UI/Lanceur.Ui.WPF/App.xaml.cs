@@ -8,16 +8,16 @@ using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.Extensions;
 using Lanceur.Infra.Macros;
-using Lanceur.Infra.SQLite;
 using Lanceur.Infra.SQLite.Extensions;
 using Lanceur.Infra.Stores;
+using Lanceur.Infra.Win32.Extensions;
 using Lanceur.Infra.Win32.Helpers;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Logging;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
-using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.WPF.Extensions;
 using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Services;
@@ -46,12 +46,15 @@ public partial class App
                                    .RegisterView("Lanceur.Ui.WPF")
                                    .RegisterViewModel("Lanceur.Ui.Core")
                                    .Register("Control", "Lanceur.Ui.WPF")
-                                   .AddServices()
+                                   .AddInfraServices()
+                                   .AddDatabaseServices()
+                                   .AddWin32Services()
+                                   .AddUiCoreServices()
                                    .AddWpfServices()
                                    .AddStores()
+                                   .AddSettingsInfrastructure()
                                    .AddReservedAliases(typeof(AddAlias))
                                    .AddMacros()
-                                   .AddDatabaseServices()
                                    .AddLoggers();
                        }
                    )
@@ -209,7 +212,7 @@ public partial class App
         /* Checks whether a database update is needed...
          */
         var cs = Ioc.Default.GetService<IConnectionString>()!;
-        Ioc.Default.GetService<SQLiteUpdater>()!
+        Ioc.Default.GetService<IDatabaseUpdater>()!
            .Update(cs.ToString());
 
         /* Register HotKey to the application

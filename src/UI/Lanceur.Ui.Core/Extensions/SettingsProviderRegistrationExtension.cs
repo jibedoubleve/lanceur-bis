@@ -1,8 +1,8 @@
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,7 +34,7 @@ public static class SettingsProviderFactory
     ///     <see cref="InfrastructureSettings" /> outside of the DI container.
     ///     Returns <see cref="MemoryInfrastructureSettingsProvider" /> in DEBUG builds and
     ///     <see cref="JsonInfrastructureSettingsProvider" /> in Release builds, mirroring the
-    ///     registration logic of <see cref="AddSettingsProviders" />.
+    ///     registration logic of <see cref="AddSettingsInfrastructure" />.
     /// </summary>
     public static ISettingsProvider<InfrastructureSettings> GetInfrastructureSettingsProvider()
     {
@@ -49,17 +49,20 @@ public static class SettingsProviderFactory
     ///     Registers SettingsProviders as a singleton in the DI container
     ///     using the same conditional logic as <see cref="GetInfrastructureSettingsProvider" />.
     /// </summary>
-    public static IServiceCollection AddSettingsProviders(this IServiceCollection services)
+    public static IServiceCollection AddSettingsInfrastructure(this IServiceCollection serviceCollection)
     {
-        services
+        // Configure providers
+        serviceCollection
+            .AddSingleton<SQLiteApplicationSettingsProvider>()
+            .AddSingleton(GetInfrastructureSettingsProvider())
             .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
             .AddSingleton<ISettingsProvider>(sp => sp.GetRequiredService<ISettingsProvider<ApplicationSettings>>())
-            .AddSingletonConditional<
-                ISettingsProvider<InfrastructureSettings>,
-                MemoryInfrastructureSettingsProvider,
-                JsonInfrastructureSettingsProvider>()
             .AddSingleton<ISettingsProvider>(sp => sp.GetRequiredService<ISettingsProvider<InfrastructureSettings>>());
-        return services;
+        
+        // Configure sections
+        serviceCollection.AddSingleton(typeof(IWriteableSection<>), typeof(Section<>))
+                         .AddSingleton(typeof(ISection<>), typeof(ForwardingSection<>));
+        return serviceCollection;
     }
 
     #endregion

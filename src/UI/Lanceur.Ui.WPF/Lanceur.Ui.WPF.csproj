@@ -28,6 +28,7 @@
         </Page>
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\Infra\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj" />
         <ProjectReference Include="..\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj"/>
     </ItemGroup>
     <ItemGroup>

@@ -1,7 +1,8 @@
-﻿using Lanceur.Core.Utils;
+﻿using System.IO;
+using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Extensions;
 
-namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
+namespace Lanceur.Infra.SQLite.ConnectionStrings;
 
 public sealed class LightConnectionString : BaseConnectionString, IConnectionString
 {

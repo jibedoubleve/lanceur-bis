@@ -1,30 +1,10 @@
-using System.Data;
-using System.Data.SQLite;
-using System.Web.Bookmarks;
-using System.Web.Bookmarks.Factories;
-using Everything.Wrapper;
 using Lanceur.Core.Constants;
-using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
-using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Core.Utils;
-using Lanceur.Infra.LuaScripting;
-using Lanceur.Infra.Services;
-using Lanceur.Infra.SQLite;
-using Lanceur.Infra.SQLite.DataAccess;
-using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Infra.Wildcards;
-using Lanceur.Infra.Win32.Helpers;
-using Lanceur.Infra.Win32.Services;
-using Lanceur.Infra.Win32.Thumbnails;
-using Lanceur.Scripts;
 using Lanceur.SharedKernel.Caching;
-using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
-using Lanceur.Ui.Core.Utils.ConnectionStrings;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
@@ -97,67 +77,23 @@ public static class ServiceCollectionExtensions
         }
     }
 
-    public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddConfigurationSections()
-                         .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-                         .AddSingleton<IServiceProvider>(x => x)
-                         .AddSingleton<SQLiteUpdater>(sp => new SQLiteUpdater(
-                                 sp.GetService<IDataStoreVersionService>()!,
-                                 sp.GetService<ILoggerFactory>()!,
-                                 sp.GetService<IDbConnection>()!,
-                                 ScriptRepository.Asm,
-                                 ScriptRepository.DbScriptEmbeddedResourcePattern
-                             )
-                         )
-                         .AddTransient<IGithubService, GithubService>()
-                         .AddTransient<IDataStoreVersionService, SQLiteVersionService>()
-                         .AddTransient<IAliasValidationService, AliasValidationService>()
-                         .AddTransient<IAliasManagementService, AliasManagementService>()
-                         .AddTransient<IClipboardService, ClipboardService>()
-                         .AddTransient<IAliasRepository, SQLiteAliasRepository>()
-                         .AddTransient<IDbConnection, SQLiteConnection>(sp
-                             => new SQLiteConnection(sp.GetService<IConnectionString>()!.ToString())
-                         )
-                         .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
-                         .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
-                         .AddTransient<IConnectionString, ConnectionString>()
-                         .AddTransient<ISearchService, SearchService>()
-                         .AddTransient<IMacroAliasExpanderService, MacroAliasExpanderService>()
-                         .AddTransient<ILoggerFactory, LoggerFactory>()
-                         .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
-                         .AddTransient<IFavIconService, FavIconService>()
-                         .AddSingleton<IFavIconDownloader, FavIconDownloader>()
-                         .AddTransient<IEverythingApi, EverythingApi>()
-                         .AddTransient<IExecutionService, ExecutionService>()
-                         .AddTransient<IWildcardService, ReplacementComposite>()
-                         .AddTransient<IReconciliationService, ReconciliationService>()
-                         .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
-                         .AddTransient<IFeatureFlagService, FeatureFlagService>()
-                         .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
-                         .AddTransientConditional<IProcessLauncher, ProcessLauncherNoOp, ProcessLauncherWin32>()
-                         .AddSingleton<ICalculatorService, NCalcCalculatorService>()
-                         .AddSingleton<ILuaManager, LuaManager>()
-                         .AddSingleton<IEnigma, Enigma>()
-                         .AddHttpClient()
-                         .AddThumbnailStrategies()
-                         .AddStaThreadRunner()
-                         .AddTransient<IThumbnailService, ThumbnailService>()
-                         .AddTransient<ISteamLibraryService, SteamLibraryService>()
-                         .AddTransient<IStoreShortcutService, StoreShortcutService>()
-                         .AddTransient<IFeatureFlagService, FeatureFlagService>()
-                         .AddTransient<IFeatureFlagRepository, SQLiteFeatureFlagRepository>()
-                         .AddSingleton<IFavIconHttpClient, FavIconHttpClient>();
-
-        return serviceCollection;
-    }
-
     public static IServiceCollection AddTrackedMemoryCache(this IServiceCollection services)
     {
         services.AddMemoryCache();
         services.Decorate<IMemoryCache, TrackedMemoryCache>();
 
         return services;
+    }
+
+    public static IServiceCollection AddUiCoreServices(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddTransient<IGithubService, GithubService>()
+                         .AddTransient<IClipboardService, ClipboardService>()
+                         .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
+                         .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+                         .AddSingleton<IEnigma, Enigma>()
+                         .AddHttpClient();
+        return serviceCollection;
     }
 
     #endregion

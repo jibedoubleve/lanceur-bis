@@ -1,4 +1,4 @@
-﻿namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
+﻿namespace Lanceur.Infra.SQLite.ConnectionStrings;
 
 public abstract class BaseConnectionString
 {

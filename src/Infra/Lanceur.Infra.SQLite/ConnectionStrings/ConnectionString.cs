@@ -1,12 +1,11 @@
-﻿using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Configurations;
+﻿using System.IO;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Infrastructure;
-using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Ui.Core.Utils.ConnectionStrings;
+namespace Lanceur.Infra.SQLite.ConnectionStrings;
 
 public sealed class ConnectionString : BaseConnectionString, IConnectionString
 {

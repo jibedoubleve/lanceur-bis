@@ -2,15 +2,12 @@
 using System.Reflection;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite;
 
-/// <summary>
-///     This sealed class is responsible for ensuring that the SQLite database is updated to the latest version.
-/// </summary>
-public sealed class SQLiteUpdater
+/// <inheritdoc />
+public sealed class SQLiteUpdater : IDatabaseUpdater
 {
     #region Fields
 
@@ -58,12 +55,7 @@ public sealed class SQLiteUpdater
     }
 
 
-    /// <summary>
-    ///     Checks whether the database specified by the connection string needs an update.
-    ///     If an update is required, applies the necessary Data Definition Language (DDL) scripts
-    ///     to bring the database to the latest version.
-    /// </summary>
-    /// <param name="connectionString">The connection string pointing to the SQLite database.</param>
+    /// <inheritdoc />
     public void Update(string connectionString)
     {
         var dbPath = connectionString.ExtractPathFromSQLiteCString();

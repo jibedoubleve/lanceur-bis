@@ -42,7 +42,7 @@ public sealed class AliasUseCases : TestBase
         var connectionString = ConnectionStringFactory.InMemory;
         var db = GetConnectionManager(Sql.Empty, connectionString.ToString());
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddConfigurationSections()
+        serviceCollection.AddSettingsInfrastructure()
                          .AddLogging(builder => builder.AddXUnit(OutputHelper))
                          .AddDatabase(db)
                          .AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())

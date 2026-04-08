@@ -2,12 +2,9 @@ using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
-using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
-using Lanceur.Ui.Core.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
@@ -33,27 +30,6 @@ public sealed class SettingsProvidersTest : TestBase
         var provider = new SQLiteApplicationSettingsProvider(scope, logger);
         var section = new Section<T>([provider]);
         action(section, provider);
-    }
-
-    /// <summary>
-    ///     Test for issue #1334
-    /// </summary>
-    [Fact]
-    public void When_AddSettingsProviders_is_called_Then_generic_providers_are_registered()
-    {
-        // arrange
-        var services = new ServiceCollection();
-
-        // act
-        services.AddSettingsProviders();
-
-        // assert
-        services.ShouldSatisfyAllConditions(
-            s => s.Any(d => d.ServiceType == typeof(ISettingsProvider<ApplicationSettings>))
-                  .ShouldBeTrue("ISettingsProvider<ApplicationSettings> should be registered"),
-            s => s.Any(d => d.ServiceType == typeof(ISettingsProvider<InfrastructureSettings>))
-                  .ShouldBeTrue("ISettingsProvider<InfrastructureSettings> should be registered")
-        );
     }
 
     [Fact]

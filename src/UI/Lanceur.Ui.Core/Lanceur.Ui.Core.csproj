@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+        <UseWpf>True</UseWpf>
         <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -21,9 +22,6 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
         <ProjectReference Include="..\..\Infra\Lanceur.Infra.SQLite\Lanceur.Infra.SQLite.csproj"/>
-        <ProjectReference Include="..\..\Infra\Lanceur.Infra.Win32\Lanceur.Infra.Win32.csproj"/>
-        <ProjectReference Include="..\..\Infra\Lanceur.Infra\Lanceur.Infra.csproj"/>
-        <ProjectReference Include="..\..\Lanceur.Scripts\Lanceur.Scripts.csproj"/>
     </ItemGroup>
     <ItemGroup>
         <Compile Update="ViewModels\Pages\KeywordsViewModelExtensions.cs">

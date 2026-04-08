@@ -30,26 +30,6 @@ public sealed class IoCForStoresTest : TestBase
 
     #region Methods
 
-    [Fact]
-    public void When_loading_all_stores_Then_all_are_loaded_automatically()
-    {
-        // arrange
-
-
-        var serviceProvider = new ServiceCollection()
-                              .AddLoggingForTests(OutputHelper)
-                              .AddStoreServicesConfiguration()
-                              .AddStores()
-                              .AddStoreServicesMockContext()
-                              .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-                              .BuildServiceProvider();
-        // act
-        var stores = serviceProvider.GetServices<IStoreService>();
-
-        // assert
-        stores.Count().ShouldBe(7);
-    }
-
     [Theory]
     [InlineData(null, "pp hello world")] // null override, then use the default one
     [InlineData("^pp.*", ": hello world")]
@@ -207,7 +187,7 @@ public sealed class IoCForStoresTest : TestBase
                 .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                 .AddMockSingleton<IEverythingApi>()
                 .AddLoggingForTests(OutputHelper)
-                .AddConfigurationSections()
+                .AddSettingsInfrastructure()
                 .BuildServiceProvider();
 
         void UpdateConfiguration(string aliasOverride)

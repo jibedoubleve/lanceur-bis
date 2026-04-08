@@ -4,7 +4,7 @@ using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Infra.Services;
+namespace Lanceur.Infra.Win32.Services;
 
 public sealed class ProcessLauncherNoOp : IProcessLauncher
 {
