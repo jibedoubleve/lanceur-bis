@@ -38,17 +38,21 @@ public static class ServiceRegistrationExtensions
     {
         var types = asm.GetTypes()
                        .Where(e => e.FullName!.EndsWith(suffix))
+                       .Where(HasNot<ExcludeFromIoCAttribute>)
                        .ToArray();
 
-        _ = types.Where(e => e.GetCustomAttributes(typeof(SingletonAttribute), true).Length == 0)
+        _ = types.Where(HasNot<SingletonAttribute>)
                  .Select(serviceCollection.AddTransient)
                  .ToArray();
 
-        _ = types.Where(e => e.GetCustomAttributes(typeof(SingletonAttribute), true).Length > 0)
+        _ = types.Where(Has<SingletonAttribute>)
                  .Select(e => serviceCollection.AddSingleton(e))
                  .ToArray();
 
         return serviceCollection;
+
+        bool Has<T>(Type e) => e.GetCustomAttributes(typeof(T), true).Length > 0;
+        bool HasNot<T>(Type e) => !Has<T>(e);
     }
 
     /// <summary>

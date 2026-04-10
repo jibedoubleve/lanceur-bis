@@ -19,7 +19,7 @@ public static class MacroRegistrationExtension
     /// </summary>
     /// <param name="serviceCollection">The service collection to register macros into.</param>
     /// <returns>The service collection for method chaining.</returns>
-    public static IServiceCollection AddMacros(this IServiceCollection serviceCollection)
+    internal static IServiceCollection AddMacros(this IServiceCollection serviceCollection)
     {
         var asm = Assembly.GetAssembly(typeof(GuidMacro));
         var types = asm?.GetTypes() ?? [];

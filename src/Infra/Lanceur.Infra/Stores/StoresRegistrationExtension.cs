@@ -19,7 +19,7 @@ public static class StoresRegistrationExtension
     /// </summary>
     /// <param name="serviceCollection">The service collection to register stores into.</param>
     /// <returns>The service collection for method chaining.</returns>
-    public static IServiceCollection AddStores(this IServiceCollection serviceCollection)
+    internal static IServiceCollection AddStores(this IServiceCollection serviceCollection)
     {
         var asm = Assembly.GetAssembly(typeof(SearchService));
         var types = asm?.GetTypes() ?? [];

@@ -6,6 +6,7 @@ using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.SQL;
+using Lanceur.Tests.Tools.Stubs;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
@@ -67,14 +68,9 @@ public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSetting
     {
         serviceCollection.AddLoggingForTests(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
-                         .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
                          .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
-                         .AddMockSingleton<IUserGlobalNotificationService>()
-                         .AddMockSingleton<IUserNotificationService>()
-                         .AddMockSingleton<IAppRestartService>()
-                         .AddMockSingleton<IViewFactory>()
-                         .AddMockSingleton<IUserDialogueService>();
+                         .AddUiServicesMockContext();
         return serviceCollection;
     }
 
