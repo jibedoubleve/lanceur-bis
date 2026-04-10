@@ -1,5 +1,6 @@
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.SQLite.Repositories;
@@ -49,7 +50,7 @@ public static class SettingsProviderFactory
     ///     Registers SettingsProviders as a singleton in the DI container
     ///     using the same conditional logic as <see cref="GetInfrastructureSettingsProvider" />.
     /// </summary>
-    public static IServiceCollection AddSettingsInfrastructure(this IServiceCollection serviceCollection)
+    internal static IServiceCollection AddSettingsInfrastructure(this IServiceCollection serviceCollection)
     {
         // Configure providers
         serviceCollection
@@ -61,7 +62,12 @@ public static class SettingsProviderFactory
         
         // Configure sections
         serviceCollection.AddSingleton(typeof(IWriteableSection<>), typeof(Section<>))
-                         .AddSingleton(typeof(ISection<>), typeof(ForwardingSection<>));
+                         .AddSingleton(typeof(ISection<>), typeof(ForwardingSection<>))
+                         .AddSingleton<ISection<DatabaseSection>>(sp =>
+                             new Section<DatabaseSection>([
+                                 sp.GetRequiredService<ISettingsProvider<InfrastructureSettings>>()
+                             ])
+                         );
         return serviceCollection;
     }
 

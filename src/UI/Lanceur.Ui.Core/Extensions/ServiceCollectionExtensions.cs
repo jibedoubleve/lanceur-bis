@@ -2,6 +2,7 @@ using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Caching;
+using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
@@ -20,6 +21,14 @@ namespace Lanceur.Ui.Core.Extensions;
 public static class ServiceCollectionExtensions
 {
     #region Methods
+
+    private static IServiceCollection AddTrackedMemoryCache(this IServiceCollection services)
+    {
+        services.AddMemoryCache();
+        services.Decorate<IMemoryCache, TrackedMemoryCache>();
+
+        return services;
+    }
 
     public static IServiceCollection AddLoggers(
         this IServiceCollection serviceCollection
@@ -77,14 +86,6 @@ public static class ServiceCollectionExtensions
         }
     }
 
-    public static IServiceCollection AddTrackedMemoryCache(this IServiceCollection services)
-    {
-        services.AddMemoryCache();
-        services.Decorate<IMemoryCache, TrackedMemoryCache>();
-
-        return services;
-    }
-
     public static IServiceCollection AddUiCoreServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddTransient<IGithubService, GithubService>()
@@ -92,6 +93,9 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
                          .AddSingleton<IEnigma, Enigma>()
+                         .AddSettingsInfrastructure()
+                         .AddTrackedMemoryCache()
+                         .RegisterViewModel("Lanceur.Ui.Core")
                          .AddHttpClient();
         return serviceCollection;
     }

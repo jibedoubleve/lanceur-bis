@@ -40,7 +40,10 @@ public static class ServiceCollectionExtensions
                                  ReservedKeywordSource = Assembly.GetAssembly(typeof(QuitAlias))!,
                                  MacroSource = Assembly.GetAssembly(typeof(MultiMacro))!
                              }
-                         );
+                         )
+                         .RegisterView("Lanceur.Ui.WPF")
+                         .Register("Control", "Lanceur.Ui.WPF")
+                         .AddReservedAliases(typeof(AddAlias));
 
         return serviceCollection;
     }

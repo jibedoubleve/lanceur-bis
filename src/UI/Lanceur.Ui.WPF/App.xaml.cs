@@ -9,17 +9,13 @@ using Lanceur.Core.Constants;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Extensions;
-using Lanceur.Infra.Macros;
 using Lanceur.Infra.SQLite.Extensions;
-using Lanceur.Infra.Stores;
 using Lanceur.Infra.Win32.Extensions;
 using Lanceur.Infra.Win32.Helpers;
-using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Logging;
 using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.WPF.Extensions;
-using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Services;
 using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.Configuration;
@@ -42,19 +38,11 @@ public partial class App
         = Microsoft.Extensions.Hosting.Host
                    .CreateDefaultBuilder()
                    .ConfigureServices((_, services) => {
-                           services.AddTrackedMemoryCache()
-                                   .RegisterView("Lanceur.Ui.WPF")
-                                   .RegisterViewModel("Lanceur.Ui.Core")
-                                   .Register("Control", "Lanceur.Ui.WPF")
-                                   .AddInfraServices()
+                           services.AddInfraServices()
                                    .AddDatabaseServices()
                                    .AddWin32Services()
                                    .AddUiCoreServices()
                                    .AddWpfServices()
-                                   .AddStores()
-                                   .AddSettingsInfrastructure()
-                                   .AddReservedAliases(typeof(AddAlias))
-                                   .AddMacros()
                                    .AddLoggers();
                        }
                    )

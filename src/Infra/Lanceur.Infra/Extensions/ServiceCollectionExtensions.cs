@@ -2,9 +2,12 @@ using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
 using Lanceur.Core.LuaScripting;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
+using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
+using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,7 +33,9 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IStoreShortcutService, StoreShortcutService>()
                          .AddSingleton<IFavIconHttpClient, FavIconHttpClient>()
                          .AddTransient<IEverythingApi, EverythingApi>()
-                         .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>();
+                         .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
+                         .AddStores()
+                         .AddMacros();
         return serviceCollection;
     }
 }

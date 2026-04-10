@@ -6,10 +6,12 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
+using Lanceur.Infra.Extensions;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Logging;
+using Lanceur.Tests.Tools.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -231,7 +233,8 @@ public sealed class StoresOrchestrationTest
     [InlineData("r::::: mlk")]
     public void When_retrieving_additional_parameters_store_Then_it_is_alive_for_the_orchestrator(string query)
     {
-        // ACT
+        // arrange
+        var ffRepository = new TestFeatureFlagRepository();
         var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
                                                      .AddSingleton<IStoreOrchestrationFactory>(
                                                          new StoreOrchestrationFactory()
@@ -240,11 +243,13 @@ public sealed class StoresOrchestrationTest
                                                      .AddSingleton<AdditionalParametersStore>()
                                                      .AddLoggingForTests(_outputHelper)
                                                      .AddStoreServicesMockContext()
-                                                     .AddStores()
+                                                     .AddSingleton<IFeatureFlagRepository>(ffRepository)
                                                      .BuildServiceProvider();
+        
+        // act
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
-        // ASSERT
+        // assert
         store.Orchestration.IsAlive(query).ShouldBeTrue();
     }
 

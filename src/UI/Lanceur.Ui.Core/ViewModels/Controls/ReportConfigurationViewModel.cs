@@ -3,9 +3,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
+using Lanceur.SharedKernel.IoC;
 
 namespace Lanceur.Ui.Core.ViewModels.Controls;
 
+[ExcludeFromIoC]
 public partial class ReportConfigurationViewModel : ObservableObject
 {
     #region Fields
@@ -27,7 +29,7 @@ public partial class ReportConfigurationViewModel : ObservableObject
         ReportType currentReport
     )
     {
-        Configurations = new ObservableCollection<ReportConfiguration>(configurations.Select(c => c.Clone()));
+        Configurations = [.. configurations.Select(c => c.Clone())];
         SelectedConfiguration = Configurations.FirstOrDefault(e => e.ReportType == currentReport)!;
         Label = label;
         ToolTip = toolTip;

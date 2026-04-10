@@ -2,11 +2,13 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using Lanceur.Core.Constants;
+using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;
 
 namespace Lanceur.Ui.WPF.Views.Controls;
 
-public partial class VersionView : UserControl
+[ExcludeFromIoC]
+public partial class VersionView
 {
     #region Fields
 
