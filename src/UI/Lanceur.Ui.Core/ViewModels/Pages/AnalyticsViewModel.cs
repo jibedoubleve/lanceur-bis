@@ -61,8 +61,8 @@ public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
     private static ObservableCollection<string> GetYears(IEnumerable<DataPoint<DateTime, double>> points)
     {
         var list = points.Select(e => e.X.Year.ToString())
-                         .Distinct()
-                         .ToList();
+            .Distinct()
+            .ToList();
         list.Insert(0, SelectAll);
         return new ObservableCollection<string>(list);
     }
@@ -91,11 +91,10 @@ public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
         InvalidateCache(points);
 
         IsMonthlyVisible = points.Any();
-        if (IsMonthlyVisible) { RedrawPlot(OnRefreshMonthlyPlot, points, PlotType.MonthlyHistory); }
+        if (IsMonthlyVisible)
+            RedrawPlot(OnRefreshMonthlyPlot, points, PlotType.MonthlyHistory);
         else // To be here means there's nothing to show, fallback is daily history...
-        {
             await OnRefreshDailyHistory();
-        }
     }
 
     [RelayCommand]
@@ -134,11 +133,10 @@ public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
         InvalidateCache(points);
 
         IsMonthlyVisible = points.Any();
-        if (IsMonthlyVisible) { RedrawPlot(OnRefreshYearlyPlot, points, PlotType.YearlyHistory); }
+        if (IsMonthlyVisible)
+            RedrawPlot(OnRefreshYearlyPlot, points, PlotType.YearlyHistory);
         else // To be here means there's nothing to show, fallback is daily history...
-        {
             await OnRefreshDailyHistory();
-        }
     }
 
     [RelayCommand]
@@ -162,7 +160,7 @@ public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
 
     private void RedrawLastTrendPlot(string yearStr)
     {
-        if (LastPlotContext is null) { return; }
+        if (LastPlotContext is null) return;
 
         int? year = int.TryParse(yearStr, out var yearValue) ? yearValue : null;
         var per = LastPlotContext.PlotType switch
@@ -183,7 +181,7 @@ public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
         [CallerMemberName] string? caller = null
     )
     {
-        if (plotContext is null) { return; }
+        if (plotContext is null) return;
 
         RedrawPlot(
             plotContext.RedrawPlotAction,
@@ -205,7 +203,7 @@ public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
         dateTimeToDoubleConverter ??= r => r.ToOADate();
         dataPoints = dataPoints.ToList();
 
-        if (LastPlotContext is null) { Years = GetYears(dataPoints); }
+        if (LastPlotContext is null) Years = GetYears(dataPoints);
 
         LastPlotContext = new PlotContext
         {
@@ -220,6 +218,12 @@ public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
         var y = points.Select(p => p.Y).ToArray();
         CurrentPlotType = plotType;
         redrawPlotAction?.Invoke(x, y);
+    }
+
+    public void Dispose()
+    {
+        _cancellationCacheTokenSource.Dispose();
+        _memoryCache.Dispose();
     }
 
     #endregion
@@ -257,11 +261,5 @@ public sealed partial class AnalyticsViewModel : ObservableObject, IDisposable
         }
 
         #endregion
-    }
-
-    public void Dispose()
-    {
-        _cancellationCacheTokenSource.Dispose();
-        _memoryCache.Dispose();
     }
 }
