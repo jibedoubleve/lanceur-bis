@@ -18,7 +18,7 @@
         <PackageReference Include="MiniProfiler.Shared" Version="4.5.4"/>
         <PackageReference Include="NSubstitute" Version="6.2.0"/>
         <PackageReference Include="Shouldly" Version="4.3.0"/>
-        <PackageReference Include="xunit.v3.assert" Version="3.2.2"/>
-        <PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2"/>
+        <PackageReference Include="xunit.v3.assert" Version="4.0.2"/>
+        <PackageReference Include="xunit.v3.extensibility.core" Version="4.0.2"/>
     </ItemGroup>
 </Project>
