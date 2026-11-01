@@ -59,15 +59,32 @@ public sealed class ServiceRegistrationTest : TestBase
     {
         // arrange
         var services = new ServiceCollection();
+        IList<Type> expected =
+        [
+            typeof(AddAlias), typeof(AnalyticsAlias), typeof(CentreAlias),
+            typeof(ClearBookmarkCacheAlias), typeof(HelpAlias), typeof(QuitAlias),
+            typeof(SetupAlias), typeof(ShowLogs), typeof(VersionAlias)
+        ];
+
+#if DEBUG
+        expected.Add(typeof(ThrowAlias));
+#endif
 
         // act
         services.AddReservedAliases(typeof(AddAlias));
 
         // assert
-        const int expectedCount = 10;
-        services
-            .Count(d => d.ServiceType == typeof(SelfExecutableQueryResult))
-            .ShouldBe(expectedCount, $"{expectedCount} reserved aliases should be discovered and registered");
+        var discovered = typeof(AddAlias).Assembly.GetTypes()
+                                         .Where(t => t.IsAssignableTo(typeof(SelfExecutableQueryResult)) && !t.IsAbstract)
+                                         .ToList();
+
+        var registered = services
+                         .Where(d => d.ServiceType == typeof(SelfExecutableQueryResult))
+                         .Select(d => d.ImplementationType!)
+                         .ToList();
+
+        registered.ShouldBe(discovered, true);
+        registered.ShouldBe(expected, true);
     }
 
     /// <summary>
