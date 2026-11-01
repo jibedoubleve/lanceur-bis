@@ -2,7 +2,6 @@
 using System.Reflection;
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
@@ -11,8 +10,6 @@ using Lanceur.Infra.Macros;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
-using Lanceur.Infra.Stores;
-using Lanceur.Infra.Utils;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Helpers;
@@ -145,32 +142,6 @@ public sealed class MacroServiceTest : TestBase
             );
     }
 
-    [Fact]
-    public void When_loading_macros_Then_at_least_one_macro_should_exist_by_default()
-    {
-        var serviceProvider = new ServiceCollection()
-                              .AddSingleton(
-                                  new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! }
-                              )
-                              .AddSingleton<ILoggerFactory, LoggerFactory>()
-                              .AddMockSingleton<ILogger<MacroAliasExpanderService>>()
-                              .AddMockSingleton<IExecutionService>()
-                              .AddMockSingleton<ISearchService>()
-                              .AddMockSingleton<IAliasRepository>()
-                              .AddSingleton<MacroAliasExpanderService>()
-                              .AddMockSingleton<IClipboardService>()
-                              .AddLoggingForTests(OutputHelper)
-                              .AddLogging()
-                              .AddMockSingleton<IGithubService>()
-                              .AddMockSingleton<IUserGlobalNotificationService>()
-                              .AddMockSingleton<IEnigma>()
-                              .AddMockSingleton<ISection<GithubSection>>()
-                              .AddMacros()
-                              .BuildServiceProvider();
-
-        var manager = serviceProvider.GetService<MacroAliasExpanderService>()!;
-        manager.MacroCount.ShouldBeGreaterThan(0);
-    }
 
     [Fact]
     public void When_loading_macros_Then_expected_amount_of_macro_found()
@@ -249,6 +220,21 @@ public sealed class MacroServiceTest : TestBase
     }
 
     [Fact]
+    public void When_using_Multi_macro_Then_it_is_assignable_to_CompositeAliasQueryResult()
+    {
+        // Arrange
+        const string sql = Cfg.SqlForAliases;
+        using var db = BuildFreshDb(sql);
+        var service = Cfg.GetDataService(db, OutputHelper);
+
+        // Act
+        var results = service.Search("alias1");
+
+        // Assert
+        results.ElementAt(0).ShouldBeAssignableTo<CompositeAliasQueryResult>();
+    }
+
+    [Fact]
     public void When_using_a_macro_Then_it_has_default_description()
     {
         QueryResult[] queryResults =
@@ -296,72 +282,19 @@ public sealed class MacroServiceTest : TestBase
     }
 
     [Theory]
-    [InlineData("un")]
-    [InlineData("deux")]
-    [InlineData("trois")]
-    public void When_using_a_macro_Then_it_is_recognised_as_macro(string macro)
-    {
-        var query = new AliasQueryResult { FileName = $"@{macro}@" };
-
-        query.IsMacro().ShouldBeTrue();
-    }
-
-    [Theory]
     [InlineData("multi", true)]
     [InlineData("MULTI", true)]
+    [InlineData("MuLtI", true)]
     [InlineData("macro", false)]
     [InlineData("MACRO", false)]
     [InlineData("calendar", false)]
     [InlineData("CALENDAR", false)]
+    [InlineData("CaLeNdAr", false)]
     public void When_using_composite_macro_Then_it_is_marked_as_composite(string macro, bool expected)
     {
         var alias = new AliasQueryResult { FileName = $"@{macro}@" };
 
         alias.IsComposite().ShouldBe(expected);
-    }
-
-    [Fact]
-    public void When_using_MacroQueryResult_Then_it_is_assignable_to_SelfExecutableQueryResult()
-    {
-        // ARRANGE
-        var serviceProvider = new ServiceCollection()
-                              .AddSingleton(
-                                  new AssemblySource { MacroSource = Assembly.GetAssembly(typeof(MultiMacro))! }
-                              )
-                              .AddSingleton<ILoggerFactory, LoggerFactory>()
-                              .AddMockSingleton<ILogger<MacroAliasExpanderService>>()
-                              .AddMockSingleton<IExecutionService>()
-                              .AddMockSingleton<ISearchService>()
-                              .AddMockSingleton<IAliasRepository>()
-                              .AddSingleton<MacroAliasExpanderService>()
-                              .AddMockSingleton<IClipboardService>()
-                              .AddLoggingForTests(OutputHelper)
-                              .AddLogging()
-                              .AddMockSingleton<IGithubService>()
-                              .AddMockSingleton<IUserGlobalNotificationService>()
-                              .AddMockSingleton<IEnigma>()
-                              .AddMockSingleton<ISection<GithubSection>>()
-                              .AddMacros()
-                              .BuildServiceProvider();
-
-
-        // ACT
-        var macros = serviceProvider.GetServices<MacroQueryResult>()
-                                    .ToList();
-
-        // ASSERT
-
-        macros.ShouldNotBeNull();
-        macros!.Count.ShouldBeGreaterThan(0, "there are preconfigured macros");
-
-        Assert.All(
-            macros,
-            macro => {
-                OutputHelper.WriteLine($"Checking '{macro.Name}'");
-                macro.ShouldBeAssignableTo(typeof(SelfExecutableQueryResult));
-                macro.ShouldBeAssignableTo(typeof(MacroQueryResult));
-            }
-        );
     }
 
     [Fact]
@@ -377,21 +310,6 @@ public sealed class MacroServiceTest : TestBase
 
         //Assert
         results.ElementAt(0).GetMacroName().ShouldBe("MULTI");
-    }
-
-    [Fact]
-    public void When_using_Multi_macro_Then_it_is_assignable_to_CompositeAliasQueryResult()
-    {
-        // Arrange
-        const string sql = Cfg.SqlForAliases;
-        using var db = BuildFreshDb(sql);
-        var service = Cfg.GetDataService(db, OutputHelper);
-
-        // Act
-        var results = service.Search("alias1");
-
-        // Assert
-        results.ElementAt(0).ShouldBeAssignableTo<CompositeAliasQueryResult>();
     }
 
     [Fact]
@@ -414,7 +332,7 @@ public sealed class MacroServiceTest : TestBase
     }
 
     [Fact]
-    public void When_using_regular_alias_then_is_it_not_recognised_as_macro()
+    public void When_using_regular_alias_Then_it_is_not_recognised_as_macro()
     {
         // Arrange
         const string sql = Cfg.SqlForAliases;

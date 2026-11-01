@@ -10,11 +10,11 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public sealed class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewModel>
+public sealed class AnalyticsViewModelTest : ViewModelTester<AnalyticsViewModel>
 {
     #region Constructors
 
-    public AnalyticsViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public AnalyticsViewModelTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -31,7 +31,7 @@ public sealed class AnalyticsViewModelShould : ViewModelTester<AnalyticsViewMode
     }
 
     [Fact]
-    public void NotCrashWhenNoResultRetrievedFromDb() =>
+    public void When_selecting_year_with_empty_db_Then_no_error() =>
         TestViewModel(
             (viewModel, _) => {
                 Record.Exception(() => viewModel.SelectYearCommand.Execute(null))

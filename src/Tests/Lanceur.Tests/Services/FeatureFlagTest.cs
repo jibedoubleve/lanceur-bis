@@ -8,18 +8,18 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public sealed class FeatureFlagShould : TestBase
+public sealed class FeatureFlagTest : TestBase
 {
     #region Constructors
 
-    public FeatureFlagShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public FeatureFlagTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
     #region Methods
 
     [Fact]
-    public void TakeDefaultWhenDbIsEmpty()
+    public void When_database_is_empty_Then_default_flag_value_is_used()
     {
         var conn = BuildFreshDb();
         var scope = new DbSingleConnectionManager(conn);

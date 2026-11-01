@@ -17,11 +17,11 @@ namespace Lanceur.Tests.Repositories;
 ///     Tests for the analytics and reporting queries of <see cref="SQLiteAliasRepository" />.
 ///     These tests verify that queries return correct data based on usage history, doubloons, activity, and alias state.
 /// </summary>
-public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
+public sealed class SQLiteAliasRepositoryAnalyticsTest : TestBase
 {
     #region Constructors
 
-    public SQLiteAliasRepositoryAnalyticsShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public SQLiteAliasRepositoryAnalyticsTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -81,12 +81,12 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetAdditionalParameter()
+    public void When_getting_additional_parameters_Then_no_error()
         => Record.Exception(() => BuildRepository().GetAdditionalParameter([1, 2, 3]))
                  .ShouldBeNull();
 
     [Fact]
-    public void GetAliasesWithoutNotes()
+    public void When_getting_aliases_without_notes_Then_they_are_returned_with_usage()
     {
         // arrange
         const int count = 2;
@@ -130,10 +130,10 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetAll() => Record.Exception(() => BuildRepository().GetAll()).ShouldBeNull();
+    public void When_getting_all_aliases_Then_no_error() => Record.Exception(() => BuildRepository().GetAll()).ShouldBeNull();
 
     [Fact]
-    public void GetAllAliasWithAdditionalParameters()
+    public void When_getting_aliases_with_additional_parameters_Then_no_error()
         => Record
            .Exception(()
                => BuildRepository().GetAllAliasWithAdditionalParameters()
@@ -145,7 +145,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     [InlineData(@"C:\NOT\A\REAL\FILE.EXE")]
     [InlineData(@"c:\not\a\real\file\")]
     [InlineData(@"C:\NOT\A\REAL\FILE\")]
-    public void GetBrokenAliases(string fileName)
+    public void When_file_does_not_exist_Then_alias_is_broken(string fileName)
     {
         // arrange
         const int count = 2;
@@ -194,12 +194,12 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetById()
+    public void When_getting_alias_by_id_Then_no_error()
         => Record.Exception(() => BuildRepository().GetById(1))
                  .ShouldBeNull();
 
     [Fact]
-    public void GetDeletedAlias()
+    public void When_getting_deleted_aliases_Then_they_are_returned_with_usage()
     {
         // arrange
         const int count = 2;
@@ -250,7 +250,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
 
     [Theory]
     [InlineData("filename", "some arguments")]
-    public void GetDoubloons(string filename, string arguments)
+    public void When_aliases_have_same_file_and_arguments_Then_they_are_doubloons(string filename, string arguments)
     {
         // arrange
         const int count = 2;
@@ -306,7 +306,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetDoubloonsWithLuaScript()
+    public void When_lua_scripts_differ_Then_only_same_scripts_are_doubloons()
     {
         // arrange
         const int count = 2;
@@ -370,7 +370,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetDoubloonsWithLuaScriptAndNullScript()
+    public void When_a_lua_script_is_null_Then_only_same_scripts_are_doubloons()
     {
         // arrange
         const int count = 2;
@@ -432,7 +432,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetExistingAliases()
+    public void When_getting_existing_aliases_for_alias_Then_other_aliases_with_name_are_returned()
     {
         // arrange
         var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("name_1"))
@@ -456,17 +456,17 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetExistingDeletedAliases()
+    public void When_getting_existing_deleted_aliases_Then_no_error()
         => Record.Exception(() => BuildRepository().GetExistingDeletedAliases([], 0))
                  .ShouldBeNull();
 
     [Fact]
-    public void GetHiddenCounters()
+    public void When_getting_hidden_counters_Then_no_error()
         => Record.Exception(() => BuildRepository().GetHiddenCounters())
                  .ShouldBeNull();
 
     [Fact]
-    public void GetInactiveAliases()
+    public void When_getting_inactive_aliases_Then_recently_used_alias_is_excluded()
     {
         // arrange
         var date1 = DateTime.Now.AddMonths(-10);
@@ -507,7 +507,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetRarelyUsedAliases()
+    public void When_getting_rarely_used_aliases_Then_aliases_above_threshold_are_excluded()
     {
         // arrange
         var date1 = DateTime.Now.AddMonths(-10);
@@ -550,7 +550,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetUnusedAliases()
+    public void When_getting_unused_aliases_Then_all_have_zero_count()
     {
         // arrange
         var gen = new SqlBuilder();
@@ -572,17 +572,17 @@ public sealed class SQLiteAliasRepositoryAnalyticsShould : TestBase
     }
 
     [Fact]
-    public void GetUsage()
+    public void When_getting_usage_Then_no_error()
         => Record.Exception(() => BuildRepository().GetUsage(Per.DayOfWeek))
                  .ShouldBeNull();
 
     [Fact]
-    public void GetYearsWithUsage()
+    public void When_getting_years_with_usage_Then_no_error()
         => Record.Exception(() => BuildRepository().GetYearsWithUsage())
                  .ShouldBeNull();
 
     [Fact]
-    public void HydrateAlias()
+    public void When_hydrating_alias_Then_no_error()
         => Record.Exception(() => BuildRepository().HydrateAlias(new AliasQueryResult()))
                  .ShouldBeNull();
 

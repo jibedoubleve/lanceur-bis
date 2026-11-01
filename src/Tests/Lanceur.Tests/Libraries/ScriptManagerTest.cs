@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Libraries;
 
-public sealed class ScriptManagerShould
+public sealed class ScriptManagerTest
 {
     #region Fields
 
@@ -24,7 +24,7 @@ public sealed class ScriptManagerShould
     [InlineData("0.1", 2)]
     [InlineData("0.2", 1)]
     [InlineData("0.2.1", 0)]
-    public void ExecuteExpectedScriptAfterGivenVersion(string version, int expectedCount)
+    public void When_filtering_scripts_after_version_Then_only_newer_scripts_are_returned(string version, int expectedCount)
     {
         var ver = new Version(version);
         var manager = new ScriptManager(Asm, Pattern);
@@ -36,7 +36,7 @@ public sealed class ScriptManagerShould
     }
 
     [Fact]
-    public void GetListOfResources()
+    public void When_listing_resources_Then_all_resources_are_returned()
     {
         var manager = new ScriptManager(Asm, Pattern);
 
@@ -46,7 +46,7 @@ public sealed class ScriptManagerShould
     }
 
     [Fact]
-    public void HaveResourceWithSpecifiedVersion()
+    public void When_getting_resource_by_name_Then_it_is_found()
     {
         var manager = new ScriptManager(Asm, Pattern);
 
@@ -54,7 +54,7 @@ public sealed class ScriptManagerShould
     }
 
     [Fact]
-    public void HaveSql()
+    public void When_getting_scripts_Then_none_is_empty()
     {
         var manager = new ScriptManager(Asm, Pattern);
 
@@ -65,14 +65,14 @@ public sealed class ScriptManagerShould
     }
 
     [Fact]
-    public void ReturnDictionaryOfResources()
+    public void When_getting_resources_Then_all_resources_are_returned()
     {
         var manager = new ScriptManager(Asm, Pattern);
         manager.GetResources().Count.ShouldBe(Count);
     }
 
     [Fact]
-    public void ReturnLatestVersionOfScripts()
+    public void When_getting_max_version_Then_latest_script_version_is_returned()
     {
         var version = new Version(0, 2, 1);
         var manager = new ScriptManager(Asm, Pattern);
@@ -81,7 +81,7 @@ public sealed class ScriptManagerShould
     }
 
     [Fact]
-    public void ReturnPackOfScripts()
+    public void When_getting_scripts_Then_all_scripts_are_returned()
     {
         var manager = new ScriptManager(Asm, Pattern);
         manager.GetScripts().Count().ShouldBe(Count);
@@ -91,7 +91,7 @@ public sealed class ScriptManagerShould
     [InlineData("0.1")]
     [InlineData("0.2")]
     [InlineData("0.2.1")]
-    public void ReturnScriptFromVersion(string version)
+    public void When_indexing_scripts_by_version_Then_script_is_returned(string version)
     {
         var ver = new Version(version);
         var manager = new ScriptManager(Asm, Pattern);
@@ -105,7 +105,7 @@ public sealed class ScriptManagerShould
     [InlineData("1.0.0", 2)]
     [InlineData("1.0.1", 1)]
     [InlineData("1.1.1", 0)]
-    public void UpdateAfter(string version, int count)
+    public void When_filtering_collection_after_version_Then_only_newer_versions_are_returned(string version, int count)
     {
         var dico = new Dictionary<Version, string>
             { { new Version("1.0.0"), "" }, { new Version("1.0.1"), "" }, { new Version("1.1.1"), "" } };

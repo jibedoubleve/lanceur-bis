@@ -145,7 +145,7 @@ public partial class App
             };
 
             Current.Dispatcher.Invoke(
-                delegate{ action.Invoke(); }
+                action.Invoke
             );
         };
 

@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public sealed class TextToParameterParserShould
+public sealed class TextToParameterParserTest
 {
     #region Methods
 
@@ -39,7 +39,7 @@ public sealed class TextToParameterParserShould
 
     [Theory]
     [MemberData(nameof(FeedParseAdditionalParameters))]
-    public void ParseAdditionalParameters(string additionalParameters, int parameterCount)
+    public void When_parsing_additional_parameters_Then_all_lines_are_parsed(string additionalParameters, int parameterCount)
     {
         var parser = new TextToParameterParser();
         var result = parser.Parse(additionalParameters);

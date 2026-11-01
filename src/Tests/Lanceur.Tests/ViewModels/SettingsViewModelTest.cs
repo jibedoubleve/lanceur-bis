@@ -19,11 +19,11 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSettingsViewModel>
+public sealed class SettingsViewModelTest : ViewModelTester<ApplicationSettingsViewModel>
 {
     #region Constructors
 
-    public SettingsViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public SettingsViewModelTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -77,7 +77,7 @@ public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSetting
     [Theory]
     [InlineData(500)]
     [InlineData(123)]
-    public void SaveOptionSearchDelay(double value)
+    public void When_search_delay_changes_Then_it_is_saved_in_db(double value)
         => AssertProperty(
             viewModel => viewModel.SearchDelay = value,
             () => GetProperty("SearchBox.SearchDelay"),
@@ -87,7 +87,7 @@ public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSetting
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void SaveOptionShowAtStartup(bool value)
+    public void When_ShowAtStartup_changes_Then_it_is_saved_in_db(bool value)
         => AssertProperty(
             viewModel => viewModel.ShowAtStartup = value,
             () => GetProperty("SearchBox.ShowAtStartup"),
@@ -97,7 +97,7 @@ public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSetting
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void SaveOptionShowLastQuery(bool value)
+    public void When_ShowLastQuery_changes_Then_it_is_saved_in_db(bool value)
         => AssertProperty(
             viewModel => viewModel.ShowLastQuery = value,
             () => GetProperty("SearchBox.ShowLastQuery"),
@@ -107,7 +107,7 @@ public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSetting
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void SaveOptionShowResult(bool value)
+    public void When_ShowResult_changes_Then_it_is_saved_in_db(bool value)
         => AssertProperty(
             viewModel => viewModel.ShowResult = value,
             () => GetProperty("SearchBox.ShowResult"),
@@ -120,7 +120,7 @@ public sealed class SettingsViewModelShould : ViewModelTester<ApplicationSetting
     [InlineData("Edge")]
     [InlineData("Firefox")]
     [InlineData("SomeUnknownValue")]
-    public void SaveOptionStoresBookmarkSourceBrowser(string value)
+    public void When_bookmark_source_browser_changes_Then_it_is_saved_in_db(string value)
         => AssertProperty(
             viewModel => viewModel.BookmarkSourceBrowser = value,
             () => GetProperty("Stores.BookmarkSourceBrowser"),

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Libraries;
 
-public sealed class SQLiteUpdaterShould : TestBase
+public sealed class SQLiteUpdaterTest : TestBase
 {
     #region Fields
 
@@ -20,14 +20,14 @@ public sealed class SQLiteUpdaterShould : TestBase
 
     #region Constructors
 
-    public SQLiteUpdaterShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public SQLiteUpdaterTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
     #region Methods
 
     [Fact]
-    public void UpdateDatabase()
+    public void When_updating_from_version_zero_Then_scripts_are_applied()
     {
         var ver = new Version(0, 0);
 

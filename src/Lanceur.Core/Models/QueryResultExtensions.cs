@@ -20,7 +20,7 @@ public static partial class QueryResultExtensions
     {
         var fileName = @this.FileName ?? string.Empty;
         return fileName.Contains(
-            $"@{macro.ToLowerString()}@",
+            $"@{macro.ToString().ToLower()}@",
             StringComparison.CurrentCultureIgnoreCase
         );
     }

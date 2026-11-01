@@ -56,12 +56,12 @@ public sealed class StorePruningContractTest
     [Theory]
     [InlineData("fo", "foo", true)] // refinement (StartsWith) → can prune
     [InlineData("foo", "bar", false)] // not a refinement → cannot prune
-    public void AliasStore_CanPruneResult(string previous, string current, bool expected)
+    public void When_checking_alias_store_pruning_Then_only_refinement_can_be_pruned(string previous, string current, bool expected)
         => BuildAliasStore().CanPruneResult(Cmdline.Parse(previous), current)
                             .ShouldBe(expected);
 
     [Fact]
-    public void AliasStore_PruneResult_FiltersCorrectly()
+    public void When_pruning_alias_store_Then_non_matching_owned_results_are_removed()
     {
         var store = BuildAliasStore();
         var destination = new List<QueryResult>
@@ -90,12 +90,12 @@ public sealed class StorePruningContractTest
     [InlineData("/ foo", "/ xyz", false)] // "xyz" doesn't contain "foo" → should be false, currently true
     [InlineData("/ oo", "/ goo", true)] // "goo" contains "oo" → can prune 
     [InlineData("/ ", "/ google", false)] // empty previous params → must trigger full search 
-    public void BookmarksStore_CanPruneResult(string previous, string current, bool expected)
+    public void When_checking_bookmarks_store_pruning_Then_only_refinement_can_be_pruned(string previous, string current, bool expected)
         => BuildBookmarksStore().CanPruneResult(Cmdline.Parse(previous), current)
                                 .ShouldBe(expected);
 
     [Fact]
-    public void BookmarksStore_PruneResult_FiltersCorrectly()
+    public void When_pruning_bookmarks_store_Then_non_matching_owned_results_are_removed()
     {
         var store = BuildBookmarksStore();
         var destination = new List<QueryResult>
@@ -116,7 +116,7 @@ public sealed class StorePruningContractTest
     }
 
     [Fact]
-    public void BookmarksStore_PruneResult_ShouldRemoveItemsThatMatchPreviousButNotCurrentFilter()
+    public void When_pruning_bookmarks_store_Then_results_matching_previous_but_not_current_are_removed()
     {
         var store = BuildBookmarksStore();
 
@@ -145,7 +145,7 @@ public sealed class StorePruningContractTest
     [Theory]
     [InlineData("1+", "1+2", false)] // CalculatorStore always returns false — each expression is unique
     [InlineData("1+2", "3*4", false)]
-    public void CalculatorStore_CanPruneResult(string previous, string current, bool expected)
+    public void When_checking_calculator_store_pruning_Then_it_cannot_prune(string previous, string current, bool expected)
         => BuildCalculatorStore().CanPruneResult(Cmdline.Parse(previous), current)
                                  .ShouldBe(expected);
 
@@ -154,7 +154,7 @@ public sealed class StorePruningContractTest
     [InlineData("", "1+2")]
     [InlineData(null, "1+2")]
     [InlineData("aaa", "1+2")]
-    public void CalculatorStore_PruneResult_FiltersCorrectly(string? previous, string current)
+    public void When_pruning_calculator_store_without_results_Then_nothing_is_removed(string? previous, string current)
     {
         // CalculatorStore uses StoreBase default: Name.StartsWith
         var store = BuildCalculatorStore();
@@ -172,12 +172,12 @@ public sealed class StorePruningContractTest
     [Theory]
     [InlineData(": fo", ": foo", false)] // EverythingStore always returns false — results are non-deterministic
     [InlineData(": foo", ": bar", false)]
-    public void EverythingStore_CanPruneResult(string previous, string current, bool expected)
+    public void When_checking_everything_store_pruning_Then_it_cannot_prune(string previous, string current, bool expected)
         => BuildEverythingStore().CanPruneResult(Cmdline.Parse(previous), current)
                                  .ShouldBe(expected);
 
     [Fact]
-    public void EverythingStore_PruneResult_FiltersCorrectly()
+    public void When_pruning_everything_store_Then_non_matching_owned_results_are_removed()
     {
         // EverythingStore uses StoreBase default: Name.StartsWith.
         // Note: realistic Everything queries (": term") always have Name=":", so prevValue = currValue

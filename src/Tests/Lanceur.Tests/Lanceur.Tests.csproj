@@ -7,7 +7,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Remove="UI\**"/>
-        <Compile Include="Ui\ConverterShould.cs"/>
+        <Compile Include="Ui\ConverterTest.cs"/>
         <EmbeddedResource Remove="UI\**"/>
         <None Remove="UI\**"/>
     </ItemGroup>

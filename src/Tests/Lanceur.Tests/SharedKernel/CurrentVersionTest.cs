@@ -4,13 +4,13 @@ using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
-public sealed class CurrentVersionShould
+public sealed class CurrentVersionTest
 {
     #region Methods
 
     [Theory]
     [MemberData(nameof(FeedCreateCurrentVersionFromFullVersion))]
-    public void CreateCurrentVersionFromFullVersion(string fullVersion, string version, string suffix, string commit) =>
+    public void When_parsing_full_version_Then_version_suffix_and_commit_are_extracted(string fullVersion, string version, string suffix, string commit) =>
         CurrentVersion.FromFullVersion(fullVersion)
                       .ShouldSatisfyAllConditions(
                           v => v.Commit.ShouldBe(commit),

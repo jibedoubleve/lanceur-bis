@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Repositories;
 
-public sealed class WebBookmarksShould
+public sealed class WebBookmarksTest
 {
     #region Fields
 
@@ -19,14 +19,14 @@ public sealed class WebBookmarksShould
 
     #region Constructors
 
-    public WebBookmarksShould(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
+    public WebBookmarksTest(ITestOutputHelper outputHelper) => _outputHelper = outputHelper;
 
     #endregion
 
     #region Methods
 
     [Fact]
-    public void NotThrowWhenChromeConfigurationIsWrong()
+    public void When_chrome_configuration_is_wrong_Then_no_bookmarks_are_returned()
     {
         // ARRANGE
         var serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddXUnit(_outputHelper))
@@ -43,7 +43,7 @@ public sealed class WebBookmarksShould
     }
 
     [Fact]
-    public void NotThrowWhenGeckoConfigurationIsWrong()
+    public void When_gecko_configuration_is_wrong_Then_no_bookmarks_are_returned()
     {
         // ARRANGE
         var serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddXUnit(_outputHelper))

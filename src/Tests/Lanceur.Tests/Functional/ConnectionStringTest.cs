@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public sealed class ConnectionStringShould
+public sealed class ConnectionStringTest
 {
     #region Fields
 
@@ -20,7 +20,7 @@ public sealed class ConnectionStringShould
 
     #region Constructors
 
-    public ConnectionStringShould(ITestOutputHelper output) => _output = output;
+    public ConnectionStringTest(ITestOutputHelper output) => _output = output;
 
     #endregion
 
@@ -37,7 +37,7 @@ public sealed class ConnectionStringShould
     }
 
     [Fact]
-    public void HaveExistingDebugDatabase()
+    public void When_building_connection_string_from_file_Then_data_source_is_file_path()
     {
         // ARRANGE
         var file = Path.GetTempFileName();
@@ -52,7 +52,7 @@ public sealed class ConnectionStringShould
     }
 
     [Fact]
-    public void NotThrowErrorWhenFileDoesNotExist()
+    public void When_database_file_does_not_exist_Then_ToString_does_not_throw()
     {
         // Arrange
         var config = Substitute.For<ISection<DatabaseSection>>();
@@ -68,7 +68,7 @@ public sealed class ConnectionStringShould
     }
 
     [Fact]
-    public void NotThrowErrorWhenFileExists()
+    public void When_database_file_exists_Then_ToString_does_not_throw()
     {
         // Arrange
         var file = CreateTemporaryFile();

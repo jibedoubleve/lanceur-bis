@@ -11,11 +11,11 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public sealed class SQLiteFeatureFlagServiceShould : TestBase
+public sealed class SQLiteFeatureFlagServiceTest : TestBase
 {
     #region Constructors
 
-    public SQLiteFeatureFlagServiceShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public SQLiteFeatureFlagServiceTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -24,7 +24,7 @@ public sealed class SQLiteFeatureFlagServiceShould : TestBase
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void CheckFeatureFlag(bool value)
+    public void When_flag_is_saved_Then_service_returns_new_value(bool value)
     {
         // arrange
         var conn = BuildFreshDb();
@@ -49,7 +49,7 @@ public sealed class SQLiteFeatureFlagServiceShould : TestBase
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void UpdateFeatureFlag(bool value)
+    public void When_flag_is_saved_Then_new_value_is_persisted_in_db(bool value)
     {
         // arrange
         var conn = BuildFreshDb();

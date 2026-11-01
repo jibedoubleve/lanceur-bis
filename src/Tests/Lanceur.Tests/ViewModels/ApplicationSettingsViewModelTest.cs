@@ -20,11 +20,11 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public sealed class ApplicationSettingsViewModelShould : ViewModelTester<ApplicationSettingsViewModel>
+public sealed class ApplicationSettingsViewModelTest : ViewModelTester<ApplicationSettingsViewModel>
 {
     #region Constructors
 
-    public ApplicationSettingsViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public ApplicationSettingsViewModelTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -53,7 +53,7 @@ public sealed class ApplicationSettingsViewModelShould : ViewModelTester<Applica
     }
 
     [Fact]
-    public void AskRebootAfterDbPathChanged()
+    public void When_db_path_changes_Then_restart_is_requested()
     {
         IUserGlobalNotificationService userInteractionService = null!;
         var visitors = new ServiceVisitors
@@ -79,7 +79,7 @@ public sealed class ApplicationSettingsViewModelShould : ViewModelTester<Applica
     }
 
     [Fact]
-    public void AskRebootAfterShortcutChanged()
+    public void When_shortcut_changes_Then_restart_is_requested_for_each_change()
     {
         IUserGlobalNotificationService userInteractionService = null!;
         var visitors = new ServiceVisitors
@@ -111,7 +111,7 @@ public sealed class ApplicationSettingsViewModelShould : ViewModelTester<Applica
     }
 
     [Fact]
-    public void SaveStoreShortcutOverrides()
+    public void When_store_shortcuts_change_Then_they_are_saved_in_db()
     {
         const string shortcut = "shortcut";
         const string defaultConfig = """

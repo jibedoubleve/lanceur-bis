@@ -45,7 +45,6 @@ public partial class MainView
         MainViewModel viewModel,
         ILogger<MainView> logger,
         IServiceProvider serviceProvider,
-        IHotKeyService hotKeyService,
         IComputerInfoService computerInfoService,
         IFeatureFlagService featureFlagService,
         MainViewSections sections
@@ -53,7 +52,6 @@ public partial class MainView
     {
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewModel);
-        ArgumentNullException.ThrowIfNull(hotKeyService);
         ArgumentNullException.ThrowIfNull(computerInfoService);
         ArgumentNullException.ThrowIfNull(featureFlagService);
 
@@ -66,8 +64,9 @@ public partial class MainView
         InitializeComponent();
         DataContext = viewModel;
 
-        ConditionalExecution.ExecuteOnDebug(() => { MainContentGrid.Background = new SolidColorBrush(Colors.Crimson); }
-        );
+        ConditionalExecution.ExecuteOnDebug(() => {
+            MainContentGrid.Background = new SolidColorBrush(Colors.Crimson);
+        });
 
         Closed += (_, _) => {
             var messenger = WeakReferenceMessenger.Default;

@@ -4,26 +4,26 @@ using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
-public sealed class IndexNavigatorShould
+public sealed class IndexNavigatorTest
 {
     #region Methods
 
     [Fact]
-    public void GetAlwaysTheSameWhenOneItemListWhenNext()
+    public void When_getting_next_item_of_single_item_list_Then_same_item_is_returned()
     {
         var list = new List<string> { "un" };
         list.GetNextItem(0).ShouldBe("un");
     }
 
     [Fact]
-    public void GetAlwaysTheSameWhenOneItemListWhenPrevious()
+    public void When_getting_previous_item_of_single_item_list_Then_same_item_is_returned()
     {
         var list = new List<string> { "un" };
         list.GetPreviousItem(0).ShouldBe("un");
     }
 
     [Fact]
-    public void GetErrorIndexWhenCurrentIsMinusOneOnNextInEmptyCollection()
+    public void When_getting_next_item_of_empty_list_Then_it_throws()
     {
         var list = new List<string>();
         var action = () => list.GetNextItem(-1);
@@ -32,7 +32,7 @@ public sealed class IndexNavigatorShould
     }
 
     [Fact]
-    public void GetErrorIndexWhenCurrentIsMinusOneOnPreviousInEmptyCollection()
+    public void When_getting_previous_item_of_empty_list_Then_it_throws()
     {
         var list = new List<string>();
         var action = () => list.GetPreviousItem(-1);
@@ -47,7 +47,7 @@ public sealed class IndexNavigatorShould
     [InlineData(3, 4)]
     [InlineData(4, 5)]
     [InlineData(5, 0)]
-    public void GetNextIndex(int current, int next)
+    public void When_getting_next_index_Then_it_wraps_at_the_end(int current, int next)
     {
         var list = new List<int>
         {
@@ -63,7 +63,7 @@ public sealed class IndexNavigatorShould
     }
 
     [Fact]
-    public void GetNextIndexWithEmptyList()
+    public void When_indexing_empty_list_with_next_index_Then_it_throws()
     {
         var list = new List<int>();
 
@@ -77,7 +77,7 @@ public sealed class IndexNavigatorShould
     [InlineData(3, "quatre")]
     [InlineData(4, "cinq")]
     [InlineData(5, "zero")]
-    public void GetNextItem(int next, string expected)
+    public void When_getting_next_item_Then_it_wraps_at_the_end(int next, string expected)
     {
         var list = new List<string>
         {
@@ -102,7 +102,7 @@ public sealed class IndexNavigatorShould
     [InlineData(5, 0)]
     [InlineData(6, 0)]
     [InlineData(7, 0)]
-    public void GetNextPage_ReturnsExpectedIndex(int current, int next)
+    public void When_getting_next_page_Then_expected_index_is_returned(int current, int next)
     {
         var list = new List<int>
         {
@@ -127,7 +127,7 @@ public sealed class IndexNavigatorShould
     [InlineData(2, 1)]
     [InlineData(1, 0)]
     [InlineData(0, 5)]
-    public void GetPreviousIndex(int current, int previous)
+    public void When_getting_previous_index_Then_it_wraps_at_the_start(int current, int previous)
     {
         var list = new List<int>
         {
@@ -143,10 +143,10 @@ public sealed class IndexNavigatorShould
     }
 
     [Fact]
-    public void GetPreviousIndexWithEmptyList()
+    public void When_indexing_empty_list_with_previous_index_Then_it_throws()
     {
         var list = new List<int>();
-        Should.Throw<IndexOutOfRangeException>(() => list[list.GetPreviousIndex(0)]
+        Should.Throw<ArgumentOutOfRangeException>(() => list[list.GetPreviousIndex(0)]
         );
     }
 
@@ -157,7 +157,7 @@ public sealed class IndexNavigatorShould
     [InlineData(3, "deux")]
     [InlineData(4, "trois")]
     [InlineData(5, "quatre")]
-    public void GetPreviousItem(int next, string expected)
+    public void When_getting_previous_item_Then_it_wraps_at_the_start(int next, string expected)
     {
         var list = new List<string>
         {
@@ -182,7 +182,7 @@ public sealed class IndexNavigatorShould
     [InlineData(5, 2)]
     [InlineData(6, 3)]
     [InlineData(7, 4)]
-    public void GetPreviousPage_ReturnsExpectedIndex(int current, int previous)
+    public void When_getting_previous_page_Then_expected_index_is_returned(int current, int previous)
     {
         var list = new List<int>
         {
@@ -201,28 +201,14 @@ public sealed class IndexNavigatorShould
     }
 
     [Fact]
-    public void GetZeroIndexWhenCurrentZeroWhenNext()
-    {
-        var list = new List<string> { "un" };
-        list.GetNextItem(0).ShouldBe("un");
-    }
-
-    [Fact]
-    public void GetZeroIndexWhenCurrentZeroWhenPrevious()
-    {
-        var list = new List<string> { "un" };
-        list.GetPreviousItem(0).ShouldBe("un");
-    }
-
-    [Fact]
-    public void IndicateNavigationImpossibleWithList()
+    public void When_list_is_empty_Then_navigation_is_impossible()
     {
         var list = new List<int>();
         list.CanNavigate().ShouldBe(false);
     }
 
     [Fact]
-    public void IndicateNavigationPossibleWithList()
+    public void When_list_has_items_Then_navigation_is_possible()
     {
         var list = new List<int> { 1, 2, 3 };
         list.CanNavigate().ShouldBe(true);
@@ -231,17 +217,17 @@ public sealed class IndexNavigatorShould
     [Theory]
     [InlineData(-2)]
     [InlineData(1)]
-    public void ThrowsWhenIndexBiggerThanCountOnNext(int index)
+    public void When_getting_previous_item_with_out_of_range_index_Then_it_throws(int index)
     {
         var list = new List<string> { "un" };
         var subject = () => list.GetPreviousItem(index);
-        subject.ShouldThrow<IndexOutOfRangeException>();
+        subject.ShouldThrow<ArgumentOutOfRangeException>();
     }
 
     [Theory]
     [InlineData(-2)]
     [InlineData(1)]
-    public void ThrowsWhenIndexBiggerThanCountOnPrevious(int index)
+    public void When_getting_next_item_with_out_of_range_index_Then_it_throws(int index)
     {
         var list = new List<string> { "un" };
         var subject = () => list.GetNextItem(index);

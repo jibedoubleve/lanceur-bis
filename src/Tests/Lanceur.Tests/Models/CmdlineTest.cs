@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Models;
 
-public sealed class CmdlineShould
+public sealed class CmdlineTest
 {
     #region Methods
 
@@ -13,7 +13,7 @@ public sealed class CmdlineShould
     [InlineData(null)]
     [InlineData("un deux trois")]
     [InlineData("un")]
-    public void BeEquals(string cmd)
+    public void When_parsing_same_text_twice_Then_cmdlines_are_equal(string cmd)
     {
         var left = Cmdline.Parse(cmd);
         var right = Cmdline.Parse(cmd);
@@ -29,7 +29,7 @@ public sealed class CmdlineShould
     [InlineData("cmd", "cmd", "     arg1 arg2")]
     [InlineData("%", "%", " arg1 arg2")]
     [InlineData("$", "$", "arg1 arg2")]
-    public void Build(string asExpected, string cmd, string args)
+    public void When_creating_with_constructor_Then_name_is_trimmed(string asExpected, string cmd, string args)
     {
         var line = new Cmdline(cmd, args);
 
@@ -62,7 +62,7 @@ public sealed class CmdlineShould
     [InlineData("%AAAA aa")]
     [InlineData("?AAAA aa")]
     [InlineData(".AAAA aa")]
-    public void HandleSpecialCmdCharacter(string cmdline) =>
+    public void When_text_starts_with_special_char_Then_name_is_that_char(string cmdline) =>
         Cmdline.Parse(cmdline)
                .Name.ShouldBe(cmdline[0].ToString());
 
@@ -75,7 +75,7 @@ public sealed class CmdlineShould
     [InlineData("arg1 arg2", "? arg1 arg2")]
     [InlineData("arg1 arg2", "?arg1 arg2")]
     [InlineData("a?rg2", "arg1 a?rg2")]
-    public void HaveArguments(string asExpected, string actual)
+    public void When_parsing_Then_parameters_are_extracted(string asExpected, string actual)
     {
         var line = Cmdline.Parse(actual);
 
@@ -83,16 +83,10 @@ public sealed class CmdlineShould
     }
 
     [Fact]
-    public void HaveEmptyNameByDefault() => Cmdline.Empty.Name.ShouldBeEmpty();
+    public void When_using_Empty_Then_name_is_empty() => Cmdline.Empty.Name.ShouldBeEmpty();
 
     [Fact]
-    public void HaveEmptyNameWhenCtorNull() => Cmdline.Empty.Name.ShouldBeEmpty();
-
-    [Fact]
-    public void HaveEmptyParametersByDefault() => Cmdline.Empty.Parameters.ShouldBeEmpty();
-
-    [Fact]
-    public void HaveEmptyParametersWhenCtorNull() => Cmdline.Empty.Parameters.ShouldBeEmpty();
+    public void When_using_Empty_Then_parameters_are_empty() => Cmdline.Empty.Parameters.ShouldBeEmpty();
 
     [Theory]
     [InlineData("cmd", "cmd")]
@@ -102,7 +96,7 @@ public sealed class CmdlineShould
     [InlineData("cmd", "cmd     arg1 arg2")]
     [InlineData("%", "% arg1 arg2")]
     [InlineData("$", "$arg1 arg2")]
-    public void HaveName(string asExpected, string actual)
+    public void When_parsing_Then_name_is_extracted(string asExpected, string actual)
     {
         var line = Cmdline.Parse(actual);
 
@@ -115,7 +109,7 @@ public sealed class CmdlineShould
     [InlineData("un", null)]
     [InlineData("un deux trois", "un deux")]
     [InlineData("deux trois", "deux quatre")]
-    public void NotBeEquals(string cmd1, string cmd2)
+    public void When_parsing_different_text_Then_cmdlines_are_not_equal(string cmd1, string cmd2)
     {
         var left = Cmdline.Parse(cmd1?.Trim());
         var right = Cmdline.Parse(cmd2?.Trim());
@@ -133,13 +127,13 @@ public sealed class CmdlineShould
     [InlineData("m&&", "m&&")]
     [InlineData("m& fff", "m&")]
     [InlineData("m&& fff", "m&&")]
-    public void RecogniseDoubleOrSingleSpecialChar(string cmdline, string expected) =>
+    public void When_parsing_single_or_double_special_char_Then_name_keeps_them(string cmdline, string expected) =>
         Cmdline.Parse(cmdline)
                .Name
                .ShouldBe(expected);
 
     [Fact]
-    public void ReturnsEmptyOnEmptyCmdline()
+    public void When_parsing_empty_text_Then_name_and_parameters_are_empty()
     {
         var line = Cmdline.Parse(string.Empty);
 
@@ -148,7 +142,7 @@ public sealed class CmdlineShould
     }
 
     [Fact]
-    public void ReturnsEmptyOnNullCmdline()
+    public void When_parsing_null_Then_name_and_parameters_are_empty()
     {
         var line = Cmdline.Parse(null);
 
@@ -161,7 +155,7 @@ public sealed class CmdlineShould
     [InlineData("  undeux  ")]
     [InlineData("  undeux")]
     [InlineData("undeux  ")]
-    public void TrimLeadingAndTrailingWhitespace(string cmd) =>
+    public void When_text_has_surrounding_spaces_Then_name_is_trimmed(string cmd) =>
         Cmdline.Parse(cmd)
                .Name.ShouldBe(cmd.Trim());
 

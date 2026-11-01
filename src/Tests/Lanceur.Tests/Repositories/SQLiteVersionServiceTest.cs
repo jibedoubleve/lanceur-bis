@@ -8,11 +8,11 @@ using Xunit;
 
 namespace Lanceur.Tests.Repositories;
 
-public sealed class SQLiteVersionServiceShould : TestBase
+public sealed class SQLiteVersionServiceTest : TestBase
 {
     #region Constructors
 
-    public SQLiteVersionServiceShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public SQLiteVersionServiceTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -33,7 +33,7 @@ public sealed class SQLiteVersionServiceShould : TestBase
     [InlineData("1.9")]
     [InlineData("1.8")]
     [InlineData("1.7")]
-    public void BeUpToDate(string goal)
+    public void When_database_version_is_lower_than_goal_Then_it_is_not_up_to_date(string goal)
     {
         using var db = new DbSingleConnectionManager(BuildConnection());
         CreateTable(db.GetConnection());
@@ -49,7 +49,7 @@ public sealed class SQLiteVersionServiceShould : TestBase
     [InlineData("2")]
     [InlineData("")]
     [InlineData(null)]
-    public void CrashWhenInvalidVersionAsStringIsSpecified(string version)
+    public void When_version_string_is_invalid_Then_argument_exception_is_thrown(string version)
     {
         using var db = new DbSingleConnectionManager(BuildConnection());
         CreateTable(db.GetConnection());
@@ -64,7 +64,7 @@ public sealed class SQLiteVersionServiceShould : TestBase
     [InlineData("1.1", "1.1")]
     [InlineData("1.1.1", "1.1.1")]
     [InlineData("1.1.1.1", "1.1.1.1")]
-    public void HaveUpToDateDatabaseWhenVersionAsStringIsSpecified(string expected, string actual)
+    public void When_version_string_equals_database_version_Then_it_is_up_to_date(string expected, string actual)
     {
         using var db = new DbSingleConnectionManager(BuildConnection());
         CreateTable(db.GetConnection());
@@ -79,7 +79,7 @@ public sealed class SQLiteVersionServiceShould : TestBase
     [InlineData("1.1", "1.1")]
     [InlineData("1.1.1", "1.1.1")]
     [InlineData("1.1.1.1", "1.1.1.1")]
-    public void HaveUpToDateDatabaseWhenVersionIsSpecified(string goal, string actual)
+    public void When_version_equals_database_version_Then_it_is_up_to_date(string goal, string actual)
     {
         using var db = new DbSingleConnectionManager(BuildConnection());
         CreateTable(db.GetConnection());
@@ -96,7 +96,7 @@ public sealed class SQLiteVersionServiceShould : TestBase
     [InlineData("2.0")]
     [InlineData("2.1")]
     [InlineData("2.1.1")]
-    public void ReturnVersionOfDatabase(string version)
+    public void When_getting_current_version_Then_database_version_is_returned(string version)
     {
         using var db = new DbSingleConnectionManager(BuildConnection());
         CreateTable(db.GetConnection());
@@ -112,7 +112,7 @@ public sealed class SQLiteVersionServiceShould : TestBase
     [InlineData("1.2")]
     [InlineData("1.2.3")]
     [InlineData("1.2.3.4")]
-    public void SetDatabaseVersion(string ver)
+    public void When_setting_version_Then_it_is_saved(string ver)
     {
         var version = new Version(ver);
 
@@ -129,7 +129,7 @@ public sealed class SQLiteVersionServiceShould : TestBase
     [InlineData("0.9")]
     [InlineData("0.8")]
     [InlineData("0.7")]
-    public void Update(string goal)
+    public void When_database_version_is_higher_than_goal_Then_it_is_up_to_date(string goal)
     {
         using var db = new DbSingleConnectionManager(BuildConnection());
         CreateTable(db.GetConnection());
