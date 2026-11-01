@@ -83,7 +83,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IExecutionService, ExecutionService>();
-        
+
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, ReservedAliasStore>());
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, CalculatorStore>());
@@ -92,9 +92,32 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
     }
 
     [Theory]
+    [InlineData(new[] { true, false })]
+    [InlineData(new[] { false, true })]
+    public void When_ShowLastQuery_setting_changes_Then_view_model_reflects_it(bool[] callsOfShowLastQuery)
+    {
+        MemoryApplicationSettingsProvider config = null!;
+
+        var visitors = new ServiceVisitors { VisitApplicationSettingsProvider = c => config = c };
+        TestViewModel(
+            (viewModel, _) => {
+                Assert.All(
+                    callsOfShowLastQuery.Select((expected, i) => (expected, i)),
+                    t => {
+                        config.Value.SearchBox.ShowLastQuery = t.expected;
+                        viewModel.ShowLastQuery.ShouldBe(t.expected, $"this is the call n° {t.i + 1} of the test");
+                    }
+                );
+            },
+            Sql.Empty,
+            visitors
+        );
+    }
+
+    [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task Check_configuration_DisplayResultsIfAllowed(bool showAllResults)
+    public async Task When_ShowResult_setting_varies_Then_results_are_displayed_accordingly(bool showAllResults)
     {
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
                                          .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
@@ -117,66 +140,8 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
     }
 
-    [Theory]
-    [InlineData(new[] { true, false })]
-    [InlineData(new[] { false, true })]
-    public void Check_configuration_ShowLastQuery(bool[] callsOfShowLastQuery)
-    {
-        MemoryApplicationSettingsProvider config = null!;
-
-        var visitors = new ServiceVisitors { VisitApplicationSettingsProvider = c => config = c };
-        TestViewModel(
-            (viewModel, _) => {
-                Assert.All(
-                    callsOfShowLastQuery.Select((expected, i) => (expected, i)),
-                    t => {
-                        config.Value.SearchBox.ShowLastQuery = t.expected;
-                        viewModel.ShowLastQuery.ShouldBe(t.expected, $"this is the call n° {t.i + 1} of the test");
-                    }
-                );
-            },
-            Sql.Empty,
-            visitors
-        );
-    }
-
     [Fact]
-    public async Task Check_configuration_ShowResult()
-    {
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms())
-                                         .AppendAlias(a => a.WithSynonyms())
-                                         .AppendAlias(a => a.WithSynonyms())
-                                         .AppendAlias(a => a.WithSynonyms());
-        var visitors = new ServiceVisitors
-        {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitApplicationSettingsProvider = s => {
-                s.Value.SearchBox.ShowLastQuery = true;
-                s.Value.SearchBox.ShowResult = true;
-            }
-        };
-        await TestViewModelAsync(
-            async (viewModel, _) => {
-                const int expectedCount = 1;
-                viewModel.Query = "alias_1"; // default name is alias_{idAlias}
-
-                // Handle the option "Application.SearchBox.ShowResult" If sets to "True" it means it should show
-                // all the results (only if query is empty)
-                await viewModel.DisplayResultsIfAllowed();
-                await viewModel.SearchCommand.ExecuteAsync(null);
-
-                viewModel.ShouldSatisfyAllConditions(
-                    vm => vm.Results.Count.ShouldBe(expectedCount),
-                    vm => vm.Results.Count.ShouldBe(expectedCount)
-                );
-            },
-            sqlBuilder,
-            visitors
-        );
-    }
-
-    [Fact]
-    public async Task Execute_alias()
+    public async Task When_executing_alias_Then_process_is_started()
     {
         IProcessLauncher sut = null!;
         var visitors = new ServiceVisitors
@@ -207,57 +172,13 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
     }
 
-    [Theory]
-    [InlineData("2+5", "7")]
-    [InlineData("2 + 5", "7")]
-    [InlineData("2 * 5", "10")]
-    public async Task Execute_calculation(string operation, string result) =>
-        await TestViewModelAsync(async (viewModel, _) => {
-                // ARRANGE
-                var alias = Substitute.For<ExecutableQueryResult>();
-                viewModel.Results.Add(alias);
-
-                // ACT
-                viewModel.Query = operation;
-                await viewModel.SearchCommand.ExecuteAsync(null);
-
-                // ASSERT done in ServiceCollectionConfigurator
-                viewModel.ShouldSatisfyAllConditions(
-                    vm => vm.Results.Count.ShouldBeGreaterThan(0),
-                    vm => vm.Results.ElementAt(0).Name.ShouldBe(result)
-                );
-            }
-        );
-
-    [Fact]
-    public async Task Execute_search_aliases()
-    {
-        // ARRANGE
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
-                                         .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
-                                         .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
-
-
-        await TestViewModelAsync(
-            async (viewModel, _) => {
-                // ACT
-                viewModel.Query = "alias";
-                await viewModel.SearchCommand.ExecuteAsync(null);
-
-                // ASSERT
-                viewModel.Results.Count.ShouldBe(6);
-            },
-            sqlBuilder
-        );
-    }
-
     /// <summary>
     ///     Regression test for bug #1185: executing a builtin keyword multiple times
     ///     should reuse the existing dummy alias, not create a duplicate.
     /// </summary>
     [Theory]
     [MemberData(nameof(GetBuiltinKeywords))]
-    public async Task Show_correct_usage_for_builtin_keywords(string keyword) =>
+    public async Task When_executing_builtin_keyword_repeatedly_Then_usage_is_tracked_on_one_alias(string keyword) =>
         await TestViewModelAsync(
             async (viewModel, db) => {
                 const int count = 5;
@@ -281,7 +202,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
 
     [Fact]
-    public async Task Show_correct_usage_for_regular_alias() =>
+    public async Task When_executing_regular_alias_repeatedly_Then_usage_is_tracked_on_one_alias() =>
         await TestViewModelAsync(
             async (viewModel, db) => {
                 // Arrange
@@ -309,6 +230,82 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
             },
             Sql.Empty
         );
+
+    [Fact]
+    public async Task When_searching_aliases_Then_all_names_are_returned()
+    {
+        // ARRANGE
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1", "alias_1"))
+                                         .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
+                                         .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
+
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // ACT
+                viewModel.Query = "alias";
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                // ASSERT
+                viewModel.Results.Count.ShouldBe(6);
+            },
+            sqlBuilder
+        );
+    }
+
+    [Theory]
+    [InlineData("2+5", "7")]
+    [InlineData("2 + 5", "7")]
+    [InlineData("2 * 5", "10")]
+    public async Task When_searching_calculation_Then_result_is_first_item(string operation, string result) =>
+        await TestViewModelAsync(async (viewModel, _) => {
+                // ARRANGE
+                var alias = Substitute.For<ExecutableQueryResult>();
+                viewModel.Results.Add(alias);
+
+                // ACT
+                viewModel.Query = operation;
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                // ASSERT done in ServiceCollectionConfigurator
+                viewModel.ShouldSatisfyAllConditions(
+                    vm => vm.Results.Count.ShouldBeGreaterThan(0),
+                    vm => vm.Results.ElementAt(0).Name.ShouldBe(result)
+                );
+            }
+        );
+
+    [Fact]
+    public async Task When_searching_with_ShowResult_enabled_Then_only_matching_results_are_shown()
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms())
+                                         .AppendAlias(a => a.WithSynonyms())
+                                         .AppendAlias(a => a.WithSynonyms())
+                                         .AppendAlias(a => a.WithSynonyms());
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            VisitApplicationSettingsProvider = s => {
+                s.Value.SearchBox.ShowLastQuery = true;
+                s.Value.SearchBox.ShowResult = true;
+            }
+        };
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                const int expectedCount = 1;
+                viewModel.Query = "alias_1"; // default name is alias_{idAlias}
+
+                // Handle the option "Application.SearchBox.ShowResult" If sets to "True" it means it should show
+                // all the results (only if query is empty)
+                await viewModel.DisplayResultsIfAllowed();
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                viewModel.Results.Count.ShouldBe(expectedCount);
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
 
     #endregion
 }

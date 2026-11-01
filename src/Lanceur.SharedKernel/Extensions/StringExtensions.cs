@@ -25,7 +25,5 @@ public static class StringExtensions
               .Select(n => n.Trim())
               .ToArray();
 
-    public static string? ToLowerString(this object? value) => value?.ToString()?.ToLower();
-
     #endregion
 }

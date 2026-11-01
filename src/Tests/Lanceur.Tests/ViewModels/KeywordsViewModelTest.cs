@@ -89,7 +89,7 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
     }
 
     [Fact]
-    public async Task Whe_soft_deleting_alias_Then_it_is_not_anymore_in_search_results()
+    public async Task When_soft_deleting_alias_Then_it_is_not_anymore_in_search_results()
     {
         var visitors = new ServiceVisitors
         {

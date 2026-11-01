@@ -8,11 +8,11 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public sealed class ReplacementShould : TestBase
+public sealed class ReplacementTest : TestBase
 {
     #region Constructors
 
-    public ReplacementShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public ReplacementTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -74,7 +74,7 @@ public sealed class ReplacementShould : TestBase
     [InlineData("URL: $W$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
     [InlineData("$w$-$i$-$w$-$i$", "a", "a-a-a-a")]
     [InlineData("$W$-$I$-$W$-$I$", "a", "a-a-a-a")]
-    public void ReplaceWithAll(string actual, string param, string expected)
+    public void When_using_composite_replacement_Then_wildcards_are_replaced(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
         clipboard.RetrieveText().Returns(param);
@@ -99,7 +99,7 @@ public sealed class ReplacementShould : TestBase
     [InlineData("Hello $R$", " ", "Hello  ")]
     [InlineData("Hello $R$", "", "Hello ")]
     [InlineData("Hello $R$", "`", "Hello `")]
-    public void ReplaceWithClipboardText(string actual, string param, string expected)
+    public void When_using_clipboard_replacement_Then_wildcard_is_replaced_by_clipboard_text(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
         clipboard.RetrieveText().Returns(param);
@@ -127,7 +127,7 @@ public sealed class ReplacementShould : TestBase
     [InlineData("Hello $I$", " ", "Hello  ")]
     [InlineData("Hello $I$", "", "Hello ")]
     [InlineData("Hello $I$", "`", "Hello `")]
-    public void ReplaceWithText(string actual, string param, string expected)
+    public void When_using_text_replacement_Then_wildcard_is_replaced_by_parameter(string actual, string param, string expected)
     {
         var rpl = new TextReplacement();
 
@@ -151,7 +151,7 @@ public sealed class ReplacementShould : TestBase
     [InlineData("$C$", "hello", "hello")]
     [InlineData("$C$", "hello `", "hello+%60")]
     [InlineData("URL: $C$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
-    public void ReplaceWithWebClipboardText(string actual, string param, string expected)
+    public void When_using_web_clipboard_replacement_Then_wildcard_is_replaced_by_encoded_clipboard_text(string actual, string param, string expected)
     {
         var clipboard = Substitute.For<IClipboardService>();
         clipboard.RetrieveText().Returns(param);
@@ -181,7 +181,7 @@ public sealed class ReplacementShould : TestBase
     [InlineData("$W$", "hello", "hello")]
     [InlineData("$W$", "hello `", "hello+%60")]
     [InlineData("URL: $W$", "un deux / \\ - <", "URL: un+deux+%2f+%5c+-+%3c")]
-    public void ReplaceWithWebText(string actual, string param, string expected)
+    public void When_using_web_text_replacement_Then_wildcard_is_replaced_by_encoded_parameter(string actual, string param, string expected)
     {
         var rpl = new WebTextReplacement();
 

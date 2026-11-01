@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Functional;
 
-public sealed class LuaManagerShould
+public sealed class LuaManagerTest
 {
     #region Properties
 
@@ -26,7 +26,7 @@ public sealed class LuaManagerShould
     [InlineData("dev", "output_dev")]
     [InlineData("test", "output_test")]
     [InlineData("prod", "output_prod")]
-    public void GetExpectedFileNameAfterScriptExecution(string parameter, string expectedFilename)
+    public void When_script_sets_file_name_Then_context_has_new_file_name(string parameter, string expectedFilename)
     {
         // arrange
         const string luaScript = """
@@ -58,7 +58,7 @@ public sealed class LuaManagerShould
     [InlineData("dev", "output_dev")]
     [InlineData("test", "output_test")]
     [InlineData("prod", "output_prod")]
-    public void GetExpectedParametersAfterScriptExecution(string parameter, string expectedParameter)
+    public void When_script_sets_parameters_Then_context_has_new_parameters(string parameter, string expectedParameter)
     {
         // arrange
         const string url = "https://random.url.com";
@@ -88,7 +88,7 @@ public sealed class LuaManagerShould
     }
 
     [Fact]
-    public void NotCrashWhenScriptIsNull()
+    public void When_script_is_null_Then_result_has_non_null_context()
     {
         var result = LuaManager.ExecuteScript(
             new Script { Code = null, Context = new ScriptContext() }
@@ -102,7 +102,7 @@ public sealed class LuaManagerShould
     }
 
     [Fact]
-    public void ReturnAnErrorWhenScriptDoesNotCompile()
+    public void When_script_does_not_compile_Then_result_has_exception_and_empty_context()
     {
         // arrange
         const string url = "https://random.url.com";
@@ -123,7 +123,7 @@ public sealed class LuaManagerShould
     }
 
     [Fact]
-    public void ReturnEmptyContextWhenScriptDoNotReturnContext()
+    public void When_script_does_not_return_context_Then_original_context_is_kept()
     {
         // arrange
         const string url = "https://random.url.com";

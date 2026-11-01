@@ -4,12 +4,12 @@ using Xunit;
 
 namespace Lanceur.Tests.SharedKernel;
 
-public sealed class CircularQueueShould
+public sealed class CircularQueueTest
 {
     #region Methods
 
     [Fact]
-    public void GetAverage()
+    public void When_enqueuing_Then_average_covers_latest_values()
     {
         var values = new Dictionary<float, float>
         {
@@ -29,7 +29,7 @@ public sealed class CircularQueueShould
     }
 
     [Fact]
-    public void NeverHaveCountGreaterThanMax()
+    public void When_enqueuing_beyond_max_Then_count_stays_within_max()
     {
         const int max = 2;
         var sut = new CircularQueue<float>(max);
@@ -42,7 +42,7 @@ public sealed class CircularQueueShould
     }
 
     [Fact]
-    public void ResetQueue()
+    public void When_clearing_Then_queue_is_empty()
     {
         var sut = new CircularQueue<float>(2);
         sut.Enqueue(1);

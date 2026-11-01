@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Lanceur.Tests.ViewModels;
 
-public sealed class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
+public sealed class MostUsedViewModelTest : ViewModelTester<MostUsedViewModel>
 {
     #region Fields
 
@@ -20,7 +20,7 @@ public sealed class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
 
     #region Constructors
 
-    public MostUsedViewModelShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public MostUsedViewModelTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 
@@ -64,7 +64,7 @@ public sealed class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
     [InlineData("Get all aliases")]
     [InlineData(null)]
     [InlineData("All")]
-    public async Task ShowAllUsageForAll(string filter)
+    public async Task When_no_year_is_selected_Then_all_usage_is_shown(string filter)
     {
         var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         var sqlBuilder = BuildSqlBuilder();
@@ -87,7 +87,7 @@ public sealed class MostUsedViewModelShould : ViewModelTester<MostUsedViewModel>
     [Theory]
     [InlineData("2025")]
     [InlineData("2024")]
-    public async Task ShowAllUsageForYear(string year)
+    public async Task When_year_is_selected_Then_usage_of_that_year_is_shown(string year)
     {
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         var sqlBuilder = BuildSqlBuilder();

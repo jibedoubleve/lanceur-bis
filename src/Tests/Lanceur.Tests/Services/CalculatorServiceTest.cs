@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public sealed class CalculatorServiceShould
+public sealed class CalculatorServiceTest
 {
     #region Fields
 
@@ -17,7 +17,7 @@ public sealed class CalculatorServiceShould
 
     #region Constructors
 
-    public CalculatorServiceShould(ITestOutputHelper output) => _output = output;
+    public CalculatorServiceTest(ITestOutputHelper output) => _output = output;
 
     #endregion
 
@@ -67,7 +67,7 @@ public sealed class CalculatorServiceShould
     [InlineData(" 45  + (")]
     [InlineData("0")]
     [InlineData(" 0")]
-    public void HandleNumbers_NCalc(string expression)
+    public void When_expression_contains_numbers_Then_validation_regex_matches(string expression)
     {
         var sp = new ServiceCollection().AddLoggingForTests(_output)
                                         .AddSingleton<NCalcCalculatorService>()
@@ -79,8 +79,8 @@ public sealed class CalculatorServiceShould
     }
 
     [Theory]
-    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
-    public void NotValidateExpressionWhenNoNumberInIt(string operation)
+    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceTest))]
+    public void When_function_has_no_number_Then_validation_regex_does_not_match(string operation)
     {
         var sp = new ServiceCollection().AddLoggingForTests(_output)
                                         .AddSingleton<NCalcCalculatorService>()
@@ -98,7 +98,7 @@ public sealed class CalculatorServiceShould
 
     [Theory]
     [InlineData("lkj")]
-    public void ReturnResultOnError(string expression)
+    public void When_expression_is_invalid_Then_result_is_error(string expression)
     {
         var sp = new ServiceCollection().AddLoggingForTests(_output)
                                         .AddSingleton<NCalcCalculatorService>()
@@ -120,7 +120,7 @@ public sealed class CalculatorServiceShould
     [InlineData("Sqrt(9)", "3")]
     [InlineData("sqrt(9)", "3")]
     [InlineData("(8+2) * 2 ", "20")]
-    public void ReturnResultOnSuccess(string expression, string expected)
+    public void When_expression_is_valid_Then_result_is_computed(string expression, string expected)
     {
         var calculator = new NCalcCalculatorService(
             new TestOutputHelperDecoratorForMicrosoftLogging<NCalcCalculatorService>(_output)
@@ -134,8 +134,8 @@ public sealed class CalculatorServiceShould
     }
 
     [Theory]
-    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceShould))]
-    public void ValidateExpressionWhenNumberInIt(string operation)
+    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceTest))]
+    public void When_function_has_number_Then_validation_regex_matches(string operation)
     {
         var sp = new ServiceCollection().AddLoggingForTests(_output)
                                         .AddSingleton<NCalcCalculatorService>()

@@ -7,20 +7,20 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public sealed class UserInteractionServiceShould : IDisposable
+public sealed class UserInteractionServiceTest : IDisposable
 {
     #region Methods
 
     public void Dispose() => WeakReferenceMessenger.Default.Unregister<QuestionRequestMessage>(this);
 
     [WpfFact]
-    public async Task ReturnContentDataContextWhenDataContextOmmited()
+    public async Task When_data_context_is_omitted_Then_content_data_context_is_used()
     {
         // ARRANGE
         const string viewModel = "undeux";
         var sut = new UserDialogueService();
         var userControl = new UserControl { DataContext = viewModel };
-        WeakReferenceMessenger.Default.Register<UserInteractionServiceShould, QuestionRequestMessage>(
+        WeakReferenceMessenger.Default.Register<UserInteractionServiceTest, QuestionRequestMessage>(
             this,
             (_, m) => m.Reply(true)
         );
@@ -32,13 +32,13 @@ public sealed class UserInteractionServiceShould : IDisposable
     }
 
     [WpfFact]
-    public async Task UseSpecifiedDataContextWithPriority()
+    public async Task When_data_context_is_specified_Then_it_is_used()
     {
         // ARRANGE
         const string viewModel = "undeux";
         var sut = new UserDialogueService();
         var userControl = new UserControl();
-        WeakReferenceMessenger.Default.Register<UserInteractionServiceShould, QuestionRequestMessage>(
+        WeakReferenceMessenger.Default.Register<UserInteractionServiceTest, QuestionRequestMessage>(
             this,
             (_, m) => m.Reply(true)
         );

@@ -70,7 +70,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     }
 
     [Fact]
-    public void AddNewNames()
+    public void When_adding_names_to_alias_Then_all_names_are_saved()
     {
         // ARRANGE
         const string sql = """
@@ -110,144 +110,6 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         found.ShouldSatisfyAllConditions(
             f => f.ShouldNotBeNull(),
             f => f!.Synonyms?.SplitCsv().Length.ShouldBe(5)
-        );
-    }
-
-    [Fact]
-    public void BeAbleToFindById()
-    {
-        // ARRANGE
-        const string sql = """
-                           insert into alias(id) values (100);
-                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
-                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
-                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);
-                           """;
-
-        var connection = BuildFreshDb(sql);
-        var action = BuildAliasDbAction();
-        var c = new DbSingleConnectionManager(connection);
-
-        // ACT
-        var found = c.WithConnection(conn => action.GetById(conn, 100));
-
-        // ASSERT
-        found.ShouldSatisfyAllConditions(
-            f => f.ShouldNotBeNull(),
-            f => f!.Name.ShouldBe("noname")
-        );
-    }
-
-    [Fact]
-    public void RemoveAliasWithDbActionSql()
-    {
-        // ARRANGE
-        const string sql = """
-                           insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
-                           insert into alias_name(name, id_alias) values ('noname', 256);
-
-                           insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
-                           insert into alias_name(name, id_alias) values ('noname', 257);
-
-                           insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
-                           insert into alias_name(name, id_alias) values ('noname', 258);
-                           """;
-        var connection = BuildFreshDb(sql);
-        var c = new DbSingleConnectionManager(connection);
-
-        var action = BuildAliasDbAction();
-
-        // ACT
-        c.WithinTransaction(tx => action.Remove(tx, 256L));
-
-        // ASSERT
-        const string sql2 = "select count(*) from alias where id = 256";
-        const string sql3 = "select count(*) from alias_name where id_alias = 256";
-        connection.ShouldSatisfyAllConditions(
-            co => co.ExecuteScalar<int>(sql2).ShouldBe(0),
-            co => co.ExecuteScalar<int>(sql3).ShouldBe(0)
-        );
-    }
-
-    [Fact]
-    public void RemoveAliasWithServiceSql()
-    {
-        // ARRANGE
-        const string sql = """
-                           insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
-                           insert into alias_name(name, id_alias) values ('noname', 256);
-
-                           insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
-                           insert into alias_name(name, id_alias) values ('noname', 257);
-
-                           insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
-                           insert into alias_name(name, id_alias) values ('noname', 258);
-                           """;
-        var connection = BuildFreshDb(sql);
-
-        var service = BuildDataService(connection);
-
-        // ACT
-        service.RemoveLogically(new AliasQueryResult { Id = 256 });
-
-        // ASSERT
-        const string sql2 = "select count(*) from alias where id = 256 and deleted_at is null";
-        connection.ExecuteScalar<int>(sql2).ShouldBe(0);
-
-        const string sql3 = "select count(*) from alias_name where id_alias = 256";
-        // The logical deletion don't remove data, the names should therefore
-        // remain in the database
-        connection.ExecuteScalar<int>(sql3).ShouldBe(1);
-    }
-
-    [Fact]
-    public void RetrieveAliasWithPrivilegeUsingService()
-    {
-        // ARRANGE
-        var connection = BuildFreshDb();
-        var service = BuildDataService(connection);
-        const string name = "admin";
-
-        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
-                                                     .WithRunAs(RunAs.Admin)
-                                  )
-                                  .ToSql();
-        connection.Execute(sql);
-
-        // ACT
-        var sut = service.Search(name).ToList();
-
-        // ASSERT
-        sut.ShouldSatisfyAllConditions(
-            s => s.ShouldNotBeEmpty(),
-            s => s.Count.ShouldBe(1),
-            s => s[0].RunAs.ShouldBe(RunAs.Admin)
-        );
-    }
-
-    [Fact]
-    public void RetrieveAliasWithThumbnailUsingService()
-    {
-        // ARRANGE
-        var connection = BuildFreshDb();
-        var service = BuildDataService(connection);
-        const string name = "admin";
-        const string thumbnail = "thumbnail";
-
-        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
-                                                     .WithThumbnail(thumbnail)
-                                  )
-                                  .ToSql();
-        connection.Execute(sql);
-
-        // ACT
-        var sut = service.Search(name).ToList();
-
-        // ASSERT
-        sut.ShouldSatisfyAllConditions(
-            s => s.ShouldNotBeEmpty(),
-            s => s.Count.ShouldBe(1),
-            s => s[0].Thumbnail.ShouldBe(thumbnail)
         );
     }
 
@@ -305,27 +167,6 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
             s => s.Name.ShouldBe(name),
             s => s.RunAs.ShouldBe(RunAs.Admin)
         );
-    }
-
-    [Fact]
-    public void When_create_invisible_alias_Then_invisible_alias_creates_in_db()
-    {
-        // ARRANGE
-        var aliasName = Any.String(10);
-
-        var connection = BuildFreshDb();
-        var service = BuildDataService(connection);
-
-        var alias1 = BuildAlias(aliasName);
-
-        // ACT
-        service.SaveOrUpdate(alias1);
-
-        var sut = service.GetById(alias1.Id);
-
-        //ASSERT
-        sut.ShouldNotBeNull();
-        sut.IsHidden.ShouldBe(false);
     }
 
     [Fact]
@@ -433,6 +274,31 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     }
 
     [Fact]
+    public void When_getting_by_id_Then_alias_is_found()
+    {
+        // ARRANGE
+        const string sql = """
+                           insert into alias(id) values (100);
+                           insert into alias_name(id, name, id_alias) values (1000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (2000, 'noname', 100);
+                           insert into alias_name(id, name, id_alias) values (3000, 'noname', 100);
+                           """;
+
+        var connection = BuildFreshDb(sql);
+        var action = BuildAliasDbAction();
+        var c = new DbSingleConnectionManager(connection);
+
+        // ACT
+        var found = c.WithConnection(conn => action.GetById(conn, 100));
+
+        // ASSERT
+        found.ShouldSatisfyAllConditions(
+            f => f.ShouldNotBeNull(),
+            f => f!.Name.ShouldBe("noname")
+        );
+    }
+
+    [Fact]
     public void When_logically_remove_alias_from_service_Then_alias_not_anymore_in_results()
     {
         // ARRANGE
@@ -457,7 +323,7 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         connection.ExecuteScalar<int>(sql2).ShouldBe(2);
         // Logical deletion don't remove data: the names of the
         // deleted alias should remain in the database
-        connection.ExecuteScalar<int>(sql3).ShouldBe(3); 
+        connection.ExecuteScalar<int>(sql3).ShouldBe(3);
     }
 
     [Fact]
@@ -486,30 +352,65 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
     }
 
     [Fact]
-    public void When_retrieving_alias_from_names_Then_alias_contains_thumbnails()
+    public void When_removing_alias_logically_Then_alias_is_marked_deleted_and_names_remain()
     {
         // ARRANGE
-        var name = Any.String(10);
-        var thumbnail = Any.String(10);
-        var sql = new SqlBuilder().AppendAlias(a => {
-            a.WithSynonyms(name)
-             .WithThumbnail(thumbnail);
-        }).ToSql();
+        const string sql = """
+                           insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 256);
 
+                           insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 257);
+
+                           insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 258);
+                           """;
         var connection = BuildFreshDb(sql);
-        var action = BuildAliasDbAction();
-        var c = new DbSingleConnectionManager(connection);
+
+        var service = BuildDataService(connection);
 
         // ACT
-        var found = c.WithConnection(conn => action.GetByNames(conn, [name]));
+        service.RemoveLogically(new AliasQueryResult { Id = 256 });
 
         // ASSERT
-        found.ToList()
-             .ShouldSatisfyAllConditions(
-                 f => f.ShouldNotBeNull(),
-                 f => f.Count.ShouldBe(1),
-                 f => f[0].Thumbnail.ShouldNotBeNullOrEmpty()
-             );
+        const string sql2 = "select count(*) from alias where id = 256 and deleted_at is null";
+        connection.ExecuteScalar<int>(sql2).ShouldBe(0);
+
+        const string sql3 = "select count(*) from alias_name where id_alias = 256";
+        // The logical deletion don't remove data, the names should therefore
+        // remain in the database
+        connection.ExecuteScalar<int>(sql3).ShouldBe(1);
+    }
+
+    [Fact]
+    public void When_removing_alias_with_db_action_Then_alias_and_names_are_deleted()
+    {
+        // ARRANGE
+        const string sql = """
+                           insert into alias (id, arguments, file_name) values (256, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 256);
+
+                           insert into alias (id, arguments, file_name) values (257, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 257);
+
+                           insert into alias (id, arguments, file_name) values (258, 'no args', 'no file name');
+                           insert into alias_name(name, id_alias) values ('noname', 258);
+                           """;
+        var connection = BuildFreshDb(sql);
+        var c = new DbSingleConnectionManager(connection);
+
+        var action = BuildAliasDbAction();
+
+        // ACT
+        c.WithinTransaction(tx => action.Remove(tx, 256L));
+
+        // ASSERT
+        const string sql2 = "select count(*) from alias where id = 256";
+        const string sql3 = "select count(*) from alias_name where id_alias = 256";
+        connection.ShouldSatisfyAllConditions(
+            co => co.ExecuteScalar<int>(sql2).ShouldBe(0),
+            co => co.ExecuteScalar<int>(sql3).ShouldBe(0)
+        );
     }
 
     [Fact]
@@ -531,6 +432,27 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
             f => f.ShouldNotBeNull(),
             f => f!.Thumbnail.ShouldNotBeNullOrEmpty()
         );
+    }
+
+    [Fact]
+    public void When_saving_alias_Then_it_is_not_hidden()
+    {
+        // ARRANGE
+        var aliasName = Any.String(10);
+
+        var connection = BuildFreshDb();
+        var service = BuildDataService(connection);
+
+        var alias1 = BuildAlias(aliasName);
+
+        // ACT
+        service.SaveOrUpdate(alias1);
+
+        var sut = service.GetById(alias1.Id);
+
+        //ASSERT
+        sut.ShouldNotBeNull();
+        sut.IsHidden.ShouldBeFalse();
     }
 
     [Fact]
@@ -592,6 +514,57 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
             f => f.ShouldNotBeNull(),
             f => f.Count.ShouldBe(1),
             f => f[0].Thumbnail.ShouldBe(thumbnail)
+        );
+    }
+
+    [Fact]
+    public void When_searching_admin_alias_Then_run_as_is_admin()
+    {
+        // ARRANGE
+        var connection = BuildFreshDb();
+        var service = BuildDataService(connection);
+        const string name = "admin";
+
+        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
+                                                     .WithRunAs(RunAs.Admin)
+                                  )
+                                  .ToSql();
+        connection.Execute(sql);
+
+        // ACT
+        var sut = service.Search(name).ToList();
+
+        // ASSERT
+        sut.ShouldSatisfyAllConditions(
+            s => s.ShouldNotBeEmpty(),
+            s => s.Count.ShouldBe(1),
+            s => s[0].RunAs.ShouldBe(RunAs.Admin)
+        );
+    }
+
+    [Fact]
+    public void When_searching_alias_with_thumbnail_Then_thumbnail_is_returned()
+    {
+        // ARRANGE
+        var connection = BuildFreshDb();
+        var service = BuildDataService(connection);
+        const string name = "admin";
+        const string thumbnail = "thumbnail";
+
+        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms(name)
+                                                     .WithThumbnail(thumbnail)
+                                  )
+                                  .ToSql();
+        connection.Execute(sql);
+
+        // ACT
+        var sut = service.Search(name).ToList();
+
+        // ASSERT
+        sut.ShouldSatisfyAllConditions(
+            s => s.ShouldNotBeEmpty(),
+            s => s.Count.ShouldBe(1),
+            s => s[0].Thumbnail.ShouldBe(thumbnail)
         );
     }
 

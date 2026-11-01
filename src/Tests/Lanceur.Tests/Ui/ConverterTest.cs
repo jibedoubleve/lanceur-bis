@@ -9,18 +9,18 @@ using Xunit;
 
 namespace Lanceur.Tests.Ui;
 
-public sealed class ConverterShould
+public sealed class ConverterTest
 {
     #region Methods
 
     [Theory]
     [ClassData(typeof(DataConvertStoreTypeAsExpected))]
-    public void ConvertStoreTypeAsExpected(object input, object output)
+    public void When_converting_store_type_Then_store_name_is_returned(object input, object output)
     {
         var converter = new StoreTypeToStoreNameConverter();
         converter.Convert(
                      input,
-                     typeof(ConverterShould),
+                     typeof(ConverterTest),
                      null,
                      CultureInfo.CurrentCulture
                  )

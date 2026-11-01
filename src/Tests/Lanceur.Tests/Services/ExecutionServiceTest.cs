@@ -21,11 +21,11 @@ using Xunit;
 
 namespace Lanceur.Tests.Services;
 
-public sealed class ExecutionServiceShould : TestBase
+public sealed class ExecutionServiceTest : TestBase
 {
     #region Constructors
 
-    public ExecutionServiceShould(ITestOutputHelper outputHelper) : base(outputHelper) { }
+    public ExecutionServiceTest(ITestOutputHelper outputHelper) : base(outputHelper) { }
 
     #endregion
 

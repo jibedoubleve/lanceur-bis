@@ -54,7 +54,9 @@ public static class IndexNavigatorExtensions
             : current + pageSize;
 
         return current < -1 || current >= max
-            ? throw new IndexOutOfRangeException("Cannot navigate to next page when index if out of range.")
+            ? throw new ArgumentOutOfRangeException(nameof(current),
+                current,
+                "Cannot navigate to next page when index if out of range.")
             : ValidateNewIndex(newIdx, max);
     }
 
@@ -67,11 +69,11 @@ public static class IndexNavigatorExtensions
     /// <returns>The index of the previous item in the collection.</returns>
     public static int GetPreviousIndex<T>(this IEnumerable<T> collection, int current)
     {
-        if (current == -1) { return -1; }
-
         var max = collection.Count();
         return current < 0 || current >= max
-            ? throw new IndexOutOfRangeException("Cannot navigate to previous index when index if out of range.")
+            ? throw new ArgumentOutOfRangeException(nameof(current),
+                current,
+                "Cannot navigate to previous index when index if out of range.")
             : ValidateNewIndex(current - 1, max);
     }
 
@@ -83,7 +85,10 @@ public static class IndexNavigatorExtensions
     /// <param name="currentIndex">The actual index into the collection</param>
     /// <returns>The next element</returns>
     public static T GetPreviousItem<T>(this IEnumerable<T> collection, int currentIndex)
-        => collection.ElementAt(collection.GetPreviousIndex(currentIndex));
+    {
+        var c = collection.ToArray();
+        return c.ElementAt(c.GetPreviousIndex(currentIndex));
+    }
 
     public static int GetPreviousPage<T>(this IEnumerable<T> collection, int current, int pageSize)
     {
@@ -95,7 +100,9 @@ public static class IndexNavigatorExtensions
             : current - pageSize;
 
         return current < 0 || current >= max
-            ? throw new IndexOutOfRangeException("Cannot navigate to previous page when index if out of range.")
+            ? throw new ArgumentOutOfRangeException(nameof(current),
+                current,
+                "Cannot navigate to previous page when index if out of range.")
             : ValidateNewIndex(newIdx, max);
     }
 

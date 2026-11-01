@@ -5,15 +5,15 @@ using Xunit;
 
 namespace Lanceur.Tests.Models;
 
-public sealed class QueryResultShould
+public sealed class QueryResultTest
 {
     #region Methods
 
     [Fact]
-    public void HaveEmptyNameByDefault() => new TestQueryResult().Name.ShouldBeEmpty();
+    public void When_created_Then_name_is_empty() => new TestQueryResult().Name.ShouldBeEmpty();
 
     [Fact]
-    public void HaveEmptyQueryByDefault()
+    public void When_created_Then_originating_query_is_not_null()
     {
         var query = new TestQueryResult().OriginatingQuery;
         query.ShouldNotBeNull();
@@ -23,7 +23,7 @@ public sealed class QueryResultShould
     [InlineData(null, "un", "un")]
     [InlineData("un", null, "un")]
     [InlineData(null, null, "")]
-    public void HaveFileNameAsDescriptionWhenNoDescription(string description, string fileName, string expected)
+    public void When_description_is_missing_Then_file_name_is_displayed(string description, string fileName, string expected)
     {
         // ARRANGE
         var queryResult = new AliasQueryResult { Description = description, FileName = fileName };
@@ -33,14 +33,14 @@ public sealed class QueryResultShould
     }
 
     [Fact]
-    public void HaveNullDescriptionByDefault() => new TestQueryResult().Description.ShouldBeNull();
+    public void When_created_Then_description_is_null() => new TestQueryResult().Description.ShouldBeNull();
 
     [Theory]
     [InlineData("un, deux,trois,quatre,cinq", 5)]
     [InlineData(" un, deux,trois,quatre,cinq ", 5)]
     [InlineData("un, deux,trois,quatre,cinq ", 5)]
     [InlineData(" un, deux,trois,quatre,cinq", 5)]
-    public void HaveTrimmedResultInSynonyms(string synonyms, int count)
+    public void When_splitting_synonyms_Then_names_are_trimmed(string synonyms, int count)
     {
         // ARRANGE
         var queryResult = new AliasQueryResult { Synonyms = synonyms };
@@ -57,7 +57,7 @@ public sealed class QueryResultShould
     }
 
     [Fact]
-    public void HaveZeroCountByDefault() => new TestQueryResult().Count.ShouldBe(0);
+    public void When_created_Then_count_is_zero() => new TestQueryResult().Count.ShouldBe(0);
 
     #endregion
 

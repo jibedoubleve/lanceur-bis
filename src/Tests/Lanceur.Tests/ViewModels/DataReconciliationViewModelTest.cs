@@ -490,7 +490,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     }
 
     [Fact]
-    public async Task When_executing_ShowAliasesWithoutNotesCommand_then_no_error() =>
+    public async Task When_executing_ShowAliasesWithoutNotesCommand_Then_no_error() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -502,7 +502,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         );
 
     [Fact]
-    public async Task When_executing_ShowBrokenAliasesCommand_then_no_error() =>
+    public async Task When_executing_ShowBrokenAliasesCommand_Then_no_error() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -514,7 +514,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         );
 
     [Fact]
-    public async Task When_executing_ShowDoubloonsCommand_then_no_error() =>
+    public async Task When_executing_ShowDoubloonsCommand_Then_no_error() =>
         await TestViewModelAsync(
             async (viewModel, _) => {
                 var t = await Record.ExceptionAsync(async ()
@@ -874,7 +874,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     }
 
     [Fact]
-    public async Task When_searching_doubloons_then_doubloons_are_showed()
+    public async Task When_searching_doubloons_Then_doubloons_are_showed()
     {
         var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
         var fileName = Any.String(10);
