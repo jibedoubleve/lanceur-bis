@@ -47,7 +47,8 @@ public sealed class ExecutionServiceTest : TestBase
                 Substitute.For<IUserGlobalNotificationService>(),
                 Substitute.For<ILogger<LuaManager>>()
             ),
-            processLauncher ?? Substitute.For<IProcessLauncher>()
+            processLauncher ?? Substitute.For<IProcessLauncher>(),
+            Substitute.For<IUserGlobalNotificationService>()
         );
         return executionService;
     }

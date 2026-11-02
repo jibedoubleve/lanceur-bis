@@ -33,6 +33,49 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
 
     #region Methods
 
+    private void TrackStartup(Process process, string fileName)
+    {
+        using (process)
+        {
+            var watch = Stopwatch.StartNew();
+            try
+            {
+                var isReady = process.WaitForInputIdle(30_000);
+                if (isReady)
+                {
+                    _logger.LogInformation("{FileName}: ready after {Elapsed} ms", fileName, watch.ElapsedMilliseconds);
+                }
+                else
+                {
+                    _logger.LogWarning("{FileName}: not ready after {Elapsed} ms", fileName, watch.ElapsedMilliseconds);
+                    _notificationService.Warning(
+                        $"Process '{fileName}' is not ready after {watch.Elapsed.Seconds} seconds"
+                    );
+                }
+            }
+            catch (InvalidOperationException ex) when (process.HasExited)
+            {
+                var logLevel = process.ExitCode == 0 ? LogLevel.Information : LogLevel.Warning;
+                _logger.Log(
+                    logLevel,
+                    ex,
+                    "{FileName}: exited after {Elapsed} ms with code {ExitCode}",
+                    fileName,
+                    watch.ElapsedMilliseconds,
+                    process.ExitCode
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogInformation(ex, "{FileName}: no GUI to wait for", fileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "{FileName}: cannot track startup", fileName);
+            }
+        }
+    }
+
     /// <inheritdoc />
     public void Open(string path)
         => Process.Start(
@@ -43,23 +86,24 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
     /// <inheritdoc />
     public void Start(ProcessContext context)
     {
-        var process = new Process { StartInfo = context.ToProcessStartInfo(), EnableRaisingEvents = true };
+        var process = new Process { StartInfo = context.ToProcessStartInfo() };
+        bool isStarted;
+        try { isStarted = process.Start(); }
+        catch (Exception)
+        {
+            process.Dispose();
+            throw;
+        }
 
-        if (!process.Start()) { _logger.LogInformation("Process {ProcessName} failed to start.", context.FileName); }
+        if (!isStarted)
+        {
+            _logger.LogInformation("{FileName}: handled by the shell, no process to track", context.FileName);
+            process.Dispose();
+            return;
+        }
 
-        _ = Task.Run(() => {
-                try
-                {
-                    _notificationService.StartBusyIndicator();
-                    process.WaitForInputIdle(5_000);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogInformation(ex, "Process {ProcessName} failed to start.", context.FileName);
-                }
-                finally { _notificationService.StopBusyIndicator(); }
-            }
-        );
+        _logger.LogInformation("{FileName}: started with PID {ProcessId}", context.FileName, process.Id);
+        _ = Task.Run(() => TrackStartup(process, context.FileName));
     }
 
     /// <inheritdoc />

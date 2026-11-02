@@ -39,6 +39,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
             var serviceCollection = new ServiceCollection().AddSingleton<TViewModel>()
                                                            .AddSingleton<IEnigma, Enigma>()
                                                            .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
+                                                           .AddMockSingleton<IUserGlobalNotificationService>()
                                                            .AddMockSingleton<IStoreShortcutService>()
                                                            .AddMockConfigurationSections(
                                                                visitors?.VisitApplicationSettingsProvider)

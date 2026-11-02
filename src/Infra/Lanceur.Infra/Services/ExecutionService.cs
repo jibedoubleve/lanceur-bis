@@ -14,13 +14,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
-public sealed class ExecutionService : IExecutionService
+public sealed class ExecutionService  : IExecutionService
 {
     #region Fields
 
     private readonly IAliasRepository _aliasRepository;
     private readonly ILogger<ExecutionService> _logger;
     private readonly ILuaManager _luaManager;
+    private readonly IUserGlobalNotificationService _notificationService;
     private readonly IProcessLauncher _process;
     private readonly IWildcardService _wildcardService;
 
@@ -33,7 +34,8 @@ public sealed class ExecutionService : IExecutionService
         IWildcardService wildcardService,
         IAliasRepository aliasRepository,
         ILuaManager luaManager,
-        IProcessLauncher processLauncher
+        IProcessLauncher processLauncher,
+        IUserGlobalNotificationService notificationService
     )
     {
         _logger = logFactory.CreateLogger<ExecutionService>();
@@ -41,6 +43,7 @@ public sealed class ExecutionService : IExecutionService
         _aliasRepository = aliasRepository;
         _luaManager = luaManager;
         _process = processLauncher;
+        _notificationService = notificationService;
     }
 
     #endregion
@@ -63,7 +66,7 @@ public sealed class ExecutionService : IExecutionService
         catch (Exception ex)
         {
             throw new InvalidDataException(
-                $"Cannot execute alias {query?.Name ?? "NULL"}. Check the path of the executable or the URL.",
+                $"Cannot execute alias {query.Name}. Check the path of the executable or the URL.",
                 ex
             );
         }
@@ -71,8 +74,17 @@ public sealed class ExecutionService : IExecutionService
 
     private async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request, int delay)
     {
-        await Task.Delay(delay);
-        return await ExecuteAsync(request);
+        try
+        {
+            await Task.Delay(delay);
+            return await ExecuteAsync(request);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to execute alias {AliasName}", request.QueryResult.Name);
+            _notificationService.Warning($"Failed to execute alias {request.QueryResult.Name}");
+            return ExecutionResponse.NoResult;
+        }
     }
 
     private ScriptResult ExecuteLuaScript(AliasQueryResult query)
@@ -114,8 +126,6 @@ public sealed class ExecutionService : IExecutionService
 
     private void ExecuteProcess(AliasQueryResult query)
     {
-        if (query is null) { return; }
-
         using var _ = _logger.WarnIfSlow(this);
 
         // LUA SCRIPT
@@ -182,20 +192,11 @@ public sealed class ExecutionService : IExecutionService
     /// <inheritdoc />
     public async Task<ExecutionResponse> ExecuteAsync(ExecutionRequest request)
     {
-        if (request is null)
-        {
-            _logger.LogInformation("The execution request is null");
-            return new ExecutionResponse
-            {
-                Results = DisplayQueryResult.SingleFromResult("This alias does not exist"), HasResult = true
-            };
-        }
-
         _logger.LogInformation(
             "Executing alias {AliasName}",
             request.QueryResult.Name.IsNullOrWhiteSpace() ? "<EMPTY>" : request.QueryResult.Name
         );
-        var name = request.QueryResult?.Name ?? "<EMPTY>";
+        var name = request.QueryResult.Name;
         if (request.QueryResult is not IExecutable)
         {
             const string noResult = nameof(ExecutionResponse.NoResult);
@@ -240,7 +241,7 @@ public sealed class ExecutionService : IExecutionService
     }
 
     /// <inheritdoc />
-    public void OpenDirectoryAsync(QueryResult queryResult)
+    public void OpenDirectory(QueryResult queryResult)
     {
         if (queryResult is not AliasQueryResult alias) { return; }
 
