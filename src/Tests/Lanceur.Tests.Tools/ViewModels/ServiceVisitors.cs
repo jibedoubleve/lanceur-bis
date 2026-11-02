@@ -2,6 +2,7 @@ using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Repositories;
 using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.Core.Utils.Watchdogs;
 
 namespace Lanceur.Tests.Tools.ViewModels;
 
@@ -15,12 +16,12 @@ public sealed class ServiceVisitors
 
     public IConnectionString? OverridenConnectionString { get; init; }
 
+    public Action<MemoryApplicationSettingsProvider>? VisitApplicationSettingsProvider { get; init; }
+
     public Func<IServiceProvider, IUserGlobalNotificationService, IUserGlobalNotificationService>?
         VisitGlobalUserInteractionService { get; init; }
 
     public Func<IServiceProvider, IProcessLauncher, IProcessLauncher>? VisitProcessLauncher { get; init; }
-    
-    public Action<MemoryApplicationSettingsProvider>? VisitApplicationSettingsProvider { get; init; }
 
     public Func<IServiceProvider, IUserDialogueService, IUserDialogueService>? VisitUserInteractionService
     {
@@ -35,6 +36,8 @@ public sealed class ServiceVisitors
     }
 
     public Func<IServiceProvider, IViewFactory, IViewFactory>? VisitViewFactory { get; init; }
+
+    public IWatchdogBuilder? WatchdogBuilder { get; set; }
 
     #endregion
 }
