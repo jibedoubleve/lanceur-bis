@@ -1,7 +1,7 @@
 namespace Lanceur.Ui.Core.Utils.Watchdogs;
 
 /// <summary>
-///     Represents a builder interface for constructing Watchdog instances with customizable configurations.
+///     Represents a builder interface for constructing Watchdog instances with customisable configurations.
 /// </summary>
 public interface IWatchdogBuilder
 {

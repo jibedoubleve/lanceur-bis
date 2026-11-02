@@ -15,6 +15,7 @@ using Lanceur.Infra.Stores;
 using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils.Watchdogs;
@@ -74,7 +75,6 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                          .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IUserNotificationService>()
                          .AddMockSingleton<IUserCommunicationService>()
-                         .AddSingleton<IWatchdogBuilder>(_ => visitors?.WatchdogBuilder ?? new TestWatchdogBuilder())
                          .AddSingleton<IMemoryCache, MemoryCache>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<IWildcardService, ReplacementComposite>()
@@ -83,6 +83,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                          .AddMockSingleton<IProcessLauncher>((sp, i)
                              => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
                          )
+                         .AddSingleton<IWatchdogBuilder>(_ => visitors?.WatchdogBuilder ?? new TestWatchdogBuilder())
                          .AddSingleton<IExecutionService, ExecutionService>();
 
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
@@ -233,6 +234,38 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
 
     [Fact]
+    public async Task When_executing_while_search_is_pending_Then_alias_is_executed()
+    {
+        IProcessLauncher processLauncher = null!;
+        var visitors = new ServiceVisitors
+        {
+            WatchdogBuilder = new PendingWatchdogBuilder(),
+            VisitProcessLauncher = (_, i) => {
+                processLauncher = i;
+                return i;
+            }
+        };
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias1"));
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // Arrange
+                viewModel.Query = "alias1";
+                await viewModel.SearchCommand.ExecuteAsync(null);
+                viewModel.SelectedResult.ShouldBeNull();
+
+                // Act
+                await viewModel.ExecuteCommand.ExecuteAsync(false);
+
+                // Assert
+                processLauncher.Received(1).Start(Arg.Any<ProcessContext>());
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+
+    [Fact]
     public async Task When_searching_aliases_Then_all_names_are_returned()
     {
         // ARRANGE
@@ -271,7 +304,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                 // ASSERT done in ServiceCollectionConfigurator
                 viewModel.ShouldSatisfyAllConditions(
                     vm => vm.Results.Count.ShouldBeGreaterThan(0),
-                    vm => vm.Results.ElementAt(0).Name.ShouldBe(result)
+                    vm => vm.Results[0].Name.ShouldBe(result)
                 );
             }
         );
