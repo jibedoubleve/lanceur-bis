@@ -7,6 +7,9 @@ public sealed class Watchdog : IWatchdog
 {
     #region Fields
 
+    private readonly Func<Task> _action;
+    private Task _running = Task.CompletedTask;
+
     private readonly DispatcherTimer _timer;
 
     #endregion
@@ -14,25 +17,40 @@ public sealed class Watchdog : IWatchdog
     #region Constructors
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Watchdog" /> sealed class with a countdown duration and an action to execute.
+    ///     Initialises a new instance of the <see cref="Watchdog" /> sealed class with a countdown duration and an action to
+    ///     execute.
     /// </summary>
     /// <param name="interval">The duration of the interval in milliseconds.</param>
     /// <param name="action">The action to execute when the countdown reaches zero.</param>
     /// <exception cref="ArgumentNullException">Thrown if the <paramref name="action" /> parameter is null.</exception>
     public Watchdog(Func<Task> action, TimeSpan interval)
     {
-        if (action is null) { throw new ArgumentNullException(nameof(action)); }
+        ArgumentNullException.ThrowIfNull(action);
+        _action = action;
 
         _timer = new DispatcherTimer { Interval = interval };
         _timer.Tick += async (_, _) => {
             _timer.Stop();
-            await action();
+            _running = _action();
+            await _running;
         };
     }
 
     #endregion
 
     #region Methods
+
+    /// <inheritdoc />
+    public async Task Flush()
+    {
+        if (_timer.IsEnabled)
+        {
+            _timer.Stop();
+            _running = _action(); 
+        }
+
+        await _running;
+    }
 
     /// <inheritdoc />
     public Task Pulse()

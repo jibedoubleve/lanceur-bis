@@ -1,38 +1,15 @@
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using Humanizer;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.Ui.WPF.Helpers;
-using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace Lanceur.Ui.WPF.Services;
 
 public sealed class ToastUserNotificationService : IUserGlobalNotificationService
 {
-    #region Fields
-
-    private readonly LazyLoadedSynchronisationContext _dispatcher;
-    private readonly ILogger<ToastUserNotificationService> _logger;
-
-    #endregion
-
-    #region Constructors
-
-    public ToastUserNotificationService(
-        LazyLoadedSynchronisationContext dispatcher,
-        ILogger<ToastUserNotificationService> logger
-    )
-    {
-        _dispatcher = dispatcher;
-        _logger = logger;
-    }
-
-    #endregion
-
     #region Methods
 
     private static string GetIconUri(Level level)

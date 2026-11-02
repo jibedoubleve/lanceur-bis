@@ -122,6 +122,8 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
+            await _watchdog.Flush();
+            
             if (SelectedResult is null) { return; }
 
             if (SelectedResult.IsExecutionConfirmationRequired)

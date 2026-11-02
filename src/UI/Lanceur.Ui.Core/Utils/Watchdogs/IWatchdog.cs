@@ -9,6 +9,14 @@ public interface IWatchdog
     #region Methods
 
     /// <summary>
+    ///     Runs the pending action immediately, if any, and waits for it to complete.
+    ///     If the timer is running, it is stopped and the action is executed right away.
+    ///     Otherwise, the action is not executed again: the method only waits for the
+    ///     last started action to complete.
+    /// </summary>
+    Task Flush();
+
+    /// <summary>
     ///     Starts the watchdog timer. If already running, it stops and resets the timer.
     /// </summary>
     Task Pulse();

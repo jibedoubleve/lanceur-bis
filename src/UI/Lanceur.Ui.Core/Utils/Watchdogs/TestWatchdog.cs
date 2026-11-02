@@ -17,6 +17,9 @@ public sealed class TestWatchdog : IWatchdog
     #region Methods
 
     /// <inheritdoc />
+    public Task Flush() => Task.CompletedTask;
+
+    /// <inheritdoc />
     public async Task Pulse() => await _action?.Invoke()!;
 
     public void ResetDelay(double searchDelay)
