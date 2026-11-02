@@ -7,7 +7,7 @@ namespace Lanceur.Infra.Mappers;
 public static class ProcessStartInfoMapperExtensions
 {
     #region Methods
-
+    
     public static ProcessStartInfo ToProcessStartInfo(this ProcessContext context)
         => new()
         {
