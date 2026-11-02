@@ -124,9 +124,30 @@ public sealed class ToastUserNotificationService : IUserGlobalNotificationServic
     }
 
     /// <inheritdoc />
+    public IDisposable Progress(string title, string message)
+    {
+        var tag = Guid.NewGuid().ToString("N")[..16];
+        new ToastContentBuilder()
+            .AddText(title)
+            .AddText(message)
+            .Show(toast => toast.Tag = tag);
+
+        return new ToastRemover(tag);
+    }
+
+    /// <inheritdoc />
     public void Warning(string message) => Show(Level.Warning, message);
 
     #endregion
+
+    private sealed class ToastRemover(string tag) : IDisposable
+    {
+        #region Methods
+
+        public void Dispose() => ToastNotificationManagerCompat.History.Remove(tag);
+
+        #endregion
+    }
 
     #region Enums
 

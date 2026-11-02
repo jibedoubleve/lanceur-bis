@@ -7,6 +7,9 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <ItemGroup>
+        <InternalsVisibleTo Include="Lanceur.Tests"/>
+    </ItemGroup>
+    <ItemGroup>
         <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
         <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj"/>
     </ItemGroup>

@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.IO;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Mappers;
@@ -11,8 +13,8 @@ namespace Lanceur.Infra.Win32.Services;
 public sealed class ProcessLauncherWin32 : IProcessLauncher
 {
     #region Fields
-
     private readonly ILogger<ProcessLauncherWin32> _logger;
+    private readonly SearchBoxSection _settings;
 
     private readonly IUserGlobalNotificationService _notificationService;
 
@@ -22,25 +24,33 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
 
     public ProcessLauncherWin32(
         IUserGlobalNotificationService notificationService,
-        ILogger<ProcessLauncherWin32> logger
-    )
+        ILogger<ProcessLauncherWin32> logger,
+        ISection<SearchBoxSection> settings)
     {
         _notificationService = notificationService;
         _logger = logger;
+        _settings = settings.Value;
     }
 
     #endregion
 
     #region Methods
 
-    private void TrackStartup(Process process, string fileName)
+    internal void TrackStartup(ITrackedProcess process, string fileName)
     {
         using (process)
         {
             var watch = Stopwatch.StartNew();
             try
             {
-                var isReady = process.WaitForInputIdle(30_000);
+                var isReady = process.WaitForInputIdle(_settings.SlowStartupMs);
+                if (!isReady)
+                {
+                    using var _ =
+                        _notificationService.Progress("Starting", $"Starting {fileName} ...");
+                    isReady = process.WaitForInputIdle(_settings.StartupTimeout - _settings.SlowStartupMs);
+                }
+
                 if (isReady)
                 {
                     _logger.LogInformation("{FileName}: ready after {Elapsed} ms", fileName, watch.ElapsedMilliseconds);
@@ -103,7 +113,7 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
         }
 
         _logger.LogInformation("{FileName}: started with PID {ProcessId}", context.FileName, process.Id);
-        _ = Task.Run(() => TrackStartup(process, context.FileName));
+        _ = Task.Run(() => TrackStartup(new TrackedProcess(process), context.FileName));
     }
 
     /// <inheritdoc />
