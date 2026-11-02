@@ -5,6 +5,20 @@ public sealed class SearchBoxSection
     #region Properties
 
     /// <summary>
+    ///     Gets or sets a value indicating whether the settings button is visible in the search box.
+    /// </summary>
+    /// <remarks>Default value is <c>true</c>.</remarks>
+    public bool IsSettingsButtonEnabled { get; set; } = true;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the settings button remains visible at all times in the search box,
+    ///     regardless of whether results are currently displayed. Requires <see cref="IsSettingsButtonEnabled" /> to be
+    ///     <c>true</c>.
+    /// </summary>
+    /// <remarks>Default value is <c>true</c>.</remarks>
+    public bool IsStatusBarAlwaysVisible { get; set; } = true;
+
+    /// <summary>
     ///     Gets or sets the delay (in milliseconds) without keystrokes before triggering the search
     ///     with the text that has already been typed. Acts as a "watchdog" to wait for typing pauses.
     /// </summary>
@@ -36,25 +50,24 @@ public sealed class SearchBoxSection
     public bool ShowResult { get; set; }
 
     /// <summary>
+    ///     Gets or sets the delay (in milliseconds) after which the startup of an alias is considered slow.
+    ///     Once this delay is exceeded, a notification is displayed until the process is ready.
+    /// </summary>
+    /// <remarks> Default value is <c>2000</c></remarks>
+    public int SlowStartupMs { get; set; } = 2_000;
+
+    /// <summary>
+    ///     Gets or sets the maximum time (in milliseconds) to wait for an alias to be ready after it has started.
+    /// </summary>
+    /// <remarks> Default value is <c>30000</c></remarks>
+    public int StartupTimeout { get; set; } = 30_000;
+
+    /// <summary>
     ///     Gets or sets a value indicating whether the shortcut toggles the search box,
     ///     showing it on first use and hiding it on subsequent use.
     /// </summary>
     /// <remarks> Default value is <c>True</c></remarks>
     public bool ToggleVisibility { get; set; } = true;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether the settings button is visible in the search box.
-    /// </summary>
-    /// <remarks>Default value is <c>true</c>.</remarks>
-    public bool IsSettingsButtonEnabled { get; set; } = true;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether the settings button remains visible at all times in the search box,
-    ///     regardless of whether results are currently displayed. Requires <see cref="IsSettingsButtonEnabled"/> to be
-    ///     <c>true</c>.
-    /// </summary>
-    /// <remarks>Default value is <c>true</c>.</remarks>
-    public bool IsStatusBarAlwaysVisible { get; set; } = true;
 
     #endregion
 }

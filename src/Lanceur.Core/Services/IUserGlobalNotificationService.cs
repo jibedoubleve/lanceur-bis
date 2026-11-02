@@ -44,6 +44,14 @@ public interface IUserGlobalNotificationService
     void NotifyNewVersionAvailable(Version version);
 
     /// <summary>
+    ///     Displays a notification that remains until the returned object is disposed.
+    /// </summary>
+    /// <param name="title">The title to be displayed in the notification.</param>
+    /// <param name="message">The message to be displayed in the notification.</param>
+    /// <returns>An <see cref="IDisposable" /> that removes the notification when disposed.</returns>
+    IDisposable Progress(string title, string message);
+
+    /// <summary>
     ///     Displays a notification to warn the user about a potential issue.
     /// </summary>
     /// <param name="message">The warning message to be displayed in the notification.</param>
