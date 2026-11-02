@@ -86,8 +86,8 @@ public static class IndexNavigatorExtensions
     /// <returns>The next element</returns>
     public static T GetPreviousItem<T>(this IEnumerable<T> collection, int currentIndex)
     {
-        var c = collection.ToArray();
-        return c.ElementAt(c.GetPreviousIndex(currentIndex));
+        var col = collection.ToArray();
+        return col[col.GetPreviousIndex(currentIndex)];
     }
 
     public static int GetPreviousPage<T>(this IEnumerable<T> collection, int current, int pageSize)
