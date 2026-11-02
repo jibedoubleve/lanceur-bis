@@ -33,7 +33,7 @@ public interface IExecutionService
     ///     If the provided alias does not correspond to a file, no action is taken.
     /// </summary>
     /// <param name="queryResult">The alias representing the file or directory to be opened.</param>
-    void OpenDirectoryAsync(QueryResult queryResult);
+    void OpenDirectory(QueryResult queryResult);
 
     #endregion
 }

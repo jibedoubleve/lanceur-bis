@@ -44,16 +44,6 @@ public interface IUserGlobalNotificationService
     void NotifyNewVersionAvailable(Version version);
 
     /// <summary>
-    ///     Starts displaying a visual indicator to inform the user that a background operation is in progress.
-    /// </summary>
-    void StartBusyIndicator();
-
-    /// <summary>
-    ///     Stops displaying the busy indicator, signaling that the background operation has completed.
-    /// </summary>
-    void StopBusyIndicator();
-
-    /// <summary>
     ///     Displays a notification to warn the user about a potential issue.
     /// </summary>
     /// <param name="message">The warning message to be displayed in the notification.</param>

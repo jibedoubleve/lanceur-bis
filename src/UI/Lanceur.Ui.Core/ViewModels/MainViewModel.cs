@@ -138,7 +138,7 @@ public partial class MainViewModel : ObservableObject
             );
 
             WeakReferenceMessenger.Default.Send(new KeepAliveMessage(response.HasResult));
-            if (response.HasResult) { Results = new ObservableCollection<QueryResult>(response.Results); }
+            if (response.HasResult) { Results = [.. response.Results]; }
         }
         catch (Exception ex)
         {
@@ -191,7 +191,7 @@ public partial class MainViewModel : ObservableObject
         if (SelectedResult is null) { return; }
 
         _logger.LogInformation("Open directory of {Alias}", SelectedResult.Name);
-        _executionService.OpenDirectoryAsync(SelectedResult);
+        _executionService.OpenDirectory(SelectedResult);
     }
 
     [RelayCommand]

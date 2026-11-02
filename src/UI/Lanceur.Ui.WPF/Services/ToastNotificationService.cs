@@ -147,24 +147,9 @@ public sealed class ToastUserNotificationService : IUserGlobalNotificationServic
     }
 
     /// <inheritdoc />
-    public void StartBusyIndicator()
-    {
-        _logger.LogTrace("Starting Busy Indicator");
-        _dispatcher.Current.Post(_ => Mouse.OverrideCursor = Cursors.AppStarting, null);
-    }
-
-    /// <inheritdoc />
-    public void StopBusyIndicator()
-    {
-        _logger.LogTrace("Stopping Busy Indicator");
-        _dispatcher.Current.Post(_ => Mouse.OverrideCursor = null, null);
-    }
-
-    /// <inheritdoc />
     public void Warning(string message) => Show(Level.Warning, message);
 
     #endregion
-
 
     #region Enums
 
