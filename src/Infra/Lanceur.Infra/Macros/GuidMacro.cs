@@ -17,7 +17,7 @@ public sealed class GuidMacro : MacroQueryResult
 
     #region Constructors
     
-    public GuidMacro(IClipboardService memoryMemento) => _memoryMemento = memoryMemento!;
+    public GuidMacro(IClipboardService memoryMemento) => _memoryMemento = memoryMemento;
 
     #endregion
 

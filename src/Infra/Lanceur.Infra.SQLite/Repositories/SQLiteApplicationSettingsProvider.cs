@@ -46,7 +46,7 @@ public sealed class SQLiteApplicationSettingsProvider : SQLiteRepositoryBase, IS
             Load();
             _settingsLoaded = true;
 
-            return _value!;
+            return _value;
         }
     }
 

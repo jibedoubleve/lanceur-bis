@@ -21,7 +21,7 @@ public static partial class AliasQueryResultExtensions
 
     public static bool IsSteamGame(this AliasQueryResult alias)
         => alias.FileName != null
-           && SteamGameRegex().IsMatch(alias.FileName!);
+           && SteamGameRegex().IsMatch(alias.FileName);
 
     #endregion
 }
