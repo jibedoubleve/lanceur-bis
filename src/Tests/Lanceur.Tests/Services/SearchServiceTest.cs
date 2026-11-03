@@ -15,9 +15,9 @@ using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Fakes;
 using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
-using Lanceur.Tests.Tools.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -110,7 +110,7 @@ public sealed class SearchServiceTest : TestBase
             new AliasQueryResult { Name = "foobar" },
             new AliasQueryResult { Name = "baz" }
         ];
-        var store = new TestStore(
+        var store = new FakeStore(
             new StoreOrchestrationFactory(),
             Substitute.For<ISection<StoreSection>>(),
             cmdline => cmdline.Parameters
@@ -190,7 +190,7 @@ public sealed class SearchServiceTest : TestBase
             new AliasQueryResult { Name = "foobar" },
             new AliasQueryResult { Name = "baz" }
         ];
-        var store = new TestStore(
+        var store = new FakeStore(
             new StoreOrchestrationFactory(),
             Substitute.For<ISection<StoreSection>>(),
             cmdline => cmdline.Parameters

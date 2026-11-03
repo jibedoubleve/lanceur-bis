@@ -1,6 +1,6 @@
 using Lanceur.Infra.Win32.Services;
 
-namespace Lanceur.Tests.Tools.Stubs;
+namespace Lanceur.Tests.Tools.Fakes;
 
 /// <summary>
 ///     Replays the given readiness results, one per wait, and records the delay of each wait.

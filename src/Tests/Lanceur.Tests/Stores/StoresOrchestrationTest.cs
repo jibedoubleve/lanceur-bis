@@ -10,8 +10,8 @@ using Lanceur.Infra.Extensions;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
+using Lanceur.Tests.Tools.Fakes;
 using Lanceur.Tests.Tools.Logging;
-using Lanceur.Tests.Tools.Stubs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -234,7 +234,7 @@ public sealed class StoresOrchestrationTest
     public void When_retrieving_additional_parameters_store_Then_it_is_alive_for_the_orchestrator(string query)
     {
         // arrange
-        var ffRepository = new TestFeatureFlagRepository();
+        var ffRepository = new FakeFeatureFlagRepository();
         var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
                                                      .AddSingleton<IStoreOrchestrationFactory>(
                                                          new StoreOrchestrationFactory()

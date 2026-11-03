@@ -1,6 +1,6 @@
 using Lanceur.Infra.Win32.Services;
 
-namespace Lanceur.Tests.Tools.Stubs;
+namespace Lanceur.Tests.Tools.Fakes;
 
 public sealed class FakeProcessLookup(params int[] alive) : IProcessLookup
 {

@@ -5,9 +5,9 @@ using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Stores;
 
-namespace Lanceur.Tests.Tools.Stubs;
+namespace Lanceur.Tests.Tools.Fakes;
 
-public class TestStore : StoreBase, IStoreService
+public class FakeStore : StoreBase, IStoreService
 {
     #region Fields
 
@@ -19,7 +19,7 @@ public class TestStore : StoreBase, IStoreService
 
     #region Constructors
 
-    public TestStore(
+    public FakeStore(
         IStoreOrchestrationFactory orchestrationFactory,
         ISection<StoreSection> storeSettings,
         Func<Cmdline, string> prunePolicy) : base(orchestrationFactory, storeSettings)

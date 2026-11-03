@@ -1,8 +1,8 @@
 using Lanceur.Core.Configuration.Sections.Infrastructure;
 
-namespace Lanceur.Tests.Tools.Stubs;
+namespace Lanceur.Tests.Tools.Fakes;
 
-public sealed class TestSettingsWithTwiceSameSection
+public sealed class FakeSettingsWithTwiceSameSection
 {
     #region Properties
 

@@ -1,9 +1,9 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 
-namespace Lanceur.Tests.Tools.Stubs;
+namespace Lanceur.Tests.Tools.Fakes;
 
-public class TestFeatureFlagRepository : IFeatureFlagRepository
+public class FakeFeatureFlagRepository : IFeatureFlagRepository
 {
     #region Methods
 
