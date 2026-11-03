@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IPackagedAppSearchService, PackagedAppSearchService>()
                          .AddTransient<IThumbnailService, ThumbnailService>()
                          .AddTransient<ISteamLibraryService, SteamLibraryService>()
+                         .AddTransient<IProcessLookup, ProcessLookup>()
                          .AddThumbnailStrategies()
                          .AddStaThreadRunner();
         return serviceCollection;
