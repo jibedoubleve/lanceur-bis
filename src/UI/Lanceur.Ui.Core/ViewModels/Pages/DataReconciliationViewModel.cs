@@ -156,7 +156,7 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         if (!result.IsSuccess) { return; }
 
-        _reconciliationSection.Value.ReportsConfiguration = result.Configuration!;
+        _reconciliationSection.Value.ReportsConfiguration = result.Configuration ?? [];
         _reconciliationSection.Save();
         await OnShowAsync(ReportType);
     }

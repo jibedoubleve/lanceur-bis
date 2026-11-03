@@ -378,12 +378,12 @@ public partial class KeywordsViewModel : ObservableObject
                 result.ErrorContent ?? "An error occured",
                 "Validation failed"
             );
-            _logger.LogDebug("Validation failed for {AliasName}: {Errors}", queryResult!.Name, result.ErrorContent);
+            _logger.LogDebug("Validation failed for {AliasName}: {Errors}", queryResult.Name, result.ErrorContent);
             _hubService.Notifications.Warning($"Alias validation failed:\n{result.ErrorContent}");
             return;
         }
 
-        _logger.LogDebug("Saving alias {AliasName}", queryResult!.Name);
+        _logger.LogDebug("Saving alias {AliasName}", queryResult.Name);
 
         await _packagedAppSearchService.TryResolveDetailsAsync(queryResult);
 

@@ -76,7 +76,7 @@ public sealed class MacroDbAction
             }
         }
 
-        var result = item!.ToAliasQueryResultComposite(subAliases);
+        var result = item.ToAliasQueryResultComposite(subAliases);
         return result;
     }
 

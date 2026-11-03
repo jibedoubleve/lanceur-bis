@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.SharedKernel.IoC;
@@ -30,7 +29,7 @@ public partial class ReportConfigurationViewModel : ObservableObject
     )
     {
         Configurations = [.. configurations.Select(c => c.Clone())];
-        SelectedConfiguration = Configurations.FirstOrDefault(e => e.ReportType == currentReport)!;
+        SelectedConfiguration = Configurations.First(e => e.ReportType == currentReport);
         Label = label;
         ToolTip = toolTip;
     }

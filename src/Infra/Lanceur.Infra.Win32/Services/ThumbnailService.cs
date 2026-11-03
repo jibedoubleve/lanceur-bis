@@ -45,7 +45,7 @@ public sealed class ThumbnailService : IThumbnailService, IAsyncDisposable
          * but nothing processes them. Exceptions are only surfaced at Dispose() via WhenAll.
          */
         _consumers = Enumerable.Range(0, stg.ConsumerCount)
-                               .Select(_ => Task.Run(ConsumeAsync)
+                               .Select(_ => Task.Run(ConsumeAsync, _cts.Token)
                                                 .LogOnFaulted(
                                                     _logger,
                                                     "One of the thread of the thumbnail service thread pool crashed!"
