@@ -1,5 +1,9 @@
 namespace Lanceur.Core.Configuration.Sections.Application;
 
+/// <summary>
+///     Timing settings that drive how the launch of an alias is monitored:
+///     startup timeout, slow-startup notification and early-exit detection.
+/// </summary>
 public class ProcessLaunchSection
 {
     #region Properties
@@ -16,12 +20,12 @@ public class ProcessLaunchSection
     ///     Gets or sets the delay (in milliseconds) after which the startup of an alias is considered slow.
     ///     Once this delay is exceeded, a notification is displayed until the process is ready.
     /// </summary>
-    public int SlowStartupMs { get; set; } = 2_000;
+    public int SlowStartupThreshold { get; set; } = 500;
 
     /// <summary>
     ///     Gets or sets the maximum time (in milliseconds) to wait for an alias to be ready after it has started.
     /// </summary>
-    public int StartupTimeout { get; set; } = 30_000;
+    public int StartupTimeout { get; set; } = 10_000;
 
     #endregion
 }

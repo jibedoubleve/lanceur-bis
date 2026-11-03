@@ -23,42 +23,19 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private string _apiToken = string.Empty;
     private readonly ISettingsProvider<ApplicationSettings> _appSettings;
-    [ObservableProperty] private string _bookmarkSourceBrowser = string.Empty;
-    [ObservableProperty] private int _cpuSmoothingIndex;
-    [ObservableProperty] private string _dateTimeFormat = ""; // Just to avoid warning, this prop is set in the Ctor
-    [ObservableProperty] private string _dbPath = string.Empty;
+
     private readonly IEnigma _enigma;
-    [ObservableProperty] private bool _excludeFilesInBinWithEverything;
-    [ObservableProperty] private bool _excludeHiddenFilesWithEverything;
-    [ObservableProperty] private bool _excludeSystemFilesWithEverything;
-    [ObservableProperty] private ObservableCollection<FeatureFlag> _featureFlags = [];
+
     private readonly IUserCommunicationService _hubService;
-    [ObservableProperty] private bool _includeOnlyExecFilesWithEverything;
+
     private readonly ISettingsProvider<InfrastructureSettings> _infraSettings;
-    [ObservableProperty] private bool _isAdminModeEnabled;
-    [ObservableProperty] private bool _isAlt;
-    [ObservableProperty] private bool _isCtrl;
-    [ObservableProperty] private bool _isResourceMonitorEnabled;
-    [ObservableProperty] private bool _isSettingsButtonEnabled;
-    [ObservableProperty] private bool _isShift;
-    [ObservableProperty] private bool _isStatusBarAlwaysVisible;
-    [ObservableProperty] private bool _isWin;
-    [ObservableProperty] private int _key;
+
     private readonly ILogger<ApplicationSettingsViewModel> _logger;
-    [ObservableProperty] private int _notificationDisplayDuration;
-    [ObservableProperty] private int _refreshRate;
-    [ObservableProperty] private double _searchDelay;
-    [ObservableProperty] private LogLevel _selectedLogLevel;
-    [ObservableProperty] private bool _showAtStartup;
-    [ObservableProperty] private bool _showLastQuery;
-    [ObservableProperty] private bool _showResult;
-    [ObservableProperty] private ObservableCollection<StoreShortcut> _storeShortcuts = [];
+
     private readonly IStoreShortcutService _storeShortcutService;
-    [ObservableProperty] private bool _toggleVisibility;
+
     private readonly IViewFactory _viewFactory;
-    [ObservableProperty] private string _windowBackdropStyle = "Mica";
 
     #endregion
 
@@ -67,7 +44,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     public ApplicationSettingsViewModel(
         IUserCommunicationService userCommunicationService,
         ILogger<ApplicationSettingsViewModel> logger,
-        IAppRestartService appRestartService,
         IViewFactory viewFactory,
         IEnigma enigma,
         IStoreShortcutService storeShortcutService,
@@ -76,7 +52,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(userCommunicationService);
         ArgumentNullException.ThrowIfNull(logger);
-        ArgumentNullException.ThrowIfNull(appRestartService);
         ArgumentNullException.ThrowIfNull(viewFactory);
         ArgumentNullException.ThrowIfNull(enigma);
         ArgumentNullException.ThrowIfNull(storeShortcutService);
@@ -121,7 +96,103 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     #region Properties
 
+    [ObservableProperty]
+    public partial string ApiToken { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string BookmarkSourceBrowser { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial int CpuSmoothingIndex { get; set; }
+
+    [ObservableProperty]
+    public partial string DateTimeFormat { get; set; } = "";
+
+    [ObservableProperty]
+    public partial string DbPath { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial int EarlyExitCheckDelay { get; set; }
+
+    [ObservableProperty]
+    public partial bool ExcludeFilesInBinWithEverything { get; set; }
+
+    [ObservableProperty]
+    public partial bool ExcludeHiddenFilesWithEverything { get; set; }
+
+    [ObservableProperty]
+    public partial bool ExcludeSystemFilesWithEverything { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableCollection<FeatureFlag> FeatureFlags { get; set; } = [];
+
+    [ObservableProperty]
+    public partial bool IncludeOnlyExecFilesWithEverything { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsAdminModeEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsAlt { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsCtrl { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsResourceMonitorEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsSettingsButtonEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsShift { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsStatusBarAlwaysVisible { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsWin { get; set; }
+
+    [ObservableProperty]
+    public partial int Key { get; set; }
+
     public static ObservableCollection<LogLevel> LogLevels => [LogLevel.Trace, LogLevel.Debug, LogLevel.Information];
+
+    [ObservableProperty]
+    public partial int NotificationDisplayDuration { get; set; }
+
+    [ObservableProperty]
+    public partial int RefreshRate { get; set; }
+
+    [ObservableProperty]
+    public partial double SearchDelay { get; set; }
+
+    [ObservableProperty]
+    public partial LogLevel SelectedLogLevel { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowAtStartup { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowLastQuery { get; set; }
+
+    [ObservableProperty]
+    public partial bool ShowResult { get; set; }
+
+    [ObservableProperty]
+    public partial int SlowStartupThreshold { get; set; }
+
+    [ObservableProperty]
+    public partial int StartupTimeout { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableCollection<StoreShortcut> StoreShortcuts { get; set; } = [];
+
+    [ObservableProperty]
+    public partial bool ToggleVisibility { get; set; }
+
+    [ObservableProperty]
+    public partial string WindowBackdropStyle { get; set; } = "Mica";
 
     #endregion
 
@@ -174,11 +245,16 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         DateTimeFormat = _appSettings.Value.Window.DateTimeFormat;
 
         // Feature flags
-        FeatureFlags = new ObservableCollection<FeatureFlag>(_appSettings.Value.FeatureFlags);
+        FeatureFlags = [.. _appSettings.Value.FeatureFlags];
 
         // Resource Monitor
         CpuSmoothingIndex = _appSettings.Value.ResourceMonitor.CpuSmoothingIndex;
         RefreshRate = _appSettings.Value.ResourceMonitor.RefreshRate;
+
+        // Process launch
+        EarlyExitCheckDelay = _appSettings.Value.ProcessLaunch.EarlyExitCheckDelay;
+        SlowStartupThreshold = _appSettings.Value.ProcessLaunch.SlowStartupThreshold;
+        StartupTimeout = _appSettings.Value.ProcessLaunch.StartupTimeout;
 
         // Miscellaneous
         var token = _appSettings.Value.Github.Token;
@@ -227,6 +303,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         // Resource Monitor
         _appSettings.Value.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
         _appSettings.Value.ResourceMonitor.RefreshRate = RefreshRate;
+
+        // Process launch
+        _appSettings.Value.ProcessLaunch.EarlyExitCheckDelay = EarlyExitCheckDelay;
+        _appSettings.Value.ProcessLaunch.SlowStartupThreshold = SlowStartupThreshold;
+        _appSettings.Value.ProcessLaunch.StartupTimeout = StartupTimeout;
 
         // Miscellaneous
         _appSettings.Value.Github.Token
