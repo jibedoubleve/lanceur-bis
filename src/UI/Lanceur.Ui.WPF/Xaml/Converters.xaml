@@ -22,7 +22,6 @@
     <conv:InvertReportTypeToVisibilityConverter x:Key="InvertReportTypeToVisibilityConverter" />
     <conv:DivideByConverter x:Key="DivideByConverter" />
     <conv:EnumerableToVisibilityConverter x:Key="EnumerableToVisibilityConverter" />
-    <conv:CmdLineArgumentsToVisibility x:Key="CmdLineArgumentsToVisibility" />
     <conv:CounterToVisibilityConverter x:Key="CounterToVisibilityConverter" />
     <conv:StoreOrchestrationToStringConverter x:Key="StoreOrchestrationToStringConverter" />
     <conv:StoreTypeToStoreNameConverter x:Key="StoreTypeToStoreNameConverter" />

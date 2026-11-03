@@ -105,7 +105,6 @@
                         Background="Transparent"
                         Panel.ZIndex="0"
                         IsEnabled="False"
-                        Visibility="{Binding Query,Converter={StaticResource CmdLineArgumentsToVisibility}}"
                         Text="{Binding Suggestion}" />
                     <ui:SymbolIcon Symbol="Search24" Grid.Row="0" Grid.Column="1" Margin="5,0,15,0"
                                    VerticalAlignment="Center"
