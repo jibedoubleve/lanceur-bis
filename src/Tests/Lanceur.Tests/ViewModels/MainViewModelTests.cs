@@ -265,6 +265,27 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
     }
 
+    [Theory]
+    [InlineData("note", "notepad")]
+    [InlineData("  note", "  notepad")] // #1448: suggestion keeps the leading whitespace of the query
+    [InlineData("note params", "")] // suggestion hidden when parameters are typed
+    public async Task When_searching_Then_suggestion_is_aligned_with_query(string query, string expected)
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("notepad"));
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // ACT
+                viewModel.Query = query;
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                // ASSERT
+                viewModel.Suggestion.ShouldBe(expected);
+            },
+            sqlBuilder
+        );
+    }
+
     [Fact]
     public async Task When_searching_aliases_Then_all_names_are_returned()
     {

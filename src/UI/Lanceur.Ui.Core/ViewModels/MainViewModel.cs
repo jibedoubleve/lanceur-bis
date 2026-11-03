@@ -4,7 +4,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Humanizer;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Lanceur.Core.Requests;
@@ -96,12 +95,23 @@ public partial class MainViewModel : ObservableObject
 
     #region Methods
 
-    private static string GetSuggestion(string query, QueryResult? selectedItem)
+    private string GetSuggestion(QueryResult? selectedItem)
     {
+        if (Query is null) { return string.Empty; }
+
         var name = selectedItem?.Name ?? string.Empty;
-        return !name.Contains(query) || name.Contains(' ')
+
+        var trimmed = Query.TrimStart();
+        var trimmedLength = Query.Length - trimmed.Length;
+        var cmdline = Cmdline.Parse(trimmed);
+        var leading = Query[..trimmedLength];
+
+        // The suggestion is drawn under the query: with parameters it would overlap them.
+        if (cmdline.Parameters.Any()) { return string.Empty; }
+
+        return !cmdline.Name.Contains(trimmed) || name.Contains(' ')
             ? string.Empty
-            : name;
+            : leading + name;
     }
 
     /// <summary>
@@ -123,7 +133,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await _watchdog.Flush();
-            
+
             if (SelectedResult is null) { return; }
 
             if (SelectedResult.IsExecutionConfirmationRequired)
@@ -183,8 +193,8 @@ public partial class MainViewModel : ObservableObject
             Direction.PageDown => Results.GetNextPage(currentIndex, navOffset),
             _                  => currentIndex
         };
-        SelectedResult = Results.ElementAt(index);
-        Suggestion = GetSuggestion(Query ?? "", SelectedResult);
+        SelectedResult = Results[index];
+        Suggestion = GetSuggestion(SelectedResult);
     }
 
     [RelayCommand]
@@ -203,13 +213,11 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            var criterion = Cmdline.Parse(Query ?? string.Empty);
+            if (Query.IsNullOrWhiteSpace()) { Results.Clear(); }
 
-            if (criterion.IsNullOrEmpty()) { Results.Clear(); }
-
-            await _searchService.SearchAsync(Results, criterion, DoesReturnAllIfEmpty);
+            await _searchService.SearchAsync(Results, Query!, DoesReturnAllIfEmpty);
             SelectedResult = Results.FirstOrDefault()!;
-            Suggestion = GetSuggestion(criterion.Name, SelectedResult);
+            Suggestion = GetSuggestion(SelectedResult);
 
             _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
         }
