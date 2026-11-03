@@ -420,7 +420,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     #endregion
 
 
-    #region AdditionalParametersStore — PruneResult
+    #region AdditionalParametersStore - PruneResult
 
     [Theory]
     [InlineData(null)]
@@ -480,14 +480,14 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
 
     #endregion
 
-    #region SteamGameStore — Incremental filter
+    #region SteamGameStore - Incremental filter
 
     [Fact]
     public void When_steam_store_prunes_Then_game_containing_parameter_but_not_starting_with_it_is_retained()
     {
         // ARRANGE
         // Search uses Contains("a"), so PruneResult must also use Contains to stay consistent.
-        // The current implementation uses StartsWith — this test is RED until the bug is fixed.
+        // The current implementation uses StartsWith - this test is RED until the bug is fixed.
         var store = BuildSteamGameStore();
         var destination = new List<QueryResult>
         {
@@ -530,7 +530,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     [Fact]
     public async Task When_unfiltered_steam_query_is_followed_by_refined_query_Then_store_is_not_searched_again()
     {
-        // ARRANGE — expose the steam service to count GetGames() calls
+        // ARRANGE - expose the steam service to count GetGames() calls
         var steamService = Substitute.For<ISteamLibraryService>();
         steamService.GetGames().Returns([
             new SteamGame(1, "Age of Empires"),
@@ -563,7 +563,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
 
     #endregion
 
-    #region AdditionalParametersStore — Functional
+    #region AdditionalParametersStore - Functional
 
     [Fact]
     public async Task When_additional_params_query_refines_from_empty_parameter_Then_non_matching_results_are_removed_to_delete()

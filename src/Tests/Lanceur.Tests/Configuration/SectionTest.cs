@@ -39,11 +39,11 @@ public sealed class SectionTest : TestBase
         var section = new Section<WindowSection>([provider]);
         _ = section.Value; // prime the cache
 
-        // act — provider.Load() replaces _current; section._value becomes detached
+        // act - provider.Load() replaces _current; section._value becomes detached
         provider.Load();
         section.Value.NotificationDisplayDuration = 99;
 
-        // assert — the modification must be reachable through the provider
+        // assert - the modification must be reachable through the provider
         provider.Value.Window.NotificationDisplayDuration.ShouldBe(99);
     }
 
@@ -60,7 +60,7 @@ public sealed class SectionTest : TestBase
         // act
         provider.Load();
 
-        // assert — all sections must point to the new provider state
+        // assert - all sections must point to the new provider state
         ReferenceEquals(windowSection.Value, provider.Value.Window).ShouldBeTrue();
         ReferenceEquals(searchSection.Value, provider.Value.SearchBox).ShouldBeTrue();
     }
@@ -76,7 +76,7 @@ public sealed class SectionTest : TestBase
         // act
         provider.Load(); // replaces _current with a new deserialized instance
 
-        // assert — section.Value must point to the new provider state, not the detached one
+        // assert - section.Value must point to the new provider state, not the detached one
         ReferenceEquals(section.Value, provider.Value.Window).ShouldBeTrue();
     }
 
@@ -133,10 +133,10 @@ public sealed class SectionTest : TestBase
         var section = new Section<WindowSection>([provider]);
         _ = section.Value; // prime the cache
 
-        // act — section.Reload() calls provider.Load() AND nullifies the cached _value
+        // act - section.Reload() calls provider.Load() AND nullifies the cached _value
         section.Reload();
 
-        // assert — next access re-resolves from the fresh provider state
+        // assert - next access re-resolves from the fresh provider state
         ReferenceEquals(section.Value, provider.Value.Window).ShouldBeTrue();
     }
 
@@ -175,7 +175,7 @@ public sealed class SectionTest : TestBase
         // act
         section.Value.NotificationDisplayDuration = 99;
 
-        // assert — Section<T>.Value and provider.Value.Window are the same reference
+        // assert - Section<T>.Value and provider.Value.Window are the same reference
         provider.Value.Window.NotificationDisplayDuration.ShouldBe(99);
     }
 

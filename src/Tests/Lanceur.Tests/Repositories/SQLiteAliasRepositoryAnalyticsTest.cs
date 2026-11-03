@@ -46,7 +46,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsTest : TestBase
             Count = 0
         } as QueryResult;
 
-        // act — simulate two consecutive executions of the same alias with Id == 0
+        // act - simulate two consecutive executions of the same alias with Id == 0
         connectionManager.WithinTransaction((tx) => {
             var setUsage = new SetUsageDbAction(dbActionFactory);
             setUsage.SetUsage(tx, alias);
@@ -59,7 +59,7 @@ public sealed class SQLiteAliasRepositoryAnalyticsTest : TestBase
              setUsage.SetUsage(tx, alias);
          });
 
-        // assert — only one alias row should exist for that file_name
+        // assert - only one alias row should exist for that file_name
         var count = connectionManager.Connection.ExecuteScalar<int>(
             "select count(*) from alias where file_name = @fileName",
             new { fileName = "some\\path\\tool.exe" }

@@ -74,7 +74,7 @@ public abstract class StoreBase
     ///     that extracts the field the store actually searches on (e.g. <c>q => q.Name</c>
     ///     or <c>q => q.Parameters</c>), and a <paramref name="isRefinementOf" /> that matches
     ///     the store's own search semantics (e.g. <c>StartsWith</c> or <c>Contains</c>).
-    ///     An empty previous search key is allowed and means "return all" — any refinement
+    ///     An empty previous search key is allowed and means "return all" - any refinement
     ///     of it is always a valid subset.
     /// </remarks>
     /// <param name="previous">The query used to produce the current result set. Can be <c>null</c>.</param>

@@ -107,7 +107,7 @@ internal sealed class Win32ThumbnailService
             }
         }
 
-        // Return original if resolution fails — let downstream checks handle it
+        // Return original if resolution fails - let downstream checks handle it
         return path;
     }
 

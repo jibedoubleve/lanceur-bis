@@ -39,7 +39,7 @@ public sealed class ConverterTest
         // ACT
         var result = converter.ConvertBack(shortcut, typeof(string), null, CultureInfo.CurrentCulture) as string;
 
-        // ASSERT — the stored regex must contain at least one capture group
+        // ASSERT - the stored regex must contain at least one capture group
         result.ShouldBe(shortcut);
     }
 
@@ -52,7 +52,7 @@ public sealed class ConverterTest
         // ARRANGE
         var converter = new StoreOrchestrationToStringConverter();
 
-        // ACT — round-trip
+        // ACT - round-trip
         var stored  = converter.ConvertBack(shortcut, typeof(string), null, CultureInfo.CurrentCulture);
         var restored = converter.Convert(stored, typeof(string), null, CultureInfo.CurrentCulture) as string;
 

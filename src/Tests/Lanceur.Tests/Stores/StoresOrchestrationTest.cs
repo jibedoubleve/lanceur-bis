@@ -192,7 +192,7 @@ public sealed class StoresOrchestrationTest
                                                      .BuildServiceProvider();
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
-        // ASSERT — must check only the Name, not the full cmdline string
+        // ASSERT - must check only the Name, not the full cmdline string
         store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString)).ShouldBeFalse();
     }
 

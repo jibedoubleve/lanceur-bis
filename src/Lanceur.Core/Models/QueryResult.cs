@@ -91,7 +91,7 @@ public abstract class QueryResult : ObservableModel
             //   1. A thumbnail file is deleted from disk.
             //   2. The thumbnail is re-downloaded and saved under the same path.
             //   3. The alias already holds that path, so a standard equality check would skip
-            //      the notification — leaving the UI stuck on a broken image.
+            //      the notification - leaving the UI stuck on a broken image.
             // By always notifying, the UI re-evaluates the binding and reloads the image.
             field = value;
             OnPropertyChanged();

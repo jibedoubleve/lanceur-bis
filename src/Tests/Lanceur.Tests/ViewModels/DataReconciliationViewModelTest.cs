@@ -44,7 +44,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
 
         yield return
         [
-            "Notes differ — should be doubloons",
+            "Notes differ - should be doubloons",
             2,
             new SqlBuilder()
                 .AppendAlias(a =>
@@ -60,7 +60,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         ];
         yield return
         [
-            "Icon differs — should be doubloons",
+            "Icon differs - should be doubloons",
             2,
             new SqlBuilder()
                 .AppendAlias(a =>
@@ -76,7 +76,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         ];
         yield return
         [
-            "run_as differs — should NOT be doubloons",
+            "run_as differs - should NOT be doubloons",
             0,
             new SqlBuilder()
                 .AppendAlias(a =>
@@ -92,7 +92,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         ];
         yield return
         [
-            "lua_script differs — should NOT be doubloons",
+            "lua_script differs - should NOT be doubloons",
             0,
             new SqlBuilder()
                 .AppendAlias(a =>
@@ -108,7 +108,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         ];
         yield return
         [
-            "Two hidden Steam aliases with same file_name — should be doubloons",
+            "Two hidden Steam aliases with same file_name - should be doubloons",
             2,
             new SqlBuilder()
                 .AppendAlias(a =>
@@ -122,7 +122,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         ];
         yield return
         [
-            "Two hidden Steam aliases with different file_names — should NOT be doubloons",
+            "Two hidden Steam aliases with different file_names - should NOT be doubloons",
             0,
             new SqlBuilder()
                 .AppendAlias(a =>
@@ -136,7 +136,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         ];
         yield return
         [
-            "Two non-hidden Steam aliases with same file_name — should be doubloons",
+            "Two non-hidden Steam aliases with same file_name - should be doubloons",
             2,
             new SqlBuilder()
                 .AppendAlias(a =>
@@ -380,13 +380,13 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
 
         await TestViewModelAsync(
             async (viewModel, _) => {
-                // arrange — navigate to RestoreAlias report first so ReportType is not None
+                // arrange - navigate to RestoreAlias report first so ReportType is not None
                 await viewModel.ShowRestoreAliasesCommand.ExecuteAsync(null);
 
-                // act — user opens the config dialogue and changes FileName visibility
+                // act - user opens the config dialogue and changes FileName visibility
                 await viewModel.ConfigureReportCommand.ExecuteAsync(null);
 
-                // assert — the new configuration must have been assigned before Save() was called
+                // assert - the new configuration must have been assigned before Save() was called
                 capturedProvider!.Value.Reconciliation.ReportsConfiguration
                                  .First(e => e.ReportType == ReportType.RestoreAlias)
                                  .ColumnsVisibility.FileName
