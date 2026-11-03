@@ -82,7 +82,8 @@
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Window" />
 
-                <ui:CardControl Icon="{ui:SymbolIcon Keyboard24}" ToolTipService.ToolTip="Defines the keyboard shortcut used to open the search interface and start searching aliases. Choose a key combination that does not conflict with system or application shortcuts.">
+                <ui:CardControl Icon="{ui:SymbolIcon Keyboard24}"
+                                ToolTipService.ToolTip="Defines the keyboard shortcut used to open the search interface and start searching aliases. Choose a key combination that does not conflict with system or application shortcuts.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Hot key" />
                     </ui:CardControl.Header>
@@ -103,7 +104,8 @@
                             Margin="0,0,5,0"
                             Content="Shift"
                             IsChecked="{Binding IsShift}" />
-                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}" SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
+                        <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}"
+                                  SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
                     </StackPanel>
                 </ui:CardControl>
 
@@ -145,7 +147,8 @@
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Glass Effect" />
                     </ui:CardControl.Header>
-                    <ComboBox ItemsSource="{StaticResource WindowBackdropStyles}" SelectedItem="{Binding WindowBackdropStyle}" />
+                    <ComboBox ItemsSource="{StaticResource WindowBackdropStyles}"
+                              SelectedItem="{Binding WindowBackdropStyle}" />
 
                 </ui:CardControl>
 
@@ -222,7 +225,8 @@
 
                 <ui:CardControl Icon="{ui:SymbolIcon Search24}">
                     <ui:CardControl.Header>
-                        <ui:TextBlock FontTypography="Body" Text="Should the last query be shown when the search opens?" />
+                        <ui:TextBlock FontTypography="Body"
+                                      Text="Should the last query be shown when the search opens?" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
                         <ui:ToggleSwitch
@@ -232,7 +236,8 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Icon="{ui:SymbolIcon Settings24}" ToolTip="Controls whether the settings button is visible in the search box.">
+                <ui:CardControl Icon="{ui:SymbolIcon Settings24}"
+                                ToolTip="Controls whether the settings button is visible in the search box.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Show settings button in search box?" />
                     </ui:CardControl.Header>
@@ -244,7 +249,8 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Icon="{ui:SymbolIcon Pin24}" ToolTip="Keep the status bar visible at all times, even when there are no active results to display.">
+                <ui:CardControl Icon="{ui:SymbolIcon Pin24}"
+                                ToolTip="Keep the status bar visible at all times, even when there are no active results to display.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Always show status bar" />
                     </ui:CardControl.Header>
@@ -263,7 +269,8 @@
                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                     Text="Data sources" />
 
-                <ui:CardControl Icon="{ui:SymbolIcon Database24}" ToolTip="This change will take effect until you restart the application or adjust it again here.">
+                <ui:CardControl Icon="{ui:SymbolIcon Database24}"
+                                ToolTip="This change will take effect until you restart the application or adjust it again here.">
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Database" />
                     </ui:CardControl.Header>
@@ -276,13 +283,15 @@
                     </StackPanel>
                 </ui:CardControl>
 
-                <ui:CardControl Icon="{ui:SymbolIcon BookmarkSearch24}" ToolTip="Select the main browser to use for searching your bookmarks.">
+                <ui:CardControl Icon="{ui:SymbolIcon BookmarkSearch24}"
+                                ToolTip="Select the main browser to use for searching your bookmarks.">
 
                     <ui:CardControl.Header>
                         <ui:TextBlock FontTypography="Body" Text="Source of the bookmarks" />
                     </ui:CardControl.Header>
                     <StackPanel Orientation="Horizontal">
-                        <ComboBox ItemsSource="{StaticResource Browsers}" SelectedItem="{Binding BookmarkSourceBrowser}" />
+                        <ComboBox ItemsSource="{StaticResource Browsers}"
+                                  SelectedItem="{Binding BookmarkSourceBrowser}" />
                     </StackPanel>
                 </ui:CardControl>
 
@@ -302,7 +311,8 @@
                     <StackPanel>
                         <ui:CardControl Icon="{ui:SymbolIcon SlideHide24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body" Text="Should hidden files be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body"
+                                              Text="Should hidden files be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -314,7 +324,8 @@
 
                         <ui:CardControl Icon="{ui:SymbolIcon ShieldKeyhole24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body" Text="Should system files be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body"
+                                              Text="Should system files be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -326,7 +337,8 @@
 
                         <ui:CardControl Icon="{ui:SymbolIcon Run24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body" Text="Should only executable files be included in the results?" />
+                                <ui:TextBlock FontTypography="Body"
+                                              Text="Should only executable files be included in the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -338,7 +350,8 @@
 
                         <ui:CardControl Icon="{ui:SymbolIcon Delete24}">
                             <ui:CardControl.Header>
-                                <ui:TextBlock FontTypography="Body" Text="Should files in the Recycle Bin be excluded from the results?" />
+                                <ui:TextBlock FontTypography="Body"
+                                              Text="Should files in the Recycle Bin be excluded from the results?" />
                             </ui:CardControl.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:ToggleSwitch
@@ -487,7 +500,8 @@
                     <ui:CardControl.ToolTip>
                         Enter the API token from your GitHub account. It is used, among other things, to create new issues.
                     </ui:CardControl.ToolTip>
-                    <ui:PasswordBox Password="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Enter your API token" />
+                    <ui:PasswordBox Password="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    PlaceholderText="Enter your API token" />
                 </ui:CardControl>
 
                 <!--  Resource monitor settings  -->
@@ -525,6 +539,58 @@
                                 Determines the level of smoothing applied to CPU usage measurements. Higher values result in a more stable average but may reduce responsiveness to sudden changes.
                             </ui:CardControl.ToolTip>
                             <ui:NumberBox Value="{Binding CpuSmoothingIndex, UpdateSourceTrigger=PropertyChanged}" />
+                        </ui:CardControl>
+                    </StackPanel>
+                </ui:CardExpander>
+
+                <!--  Alias startup tracking  -->
+                <ui:CardExpander Icon="{ui:SymbolIcon Rocket24}" IsExpanded="False">
+                    <ui:CardExpander.Header>
+                        <ui:TextBlock FontTypography="Body" Text="Alias startup tracking" />
+                    </ui:CardExpander.Header>
+
+                    <StackPanel>
+                        <ui:CardControl Icon="{ui:SymbolIcon HourglassHalf24}">
+                            <ui:CardControl.Header>
+                                <ui:TextBlock FontTypography="Body" Text="Slow startup notification delay (ms)" />
+                            </ui:CardControl.Header>
+                            <ui:CardControl.ToolTip>
+                                Time after which a "Starting…" notification is shown while the application is still loading.
+                            </ui:CardControl.ToolTip>
+                            <ui:NumberBox
+                                LargeChange="1000"
+                                Minimum="0"
+                                SmallChange="100"
+                                Value="{Binding SlowStartupThreshold, UpdateSourceTrigger=PropertyChanged}" />
+                        </ui:CardControl>
+
+                        <ui:CardControl Icon="{ui:SymbolIcon Timer24}">
+                            <ui:CardControl.Header>
+                                <ui:TextBlock FontTypography="Body" Text="Startup timeout (ms)" />
+                            </ui:CardControl.Header>
+                            <ui:CardControl.ToolTip>
+                                Maximum time to wait for the application to be ready. Past this delay, a warning is shown.
+                            </ui:CardControl.ToolTip>
+                            <ui:NumberBox
+                                LargeChange="5000"
+                                Minimum="0"
+                                SmallChange="1000"
+                                Value="{Binding StartupTimeout, UpdateSourceTrigger=PropertyChanged}" />
+                        </ui:CardControl>
+
+                        <ui:CardControl Icon="{ui:SymbolIcon ArrowSync24}">
+                            <ui:CardControl.Header>
+                                <ui:TextBlock FontTypography="Body" Text="Closed-instance check delay (ms)" />
+                            </ui:CardControl.Header>
+                            <ui:CardControl.ToolTip>
+                                When the application was already running, time to wait before checking that an instance is still running.
+                                Increase it if an application closes slowly and the launch is lost without a warning.
+                            </ui:CardControl.ToolTip>
+                            <ui:NumberBox
+                                LargeChange="5000"
+                                Minimum="0"
+                                SmallChange="1000"
+                                Value="{Binding EarlyExitCheckDelay, UpdateSourceTrigger=PropertyChanged}" />
                         </ui:CardControl>
                     </StackPanel>
                 </ui:CardExpander>

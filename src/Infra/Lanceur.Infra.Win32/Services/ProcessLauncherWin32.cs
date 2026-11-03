@@ -47,12 +47,12 @@ internal sealed class ProcessLauncherWin32 : IProcessLauncher
             var watch = Stopwatch.StartNew();
             try
             {
-                var isReady = process.WaitForInputIdle(_settings.SlowStartupMs);
+                var isReady = process.WaitForInputIdle(_settings.SlowStartupThreshold);
                 if (!isReady) // Notify slow startup
                 {
                     using var _ =
                         _notificationService.Progress("Starting", $"Starting {fileName} ...");
-                    isReady = process.WaitForInputIdle(_settings.StartupTimeout - _settings.SlowStartupMs);
+                    isReady = process.WaitForInputIdle(_settings.StartupTimeout - _settings.SlowStartupThreshold);
                 }
 
                 if (isReady) // Process is ready and running
@@ -117,7 +117,9 @@ internal sealed class ProcessLauncherWin32 : IProcessLauncher
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "{FileName}: cannot check whether the process closed right after starting", fileName);
+                    _logger.LogError(ex,
+                        "{FileName}: cannot check whether the process closed right after starting",
+                        fileName);
                     return false;
                 }
             }

@@ -15,7 +15,7 @@ public sealed class ProcessLauncherWin32Test
     #region Fields
 
     private const string FileName = "app.exe";
-    private const int SlowStartupMs = 100;
+    private const int SlowStartupThreshold = 100;
     private const int StartupTimeout = 1_000;
 
     private readonly IUserGlobalNotificationService _notifications = Substitute.For<IUserGlobalNotificationService>();
@@ -43,7 +43,7 @@ public sealed class ProcessLauncherWin32Test
         settings.Value.Returns(
             new ProcessLaunchSection
             {
-                SlowStartupMs = slowStartupMs,
+                SlowStartupThreshold = slowStartupMs,
                 StartupTimeout = startupTimeout,
                 EarlyExitCheckDelay = earlyExitCheckDelay
             }
@@ -171,7 +171,7 @@ public sealed class ProcessLauncherWin32Test
 
         await CreateSut().TrackStartupAsync(process, FileName, new ProcessSnapshot(new ProcessLookup(), []));
 
-        process.Waits.ShouldBe([SlowStartupMs, StartupTimeout - SlowStartupMs]);
+        process.Waits.ShouldBe([SlowStartupThreshold, StartupTimeout - SlowStartupThreshold]);
     }
 
     #endregion

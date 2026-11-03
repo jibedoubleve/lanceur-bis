@@ -58,6 +58,13 @@ public class ApplicationSettings
     public HotKeySection HotKey { get; set; } = new(3, 18);
 
     /// <summary>
+    ///     Gets or sets the timing settings applied when an alias launches a process.
+    ///     They control how long to wait for the process to be ready, when to warn the user
+    ///     about a slow startup, and when to check whether the process exited right after launch.
+    /// </summary>
+    public ProcessLaunchSection ProcessLaunch { get; set; } = new();
+
+    /// <summary>
     ///     Gets or sets miscellaneous configuration settings that do not fall into other categories.
     ///     These settings may include other application preferences not specifically handled elsewhere.
     /// </summary>
