@@ -128,12 +128,12 @@ public sealed class ServiceRegistrationTest : TestBase
                        .AddUiCoreServices()
                        .AddWpfServices();
 
-        // act — ValidateOnBuild checks the full type-based dependency graph
+        // act - ValidateOnBuild checks the full type-based dependency graph
         var provider = Should.NotThrow(() =>
             services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true })
         );
 
-        // assert — explicitly resolve services registered via factory lambda, which ValidateOnBuild cannot validate
+        // assert - explicitly resolve services registered via factory lambda, which ValidateOnBuild cannot validate
         provider.ShouldSatisfyAllConditions(
             p => Should.NotThrow(p.GetRequiredService<IDbConnection>),
             p => Should.NotThrow(p.GetRequiredService<IDatabaseUpdater>),

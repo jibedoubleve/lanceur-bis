@@ -36,7 +36,7 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
     /// <summary>
     ///     Builds an in-memory alias that aggregates data from all specified aliases into the first one.
     ///     The synonyms and additional parameters of all aliases are consolidated into the target alias.
-    ///     This method does not persist any changes — call the appropriate save method to commit the result.
+    ///     This method does not persist any changes - call the appropriate save method to commit the result.
     /// </summary>
     /// <param name="ids">
     ///     The ids of the aliases to aggregate. The first id designates the target alias;

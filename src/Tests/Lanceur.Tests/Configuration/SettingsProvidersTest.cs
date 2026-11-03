@@ -39,7 +39,7 @@ public sealed class SettingsProvidersTest : TestBase
             _ = section.Value; // trigger initial load and prime the cache
 
             // act
-            provider.Load(); // simulate a reload triggered by another component — the bug trigger
+            provider.Load(); // simulate a reload triggered by another component - the bug trigger
             section.Value.NotificationDisplayDuration = 99;
             section.Save();
 
@@ -68,11 +68,11 @@ public sealed class SettingsProvidersTest : TestBase
             section.Value.StoreShortcuts = [new StoreShortcut { StoreType = "TypeA", AliasOverride = "a" }];
             section.Save();
 
-            // act — reload twice to detect merge vs replace behaviour
+            // act - reload twice to detect merge vs replace behaviour
             provider.Load();
             provider.Load();
 
-            // assert — should still have exactly 1 shortcut, not 2 or 3
+            // assert - should still have exactly 1 shortcut, not 2 or 3
             provider.Value.Stores.StoreShortcuts.Count().ShouldBe(1);
         });
 
@@ -94,7 +94,7 @@ public sealed class SettingsProvidersTest : TestBase
             // act
             provider.Load();
 
-            // assert — should have exactly 1 shortcut, TypeA and TypeB must be gone
+            // assert - should have exactly 1 shortcut, TypeA and TypeB must be gone
             provider.Value.Stores.StoreShortcuts.ShouldSatisfyAllConditions(
                 s => s.Single().StoreType.ShouldBe("TypeC"),
                 s => s.Count().ShouldBe(1)
@@ -104,11 +104,11 @@ public sealed class SettingsProvidersTest : TestBase
     [Fact]
     public void When_settings_are_reloaded_multiple_times_Then_feature_flags_are_not_duplicated()
         => WithConfiguration<WindowSection>((_, provider) => {
-            // arrange — prime the cache and save initial state to DB
+            // arrange - prime the cache and save initial state to DB
             var initialCount = provider.Value.FeatureFlags.Count();
             provider.Save();
 
-            // act — reload multiple times (each Load() was accumulating flags before the fix)
+            // act - reload multiple times (each Load() was accumulating flags before the fix)
             provider.Load();
             provider.Load();
             provider.Load();

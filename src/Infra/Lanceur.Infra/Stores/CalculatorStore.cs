@@ -55,7 +55,7 @@ public sealed class CalculatorStore : StoreBase, IStoreService
 
     /// <inheritdoc cref="CanPruneResult" />
     /// <remarks>
-    ///     Always returns <c>0</c> — pruning is meaningless here because each expression evaluation
+    ///     Always returns <c>0</c> - pruning is meaningless here because each expression evaluation
     ///     produces a single, self-contained result (the computed value or an error message) that is
     ///     unrelated to the previous result. <see cref="CanPruneResult" /> already prevents this
     ///     method from being called in normal operation.

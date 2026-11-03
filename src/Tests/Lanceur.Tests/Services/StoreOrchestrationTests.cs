@@ -98,10 +98,10 @@ public sealed class StoreOrchestrationTests
             featureFlags
         );
 
-        // act — query starts with "&", which matches the override pattern
+        // act - query starts with "&", which matches the override pattern
         var result = store.Orchestration.IsAlive(Cmdline.Parse("&steam"));
 
-        // assert — AlwaysInactive must win: the disabled feature flag takes precedence over any stored shortcut
+        // assert - AlwaysInactive must win: the disabled feature flag takes precedence over any stored shortcut
         result.ShouldBeFalse();
     }
 

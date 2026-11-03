@@ -127,19 +127,19 @@
 
                                 <TextBlock
                                     Margin="0,0,0,2"
-                                    Text="• Mica — Subtle transparency with depth."
+                                    Text="• Mica - Subtle transparency with depth."
                                     TextWrapping="Wrap" />
                                 <TextBlock
                                     Margin="0,0,0,2"
-                                    Text="• Acrylic — Stronger blur and transparency for a dynamic look."
+                                    Text="• Acrylic - Stronger blur and transparency for a dynamic look."
                                     TextWrapping="Wrap" />
                                 <TextBlock
                                     Margin="0,0,0,2"
-                                    Text="• Tab — Applies the effect only to tab surfaces."
+                                    Text="• Tab - Applies the effect only to tab surfaces."
                                     TextWrapping="Wrap" />
                                 <TextBlock
                                     Margin="0,0,0,2"
-                                    Text="• None — Disables all visual effects."
+                                    Text="• None - Disables all visual effects."
                                     TextWrapping="Wrap" />
                             </StackPanel>
                         </ToolTip>

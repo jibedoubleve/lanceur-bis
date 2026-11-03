@@ -124,7 +124,7 @@ public sealed class StorePruningContractTest
         {
             new AliasQueryResult { Name = "Google" }, // contains "oo" but NOT "ooh" → removed
             new AliasQueryResult { Name = "Doohan" }, // contains "ooh" → kept
-            // "xyz" is owned by another store — this store ignores it and leaves it untouched.
+            // "xyz" is owned by another store - this store ignores it and leaves it untouched.
             new AliasQueryResult { Name = "xyz" } // contains neither "oo" nor "ooh" → not owned by this store, kept
         };
 
@@ -143,7 +143,7 @@ public sealed class StorePruningContractTest
     #region CalculatorStore
 
     [Theory]
-    [InlineData("1+", "1+2", false)] // CalculatorStore always returns false — each expression is unique
+    [InlineData("1+", "1+2", false)] // CalculatorStore always returns false - each expression is unique
     [InlineData("1+2", "3*4", false)]
     public void When_checking_calculator_store_pruning_Then_it_cannot_prune(string previous, string current, bool expected)
         => BuildCalculatorStore().CanPruneResult(Cmdline.Parse(previous), current)
@@ -170,7 +170,7 @@ public sealed class StorePruningContractTest
     #region EverythingStore
 
     [Theory]
-    [InlineData(": fo", ": foo", false)] // EverythingStore always returns false — results are non-deterministic
+    [InlineData(": fo", ": foo", false)] // EverythingStore always returns false - results are non-deterministic
     [InlineData(": foo", ": bar", false)]
     public void When_checking_everything_store_pruning_Then_it_cannot_prune(string previous, string current, bool expected)
         => BuildEverythingStore().CanPruneResult(Cmdline.Parse(previous), current)

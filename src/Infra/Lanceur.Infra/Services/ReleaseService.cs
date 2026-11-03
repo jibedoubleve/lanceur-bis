@@ -47,7 +47,7 @@ public sealed class ReleaseService : IReleaseService
         {
             _logger.LogInformation(!hasUpdate
                 ? "Application is up to date."
-                : "Update available but notification is snoozed — skipping.");
+                : "Update available but notification is snoozed - skipping.");
 
             return;
         }

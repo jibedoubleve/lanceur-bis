@@ -57,7 +57,7 @@ public sealed class StoreOrchestration
 
     /// <summary>
     ///     Determines whether this store should handle the given query by matching
-    ///     the alive pattern against <see cref="Cmdline.Name" /> only — parameters are intentionally excluded
+    ///     the alive pattern against <see cref="Cmdline.Name" /> only - parameters are intentionally excluded
     ///     to prevent false positives when a parameter value happens to contain the store's trigger character.
     /// </summary>
     /// <param name="query">The parsed command line whose <see cref="Cmdline.Name" /> is evaluated.</param>

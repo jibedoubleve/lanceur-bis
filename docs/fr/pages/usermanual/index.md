@@ -25,7 +25,7 @@ Une ligne de commande suit cette structure :
 
 > `commande` [espace] `paramètres`
 
-- Le texte avant le premier espace est la **commande** — l'action à exécuter.
+- Le texte avant le premier espace est la **commande** - l'action à exécuter.
 - Tout ce qui suit le premier espace sont les **paramètres**, qui modifient le comportement de la commande.
 
 Si la commande commence par l'un des caractères suivants :
