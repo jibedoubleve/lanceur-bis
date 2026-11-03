@@ -209,6 +209,7 @@ public sealed class ExecutionServiceTest : TestBase
                                         .AddMockSingleton<IUserGlobalNotificationService>()
                                         .AddMockSingleton<IEnigma>()
                                         .AddSingleton<GithubIssueMacro>()
+                                        .AddMockSingleton<IProcessLookup>()
                                         .AddMockConfigurationSections()
                                         .BuildServiceProvider();
 

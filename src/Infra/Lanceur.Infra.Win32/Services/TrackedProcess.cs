@@ -19,6 +19,12 @@ internal interface ITrackedProcess : IDisposable
     /// </summary>
     bool HasExited { get; }
 
+    /// <summary>
+    ///     Gets the system-assigned identifier (PID) of the process.
+    ///     Remains readable after the process has exited, but Windows may reassign it to another process.
+    /// </summary>
+    int Id { get; }
+
     #endregion
 
     #region Methods
@@ -56,6 +62,8 @@ internal sealed class TrackedProcess : ITrackedProcess
     /// <inheritdoc />
     public bool HasExited => _process.HasExited;
 
+    /// <inheritdoc />
+    public int Id => _process.Id;
     #endregion
 
     #region Methods

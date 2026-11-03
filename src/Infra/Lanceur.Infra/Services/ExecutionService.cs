@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Services;
 
-public sealed class ExecutionService  : IExecutionService
+public sealed class ExecutionService : IExecutionService
 {
     #region Fields
 
@@ -146,7 +146,7 @@ public sealed class ExecutionService  : IExecutionService
         );
 
         // EXECUTE PROCESS
-        _logger.LogInformation("Executing {FileName} with args {Parameters}", query.FileName, query.Parameters);
+        _logger.LogInformation("Executing {FileName} with args {Parameters}", fileName, parameters);
         var psi = new ProcessContext
         {
             FileName = fileName,

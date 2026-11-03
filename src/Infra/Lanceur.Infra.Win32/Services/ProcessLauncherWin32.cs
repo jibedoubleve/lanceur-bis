@@ -10,13 +10,15 @@ using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;
 
-public sealed class ProcessLauncherWin32 : IProcessLauncher
+internal sealed class ProcessLauncherWin32 : IProcessLauncher
 {
     #region Fields
+
     private readonly ILogger<ProcessLauncherWin32> _logger;
-    private readonly SearchBoxSection _settings;
 
     private readonly IUserGlobalNotificationService _notificationService;
+    private readonly IProcessLookup _processLookup;
+    private readonly ProcessLaunchSection _settings;
 
     #endregion
 
@@ -25,10 +27,12 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
     public ProcessLauncherWin32(
         IUserGlobalNotificationService notificationService,
         ILogger<ProcessLauncherWin32> logger,
-        ISection<SearchBoxSection> settings)
+        ISection<ProcessLaunchSection> settings,
+        IProcessLookup processLookup)
     {
         _notificationService = notificationService;
         _logger = logger;
+        _processLookup = processLookup;
         _settings = settings.Value;
     }
 
@@ -36,7 +40,7 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
 
     #region Methods
 
-    internal void TrackStartup(ITrackedProcess process, string fileName)
+    internal async Task TrackStartupAsync(ITrackedProcess process, string fileName, ProcessSnapshot snapshot)
     {
         using (process)
         {
@@ -44,18 +48,19 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
             try
             {
                 var isReady = process.WaitForInputIdle(_settings.SlowStartupMs);
-                if (!isReady)
+                if (!isReady) // Notify slow startup
                 {
                     using var _ =
                         _notificationService.Progress("Starting", $"Starting {fileName} ...");
                     isReady = process.WaitForInputIdle(_settings.StartupTimeout - _settings.SlowStartupMs);
                 }
 
-                if (isReady)
+                if (isReady) // Process is ready and running
                 {
                     _logger.LogInformation("{FileName}: ready after {Elapsed} ms", fileName, watch.ElapsedMilliseconds);
+                    await TryHandleEarlyExit();
                 }
-                else
+                else // Timeout: if app isn't started yet, this is not expected; inform user.
                 {
                     _logger.LogWarning("{FileName}: not ready after {Elapsed} ms", fileName, watch.ElapsedMilliseconds);
                     _notificationService.Warning(
@@ -65,6 +70,8 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
             }
             catch (InvalidOperationException ex) when (process.HasExited)
             {
+                if (await TryHandleEarlyExit()) { return; }
+
                 var logLevel = process.ExitCode == 0 ? LogLevel.Information : LogLevel.Warning;
                 _logger.Log(
                     logLevel,
@@ -83,6 +90,37 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
             {
                 _logger.LogWarning(ex, "{FileName}: cannot track startup", fileName);
             }
+
+            //----------
+            async Task<bool> TryHandleEarlyExit()
+            {
+                try
+                {
+                    if (snapshot.IsEmpty) { return false; }
+
+                    // Wait some time and check the snapshot
+                    await Task.Delay(_settings.EarlyExitCheckDelay);
+
+                    snapshot.Add(process.Id);
+                    if (snapshot.AnyAlive()) { return false; }
+
+                    _logger.LogWarning(
+                        "{FileName}: process {ProcessId} closed within {Delay} ms of starting and no other instance is running",
+                        fileName,
+                        process.Id,
+                        _settings.EarlyExitCheckDelay
+                    );
+                    _notificationService.Warning(
+                        $"'{Path.GetFileName(fileName)}' closed right after starting and no other instance is running. Try running the alias again."
+                    );
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "{FileName}: cannot check whether the process closed right after starting", fileName);
+                    return false;
+                }
+            }
         }
     }
 
@@ -97,8 +135,13 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
     public void Start(ProcessContext context)
     {
         var process = new Process { StartInfo = context.ToProcessStartInfo() };
+        var snapshot = ProcessSnapshot.Capture(_processLookup, Path.GetFileNameWithoutExtension(context.FileName));
         bool isStarted;
-        try { isStarted = process.Start(); }
+
+        try
+        {
+            isStarted = process.Start();
+        }
         catch (Exception)
         {
             process.Dispose();
@@ -113,7 +156,11 @@ public sealed class ProcessLauncherWin32 : IProcessLauncher
         }
 
         _logger.LogInformation("{FileName}: started with PID {ProcessId}", context.FileName, process.Id);
-        _ = Task.Run(() => TrackStartup(new TrackedProcess(process), context.FileName));
+        _ = Task.Run(() => TrackStartupAsync(
+            new TrackedProcess(process),
+            context.FileName,
+            snapshot
+        ));
     }
 
     /// <inheritdoc />

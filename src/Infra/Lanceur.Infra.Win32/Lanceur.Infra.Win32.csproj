@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <UseWpf>True</UseWpf>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
-    <ItemGroup>
-        <InternalsVisibleTo Include="Lanceur.Tests"/>
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
-        <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj"/>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="System.IO.Hashing" Version="10.0.14"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWpf>True</UseWpf>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Lanceur.Tests" />
+    <InternalsVisibleTo Include="Lanceur.Tests.Tools" />
+    <!-- Lets NSubstitute mock internal types: it generates its proxies 
+             in this dynamic assembly (Castle DynamicProxy) 
+         -->
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj" />
+    <ProjectReference Include="..\Lanceur.Infra\Lanceur.Infra.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" Version="10.0.14" />
+  </ItemGroup>
 </Project>
