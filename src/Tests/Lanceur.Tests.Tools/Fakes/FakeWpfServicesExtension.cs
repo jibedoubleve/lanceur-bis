@@ -3,9 +3,9 @@ using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Lanceur.Tests.Tools.Stubs;
+namespace Lanceur.Tests.Tools.Fakes;
 
-public static class MockWpfServicesExtension
+public static class FakeWpfServicesExtension
 {
     #region Methods
 

@@ -6,7 +6,7 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
-using Lanceur.Tests.Tools.Stubs;
+using Lanceur.Tests.Tools.Fakes;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -104,13 +104,13 @@ public sealed class SectionTest : TestBase
     public void When_section_is_registered_twice_Then_throws()
     {
         // arrange
-        var testSettings = new TestSettingsWithTwiceSameSection();
+        var testSettings = new FakeSettingsWithTwiceSameSection();
         var infraSettings = new InfrastructureSettings();
 
         // ISettingsProvider<T>.Value uses "new" (hiding, not override), so NSubstitute
         // configures it as a separate member from ISettingsProvider.Value.
         // Casting to the base interface ensures we stub the property that Section<T> actually reads.
-        var testProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<TestSettingsWithTwiceSameSection>>();
+        var testProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<FakeSettingsWithTwiceSameSection>>();
         var infraProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<InfrastructureSettings>>();
 
         testProvider.Value.Returns(testSettings);
@@ -150,7 +150,7 @@ public sealed class SectionTest : TestBase
         // ISettingsProvider<T>.Value uses "new" (hiding, not override), so NSubstitute
         // configures it as a separate member from ISettingsProvider.Value.
         // Casting to the base interface ensures we stub the property that Section<T> actually reads.
-        var appProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<TestSettingsWithTwiceSameSection>>();
+        var appProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<FakeSettingsWithTwiceSameSection>>();
         var infraProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<InfrastructureSettings>>();
 
         appProvider.Value.Returns(appSettings);
@@ -189,7 +189,7 @@ public sealed class SectionTest : TestBase
         // ISettingsProvider<T>.Value uses "new" (hiding, not override), so NSubstitute
         // configures it as a separate member from ISettingsProvider.Value.
         // Casting to the base interface ensures we stub the property that Section<T> actually reads.
-        var appProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<TestSettingsWithTwiceSameSection>>();
+        var appProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<FakeSettingsWithTwiceSameSection>>();
         var infraProvider = (ISettingsProvider)Substitute.For<ISettingsProvider<InfrastructureSettings>>();
 
         appProvider.Value.Returns(appSettings);

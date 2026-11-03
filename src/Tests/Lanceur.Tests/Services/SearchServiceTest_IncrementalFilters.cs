@@ -8,7 +8,7 @@ using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
-using Lanceur.Tests.Tools.Stubs;
+using Lanceur.Tests.Tools.Fakes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -302,7 +302,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         return sc.BuildServiceProvider().GetRequiredService<SearchService>();
     }
 
-    private static TestStore BuildTestStore(Func<Cmdline, string>? prunePolicy = null)
+    private static FakeStore BuildTestStore(Func<Cmdline, string>? prunePolicy = null)
         => new(
             new StoreOrchestrationFactory(),
             Substitute.For<ISection<StoreSection>>(),
