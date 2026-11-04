@@ -56,7 +56,6 @@ Setup(ctx =>
     { 
         OutputType            = GitVersionOutput.Json,
         Verbosity             = GitVersionVerbosity.Verbose,        
-        ArgumentCustomization = args => args.Append("/updateprojectfiles")
     });
     var branchName = gitVersion.BranchName;
 
@@ -117,11 +116,15 @@ Task("restore")
 });
 
 Task("build")
-    .Does(() => {        
+    .Does(() => {
         DotNetTool(
             solution,
             "build",
-            "--no-restore -c release"
+            "--no-restore -c release " +
+            $"-p:Version={gitVersion.SemVer} " +
+            $"-p:AssemblyVersion={gitVersion.AssemblySemVer} " +
+            $"-p:FileVersion={gitVersion.AssemblySemFileVer} " +
+            $"-p:InformationalVersion={gitVersion.InformationalVersion}"
         );
 });
 
