@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -73,6 +74,7 @@ public partial class MainView
             messenger.Unregister<KeepAliveMessage>(this);
             messenger.Unregister<ChangeCoordinateMessage>(this);
             messenger.Unregister<SetQueryMessage>(this);
+            messenger.Unregister<AlignParametersMessage>(this);
         };
     }
 
@@ -85,6 +87,38 @@ public partial class MainView
     #endregion
 
     #region Methods
+
+    private void HandleAlignParameters(AlignParametersValue value)
+    {
+        var typed = value.Query.Name.TrimEnd();
+        var targetWidth = Width(value.Suggestion) + Width(" ");
+        var spaces = (int)Math.Ceiling((targetWidth - Width(typed)) / Width(" "));
+        SetQuery(typed + new string(' ', Math.Max(spaces, 0)) + value.Query.RawParameters);
+
+        return;
+
+        double Width(string s)
+        {
+            var typeface = new Typeface(
+                QueryTextBox.FontFamily,
+                QueryTextBox.FontStyle,
+                QueryTextBox.FontWeight,
+                QueryTextBox.FontStretch
+            );
+            var pixelsPerDip = VisualTreeHelper.GetDpi(QueryTextBox).PixelsPerDip;
+
+            var ft = new FormattedText(
+                s,
+                CultureInfo.CurrentUICulture,
+                QueryTextBox.FlowDirection,
+                typeface,
+                QueryTextBox.FontSize,
+                Brushes.Black,
+                pixelsPerDip);
+
+            return ft.WidthIncludingTrailingWhitespace;
+        }
+    }
 
     private void HandleCpuAndMemoryUsage()
     {
@@ -158,6 +192,7 @@ public partial class MainView
         );
         messenger.Register<ChangeCoordinateMessage>(this, (_, m) => SetWindowPosition(m.Value));
         messenger.Register<SetQueryMessage>(this, (_, m) => SetQuery(m.Value));
+        messenger.Register<AlignParametersMessage>(this, (_, m) => HandleAlignParameters(m.Value));
 
         SystemThemeWatcher.Watch(
             this,

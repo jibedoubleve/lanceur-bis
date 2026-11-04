@@ -8,6 +8,11 @@ public sealed class KeepAliveMessage(bool value) : ValueChangedMessage<bool>(val
 
 public sealed class SetQueryMessage(string value) : ValueChangedMessage<string>(value);
 
+public sealed record AlignParametersValue(string Suggestion, Cmdline Query);
+
+public sealed class AlignParametersMessage(AlignParametersValue value)
+    : ValueChangedMessage<AlignParametersValue>(value);
+
 public sealed class SaveAliasMessage(AliasQueryResult alias) : ValueChangedMessage<AliasQueryResult>(alias);
 
 public sealed class ChangeCoordinateMessage(Coordinate value) : ValueChangedMessage<Coordinate>(value);

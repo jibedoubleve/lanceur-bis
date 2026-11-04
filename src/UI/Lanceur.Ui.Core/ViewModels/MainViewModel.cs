@@ -10,6 +10,7 @@ using Lanceur.Core.Requests;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.Ui.Core.Messages;
+using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.Logging;
 
@@ -20,18 +21,17 @@ public partial class MainViewModel : ObservableObject
     #region Fields
 
     private readonly IExecutionService _executionService;
+    private readonly QueryInputTracker _inputTracker = new();
+
+    private bool _isSearchActivated = true;
+
     private readonly ILogger<MainViewModel> _logger;
-    [ObservableProperty] private string? _query;
-    [ObservableProperty] private ObservableCollection<QueryResult> _results = [];
     private readonly ISearchService _searchService;
-    [ObservableProperty] private QueryResult? _selectedResult;
     private readonly ISection<SearchBoxSection> _stgSearchBox;
     private readonly ISection<WindowSection> _stgWindow;
-    [ObservableProperty] private string? _suggestion;
     private readonly IThumbnailService _thumbnailService;
     private readonly IUserCommunicationService _userCommunicationService;
     private readonly IWatchdog _watchdog;
-    [ObservableProperty] private string _windowBackdropStyle;
 
     #endregion
 
@@ -81,6 +81,15 @@ public partial class MainViewModel : ObservableObject
 
     private bool DoesReturnAllIfEmpty => _stgSearchBox.Value.ShowResult;
 
+    [ObservableProperty]
+    public partial string? Query { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableCollection<QueryResult> Results { get; set; } = [];
+
+    [ObservableProperty]
+    public partial QueryResult? SelectedResult { get; set; }
+
     public bool ShowAtStartup => _stgSearchBox.Value.ShowAtStartup;
 
     public bool ShowLastQuery => _stgSearchBox.Value.ShowLastQuery;
@@ -91,26 +100,29 @@ public partial class MainViewModel : ObservableObject
         _stgSearchBox.Value.IsStatusBarAlwaysVisible
         || Results.Count > 0;
 
+    [ObservableProperty]
+    public partial string? Suggestion { get; set; }
+
+    [ObservableProperty]
+    public partial string WindowBackdropStyle { get; set; }
+
     #endregion
 
     #region Methods
 
-    private static string GetSuggestion(Cmdline cmdline, QueryResult? selectedItem)
+    private static bool CanNavigate(Direction direction) => direction != Direction.None;
+
+    private string GetSuggestion(QueryResult? selectedItem)
     {
-        if (cmdline.IsEmpty()) { return string.Empty; }
+        if ((!selectedItem?.IsResult ?? false) || Query is null) { return string.Empty; }
 
         var name = selectedItem?.Name ?? string.Empty;
 
-        var trimmed = cmdline.Raw.TrimStart();
-        var trimmedLength = cmdline.Raw.Length - trimmed.Length;
-        var leading = cmdline.Raw[..trimmedLength];
+        var trimmed = Query.TrimStart();
+        var trimmedLength = Query.Length - trimmed.Length;
+        var leading = Query[..trimmedLength];
 
-        // The suggestion is drawn under the query: with parameters it would overlap them.
-        if (cmdline.Parameters.Any()) { return string.Empty; }
-
-        return !cmdline.Name.Contains(trimmed) || name.Contains(' ')
-            ? string.Empty
-            : leading + name;
+        return leading + name;
     }
 
     /// <summary>
@@ -173,7 +185,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanNavigate))]
     private void OnNavigate(Direction direction)
     {
         if (SelectedResult == null)
@@ -193,10 +205,8 @@ public partial class MainViewModel : ObservableObject
             _                  => currentIndex
         };
         SelectedResult = Results[index];
-        Suggestion = GetSuggestion(
-            Cmdline.Parse(Query),
-            SelectedResult
-        );
+        Suggestion = GetSuggestion(SelectedResult);
+        SendAlignParameter(Suggestion, _inputTracker.Current);
     }
 
     [RelayCommand]
@@ -209,20 +219,41 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OnSearch() => await _watchdog.Pulse();
+    private async Task OnSearch()
+    {
+        if (!_isSearchActivated) { return; }
+
+        await _watchdog.Pulse();
+    }
 
     private async Task SearchAsync()
     {
         try
         {
-            if (Query.IsNullOrWhiteSpace()) { Results.Clear(); }
+            var report = TrackCurrentQuery();
+            if (_inputTracker.IsCurrentEmpty)
+            {
+                Results.Clear();
+                return;
+            }
 
-            await _searchService.SearchAsync(Results, Query!, DoesReturnAllIfEmpty);
-            SelectedResult = Results.FirstOrDefault()!;
-            Suggestion = GetSuggestion(
-                Cmdline.Parse(Query),
-                SelectedResult
-            );
+            switch (report)
+            {
+                case TrackingReport.EnteringParameters:
+                    SendAlignParameter(Suggestion ?? string.Empty, _inputTracker.Current);
+                    break;
+
+                case TrackingReport.Deleting:
+                    WeakReferenceMessenger.Default.Send(new SetQueryMessage(_inputTracker.Current.Raw));
+
+                    goto default;
+
+                default:
+                    await _searchService.SearchAsync(Results, Query!, DoesReturnAllIfEmpty);
+                    SelectedResult = Results.FirstOrDefault()!;
+                    Suggestion = GetSuggestion(SelectedResult);
+                    break;
+            }
 
             _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
         }
@@ -232,6 +263,20 @@ public partial class MainViewModel : ObservableObject
             _userCommunicationService.GlobalNotifications.Error("An error occured while performing search.", ex);
         }
     }
+
+    /// <summary>
+    ///     Notify the UI it has to align the arguments to avoid the query
+    ///     to overlap with the suggestion
+    /// </summary>
+    private void SendAlignParameter(string suggestion, Cmdline current)
+    {
+        _isSearchActivated = false;
+        var value = new AlignParametersValue(suggestion, current);
+        WeakReferenceMessenger.Default.Send(new AlignParametersMessage(value));
+        _isSearchActivated = true;
+    }
+
+    private TrackingReport TrackCurrentQuery() => _inputTracker.Track(Query);
 
     /// <summary>
     ///     Resets the search UI by clearing both the query input and the displayed results.

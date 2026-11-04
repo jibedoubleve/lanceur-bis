@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Web.Bookmarks;
 using Bogus.Platform;
+using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
 using Lanceur.Core;
 using Lanceur.Core.Configuration.Configurations;
@@ -18,6 +19,7 @@ using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
+using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
 using Lanceur.Ui.WPF.ReservedAliases;
@@ -268,7 +270,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
     [Theory]
     [InlineData("note", "notepad")]
     [InlineData("  note", "  notepad")] // #1448: suggestion keeps the leading whitespace of the query
-    [InlineData("note params", "")] // suggestion hidden when parameters are typed
+    [InlineData("note params", "notepad")]
     public async Task When_searching_Then_suggestion_is_aligned_with_query(string query, string expected)
     {
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("notepad"));
@@ -281,6 +283,70 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 
                 // ASSERT
                 viewModel.Suggestion.ShouldBe(expected);
+            },
+            sqlBuilder
+        );
+    }
+    
+    [Fact]
+    public async Task When_searching_has_no_result_Then_no_suggestion()
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("notepad"));
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // ACT
+                viewModel.Query = "no_result_should_be_found";
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                // ASSERT
+                viewModel.Suggestion.ShouldBeEmpty();
+            },
+            sqlBuilder
+        );
+    }
+    
+    [Fact]
+    public async Task When_deleting_padding_with_backspace_Then_query_shrinks()
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("notepad"));
+        var fakeView = new object();
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // ARRANGE
+                var messenger = WeakReferenceMessenger.Default;
+                messenger.Register<SetQueryMessage>(fakeView, (_, m) => viewModel.Query = m.Value);
+                messenger.Register<AlignParametersMessage>(fakeView, (_, m) => {
+                    var typed = m.Value.Query.Name.TrimEnd();
+                    viewModel.Query = typed.PadRight(m.Value.Suggestion.Length + 1) + m.Value.Query.RawParameters;
+                });
+
+                try
+                {
+                    await TypeAsync("notepa");
+                    await TypeAsync("notepa "); // Adds two spaces to align with "notepad"
+
+                    // ACT
+                    var before = viewModel.Query!;
+                    await TypeAsync(before[..^1]);
+                    await TypeAsync(before[..^2]);
+
+                    // ASSERT
+                    viewModel.ShouldSatisfyAllConditions(
+                        vm => vm.Query.ShouldNotBeNull(),
+                        vm => vm.Query!.ShouldBe("notepa")
+                    );
+                }
+                finally { messenger.UnregisterAll(fakeView); }
+
+                return;
+
+                async Task TypeAsync(string text)
+                {
+                    viewModel.Query = text;
+                    await viewModel.SearchCommand.ExecuteAsync(null);
+                }
             },
             sqlBuilder
         );
