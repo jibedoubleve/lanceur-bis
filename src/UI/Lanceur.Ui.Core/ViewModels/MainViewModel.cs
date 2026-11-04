@@ -95,16 +95,15 @@ public partial class MainViewModel : ObservableObject
 
     #region Methods
 
-    private string GetSuggestion(QueryResult? selectedItem)
+    private static string GetSuggestion(Cmdline cmdline, QueryResult? selectedItem)
     {
-        if (Query is null) { return string.Empty; }
+        if (cmdline.IsEmpty()) { return string.Empty; }
 
         var name = selectedItem?.Name ?? string.Empty;
 
-        var trimmed = Query.TrimStart();
-        var trimmedLength = Query.Length - trimmed.Length;
-        var cmdline = Cmdline.Parse(trimmed);
-        var leading = Query[..trimmedLength];
+        var trimmed = cmdline.Raw.TrimStart();
+        var trimmedLength = cmdline.Raw.Length - trimmed.Length;
+        var leading = cmdline.Raw[..trimmedLength];
 
         // The suggestion is drawn under the query: with parameters it would overlap them.
         if (cmdline.Parameters.Any()) { return string.Empty; }
@@ -194,7 +193,10 @@ public partial class MainViewModel : ObservableObject
             _                  => currentIndex
         };
         SelectedResult = Results[index];
-        Suggestion = GetSuggestion(SelectedResult);
+        Suggestion = GetSuggestion(
+            Cmdline.Parse(Query),
+            SelectedResult
+        );
     }
 
     [RelayCommand]
@@ -217,7 +219,10 @@ public partial class MainViewModel : ObservableObject
 
             await _searchService.SearchAsync(Results, Query!, DoesReturnAllIfEmpty);
             SelectedResult = Results.FirstOrDefault()!;
-            Suggestion = GetSuggestion(SelectedResult);
+            Suggestion = GetSuggestion(
+                Cmdline.Parse(Query),
+                SelectedResult
+            );
 
             _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
         }

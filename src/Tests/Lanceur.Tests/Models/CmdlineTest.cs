@@ -159,5 +159,28 @@ public sealed class CmdlineTest
         Cmdline.Parse(cmd)
                .Name.ShouldBe(cmd.Trim());
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("hello world")]
+    [InlineData("hello                     world")]
+    [InlineData("hello")]
+    [InlineData("$ world")]
+    [InlineData("$                     world")]
+    [InlineData("$")]
+    public void When_parsing_from_text_Then_Raw_returns_the_unparsed_string(string raw)
+        => Cmdline.Parse(raw).Raw.ShouldBe(raw);
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData("hello", "world")]
+    [InlineData("hello", "")]
+    [InlineData("$", "world")]
+    [InlineData("$", "")]
+    public void When_using_cmdline_ctor(string name, string arguments)
+    {
+        var args = string.IsNullOrWhiteSpace(arguments) ? "" : $" {arguments}";
+        var expected = $"{name}{args}";
+        new Cmdline(name, arguments).Raw.ShouldBe(expected);
+    }
     #endregion
 }

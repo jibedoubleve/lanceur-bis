@@ -3,17 +3,20 @@ using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Core.Models;
 
-public record Cmdline
+public sealed record Cmdline
 {
     #region Constructors
 
-    public Cmdline(string name, string parameters = "")
+    public Cmdline(string name, string parameters = "") : this(name, parameters, null) { }
+
+    private Cmdline(string name, string parameters, string? raw)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(parameters);
 
         Name = name.Trim();
         Parameters = parameters.Trim();
+        Raw = raw ?? ToString();
 
         if (Name.Contains(' '))
         {
@@ -32,11 +35,44 @@ public record Cmdline
     public string Name { get; }
     public string Parameters { get; }
 
+    /// <summary>
+    ///     Gets the original, unparsed string this <see cref="Cmdline" /> was built from, whitespace included.
+    ///     If no raw string was provided, it is rebuilt from <see cref="Name" /> and <see cref="Parameters" />.
+    /// </summary>
+    public string Raw { get; init; }
+
     #endregion
 
     #region Methods
 
     public bool IsNullOrEmpty() => Name.IsNullOrWhiteSpace();
+
+    public static Cmdline Parse(string? cmdline)
+    {
+        var raw = cmdline ?? string.Empty;
+        var trimmed = raw.Trim();
+
+        if (CmdlineManager.HasSpecialName(trimmed))
+        {
+            return new Cmdline(
+                CmdlineManager.GetSpecialName(trimmed),
+                trimmed[1..],
+                raw
+            );
+        }
+
+        var elements = trimmed.Split(" ");
+        if (elements.Length <= 0) { return Empty; }
+
+        var name = elements[0];
+        return new Cmdline(
+            name,
+            trimmed[name.Length..],
+            raw
+        );
+    }
+
+    public override string ToString() => $"{Name} {Parameters}".Trim();
 
     /// <summary>
     ///     Implicitly converts a <see cref="Cmdline" /> object to a <see cref="string" /> by invoking its
@@ -53,30 +89,6 @@ public record Cmdline
     /// <param name="source">The string to parse into a <see cref="Cmdline" />.</param>
     /// <returns>A <see cref="Cmdline" /> parsed from <paramref name="source" />.</returns>
     public static implicit operator Cmdline(string source) => Parse(source);
-
-    public static Cmdline Parse(string? cmdline)
-    {
-        cmdline = (cmdline ?? string.Empty).Trim();
-
-        if (CmdlineManager.HasSpecialName(cmdline))
-        {
-            return new Cmdline(
-                CmdlineManager.GetSpecialName(cmdline),
-                cmdline[1..]
-            );
-        }
-
-        var elements = cmdline.Split(" ");
-        if (elements.Length <= 0) { return Empty; }
-
-        var name = elements[0];
-        return new Cmdline(
-            name,
-            cmdline[name.Length..]
-        );
-    }
-
-    public override string ToString() => $"{Name} {Parameters}".Trim();
 
     #endregion
 }
