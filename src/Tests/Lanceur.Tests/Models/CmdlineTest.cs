@@ -176,7 +176,7 @@ public sealed class CmdlineTest
     [InlineData("hello", "")]
     [InlineData("$", "world")]
     [InlineData("$", "")]
-    public void When_using_cmdline_ctor(string name, string arguments)
+    public void When_creating_from_name_and_arguments_Then_Raw_joins_them_with_a_space(string name, string arguments)
     {
         var args = string.IsNullOrWhiteSpace(arguments) ? "" : $" {arguments}";
         var expected = $"{name}{args}";

@@ -15,6 +15,7 @@ public sealed record Cmdline
         ArgumentNullException.ThrowIfNull(parameters);
 
         Name = name.Trim();
+        RawParameters = parameters.TrimStart();
         Parameters = parameters.Trim();
         Raw = raw ?? ToString();
 
@@ -33,13 +34,20 @@ public sealed record Cmdline
     public bool HasParameters => !Parameters.IsNullOrEmpty();
 
     public string Name { get; }
+
     public string Parameters { get; }
 
     /// <summary>
     ///     Gets the original, unparsed string this <see cref="Cmdline" /> was built from, whitespace included.
     ///     If no raw string was provided, it is rebuilt from <see cref="Name" /> and <see cref="Parameters" />.
     /// </summary>
-    public string Raw { get; init; }
+    public string Raw { get; }
+
+    /// <summary>
+    ///     Gets the parameters as typed, with only the leading whitespace removed.
+    ///     Unlike <see cref="Parameters" />, trailing whitespace is preserved.
+    /// </summary>
+    public string RawParameters { get; }
 
     #endregion
 
@@ -50,7 +58,7 @@ public sealed record Cmdline
     public static Cmdline Parse(string? cmdline)
     {
         var raw = cmdline ?? string.Empty;
-        var trimmed = raw.Trim();
+        var trimmed = raw.TrimStart();
 
         if (CmdlineManager.HasSpecialName(trimmed))
         {
