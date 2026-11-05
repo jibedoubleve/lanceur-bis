@@ -114,9 +114,13 @@ public partial class MainViewModel : ObservableObject
 
     private string GetSuggestion(QueryResult? selectedItem)
     {
-        if ((!selectedItem?.IsResult ?? false) || Query is null) { return string.Empty; }
+        if (Query is null 
+            || (!selectedItem?.IsResult ?? true) 
+            || !selectedItem.Name.StartsWith(Cmdline.Parse(Query).Name, StringComparison.OrdinalIgnoreCase)) 
+        { return string.Empty; }
 
-        var name = selectedItem?.Name ?? string.Empty;
+
+        var name = selectedItem.Name;
 
         var trimmed = Query.TrimStart();
         var trimmedLength = Query.Length - trimmed.Length;

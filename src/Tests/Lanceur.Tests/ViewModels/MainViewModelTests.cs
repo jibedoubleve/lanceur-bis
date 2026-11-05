@@ -1,14 +1,18 @@
 using System.Reflection;
+using System.Runtime.Intrinsics.X86;
 using System.Web.Bookmarks;
 using Bogus.Platform;
 using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
 using Lanceur.Core;
+using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
+using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
+using Lanceur.Core.Stores;
 using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
@@ -428,5 +432,57 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
     }
 
+    [Fact]
+    public async Task When_query_does_not_start_with_result_name_Then_no_suggestion()
+    {
+        // arrange 
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            AddServices = sc => sc.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IStoreService, MismatchedNameStore>()
+            )
+        };
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // act
+                viewModel.Query = "magic query";
+                await viewModel.SearchCommand.ExecuteAsync(null);
+                
+                // assert
+                viewModel.ShouldSatisfyAllConditions(
+                    vm => vm.Results.ShouldNotBeEmpty(),
+                    vm => vm.SelectedResult.ShouldNotBeNull(),
+                    vm => vm.SelectedResult?.Name.ShouldBe("alias_1"),
+                    vm => vm.Suggestion.ShouldBeNullOrEmpty()
+                );
+            },
+            visitors: visitors
+        );
+    }
+
+    [Store("&")]
+    internal class MismatchedNameStore : IStoreService
+    {
+        #region Properties
+
+        public bool IsOverridable => false;
+        public StoreOrchestration Orchestration => new StoreOrchestrationFactory().SharedAlwaysActive();
+
+        #endregion
+
+        #region Methods
+
+        public bool CanPruneResult(Cmdline previous, Cmdline current) => false;
+        public IEnumerable<QueryResult> GetAll() => [];
+        public int PruneResult(IList<QueryResult> destination, Cmdline previous, Cmdline current) => throw new NotImplementedException();
+
+        public IEnumerable<QueryResult> Search(Cmdline cmdline) =>
+        [
+            new AliasQueryResult { Name = "alias_1" }
+        ];
+
+        #endregion
+    }
     #endregion
 }
