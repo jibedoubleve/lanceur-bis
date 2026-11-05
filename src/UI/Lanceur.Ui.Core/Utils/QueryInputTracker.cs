@@ -50,7 +50,8 @@ public sealed class QueryInputTracker
             return current.Raw.Length < previous.Raw.Length;
         }
 
-        // Backspace on a whitespace: the query is the previous one minus trailing whitespace only.
+        // if current is included in previous ("abc" is included in "abcd") they are the
+        // same if they only differs by trailing white spaces
         static bool IsDeletingTrailingWhitespace(string current, string previous)
         {
             if (current.Length >= previous.Length) { return false; }

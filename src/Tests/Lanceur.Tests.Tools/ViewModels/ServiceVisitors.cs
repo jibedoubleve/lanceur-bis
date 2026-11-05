@@ -3,6 +3,7 @@ using Lanceur.Core.Utils;
 using Lanceur.Infra.Repositories;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Tests.Tools.ViewModels;
 
@@ -13,6 +14,8 @@ namespace Lanceur.Tests.Tools.ViewModels;
 public sealed class ServiceVisitors
 {
     #region Properties
+
+    public Action<IServiceCollection>? AddServices { get; init; }
 
     public IConnectionString? OverridenConnectionString { get; init; }
 
@@ -37,7 +40,7 @@ public sealed class ServiceVisitors
 
     public Func<IServiceProvider, IViewFactory, IViewFactory>? VisitViewFactory { get; init; }
 
-    public IWatchdogBuilder? WatchdogBuilder { get; set; }
+    public IWatchdogBuilder? WatchdogBuilder { get; init; }
 
     #endregion
 }
