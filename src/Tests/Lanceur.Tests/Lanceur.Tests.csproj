@@ -6,12 +6,6 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Remove="UI\**"/>
-        <Compile Include="Ui\ConverterTest.cs"/>
-        <EmbeddedResource Remove="UI\**"/>
-        <None Remove="UI\**"/>
-    </ItemGroup>
-    <ItemGroup>
         <EmbeddedResource Include="Libraries\Scripts\invalid_script.sql"/>
         <EmbeddedResource Include="Libraries\Scripts\script-0.2.1.sql"/>
         <EmbeddedResource Include="Libraries\Scripts\script-0.2.sql"/>

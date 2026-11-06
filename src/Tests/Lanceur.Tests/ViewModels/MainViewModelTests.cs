@@ -484,5 +484,35 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 
         #endregion
     }
+
+    [Theory]
+    [InlineData(true, 4)]
+    [InlineData(false, 0)]
+    public async Task When_query_is_emptied_Then_results_follow_ShowResult_setting(bool showResult, int expectedCount)
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias_1"))
+                                         .AppendAlias(a => a.WithSynonyms("alias_2"))
+                                         .AppendAlias(a => a.WithSynonyms("alias_3"))
+                                         .AppendAlias(a => a.WithSynonyms("alias_4"));
+        var visitors = new ServiceVisitors
+        {
+            OverridenConnectionString = ConnectionStringFactory.InDesktop,
+            VisitApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showResult
+        };
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                viewModel.Query = "alias_";
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                viewModel.Query = string.Empty;
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                viewModel.Results.Count(r => r.Name.StartsWith("alias_")).ShouldBe(expectedCount);
+            },
+            sqlBuilder,
+            visitors
+        );
+    }
+
     #endregion
 }

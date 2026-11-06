@@ -38,7 +38,7 @@ public sealed class SearchBoxSection
 
     /// <summary>
     ///     Gets or sets a value indicating whether search results are shown immediately when the search window is displayed.
-    ///     If set to <c>true</c>, all results are displayed immediately, which may impact performance.
+    ///     If set to <c>true</c>, all results are displayed immediately.
     ///     If set to <c>false</c>, no results are shown until a search is executed.
     /// </summary>
     public bool ShowResult { get; set; }
