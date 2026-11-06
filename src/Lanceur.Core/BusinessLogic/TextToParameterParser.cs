@@ -31,7 +31,7 @@ public sealed class TextToParameterParser
             return false;
         }
 
-        parameter = new AdditionalParameter { Name = parts[0].Trim(), Parameter = parts[1].Trim() };
+        parameter = new AdditionalParameter { Name = parts[0], Parameter = parts[1] };
         return true;
     }
 

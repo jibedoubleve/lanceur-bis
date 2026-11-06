@@ -20,10 +20,10 @@ public partial class KeywordsViewModel : ObservableObject
 {
     #region Fields
 
-    [ObservableProperty] private ObservableCollection<AliasQueryResult> _aliases = [];
     private readonly IAliasManagementService _aliasManagementService;
+
     private List<AliasQueryResult> _cachedAliases = [];
-    [ObservableProperty] private string _criterion = string.Empty;
+
     private readonly IUserCommunicationService _hubService;
     private readonly ILogger<KeywordsViewModel> _logger;
     private readonly IPackagedAppSearchService _packagedAppSearchService;
@@ -80,11 +80,11 @@ public partial class KeywordsViewModel : ObservableObject
                     if (!confirmed) { return; }
 
                     await viewModel.SaveAliasAsync(m.Value);
-                    _logger.LogInformation("Update alias {Name}", m.Value.Name ?? "<EMPTY>");
+                    _logger.LogInformation("Update alias {Name}", m.Value.Name);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to save current alias {Name}", m.Value.Name ?? "<EMPTY>");
+                    _logger.LogError(ex, "Failed to save current alias {Name}", m.Value.Name);
                     _hubService.Notifications.Warning($"Failed to save current alias '{m.Value.Name}'");
                 }
             }
@@ -95,6 +95,12 @@ public partial class KeywordsViewModel : ObservableObject
 
     #region Properties
 
+    [ObservableProperty]
+    public partial ObservableCollection<AliasQueryResult> Aliases { get; set; } = [];
+
+    [ObservableProperty]
+    public partial string Criterion { get; set; } = string.Empty;
+
     public AliasQueryResult? SelectedAlias
     {
         get => _selectedAlias;
@@ -102,7 +108,7 @@ public partial class KeywordsViewModel : ObservableObject
         {
             if (_selectedAlias?.IsDirty ?? false)
             {
-                WeakReferenceMessenger.Default.Send<SaveAliasMessage>(new SaveAliasMessage(SelectedAlias!));
+                WeakReferenceMessenger.Default.Send(new SaveAliasMessage(SelectedAlias!));
             }
 
             value?.MarkUnchanged(); // Newly selected means no changed to be saved...
@@ -274,7 +280,7 @@ public partial class KeywordsViewModel : ObservableObject
         );
         if (!result) { return; }
 
-        var param = SelectedAlias?.AdditionalParameters?.SingleOrDefault(x => x.Id == parameter.Id);
+        var param = SelectedAlias?.AdditionalParameters.SingleOrDefault(x => x.Id == parameter.Id);
         if (param is null)
         {
             _logger.LogWarning("Parameter to update is not found in current alias.");
