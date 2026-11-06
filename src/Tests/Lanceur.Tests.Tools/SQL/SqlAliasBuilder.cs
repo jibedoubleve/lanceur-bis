@@ -70,12 +70,14 @@ public sealed class SqlAliasBuilder : SqlBuilderBase
         return this;
     }
 
-    public SqlAliasBuilder WithDeletedAt(DateTime date)
+    public SqlAliasBuilder WithDeletedAt(DateTime? date)
     {
+        if (date is null) { return this;}
+        
         const string sql = "update alias set deleted_at = '{0}' where id = {1};";
         Sql.AppendLine(
             sql.Format(
-                date.ToString("o", CultureInfo.InvariantCulture),
+                date.Value.ToString("o", CultureInfo.InvariantCulture),
                 _idAlias
             )
         );
@@ -90,10 +92,10 @@ public sealed class SqlAliasBuilder : SqlBuilderBase
         return this;
     }
 
-    public SqlAliasBuilder WithHiddenFlag()
+    public SqlAliasBuilder WithHiddenFlag(bool isHidden = true)
     {
         const string sql = "update alias set  hidden = {1} where id = {0};";
-        Sql.AppendLine(sql.Format(_idAlias, 1));
+        Sql.AppendLine(sql.Format(_idAlias, isHidden ? 1 : 0));
         return this;
     }
 

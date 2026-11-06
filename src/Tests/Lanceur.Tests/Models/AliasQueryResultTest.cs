@@ -41,5 +41,26 @@ public sealed class AliasQueryResultTest
         alias.FileName.ShouldBe(expected);
     }
 
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("a", "a")]
+    [InlineData("a, b", "a,b")]
+    [InlineData(" a , b ", "a,b")]
+    [InlineData("a,,b,", "a,b")]
+    [InlineData("a b", "a,b")]
+    [InlineData("a  b", "a,b")]
+    [InlineData("a, b c", "a,b,c")]
+    public void When_sanitize_Synonyms_Then_commas_and_spaces_split_names(string? synonyms, string? expected)
+    {
+        // ARRANGE
+        var alias = new AliasQueryResult { Synonyms = synonyms };
+
+        // ACT
+        alias.SanitizeSynonyms();
+
+        // ASSERT
+        alias.Synonyms.ShouldBe(expected);
+    }
+
     #endregion
 }

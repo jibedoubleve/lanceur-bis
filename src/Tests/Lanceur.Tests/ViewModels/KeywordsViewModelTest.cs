@@ -303,6 +303,27 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
     }
 
     [Theory]
+    [InlineData("a b")]
+    [InlineData("a, b")]
+    [InlineData("a,b")]
+    public async Task When_creating_alias_with_space_or_comma_separated_names_Then_each_name_is_a_synonym(string names)
+    {
+        await TestViewModelAsync(
+            async (viewModel, db) => {
+                // ACT
+                await viewModel.CreateNewAlias(names, "SomeFileName");
+
+                // ASSERT
+                const string sql = "select name from alias_name";
+                var synonyms = db.WithConnection(c => c.Query<string>(sql)).ToArray();
+
+                synonyms.ShouldBe(["a", "b"], ignoreOrder: true);
+            },
+            Sql.Empty
+        );
+    }
+
+    [Theory]
     [MemberData(nameof(FeedAdditionalParametersWithEmptyTrailingLine))]
     public async Task When_creating_multiple_parameters_with_empty_trailing_line_Then_no_error_raised(
         string additionalParameters)
