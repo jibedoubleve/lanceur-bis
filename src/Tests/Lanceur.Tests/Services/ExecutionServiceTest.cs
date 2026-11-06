@@ -7,7 +7,6 @@ using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
-using Lanceur.Infra.Wildcards;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
@@ -38,9 +37,8 @@ public sealed class ExecutionServiceTest : TestBase
     {
         var executionService = new ExecutionService(
             LoggerFactory,
-            new ReplacementComposite(
-                clipboardService ?? Substitute.For<IClipboardService>(),
-                LoggerFactory.CreateLogger<ReplacementComposite>()
+            new WildcardService(
+                clipboardService ?? Substitute.For<IClipboardService>()
             ),
             Substitute.For<IAliasRepository>(),
             new LuaManager(
@@ -51,6 +49,31 @@ public sealed class ExecutionServiceTest : TestBase
             Substitute.For<IUserGlobalNotificationService>()
         );
         return executionService;
+    }
+
+    [Theory]
+    [InlineData("ini", "thb@joplin@spotify")]
+    public async Task When_executing_MultiMacro_Then_no_error(string cmd, string parameters)
+    {
+        var cmdline = new Cmdline(cmd, parameters);
+        var executionService = CreateExecutionService();
+
+        var sp = new ServiceCollection()
+                 .AddMockSingleton<IExecutionService>()
+                 .AddMockSingleton<ISearchService>()
+                 .AddMacros()
+                 .AddLoggingForTests(OutputHelper)
+                 .BuildServiceProvider();
+
+        var macro = new MultiMacro(
+            sp.GetService<IExecutionService>()!,
+            sp.GetService<Lazy<ISearchService>>()!,
+            sp.GetService<ILogger<MultiMacro>>()!
+        );
+        var request = new ExecutionRequest(macro, cmdline);
+
+        try { await executionService.ExecuteAsync(request); }
+        catch (Exception) { Assert.Fail("This should not throw an exception"); }
     }
 
     [Fact]
@@ -177,6 +200,48 @@ public sealed class ExecutionServiceTest : TestBase
     }
 
     [Theory]
+    [InlineData(null, "updated-12")]
+    [InlineData("", "updated-12")]
+    [InlineData("-c aa", "-c aa updated-12")]
+    public async Task When_executing_lua_script_without_wildcard_Then_updated_parameters_are_appended(
+        string? aliasParameters,
+        string expected
+    )
+    {
+        // arrange
+        const string script = """
+                              if tonumber(context.Parameters) ~= nil then
+                                  context.Parameters = "updated-" .. context.Parameters
+                              end
+
+                              return context
+                              """;
+        var cmdline = Cmdline.Parse("alias 12");
+        var processLauncher = Substitute.For<IProcessLauncher>();
+        var executionService = CreateExecutionService(processLauncher);
+
+        var request = new ExecutionRequest(
+            new AliasQueryResult
+            {
+                FileName = "alias",
+                LuaScript = script,
+                OriginatingQuery = cmdline,
+                Parameters = aliasParameters! // Null should be handled anyway
+            },
+            cmdline
+        );
+
+        // act
+        await executionService.ExecuteAsync(request);
+
+        // assert
+        processLauncher.Received()
+                       .Start(
+                           Arg.Is<ProcessContext>(psi => psi.Arguments == expected)
+                       );
+    }
+
+    [Theory]
     [InlineData("issue", "with some text as parameters")]
     public async Task When_executing_macro_with_parameters_Then_parameters_are_used(string cmd, string parameters)
     {
@@ -200,9 +265,8 @@ public sealed class ExecutionServiceTest : TestBase
                                         )
                                         .AddMockSingleton<IAliasRepository>()
                                         .AddMockSingleton<ILuaManager>()
-                                        .AddSingleton<IWildcardService, ReplacementComposite>()
+                                        .AddSingleton<IWildcardService, WildcardService>()
                                         .AddSingleton<IExecutionService, ExecutionService>()
-                                        .AddSingleton<ReplacementComposite>()
                                         .AddMockSingleton<IClipboardService>()
                                         .AddTransient<IProcessLauncher, ProcessLauncherWin32>()
                                         .AddSingleton(githubService)
@@ -219,14 +283,13 @@ public sealed class ExecutionServiceTest : TestBase
 
         // ACT
         await executionService.ExecuteAsync(request);
-        
+
         // ASSERT
         await githubService.Received()
                            .CreateIssueAsync(
                                Arg.Is<string>(s => string.Equals(s, parameters)),
                                Arg.Any<string>()
                            );
-
     }
 
     [Theory]
@@ -250,37 +313,19 @@ public sealed class ExecutionServiceTest : TestBase
     }
 
     [Theory]
-    [InlineData("ini", "thb@joplin@spotify")]
-    public async Task When_executing_MultiMacro_Then_no_error(string cmd, string parameters)
-    {
-        var cmdline = new Cmdline(cmd, parameters);
-        var executionService = CreateExecutionService();
-
-        var sp = new ServiceCollection()
-                 .AddMockSingleton<IExecutionService>()
-                 .AddMockSingleton<ISearchService>()
-                 .AddMacros()
-                 .AddLoggingForTests(OutputHelper)
-                 .BuildServiceProvider();
-
-        var macro = new MultiMacro(
-            sp.GetService<IExecutionService>()!,
-            sp.GetService<Lazy<ISearchService>>()!,
-            sp.GetService<ILogger<MultiMacro>>()!
-        );
-        var request = new ExecutionRequest(macro, cmdline);
-
-        try { await executionService.ExecuteAsync(request); }
-        catch (Exception) { Assert.Fail("This should not throw an exception"); }
-    }
-
-    [Theory]
-    [InlineData("application.exe", "-c aa -b bb", "app")]
-    [InlineData("application.exe", "-c aa -b bb", "app undeux trois")]
+    [InlineData("application.exe",
+        "-c aa -b bb",
+        "app",
+        "-c aa -b bb")]
+    [InlineData("application.exe",
+        "-c aa -b bb",
+        "app undeux trois",
+        "-c aa -b bb undeux trois")]
     public async Task When_not_using_replacements_for_Parameters_Then_no_replacement_occured(
         string fileName,
         string parameters,
-        string originatingQuery
+        string originatingQuery,
+        string expected
     )
     {
         // arrange
@@ -306,7 +351,7 @@ public sealed class ExecutionServiceTest : TestBase
         // assert
         Assert.Multiple(
             () => outputFileName.ShouldBe(fileName),
-            () => outputParameters.ShouldBe(parameters)
+            () => outputParameters.ShouldBe(expected)
         );
     }
 

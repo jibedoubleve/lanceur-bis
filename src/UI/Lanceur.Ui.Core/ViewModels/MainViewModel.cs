@@ -116,7 +116,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (Query is null
             || (!selectedItem?.IsResult ?? true)
-            || !selectedItem.Name.StartsWith(Cmdline.Parse(Query).Name, StringComparison.OrdinalIgnoreCase))
+            || !selectedItem!.Name.StartsWith(Cmdline.Parse(Query).Name, StringComparison.OrdinalIgnoreCase))
         {
             return string.Empty;
         }

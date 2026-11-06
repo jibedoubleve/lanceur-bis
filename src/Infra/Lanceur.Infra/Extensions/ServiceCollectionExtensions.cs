@@ -2,13 +2,11 @@ using System.Web.Bookmarks;
 using System.Web.Bookmarks.Factories;
 using Everything.Wrapper;
 using Lanceur.Core.LuaScripting;
-using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.LuaScripting;
 using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
-using Lanceur.Infra.Wildcards;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lanceur.Infra.Extensions;
@@ -25,11 +23,11 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IFavIconService, FavIconService>()
                          .AddSingleton<IFavIconDownloader, FavIconDownloader>()
                          .AddTransient<IExecutionService, ExecutionService>()
-                         .AddTransient<IWildcardService, ReplacementComposite>()
                          .AddTransient<IReconciliationService, ReconciliationService>()
                          .AddTransient<IFeatureFlagService, FeatureFlagService>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
                          .AddSingleton<ILuaManager, LuaManager>()
+                         .AddTransient<IWildcardService, WildcardService>()
                          .AddTransient<IStoreShortcutService, StoreShortcutService>()
                          .AddSingleton<IFavIconHttpClient, FavIconHttpClient>()
                          .AddTransient<IEverythingApi, EverythingApi>()
