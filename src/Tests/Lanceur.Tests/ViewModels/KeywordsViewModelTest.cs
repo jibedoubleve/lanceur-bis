@@ -35,7 +35,7 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors? visitors
+        ServiceHooks? hooks
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
@@ -45,16 +45,16 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                          .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IPackagedAppSearchService>()
                          .AddMockSingleton<IThumbnailService>()
-                         .AddMockSingleton<IViewFactory>((sp, i) => visitors?.VisitViewFactory?.Invoke(sp, i) ?? i
+                         .AddMockSingleton<IViewFactory>((sp, i) => hooks?.InterceptViewFactory?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IUserDialogueService>((sp, i)
-                             => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptUserInteractionService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IUserNotificationService>((sp, i)
-                             => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptUserNotificationService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IProcessLauncher>((sp, i)
-                             => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptProcessLauncher?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddSingleton<IWatchdogBuilder, TestWatchdogBuilder>()
@@ -91,9 +91,9 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
     [Fact]
     public async Task When_soft_deleting_alias_Then_it_is_not_anymore_in_search_results()
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 // Configured to say yes when it'll be asked to delete the alias
                 i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
@@ -134,17 +134,17 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                 );
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
     [Fact]
     public async Task When_crating_new_alias_with_additional_parameters_Then_additional_parameters_are_in_db()
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 var parameter = new AdditionalParameter { Name = "SomeTestName", Parameter = "SomeParameter" };
                 i.InteractAsync(
                      Arg.Any<object>(),
@@ -173,7 +173,7 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                 count.ShouldBe(1);
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
@@ -246,13 +246,13 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
     public async Task When_creating_alias_with_name_of_soft_deleted_alias_Then_creation_is_impossible()
     {
         IUserNotificationService userNotificationService = null!;
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitUserNotificationService = (_, i) => {
+            InterceptUserNotificationService = (_, i) => {
                 userNotificationService = i;
                 return i;
             },
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 // Configured to say yes when it'll be asked to delete the alias
                 i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
@@ -298,7 +298,7 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                 );
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
@@ -308,10 +308,10 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
         string additionalParameters)
     {
         var sqlBuilder = Sql.Empty;
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 var parameter = new MultipleAdditionalParameterViewModel { RawParameters = additionalParameters };
                 i.InteractAsync(
                      Arg.Any<object>(),
@@ -340,7 +340,7 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                 count.ShouldBe(2);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -355,7 +355,7 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                                                          .WithArguments("params deux")
                                                          .WithSynonyms("trois")
                                       );
-        var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var hooks = new ServiceHooks { OverridenConnectionString = ConnectionStringFactory.InMemory };
         await TestViewModelAsync(
             async (viewModel, _) => {
                 await viewModel.LoadAliasesCommand.ExecuteAsync(null);
@@ -365,7 +365,7 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                 viewModel.Aliases.Count.ShouldBe(2);
             },
             builder,
-            visitor
+            hooks
         );
     }
 
@@ -400,9 +400,9 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
     [InlineData(2)]
     public async Task When_soft_deleting_alias_Then_cache_is_refreshed(int countToAdd)
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 // Configured to say yes when it'll be asked to delete the alias
                 i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
@@ -425,16 +425,16 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                 viewModel.Aliases.Count.ShouldBe(countToAdd - 1, "because the alias has been deleted logically");
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
     [Fact]
     public async Task When_tying_to_save_without_filename_or_no_uwp_app_selected_Then_no_save_executed()
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 // Configured to say yes when it'll be asked to delete the alias
                 i.InteractAsync(
                      Arg.Any<object>(),
@@ -463,7 +463,7 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                   .ShouldBe(0);
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 

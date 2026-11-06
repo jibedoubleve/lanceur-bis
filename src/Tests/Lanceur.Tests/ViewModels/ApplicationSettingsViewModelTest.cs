@@ -32,7 +32,7 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors? visitors
+        ServiceHooks? hooks
     )
     {
         serviceCollection.AddMockSingleton<IAppRestartService>()
@@ -40,13 +40,13 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
                          .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
                          .AddMockSingleton<IViewFactory>()
                          .AddMockSingleton<IUserGlobalNotificationService>((sp, i)
-                             => visitors?.VisitGlobalUserInteractionService?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptGlobalUserInteractionService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IUserDialogueService>((sp, i)
-                             => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptUserInteractionService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IUserNotificationService>((sp, i)
-                             => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptUserNotificationService?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>();
         return serviceCollection;
@@ -56,10 +56,10 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
     public void When_db_path_changes_Then_restart_is_requested()
     {
         IUserGlobalNotificationService userInteractionService = null!;
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitGlobalUserInteractionService = (_, i) => {
+            InterceptGlobalUserInteractionService = (_, i) => {
                 userInteractionService = i;
                 return i;
             }
@@ -74,7 +74,7 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
                                       .AskRestart();
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
@@ -82,10 +82,10 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
     public void When_shortcut_changes_Then_restart_is_requested_for_each_change()
     {
         IUserGlobalNotificationService userInteractionService = null!;
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitGlobalUserInteractionService = (_, i) => {
+            InterceptGlobalUserInteractionService = (_, i) => {
                 userInteractionService = i;
                 return i;
             }
@@ -106,7 +106,7 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
                                       .AskRestart();
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
@@ -148,7 +148,7 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
                                          }
                                      }
                                      """;
-        var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var hooks = new ServiceHooks { OverridenConnectionString = ConnectionStringFactory.InMemory };
         TestViewModel(
             (viewModel, db) => {
                 // arrange
@@ -173,7 +173,7 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
                 Assert.All(results, e => e.ShouldBe(shortcut));
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 

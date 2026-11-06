@@ -158,11 +158,11 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors? visitors
+        ServiceHooks? hooks
     )
     {
         serviceCollection.AddMockSingleton<IViewFactory>((sp, i)
-                             => visitors?.VisitViewFactory?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptViewFactory?.Invoke(sp, i) ?? i
                          )
                          .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
                          .AddMockSingleton<ISettingsProvider<ApplicationSettings>>()
@@ -173,10 +173,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IUserDialogueService>((sp, i)
-                             => visitors?.VisitUserInteractionService?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptUserInteractionService?.Invoke(sp, i) ?? i
                          )
                          .AddMockSingleton<IUserNotificationService>((sp, i)
-                             => visitors?.VisitUserNotificationService?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptUserNotificationService?.Invoke(sp, i) ?? i
                          );
 
         return serviceCollection;
@@ -185,9 +185,9 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     [Fact]
     public async Task When_canceling_permanent_deletion_Then_nothing_is_deleted()
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(false);
                 return i;
@@ -235,7 +235,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 );
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -247,10 +247,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     public async Task When_changing_inactivity_threshold_Then_search_does_not_select_inactive_aliases(
         string filter, int count)
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.AskUserYesNoAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -260,7 +260,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                  .Returns(true);
                 return i;
             },
-            VisitApplicationSettingsProvider = settings => settings.Value.Reconciliation.InactivityThreshold = 2
+            InterceptApplicationSettingsProvider = settings => settings.Value.Reconciliation.InactivityThreshold = 2
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -281,7 +281,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(count);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -293,10 +293,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     public async Task When_changing_rarely_used_threshold_Then_search_does_not_select_inactive_aliases(
         string filter, int count)
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.AskUserYesNoAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -306,7 +306,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                  .Returns(true);
                 return i;
             },
-            VisitApplicationSettingsProvider = settings => settings.Value.Reconciliation.LowUsageThreshold = 10
+            InterceptApplicationSettingsProvider = settings => settings.Value.Reconciliation.LowUsageThreshold = 10
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -336,7 +336,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(count);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -346,7 +346,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         string description, int expectedCount, SqlBuilder sqlBuilder)
     {
         OutputHelper.WriteLine($"Test description: {description}");
-        var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var hooks = new ServiceHooks { OverridenConnectionString = ConnectionStringFactory.InMemory };
 
         await TestViewModelAsync(
             async (viewModel, _) => {
@@ -354,7 +354,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(expectedCount);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -363,11 +363,11 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     {
         MemoryApplicationSettingsProvider? capturedProvider = null;
 
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitApplicationSettingsProvider = provider => capturedProvider = provider,
-            VisitViewFactory = (_, _) => new ReportConfigurationStubViewFactory(),
-            VisitUserInteractionService = (_, i) => {
+            InterceptApplicationSettingsProvider = provider => capturedProvider = provider,
+            InterceptViewFactory = (_, _) => new ReportConfigurationStubViewFactory(),
+            InterceptUserInteractionService = (_, i) => {
                 i.AskUserYesNoAsync(
                     Arg.Any<object>(),
                     Arg.Any<string>(),
@@ -393,7 +393,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                                  .ShouldBeFalse("new configuration returned by the dialog must be persisted");
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
@@ -402,11 +402,11 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     {
         MemoryApplicationSettingsProvider? capturedProvider = null;
 
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitApplicationSettingsProvider = provider => capturedProvider = provider,
-            VisitViewFactory = (_, _) => new ReportConfigurationMutatingStubViewFactory(),
-            VisitUserInteractionService = (_, i) => {
+            InterceptApplicationSettingsProvider = provider => capturedProvider = provider,
+            InterceptViewFactory = (_, _) => new ReportConfigurationMutatingStubViewFactory(),
+            InterceptUserInteractionService = (_, i) => {
                 i.AskUserYesNoAsync(
                     Arg.Any<object>(),
                     Arg.Any<string>(),
@@ -428,16 +428,16 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                                  .ShouldBeTrue("cancelling the dialog must not mutate the in-memory configuration");
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
     [Fact]
     public async Task When_delete_permanently_alias_Then_all_correlated_data_is_deleted()
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.AskUserYesNoAsync(Arg.Any<object>())
                  .Returns(true);
                 return i;
@@ -485,7 +485,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 );
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -544,10 +544,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     [Fact]
     public async Task When_filer_rarely_used_aliases_Then_filter_works_as_expected()
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.AskUserYesNoAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -557,7 +557,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                  .Returns(true);
                 return i;
             },
-            VisitApplicationSettingsProvider = settings => settings.Value.Reconciliation.LowUsageThreshold = 3
+            InterceptApplicationSettingsProvider = settings => settings.Value.Reconciliation.LowUsageThreshold = 3
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -595,7 +595,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(1);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -614,10 +614,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     [Fact]
     public async Task When_merged_alias_Then_no_soft_deleted_aliases_correlated_to_the_merge_is_found()
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.InteractAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -661,7 +661,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 db.WithConnection(c => c.ExecuteScalar(sql)).ShouldBe(0, "merging should undelete alias");
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -673,10 +673,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         var now = DateTime.Now;
         var timeOffset = 0;
 
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.InteractAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -740,7 +740,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 );
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -748,10 +748,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
     [ClassData(typeof(DoubloonGenerator))]
     public async Task When_merged_aliases_Then_only_one_is_found(ISqlBuilder sqlBuilder)
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.InteractAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -776,7 +776,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(0);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -786,10 +786,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         string description, int doubloons, SqlBuilder sqlBuilder)
     {
         OutputHelper.WriteLine($"Test description: {description}");
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.InteractAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -807,7 +807,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(doubloons);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -819,10 +819,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
         var todayDate = today.ToDateTime(TimeOnly.MinValue);
         var lastUsageDate = lastUsage.ToDateTime(TimeOnly.MinValue);
 
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.AskUserYesNoAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -832,7 +832,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                  .Returns(true);
                 return i;
             },
-            VisitApplicationSettingsProvider = settings => settings.Value.Reconciliation.InactivityThreshold = 1
+            InterceptApplicationSettingsProvider = settings => settings.Value.Reconciliation.InactivityThreshold = 1
         };
         var sqlBuilder = new SqlBuilder()
                          .AppendAlias(a => a.WithSynonyms("A")
@@ -869,14 +869,14 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(1);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
     [Fact]
     public async Task When_searching_doubloons_Then_doubloons_are_showed()
     {
-        var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var hooks = new ServiceHooks { OverridenConnectionString = ConnectionStringFactory.InMemory };
         var fileName = Any.String(10);
         var arguments = Any.String(10);
 
@@ -919,17 +919,17 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(3);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
     [Fact]
     public async Task When_searching_doubloons_Then_they_can_be_found()
     {
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitUserInteractionService = (_, i) => {
+            InterceptUserInteractionService = (_, i) => {
                 i.InteractAsync(
                      Arg.Any<object>(),
                      Arg.Any<string>(),
@@ -964,7 +964,7 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
                 viewModel.Aliases.Count.ShouldBe(2);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 

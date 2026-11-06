@@ -27,14 +27,14 @@ public abstract class ViewModelTester<TViewModel> : TestBase
 
     private DbSingleConnectionManager ConfigureServices(
         ISqlBuilder? sqlBuilder,
-        ServiceVisitors? visitors,
+        ServiceHooks? hooks,
         out TViewModel viewModel
     )
     {
         DbSingleConnectionManager? connectionManager = null;
         try
         {
-            var connectionString = visitors?.OverridenConnectionString ?? ConnectionStringFactory.InMemory;
+            var connectionString = hooks?.OverridenConnectionString ?? ConnectionStringFactory.InMemory;
             connectionManager = GetConnectionManager(sqlBuilder ?? Sql.Empty, connectionString.ToString());
 
             var serviceCollection = new ServiceCollection().AddSingleton<TViewModel>()
@@ -43,7 +43,7 @@ public abstract class ViewModelTester<TViewModel> : TestBase
                                                            .AddMockSingleton<IUserGlobalNotificationService>()
                                                            .AddMockSingleton<IStoreShortcutService>()
                                                            .AddMockConfigurationSections(
-                                                               visitors?.VisitApplicationSettingsProvider)
+                                                               hooks?.InterceptApplicationSettingsProvider)
                                                            .AddLogging(builder =>
                                                                builder.AddXUnit(OutputHelper)
                                                                       .SetMinimumLevel(LogLevel.Trace)
@@ -51,9 +51,9 @@ public abstract class ViewModelTester<TViewModel> : TestBase
                                                            .AddReservedAliases(typeof(AddAlias))
                                                            .AddDatabase(connectionManager);
 
-            visitors?.AddServices?.Invoke(serviceCollection);
+            hooks?.OverridenServices?.Invoke(serviceCollection);
 
-            var serviceProvider = ConfigureServices(serviceCollection, visitors).BuildServiceProvider();
+            var serviceProvider = ConfigureServices(serviceCollection, hooks).BuildServiceProvider();
             viewModel = serviceProvider.GetService<TViewModel>()!;
             return connectionManager;
         }
@@ -66,26 +66,26 @@ public abstract class ViewModelTester<TViewModel> : TestBase
 
     protected abstract IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors? visitors
+        ServiceHooks? hooks
     );
 
     protected void TestViewModel(
         Action<TViewModel, IDbConnectionManager> scope,
         ISqlBuilder? sqlBuilder = null,
-        ServiceVisitors? visitors = null
+        ServiceHooks? Hooks = null
     )
     {
-        using var connectionManager = ConfigureServices(sqlBuilder, visitors, out var viewModel);
+        using var connectionManager = ConfigureServices(sqlBuilder, Hooks, out var viewModel);
         scope(viewModel, connectionManager);
     }
 
     protected async Task TestViewModelAsync(
         Func<TViewModel, IDbConnectionManager, Task> scope,
         ISqlBuilder? sqlBuilder = null,
-        ServiceVisitors? visitors = null
+        ServiceHooks? hooks = null
     )
     {
-        using var connectionManager = ConfigureServices(sqlBuilder, visitors, out var viewModel);
+        using var connectionManager = ConfigureServices(sqlBuilder, hooks, out var viewModel);
         await scope(viewModel, connectionManager);
     }
 

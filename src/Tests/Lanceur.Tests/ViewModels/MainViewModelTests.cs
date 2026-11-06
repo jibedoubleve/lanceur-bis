@@ -60,7 +60,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors? visitors
+        ServiceHooks? hooks
     )
     {
         serviceCollection.AddSingleton<IStoreOrchestrationFactory>(new StoreOrchestrationFactory())
@@ -87,9 +87,9 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                          .AddMockSingleton<ILuaManager>()
                          .AddMockSingleton<IClipboardService>()
                          .AddMockSingleton<IProcessLauncher>((sp, i)
-                             => visitors?.VisitProcessLauncher?.Invoke(sp, i) ?? i
+                             => hooks?.InterceptProcessLauncher?.Invoke(sp, i) ?? i
                          )
-                         .AddSingleton<IWatchdogBuilder>(_ => visitors?.WatchdogBuilder ?? new TestWatchdogBuilder())
+                         .AddSingleton<IWatchdogBuilder>(_ => hooks?.OverridenWatchdogBuilder ?? new TestWatchdogBuilder())
                          .AddSingleton<IExecutionService, ExecutionService>();
 
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
@@ -106,7 +106,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
     {
         MemoryApplicationSettingsProvider config = null!;
 
-        var visitors = new ServiceVisitors { VisitApplicationSettingsProvider = c => config = c };
+        var hooks = new ServiceHooks { InterceptApplicationSettingsProvider = c => config = c };
         TestViewModel(
             (viewModel, _) => {
                 Assert.All(
@@ -118,7 +118,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                 );
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
@@ -131,9 +131,9 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                                          .AppendAlias(a => a.WithSynonyms("alias2", "alias_2"))
                                          .AppendAlias(a => a.WithSynonyms("alias3", "alias_3"));
 
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showAllResults
+            InterceptApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showAllResults
         };
         await TestViewModelAsync(
             async (viewModel, _) => {
@@ -144,7 +144,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                 showAllResults.ShouldBe(viewModel.Results.Count > 0);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -152,9 +152,9 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
     public async Task When_executing_alias_Then_process_is_started()
     {
         IProcessLauncher sut = null!;
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            VisitProcessLauncher = (_, i) => {
+            InterceptProcessLauncher = (_, i) => {
                 sut = i;
                 return i;
             }
@@ -176,7 +176,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                 );
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
@@ -243,10 +243,10 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
     public async Task When_executing_while_search_is_pending_Then_alias_is_executed()
     {
         IProcessLauncher processLauncher = null!;
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
-            WatchdogBuilder = new PendingWatchdogBuilder(),
-            VisitProcessLauncher = (_, i) => {
+            OverridenWatchdogBuilder = new PendingWatchdogBuilder(),
+            InterceptProcessLauncher = (_, i) => {
                 processLauncher = i;
                 return i;
             }
@@ -267,7 +267,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                 processLauncher.Received(1).Start(Arg.Any<ProcessContext>());
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -407,10 +407,10 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                                          .AppendAlias(a => a.WithSynonyms())
                                          .AppendAlias(a => a.WithSynonyms())
                                          .AppendAlias(a => a.WithSynonyms());
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            VisitApplicationSettingsProvider = s => {
+            InterceptApplicationSettingsProvider = s => {
                 s.Value.SearchBox.ShowLastQuery = true;
                 s.Value.SearchBox.ShowResult = true;
             }
@@ -428,7 +428,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                 viewModel.Results.Count.ShouldBe(expectedCount);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
@@ -436,10 +436,10 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
     public async Task When_query_does_not_start_with_result_name_Then_no_suggestion()
     {
         // arrange 
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InMemory,
-            AddServices = sc => sc.TryAddEnumerable(
+            OverridenServices = sc => sc.TryAddEnumerable(
                 ServiceDescriptor.Singleton<IStoreService, MismatchedNameStore>()
             )
         };
@@ -457,7 +457,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                     vm => vm.Suggestion.ShouldBeNullOrEmpty()
                 );
             },
-            visitors: visitors
+            hooks: hooks
         );
     }
 
@@ -494,10 +494,10 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                                          .AppendAlias(a => a.WithSynonyms("alias_2"))
                                          .AppendAlias(a => a.WithSynonyms("alias_3"))
                                          .AppendAlias(a => a.WithSynonyms("alias_4"));
-        var visitors = new ServiceVisitors
+        var hooks = new ServiceHooks
         {
             OverridenConnectionString = ConnectionStringFactory.InDesktop,
-            VisitApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showResult
+            InterceptApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showResult
         };
         await TestViewModelAsync(
             async (viewModel, _) => {
@@ -510,7 +510,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                 viewModel.Results.Count(r => r.Name.StartsWith("alias_")).ShouldBe(expectedCount);
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 

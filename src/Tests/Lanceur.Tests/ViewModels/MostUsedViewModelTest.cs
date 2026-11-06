@@ -51,7 +51,7 @@ public sealed class MostUsedViewModelTest : ViewModelTester<MostUsedViewModel>
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors? visitors
+        ServiceHooks? hooks
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
@@ -66,7 +66,7 @@ public sealed class MostUsedViewModelTest : ViewModelTester<MostUsedViewModel>
     [InlineData("All")]
     public async Task When_no_year_is_selected_Then_all_usage_is_shown(string filter)
     {
-        var visitor = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var hooks = new ServiceHooks { OverridenConnectionString = ConnectionStringFactory.InMemory };
         var sqlBuilder = BuildSqlBuilder();
 
         await TestViewModelAsync(
@@ -80,7 +80,7 @@ public sealed class MostUsedViewModelTest : ViewModelTester<MostUsedViewModel>
                 Assert.All(viewModel.Aliases, alias => alias.Count.ShouldBe(HistorySize));
             },
             sqlBuilder,
-            visitor
+            hooks
         );
     }
 
@@ -89,7 +89,7 @@ public sealed class MostUsedViewModelTest : ViewModelTester<MostUsedViewModel>
     [InlineData("2024")]
     public async Task When_year_is_selected_Then_usage_of_that_year_is_shown(string year)
     {
-        var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var hooks = new ServiceHooks { OverridenConnectionString = ConnectionStringFactory.InMemory };
         var sqlBuilder = BuildSqlBuilder();
 
         await TestViewModelAsync(
@@ -104,7 +104,7 @@ public sealed class MostUsedViewModelTest : ViewModelTester<MostUsedViewModel>
                 Assert.All(viewModel.Aliases, alias => alias.Count.ShouldBe(3));
             },
             sqlBuilder,
-            visitors
+            hooks
         );
     }
 
