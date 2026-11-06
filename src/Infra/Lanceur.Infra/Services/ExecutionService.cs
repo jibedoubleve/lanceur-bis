@@ -140,18 +140,22 @@ public sealed class ExecutionService : IExecutionService
             result.Context.FileName,
             result.Context.Parameters
         );
-        var parameters = _wildcardService.ReplaceOrReplacementOnNull(
+        var parameters = _wildcardService.Replace(
             query.Parameters,
             result.Context.Parameters
         );
-
+        
+        var args = _wildcardService.HasWildcard(query.Parameters)
+            ? parameters
+            : $"{parameters} {result.Context.Parameters}".Trim();
+        
         // EXECUTE PROCESS
-        _logger.LogInformation("Executing {FileName} with args {Parameters}", fileName, parameters);
+        _logger.LogInformation("Executing {FileName} with args {Parameters}", fileName, args);
         var psi = new ProcessContext
         {
             FileName = fileName,
             Verb = "open",
-            Arguments = parameters,
+            Arguments = args,
             UseShellExecute = true, // https://stackoverflow.com/a/5255335/389529
             WorkingDirectory = query.WorkingDirectory,
             WindowStyle = query.StartMode

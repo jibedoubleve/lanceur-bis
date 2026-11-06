@@ -1,13 +1,11 @@
+using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.Intrinsics.X86;
 using System.Web.Bookmarks;
 using Bogus.Platform;
 using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
 using Lanceur.Core;
-using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.LuaScripting;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
@@ -17,7 +15,6 @@ using Lanceur.Infra.Repositories;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.Stores;
-using Lanceur.Infra.Wildcards;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Helpers;
@@ -34,6 +31,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSubstitute;
 using Shouldly;
 using Xunit;
+using WildcardService = Lanceur.Infra.Services.WildcardService;
 
 namespace Lanceur.Tests.ViewModels;
 
@@ -83,7 +81,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                          .AddMockSingleton<IUserCommunicationService>()
                          .AddSingleton<IMemoryCache, MemoryCache>()
                          .AddSingleton<ICalculatorService, NCalcCalculatorService>()
-                         .AddSingleton<IWildcardService, ReplacementComposite>()
+                         .AddSingleton<IWildcardService, WildcardService>()
                          .AddMockSingleton<ILuaManager>()
                          .AddMockSingleton<IClipboardService>()
                          .AddMockSingleton<IProcessLauncher>((sp, i)
@@ -475,7 +473,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 
         public bool CanPruneResult(Cmdline previous, Cmdline current) => false;
         public IEnumerable<QueryResult> GetAll() => [];
-        public int PruneResult(IList<QueryResult> destination, Cmdline previous, Cmdline current) => throw new NotImplementedException();
+        public int PruneResult(IList<QueryResult> destination, Cmdline previous, Cmdline current) => throw new UnreachableException();
 
         public IEnumerable<QueryResult> Search(Cmdline cmdline) =>
         [
@@ -496,7 +494,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                                          .AppendAlias(a => a.WithSynonyms("alias_4"));
         var hooks = new ServiceHooks
         {
-            OverridenConnectionString = ConnectionStringFactory.InDesktop,
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
             InterceptApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showResult
         };
         await TestViewModelAsync(
