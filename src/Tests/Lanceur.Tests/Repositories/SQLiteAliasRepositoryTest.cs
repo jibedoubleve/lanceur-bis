@@ -353,6 +353,99 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         connection.ExecuteScalar<int>(sql3).ShouldBe(3);
     }
 
+    [Theory]
+    [InlineData(true, false, false, false)]  // target hidden
+    [InlineData(false, true, false, false)]  // target deleted
+    [InlineData(false, false, true, false)]  // source hidden
+    [InlineData(false, false, false, true)]  // source deleted
+    [InlineData(true, true, true, true)]     // everything hidden and deleted
+    public void When_merging_hidden_or_deleted_aliases_Then_merged_alias_is_visible_and_not_deleted(
+        bool isTargetHidden,
+        bool isTargetDeleted,
+        bool isSourceHidden,
+        bool isSourceDeleted
+    )
+    {
+        // ARRANGE
+        var sql = new SqlBuilder()
+                  .AppendAlias(a =>
+                      a.WithSynonyms("target")
+                       .WithFileName("target.exe")
+                       .WithDeletedAt(isTargetDeleted ? new(2026, 1, 1) : null)
+                       .WithHiddenFlag(isTargetHidden)
+                  )
+                  .AppendAlias(a =>
+                      a.WithSynonyms("source")
+                       .WithFileName("source.exe")
+                       .WithDeletedAt(isSourceDeleted ? new(2026, 1, 1) : null)
+                       .WithHiddenFlag(isSourceHidden)
+                  )
+                  .ToSql();
+        var connection = BuildFreshDb(sql);
+        var service = BuildDataService(connection);
+
+        // ACT
+        service.Merge([1, 2]);
+
+        // ASSERT
+        const string sqlAliases = "select id as Id, hidden as Hidden, deleted_at as DeletedAt from alias";
+        var aliases = connection.Query<(long Id, bool Hidden, string? DeletedAt)>(sqlAliases).ToArray();
+
+        aliases.ShouldHaveSingleItem();
+        aliases[0].ShouldSatisfyAllConditions(
+            a => a.Id.ShouldBe(1),
+            a => a.Hidden.ShouldBeFalse(),
+            a => a.DeletedAt.ShouldBeNull()
+        );
+    }
+
+    [Fact]
+    public void When_merging_aliases_with_common_synonyms_Then_synonyms_are_not_duplicated()
+    {
+        // ARRANGE
+        var sql = new SqlBuilder()
+                  .AppendAlias(a => a.WithSynonyms("a", "b", "c"))
+                  .AppendAlias(a => a.WithSynonyms("b", "c", "d"))
+                  .ToSql();
+        var connection = BuildFreshDb(sql);
+        var service = BuildDataService(connection);
+
+        // ACT
+        service.Merge([1, 2]);
+
+        // ASSERT
+        const string sqlNames = "select name from alias_name where id_alias = 1";
+        var names = connection.Query<string>(sqlNames).ToArray();
+
+        names.ShouldBe(["a", "b", "c", "d"], ignoreOrder: true);
+    }
+
+    [Theory]
+    [InlineData("a, b")]
+    [InlineData(" a ,b ")]
+    [InlineData("a,,b")]
+    [InlineData("a b")]
+    [InlineData("a  b")]
+    [InlineData(" a, ,b ")]
+    public void When_saving_alias_with_comma_or_space_separated_names_Then_each_name_is_saved(string synonyms)
+    {
+        // ARRANGE
+        var connection = BuildFreshDb();
+        var service = BuildDataService(connection);
+
+        var alias = BuildAlias();
+        alias.Synonyms = synonyms;
+
+        // ACT
+        service.SaveOrUpdate(alias);
+
+        // ASSERT
+        const string sqlNames = "select name from alias_name where id_alias = @id";
+        var names = connection.Query<string>(sqlNames, new { id = alias.Id }).ToArray();
+
+        names.ShouldBe(["a", "b"], ignoreOrder: true);
+    }
+
     [Fact]
     public void When_permanently_remove_alias_Then_alias_not_anymore_in_results()
     {
