@@ -8,9 +8,7 @@ using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.Fakes;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
-using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Pages;
-using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Core;
 using Serilog.Events;
@@ -31,7 +29,7 @@ public sealed class SettingsViewModelTest : ViewModelTester<ApplicationSettingsV
 
     private void AssertProperty(Action<ApplicationSettingsViewModel> act, Func<string> getSql, Func<string> expected)
     {
-        var visitors = new ServiceVisitors { OverridenConnectionString = ConnectionStringFactory.InMemory };
+        var hooks = new ServiceHooks { OverridenConnectionString = ConnectionStringFactory.InMemory };
 
         TestViewModel(
             (viewModel, db) => {
@@ -50,7 +48,7 @@ public sealed class SettingsViewModelTest : ViewModelTester<ApplicationSettingsV
                 result.ShouldBe(expected());
             },
             Sql.Empty,
-            visitors
+            hooks
         );
     }
 
@@ -63,7 +61,7 @@ public sealed class SettingsViewModelTest : ViewModelTester<ApplicationSettingsV
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors? visitors
+        ServiceHooks? hooks
     )
     {
         serviceCollection.AddLoggingForTests(OutputHelper)

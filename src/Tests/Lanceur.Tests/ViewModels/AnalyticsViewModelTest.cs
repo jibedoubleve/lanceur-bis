@@ -22,7 +22,7 @@ public sealed class AnalyticsViewModelTest : ViewModelTester<AnalyticsViewModel>
 
     protected override IServiceCollection ConfigureServices(
         IServiceCollection serviceCollection,
-        ServiceVisitors? visitors
+        ServiceHooks? hooks
     )
     {
         serviceCollection.AddSingleton<IDbActionFactory, DbActionFactory>()
