@@ -137,6 +137,33 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         connection.ExecuteScalar<int>(sqlCount).ShouldBe(1);
     }
 
+    /// <summary>
+    ///     Regression test for issue #1420. Quotes surrounding an additional parameter are not saved in the database.
+    /// </summary>
+    [Fact]
+    public void When_create_alias_with_quoted_additional_parameters_Then_quotes_are_not_saved_in_db()
+    {
+        // ARRANGE
+        var sb = new ServiceCollection().AddLogging(b => b.AddXUnit(OutputHelper))
+                                        .BuildServiceProvider();
+
+        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("Alias")).ToSql();
+
+        var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
+        var dbAction = BuildAliasDbAction(sb.GetService<ILoggerFactory>());
+
+        var alias = new AliasQueryResult { Id = 1, Name = "Alias" };
+
+        // ACT
+        alias.AdditionalParameters.Add(new AdditionalParameter
+            { AliasId = 1, Name = "someName", Parameter = "\"someParameter\"" });
+        dbAction.SaveOrUpdate(connection.BeginTransaction(), alias);
+
+        // ASSERT
+        const string sqlArgument = "select argument from alias_argument";
+        connection.ExecuteScalar<string>(sqlArgument).ShouldBe("someParameter");
+    }
+
     [Fact]
     public void When_create_alias_with_privileges_Then_all_is_saved_in_db()
     {
