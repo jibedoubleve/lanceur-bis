@@ -114,10 +114,12 @@ public partial class MainViewModel : ObservableObject
 
     private string GetSuggestion(QueryResult? selectedItem)
     {
-        if (Query is null 
-            || (!selectedItem?.IsResult ?? true) 
-            || !selectedItem.Name.StartsWith(Cmdline.Parse(Query).Name, StringComparison.OrdinalIgnoreCase)) 
-        { return string.Empty; }
+        if (Query is null
+            || (!selectedItem?.IsResult ?? true)
+            || !selectedItem.Name.StartsWith(Cmdline.Parse(Query).Name, StringComparison.OrdinalIgnoreCase))
+        {
+            return string.Empty;
+        }
 
 
         var name = selectedItem.Name;
@@ -235,29 +237,25 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var report = TrackCurrentQuery();
-            if (_inputTracker.IsCurrentEmpty)
-            {
-                Results.Clear();
-                return;
-            }
 
             switch (report)
             {
+                case TrackingReport.Empty when !DoesReturnAllIfEmpty:
+                    Clear();
+                    break;
+                
                 case TrackingReport.EnteringParameters:
                     SendAlignParameter(Suggestion ?? string.Empty, _inputTracker.Current);
                     break;
 
                 case TrackingReport.Deleting:
                     WeakReferenceMessenger.Default.Send(new SetQueryMessage(_inputTracker.Current.Raw));
-
-                    goto default;
-
-                default:
-                    await _searchService.SearchAsync(Results, Query!, DoesReturnAllIfEmpty);
-                    SelectedResult = Results.FirstOrDefault()!;
-                    Suggestion = GetSuggestion(SelectedResult);
                     break;
             }
+
+            await _searchService.SearchAsync(Results, Query!, DoesReturnAllIfEmpty);
+            SelectedResult = Results.FirstOrDefault()!;
+            Suggestion = GetSuggestion(SelectedResult);
 
             _logger.LogTrace("Found {Count} element(s) for query {Query}", Results.Count, Query);
         }
@@ -289,6 +287,8 @@ public partial class MainViewModel : ObservableObject
     public void Clear()
     {
         Query = string.Empty;
+        Suggestion = string.Empty;
+        _inputTracker.Reset();
         Results.Clear();
     }
 

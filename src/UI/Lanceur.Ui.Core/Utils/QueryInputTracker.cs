@@ -11,15 +11,23 @@ public sealed class QueryInputTracker
 
     public Cmdline Current { get; private set; } = Cmdline.Empty;
 
-    public bool IsCurrentEmpty => string.IsNullOrWhiteSpace(Current?.Raw ?? string.Empty);
-
     #endregion
 
     #region Methods
 
+    public void Reset()
+    {
+        Previous = Cmdline.Empty;
+        Current = Cmdline.Empty;
+    }
+
     public TrackingReport Track(string? query)
     {
-        if (string.IsNullOrWhiteSpace(query)) { return TrackingReport.Other; }
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            Reset();
+            return TrackingReport.Empty;
+        }
 
         Previous = Current;
 
@@ -79,5 +87,6 @@ public enum TrackingReport
     EnteringName,
     EnteringParameters,
     Other,
-    Deleting
+    Deleting,
+    Empty
 }
