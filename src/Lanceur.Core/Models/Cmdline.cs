@@ -62,20 +62,20 @@ public sealed record Cmdline
 
         if (CmdlineManager.HasSpecialName(trimmed))
         {
+            var name = CmdlineManager.GetSpecialName(trimmed); 
             return new Cmdline(
-                CmdlineManager.GetSpecialName(trimmed),
-                trimmed[1..],
+                name,
+                trimmed[name.Length..],
                 raw
             );
         }
 
         var elements = trimmed.Split(" ");
         if (elements.Length <= 0) { return Empty; }
-
-        var name = elements[0];
+        
         return new Cmdline(
-            name,
-            trimmed[name.Length..],
+            elements[0],
+            trimmed[elements[0].Length..],
             raw
         );
     }

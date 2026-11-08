@@ -30,7 +30,8 @@ public abstract class StoreBase
     /// <summary>
     ///     Returns the effective shortcut for this store. If a user-defined override is configured,
     ///     it takes precedence over the default shortcut defined via <see cref="StoreAttribute" />.
-    ///     Returns an empty string if neither is defined.
+    ///     An override that is not a single special character (e.g. an alphanumeric one coming
+    ///     from an older configuration) is ignored. Returns an empty string if neither is defined.
     /// </summary>
     protected string Shortcut
     {
@@ -40,7 +41,7 @@ public abstract class StoreBase
             {
                 var overridenShortcut = StoreSettings.Value.GetOverride(this);
 
-                if (!string.IsNullOrEmpty(overridenShortcut)) { return overridenShortcut; }
+                if (CmdlineManager.IsSpecialCharacter(overridenShortcut)) { return overridenShortcut; }
             }
 
             var attribute = GetType().GetCustomAttribute<StoreAttribute>();

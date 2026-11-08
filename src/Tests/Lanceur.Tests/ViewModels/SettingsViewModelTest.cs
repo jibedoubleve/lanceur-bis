@@ -2,6 +2,7 @@ using Dapper;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
+using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
@@ -68,6 +69,7 @@ public sealed class SettingsViewModelTest : ViewModelTester<ApplicationSettingsV
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
                          .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
                          .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
+                         .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddUiServicesMockContext();
         return serviceCollection;
     }

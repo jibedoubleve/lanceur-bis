@@ -15,11 +15,12 @@ public interface IStoreOrchestrationFactory
 
     /// <summary>
     ///     Create an exclusive orchestrator, that's a store that will silence all the
-    ///     other search that can occur at the same time
+    ///     other search that can occur at the same time. The store is alive only when
+    ///     the name of the query is strictly equal to <paramref name="shortcut" />.
     /// </summary>
-    /// <param name="alivePattern">The regex to apply to determine whether the service should be executed.</param>
+    /// <param name="shortcut">The name that wakes the store up.</param>
     /// <returns>An Orchestrator</returns>
-    StoreOrchestration Exclusive(string alivePattern);
+    StoreOrchestration Exclusive(string shortcut);
 
     /// <summary>
     ///     Create an orchestrator that allows the store to run with all the

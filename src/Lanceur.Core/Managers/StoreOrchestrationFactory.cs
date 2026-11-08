@@ -3,24 +3,35 @@ using System.Text.RegularExpressions;
 namespace Lanceur.Core.Managers;
 
 /// <inheritdoc />
-public sealed class StoreOrchestrationFactory : IStoreOrchestrationFactory
+public sealed partial class StoreOrchestrationFactory : IStoreOrchestrationFactory
 {
     #region Methods
 
-    /// <inheritdoc />
-    public StoreOrchestration AlwaysInactive() => new("(?!)", false);
+    /// <summary>
+    /// Returns a regex that never matches any input, including an empty string.
+    /// Used by <see cref="AlwaysInactive"/> to ensure the store is never activated.
+    /// </summary>
+    /// <remarks>
+    /// <c>(?!)</c> is an empty negative lookahead: an empty pattern always matches,
+    /// so its negation fails at every position.
+    /// </remarks>
+    [GeneratedRegex("(?!)")]
+    private static partial Regex NeverMatchRegex();
 
     /// <inheritdoc />
-    public StoreOrchestration Exclusive(string alivePattern) => new(alivePattern, true);
+    public StoreOrchestration AlwaysInactive() => new(NeverMatchRegex(), false);
+
+    /// <inheritdoc />
+    public StoreOrchestration Exclusive(string shortcut) => new(StoreOrchestration.ExactMatch(shortcut), true);
 
     /// <inheritdoc />
     public StoreOrchestration Shared(Regex alivePattern) => new(alivePattern, false);
 
     /// <inheritdoc />
-    public StoreOrchestration SharedOnFullQuery(Regex alivePattern) => new(alivePattern, false, c => c.ToString());
+    public StoreOrchestration SharedAlwaysActive() => new(new Regex(".*"), false);
 
     /// <inheritdoc />
-    public StoreOrchestration SharedAlwaysActive() => new(string.Empty, false);
+    public StoreOrchestration SharedOnFullQuery(Regex alivePattern) => new(alivePattern, false, c => c.ToString());
 
     #endregion
 }
