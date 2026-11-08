@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
@@ -64,8 +63,7 @@ public sealed class SteamGameStore : StoreBase, IStoreService
 
     private static bool IsRefinementOf(string candidate, string searchKey)
         => candidate.Contains(searchKey, StringComparison.InvariantCultureIgnoreCase);
-
-
+    
     private static string PropertySelector(Cmdline query) => query.Parameters;
 
     /// <inheritdoc cref="CanPruneResult" />

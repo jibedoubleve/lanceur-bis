@@ -13,6 +13,7 @@ public interface ISearchService
     ///     Retrieves all available results from all registered stores without applying any search filters.
     /// </summary>
     /// <returns>A task that resolves to a collection of all available results.</returns>
+    //refactor: Remove unused method
     Task<IEnumerable<QueryResult>> GetAllAsync();
 
     /// <summary>

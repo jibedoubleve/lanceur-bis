@@ -22,9 +22,6 @@ public sealed class StoreOrchestration
 
     #region Constructors
 
-    internal StoreOrchestration(string alivePattern, bool idleOthers, Func<Cmdline, string>? selector = null)
-        : this(AsRegex(alivePattern), idleOthers, selector) { }
-
     internal StoreOrchestration(Regex aliveRegex, bool idleOthers, Func<Cmdline, string>? selector = null)
     {
         _selector = selector ?? (c => c.Name);
@@ -48,9 +45,14 @@ public sealed class StoreOrchestration
 
     #region Methods
 
-    private static Regex AsRegex(string pattern)
+    /// <summary>
+    ///     Builds a regex matching a name strictly equal to <paramref name="shortcut" />.
+    ///     A prefix match would let a store hijack every name starting with its shortcut
+    ///     (e.g. a store bound to <c>?</c> would wake up on the alias <c>??</c>).
+    /// </summary>
+    internal static Regex ExactMatch(string shortcut)
         => new(
-            $@"(^\s*){Regex.Escape(pattern)}(.*)",
+            $"^{Regex.Escape(shortcut)}$",
             RegexOptions.Compiled,
             TimeSpan.FromMilliseconds(200)
         );
@@ -62,8 +64,7 @@ public sealed class StoreOrchestration
     /// </summary>
     /// <param name="query">The parsed command line whose <see cref="Cmdline.Name" /> is evaluated.</param>
     /// <returns><c>true</c> if the store should be activated for this query; otherwise <c>false</c>.</returns>
-    public bool IsAlive(Cmdline query) 
-        => _aliveRegex.IsMatch(_selector(query));
+    public bool IsAlive(Cmdline query) => _aliveRegex.IsMatch(_selector(query));
 
     #endregion
 }

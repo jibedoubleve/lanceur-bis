@@ -62,6 +62,7 @@ public sealed class AliasUseCases : TestBase
                          )
                          .AddSingleton<IAliasManagementService, AliasManagementService>()
                          .AddSingleton<IAliasValidationService, AliasValidationService>()
+                         .AddMockSingleton<IStoreShortcutService>()
                          .AddMockSingleton<IViewFactory>()
                          .AddMockSingleton<IUserDialogueService>((_, i) => {
                                  i.AskUserYesNoAsync(Arg.Any<string>())

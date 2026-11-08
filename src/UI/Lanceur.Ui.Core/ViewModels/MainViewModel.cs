@@ -272,6 +272,10 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     private void SendAlignParameter(string suggestion, Cmdline current)
     {
+        // Nothing to align with: keep the query as typed, otherwise the whitespace
+        // separating the name from the parameters is removed (e.g. "st aim" -> "staim").
+        if (suggestion.IsNullOrEmpty()) { return; }
+
         _isSearchActivated = false;
         var value = new AlignParametersValue(suggestion, current);
         WeakReferenceMessenger.Default.Send(new AlignParametersMessage(value));

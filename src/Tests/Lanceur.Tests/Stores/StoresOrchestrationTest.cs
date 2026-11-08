@@ -203,6 +203,7 @@ public sealed class StoresOrchestrationTest
     [InlineData("é'(§è(§é")]
     [InlineData("  undeux")]
     [InlineData("   g :: ")]
+    [InlineData("::::")] // "::::" is a name on its own, not the shortcut ":"
     public void When_not_searching_with_Everything_Then_this_store_is_not_used(string query)
     {
         // ACT
@@ -307,7 +308,6 @@ public sealed class StoresOrchestrationTest
     [InlineData(" : Hello")]
     [InlineData(": *.pdf")]
     [InlineData(":132")]
-    [InlineData("::::")]
     [InlineData(":/.()}{")]
     [InlineData(":")]
     [InlineData(": ")]

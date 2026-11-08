@@ -4,6 +4,7 @@ using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Repositories;
+using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.Extensions;
@@ -36,6 +37,7 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
     )
     {
         serviceCollection.AddMockSingleton<IAppRestartService>()
+                         .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
                          .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
                          .AddMockSingleton<IViewFactory>()

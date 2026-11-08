@@ -561,6 +561,107 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         steamService.Received(1).GetGames();
     }
 
+    [Theory]
+    [InlineData("%%")]
+    [InlineData("%% foo")]
+    public async Task When_alias_repeats_the_overridden_shortcut_Then_steam_store_is_not_alive(string query)
+    {
+        // ARRANGE
+        // With "%" as steam shortcut, the alias "%%" is another name: it must not wake up the (exclusive)
+        // steam store.
+        var steamService = Substitute.For<ISteamLibraryService>();
+        steamService.GetGames().Returns([new SteamGame(1, "Age of Empires")]);
+        var featureFlags = Substitute.For<IFeatureFlagService>();
+        featureFlags.IsEnabled(Arg.Any<string>()).Returns(true);
+        var storeSection = Substitute.For<ISection<StoreSection>>();
+        storeSection.Value.Returns(
+            new StoreSection
+            {
+                StoreShortcuts = [new() { StoreType = typeof(SteamGameStore).FullName, AliasOverride = "%" }]
+            }
+        );
+
+        var steamStore = new SteamGameStore(
+            new StoreOrchestrationFactory(),
+            storeSection,
+            steamService,
+            Substitute.For<IAliasManagementService>(),
+            featureFlags
+        );
+
+        var sharedStore = Substitute.For<IStoreService>();
+        sharedStore.Orchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
+        sharedStore.Search(Arg.Any<Cmdline>()).Returns([new AliasQueryResult { Name = "%%" }]);
+
+        var service = BuildSearchService(steamStore, sharedStore);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, query);
+
+        // ASSERT
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldContain(x => x.Name == "%%"),
+            r => r.ShouldNotContain(x => x.Name == "Age of Empires")
+        );
+        steamService.DidNotReceive().GetGames();
+    }
+
+    [Theory]
+    [InlineData("f", "%")]
+    [InlineData("f", "% a")]
+    [InlineData("foo", "%")]
+    public async Task When_typing_an_overridden_shortcut_Then_steam_store_is_searched(string previous, string current)
+    {
+        // ARRANGE
+        // Regression: when the shortcut is overridden (e.g. "%"), the query typed just before
+        // (e.g. "f") is handled by other stores. Pruning those results with the steam store semantics
+        // is wrong: the steam store has never been searched, so a full search is required.
+        var steamService = Substitute.For<ISteamLibraryService>();
+        steamService.GetGames().Returns([
+            new SteamGame(1, "Age of Empires"),
+            new SteamGame(2, "The Dark Age")
+        ]);
+        var managementService = Substitute.For<IAliasManagementService>();
+        managementService.HydrateSteamGameUsage(Arg.Any<IEnumerable<AliasQueryResult>>())
+                         .Returns(x => x.Arg<IEnumerable<AliasQueryResult>>());
+        var featureFlags = Substitute.For<IFeatureFlagService>();
+        featureFlags.IsEnabled(Arg.Any<string>()).Returns(true);
+        var storeSection = Substitute.For<ISection<StoreSection>>();
+        storeSection.Value.Returns(
+            new StoreSection
+            {
+                StoreShortcuts = [new() { StoreType = typeof(SteamGameStore).FullName, AliasOverride = "%" }]
+            }
+        );
+
+        var steamStore = new SteamGameStore(
+            new StoreOrchestrationFactory(),
+            storeSection,
+            steamService,
+            managementService,
+            featureFlags
+        );
+
+        var sharedStore = Substitute.For<IStoreService>();
+        sharedStore.Orchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
+        sharedStore.CanPruneResult(Arg.Any<Cmdline>(), Arg.Any<Cmdline>()).Returns(true);
+        sharedStore.Search(Arg.Any<Cmdline>()).Returns([new AliasQueryResult { Name = "sublime" }]);
+
+        var service = BuildSearchService(steamStore, sharedStore);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, previous);
+        await service.SearchAsync(result, current);
+
+        // ASSERT
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotContain(x => x.Name == "sublime"),
+            r => r.ShouldContain(x => x.Name == "Age of Empires")
+        );
+    }
+
     #endregion
 
     #region AdditionalParametersStore - Functional

@@ -1,10 +1,15 @@
+using System.Text;
+
 namespace Lanceur.Core.Managers;
 
 public static class CmdlineManager
 {
     #region Fields
 
-    private static readonly string[] SpecialNames =
+    /// <summary>
+    ///     The characters that can be used as a special name, and therefore as a store shortcut.
+    /// </summary>
+    public static IReadOnlyList<string> SpecialCharacters =>
     [
         "$",
         "&",
@@ -37,28 +42,33 @@ public static class CmdlineManager
 
     #region Methods
 
-    public static string GetSpecialName(string cmdline) =>
-        cmdline.Length switch
-        {
-            > 1 when cmdline[0] == cmdline[1] => cmdline[..2],
-            > 0                               => cmdline[..1],
-            _ => throw new ArgumentException(
-                $"Cmdline is too short (length {cmdline.Length})"
-            )
-        };
-
-    public static bool HasSpecialName(string cmdName)
+    public static string GetSpecialName(string cmdline)
     {
-        cmdName = cmdName.Trim();
-        var res1 = false;
-        var res2 = false;
+        if (cmdline.Length <= 0)
+        {
+            throw new ArgumentException("Cmdline should not be empty", nameof(cmdline));
+        }
 
-        if (cmdName.Length > 0) { res1 = SpecialNames.Contains(cmdName[..1]); }
+        var first = cmdline[0];
+        var accumulator = new StringBuilder($"{cmdline[0]}");
+        for (var i = 1; i < cmdline.Length; i++)
+        {
+            if (cmdline[i] != first) { break; }
 
-        if (cmdName.Length > 1) { res2 = SpecialNames.Contains(cmdName[..2]); }
+            accumulator.Append(cmdline[i]);
+        }
 
-        return res1 || res2;
+        return accumulator.ToString();
     }
+
+    public static bool HasSpecialName(string cmdName) => cmdName.Length > 0
+                                                         && SpecialCharacters.Contains($"{cmdName[0]}");
+
+    /// <summary>
+    ///     Determines whether <paramref name="value" /> is exactly one special character.
+    ///     This is the only form a store shortcut can take.
+    /// </summary>
+    public static bool IsSpecialCharacter(string? value) => value is { Length: 1 } && SpecialCharacters.Contains(value);
 
     #endregion
 }

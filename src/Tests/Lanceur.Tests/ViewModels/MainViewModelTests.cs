@@ -87,7 +87,8 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                          .AddMockSingleton<IProcessLauncher>((sp, i)
                              => hooks?.InterceptProcessLauncher?.Invoke(sp, i) ?? i
                          )
-                         .AddSingleton<IWatchdogBuilder>(_ => hooks?.OverridenWatchdogBuilder ?? new TestWatchdogBuilder())
+                         .AddSingleton<IWatchdogBuilder>(_ =>
+                             hooks?.OverridenWatchdogBuilder ?? new TestWatchdogBuilder())
                          .AddSingleton<IExecutionService, ExecutionService>();
 
         serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
@@ -143,6 +144,100 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
             },
             sqlBuilder,
             hooks
+        );
+    }
+
+    [Fact]
+    public async Task When_deleting_padding_with_backspace_Then_query_shrinks()
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("notepad"));
+        var fakeView = new object();
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // ARRANGE
+                var messenger = WeakReferenceMessenger.Default;
+                messenger.Register<SetQueryMessage>(fakeView, (_, m) => viewModel.Query = m.Value);
+                messenger.Register<AlignParametersMessage>(fakeView,
+                    (_, m) => {
+                        var typed = m.Value.Query.Name.TrimEnd();
+                        viewModel.Query = typed.PadRight(m.Value.Suggestion.Length + 1) + m.Value.Query.RawParameters;
+                    });
+
+                try
+                {
+                    await TypeAsync("notepa");
+                    await TypeAsync("notepa "); // Adds two spaces to align with "notepad"
+
+                    // ACT
+                    var before = viewModel.Query!;
+                    await TypeAsync(before[..^1]);
+                    await TypeAsync(before[..^2]);
+
+                    // ASSERT
+                    viewModel.ShouldSatisfyAllConditions(
+                        vm => vm.Query.ShouldNotBeNull(),
+                        vm => vm.Query!.ShouldBe("notepa")
+                    );
+                }
+                finally { messenger.UnregisterAll(fakeView); }
+
+                return;
+
+                async Task TypeAsync(string text)
+                {
+                    viewModel.Query = text;
+                    await viewModel.SearchCommand.ExecuteAsync(null);
+                }
+            },
+            sqlBuilder
+        );
+    }
+
+    [Fact]
+    public async Task When_entering_parameters_Then_alignment_never_uses_an_empty_suggestion()
+    {
+        // Regression: typing "& aim" displayed "&aim" because the parameters were aligned
+        // with an empty suggestion, which removed the whitespace typed by the user.
+        var hooks = new ServiceHooks
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            OverridenServices = sc => sc.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IStoreService, ShortcutStore>()
+            )
+        };
+        var fakeView = new object();
+        var alignments = new List<AlignParametersValue>();
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                var messenger = WeakReferenceMessenger.Default;
+                messenger.Register<AlignParametersMessage>(fakeView, (_, m) => alignments.Add(m.Value));
+
+                try
+                {
+                    // act
+                    await TypeAsync("&");
+                    await TypeAsync("& ");
+                    await TypeAsync("& a");
+
+                    // assert
+                    viewModel.ShouldSatisfyAllConditions(
+                        _ => alignments.ShouldAllBe(a => !string.IsNullOrEmpty(a.Suggestion)),
+                        vm => vm.Query.ShouldBe("& a")
+                    );
+                }
+                finally { messenger.UnregisterAll(fakeView); }
+
+                return;
+
+                async Task TypeAsync(string text)
+                {
+                    viewModel.Query = text;
+                    await viewModel.SearchCommand.ExecuteAsync(null);
+                }
+            },
+            hooks: hooks
         );
     }
 
@@ -269,6 +364,64 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
     }
 
+    [Fact]
+    public async Task When_query_does_not_start_with_result_name_Then_no_suggestion()
+    {
+        // arrange 
+        var hooks = new ServiceHooks
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            OverridenServices = sc => sc.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IStoreService, MismatchedNameStore>()
+            )
+        };
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // act
+                viewModel.Query = "magic query";
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                // assert
+                viewModel.ShouldSatisfyAllConditions(
+                    vm => vm.Results.ShouldNotBeEmpty(),
+                    vm => vm.SelectedResult.ShouldNotBeNull(),
+                    vm => vm.SelectedResult?.Name.ShouldBe("alias_1"),
+                    vm => vm.Suggestion.ShouldBeNullOrEmpty()
+                );
+            },
+            hooks: hooks
+        );
+    }
+
+    [Theory]
+    [InlineData(true, 4)]
+    [InlineData(false, 0)]
+    public async Task When_query_is_emptied_Then_results_follow_ShowResult_setting(bool showResult, int expectedCount)
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias_1"))
+                                         .AppendAlias(a => a.WithSynonyms("alias_2"))
+                                         .AppendAlias(a => a.WithSynonyms("alias_3"))
+                                         .AppendAlias(a => a.WithSynonyms("alias_4"));
+        var hooks = new ServiceHooks
+        {
+            OverridenConnectionString = ConnectionStringFactory.InMemory,
+            InterceptApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showResult
+        };
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                viewModel.Query = "alias_";
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                viewModel.Query = string.Empty;
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                viewModel.Results.Count(r => r.Name.StartsWith("alias_")).ShouldBe(expectedCount);
+            },
+            sqlBuilder,
+            hooks
+        );
+    }
+
     [Theory]
     [InlineData("note", "notepad")]
     [InlineData("  note", "  notepad")] // #1448: suggestion keeps the leading whitespace of the query
@@ -285,70 +438,6 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 
                 // ASSERT
                 viewModel.Suggestion.ShouldBe(expected);
-            },
-            sqlBuilder
-        );
-    }
-    
-    [Fact]
-    public async Task When_searching_has_no_result_Then_no_suggestion()
-    {
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("notepad"));
-
-        await TestViewModelAsync(
-            async (viewModel, _) => {
-                // ACT
-                viewModel.Query = "no_result_should_be_found";
-                await viewModel.SearchCommand.ExecuteAsync(null);
-
-                // ASSERT
-                viewModel.Suggestion.ShouldBeEmpty();
-            },
-            sqlBuilder
-        );
-    }
-    
-    [Fact]
-    public async Task When_deleting_padding_with_backspace_Then_query_shrinks()
-    {
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("notepad"));
-        var fakeView = new object();
-
-        await TestViewModelAsync(
-            async (viewModel, _) => {
-                // ARRANGE
-                var messenger = WeakReferenceMessenger.Default;
-                messenger.Register<SetQueryMessage>(fakeView, (_, m) => viewModel.Query = m.Value);
-                messenger.Register<AlignParametersMessage>(fakeView, (_, m) => {
-                    var typed = m.Value.Query.Name.TrimEnd();
-                    viewModel.Query = typed.PadRight(m.Value.Suggestion.Length + 1) + m.Value.Query.RawParameters;
-                });
-
-                try
-                {
-                    await TypeAsync("notepa");
-                    await TypeAsync("notepa "); // Adds two spaces to align with "notepad"
-
-                    // ACT
-                    var before = viewModel.Query!;
-                    await TypeAsync(before[..^1]);
-                    await TypeAsync(before[..^2]);
-
-                    // ASSERT
-                    viewModel.ShouldSatisfyAllConditions(
-                        vm => vm.Query.ShouldNotBeNull(),
-                        vm => vm.Query!.ShouldBe("notepa")
-                    );
-                }
-                finally { messenger.UnregisterAll(fakeView); }
-
-                return;
-
-                async Task TypeAsync(string text)
-                {
-                    viewModel.Query = text;
-                    await viewModel.SearchCommand.ExecuteAsync(null);
-                }
             },
             sqlBuilder
         );
@@ -399,6 +488,24 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
 
     [Fact]
+    public async Task When_searching_has_no_result_Then_no_suggestion()
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("notepad"));
+
+        await TestViewModelAsync(
+            async (viewModel, _) => {
+                // ACT
+                viewModel.Query = "no_result_should_be_found";
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                // ASSERT
+                viewModel.Suggestion.ShouldBeEmpty();
+            },
+            sqlBuilder
+        );
+    }
+
+    [Fact]
     public async Task When_searching_with_ShowResult_enabled_Then_only_matching_results_are_shown()
     {
         var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms())
@@ -430,33 +537,32 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
     }
 
-    [Fact]
-    public async Task When_query_does_not_start_with_result_name_Then_no_suggestion()
+    #endregion
+
+    [Store("&")]
+    internal class ShortcutStore : IStoreService
     {
-        // arrange 
-        var hooks = new ServiceHooks
-        {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
-            OverridenServices = sc => sc.TryAddEnumerable(
-                ServiceDescriptor.Singleton<IStoreService, MismatchedNameStore>()
-            )
-        };
-        await TestViewModelAsync(
-            async (viewModel, _) => {
-                // act
-                viewModel.Query = "magic query";
-                await viewModel.SearchCommand.ExecuteAsync(null);
-                
-                // assert
-                viewModel.ShouldSatisfyAllConditions(
-                    vm => vm.Results.ShouldNotBeEmpty(),
-                    vm => vm.SelectedResult.ShouldNotBeNull(),
-                    vm => vm.SelectedResult?.Name.ShouldBe("alias_1"),
-                    vm => vm.Suggestion.ShouldBeNullOrEmpty()
-                );
-            },
-            hooks: hooks
-        );
+        #region Properties
+
+        public bool IsOverridable => false;
+        public StoreOrchestration Orchestration => new StoreOrchestrationFactory().Exclusive("&");
+
+        #endregion
+
+        #region Methods
+
+        public bool CanPruneResult(Cmdline previous, Cmdline current) => false;
+        public IEnumerable<QueryResult> GetAll() => [];
+
+        public int PruneResult(IList<QueryResult> destination, Cmdline previous, Cmdline current) =>
+            throw new UnreachableException();
+
+        public IEnumerable<QueryResult> Search(Cmdline cmdline) =>
+        [
+            new AliasQueryResult { Name = "Stardew Valley" }
+        ];
+
+        #endregion
     }
 
     [Store("&")]
@@ -473,7 +579,9 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 
         public bool CanPruneResult(Cmdline previous, Cmdline current) => false;
         public IEnumerable<QueryResult> GetAll() => [];
-        public int PruneResult(IList<QueryResult> destination, Cmdline previous, Cmdline current) => throw new UnreachableException();
+
+        public int PruneResult(IList<QueryResult> destination, Cmdline previous, Cmdline current) =>
+            throw new UnreachableException();
 
         public IEnumerable<QueryResult> Search(Cmdline cmdline) =>
         [
@@ -482,35 +590,4 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
 
         #endregion
     }
-
-    [Theory]
-    [InlineData(true, 4)]
-    [InlineData(false, 0)]
-    public async Task When_query_is_emptied_Then_results_follow_ShowResult_setting(bool showResult, int expectedCount)
-    {
-        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("alias_1"))
-                                         .AppendAlias(a => a.WithSynonyms("alias_2"))
-                                         .AppendAlias(a => a.WithSynonyms("alias_3"))
-                                         .AppendAlias(a => a.WithSynonyms("alias_4"));
-        var hooks = new ServiceHooks
-        {
-            OverridenConnectionString = ConnectionStringFactory.InMemory,
-            InterceptApplicationSettingsProvider = s => s.Value.SearchBox.ShowResult = showResult
-        };
-        await TestViewModelAsync(
-            async (viewModel, _) => {
-                viewModel.Query = "alias_";
-                await viewModel.SearchCommand.ExecuteAsync(null);
-
-                viewModel.Query = string.Empty;
-                await viewModel.SearchCommand.ExecuteAsync(null);
-
-                viewModel.Results.Count(r => r.Name.StartsWith("alias_")).ShouldBe(expectedCount);
-            },
-            sqlBuilder,
-            hooks
-        );
-    }
-
-    #endregion
 }
