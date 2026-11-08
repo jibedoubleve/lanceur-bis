@@ -19,39 +19,47 @@ public sealed class StoreOrchestrationTests
 {
     #region Methods
 
+    /// <summary>
+    ///     An exclusive store wakes up when the name of the query is strictly equal to its
+    ///     shortcut. Whatever follows the name is a parameter, glued or not.
+    /// </summary>
     [Theory]
-    [InlineData("m", ".", false)]
-    [InlineData("dm", "m", false)]
     [InlineData(".", ".", true)]
-    [InlineData("m", "m", true)]
-    [InlineData("mm", "m", true)]
-    [InlineData("    mm", "m", true)]
-    [InlineData("/", "/", true)]
+    [InlineData("   .", ".", true)]
     [InlineData(".somest", ".", true)]
+    [InlineData("m", ".", false)]
+    [InlineData("/", "/", true)]
+    [InlineData("&", "&", true)]
+    //-- A repeated special character is another name, it must not wake the store up
+    [InlineData("&&", "&", false)]
+    [InlineData("&&foo", "&", false)]
+    [InlineData("?? foo", "?", false)]
+    [InlineData("&a&", "&", true)]
     //-- With params
-    [InlineData("m --with parameters", ".", false)]
-    [InlineData("dm --with parameters", "m", false)]
     [InlineData(". --with parameters", ".", true)]
-    [InlineData("m --with parameters", "m", true)]
-    [InlineData("mm --with parameters", "m", true)]
-    [InlineData("    mm             --with parameters", "m", true)]
+    [InlineData("m --with parameters", ".", false)]
     [InlineData("/ --with parameters", "/", true)]
     [InlineData("/--with parameters", "/", true)]
+    [InlineData("& game", "&", true)]
     public void When_checking_store_is_alive_Then_it_is_alive_or_not_as_expected(
-        string cmd, string regex, bool expected)
-    {
-        // arrange
-        new ServiceCollection()
-            .AddLogging(builder => builder.AddXUnit())
-            .AddMockConfigurationSections()
-            .BuildServiceProvider();
-        var storeService = Substitute.For<IStoreService>();
-        storeService.Orchestration.Returns(new StoreOrchestrationFactory().Exclusive(regex));
+        string cmd, string shortcut, bool expected)
+        => new StoreOrchestrationFactory().Exclusive(shortcut)
+                                          .IsAlive(Cmdline.Parse(cmd))
+                                          .ShouldBe(expected);
 
-        // act
-        storeService.Orchestration.IsAlive(Cmdline.Parse(cmd))
-                    .ShouldBe(expected);
-    }
+    [Theory]
+    [InlineData("&", true)]
+    [InlineData(":", true)]
+    [InlineData("&&", false)]
+    [InlineData("st", false)]
+    [InlineData("s", false)]
+    [InlineData("é", false)]
+    [InlineData(" ", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void When_checking_store_shortcut_Then_only_a_single_special_character_is_valid(
+        string? shortcut, bool expected)
+        => CmdlineManager.IsSpecialCharacter(shortcut).ShouldBe(expected);
 
     [Theory]
     [InlineData(".")]

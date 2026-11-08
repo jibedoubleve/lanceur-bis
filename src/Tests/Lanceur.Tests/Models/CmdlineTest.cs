@@ -132,6 +132,32 @@ public sealed class CmdlineTest
                .Name
                .ShouldBe(expected);
 
+    /// <summary>
+    ///     A run of the same special character is the name, whatever follows it is the parameters.
+    ///     Regression: with a name longer than one character, its tail ended up in the parameters
+    ///     (e.g. "&&" was parsed as the name "&&" with the parameter "&").
+    /// </summary>
+    [Theory]
+    [InlineData("&", "&", "")]
+    [InlineData("&&", "&&", "")]
+    [InlineData("&&&", "&&&", "")]
+    [InlineData("&&foo", "&&", "foo")]
+    [InlineData("&&&foo", "&&&", "foo")]
+    [InlineData("&& foo", "&&", "foo")]
+    [InlineData("&a&", "&", "a&")]
+    [InlineData("?? foo", "??", "foo")]
+    [InlineData("   :: foo", "::", "foo")]
+    public void When_parsing_a_run_of_special_char_Then_it_is_the_name_and_the_rest_is_parameters(
+        string cmdline, string expectedName, string expectedParameters)
+    {
+        var parsed = Cmdline.Parse(cmdline);
+
+        parsed.ShouldSatisfyAllConditions(
+            c => c.Name.ShouldBe(expectedName),
+            c => c.Parameters.ShouldBe(expectedParameters)
+        );
+    }
+
     [Fact]
     public void When_parsing_empty_text_Then_name_and_parameters_are_empty()
     {

@@ -1,3 +1,6 @@
+using Lanceur.Core.Configuration;
+using Lanceur.Core.Configuration.Sections.Application;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
@@ -27,15 +30,51 @@ public sealed class AliasValidationService : IAliasValidationService
 
     private readonly IAliasRepository _repository;
 
+    private readonly ISection<StoreSection> _storeSection;
+
+    private readonly IStoreShortcutService _storeShortcutService;
+
     #endregion
 
     #region Constructors
 
-    public AliasValidationService(IAliasRepository repository) => _repository = repository;
+    public AliasValidationService(
+        IAliasRepository repository,
+        IStoreShortcutService storeShortcutService,
+        ISection<StoreSection> storeSection)
+    {
+        ArgumentNullException.ThrowIfNull(repository);
+        ArgumentNullException.ThrowIfNull(storeShortcutService);
+        ArgumentNullException.ThrowIfNull(storeSection);
+
+        _repository = repository;
+        _storeShortcutService = storeShortcutService;
+        _storeSection = storeSection;
+    }
 
     #endregion
 
     #region Methods
+
+    private ValidationStatus AreNamesNotStoreShortcuts(string? names)
+    {
+        if (names is null) { return ValidationStatus.Valid(); }
+
+        var shortcuts = _storeShortcutService.Resolve(_storeSection.Value)
+                                             .Select(s => s.AliasOverride)
+                                             .Where(CmdlineManager.IsSpecialCharacter)
+                                             .ToHashSet();
+        var conflicts = names.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                             .Select(e => e.Trim())
+                             .Where(shortcuts.Contains)
+                             .ToArray();
+
+        return conflicts.Length != 0
+            ? ValidationStatus.Invalid(
+                $"These names are already used as store shortcuts: {string.Join(", ", conflicts)}"
+            )
+            : ValidationStatus.Valid();
+    }
 
     private ValidationStatus AreNamesUnique(object? names, long idAlias)
     {
@@ -102,7 +141,8 @@ public sealed class AliasValidationService : IAliasValidationService
             IsNameValid(alias.Name),
             IsFileNameValid(alias.FileName),
             AreNamesUnique(alias.Synonyms, alias.Id),
-            IsDeleted(alias.Synonyms, alias.Id)
+            IsDeleted(alias.Synonyms, alias.Id),
+            AreNamesNotStoreShortcuts(alias.Synonyms)
         };
 
         if (rules.All(x => x.IsSuccess)) { return ValidationStatus.Valid(); }

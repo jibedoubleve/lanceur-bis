@@ -6,7 +6,9 @@ using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
+using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
+using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Stores.Everything;
 using Lanceur.SharedKernel.Extensions;
@@ -22,6 +24,8 @@ namespace Lanceur.Ui.Core.ViewModels.Pages;
 public partial class ApplicationSettingsViewModel : ObservableObject
 {
     #region Fields
+
+    private readonly IAliasRepository _aliasRepository;
 
     private readonly ISettingsProvider<ApplicationSettings> _appSettings;
 
@@ -41,6 +45,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     #region Constructors
 
+    //refactor: Split responsabilities and lower the ctor parameters
     public ApplicationSettingsViewModel(
         IUserCommunicationService userCommunicationService,
         ILogger<ApplicationSettingsViewModel> logger,
@@ -48,9 +53,11 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IEnigma enigma,
         IStoreShortcutService storeShortcutService,
         ISettingsProvider<ApplicationSettings> appSettings,
-        ISettingsProvider<InfrastructureSettings> infraSettings)
+        ISettingsProvider<InfrastructureSettings> infraSettings,
+        IAliasRepository aliasRepository)
     {
         ArgumentNullException.ThrowIfNull(userCommunicationService);
+        ArgumentNullException.ThrowIfNull(aliasRepository);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewFactory);
         ArgumentNullException.ThrowIfNull(enigma);
@@ -66,6 +73,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         _storeShortcutService = storeShortcutService;
         _appSettings = appSettings;
         _infraSettings = infraSettings;
+        _aliasRepository = aliasRepository;
 
         // Hotkey
         var hk = _appSettings.Value.HotKey;
@@ -342,7 +350,31 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             return;
         }
 
+        var error = ValidateStoreShortcut(storeShortcut.AliasOverride);
+        if (error is not null)
+        {
+            _hubService.Notifications.Warning(error);
+            storeShortcut.AliasOverride = savedAliasOverride;
+            return;
+        }
+
         SaveSettings();
+    }
+
+    /// <summary>
+    ///     Checks that <paramref name="shortcut" /> can be used as a store shortcut.
+    /// </summary>
+    /// <returns>The reason why the shortcut is rejected, or <c>null</c> if it is valid.</returns>
+    private string? ValidateStoreShortcut(string? shortcut)
+    {
+        if (!CmdlineManager.IsSpecialCharacter(shortcut))
+        {
+            return $"The shortcut '{shortcut}' is invalid. A store shortcut must be a single special character.";
+        }
+
+        return _aliasRepository.GetExistingAliases([shortcut!], 0).Any()
+            ? $"The shortcut '{shortcut}' is already used as the name of an alias."
+            : null;
     }
 
     private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)

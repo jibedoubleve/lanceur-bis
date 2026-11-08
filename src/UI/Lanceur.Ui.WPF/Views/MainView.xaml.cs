@@ -93,7 +93,7 @@ public partial class MainView
         var typed = value.Query.Name.TrimEnd();
         var targetWidth = Width(value.Suggestion) + Width(" ");
         var spaces = (int)Math.Ceiling((targetWidth - Width(typed)) / Width(" "));
-        SetQuery(typed + new string(' ', Math.Max(spaces, 0)) + value.Query.RawParameters);
+        SetQuery(typed + new string(' ', Math.Max(spaces, 1)) + value.Query.RawParameters);
 
         return;
 

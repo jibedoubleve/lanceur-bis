@@ -10,10 +10,10 @@ public sealed class SearchService : ISearchService
 {
     #region Fields
 
-    private Cmdline? _previousQuery;
-
     private readonly ILogger<SearchService> _logger;
     private readonly IMacroAliasExpanderService _macroAliasExpanderService;
+
+    private Cmdline? _previousQuery;
     private readonly IReadOnlyCollection<IStoreService> _storeServices;
 
     #endregion
@@ -48,11 +48,18 @@ public sealed class SearchService : ISearchService
 
         if (previousQuery.IsEmpty()) { return false; }
 
-        return GetAliveStores(currentQuery)
-            .All(store => store.CanPruneResult(previousQuery, currentQuery));
+        // Pruning only makes sense on results produced by the very same stores. When the set of
+        // alive stores changes (e.g. the user just finished typing an alphanumeric store shortcut),
+        // the current result set comes from other stores and a full search is required.
+        var currentStores = GetAliveStores(currentQuery).ToHashSet();
+        var previousStores = GetAliveStores(previousQuery).ToHashSet();
+        
+        return currentStores.SetEquals(previousStores) &&
+               currentStores.All(store => store.CanPruneResult(previousQuery, currentQuery));
     }
 
-    private async Task DispatchSearchAsync(IList<QueryResult> destination, Cmdline currentQuery, bool doesReturnAllIfEmpty)
+    private async Task DispatchSearchAsync(
+        IList<QueryResult> destination, Cmdline currentQuery, bool doesReturnAllIfEmpty)
     {
         using var measurement = _logger.WarnIfSlow(this);
         if (doesReturnAllIfEmpty && currentQuery.IsEmpty())
@@ -76,7 +83,7 @@ public sealed class SearchService : ISearchService
                 currentQuery.ToString(),
                 _previousQuery?.ToString() ?? "<EMPTY>"
             );
-            
+
             //CanPrune guarantees the _previousQuery is not null
             PruneResults(destination, _previousQuery!, currentQuery);
             return;
@@ -111,9 +118,9 @@ public sealed class SearchService : ISearchService
     {
         var stores = _storeServices.Where(service => service.Orchestration.IsAlive(query))
                                    .ToArray();
-        
-        return stores.Any(x => x.Orchestration.IdleOthers) 
-            ? [stores.First(x => x.Orchestration.IdleOthers)] 
+
+        return stores.Any(x => x.Orchestration.IdleOthers)
+            ? [stores.First(x => x.Orchestration.IdleOthers)]
             : stores;
     }
 

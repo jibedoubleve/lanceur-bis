@@ -31,9 +31,15 @@ public sealed class IoCForStoresTest : TestBase
     #region Methods
 
     [Theory]
-    [InlineData(null, "pp hello world")] // null override, then use the default one
-    [InlineData("^pp.*", ": hello world")]
-    public void When_no_shortcut_override_defined_Then_default_are_used(string? aliasOverride, string cmdlineString)
+    [InlineData(null, "pp hello world", false)] // null override, then use the default one
+    [InlineData(null, ": hello world", true)]
+    //-- An override that is not a single special character is ignored
+    [InlineData("pp", "pp hello world", false)]
+    [InlineData("pp", ": hello world", true)]
+    [InlineData("^pp.*", ": hello world", true)]
+    [InlineData("&&", ": hello world", true)]
+    public void When_override_is_missing_or_invalid_Then_default_is_used(
+        string? aliasOverride, string cmdlineString, bool expected)
     {
         // arrange 
         var cfgOverride = aliasOverride is null
@@ -82,12 +88,12 @@ public sealed class IoCForStoresTest : TestBase
         // assert
         OutputHelper.WriteLine($"Cmdline      : {cmdlineString}");
         store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString))
-                    .ShouldBeFalse();
+                    .ShouldBe(expected);
     }
 
     [Theory]
     [InlineData(null, ": hello world")] // null override, then use the default one
-    [InlineData("pp", "pp hello world")]
+    [InlineData("&", "& hello world")]
     public void When_override_defined_Then_they_are_used_instead_of_defaults(
         string? aliasOverride, string cmdlineString)
     {
@@ -144,12 +150,12 @@ public sealed class IoCForStoresTest : TestBase
     public void When_overriden_shortcut_update_Then_updated_values_are_used()
     {
         // arrange
-        const string aliasOverride1 = "pp";
-        const string aliasOverride2 = "éé";
+        const string aliasOverride1 = "&";
+        const string aliasOverride2 = "%";
 
         const string cmdlineString1 = ": hello world";
-        const string cmdlineString2 = "pp hello world";
-        const string cmdlineString3 = "éé hello world";
+        const string cmdlineString2 = "& hello world";
+        const string cmdlineString3 = "% hello world";
 
         var connectionManager = GetConnectionManager(SqlBuilder.Empty);
         var serviceProvider = ConfigureServices();
