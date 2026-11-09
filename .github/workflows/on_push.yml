@@ -46,7 +46,7 @@ jobs:
           - name: TODO to Issue
             uses: alstr/todo-to-issue-action@64aca8fda7023259aada83ba44ad988c4c443657
             with:
-                IDENTIFIERS: '[{"name": "TODO", "labels": ["ungroomed"]}, {"name": "REFACTOR", "labels": ["tech-debt", "ungroomed"]}]'
+                IDENTIFIERS: '[{"name": "REFACTOR", "labels": ["tech-debt", "ungroomed"]}]'
                 INSERT_ISSUE_URLS: "true"
                 CLOSE_ISSUES: "true"
             env:
