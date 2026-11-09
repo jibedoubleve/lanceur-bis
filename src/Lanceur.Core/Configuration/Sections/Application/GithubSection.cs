@@ -18,7 +18,7 @@ public sealed class GithubSection
 
     public GithubSection()
     {
-        Tag = "ungroomed";
+        Tag = "needs-triage";
         LastCheckedVersion = new Version();
     }
 
