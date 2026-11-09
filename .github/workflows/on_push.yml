@@ -46,6 +46,21 @@ jobs:
           - name: TODO to Issue
             uses: alstr/todo-to-issue-action@64aca8fda7023259aada83ba44ad988c4c443657
             with:
-                IDENTIFIERS: '[{"name": "TODO", "labels": ["ungroomed"]}]'
+                IDENTIFIERS: '[{"name": "REFACTOR", "labels": ["tech-debt", "ungroomed"]}]'
+                INSERT_ISSUE_URLS: "true"
+                CLOSE_ISSUES: "true"
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Pushes made with GITHUB_TOKEN don't trigger workflows; [skip ci] makes it explicit.
+          - name: Commit issue URLs inserted into TODOs
+            run: |
+                git config user.name "github-actions[bot]"
+                git config user.email "github-actions[bot]@users.noreply.github.com"
+                git add -A
+                if [ -n "$(git status --porcelain)" ]; then
+                  git commit -m "Add GitHub issue links to TODOs [skip ci]"
+                  git push origin HEAD:${{ github.ref_name }}
+                else
+                  echo "No changes to commit"
+                fi
