@@ -83,7 +83,7 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
         yield return
         [
             new Action<ApplicationSettings>(_ => { }),
-            new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("ungroomed"))
+            new Action<ApplicationSettings>(cfg => cfg.Github.Tag.ShouldBe("needs-triage"))
         ];
     }
 
