@@ -10,14 +10,6 @@ public interface ISearchService
     #region Methods
 
     /// <summary>
-    ///     Retrieves all available results from all registered stores without applying any search filters.
-    /// </summary>
-    /// <returns>A task that resolves to a collection of all available results.</returns>
-    //refactor: Remove unused method
-    // Issue URL: https://github.com/jibedoubleve/lanceur-bis/issues/1491
-    Task<IEnumerable<QueryResult>> GetAllAsync();
-
-    /// <summary>
     ///     Executes a search query across all registered stores and populates the provided collection with the results.
     /// </summary>
     /// <param name="destination">The collection to populate with search results.</param>
