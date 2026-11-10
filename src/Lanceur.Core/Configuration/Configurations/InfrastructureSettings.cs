@@ -10,6 +10,11 @@ public sealed class InfrastructureSettings
     #region Properties
 
     /// <summary>
+    ///     Gets or sets the database configuration (connection path, etc.).
+    /// </summary>
+    public DatabaseSection Database { get; set; } = new();
+
+    /// <summary>
     ///     Migration-only setter: forwards the legacy flat <c>DbPath</c> value found in older JSON configs
     ///     to <see cref="Database" />.<see cref="DatabaseSection.DbPath" />.
     ///     The property is setter-only so Newtonsoft.Json never writes it back;
@@ -18,19 +23,20 @@ public sealed class InfrastructureSettings
     [Obsolete("Use Database.DbPath. This property exists only for JSON migration.")]
     public string? DbPath
     {
-        set { if (!string.IsNullOrEmpty(value)) Database.DbPath = value; }
+        set
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                Database.DbPath = value;
+            }
+        }
     }
-
-    /// <summary>
-    ///     Gets or sets the database configuration (connection path, etc.).
-    /// </summary>
-    public DatabaseSection Database { get; set; } = new();
 
     /// <summary>
     ///     Gets or sets the logging configuration (minimum log level, etc.).
     /// </summary>
     public LoggingSection Logging { get; set; } = new();
-    
+
     /// <summary>
     ///     Gets or sets the thumbnail pipeline configuration.
     ///     Provides options to control the behaviour of the pipeline channel and the number of concurrent consumers.

@@ -39,12 +39,12 @@ public interface IAliasManagementService
     AliasQueryResult Hydrate(AliasQueryResult queryResult);
 
     /// <summary>
-    ///     Hydrates the <see cref="AliasQueryResult.Count"/> property of each alias by looking up
-    ///     its execution count in the alias database, matched by <see cref="AliasQueryResult.FileName"/>.
+    ///     Hydrates the <see cref="AliasQueryResult.Count" /> property of each alias by looking up
+    ///     its execution count in the alias database, matched by <see cref="AliasQueryResult.FileName" />.
     ///     Non-Steam aliases are ignored; aliases with no matching database entry will have a <c>Count</c> of zero.
     /// </summary>
     /// <param name="aliases">The aliases whose execution counts are to be hydrated.</param>
-    /// <returns>The same collection with the <see cref="AliasQueryResult.Count"/> property updated for each Steam alias.</returns>
+    /// <returns>The same collection with the <see cref="AliasQueryResult.Count" /> property updated for each Steam alias.</returns>
     IEnumerable<AliasQueryResult> HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases);
 
     /// <summary>

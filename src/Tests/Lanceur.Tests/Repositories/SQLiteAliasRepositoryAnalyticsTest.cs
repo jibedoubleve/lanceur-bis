@@ -27,46 +27,6 @@ public sealed class SQLiteAliasRepositoryAnalyticsTest : TestBase
 
     #region Methods
 
-    
-    [Fact]
-    public void When_SetUsage_called_twice_with_same_fileName_Then_no_doubloon_is_created()
-    {
-        // arrange
-        var connectionManager = new DbSingleConnectionManager(
-            BuildFreshDb()
-        );
-        var loggerFactory = CreateLoggerFactory();
-        var dbActionFactory = new DbActionFactory(loggerFactory);
-
-        var alias = new AliasQueryResult()
-        {
-            Id = 0,
-            Name = "test-alias",
-            FileName = "some\\path\\tool.exe",
-            Count = 0
-        } as QueryResult;
-
-        // act - simulate two consecutive executions of the same alias with Id == 0
-        connectionManager.WithinTransaction((tx) => {
-            var setUsage = new SetUsageDbAction(dbActionFactory);
-            setUsage.SetUsage(tx, alias);
-        });
-
-         alias.Id = 0; // reset as if resolved again without the id
-
-         connectionManager.WithinTransaction(tx => {
-             var setUsage = new SetUsageDbAction(dbActionFactory);
-             setUsage.SetUsage(tx, alias);
-         });
-
-        // assert - only one alias row should exist for that file_name
-        var count = connectionManager.Connection.ExecuteScalar<int>(
-            "select count(*) from alias where file_name = @fileName",
-            new { fileName = "some\\path\\tool.exe" }
-        );
-        count.ShouldBe(1);
-    }
-    
     private SQLiteAliasRepository BuildRepository(string? sql = null, IConnectionString? connectionString = null)
     {
         var connection = BuildFreshDb(sql, connectionString);
@@ -80,293 +40,44 @@ public sealed class SQLiteAliasRepositoryAnalyticsTest : TestBase
         return service;
     }
 
-    [Fact]
-    public void When_getting_additional_parameters_Then_no_error()
-        => Record.Exception(() => BuildRepository().GetAdditionalParameter([1, 2, 3]))
-                 .ShouldBeNull();
 
     [Fact]
-    public void When_getting_aliases_without_notes_Then_they_are_returned_with_usage()
+    public void When_SetUsage_called_twice_with_same_fileName_Then_no_doubloon_is_created()
     {
         // arrange
-        const int count = 2;
-        var date1 = DateTime.Now.AddDays(-1);
-        var date2 = DateTime.Now.AddDays(-2);
-
-        var gen = new SqlBuilder();
-        var sql = gen.AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .ToSql();
-        var service = BuildRepository(sql);
-
-        // act
-        var aliases = service.GetAliasesWithoutNotes()
-                             .ToArray();
-
-        aliases.Length.ShouldBe(gen.IdSequence);
-        // assert
-        aliases.ShouldSatisfyAllConditions(
-            col => Assert.All(col, a => a.Count.ShouldBe(2)),
-            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
+        var connectionManager = new DbSingleConnectionManager(
+            BuildFreshDb()
         );
-    }
+        var loggerFactory = CreateLoggerFactory();
+        var dbActionFactory = new DbActionFactory(loggerFactory);
 
-    [Fact]
-    public void When_getting_all_aliases_Then_no_error() => Record.Exception(() => BuildRepository().GetAll()).ShouldBeNull();
+        var alias = new AliasQueryResult
+        {
+            Id = 0,
+            Name = "test-alias",
+            FileName = "some\\path\\tool.exe",
+            Count = 0
+        } as QueryResult;
 
-    [Fact]
-    public void When_getting_aliases_with_additional_parameters_Then_no_error()
-        => Record
-           .Exception(()
-               => BuildRepository().GetAllAliasWithAdditionalParameters()
-           )
-           .ShouldBeNull();
+        // act - simulate two consecutive executions of the same alias with Id == 0
+        connectionManager.WithinTransaction(tx => {
+            var setUsage = new SetUsageDbAction(dbActionFactory);
+            setUsage.SetUsage(tx, alias);
+        });
 
-    [Theory]
-    [InlineData(@"c:\Not\A\Real\File.exe")]
-    [InlineData(@"C:\NOT\A\REAL\FILE.EXE")]
-    [InlineData(@"c:\not\a\real\file\")]
-    [InlineData(@"C:\NOT\A\REAL\FILE\")]
-    public void When_file_does_not_exist_Then_alias_is_broken(string fileName)
-    {
-        // arrange
-        const int count = 2;
-        var date1 = DateTime.Now.AddDays(-1);
-        var date2 = DateTime.Now.AddDays(-2);
+        alias.Id = 0; // reset as if resolved again without the id
 
-        var gen = new SqlBuilder();
-        var sql = gen.AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithFileName($"{fileName}_{gen.IdSequence}")
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithFileName($"{fileName}_{gen.IdSequence}")
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithFileName($"{fileName}_{gen.IdSequence}")
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithFileName($"{fileName}_{gen.IdSequence}")
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithUsage(date1, date2)
-                                        .WithFileName($"{fileName}_{gen.IdSequence}")
-                                        .WithCount(count)
-                                        .WithSynonyms()
-                     )
-                     .ToSql();
-        var service = BuildRepository(sql);
+        connectionManager.WithinTransaction(tx => {
+            var setUsage = new SetUsageDbAction(dbActionFactory);
+            setUsage.SetUsage(tx, alias);
+        });
 
-        // act
-        var aliases = service.GetBrokenAliases()
-                             .ToArray();
-
-        // assert
-        aliases.Length.ShouldBe(gen.IdSequence);
-        aliases.ShouldSatisfyAllConditions(
-            col => Assert.All(col, a => a.Count.ShouldBe(count)),
-            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
+        // assert - only one alias row should exist for that file_name
+        var count = connectionManager.Connection.ExecuteScalar<int>(
+            "select count(*) from alias where file_name = @fileName",
+            new { fileName = "some\\path\\tool.exe" }
         );
-    }
-
-    [Fact]
-    public void When_getting_alias_by_id_Then_no_error()
-        => Record.Exception(() => BuildRepository().GetById(1))
-                 .ShouldBeNull();
-
-    [Fact]
-    public void When_getting_deleted_aliases_Then_they_are_returned_with_usage()
-    {
-        // arrange
-        const int count = 2;
-        var now = DateTime.Now.AddMinutes(-60);
-        var date1 = now.AddDays(-1);
-        var date2 = now.AddDays(-2);
-
-        var gen = new SqlBuilder();
-        var sql = gen.AppendAlias(a => a.WithDeletedAt(now)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithDeletedAt(now)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithDeletedAt(now)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithDeletedAt(now)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms()
-                     )
-                     .AppendAlias(a => a.WithDeletedAt(now)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms()
-                     )
-                     .ToSql();
-        var service = BuildRepository(sql);
-
-        // act
-        var aliases = service.GetDeletedAlias()
-                             .ToArray();
-
-        // assert
-        aliases.Length.ShouldBe(gen.IdSequence);
-        aliases.ShouldSatisfyAllConditions(
-            col => Assert.All(col, a => a.Count.ShouldBe(2)),
-            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
-        );
-    }
-
-    [Theory]
-    [InlineData("filename", "some arguments")]
-    public void When_aliases_have_same_file_and_arguments_Then_they_are_doubloons(string filename, string arguments)
-    {
-        // arrange
-        const int count = 2;
-
-        var date1 = DateTime.Now.AddDays(-1);
-        var date2 = DateTime.Now.AddDays(-2);
-
-        const string name = "is_a_doubloon";
-        var gen = new SqlBuilder();
-        var sql = gen.AppendAlias(a => a.WithFileName(filename)
-                                        .WithArguments(arguments)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .AppendAlias(a => a.WithFileName(filename)
-                                        .WithArguments(arguments)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .AppendAlias(a => a.WithFileName(filename)
-                                        .WithArguments(arguments)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .AppendAlias(a => a.WithFileName(filename)
-                                        .WithArguments(arguments)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .AppendAlias(a => a.WithFileName(filename)
-                                        .WithArguments(arguments)
-                                        .WithCount(count)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .ToSql();
-        var service = BuildRepository(sql);
-
-        // act
-        var aliases = service.GetDoubloons()
-                             .ToArray();
-
-        // assert
-        aliases.Length.ShouldBe(gen.IdSequence);
-        aliases.ShouldSatisfyAllConditions(
-            col => Assert.All(col, a => a.Count.ShouldBe(count)),
-            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
-        );
-    }
-
-    [Fact]
-    public void When_lua_scripts_differ_Then_only_same_scripts_are_doubloons()
-    {
-        // arrange
-        const int count = 2;
-
-        var date1 = DateTime.Now.AddDays(-1);
-        var date2 = DateTime.Now.AddDays(-2);
-
-        const string script1 = "return something";
-
-        const string name = "is_a_doubloon";
-        var gen = new SqlBuilder();
-        var sql = gen.AppendAlias(a => a.WithFileName(name)
-                                        .WithArguments(name)
-                                        .WithCount(count)
-                                        .WithLuaScript(script1)
-                                        .WithSynonyms(name)
-                                        .WithUsage(date1, date2)
-                     )
-                     .AppendAlias(a => a.WithFileName(name)
-                                        .WithArguments(name)
-                                        .WithCount(count)
-                                        .WithLuaScript(script1)
-                                        .WithSynonyms(name)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .AppendAlias(a => a.WithFileName(name)
-                                        .WithArguments(name)
-                                        .WithCount(count)
-                                        .WithLuaScript(script1)
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .AppendAlias(a => a.WithFileName(name)
-                                        .WithArguments(name)
-                                        .WithCount(count)
-                                        .WithLuaScript(Any.String(10))
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .AppendAlias(a => a.WithFileName(name)
-                                        .WithArguments(name)
-                                        .WithCount(count)
-                                        .WithLuaScript(Any.String(10))
-                                        .WithUsage(date1, date2)
-                                        .WithSynonyms(name)
-                     )
-                     .ToSql();
-        var service = BuildRepository(sql);
-
-        // act
-        var aliases = service.GetDoubloons()
-                             .ToArray();
-
-        // assert
-        aliases.Length.ShouldBe(3);
-        aliases.ShouldSatisfyAllConditions(
-            col => Assert.All(col, alias => alias.Count.ShouldBe(count)),
-            col => Assert.All(col, alias => alias.LastUsedAt.ShouldBe(date1))
-        );
+        count.ShouldBe(1);
     }
 
     [Fact]
@@ -428,6 +139,232 @@ public sealed class SQLiteAliasRepositoryAnalyticsTest : TestBase
         aliases.ShouldSatisfyAllConditions(
             a => Assert.All(a, alias => alias.Count.ShouldBe(count)),
             a => Assert.All(a, alias => alias.LastUsedAt.ShouldBe(date1))
+        );
+    }
+
+    [Theory]
+    [InlineData("filename", "some arguments")]
+    public void When_aliases_have_same_file_and_arguments_Then_they_are_doubloons(string filename, string arguments)
+    {
+        // arrange
+        const int count = 2;
+
+        var date1 = DateTime.Now.AddDays(-1);
+        var date2 = DateTime.Now.AddDays(-2);
+
+        const string name = "is_a_doubloon";
+        var gen = new SqlBuilder();
+        var sql = gen.AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(filename)
+                                        .WithArguments(arguments)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .ToSql();
+        var service = BuildRepository(sql);
+
+        // act
+        var aliases = service.GetDoubloons()
+                             .ToArray();
+
+        // assert
+        aliases.Length.ShouldBe(gen.IdSequence);
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, a => a.Count.ShouldBe(count)),
+            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
+        );
+    }
+
+    [Theory]
+    [InlineData(@"c:\Not\A\Real\File.exe")]
+    [InlineData(@"C:\NOT\A\REAL\FILE.EXE")]
+    [InlineData(@"c:\not\a\real\file\")]
+    [InlineData(@"C:\NOT\A\REAL\FILE\")]
+    public void When_file_does_not_exist_Then_alias_is_broken(string fileName)
+    {
+        // arrange
+        const int count = 2;
+        var date1 = DateTime.Now.AddDays(-1);
+        var date2 = DateTime.Now.AddDays(-2);
+
+        var gen = new SqlBuilder();
+        var sql = gen.AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithFileName($"{fileName}_{gen.IdSequence}")
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .ToSql();
+        var service = BuildRepository(sql);
+
+        // act
+        var aliases = service.GetBrokenAliases()
+                             .ToArray();
+
+        // assert
+        aliases.Length.ShouldBe(gen.IdSequence);
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, a => a.Count.ShouldBe(count)),
+            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
+        );
+    }
+
+    [Fact]
+    public void When_getting_additional_parameters_Then_no_error()
+        => Record.Exception(() => BuildRepository().GetAdditionalParameter([1, 2, 3]))
+                 .ShouldBeNull();
+
+    [Fact]
+    public void When_getting_alias_by_id_Then_no_error()
+        => Record.Exception(() => BuildRepository().GetById(1))
+                 .ShouldBeNull();
+
+    [Fact]
+    public void When_getting_aliases_with_additional_parameters_Then_no_error()
+        => Record
+           .Exception(()
+               => BuildRepository().GetAllAliasWithAdditionalParameters()
+           )
+           .ShouldBeNull();
+
+    [Fact]
+    public void When_getting_aliases_without_notes_Then_they_are_returned_with_usage()
+    {
+        // arrange
+        const int count = 2;
+        var date1 = DateTime.Now.AddDays(-1);
+        var date2 = DateTime.Now.AddDays(-2);
+
+        var gen = new SqlBuilder();
+        var sql = gen.AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithUsage(date1, date2)
+                                        .WithCount(count)
+                                        .WithSynonyms()
+                     )
+                     .ToSql();
+        var service = BuildRepository(sql);
+
+        // act
+        var aliases = service.GetAliasesWithoutNotes()
+                             .ToArray();
+
+        aliases.Length.ShouldBe(gen.IdSequence);
+        // assert
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, a => a.Count.ShouldBe(2)),
+            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
+        );
+    }
+
+    [Fact]
+    public void When_getting_all_aliases_Then_no_error() =>
+        Record.Exception(() => BuildRepository().GetAll()).ShouldBeNull();
+
+    [Fact]
+    public void When_getting_deleted_aliases_Then_they_are_returned_with_usage()
+    {
+        // arrange
+        const int count = 2;
+        var now = DateTime.Now.AddMinutes(-60);
+        var date1 = now.AddDays(-1);
+        var date2 = now.AddDays(-2);
+
+        var gen = new SqlBuilder();
+        var sql = gen.AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .AppendAlias(a => a.WithDeletedAt(now)
+                                        .WithCount(count)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms()
+                     )
+                     .ToSql();
+        var service = BuildRepository(sql);
+
+        // act
+        var aliases = service.GetDeletedAlias()
+                             .ToArray();
+
+        // assert
+        aliases.Length.ShouldBe(gen.IdSequence);
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, a => a.Count.ShouldBe(2)),
+            col => Assert.All(col, a => a.LastUsedAt.ShouldBe(date1))
         );
     }
 
@@ -585,6 +522,70 @@ public sealed class SQLiteAliasRepositoryAnalyticsTest : TestBase
     public void When_hydrating_alias_Then_no_error()
         => Record.Exception(() => BuildRepository().HydrateAlias(new AliasQueryResult()))
                  .ShouldBeNull();
+
+    [Fact]
+    public void When_lua_scripts_differ_Then_only_same_scripts_are_doubloons()
+    {
+        // arrange
+        const int count = 2;
+
+        var date1 = DateTime.Now.AddDays(-1);
+        var date2 = DateTime.Now.AddDays(-2);
+
+        const string script1 = "return something";
+
+        const string name = "is_a_doubloon";
+        var gen = new SqlBuilder();
+        var sql = gen.AppendAlias(a => a.WithFileName(name)
+                                        .WithArguments(name)
+                                        .WithCount(count)
+                                        .WithLuaScript(script1)
+                                        .WithSynonyms(name)
+                                        .WithUsage(date1, date2)
+                     )
+                     .AppendAlias(a => a.WithFileName(name)
+                                        .WithArguments(name)
+                                        .WithCount(count)
+                                        .WithLuaScript(script1)
+                                        .WithSynonyms(name)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(name)
+                                        .WithArguments(name)
+                                        .WithCount(count)
+                                        .WithLuaScript(script1)
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(name)
+                                        .WithArguments(name)
+                                        .WithCount(count)
+                                        .WithLuaScript(Any.String(10))
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .AppendAlias(a => a.WithFileName(name)
+                                        .WithArguments(name)
+                                        .WithCount(count)
+                                        .WithLuaScript(Any.String(10))
+                                        .WithUsage(date1, date2)
+                                        .WithSynonyms(name)
+                     )
+                     .ToSql();
+        var service = BuildRepository(sql);
+
+        // act
+        var aliases = service.GetDoubloons()
+                             .ToArray();
+
+        // assert
+        aliases.Length.ShouldBe(3);
+        aliases.ShouldSatisfyAllConditions(
+            col => Assert.All(col, alias => alias.Count.ShouldBe(count)),
+            col => Assert.All(col, alias => alias.LastUsedAt.ShouldBe(date1))
+        );
+    }
 
     #endregion
 }

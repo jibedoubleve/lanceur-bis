@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Windows.Data;
 using Lanceur.Infra.Stores;
 using Lanceur.Ui.WPF.Converters;
@@ -14,20 +13,6 @@ public sealed class ConverterTest
     #region Methods
 
     [Theory]
-    [ClassData(typeof(DataConvertStoreTypeAsExpected))]
-    public void When_converting_store_type_Then_store_name_is_returned(object input, object output)
-    {
-        var converter = new StoreTypeToStoreNameConverter();
-        converter.Convert(
-                     input,
-                     typeof(ConverterTest),
-                     null,
-                     CultureInfo.CurrentCulture
-                 )
-                 .ShouldBeEquivalentTo(output);
-    }
-
-    [Theory]
     [InlineData("&")]
     [InlineData("!")]
     [InlineData(".")]
@@ -37,7 +22,10 @@ public sealed class ConverterTest
         var converter = new StoreOrchestrationToStringConverter();
 
         // ACT
-        var result = converter.ConvertBack(shortcut, typeof(string), null, CultureInfo.CurrentCulture) as string;
+        var result = converter.ConvertBack(shortcut,
+            typeof(string),
+            null,
+            CultureInfo.CurrentCulture) as string;
 
         // ASSERT - the stored regex must contain at least one capture group
         result.ShouldBe(shortcut);
@@ -53,11 +41,31 @@ public sealed class ConverterTest
         var converter = new StoreOrchestrationToStringConverter();
 
         // ACT - round-trip
-        var stored  = converter.ConvertBack(shortcut, typeof(string), null, CultureInfo.CurrentCulture);
-        var restored = converter.Convert(stored, typeof(string), null, CultureInfo.CurrentCulture) as string;
+        var stored = converter.ConvertBack(shortcut,
+            typeof(string),
+            null,
+            CultureInfo.CurrentCulture);
+        var restored = converter.Convert(stored,
+            typeof(string),
+            null,
+            CultureInfo.CurrentCulture) as string;
 
         // ASSERT
         restored.ShouldBe(shortcut);
+    }
+
+    [Theory]
+    [ClassData(typeof(DataConvertStoreTypeAsExpected))]
+    public void When_converting_store_type_Then_store_name_is_returned(object input, object output)
+    {
+        var converter = new StoreTypeToStoreNameConverter();
+        converter.Convert(
+                     input,
+                     typeof(ConverterTest),
+                     null,
+                     CultureInfo.CurrentCulture
+                 )
+                 .ShouldBeEquivalentTo(output);
     }
 
     #endregion

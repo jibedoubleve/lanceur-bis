@@ -40,8 +40,9 @@ public sealed class PackagedAppThumbnailStrategy : ThumbnailStrategy
 
     #region Methods
 
-    /// <inheritdoc/>
-    protected override async Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    protected override async Task<bool> UpdateThumbnailCoreAsync(
+        AliasQueryResult alias, CancellationToken cancellationToken)
     {
         if (!alias.IsPackagedApplication()) { return false; }
 

@@ -4,6 +4,8 @@ namespace Lanceur.Infra.SQLite.Extensions;
 
 public static class TransactionExtension
 {
+    #region Methods
+
     internal static IDbConnection GetConnection(this IDbTransaction tx)
     {
         if (tx.Connection is null)
@@ -11,6 +13,9 @@ public static class TransactionExtension
             throw new InvalidOperationException(
                 "Cannot set the current version ot the application because no connection exists");
         }
+
         return tx.Connection;
     }
+
+    #endregion
 }

@@ -31,21 +31,24 @@ public interface IStoreOrchestrationFactory
     StoreOrchestration Shared(Regex alivePattern);
 
     /// <summary>
+    ///     Create an orchestrator that allows the store to run with all the
+    ///     other search that can occur at the same time.
+    /// </summary>
+    /// <returns>An Orchestrator</returns>
+    StoreOrchestration SharedAlwaysActive();
+
+    /// <summary>
     ///     Creates a shared orchestrator that evaluates <paramref name="alivePattern" /> against the
     ///     full command line (name + parameters) rather than the command name alone.
     ///     Use this for stores whose activation regex must inspect the entire expression,
     ///     such as a calculator where operands appear after the first token.
     /// </summary>
-    /// <param name="alivePattern">The regex applied to the full cmdline string to determine whether the store should be activated.</param>
+    /// <param name="alivePattern">
+    ///     The regex applied to the full cmdline string to determine whether the store should be
+    ///     activated.
+    /// </param>
     /// <returns>An orchestrator that does not silence other stores.</returns>
     StoreOrchestration SharedOnFullQuery(Regex alivePattern);
-
-    /// <summary>
-    ///     Create an orchestrator that allows the store to run with all the
-    ///     other search that can occur at the same time. 
-    /// </summary>
-    /// <returns>An Orchestrator</returns>
-    StoreOrchestration SharedAlwaysActive();
 
     #endregion
 }

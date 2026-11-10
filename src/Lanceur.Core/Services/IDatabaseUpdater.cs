@@ -5,6 +5,8 @@ namespace Lanceur.Core.Services;
 /// </summary>
 public interface IDatabaseUpdater
 {
+    #region Methods
+
     /// <summary>
     ///     Checks whether the database specified by the connection string needs an update.
     ///     If an update is required, applies the necessary Data Definition Language (DDL) scripts
@@ -12,4 +14,6 @@ public interface IDatabaseUpdater
     /// </summary>
     /// <param name="connectionString">The connection string pointing to the SQLite database.</param>
     void Update(string connectionString);
+
+    #endregion
 }

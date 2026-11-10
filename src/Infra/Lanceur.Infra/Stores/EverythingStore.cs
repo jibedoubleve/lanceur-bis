@@ -38,7 +38,7 @@ public sealed class EverythingStore : StoreBase, IStoreService
 
     #region Properties
 
-    /// <inheritdoc cref="IStoreService.IsOverridable"/>
+    /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => true;
 
     /// <inheritdoc />

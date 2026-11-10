@@ -9,13 +9,13 @@ public sealed partial class FavIconService : IFavIconService
 {
     #region Fields
 
-    private readonly IFavIconDownloader _favIconDownloader;
-
     /// <summary>
     ///     A regex to check whether the specified text
     ///     is the template of a Macro
     /// </summary>
     private static readonly Regex IsMacroRegex = IsMacroRegexBuilder();
+
+    private readonly IFavIconDownloader _favIconDownloader;
 
     #endregion
 

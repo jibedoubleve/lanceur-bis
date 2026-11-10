@@ -13,13 +13,14 @@ public partial class SteamLibraryService : ISteamLibraryService
 {
     #region Fields
 
+    private const string CacheKeyGames = "SteamLibraryService_Games";
+    private const string CacheKeyLibrary = "SteamLibraryService_Libraries";
+    private const string SteamApps = "steamapps";
+
     private DateTime _lastCacheUpdate = DateTime.MinValue;
 
     private readonly ILogger<SteamLibraryService> _logger;
     private readonly IMemoryCache _memoryCache;
-    private const string CacheKeyGames = "SteamLibraryService_Games";
-    private const string CacheKeyLibrary = "SteamLibraryService_Libraries";
-    private const string SteamApps = "steamapps";
 
     #endregion
 
@@ -110,7 +111,7 @@ public partial class SteamLibraryService : ISteamLibraryService
             var lastWrite = Directory.GetLastWriteTime(path);
             return lastWrite > _lastCacheUpdate;
         });
-        
+
         if (invalidateCache)
         {
             _logger.LogDebug("Invalidating Steam library cache");

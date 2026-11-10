@@ -8,38 +8,6 @@ public sealed class IndexNavigatorTest
 {
     #region Methods
 
-    [Fact]
-    public void When_getting_next_item_of_single_item_list_Then_same_item_is_returned()
-    {
-        var list = new List<string> { "un" };
-        list.GetNextItem(0).ShouldBe("un");
-    }
-
-    [Fact]
-    public void When_getting_previous_item_of_single_item_list_Then_same_item_is_returned()
-    {
-        var list = new List<string> { "un" };
-        list.GetPreviousItem(0).ShouldBe("un");
-    }
-
-    [Fact]
-    public void When_getting_next_item_of_empty_list_Then_it_throws()
-    {
-        var list = new List<string>();
-        var action = () => list.GetNextItem(-1);
-
-        action.ShouldThrow<ArgumentOutOfRangeException>();
-    }
-
-    [Fact]
-    public void When_getting_previous_item_of_empty_list_Then_it_throws()
-    {
-        var list = new List<string>();
-        var action = () => list.GetPreviousItem(-1);
-
-        action.ShouldThrow<ArgumentOutOfRangeException>();
-    }
-
     [Theory]
     [InlineData(0, 1)]
     [InlineData(1, 2)]
@@ -62,14 +30,6 @@ public sealed class IndexNavigatorTest
         list[list.GetNextIndex(current)].ShouldBe(next);
     }
 
-    [Fact]
-    public void When_indexing_empty_list_with_next_index_Then_it_throws()
-    {
-        var list = new List<int>();
-
-        Should.Throw<ArgumentOutOfRangeException>(() => list[list.GetNextIndex(0)]);
-    }
-
     [Theory]
     [InlineData(0, "un")]
     [InlineData(1, "deux")]
@@ -90,6 +50,32 @@ public sealed class IndexNavigatorTest
         };
 
         list.GetNextItem(next).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void When_getting_next_item_of_empty_list_Then_it_throws()
+    {
+        var list = new List<string>();
+        var action = () => list.GetNextItem(-1);
+
+        action.ShouldThrow<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void When_getting_next_item_of_single_item_list_Then_same_item_is_returned()
+    {
+        var list = new List<string> { "un" };
+        list.GetNextItem(0).ShouldBe("un");
+    }
+
+    [Theory]
+    [InlineData(-2)]
+    [InlineData(1)]
+    public void When_getting_next_item_with_out_of_range_index_Then_it_throws(int index)
+    {
+        var list = new List<string> { "un" };
+        var subject = () => list.GetNextItem(index);
+        subject.ShouldThrow<ArgumentOutOfRangeException>();
     }
 
     [Theory]
@@ -142,14 +128,6 @@ public sealed class IndexNavigatorTest
         list[list.GetPreviousIndex(current)].ShouldBe(previous);
     }
 
-    [Fact]
-    public void When_indexing_empty_list_with_previous_index_Then_it_throws()
-    {
-        var list = new List<int>();
-        Should.Throw<ArgumentOutOfRangeException>(() => list[list.GetPreviousIndex(0)]
-        );
-    }
-
     [Theory]
     [InlineData(0, "cinq")]
     [InlineData(1, "zero")]
@@ -170,6 +148,32 @@ public sealed class IndexNavigatorTest
         };
 
         list.GetPreviousItem(next).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void When_getting_previous_item_of_empty_list_Then_it_throws()
+    {
+        var list = new List<string>();
+        var action = () => list.GetPreviousItem(-1);
+
+        action.ShouldThrow<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void When_getting_previous_item_of_single_item_list_Then_same_item_is_returned()
+    {
+        var list = new List<string> { "un" };
+        list.GetPreviousItem(0).ShouldBe("un");
+    }
+
+    [Theory]
+    [InlineData(-2)]
+    [InlineData(1)]
+    public void When_getting_previous_item_with_out_of_range_index_Then_it_throws(int index)
+    {
+        var list = new List<string> { "un" };
+        var subject = () => list.GetPreviousItem(index);
+        subject.ShouldThrow<ArgumentOutOfRangeException>();
     }
 
     [Theory]
@@ -201,10 +205,19 @@ public sealed class IndexNavigatorTest
     }
 
     [Fact]
-    public void When_list_is_empty_Then_navigation_is_impossible()
+    public void When_indexing_empty_list_with_next_index_Then_it_throws()
     {
         var list = new List<int>();
-        list.CanNavigate().ShouldBe(false);
+
+        Should.Throw<ArgumentOutOfRangeException>(() => list[list.GetNextIndex(0)]);
+    }
+
+    [Fact]
+    public void When_indexing_empty_list_with_previous_index_Then_it_throws()
+    {
+        var list = new List<int>();
+        Should.Throw<ArgumentOutOfRangeException>(() => list[list.GetPreviousIndex(0)]
+        );
     }
 
     [Fact]
@@ -214,24 +227,11 @@ public sealed class IndexNavigatorTest
         list.CanNavigate().ShouldBe(true);
     }
 
-    [Theory]
-    [InlineData(-2)]
-    [InlineData(1)]
-    public void When_getting_previous_item_with_out_of_range_index_Then_it_throws(int index)
+    [Fact]
+    public void When_list_is_empty_Then_navigation_is_impossible()
     {
-        var list = new List<string> { "un" };
-        var subject = () => list.GetPreviousItem(index);
-        subject.ShouldThrow<ArgumentOutOfRangeException>();
-    }
-
-    [Theory]
-    [InlineData(-2)]
-    [InlineData(1)]
-    public void When_getting_next_item_with_out_of_range_index_Then_it_throws(int index)
-    {
-        var list = new List<string> { "un" };
-        var subject = () => list.GetNextItem(index);
-        subject.ShouldThrow<ArgumentOutOfRangeException>();
+        var list = new List<int>();
+        list.CanNavigate().ShouldBe(false);
     }
 
     #endregion

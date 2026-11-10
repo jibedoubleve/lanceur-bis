@@ -19,9 +19,9 @@ public abstract class TestBase
 {
     #region Fields
 
-    private ILoggerFactory? _loggerFactory;
-
     private const string InMemoryConnectionString = "Data Source =:memory:";
+
+    private ILoggerFactory? _loggerFactory;
 
     #endregion
 

@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Lanceur.Core.Configuration;
+﻿using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Extensions;

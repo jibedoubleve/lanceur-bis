@@ -1,10 +1,8 @@
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Services;
-using Lanceur.SharedKernel.Extensions;
 using Lanceur.Tests.Tools.Helpers;
 using NSubstitute;
-using Shouldly;
 using Xunit;
 
 namespace Lanceur.Tests.Functional;

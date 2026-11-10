@@ -5,10 +5,7 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Stores;
-using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Ui.WPF.Converters;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -90,7 +87,7 @@ public sealed class StoreOrchestrationTests
                      null!)
                  .ShouldBe(output);
     }
-    
+
     [Fact]
     public void When_store_is_always_inactive_but_shortcut_override_exists_in_settings_Then_store_should_be_inactive()
     {

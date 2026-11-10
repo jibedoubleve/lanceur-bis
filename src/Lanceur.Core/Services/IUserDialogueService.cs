@@ -1,4 +1,3 @@
-#nullable enable
 namespace Lanceur.Core.Services;
 
 /// <summary>

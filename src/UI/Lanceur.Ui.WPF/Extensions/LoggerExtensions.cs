@@ -25,7 +25,7 @@ public static class LoggerExtensions
         }
 
         logger.LogInformation(
-            "Version: {Version} --- InformationalVersion: {InformationalVersion} --- FileVersion: {FileVersion}", 
+            "Version: {Version} --- InformationalVersion: {InformationalVersion} --- FileVersion: {FileVersion}",
             version,
             iVer.InformationalVersion,
             fVer.Version

@@ -207,6 +207,23 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     #region Methods
 
+    /// <summary>
+    ///     Lists the special characters that <paramref name="storeShortcut" /> can use: those that are
+    ///     neither an alias name nor the shortcut of another store. Its current shortcut is always kept.
+    /// </summary>
+    private IEnumerable<string> GetAvailableStoreShortcuts(StoreShortcut storeShortcut)
+    {
+        var usedByAliases = _aliasRepository.GetExistingAliases(CmdlineManager.SpecialCharacters, 0);
+        var usedByStores = StoreShortcuts.Where(s => s != storeShortcut)
+                                         .Select(s => s.AliasOverride);
+        var used = usedByAliases.Concat(usedByStores)
+                                .OfType<string>()
+                                .ToHashSet();
+
+        return CmdlineManager.SpecialCharacters
+                             .Where(c => c == storeShortcut.AliasOverride || !used.Contains(c));
+    }
+
     private int GetHotKey()
     {
         var result = 0;
@@ -361,21 +378,13 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         SaveSettings();
     }
 
-    /// <summary>
-    ///     Lists the special characters that <paramref name="storeShortcut" /> can use: those that are
-    ///     neither an alias name nor the shortcut of another store. Its current shortcut is always kept.
-    /// </summary>
-    private IEnumerable<string> GetAvailableStoreShortcuts(StoreShortcut storeShortcut)
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var usedByAliases = _aliasRepository.GetExistingAliases(CmdlineManager.SpecialCharacters, 0);
-        var usedByStores = StoreShortcuts.Where(s => s != storeShortcut)
-                                         .Select(s => s.AliasOverride);
-        var used = usedByAliases.Concat(usedByStores)
-                                .OfType<string>()
-                                .ToHashSet();
+        string[] properties = [nameof(IsResourceMonitorEnabled), nameof(IsAdminModeEnabled)];
+        if (properties.Contains(e.PropertyName)) { return; }
 
-        return CmdlineManager.SpecialCharacters
-                             .Where(c => c == storeShortcut.AliasOverride || !used.Contains(c));
+        _logger.LogTrace("Property {Property} changed", e.PropertyName);
+        SaveSettings();
     }
 
     /// <summary>
@@ -392,15 +401,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         return _aliasRepository.GetExistingAliases([shortcut!], 0).Any()
             ? $"The shortcut '{shortcut}' is already used as the name of an alias."
             : null;
-    }
-
-    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        string[] properties = [nameof(IsResourceMonitorEnabled), nameof(IsAdminModeEnabled)];
-        if (properties.Contains(e.PropertyName)) { return; }
-
-        _logger.LogTrace("Property {Property} changed", e.PropertyName);
-        SaveSettings();
     }
 
     internal void SaveSettings()

@@ -13,12 +13,12 @@ public sealed class MultiMacro : MacroQueryResult
 {
     #region Fields
 
+    private static readonly Conditional<int> DefaultDelay = new(0, 1_000);
+
     private readonly int _delay;
     private readonly IExecutionService _executionService;
     private readonly ILogger<MultiMacro> _logger;
     private readonly Lazy<ISearchService> _searchService;
-
-    private static readonly Conditional<int> DefaultDelay = new(0, 1_000);
 
     #endregion
 

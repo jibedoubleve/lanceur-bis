@@ -6,7 +6,6 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Extensions;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools.Extensions;
@@ -44,6 +43,29 @@ public sealed class StoresOrchestrationTest
     #endregion
 
     #region Methods
+
+    [Theory]
+    [InlineData("sqlite foo:bar")]
+    [InlineData("notepad c:/users/docs")]
+    [InlineData("hello --flag:value")]
+    public void When_cmdline_name_has_no_colon_but_params_do_Then_additional_params_store_is_not_alive(
+        string cmdlineString)
+    {
+        // ARRANGE
+        var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
+                                                     .AddSingleton<IStoreOrchestrationFactory>(
+                                                         new StoreOrchestrationFactory()
+                                                     )
+                                                     .AddSingleton(AliasRepository)
+                                                     .AddSingleton<AdditionalParametersStore>()
+                                                     .AddLoggingForTests(_outputHelper)
+                                                     .AddStoreServicesMockContext()
+                                                     .BuildServiceProvider();
+        var store = serviceProvider.GetService<AdditionalParametersStore>()!;
+
+        // ASSERT - must check only the Name, not the full cmdline string
+        store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString)).ShouldBeFalse();
+    }
 
     [Theory]
     [InlineData("6+5", "11")]
@@ -173,28 +195,6 @@ public sealed class StoresOrchestrationTest
         // ASSERT
         store.Orchestration.IsAlive(query).ShouldBeFalse();
     }
-    
-    [Theory]
-    [InlineData("sqlite foo:bar")]
-    [InlineData("notepad c:/users/docs")]
-    [InlineData("hello --flag:value")]
-    public void When_cmdline_name_has_no_colon_but_params_do_Then_additional_params_store_is_not_alive(string cmdlineString)
-    {
-        // ARRANGE
-        var serviceProvider = new ServiceCollection().AddSingleton(LoggerFactory)
-                                                     .AddSingleton<IStoreOrchestrationFactory>(
-                                                         new StoreOrchestrationFactory()
-                                                     )
-                                                     .AddSingleton(AliasRepository)
-                                                     .AddSingleton<AdditionalParametersStore>()
-                                                     .AddLoggingForTests(_outputHelper)
-                                                     .AddStoreServicesMockContext()
-                                                     .BuildServiceProvider();
-        var store = serviceProvider.GetService<AdditionalParametersStore>()!;
-
-        // ASSERT - must check only the Name, not the full cmdline string
-        store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString)).ShouldBeFalse();
-    }
 
     [Theory]
     [InlineData("undeux")]
@@ -224,6 +224,32 @@ public sealed class StoresOrchestrationTest
     }
 
     [Theory]
+    [InlineData(" : Hello")]
+    [InlineData(": *.pdf")]
+    [InlineData(":132")]
+    [InlineData(":/.()}{")]
+    [InlineData(":")]
+    [InlineData(": ")]
+    public void When_retrieving_Everything_store_Then_it_is_alive_for_the_orchestrator(string query)
+    {
+        // ACT
+        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<IEverythingApi>())
+                                                     .AddSingleton<IStoreOrchestrationFactory>(
+                                                         new StoreOrchestrationFactory()
+                                                     )
+                                                     .AddSingleton(LoggerFactory)
+                                                     .AddSingleton<EverythingStore>()
+                                                     .AddLoggingForTests(_outputHelper)
+                                                     .AddStoreServicesMockContext()
+                                                     .AddStoreServicesConfiguration()
+                                                     .BuildServiceProvider();
+        var store = serviceProvider.GetService<EverythingStore>()!;
+
+        // ASSERT
+        store.Orchestration.IsAlive(query).ShouldBeTrue();
+    }
+
+    [Theory]
     [InlineData("r:mlk")]
     [InlineData("r:")]
     [InlineData("r:465")]
@@ -246,7 +272,7 @@ public sealed class StoresOrchestrationTest
                                                      .AddStoreServicesMockContext()
                                                      .AddSingleton<IFeatureFlagRepository>(ffRepository)
                                                      .BuildServiceProvider();
-        
+
         // act
         var store = serviceProvider.GetService<AdditionalParametersStore>()!;
 
@@ -299,32 +325,6 @@ public sealed class StoresOrchestrationTest
                               .AddLoggingForTests(_outputHelper)
                               .BuildServiceProvider();
         var store = serviceProvider.GetService<IStoreService>()!;
-
-        // ASSERT
-        store.Orchestration.IsAlive(query).ShouldBeTrue();
-    }
-
-    [Theory]
-    [InlineData(" : Hello")]
-    [InlineData(": *.pdf")]
-    [InlineData(":132")]
-    [InlineData(":/.()}{")]
-    [InlineData(":")]
-    [InlineData(": ")]
-    public void When_retrieving_Everything_store_Then_it_is_alive_for_the_orchestrator(string query)
-    {
-        // ACT
-        var serviceProvider = new ServiceCollection().AddSingleton(Substitute.For<IEverythingApi>())
-                                                     .AddSingleton<IStoreOrchestrationFactory>(
-                                                         new StoreOrchestrationFactory()
-                                                     )
-                                                     .AddSingleton(LoggerFactory)
-                                                     .AddSingleton<EverythingStore>()
-                                                     .AddLoggingForTests(_outputHelper)
-                                                     .AddStoreServicesMockContext()
-                                                     .AddStoreServicesConfiguration()
-                                                     .BuildServiceProvider();
-        var store = serviceProvider.GetService<EverythingStore>()!;
 
         // ASSERT
         store.Orchestration.IsAlive(query).ShouldBeTrue();

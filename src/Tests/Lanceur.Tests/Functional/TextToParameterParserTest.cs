@@ -39,7 +39,8 @@ public sealed class TextToParameterParserTest
 
     [Theory]
     [MemberData(nameof(FeedParseAdditionalParameters))]
-    public void When_parsing_additional_parameters_Then_all_lines_are_parsed(string additionalParameters, int parameterCount)
+    public void When_parsing_additional_parameters_Then_all_lines_are_parsed(
+        string additionalParameters, int parameterCount)
     {
         var parser = new TextToParameterParser();
         var result = parser.Parse(additionalParameters);

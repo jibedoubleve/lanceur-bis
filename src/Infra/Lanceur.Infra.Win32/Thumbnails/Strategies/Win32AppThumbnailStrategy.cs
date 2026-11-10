@@ -44,8 +44,9 @@ public sealed class Win32AppThumbnailStrategy : ThumbnailStrategy
 
     #region Methods
 
-    /// <inheritdoc/>
-    protected override async Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    protected override async Task<bool> UpdateThumbnailCoreAsync(
+        AliasQueryResult alias, CancellationToken cancellationToken)
     {
         var imageSource = await _staThreadRunner.RunAsync(
             () => _win32ThumbnailService.GetThumbnail(alias.FileName!),

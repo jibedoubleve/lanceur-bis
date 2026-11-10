@@ -24,7 +24,7 @@ public partial class WildcardService : IWildcardService
     private static partial Regex Wildcard();
 
     /// <inheritdoc />
-    public bool HasWildcard(string? template) => 
+    public bool HasWildcard(string? template) =>
         template is not null && Wildcard().IsMatch(template);
 
     /// <inheritdoc />
@@ -32,7 +32,7 @@ public partial class WildcardService : IWildcardService
     {
         template ??= string.Empty;
         input ??= string.Empty;
-        
+
         return Wildcard().Replace(template,
             m => m.Groups[1].Value.ToUpperInvariant() switch
             {
@@ -40,7 +40,8 @@ public partial class WildcardService : IWildcardService
                 "R" => _clipboard.RetrieveText(),
                 "W" => WebUtility.UrlEncode(input),
                 "C" => WebUtility.UrlEncode(_clipboard.RetrieveText()),
-                _   => throw new NotSupportedException($"Wildcard template ${m.Groups[1].Value.ToUpperInvariant()}$ is not supported")
+                _ => throw new NotSupportedException(
+                    $"Wildcard template ${m.Groups[1].Value.ToUpperInvariant()}$ is not supported")
             });
     }
 

@@ -53,7 +53,7 @@ public sealed class SearchService : ISearchService
         // the current result set comes from other stores and a full search is required.
         var currentStores = GetAliveStores(currentQuery).ToHashSet();
         var previousStores = GetAliveStores(previousQuery).ToHashSet();
-        
+
         return currentStores.SetEquals(previousStores) &&
                currentStores.All(store => store.CanPruneResult(previousQuery, currentQuery));
     }

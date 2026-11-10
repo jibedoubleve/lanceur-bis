@@ -10,6 +10,12 @@ namespace Lanceur.Tests.Tools.StateTesters;
 
 public static class AliasBuilder
 {
+    #region Fields
+
+    private static readonly Faker Faker = new();
+
+    #endregion
+
     #region Methods
 
     private static AdditionalParameter[] GetAdditionalParameters(Faker faker)
@@ -35,7 +41,6 @@ public static class AliasBuilder
         return names;
     }
 
-    private static readonly Faker Faker = new();
     public static AliasQueryResult BuildRandomAlias()
     {
         var names = GetStrings(Faker);

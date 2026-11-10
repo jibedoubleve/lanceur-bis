@@ -125,7 +125,9 @@ public sealed class ReconciliationSection
 
 public static class ReconciliationSectionExtensions
 {
-    public static ReportConfiguration Clone(this ReportConfiguration c) 
+    #region Methods
+
+    public static ReportConfiguration Clone(this ReportConfiguration c)
         => new(
             c.ReportType,
             new ColumnsConfiguration
@@ -135,9 +137,11 @@ public static class ReconciliationSectionExtensions
                 Parameters = c.ColumnsVisibility.Parameters,
                 ProposedDescription = c.ColumnsVisibility.ProposedDescription,
                 UsageCount = c.ColumnsVisibility.UsageCount
-
             });
+
+    #endregion
 }
+
 public sealed class ReportConfiguration(ReportType reportType, ColumnsConfiguration columnsVisibility) : ObservableModel
 {
     #region Properties

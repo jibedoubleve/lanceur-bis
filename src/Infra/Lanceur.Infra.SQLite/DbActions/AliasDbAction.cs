@@ -15,9 +15,9 @@ public sealed class AliasDbAction
 {
     #region Fields
 
-    private readonly ILogger<AliasDbAction> _logger;
-
     private const string MessageRemovedRows = "Removed {Count} row(s) from {Table}. Id: {IdAliases}";
+
+    private readonly ILogger<AliasDbAction> _logger;
 
     #endregion
 

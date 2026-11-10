@@ -2,7 +2,6 @@
 using System.Windows;
 using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.WPF.ReservedAliases;

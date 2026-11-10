@@ -6,7 +6,7 @@
 drop view if exists data_doubloons_v;
 create view data_doubloons_v as
 with normalised_alias as (select id,
-                                 hidden as n_hidden,
+                                 hidden                    as n_hidden,
                                  coalesce(arguments, '')   as n_arguments,
                                  coalesce(file_name, '')   as n_file_name,
                                  coalesce(run_as, '')      as n_run_as,
@@ -30,7 +30,7 @@ select a.id            as id,
        a.n_lua_script  as lua_script
 from normalised_alias a
          left join data_alias_synonyms_v b on a.id = b.id_alias
-where (n_arguments, n_file_name, n_run_as, n_lua_script) 
+where (n_arguments, n_file_name, n_run_as, n_lua_script)
           in (select n_arguments,
                      n_file_name,
                      n_run_as,
@@ -41,5 +41,5 @@ where (n_arguments, n_file_name, n_run_as, n_lua_script)
                        n_run_as,
                        n_lua_script
               having count(*) > 1
-              and n_hidden is false)
+                 and n_hidden is false)
 order by id

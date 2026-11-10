@@ -30,6 +30,22 @@ public sealed class SQLiteVersionServiceTest : TestBase
     }
 
     [Theory]
+    [InlineData("0.9.9")]
+    [InlineData("0.9")]
+    [InlineData("0.8")]
+    [InlineData("0.7")]
+    public void When_database_version_is_higher_than_goal_Then_it_is_up_to_date(string goal)
+    {
+        using var db = new DbSingleConnectionManager(BuildConnection());
+        CreateTable(db.GetConnection());
+        CreateVersion(db.GetConnection(), "1.0");
+
+        var service = new SQLiteVersionService(db);
+        service.IsUpToDate(goal)
+               .ShouldBeTrue();
+    }
+
+    [Theory]
     [InlineData("1.9")]
     [InlineData("1.8")]
     [InlineData("1.7")]
@@ -42,52 +58,6 @@ public sealed class SQLiteVersionServiceTest : TestBase
         var service = new SQLiteVersionService(db);
         service.IsUpToDate(goal)
                .ShouldBeFalse();
-    }
-
-    [Theory]
-    [InlineData("error")]
-    [InlineData("2")]
-    [InlineData("")]
-    [InlineData(null)]
-    public void When_version_string_is_invalid_Then_argument_exception_is_thrown(string version)
-    {
-        using var db = new DbSingleConnectionManager(BuildConnection());
-        CreateTable(db.GetConnection());
-        CreateVersion(db.GetConnection(), "1.0");
-
-        var service = new SQLiteVersionService(db);
-        Should.Throw<ArgumentException>(() => service.IsUpToDate(version));
-    }
-
-    [Theory]
-    [InlineData("1.0", "1.0")]
-    [InlineData("1.1", "1.1")]
-    [InlineData("1.1.1", "1.1.1")]
-    [InlineData("1.1.1.1", "1.1.1.1")]
-    public void When_version_string_equals_database_version_Then_it_is_up_to_date(string expected, string actual)
-    {
-        using var db = new DbSingleConnectionManager(BuildConnection());
-        CreateTable(db.GetConnection());
-        CreateVersion(db.GetConnection(), actual);
-
-        var service = new SQLiteVersionService(db);
-        service.IsUpToDate(expected).ShouldBeTrue();
-    }
-
-    [Theory]
-    [InlineData("1.0", "1.0")]
-    [InlineData("1.1", "1.1")]
-    [InlineData("1.1.1", "1.1.1")]
-    [InlineData("1.1.1.1", "1.1.1.1")]
-    public void When_version_equals_database_version_Then_it_is_up_to_date(string goal, string actual)
-    {
-        using var db = new DbSingleConnectionManager(BuildConnection());
-        CreateTable(db.GetConnection());
-        CreateVersion(db.GetConnection(), actual);
-
-        var goalVersion = new Version(goal);
-        var service = new SQLiteVersionService(db);
-        service.IsUpToDate(goalVersion).ShouldBeTrue();
     }
 
     [Theory]
@@ -125,19 +95,49 @@ public sealed class SQLiteVersionServiceTest : TestBase
     }
 
     [Theory]
-    [InlineData("0.9.9")]
-    [InlineData("0.9")]
-    [InlineData("0.8")]
-    [InlineData("0.7")]
-    public void When_database_version_is_higher_than_goal_Then_it_is_up_to_date(string goal)
+    [InlineData("1.0", "1.0")]
+    [InlineData("1.1", "1.1")]
+    [InlineData("1.1.1", "1.1.1")]
+    [InlineData("1.1.1.1", "1.1.1.1")]
+    public void When_version_equals_database_version_Then_it_is_up_to_date(string goal, string actual)
+    {
+        using var db = new DbSingleConnectionManager(BuildConnection());
+        CreateTable(db.GetConnection());
+        CreateVersion(db.GetConnection(), actual);
+
+        var goalVersion = new Version(goal);
+        var service = new SQLiteVersionService(db);
+        service.IsUpToDate(goalVersion).ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData("1.0", "1.0")]
+    [InlineData("1.1", "1.1")]
+    [InlineData("1.1.1", "1.1.1")]
+    [InlineData("1.1.1.1", "1.1.1.1")]
+    public void When_version_string_equals_database_version_Then_it_is_up_to_date(string expected, string actual)
+    {
+        using var db = new DbSingleConnectionManager(BuildConnection());
+        CreateTable(db.GetConnection());
+        CreateVersion(db.GetConnection(), actual);
+
+        var service = new SQLiteVersionService(db);
+        service.IsUpToDate(expected).ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData("error")]
+    [InlineData("2")]
+    [InlineData("")]
+    [InlineData(null)]
+    public void When_version_string_is_invalid_Then_argument_exception_is_thrown(string version)
     {
         using var db = new DbSingleConnectionManager(BuildConnection());
         CreateTable(db.GetConnection());
         CreateVersion(db.GetConnection(), "1.0");
 
         var service = new SQLiteVersionService(db);
-        service.IsUpToDate(goal)
-               .ShouldBeTrue();
+        Should.Throw<ArgumentException>(() => service.IsUpToDate(version));
     }
 
     #endregion

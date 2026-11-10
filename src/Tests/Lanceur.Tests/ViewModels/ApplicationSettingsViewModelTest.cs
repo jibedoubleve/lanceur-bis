@@ -39,7 +39,8 @@ public sealed class ApplicationSettingsViewModelTest : ViewModelTester<Applicati
         serviceCollection.AddMockSingleton<IAppRestartService>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
-                         .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
+                         .AddSingleton<ISettingsProvider<InfrastructureSettings>,
+                             MemoryInfrastructureSettingsProvider>()
                          .AddMockSingleton<IViewFactory>()
                          .AddMockSingleton<IUserGlobalNotificationService>((sp, i)
                              => hooks?.InterceptGlobalUserInteractionService?.Invoke(sp, i) ?? i

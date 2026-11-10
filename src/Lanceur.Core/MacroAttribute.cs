@@ -3,10 +3,6 @@
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class MacroAttribute : Attribute
 {
-    #region Fields
-
-    #endregion
-
     #region Constructors
 
     public MacroAttribute(string name, bool isVisible = true)

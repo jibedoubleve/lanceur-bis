@@ -39,7 +39,7 @@ public sealed class MacroDbAction
     private AliasQueryResult Hydrate(IDbConnection connection, AliasQueryResult item)
     {
         ArgumentNullException.ThrowIfNull(item);
-        
+
         _logger.BeginSingleScope("AliasToHydrate", item);
         if (!item.IsComposite()) { return item; }
 

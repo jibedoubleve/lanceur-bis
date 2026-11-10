@@ -11,13 +11,13 @@ public sealed partial class NCalcCalculatorService : ICalculatorService
 {
     #region Fields
 
-    private readonly ILogger<NCalcCalculatorService> _logger;
-
     private static readonly string[] Operators
         = typeof(Math).GetMethods(BindingFlags.Public | BindingFlags.Static)
                       .Select(m => m.Name)
                       .Distinct()
                       .ToArray();
+
+    private readonly ILogger<NCalcCalculatorService> _logger;
 
     #endregion
 

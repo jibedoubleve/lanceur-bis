@@ -32,8 +32,9 @@ public class FakeStore : StoreBase, IStoreService
     /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => true;
 
-    public int SearchCallCount { get; private set; }
     public StoreOrchestration Orchestration => StoreOrchestrationFactory.SharedAlwaysActive();
+
+    public int SearchCallCount { get; private set; }
 
     #endregion
 

@@ -46,7 +46,7 @@ public sealed class Watchdog : IWatchdog
         if (_timer.IsEnabled)
         {
             _timer.Stop();
-            _running = _action(); 
+            _running = _action();
         }
 
         await _running;

@@ -16,7 +16,7 @@ public static class CloningExtensions
         where T : new()
     {
         var bytes = JsonSerializer.SerializeToUtf8Bytes(obj);
-        var cloned =  JsonSerializer.Deserialize<T>(bytes);
+        var cloned = JsonSerializer.Deserialize<T>(bytes);
         return cloned is not null
             ? cloned
             : throw new InvalidDataException("Cannot clone object of type " + typeof(T).FullName);

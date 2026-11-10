@@ -62,7 +62,7 @@ public sealed record Cmdline
 
         if (CmdlineManager.HasSpecialName(trimmed))
         {
-            var name = CmdlineManager.GetSpecialName(trimmed); 
+            var name = CmdlineManager.GetSpecialName(trimmed);
             return new Cmdline(
                 name,
                 trimmed[name.Length..],
@@ -72,7 +72,7 @@ public sealed record Cmdline
 
         var elements = trimmed.Split(" ");
         if (elements.Length <= 0) { return Empty; }
-        
+
         return new Cmdline(
             elements[0],
             trimmed[elements[0].Length..],

@@ -11,10 +11,10 @@ public sealed class JsonInfrastructureSettingsProvider : ISettingsProvider<Infra
 {
     #region Fields
 
+    private static readonly Lock Locker = new();
+
     private InfrastructureSettings? _current;
     private readonly string _filePath;
-
-    private static readonly Lock Locker = new();
 
     #endregion
 

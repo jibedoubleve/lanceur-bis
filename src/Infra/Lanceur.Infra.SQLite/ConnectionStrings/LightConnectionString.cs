@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Lanceur.Core.Utils;
+﻿using Lanceur.Core.Utils;
 using Lanceur.SharedKernel.Extensions;
 
 namespace Lanceur.Infra.SQLite.ConnectionStrings;

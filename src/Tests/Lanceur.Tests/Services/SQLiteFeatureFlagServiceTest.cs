@@ -24,6 +24,48 @@ public sealed class SQLiteFeatureFlagServiceTest : TestBase
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
+    public void When_flag_is_saved_Then_new_value_is_persisted_in_db(bool value)
+    {
+        // arrange
+        var conn = BuildFreshDb();
+
+        var scope = new DbSingleConnectionManager(conn);
+        var logger = CreateLogger<SQLiteApplicationSettingsProvider>();
+        var settings = new SQLiteApplicationSettingsProvider(scope, logger);
+
+        settings.Value.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
+        settings.Value.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");
+
+        // act
+        settings.Value.FeatureFlags.ElementAt(0).Enabled = value;
+        settings.Save();
+
+        // assert
+        settings.Value.FeatureFlags
+                .Single(e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.InvariantCultureIgnoreCase)
+                ).Enabled.ShouldBe(value, "the new value changed");
+
+        const string sql = """
+                           select s_value ->> '$.FeatureFlags' as FeatureFlag
+                           from settings
+                           where s_key = 'json'
+                           """;
+        var json = conn.Query<string>(sql).Single();
+        var flags = JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json)!;
+
+        var flag = flags.SingleOrDefault(e => e.FeatureName.Equals(
+                Features.ResourceDisplay,
+                StringComparison.InvariantCultureIgnoreCase
+            )
+        );
+        flag.ShouldNotBeNull();
+        flag!.FeatureName.ShouldBe(Features.ResourceDisplay);
+        flag.Enabled.ShouldBe(value);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
     public void When_flag_is_saved_Then_service_returns_new_value(bool value)
     {
         // arrange
@@ -44,49 +86,6 @@ public sealed class SQLiteFeatureFlagServiceTest : TestBase
 
         // assert
         featureFlag.IsEnabled(Features.ResourceDisplay).ShouldBe(value);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void When_flag_is_saved_Then_new_value_is_persisted_in_db(bool value)
-    {
-        // arrange
-        var conn = BuildFreshDb();
-
-        var scope = new DbSingleConnectionManager(conn);
-        var logger = CreateLogger<SQLiteApplicationSettingsProvider>();
-        var settings = new SQLiteApplicationSettingsProvider(scope, logger);
-
-        settings.Value.FeatureFlags.ShouldNotBeEmpty("application has feature flags");
-        settings.Value.FeatureFlags.ElementAt(0).Enabled.ShouldBeTrue("this is the default value");
-
-        // act
-        settings.Value.FeatureFlags.ElementAt(0).Enabled = value;
-        settings.Save();
-
-        // assert
-        settings.Value.FeatureFlags
-                .Single(
-                    e => e.FeatureName.Equals(Features.ResourceDisplay, StringComparison.InvariantCultureIgnoreCase)
-                ).Enabled.ShouldBe(value, "the new value changed");
-
-        const string sql = """
-                           select s_value ->> '$.FeatureFlags' as FeatureFlag
-                           from settings
-                           where s_key = 'json'
-                           """;
-        var json = conn.Query<string>(sql).Single();
-        var flags = JsonConvert.DeserializeObject<IEnumerable<FeatureFlag>>(json)!;
-
-        var flag = flags.SingleOrDefault(e => e.FeatureName.Equals(
-                Features.ResourceDisplay,
-                StringComparison.InvariantCultureIgnoreCase
-            )
-        );
-        flag.ShouldNotBeNull();
-        flag!.FeatureName.ShouldBe(Features.ResourceDisplay);
-        flag.Enabled.ShouldBe(value);
     }
 
     #endregion
