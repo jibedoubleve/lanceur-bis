@@ -63,7 +63,6 @@
                     </Grid.RowDefinitions>
                     <!--  QUERY BOX  -->
                     <TextBox
-                        CharacterCasing="Lower"
                         x:Name="QueryTextBox"
                         Panel.ZIndex="2"
                         BorderThickness="0"
