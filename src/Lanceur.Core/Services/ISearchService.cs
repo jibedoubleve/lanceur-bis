@@ -14,6 +14,7 @@ public interface ISearchService
     /// </summary>
     /// <returns>A task that resolves to a collection of all available results.</returns>
     //refactor: Remove unused method
+    // Issue URL: https://github.com/jibedoubleve/lanceur-bis/issues/1491
     Task<IEnumerable<QueryResult>> GetAllAsync();
 
     /// <summary>
