@@ -1,0 +1,122 @@
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.GeneralSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="General"
+    d:Width="800"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Lanceur.Ui.WPF;component/Xaml/SettingsStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <ObjectDataProvider
+                x:Key="KeySource"
+                MethodName="GetValues"
+                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="Key" />
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+
+            <x:Array x:Key="DateTimeFormats" Type="{x:Type ComboBoxItem}">
+                <ComboBoxItem Content="05/03/2026 14:30       (dd/MM/yyyy HH:mm)" Tag="dd/MM/yyyy HH:mm" />
+                <ComboBoxItem Content="05/03/2026 14:30:00    (dd/MM/yyyy HH:mm:ss)" Tag="dd/MM/yyyy HH:mm:ss" />
+                <ComboBoxItem Content="03/05/2026 14:30       (MM/dd/yyyy HH:mm)" Tag="MM/dd/yyyy HH:mm" />
+                <ComboBoxItem Content="2026-03-05 14:30       (yyyy-MM-dd HH:mm)" Tag="yyyy-MM-dd HH:mm" />
+                <ComboBoxItem Content="2026-03-05 14:30:00    (yyyy-MM-dd HH:mm:ss)" Tag="yyyy-MM-dd HH:mm:ss" />
+                <ComboBoxItem Content="05 Mar 2026 14:30      (dd MMM yyyy HH:mm)" Tag="dd MMM yyyy HH:mm" />
+                <ComboBoxItem Content="05 March 2026 14:30    (dd MMMM yyyy HH:mm)" Tag="dd MMMM yyyy HH:mm" />
+                <ComboBoxItem Content="05.03.2026 14:30       (dd.MM.yyyy HH:mm)" Tag="dd.MM.yyyy HH:mm" />
+                <ComboBoxItem Content="2026/03/05 14:30:00    (yyyy/MM/dd HH:mm:ss)" Tag="yyyy/MM/dd HH:mm:ss" />
+                <ComboBoxItem Content="05/03/2026 02:30 PM    (dd/MM/yyyy hh:mm tt)" Tag="dd/MM/yyyy hh:mm tt" />
+            </x:Array>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,15">
+            <!--  STARTUP  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Startup" />
+
+            <ui:CardControl Icon="{ui:SymbolIcon Keyboard24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Hot key" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Keyboard shortcut that opens the search box. Avoid combinations used by Windows or other applications. Requires a restart." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox
+                        Margin="0,0,5,0"
+                        Content="Ctrl"
+                        IsChecked="{Binding IsCtrl}" />
+                    <CheckBox
+                        Margin="0,0,5,0"
+                        Content="Alt"
+                        IsChecked="{Binding IsAlt}" />
+                    <CheckBox
+                        Margin="0,0,5,0"
+                        Content="Win"
+                        IsChecked="{Binding IsWin}" />
+                    <CheckBox
+                        Margin="0,0,5,0"
+                        Content="Shift"
+                        IsChecked="{Binding IsShift}" />
+                    <ComboBox ItemsSource="{Binding Source={StaticResource KeySource}}"
+                              SelectedItem="{Binding Key, Converter={StaticResource IntToKeyEnumConverter}}" />
+                </StackPanel>
+            </ui:CardControl>
+
+            <ui:CardControl Icon="{ui:SymbolIcon Glasses24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Show search box at startup" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Opens the search box once Windows has loaded and Lanceur has started." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding ShowAtStartup}" />
+            </ui:CardControl>
+
+            <!--  NOTIFICATIONS  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Notifications" />
+
+            <ui:CardControl Icon="{ui:SymbolIcon ReadingList24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Notification duration" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="How long notifications stay visible, in seconds." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Value="{Binding NotificationDisplayDuration, UpdateSourceTrigger=PropertyChanged}" />
+            </ui:CardControl>
+
+            <!--  REGIONAL  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Regional format" />
+
+            <ui:CardControl Icon="{ui:SymbolIcon TimePicker24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Date &amp; time format" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Format used to display dates and times throughout the application." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ComboBox
+                    ItemsSource="{StaticResource DateTimeFormats}"
+                    SelectedValue="{Binding DateTimeFormat}"
+                    SelectedValuePath="Tag" />
+            </ui:CardControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

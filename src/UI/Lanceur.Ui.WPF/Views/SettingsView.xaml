@@ -54,10 +54,30 @@
                     TargetPageType="{x:Type pages:UsageCalendarView}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
-                <ui:NavigationViewItem
-                    Content="Settings"
-                    Icon="{ui:SymbolIcon Settings24}"
-                    TargetPageType="{x:Type pages:ApplicationSettingsView}" />
+                <ui:NavigationViewItem Content="Settings" Icon="{ui:SymbolIcon Settings24}">
+                    <ui:NavigationViewItem.MenuItems>
+                        <ui:NavigationViewItem
+                            Content="General"
+                            Icon="{ui:SymbolIcon Options24}"
+                            TargetPageType="{x:Type pages:GeneralSettingsView}" />
+                        <ui:NavigationViewItem
+                            Content="Appearance"
+                            Icon="{ui:SymbolIcon PaintBrush24}"
+                            TargetPageType="{x:Type pages:AppearanceSettingsView}" />
+                        <ui:NavigationViewItem
+                            Content="Search box"
+                            Icon="{ui:SymbolIcon Search24}"
+                            TargetPageType="{x:Type pages:SearchBoxSettingsView}" />
+                        <ui:NavigationViewItem
+                            Content="Data sources"
+                            Icon="{ui:SymbolIcon DatabaseSearch24}"
+                            TargetPageType="{x:Type pages:DataSourcesSettingsView}" />
+                        <ui:NavigationViewItem
+                            Content="Advanced"
+                            Icon="{ui:SymbolIcon WrenchScrewdriver24}"
+                            TargetPageType="{x:Type pages:AdvancedSettingsView}" />
+                    </ui:NavigationViewItem.MenuItems>
+                </ui:NavigationViewItem>
                 <ui:NavigationViewItem
                     Content="About"
                     Icon="{ui:SymbolIcon Info24}"
