@@ -124,6 +124,18 @@ public sealed class SearchService : ISearchService
             : stores;
     }
 
+    private async Task<IEnumerable<QueryResult>> GetAllAsync()
+    {
+        using var measurement = _logger.WarnIfSlow(this);
+
+        var tasks = _storeServices.Select(store => Task.Run(store.GetAll));
+        var results = (await Task.WhenAll(tasks))
+                      .SelectMany(x => x)
+                      .ToArray();
+
+        return FormatForDisplay(results);
+    }
+
     private void PruneResults(IList<QueryResult> destination, Cmdline previousQuery, Cmdline currentQuery)
     {
         var deletedCount = GetAliveStores(currentQuery)
@@ -171,19 +183,6 @@ public sealed class SearchService : ISearchService
                 ? DisplayQueryResult.SingleFromResult("No result found", iconKind: "AlertCircleOutline")
                 : orderedResults
         );
-    }
-
-    /// <inheritdoc />
-    public async Task<IEnumerable<QueryResult>> GetAllAsync()
-    {
-        using var measurement = _logger.WarnIfSlow(this);
-
-        var tasks = _storeServices.Select(store => Task.Run(store.GetAll));
-        var results = (await Task.WhenAll(tasks))
-                      .SelectMany(x => x)
-                      .ToArray();
-
-        return FormatForDisplay(results);
     }
 
     /// <inheritdoc />
