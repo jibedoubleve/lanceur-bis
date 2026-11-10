@@ -16,6 +16,7 @@ using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.Core.Utils;
+using Lanceur.Ui.Core.ViewModels.Controls;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Ui.Core.ViewModels.Pages;
@@ -331,12 +332,15 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             return;
         }
 
-        var view = _viewFactory.CreateView(storeShortcut);
+        var selector = new StoreShortcutSelectorViewModel(
+            GetAvailableStoreShortcuts(storeShortcut),
+            storeShortcut.AliasOverride
+        );
+        var view = _viewFactory.CreateView(selector);
         var storeName = storeShortcut.StoreType
                                      ?.Replace("Lanceur.Infra.Stores.", "")
                                      .Replace("Store", "");
 
-        var savedAliasOverride = storeShortcut.AliasOverride;
         var result = await _hubService.Dialogues.AskUserYesNoAsync(
             view,
             ButtonLabels.Apply,
@@ -344,21 +348,34 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             $"Edit shortcut for store '{storeName}'"
         );
 
-        if (!result)
-        {
-            storeShortcut.AliasOverride = savedAliasOverride;
-            return;
-        }
+        if (!result) { return; }
 
-        var error = ValidateStoreShortcut(storeShortcut.AliasOverride);
+        var error = ValidateStoreShortcut(selector.SelectedShortcut);
         if (error is not null)
         {
             _hubService.Notifications.Warning(error);
-            storeShortcut.AliasOverride = savedAliasOverride;
             return;
         }
 
+        storeShortcut.AliasOverride = selector.SelectedShortcut;
         SaveSettings();
+    }
+
+    /// <summary>
+    ///     Lists the special characters that <paramref name="storeShortcut" /> can use: those that are
+    ///     neither an alias name nor the shortcut of another store. Its current shortcut is always kept.
+    /// </summary>
+    private IEnumerable<string> GetAvailableStoreShortcuts(StoreShortcut storeShortcut)
+    {
+        var usedByAliases = _aliasRepository.GetExistingAliases(CmdlineManager.SpecialCharacters, 0);
+        var usedByStores = StoreShortcuts.Where(s => s != storeShortcut)
+                                         .Select(s => s.AliasOverride);
+        var used = usedByAliases.Concat(usedByStores)
+                                .OfType<string>()
+                                .ToHashSet();
+
+        return CmdlineManager.SpecialCharacters
+                             .Where(c => c == storeShortcut.AliasOverride || !used.Contains(c));
     }
 
     /// <summary>
