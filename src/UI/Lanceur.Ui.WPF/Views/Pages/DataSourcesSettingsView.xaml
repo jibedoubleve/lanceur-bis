@@ -115,61 +115,65 @@
             <!--  SHORTCUT OVERRIDES  -->
             <ui:TextBlock Style="{StaticResource SettingSection}" Text="Shortcut overrides" />
 
-            <ui:TextBlock
-                Margin="10,0,5,5"
-                Style="{StaticResource SettingDescription}"
-                Text="Special character typed at the start of a query to search a store directly." />
+            <ui:CardExpander Icon="{ui:SymbolIcon ArrowUpRight24}" IsExpanded="True">
+                <ui:CardExpander.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Store shortcuts" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Special character typed at the start of a query to search a store directly." />
+                    </StackPanel>
+                </ui:CardExpander.Header>
 
-            <ui:DataGrid
-                Margin="5,5,15,0"
-                AreRowDetailsFrozen="True"
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False"
-                CanUserResizeColumns="True"
-                ItemsSource="{Binding StoreShortcuts}"
-                SelectionMode="Single">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="Auto" Header="Store name">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock
-                                    Margin="10,0,10,0"
-                                    VerticalAlignment="Center"
-                                    Text="{Binding StoreType, Converter={StaticResource StoreTypeToStoreNameConverter}}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTemplateColumn Width="*" Header="Shortcut override">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock
-                                    Margin="10,0,10,0"
-                                    VerticalAlignment="Center"
-                                    Text="{Binding AliasOverride, Converter={StaticResource StoreOrchestrationToStringConverter}}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTemplateColumn Width="100" Header="Actions">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                    <Button
-                                        Margin="5"
-                                        HorizontalAlignment="Center"
-                                        Command="{Binding ElementName=Self, Path=DataContext.EditStoreShortcutCommand}"
-                                        CommandParameter="{Binding .}"
-                                        ToolTip="Edit">
-                                        <ui:SymbolIcon Symbol="Edit24" />
-                                    </Button>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </ui:DataGrid>
+                <ui:DataGrid
+                    AreRowDetailsFrozen="True"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False"
+                    CanUserResizeColumns="True"
+                    ItemsSource="{Binding StoreShortcuts}"
+                    SelectionMode="Single">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Width="Auto" Header="Store name">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Margin="10,0,10,0"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding StoreType, Converter={StaticResource StoreTypeToStoreNameConverter}}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+    
+                        <DataGridTemplateColumn Width="*" Header="Shortcut override">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Margin="10,0,10,0"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding AliasOverride, Converter={StaticResource StoreOrchestrationToStringConverter}}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+    
+                        <DataGridTemplateColumn Width="100" Header="Actions">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                        <Button
+                                            Margin="5"
+                                            HorizontalAlignment="Center"
+                                            Command="{Binding ElementName=Self, Path=DataContext.EditStoreShortcutCommand}"
+                                            CommandParameter="{Binding .}"
+                                            ToolTip="Edit">
+                                            <ui:SymbolIcon Symbol="Edit24" />
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </ui:DataGrid>
+            </ui:CardExpander>
         </StackPanel>
     </ScrollViewer>
 </Page>
