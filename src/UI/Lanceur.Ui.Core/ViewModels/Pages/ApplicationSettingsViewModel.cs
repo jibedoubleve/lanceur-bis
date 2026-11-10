@@ -47,6 +47,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
     #region Constructors
 
     //refactor: Split responsabilities and lower the ctor parameters
+    // Issue URL: https://github.com/jibedoubleve/lanceur-bis/issues/1492
     public ApplicationSettingsViewModel(
         IUserCommunicationService userCommunicationService,
         ILogger<ApplicationSettingsViewModel> logger,
