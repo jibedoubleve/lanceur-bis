@@ -4,7 +4,7 @@ namespace Lanceur.Core.Managers;
 
 public static class CmdlineManager
 {
-    #region Fields
+    #region Properties
 
     /// <summary>
     ///     The characters that can be used as a special name, and therefore as a store shortcut.
@@ -37,15 +37,6 @@ public static class CmdlineManager
         "?",
         "."
     ];
-
-    #endregion
-
-    #region Properties
-
-    /// <summary>
-    ///     The characters that can be used as a special name, and therefore as a store shortcut.
-    /// </summary>
-    public static IReadOnlyList<string> SpecialCharacters => SpecialNames;
 
     #endregion
 
