@@ -5,7 +5,6 @@ using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tools;
@@ -29,6 +28,61 @@ public sealed class IoCForStoresTest : TestBase
     #endregion
 
     #region Methods
+
+    [Theory]
+    [InlineData(null, ": hello world")] // null override, then use the default one
+    [InlineData("&", "& hello world")]
+    public void When_override_defined_Then_they_are_used_instead_of_defaults(
+        string? aliasOverride, string cmdlineString)
+    {
+        // arrange 
+        var cfgOverride = aliasOverride is null
+            ? null
+            : new ApplicationSettings
+            {
+                Stores = new StoreSection
+                {
+                    StoreShortcuts =
+                    [
+                        new StoreShortcut
+                        {
+                            AliasOverride = aliasOverride,
+                            StoreType = typeof(EverythingStore).ToString()
+                        }
+                    ]
+                }
+            };
+
+        var serviceProvider = new ServiceCollection()
+                              .AddLoggingForTests(OutputHelper)
+                              .AddSingleton<IStoreService, EverythingStore>()
+                              .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+                              .AddStoreServicesMockContext((_, i) => {
+                                  i.Value.Returns(new StoreSection
+                                  {
+                                      StoreShortcuts =
+                                      [
+                                          new StoreShortcut
+                                          {
+                                              StoreType = typeof(EverythingStore).FullName,
+                                              AliasOverride = aliasOverride
+                                          }
+                                      ]
+                                  });
+                                  return i;
+                              })
+                              .AddStoreServicesConfiguration(cfgOverride)
+                              .BuildServiceProvider();
+
+        // act
+        var store = serviceProvider
+                    .GetServices<IStoreService>()
+                    .Single(x => x is EverythingStore);
+
+        // assert
+        store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString))
+             .ShouldBeTrue();
+    }
 
     [Theory]
     [InlineData(null, "pp hello world", false)] // null override, then use the default one
@@ -88,62 +142,7 @@ public sealed class IoCForStoresTest : TestBase
         // assert
         OutputHelper.WriteLine($"Cmdline      : {cmdlineString}");
         store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString))
-                    .ShouldBe(expected);
-    }
-
-    [Theory]
-    [InlineData(null, ": hello world")] // null override, then use the default one
-    [InlineData("&", "& hello world")]
-    public void When_override_defined_Then_they_are_used_instead_of_defaults(
-        string? aliasOverride, string cmdlineString)
-    {
-        // arrange 
-        var cfgOverride = aliasOverride is null
-            ? null
-            : new ApplicationSettings
-            {
-                Stores = new StoreSection
-                {
-                    StoreShortcuts =
-                    [
-                        new StoreShortcut
-                        {
-                            AliasOverride = aliasOverride,
-                            StoreType = typeof(EverythingStore).ToString()
-                        }
-                    ]
-                }
-            };
-
-        var serviceProvider = new ServiceCollection()
-                              .AddLoggingForTests(OutputHelper)
-                              .AddSingleton<IStoreService, EverythingStore>()
-                              .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-                              .AddStoreServicesMockContext((_, i) => {
-                                  i.Value.Returns(new StoreSection
-                                  {
-                                      StoreShortcuts =
-                                      [
-                                          new StoreShortcut
-                                          {
-                                              StoreType = typeof(EverythingStore).FullName,
-                                              AliasOverride = aliasOverride
-                                          }
-                                      ]
-                                  });
-                                  return i;
-                              })
-                              .AddStoreServicesConfiguration(cfgOverride)
-                              .BuildServiceProvider();
-
-        // act
-        var store = serviceProvider
-                    .GetServices<IStoreService>()
-                    .Single(x => x is EverythingStore);
-
-        // assert
-        store.Orchestration.IsAlive(Cmdline.Parse(cmdlineString))
-                    .ShouldBeTrue();
+             .ShouldBe(expected);
     }
 
     [Fact]

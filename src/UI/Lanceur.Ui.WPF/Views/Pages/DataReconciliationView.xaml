@@ -116,7 +116,8 @@
             PlaceholderText="Filter aliases...">
             <interactivity:Interaction.Triggers>
                 <interactivity:EventTrigger EventName="TextChanged">
-                    <interactivity:InvokeCommandAction Command="{Binding FilterAliasCommand}" CommandParameter="{Binding ElementName=FilterBox, Path=Text}" />
+                    <interactivity:InvokeCommandAction Command="{Binding FilterAliasCommand}"
+                                                       CommandParameter="{Binding ElementName=FilterBox, Path=Text}" />
                 </interactivity:EventTrigger>
             </interactivity:Interaction.Triggers>
         </ui:TextBox>
@@ -221,7 +222,8 @@
                                     <ui:TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource DateFormatConverter}">
                                             <Binding Path="LastUsedAt" />
-                                            <Binding Path="DataContext.DateFormat" RelativeSource="{RelativeSource AncestorType=Page}" />
+                                            <Binding Path="DataContext.DateFormat"
+                                                     RelativeSource="{RelativeSource AncestorType=Page}" />
                                         </MultiBinding>
                                     </ui:TextBlock.Text>
                                 </ui:TextBlock>

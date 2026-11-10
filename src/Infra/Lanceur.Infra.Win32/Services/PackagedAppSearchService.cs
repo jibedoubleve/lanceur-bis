@@ -2,7 +2,6 @@
 using Lanceur.Core.Services;
 using Lanceur.Infra.Win32.Extensions;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.Win32.Services;

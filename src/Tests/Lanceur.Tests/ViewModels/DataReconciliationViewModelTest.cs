@@ -981,7 +981,10 @@ public sealed class DataReconciliationViewModelTest : ViewModelTester<DataReconc
 
         public object CreateView(object viewModel)
         {
-            if (viewModel is not ReportConfigurationViewModel vm) return new object();
+            if (viewModel is not ReportConfigurationViewModel vm)
+            {
+                return new object();
+            }
 
             // Simulate the user toggling a checkbox on the existing ColumnsConfiguration:
             // FileName was true → user sets it to false (without replacing the object)

@@ -22,7 +22,7 @@ public static class LogLevelUtil
     public static LogEventLevel GetLevel(LogEventLevel fallbackLevel = LogEventLevel.Debug)
     {
         var args = Environment.GetCommandLineArgs();
-        
+
         if (args.Any(x => x.Contains("--verbose"))) { return LogEventLevel.Verbose; }
 
         if (args.Any(x => x.Contains("--debug"))) { return LogEventLevel.Debug; }

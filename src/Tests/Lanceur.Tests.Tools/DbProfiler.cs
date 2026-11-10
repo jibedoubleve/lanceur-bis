@@ -10,8 +10,6 @@ public sealed class DbProfiler : IDbProfiler
 {
     #region Fields
 
-    private readonly ITestOutputHelper _outputHelper;
-
     private const string Template = """
                                     ----------------
                                     ---- SQL        
@@ -27,6 +25,8 @@ public sealed class DbProfiler : IDbProfiler
 
                                     ------------------------------------------------------------------------------------
                                     """;
+
+    private readonly ITestOutputHelper _outputHelper;
 
     #endregion
 

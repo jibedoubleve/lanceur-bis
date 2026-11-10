@@ -15,6 +15,8 @@ public partial class UsageCalendarViewModel : ObservableObject
 {
     #region Fields
 
+    private const string DatePattern = "dddd dd MMMM yyyy";
+
     private readonly IAliasRepository _aliasRepository;
     [ObservableProperty] private DateTime _displayDateEnd;
     [ObservableProperty] private DateTime _displayDateStart;
@@ -26,8 +28,6 @@ public partial class UsageCalendarViewModel : ObservableObject
 
     private readonly ILogger<UsageCalendarViewModel> _logger;
     private readonly IThumbnailService _thumbnailService;
-
-    private const string DatePattern = "dddd dd MMMM yyyy";
 
     #endregion
 

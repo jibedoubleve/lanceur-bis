@@ -75,7 +75,8 @@ public sealed class ServiceRegistrationTest : TestBase
 
         // assert
         var discovered = typeof(AddAlias).Assembly.GetTypes()
-                                         .Where(t => t.IsAssignableTo(typeof(SelfExecutableQueryResult)) && !t.IsAbstract)
+                                         .Where(t => t.IsAssignableTo(typeof(SelfExecutableQueryResult)) &&
+                                                     !t.IsAbstract)
                                          .ToList();
 
         var registered = services

@@ -138,15 +138,6 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
     }
 
     [Fact]
-    public void When_retrieving_default_settings_Then_default_position_has_the_expected_value() =>
-        WithConfiguration(repository => {
-                var settings = repository.Value;
-                settings.Window.Position.Left.ShouldBe(double.MaxValue);
-                settings.Window.Position.Top.ShouldBe(double.MaxValue);
-            }
-        );
-
-    [Fact]
     public void When_retrieving_default_settings_Then_HotKey_has_the_expected_value() =>
         WithConfiguration(repository => {
                 var settings = repository.Value;
@@ -176,34 +167,14 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
         settings.Value.SearchBox.ShowResult.ShouldBeFalse();
     }
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void When_updating_feature_flas_Then_json_is_updated(bool isEnabled)
-    {
-        var description = Any.String(10);
-        var featureName = Features.GetNames().ElementAt(0);
-        var icon = Any.String(10);
-
-        var section = new ApplicationSettings();
-        var fFlag = section.FeatureFlags
-                       .Single(f => f.FeatureName == featureName);
-
-        fFlag.Description = description;
-        fFlag.Enabled = isEnabled;
-        fFlag.Icon = icon;
-
-        var json = JsonConvert.SerializeObject(section);
-        WithConfiguration(repository =>
-                repository.Value.FeatureFlags
-                          .Single(f => f.FeatureName == featureName)
-                          .ShouldSatisfyAllConditions(
-                              ff => ff.Enabled.ShouldBe(isEnabled),
-                              ff => ff.Icon.ShouldBe(icon),
-                              ff => ff.Description.ShouldBe(description)
-                          ),
-            json);
-    }
+    [Fact]
+    public void When_retrieving_default_settings_Then_default_position_has_the_expected_value() =>
+        WithConfiguration(repository => {
+                var settings = repository.Value;
+                settings.Window.Position.Left.ShouldBe(double.MaxValue);
+                settings.Window.Position.Top.ShouldBe(double.MaxValue);
+            }
+        );
 
 
     [Theory]
@@ -221,6 +192,35 @@ public sealed class SQLiteDatabaseConfigurationServiceTest : TestBase
                 );
             }
         );
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void When_updating_feature_flas_Then_json_is_updated(bool isEnabled)
+    {
+        var description = Any.String(10);
+        var featureName = Features.GetNames().ElementAt(0);
+        var icon = Any.String(10);
+
+        var section = new ApplicationSettings();
+        var fFlag = section.FeatureFlags
+                           .Single(f => f.FeatureName == featureName);
+
+        fFlag.Description = description;
+        fFlag.Enabled = isEnabled;
+        fFlag.Icon = icon;
+
+        var json = JsonConvert.SerializeObject(section);
+        WithConfiguration(repository =>
+                repository.Value.FeatureFlags
+                          .Single(f => f.FeatureName == featureName)
+                          .ShouldSatisfyAllConditions(
+                              ff => ff.Enabled.ShouldBe(isEnabled),
+                              ff => ff.Icon.ShouldBe(icon),
+                              ff => ff.Description.ShouldBe(description)
+                          ),
+            json);
+    }
 
     [Fact]
     public void When_updating_json_Then_it_is_saved_in_db()

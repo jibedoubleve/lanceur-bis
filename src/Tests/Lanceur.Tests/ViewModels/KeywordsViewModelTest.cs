@@ -89,56 +89,6 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
     }
 
     [Fact]
-    public async Task When_soft_deleting_alias_Then_it_is_not_anymore_in_search_results()
-    {
-        var hooks = new ServiceHooks
-        {
-            InterceptUserInteractionService = (_, i) => {
-                // Configured to say yes when it'll be asked to delete the alias
-                i.AskUserYesNoAsync(Arg.Any<object>())
-                 .Returns(true);
-                return i;
-            }
-        };
-
-        await TestViewModelAsync(
-            async (viewModel, db) => {
-                // ARRANGE
-                const string name = "SomeTestName";
-                const string fileName = "SomeFileName";
-
-                // ACT
-                await viewModel.CreateNewAlias(name, fileName);
-                await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null);
-
-                // ASSERT
-                const string sql = """
-                                   select 
-                                       a.Id          as Id,
-                                   	    an.name      as Name,
-                                   	    case
-                                   		    when a.deleted_at is null then false
-                                   		    else true
-                                   	    end as FieldValue
-                                   from alias a 
-                                   inner join alias_name an on a.id = an.id_alias 
-                                   """;
-                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[])[name] }))
-                               .ToArray();
-
-                result.ShouldSatisfyAllConditions(
-                    r => r.Length.ShouldBeGreaterThan(0),
-                    r => r[0].Id.ShouldBeGreaterThan(0),
-                    r => r[0].Name.ShouldBe(name),
-                    r => r[0].FieldValue.ShouldBeTrue("the field 'deleted_at' has to indicate deletion")
-                );
-            },
-            Sql.Empty,
-            hooks
-        );
-    }
-
-    [Fact]
     public async Task When_crating_new_alias_with_additional_parameters_Then_additional_parameters_are_in_db()
     {
         var hooks = new ServiceHooks
@@ -306,8 +256,8 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
     [InlineData("a b")]
     [InlineData("a, b")]
     [InlineData("a,b")]
-    public async Task When_creating_alias_with_space_or_comma_separated_names_Then_each_name_is_a_synonym(string names)
-    {
+    public async Task
+        When_creating_alias_with_space_or_comma_separated_names_Then_each_name_is_a_synonym(string names) =>
         await TestViewModelAsync(
             async (viewModel, db) => {
                 // ACT
@@ -317,11 +267,10 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
                 const string sql = "select name from alias_name";
                 var synonyms = db.WithConnection(c => c.Query<string>(sql)).ToArray();
 
-                synonyms.ShouldBe(["a", "b"], ignoreOrder: true);
+                synonyms.ShouldBe(["a", "b"], true);
             },
             Sql.Empty
         );
-    }
 
     [Theory]
     [MemberData(nameof(FeedAdditionalParametersWithEmptyTrailingLine))]
@@ -444,6 +393,56 @@ public sealed class KeywordsViewModelTest : ViewModelTester<KeywordsViewModel>
 
                 // ASSERT
                 viewModel.Aliases.Count.ShouldBe(countToAdd - 1, "because the alias has been deleted logically");
+            },
+            Sql.Empty,
+            hooks
+        );
+    }
+
+    [Fact]
+    public async Task When_soft_deleting_alias_Then_it_is_not_anymore_in_search_results()
+    {
+        var hooks = new ServiceHooks
+        {
+            InterceptUserInteractionService = (_, i) => {
+                // Configured to say yes when it'll be asked to delete the alias
+                i.AskUserYesNoAsync(Arg.Any<object>())
+                 .Returns(true);
+                return i;
+            }
+        };
+
+        await TestViewModelAsync(
+            async (viewModel, db) => {
+                // ARRANGE
+                const string name = "SomeTestName";
+                const string fileName = "SomeFileName";
+
+                // ACT
+                await viewModel.CreateNewAlias(name, fileName);
+                await viewModel.DeleteCurrentAliasCommand.ExecuteAsync(null);
+
+                // ASSERT
+                const string sql = """
+                                   select 
+                                       a.Id          as Id,
+                                   	    an.name      as Name,
+                                   	    case
+                                   		    when a.deleted_at is null then false
+                                   		    else true
+                                   	    end as FieldValue
+                                   from alias a 
+                                   inner join alias_name an on a.id = an.id_alias 
+                                   """;
+                var result = db.WithConnection(c => c.Query<DynamicAlias<bool>>(sql, new { name = (string[])[name] }))
+                               .ToArray();
+
+                result.ShouldSatisfyAllConditions(
+                    r => r.Length.ShouldBeGreaterThan(0),
+                    r => r[0].Id.ShouldBeGreaterThan(0),
+                    r => r[0].Name.ShouldBe(name),
+                    r => r[0].FieldValue.ShouldBeTrue("the field 'deleted_at' has to indicate deletion")
+                );
             },
             Sql.Empty,
             hooks

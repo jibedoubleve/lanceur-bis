@@ -8,6 +8,19 @@ public sealed class AdditionalParameterTest
 {
     #region Methods
 
+    [Fact]
+    public void When_setting_null_parameter_Then_no_exception_is_thrown()
+    {
+        // ARRANGE
+        var additionalParameter = new AdditionalParameter { Name = "name", Parameter = "foo" };
+
+        // ACT
+        var action = () => additionalParameter.Parameter = null!;
+
+        // ASSERT
+        action.ShouldNotThrow();
+    }
+
     /// <summary>
     ///     Regression test for issue #1420. Leading and trailing quotes are removed from the parameter,
     ///     quotes inside the parameter are kept.
@@ -33,19 +46,6 @@ public sealed class AdditionalParameterTest
 
         // ASSERT
         additionalParameter.Parameter.ShouldBe(expected);
-    }
-
-    [Fact]
-    public void When_setting_null_parameter_Then_no_exception_is_thrown()
-    {
-        // ARRANGE
-        var additionalParameter = new AdditionalParameter { Name = "name", Parameter = "foo" };
-
-        // ACT
-        var action = () => additionalParameter.Parameter = null!;
-
-        // ASSERT
-        action.ShouldNotThrow();
     }
 
     [Fact]

@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -76,7 +75,7 @@ public sealed class GithubIssueMacro : MacroQueryResult
             _notification.Warning(msg);
             return NoResult;
         }
-        
+
         _logger.LogInformation("Creating Github issue with cmdline: {Cmdline}", cmdline.ToString());
         await _githubService.CreateIssueAsync(cmdline.Parameters, _enigma.Decrypt(_settings.Value.Token!));
 

@@ -21,7 +21,8 @@ namespace Lanceur.Ui.Core.Extensions;
 ///     </para>
 ///     <para>
 ///         To ensure consistency between the DI-registered instance and the instance used during
-///         logger setup, both are created through the same factory logic (<see cref="GetInfrastructureSettingsProvider" />).
+///         logger setup, both are created through the same factory logic (<see cref="GetInfrastructureSettingsProvider" />
+///         ).
 ///         This guarantees that the logger is always configured with the same provider implementation
 ///         as the rest of the application, regardless of the build configuration (DEBUG vs Release).
 ///     </para>
@@ -29,6 +30,31 @@ namespace Lanceur.Ui.Core.Extensions;
 public static class SettingsProviderFactory
 {
     #region Methods
+
+    /// <summary>
+    ///     Registers SettingsProviders as a singleton in the DI container
+    ///     using the same conditional logic as <see cref="GetInfrastructureSettingsProvider" />.
+    /// </summary>
+    internal static IServiceCollection AddSettingsInfrastructure(this IServiceCollection serviceCollection)
+    {
+        // Configure providers
+        serviceCollection
+            .AddSingleton<SQLiteApplicationSettingsProvider>()
+            .AddSingleton(GetInfrastructureSettingsProvider())
+            .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
+            .AddSingleton<ISettingsProvider>(sp => sp.GetRequiredService<ISettingsProvider<ApplicationSettings>>())
+            .AddSingleton<ISettingsProvider>(sp => sp.GetRequiredService<ISettingsProvider<InfrastructureSettings>>());
+
+        // Configure sections
+        serviceCollection.AddSingleton(typeof(IWriteableSection<>), typeof(Section<>))
+                         .AddSingleton(typeof(ISection<>), typeof(ForwardingSection<>))
+                         .AddSingleton<ISection<DatabaseSection>>(sp =>
+                             new Section<DatabaseSection>([
+                                 sp.GetRequiredService<ISettingsProvider<InfrastructureSettings>>()
+                             ])
+                         );
+        return serviceCollection;
+    }
 
     /// <summary>
     ///     Creates and returns an <see cref="ISettingsProvider{TConfig}" /> for
@@ -44,31 +70,6 @@ public static class SettingsProviderFactory
             new JsonInfrastructureSettingsProvider()
         );
         return conditional.Value;
-    }
-
-    /// <summary>
-    ///     Registers SettingsProviders as a singleton in the DI container
-    ///     using the same conditional logic as <see cref="GetInfrastructureSettingsProvider" />.
-    /// </summary>
-    internal static IServiceCollection AddSettingsInfrastructure(this IServiceCollection serviceCollection)
-    {
-        // Configure providers
-        serviceCollection
-            .AddSingleton<SQLiteApplicationSettingsProvider>()
-            .AddSingleton(GetInfrastructureSettingsProvider())
-            .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
-            .AddSingleton<ISettingsProvider>(sp => sp.GetRequiredService<ISettingsProvider<ApplicationSettings>>())
-            .AddSingleton<ISettingsProvider>(sp => sp.GetRequiredService<ISettingsProvider<InfrastructureSettings>>());
-        
-        // Configure sections
-        serviceCollection.AddSingleton(typeof(IWriteableSection<>), typeof(Section<>))
-                         .AddSingleton(typeof(ISection<>), typeof(ForwardingSection<>))
-                         .AddSingleton<ISection<DatabaseSection>>(sp =>
-                             new Section<DatabaseSection>([
-                                 sp.GetRequiredService<ISettingsProvider<InfrastructureSettings>>()
-                             ])
-                         );
-        return serviceCollection;
     }
 
     #endregion

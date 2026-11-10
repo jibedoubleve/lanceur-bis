@@ -33,8 +33,9 @@ public sealed class FavIconAppThumbnailStrategy : ThumbnailStrategy
 
     #region Methods
 
-    /// <inheritdoc/>
-    protected override async Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    /// <inheritdoc />
+    protected override async Task<bool> UpdateThumbnailCoreAsync(
+        AliasQueryResult alias, CancellationToken cancellationToken)
     {
         var thumbnail = await _favIconService.UpdateFaviconAsync(
             alias,

@@ -219,6 +219,8 @@ public sealed partial class AnalyticsView : IDisposable
     {
         #region Fields
 
+        private const string ColorWhite = "#d7d7d7";
+
         private readonly bool _isDark;
 
         #endregion
@@ -230,8 +232,6 @@ public sealed partial class AnalyticsView : IDisposable
         #endregion
 
         #region Properties
-
-        private const string ColorWhite = "#d7d7d7";
 
         public ScottPlot.Color Axes
             => _isDark ? ScottPlot.Color.FromHex(ColorWhite) : ScottPlot.Color.FromHex("#616161");

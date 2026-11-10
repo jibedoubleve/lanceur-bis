@@ -243,7 +243,7 @@ public partial class MainViewModel : ObservableObject
                 case TrackingReport.Empty when !DoesReturnAllIfEmpty:
                     Clear();
                     break;
-                
+
                 case TrackingReport.EnteringParameters:
                     SendAlignParameter(Suggestion ?? string.Empty, _inputTracker.Current);
                     break;

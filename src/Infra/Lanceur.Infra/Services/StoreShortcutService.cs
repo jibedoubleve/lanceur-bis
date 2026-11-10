@@ -1,5 +1,4 @@
 using System.Reflection;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
@@ -27,13 +26,12 @@ public sealed class StoreShortcutService : IStoreShortcutService
     /// <inheritdoc />
     public IEnumerable<StoreShortcut> Resolve(StoreSection storeSection)
     {
-        var discovered = _stores
-            .Where(s => s.IsOverridable)
-            .Select(s => new StoreShortcut
-            {
-                StoreType    = s.GetType().FullName!,
-                AliasOverride = s.GetType().GetCustomAttribute<StoreAttribute>()?.DefaultShortcut
-            });
+        var discovered = _stores.Where(s => s.IsOverridable)
+                                .Select(s => new StoreShortcut
+                                {
+                                    StoreType = s.GetType().FullName!,
+                                    AliasOverride = s.GetType().GetCustomAttribute<StoreAttribute>()?.DefaultShortcut
+                                });
 
         var existingTypes = storeSection.StoreShortcuts.Select(s => s.StoreType).ToHashSet();
         return storeSection.StoreShortcuts.Concat(discovered.Where(x => !existingTypes.Contains(x.StoreType)));

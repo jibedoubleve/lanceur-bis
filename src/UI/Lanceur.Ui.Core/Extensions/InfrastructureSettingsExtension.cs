@@ -1,4 +1,3 @@
-using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Configuration.Sections.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;

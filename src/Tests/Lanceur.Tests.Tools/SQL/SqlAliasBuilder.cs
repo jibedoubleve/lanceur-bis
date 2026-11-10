@@ -57,7 +57,7 @@ public sealed class SqlAliasBuilder : SqlBuilderBase
 
     public SqlAliasBuilder WithArguments(string? arguments)
     {
-        var arg = arguments is null ? "null" : $"'{arguments}'"; 
+        var arg = arguments is null ? "null" : $"'{arguments}'";
         const string sql = "update alias set arguments = {0} where id = {1};";
         Sql.AppendLine(sql.Format(arg, _idAlias));
         return this;
@@ -72,8 +72,8 @@ public sealed class SqlAliasBuilder : SqlBuilderBase
 
     public SqlAliasBuilder WithDeletedAt(DateTime? date)
     {
-        if (date is null) { return this;}
-        
+        if (date is null) { return this; }
+
         const string sql = "update alias set deleted_at = '{0}' where id = {1};";
         Sql.AppendLine(
             sql.Format(
@@ -86,7 +86,7 @@ public sealed class SqlAliasBuilder : SqlBuilderBase
 
     public SqlAliasBuilder WithFileName(string? fileName)
     {
-        var fname = (fileName is null) ? "null" : $"'{fileName}'";
+        var fname = fileName is null ? "null" : $"'{fileName}'";
         const string sql = "update alias set file_name = {0} where id = {1};";
         Sql.AppendLine(sql.Format(fname, _idAlias));
         return this;

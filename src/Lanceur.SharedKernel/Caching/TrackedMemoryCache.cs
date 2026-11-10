@@ -47,7 +47,8 @@ public sealed class TrackedMemoryCache : IMemoryCache
     }
 
     /// <summary>
-    ///     Removes the cache entry associated with the specified <paramref name="key" /> and logs the operation at Debug level.
+    ///     Removes the cache entry associated with the specified <paramref name="key" /> and logs the operation at Debug
+    ///     level.
     /// </summary>
     public void Remove(object key)
     {

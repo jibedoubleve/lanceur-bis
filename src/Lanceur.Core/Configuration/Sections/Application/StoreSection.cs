@@ -42,7 +42,7 @@ public static class StoreSectionExtension
     /// </summary>
     /// <param name="storeSection">The store configuration section containing the shortcut overrides.</param>
     /// <param name="storeType">The store instance whose type is used to look up the override.</param>
-    /// <returns>The alias override for the store, or <see cref="string.Empty"/> if none is found.</returns>
+    /// <returns>The alias override for the store, or <see cref="string.Empty" /> if none is found.</returns>
     public static string GetOverride(this StoreSection storeSection, object storeType) =>
         storeSection.StoreShortcuts
                     .FirstOrDefault(x => storeType.GetType().FullName!.Equals(x.StoreType))

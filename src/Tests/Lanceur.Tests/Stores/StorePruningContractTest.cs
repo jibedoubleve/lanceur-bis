@@ -56,7 +56,8 @@ public sealed class StorePruningContractTest
     [Theory]
     [InlineData("fo", "foo", true)] // refinement (StartsWith) → can prune
     [InlineData("foo", "bar", false)] // not a refinement → cannot prune
-    public void When_checking_alias_store_pruning_Then_only_refinement_can_be_pruned(string previous, string current, bool expected)
+    public void When_checking_alias_store_pruning_Then_only_refinement_can_be_pruned(
+        string previous, string current, bool expected)
         => BuildAliasStore().CanPruneResult(Cmdline.Parse(previous), current)
                             .ShouldBe(expected);
 
@@ -90,7 +91,8 @@ public sealed class StorePruningContractTest
     [InlineData("/ foo", "/ xyz", false)] // "xyz" doesn't contain "foo" → should be false, currently true
     [InlineData("/ oo", "/ goo", true)] // "goo" contains "oo" → can prune 
     [InlineData("/ ", "/ google", false)] // empty previous params → must trigger full search 
-    public void When_checking_bookmarks_store_pruning_Then_only_refinement_can_be_pruned(string previous, string current, bool expected)
+    public void When_checking_bookmarks_store_pruning_Then_only_refinement_can_be_pruned(
+        string previous, string current, bool expected)
         => BuildBookmarksStore().CanPruneResult(Cmdline.Parse(previous), current)
                                 .ShouldBe(expected);
 
@@ -145,7 +147,8 @@ public sealed class StorePruningContractTest
     [Theory]
     [InlineData("1+", "1+2", false)] // CalculatorStore always returns false - each expression is unique
     [InlineData("1+2", "3*4", false)]
-    public void When_checking_calculator_store_pruning_Then_it_cannot_prune(string previous, string current, bool expected)
+    public void When_checking_calculator_store_pruning_Then_it_cannot_prune(
+        string previous, string current, bool expected)
         => BuildCalculatorStore().CanPruneResult(Cmdline.Parse(previous), current)
                                  .ShouldBe(expected);
 
@@ -172,7 +175,8 @@ public sealed class StorePruningContractTest
     [Theory]
     [InlineData(": fo", ": foo", false)] // EverythingStore always returns false - results are non-deterministic
     [InlineData(": foo", ": bar", false)]
-    public void When_checking_everything_store_pruning_Then_it_cannot_prune(string previous, string current, bool expected)
+    public void When_checking_everything_store_pruning_Then_it_cannot_prune(
+        string previous, string current, bool expected)
         => BuildEverythingStore().CanPruneResult(Cmdline.Parse(previous), current)
                                  .ShouldBe(expected);
 

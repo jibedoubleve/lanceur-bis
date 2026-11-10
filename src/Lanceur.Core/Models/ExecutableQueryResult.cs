@@ -7,7 +7,6 @@ public abstract class ExecutableQueryResult : QueryResult, IExecutable
     public virtual bool IsElevated { get; set; }
 
     public string Parameters { get; set; } = string.Empty;
-        
 
     #endregion
 }

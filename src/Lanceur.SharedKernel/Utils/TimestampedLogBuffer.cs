@@ -9,9 +9,9 @@ public sealed class TimestampedLogBuffer
 {
     #region Fields
 
-    private readonly StringBuilder _logs = new();
-
     private const string LogTemplate = "{0}: {1}";
+
+    private readonly StringBuilder _logs = new();
 
     #endregion
 

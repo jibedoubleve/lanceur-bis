@@ -15,12 +15,12 @@ public partial class SQLiteAliasRepository
     private readonly GetAllAliasDbAction _getAllAliasDbAction;
     private readonly ILogger<SQLiteAliasRepository> _logger;
 
-    [GeneratedRegex(@"(www?|http?|https?|ftp):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(\.[a-zA-Z]{2,})?$")]
-    private static partial Regex BuildRegexSelectUrl();
-
     #endregion
 
     #region Methods
+
+    [GeneratedRegex(@"(www?|http?|https?|ftp):\/\/[^\s/$.?#].[^\s]*$|^[a-zA-Z0-9-]+\.[a-zA-Z]{2,6}(\.[a-zA-Z]{2,})?$")]
+    private static partial Regex BuildRegexSelectUrl();
 
     private static IEnumerable<AdditionalParameter> GetAdditionalParameter(IDbConnection conn, IEnumerable<long> ids)
     {
@@ -38,6 +38,12 @@ public partial class SQLiteAliasRepository
 
     private AliasQueryResult? GetById(IDbConnection conn, long id)
         => _dbActionFactory.AliasManagement.GetById(conn, id);
+
+    private static string[] GetSynonyms(IDbConnection conn, IEnumerable<long> ids)
+    {
+        const string sql = "select name from alias_name where id_alias in @ids";
+        return conn.Query<string>(sql, new { ids }).ToArray();
+    }
 
     private static void MergeHistory(IDbTransaction tx, IEnumerable<long> fromAliases, long toAlias)
     {
@@ -74,10 +80,5 @@ public partial class SQLiteAliasRepository
     private void SaveOrUpdate(IDbTransaction tx, AliasQueryResult alias) =>
         _dbActionFactory.SaveManagement.SaveOrUpdate(tx, alias);
 
-    private static string[] GetSynonyms(IDbConnection conn, IEnumerable<long> ids)
-    {
-        const string sql = "select name from alias_name where id_alias in @ids";
-        return conn.Query<string>(sql, new { ids }).ToArray();
-    }
     #endregion
 }

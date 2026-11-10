@@ -137,33 +137,6 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         connection.ExecuteScalar<int>(sqlCount).ShouldBe(1);
     }
 
-    /// <summary>
-    ///     Regression test for issue #1420. Quotes surrounding an additional parameter are not saved in the database.
-    /// </summary>
-    [Fact]
-    public void When_create_alias_with_quoted_additional_parameters_Then_quotes_are_not_saved_in_db()
-    {
-        // ARRANGE
-        var sb = new ServiceCollection().AddLogging(b => b.AddXUnit(OutputHelper))
-                                        .BuildServiceProvider();
-
-        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("Alias")).ToSql();
-
-        var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
-        var dbAction = BuildAliasDbAction(sb.GetService<ILoggerFactory>());
-
-        var alias = new AliasQueryResult { Id = 1, Name = "Alias" };
-
-        // ACT
-        alias.AdditionalParameters.Add(new AdditionalParameter
-            { AliasId = 1, Name = "someName", Parameter = "\"someParameter\"" });
-        dbAction.SaveOrUpdate(connection.BeginTransaction(), alias);
-
-        // ASSERT
-        const string sqlArgument = "select argument from alias_argument";
-        connection.ExecuteScalar<string>(sqlArgument).ShouldBe("someParameter");
-    }
-
     [Fact]
     public void When_create_alias_with_privileges_Then_all_is_saved_in_db()
     {
@@ -194,6 +167,33 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
             s => s.Name.ShouldBe(name),
             s => s.RunAs.ShouldBe(RunAs.Admin)
         );
+    }
+
+    /// <summary>
+    ///     Regression test for issue #1420. Quotes surrounding an additional parameter are not saved in the database.
+    /// </summary>
+    [Fact]
+    public void When_create_alias_with_quoted_additional_parameters_Then_quotes_are_not_saved_in_db()
+    {
+        // ARRANGE
+        var sb = new ServiceCollection().AddLogging(b => b.AddXUnit(OutputHelper))
+                                        .BuildServiceProvider();
+
+        var sql = new SqlBuilder().AppendAlias(a => a.WithSynonyms("Alias")).ToSql();
+
+        var connection = BuildFreshDb(sql, ConnectionStringFactory.InMemory);
+        var dbAction = BuildAliasDbAction(sb.GetService<ILoggerFactory>());
+
+        var alias = new AliasQueryResult { Id = 1, Name = "Alias" };
+
+        // ACT
+        alias.AdditionalParameters.Add(new AdditionalParameter
+            { AliasId = 1, Name = "someName", Parameter = "\"someParameter\"" });
+        dbAction.SaveOrUpdate(connection.BeginTransaction(), alias);
+
+        // ASSERT
+        const string sqlArgument = "select argument from alias_argument";
+        connection.ExecuteScalar<string>(sqlArgument).ShouldBe("someParameter");
     }
 
     [Fact]
@@ -353,12 +353,48 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         connection.ExecuteScalar<int>(sql3).ShouldBe(3);
     }
 
+    [Fact]
+    public void When_merging_aliases_with_common_synonyms_Then_synonyms_are_not_duplicated()
+    {
+        // ARRANGE
+        var sql = new SqlBuilder()
+                  .AppendAlias(a => a.WithSynonyms("a", "b", "c"))
+                  .AppendAlias(a => a.WithSynonyms("b", "c", "d"))
+                  .ToSql();
+        var connection = BuildFreshDb(sql);
+        var service = BuildDataService(connection);
+
+        // ACT
+        service.Merge([1, 2]);
+
+        // ASSERT
+        const string sqlNames = "select name from alias_name where id_alias = 1";
+        var names = connection.Query<string>(sqlNames).ToArray();
+
+        names.ShouldBe(["a", "b", "c", "d"], true);
+    }
+
     [Theory]
-    [InlineData(true, false, false, false)]  // target hidden
-    [InlineData(false, true, false, false)]  // target deleted
-    [InlineData(false, false, true, false)]  // source hidden
-    [InlineData(false, false, false, true)]  // source deleted
-    [InlineData(true, true, true, true)]     // everything hidden and deleted
+    [InlineData(true,
+        false,
+        false,
+        false)] // target hidden
+    [InlineData(false,
+        true,
+        false,
+        false)] // target deleted
+    [InlineData(false,
+        false,
+        true,
+        false)] // source hidden
+    [InlineData(false,
+        false,
+        false,
+        true)] // source deleted
+    [InlineData(true,
+        true,
+        true,
+        true)] // everything hidden and deleted
     public void When_merging_hidden_or_deleted_aliases_Then_merged_alias_is_visible_and_not_deleted(
         bool isTargetHidden,
         bool isTargetDeleted,
@@ -371,13 +407,13 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
                   .AppendAlias(a =>
                       a.WithSynonyms("target")
                        .WithFileName("target.exe")
-                       .WithDeletedAt(isTargetDeleted ? new(2026, 1, 1) : null)
+                       .WithDeletedAt(isTargetDeleted ? new DateTime(2026, 1, 1) : null)
                        .WithHiddenFlag(isTargetHidden)
                   )
                   .AppendAlias(a =>
                       a.WithSynonyms("source")
                        .WithFileName("source.exe")
-                       .WithDeletedAt(isSourceDeleted ? new(2026, 1, 1) : null)
+                       .WithDeletedAt(isSourceDeleted ? new DateTime(2026, 1, 1) : null)
                        .WithHiddenFlag(isSourceHidden)
                   )
                   .ToSql();
@@ -397,53 +433,6 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
             a => a.Hidden.ShouldBeFalse(),
             a => a.DeletedAt.ShouldBeNull()
         );
-    }
-
-    [Fact]
-    public void When_merging_aliases_with_common_synonyms_Then_synonyms_are_not_duplicated()
-    {
-        // ARRANGE
-        var sql = new SqlBuilder()
-                  .AppendAlias(a => a.WithSynonyms("a", "b", "c"))
-                  .AppendAlias(a => a.WithSynonyms("b", "c", "d"))
-                  .ToSql();
-        var connection = BuildFreshDb(sql);
-        var service = BuildDataService(connection);
-
-        // ACT
-        service.Merge([1, 2]);
-
-        // ASSERT
-        const string sqlNames = "select name from alias_name where id_alias = 1";
-        var names = connection.Query<string>(sqlNames).ToArray();
-
-        names.ShouldBe(["a", "b", "c", "d"], ignoreOrder: true);
-    }
-
-    [Theory]
-    [InlineData("a, b")]
-    [InlineData(" a ,b ")]
-    [InlineData("a,,b")]
-    [InlineData("a b")]
-    [InlineData("a  b")]
-    [InlineData(" a, ,b ")]
-    public void When_saving_alias_with_comma_or_space_separated_names_Then_each_name_is_saved(string synonyms)
-    {
-        // ARRANGE
-        var connection = BuildFreshDb();
-        var service = BuildDataService(connection);
-
-        var alias = BuildAlias();
-        alias.Synonyms = synonyms;
-
-        // ACT
-        service.SaveOrUpdate(alias);
-
-        // ASSERT
-        const string sqlNames = "select name from alias_name where id_alias = @id";
-        var names = connection.Query<string>(sqlNames, new { id = alias.Id }).ToArray();
-
-        names.ShouldBe(["a", "b"], ignoreOrder: true);
     }
 
     [Fact]
@@ -573,6 +562,32 @@ public sealed class SQLiteAliasRepositoryTest : TestBase
         //ASSERT
         sut.ShouldNotBeNull();
         sut.IsHidden.ShouldBeFalse();
+    }
+
+    [Theory]
+    [InlineData("a, b")]
+    [InlineData(" a ,b ")]
+    [InlineData("a,,b")]
+    [InlineData("a b")]
+    [InlineData("a  b")]
+    [InlineData(" a, ,b ")]
+    public void When_saving_alias_with_comma_or_space_separated_names_Then_each_name_is_saved(string synonyms)
+    {
+        // ARRANGE
+        var connection = BuildFreshDb();
+        var service = BuildDataService(connection);
+
+        var alias = BuildAlias();
+        alias.Synonyms = synonyms;
+
+        // ACT
+        service.SaveOrUpdate(alias);
+
+        // ASSERT
+        const string sqlNames = "select name from alias_name where id_alias = @id";
+        var names = connection.Query<string>(sqlNames, new { id = alias.Id }).ToArray();
+
+        names.ShouldBe(["a", "b"], true);
     }
 
     [Fact]

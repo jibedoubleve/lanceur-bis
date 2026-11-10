@@ -5,7 +5,7 @@
 drop view if exists "main"."data_doubloons_steam_v ";
 create view data_doubloons_steam_v as
 with normalised_alias as (select id,
-                                 hidden as n_hidden,
+                                 hidden                    as n_hidden,
                                  coalesce(arguments, '')   as n_arguments,
                                  coalesce(file_name, '')   as n_file_name,
                                  coalesce(run_as, '')      as n_run_as,
@@ -16,8 +16,7 @@ with normalised_alias as (select id,
                                  coalesce(exec_count, 0)   as n_exec_count,
                                  coalesce(lua_script, '')  as n_lua_script
                           from alias
-                          where
-                              file_name like 'steam://run/%'
+                          where file_name like 'steam://run/%'
                              or file_name like 'steam://rungameid/%')
 select a.id            as id,
        synonyms        as name,
@@ -48,7 +47,7 @@ order by id;
 drop view if exists "main"."data_doubloons_aliases_v";
 create view data_doubloons_aliases_v as
 with normalised_alias as (select id,
-                                 hidden as n_hidden,
+                                 hidden                    as n_hidden,
                                  coalesce(arguments, '')   as n_arguments,
                                  coalesce(file_name, '')   as n_file_name,
                                  coalesce(run_as, '')      as n_run_as,
@@ -90,6 +89,8 @@ order by id;
  */
 drop view if exists "main"."data_doubloons_v";
 create view data_doubloons_v as
-    select *  from data_doubloons_aliases_v
-    union all
-    select * from data_doubloons_steam_v;
+select *
+from data_doubloons_aliases_v
+union all
+select *
+from data_doubloons_steam_v;

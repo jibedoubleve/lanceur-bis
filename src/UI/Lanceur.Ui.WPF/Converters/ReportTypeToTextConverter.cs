@@ -30,7 +30,7 @@ public sealed class ReportTypeToTextConverter : IValueConverter
     }
 
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) 
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => Binding.DoNothing;
 
     #endregion

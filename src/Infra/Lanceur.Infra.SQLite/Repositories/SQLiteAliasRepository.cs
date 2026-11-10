@@ -7,7 +7,6 @@ using Lanceur.Core.Utils;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.SharedKernel.Extensions;
-using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace Lanceur.Infra.SQLite.Repositories;
@@ -518,21 +517,6 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
     }
 
     /// <inheritdoc />
-    public void Merge(IEnumerable<long> fromAliases) =>
-        Db.WithinTransaction(tx => {
-            fromAliases = fromAliases.ToArray();
-
-            var toAlias = AggregateIntoFirst(fromAliases);
-            MergeHistory(tx, fromAliases, toAlias.Id);
-            SaveOrUpdate(tx, toAlias);
-            Restore(tx, toAlias);
-
-            // Removed merged aliases...
-            var ids = fromAliases.Where(e => e != toAlias.Id);
-            Remove(tx, ids);
-        });
-
-    /// <inheritdoc/>
     public IEnumerable<AliasQueryResult> HydrateSteamGameUsage(IEnumerable<AliasQueryResult> aliases)
     {
         const string sql = """
@@ -556,12 +540,27 @@ public partial class SQLiteAliasRepository : SQLiteRepositoryBase, IAliasReposit
         foreach (var item in toUpdate)
         {
             var alias = aliases.SingleOrDefault(x =>
-                                   x.FileName!.Equals(item.FileName, StringComparison.InvariantCultureIgnoreCase));
+                x.FileName!.Equals(item.FileName, StringComparison.InvariantCultureIgnoreCase));
             alias?.Count = item.Count;
         }
-        return aliases; 
-            
+
+        return aliases;
     }
+
+    /// <inheritdoc />
+    public void Merge(IEnumerable<long> fromAliases) =>
+        Db.WithinTransaction(tx => {
+            fromAliases = fromAliases.ToArray();
+
+            var toAlias = AggregateIntoFirst(fromAliases);
+            MergeHistory(tx, fromAliases, toAlias.Id);
+            SaveOrUpdate(tx, toAlias);
+            Restore(tx, toAlias);
+
+            // Removed merged aliases...
+            var ids = fromAliases.Where(e => e != toAlias.Id);
+            Remove(tx, ids);
+        });
 
     /// <inheritdoc />
     public void RemoveLogically(AliasQueryResult alias)

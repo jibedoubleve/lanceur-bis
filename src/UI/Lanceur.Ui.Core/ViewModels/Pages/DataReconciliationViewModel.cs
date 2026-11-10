@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
@@ -252,10 +251,10 @@ public partial class DataReconciliationViewModel : ObservableObject
 
         var selectedAliases = GetSelectedAliases();
         if (selectedAliases.Length == 0) { return; }
-        
+
         var selectedIds = selectedAliases.Select(e => e.Id).ToArray();
         var aliasName = selectedAliases[0].Name;
-        
+
         var response = await _userDialogue.InteractAsync(
             $"""
              The selected aliases will be merged into '{aliasName}'.

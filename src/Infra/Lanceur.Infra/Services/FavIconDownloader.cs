@@ -1,7 +1,6 @@
 using System.Net;
 using Humanizer;
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
@@ -20,12 +19,6 @@ public sealed class FavIconDownloader : IFavIconDownloader
 {
     #region Fields
 
-    private readonly IMemoryCache _faviconCache;
-
-    private readonly IFavIconHttpClient _httpClient;
-    private readonly ILogger<FavIconDownloader> _logger;
-    private readonly TimeSpan _retryDelay;
-
     private static readonly Dictionary<string, (bool IsManual, string Url)> FaviconUrls = new()
     {
         ["DuckDuckGo"] = (IsManual: false, Url: "https://icons.duckduckgo.com/ip2/{0}.ico"),
@@ -33,6 +26,12 @@ public sealed class FavIconDownloader : IFavIconDownloader
         ["Manual (png)"] = (IsManual: true, Url: "favicon.png"),
         ["Manual (ico)"] = (IsManual: true, Url: "favicon.ico")
     };
+
+    private readonly IMemoryCache _faviconCache;
+
+    private readonly IFavIconHttpClient _httpClient;
+    private readonly ILogger<FavIconDownloader> _logger;
+    private readonly TimeSpan _retryDelay;
 
     #endregion
 

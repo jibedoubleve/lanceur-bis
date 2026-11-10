@@ -6,11 +6,27 @@ namespace Lanceur.Core.Configuration;
 /// </summary>
 public sealed class ForwardingSection<T> : ISection<T> where T : class
 {
+    #region Fields
+
     private readonly IWriteableSection<T> _inner;
+
+    #endregion
+
+    #region Constructors
 
     public ForwardingSection(IWriteableSection<T> inner) => _inner = inner;
 
+    #endregion
+
+    #region Properties
+
     public T Value => _inner.Value;
 
+    #endregion
+
+    #region Methods
+
     public void Reload() => _inner.Reload();
+
+    #endregion
 }

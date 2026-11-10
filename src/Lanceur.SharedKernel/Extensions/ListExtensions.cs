@@ -55,7 +55,7 @@ public static class ListExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(toReplace);
-        
+
         source.Clear();
         source.AddRange(toReplace);
     }

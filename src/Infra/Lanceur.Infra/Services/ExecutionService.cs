@@ -144,11 +144,11 @@ public sealed class ExecutionService : IExecutionService
             query.Parameters,
             result.Context.Parameters
         );
-        
+
         var args = _wildcardService.HasWildcard(query.Parameters)
             ? parameters
             : $"{parameters} {result.Context.Parameters}".Trim();
-        
+
         // EXECUTE PROCESS
         _logger.LogInformation("Executing {FileName} with args {Parameters}", fileName, args);
         var psi = new ProcessContext

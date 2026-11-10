@@ -9,6 +9,19 @@ public sealed class CircularQueueTest
     #region Methods
 
     [Fact]
+    public void When_clearing_Then_queue_is_empty()
+    {
+        var sut = new CircularQueue<float>(2);
+        sut.Enqueue(1);
+        sut.Enqueue(2);
+
+        sut.Count.ShouldBe(2);
+
+        sut.Clear();
+        sut.Count.ShouldBe(0);
+    }
+
+    [Fact]
     public void When_enqueuing_Then_average_covers_latest_values()
     {
         var values = new Dictionary<float, float>
@@ -39,19 +52,6 @@ public sealed class CircularQueueTest
             sut.Enqueue(i);
             sut.Count.ShouldBeLessThanOrEqualTo(max);
         }
-    }
-
-    [Fact]
-    public void When_clearing_Then_queue_is_empty()
-    {
-        var sut = new CircularQueue<float>(2);
-        sut.Enqueue(1);
-        sut.Enqueue(2);
-
-        sut.Count.ShouldBe(2);
-
-        sut.Clear();
-        sut.Count.ShouldBe(0);
     }
 
     #endregion

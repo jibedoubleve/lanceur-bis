@@ -2,7 +2,6 @@ using System.Text.Json.Nodes;
 using System.Web.Bookmarks.Domain;
 using System.Web.Bookmarks.Factories;
 using System.Web.Bookmarks.RepositoryConfiguration;
-using Lanceur.SharedKernel.Logging;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 

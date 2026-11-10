@@ -37,7 +37,7 @@ public sealed class AliasStore : StoreBase, IStoreService
 
     #region Properties
 
-    /// <inheritdoc cref="IStoreService.IsOverridable"/>
+    /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => false;
 
     /// <inheritdoc />

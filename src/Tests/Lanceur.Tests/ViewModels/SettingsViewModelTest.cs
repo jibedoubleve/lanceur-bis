@@ -67,22 +67,13 @@ public sealed class SettingsViewModelTest : ViewModelTester<ApplicationSettingsV
     {
         serviceCollection.AddLoggingForTests(OutputHelper)
                          .AddSingleton(new LoggingLevelSwitch(LogEventLevel.Verbose))
-                         .AddSingleton<ISettingsProvider<InfrastructureSettings>, MemoryInfrastructureSettingsProvider>()
+                         .AddSingleton<ISettingsProvider<InfrastructureSettings>,
+                             MemoryInfrastructureSettingsProvider>()
                          .AddSingleton<ISettingsProvider<ApplicationSettings>, SQLiteApplicationSettingsProvider>()
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddUiServicesMockContext();
         return serviceCollection;
     }
-
-    [Theory]
-    [InlineData(500)]
-    [InlineData(123)]
-    public void When_search_delay_changes_Then_it_is_saved_in_db(double value)
-        => AssertProperty(
-            viewModel => viewModel.SearchDelay = value,
-            () => GetProperty("SearchBox.SearchDelay"),
-            value.ToString
-        );
 
     [Theory]
     [InlineData(true)]
@@ -125,6 +116,16 @@ public sealed class SettingsViewModelTest : ViewModelTester<ApplicationSettingsV
             viewModel => viewModel.BookmarkSourceBrowser = value,
             () => GetProperty("Stores.BookmarkSourceBrowser"),
             () => value
+        );
+
+    [Theory]
+    [InlineData(500)]
+    [InlineData(123)]
+    public void When_search_delay_changes_Then_it_is_saved_in_db(double value)
+        => AssertProperty(
+            viewModel => viewModel.SearchDelay = value,
+            () => GetProperty("SearchBox.SearchDelay"),
+            value.ToString
         );
 
     #endregion

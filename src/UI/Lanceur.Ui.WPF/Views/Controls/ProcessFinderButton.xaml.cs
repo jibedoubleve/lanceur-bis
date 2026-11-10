@@ -31,10 +31,11 @@ public partial class ProcessFinderButton
         null
     );
 
+    private static readonly Point CursorHotSpot = new(16, 20);
+
     private readonly Cursor _crosshairsCursor;
     private readonly ILogger<ProcessFinderButton> _logger;
     private readonly IUserNotificationService _notify;
-    private static readonly Point CursorHotSpot = new(16, 20);
 
     #endregion
 
