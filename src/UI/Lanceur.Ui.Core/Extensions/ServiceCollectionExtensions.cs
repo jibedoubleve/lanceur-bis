@@ -7,6 +7,7 @@ using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
+using Lanceur.Ui.Core.ViewModels.Pages;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -92,6 +93,7 @@ public static class ServiceCollectionExtensions
                          .AddTransient<IClipboardService, ClipboardService>()
                          .AddTransient<IWatchdogBuilder, WatchdogBuilder>()
                          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+                         .AddTransient<ApplicationSettingsSynchroniser>()
                          .AddSingleton<IEnigma, Enigma>()
                          .AddSettingsInfrastructure()
                          .AddTrackedMemoryCache()

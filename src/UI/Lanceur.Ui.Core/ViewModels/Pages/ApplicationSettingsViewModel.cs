@@ -3,18 +3,16 @@ using System.ComponentModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Lanceur.Core.Configuration.Configurations;
-using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
-using Lanceur.Infra.Stores.Everything;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Extensions;
+using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Microsoft.Extensions.Logging;
@@ -28,17 +26,10 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     private readonly IAliasRepository _aliasRepository;
 
-    private readonly ISettingsProvider<ApplicationSettings> _appSettings;
-
-    private readonly IEnigma _enigma;
-
     private readonly IUserCommunicationService _hubService;
 
-    private readonly ISettingsProvider<InfrastructureSettings> _infraSettings;
-
     private readonly ILogger<ApplicationSettingsViewModel> _logger;
-
-    private readonly IStoreShortcutService _storeShortcutService;
+    private readonly ApplicationSettingsSynchroniser _settings;
 
     private readonly IViewFactory _viewFactory;
 
@@ -52,33 +43,23 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         IUserCommunicationService userCommunicationService,
         ILogger<ApplicationSettingsViewModel> logger,
         IViewFactory viewFactory,
-        IEnigma enigma,
-        IStoreShortcutService storeShortcutService,
-        ISettingsProvider<ApplicationSettings> appSettings,
-        ISettingsProvider<InfrastructureSettings> infraSettings,
+        ApplicationSettingsSynchroniser settings,
         IAliasRepository aliasRepository)
     {
         ArgumentNullException.ThrowIfNull(userCommunicationService);
         ArgumentNullException.ThrowIfNull(aliasRepository);
         ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(viewFactory);
-        ArgumentNullException.ThrowIfNull(enigma);
-        ArgumentNullException.ThrowIfNull(storeShortcutService);
-        ArgumentNullException.ThrowIfNull(appSettings);
-        ArgumentNullException.ThrowIfNull(infraSettings);
 
 
         _hubService = userCommunicationService;
         _logger = logger;
         _viewFactory = viewFactory;
-        _enigma = enigma;
-        _storeShortcutService = storeShortcutService;
-        _appSettings = appSettings;
-        _infraSettings = infraSettings;
+        _settings = settings;
         _aliasRepository = aliasRepository;
 
         // Hotkey
-        var hk = _appSettings.Value.HotKey;
+        var hk = settings.HotKey;
         IsCtrl = hk.ModifierKey.IsFlagSet((int)ModifierKeys.Control);
         IsAlt = hk.ModifierKey.IsFlagSet((int)ModifierKeys.Alt);
         IsWin = hk.ModifierKey.IsFlagSet((int)ModifierKeys.Windows);
@@ -86,15 +67,15 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         Key = hk.Key;
 
         // Logging
-        SelectedLogLevel = infraSettings.Value.Logging.MinimumLogLevel;
+        SelectedLogLevel = settings.MinimumLogLevel;
 
         // Miscellaneous
-        MapSettingsFromDbToUi();
-        var featureFlags = appSettings.Value.FeatureFlags.ToArray();
+        settings.MapFrom(this);
+        var featureFlags = settings.FeatureFlags;
         IsResourceMonitorEnabled = featureFlags.IsFeatureFlagEnabled(Features.ResourceDisplay);
 
         // Setup behaviour on property changed
-        foreach (var flag in FeatureFlags)
+        foreach (var flag in settings.FeatureFlags)
         {
             flag.PropertyChanged += OnPropertyChanged;
         }
@@ -225,122 +206,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
                              .Where(c => c == storeShortcut.AliasOverride || !used.Contains(c));
     }
 
-    private int GetHotKey()
-    {
-        var result = 0;
-        if (IsCtrl) { result += (int)ModifierKeys.Control; }
-
-        if (IsAlt) { result += (int)ModifierKeys.Alt; }
-
-        if (IsWin) { result += (int)ModifierKeys.Windows; }
-
-        if (IsShift) { result += (int)ModifierKeys.Shift; }
-
-        return result;
-    }
-
-    private void MapSettingsFromDbToUi()
-    {
-        DbPath = _infraSettings.Value.Database.DbPath;
-
-        // Search box section
-        SearchDelay = _appSettings.Value.SearchBox.SearchDelay;
-        ShowResult = _appSettings.Value.SearchBox.ShowResult;
-        ShowAtStartup = _appSettings.Value.SearchBox.ShowAtStartup;
-        ShowLastQuery = _appSettings.Value.SearchBox.ShowLastQuery;
-        ToggleVisibility = _appSettings.Value.SearchBox.ToggleVisibility;
-
-        IsSettingsButtonEnabled = _appSettings.Value.SearchBox.IsSettingsButtonEnabled;
-        IsStatusBarAlwaysVisible = _appSettings.Value.SearchBox.IsStatusBarAlwaysVisible;
-
-        // Store section
-        BookmarkSourceBrowser = _appSettings.Value.Stores.BookmarkSourceBrowser;
-
-        var shortcuts = _storeShortcutService.Resolve(_appSettings.Value.Stores);
-        StoreShortcuts = new ObservableCollection<StoreShortcut>(shortcuts);
-
-        // Everything Store
-        var adapter = new EverythingQueryAdapter(_appSettings.Value.Stores.EverythingQuerySuffix);
-        ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
-        ExcludeSystemFilesWithEverything = adapter.IsSystemFilesExcluded;
-        IncludeOnlyExecFilesWithEverything = adapter.SelectOnlyExecutable;
-        ExcludeFilesInBinWithEverything = adapter.IsFilesInTrashBinExcluded;
-
-        // Window section
-        NotificationDisplayDuration = _appSettings.Value.Window.NotificationDisplayDuration;
-        WindowBackdropStyle = _appSettings.Value.Window.BackdropStyle;
-        DateTimeFormat = _appSettings.Value.Window.DateTimeFormat;
-
-        // Feature flags
-        FeatureFlags = [.. _appSettings.Value.FeatureFlags];
-
-        // Resource Monitor
-        CpuSmoothingIndex = _appSettings.Value.ResourceMonitor.CpuSmoothingIndex;
-        RefreshRate = _appSettings.Value.ResourceMonitor.RefreshRate;
-
-        // Process launch
-        EarlyExitCheckDelay = _appSettings.Value.ProcessLaunch.EarlyExitCheckDelay;
-        SlowStartupThreshold = _appSettings.Value.ProcessLaunch.SlowStartupThreshold;
-        StartupTimeout = _appSettings.Value.ProcessLaunch.StartupTimeout;
-
-        // Miscellaneous
-        var token = _appSettings.Value.Github.Token;
-        ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : _enigma.Decrypt(token!);
-    }
-
-    private void MapSettingsFromUiToDb()
-    {
-        _infraSettings.Value.Database.DbPath = DbPath;
-
-        // Search box section
-        _appSettings.Value.SearchBox.SearchDelay = SearchDelay;
-        _appSettings.Value.SearchBox.ShowResult = ShowResult;
-        _appSettings.Value.SearchBox.ShowAtStartup = ShowAtStartup;
-        _appSettings.Value.SearchBox.ShowLastQuery = ShowLastQuery;
-        _appSettings.Value.SearchBox.ToggleVisibility = ToggleVisibility;
-
-        _appSettings.Value.SearchBox.IsSettingsButtonEnabled = IsSettingsButtonEnabled;
-        _appSettings.Value.SearchBox.IsStatusBarAlwaysVisible = IsStatusBarAlwaysVisible;
-
-        // Store section
-        _appSettings.Value.Stores.BookmarkSourceBrowser = BookmarkSourceBrowser;
-        _appSettings.Value.Stores.StoreShortcuts = StoreShortcuts.ToArray();
-
-        // Everything Store
-        var query = new EverythingQueryBuilder();
-        if (ExcludeHiddenFilesWithEverything) { query.ExcludeHiddenFiles(); }
-
-        if (ExcludeSystemFilesWithEverything) { query.ExcludeSystemFiles(); }
-
-        if (IncludeOnlyExecFilesWithEverything) { query.OnlyExecFiles(); }
-
-        if (ExcludeFilesInBinWithEverything) { query.ExcludeFilesInBin(); }
-
-        _appSettings.Value.Stores.EverythingQuerySuffix = query.BuildQuery();
-
-        // Window section
-        _appSettings.Value.Window.NotificationDisplayDuration = NotificationDisplayDuration;
-        _appSettings.Value.Window.BackdropStyle = WindowBackdropStyle;
-        _appSettings.Value.Window.DateTimeFormat = DateTimeFormat;
-
-        // Feature flags
-        _appSettings.Value.FeatureFlags = FeatureFlags;
-        IsResourceMonitorEnabled = FeatureFlags.IsFeatureFlagEnabled(Features.ResourceDisplay);
-
-        // Resource Monitor
-        _appSettings.Value.ResourceMonitor.CpuSmoothingIndex = CpuSmoothingIndex;
-        _appSettings.Value.ResourceMonitor.RefreshRate = RefreshRate;
-
-        // Process launch
-        _appSettings.Value.ProcessLaunch.EarlyExitCheckDelay = EarlyExitCheckDelay;
-        _appSettings.Value.ProcessLaunch.SlowStartupThreshold = SlowStartupThreshold;
-        _appSettings.Value.ProcessLaunch.StartupTimeout = StartupTimeout;
-
-        // Miscellaneous
-        _appSettings.Value.Github.Token
-            = ApiToken.IsNullOrWhiteSpace() ? string.Empty : _enigma.Encrypt(ApiToken);
-    }
-
     [RelayCommand]
     private async Task OnEditStoreShortcut(StoreShortcut? storeShortcut)
     {
@@ -404,30 +269,23 @@ public partial class ApplicationSettingsViewModel : ObservableObject
             : null;
     }
 
+    internal int GetHotKey()
+    {
+        var result = 0;
+        if (IsCtrl) { result += (int)ModifierKeys.Control; }
+
+        if (IsAlt) { result += (int)ModifierKeys.Alt; }
+
+        if (IsWin) { result += (int)ModifierKeys.Windows; }
+
+        if (IsShift) { result += (int)ModifierKeys.Shift; }
+
+        return result;
+    }
+
     internal void SaveSettings()
     {
-        var hash = _appSettings.Value.HotKey.GetHashCode();
-        _appSettings.Value.HotKey = new HotKeySection(
-            GetHotKey(),
-            Key
-        );
-
-        List<bool> reboot =
-        [
-            hash != _appSettings.Value.HotKey.GetHashCode(),
-            _infraSettings.Value.Database.DbPath != DbPath,
-            _infraSettings.Value.Logging.MinimumLogLevel != SelectedLogLevel
-        ];
-
-        MapSettingsFromUiToDb();
-        _infraSettings.Value.Logging.MinimumLogLevel = SelectedLogLevel;
-
-        _infraSettings.Save();
-        _appSettings.Save();
-
-        var needRestart = reboot.Any(r => r);
-
-        _logger.LogTrace("Saved settings. Need restart {NeedRestart}", needRestart);
+        var needRestart = _settings.SaveSettings(this);
 
         if (needRestart) { _hubService.GlobalNotifications.AskRestart(); }
     }
