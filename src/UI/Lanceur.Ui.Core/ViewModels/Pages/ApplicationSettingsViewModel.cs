@@ -10,6 +10,7 @@ using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.SharedKernel.Extensions;
 using Lanceur.SharedKernel.IoC;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Constants;
 using Lanceur.Ui.Core.Extensions;
 using Lanceur.Ui.Core.Services;
@@ -28,6 +29,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     private readonly IUserCommunicationService _hubService;
 
+    private bool _isSettingSaveActivated = true;
     private readonly ILogger<ApplicationSettingsViewModel> _logger;
     private readonly ApplicationSettingsSynchroniser _settings;
 
@@ -37,8 +39,6 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
     #region Constructors
 
-    //refactor: Split responsabilities and lower the ctor parameters
-    // Issue URL: https://github.com/jibedoubleve/lanceur-bis/issues/1492
     public ApplicationSettingsViewModel(
         IUserCommunicationService userCommunicationService,
         ILogger<ApplicationSettingsViewModel> logger,
@@ -250,7 +250,7 @@ public partial class ApplicationSettingsViewModel : ObservableObject
         if (properties.Contains(e.PropertyName)) { return; }
 
         _logger.LogTrace("Property {Property} changed", e.PropertyName);
-        SaveSettings();
+        if (_isSettingSaveActivated) { SaveSettings(); }
     }
 
     /// <summary>
@@ -289,6 +289,15 @@ public partial class ApplicationSettingsViewModel : ObservableObject
 
         if (needRestart) { _hubService.GlobalNotifications.AskRestart(); }
     }
+
+    /// <summary>
+    ///     Disables autosave until the returned scope is disposed.
+    ///     Property changes made in the meantime are not saved.
+    /// </summary>
+    public IDisposable DisableAutosave() => BooleanScope.Create(
+        () => _isSettingSaveActivated = false,
+        () => _isSettingSaveActivated = true
+    );
 
     #endregion
 }
