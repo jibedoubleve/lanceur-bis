@@ -52,15 +52,14 @@ jobs:
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          # Pushes made with GITHUB_TOKEN don't trigger workflows; [skip ci] makes it explicit.
-          - name: Commit issue URLs inserted into TODOs
-            run: |
-                git config user.name "github-actions[bot]"
-                git config user.email "github-actions[bot]@users.noreply.github.com"
-                git add -A
-                if [ -n "$(git status --porcelain)" ]; then
-                  git commit -m "Add GitHub issue links to TODOs [skip ci]"
-                  git push origin HEAD:${{ github.ref_name }}
-                else
-                  echo "No changes to commit"
-                fi
+          # The branch is protected: issue links go through a PR to merge manually.
+          # [skip ci] in the title keeps the squash-merge from triggering a release.
+          - name: Open a PR with the issue URLs inserted into TODOs
+            uses: peter-evans/create-pull-request@v7
+            with:
+                branch: todo/issue-links-${{ github.ref_name }}
+                commit-message: "(chore) Add GitHub issue links to REFACTOR comments [skip ci]"
+                title: "(chore) Add GitHub issue links to REFACTOR comments [skip ci]"
+                body: "Inserts the `Issue URL` lines added by `todo-to-issue-action` for newly created tech-debt issues."
+                labels: skip-changelog
+                delete-branch: true
