@@ -13,6 +13,7 @@ using Lanceur.Ui.Core.Messages;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Microsoft.Extensions.Logging;
+using Octokit;
 
 namespace Lanceur.Ui.Core.ViewModels;
 
@@ -121,8 +122,9 @@ public partial class MainViewModel : ObservableObject
             return string.Empty;
         }
 
-
-        var name = selectedItem.Name;
+        // Keep casing of the user input...
+        var input = Cmdline.Parse(Query);
+        var name = input.Name + selectedItem.Name[input.Name.Length..];
 
         var trimmed = Query.TrimStart();
         var trimmedLength = Query.Length - trimmed.Length;

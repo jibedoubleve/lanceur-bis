@@ -537,6 +537,31 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
         );
     }
 
+    [Theory]
+    [InlineData("codium", "codium")]
+    [InlineData("CODium", "CODium")]
+    [InlineData("CoDium", "CoDium")]
+    [InlineData("codium aAa", "codium")]
+    [InlineData("CODium aAa", "CODium")]
+    [InlineData("CoDium aAa", "CoDium")]
+    [InlineData("co", "codium")]
+    [InlineData("COD", "CODium")]
+    [InlineData("Cod", "Codium")]
+    public async Task When_writing_query_Then_suggestion_follow_user_casing(string query, string expected)
+    {
+        var sqlBuilder = new SqlBuilder().AppendAlias(a => a.WithSynonyms("codium"));
+        var hooks = new ServiceHooks { OverridenConnectionString = ConnectionStringFactory.InMemory };
+
+        await TestViewModelAsync(async (viewModel, _) => {
+                viewModel.Query = query;
+                await viewModel.SearchCommand.ExecuteAsync(null);
+
+                viewModel.Suggestion.ShouldBe(expected);
+            },
+            sqlBuilder,
+            hooks);
+    }
+
     #endregion
 
     [Store("&")]
