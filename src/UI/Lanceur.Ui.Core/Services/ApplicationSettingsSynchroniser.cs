@@ -41,14 +41,14 @@ public class ApplicationSettingsSynchroniser
         _enigma = enigma;
         _logger = logger;
 
-        FeatureFlags = _appSettings.Value.FeatureFlags.ToArray();
+        FeatureFlags = [.. _appSettings.Value.FeatureFlags];
     }
 
     #endregion
 
     #region Properties
 
-    public IReadOnlyCollection<FeatureFlag> FeatureFlags { get; private set; }
+    public IReadOnlyCollection<FeatureFlag> FeatureFlags { get; }
 
     public HotKeySection HotKey => _appSettings.Value.HotKey;
 
@@ -113,51 +113,54 @@ public class ApplicationSettingsSynchroniser
 
     public void MapFrom(ApplicationSettingsViewModel vm)
     {
-        vm.DbPath = _infraSettings.Value.Database.DbPath;
+        using (vm.DisableAutosave())
+        {
+            vm.DbPath = _infraSettings.Value.Database.DbPath;
 
-        // Search box section
-        vm.SearchDelay = _appSettings.Value.SearchBox.SearchDelay;
-        vm.ShowResult = _appSettings.Value.SearchBox.ShowResult;
-        vm.ShowAtStartup = _appSettings.Value.SearchBox.ShowAtStartup;
-        vm.ShowLastQuery = _appSettings.Value.SearchBox.ShowLastQuery;
-        vm.ToggleVisibility = _appSettings.Value.SearchBox.ToggleVisibility;
+            // Search box section
+            vm.SearchDelay = _appSettings.Value.SearchBox.SearchDelay;
+            vm.ShowResult = _appSettings.Value.SearchBox.ShowResult;
+            vm.ShowAtStartup = _appSettings.Value.SearchBox.ShowAtStartup;
+            vm.ShowLastQuery = _appSettings.Value.SearchBox.ShowLastQuery;
+            vm.ToggleVisibility = _appSettings.Value.SearchBox.ToggleVisibility;
 
-        vm.IsSettingsButtonEnabled = _appSettings.Value.SearchBox.IsSettingsButtonEnabled;
-        vm.IsStatusBarAlwaysVisible = _appSettings.Value.SearchBox.IsStatusBarAlwaysVisible;
+            vm.IsSettingsButtonEnabled = _appSettings.Value.SearchBox.IsSettingsButtonEnabled;
+            vm.IsStatusBarAlwaysVisible = _appSettings.Value.SearchBox.IsStatusBarAlwaysVisible;
 
-        // Store section
-        vm.BookmarkSourceBrowser = _appSettings.Value.Stores.BookmarkSourceBrowser;
+            // Store section
+            vm.BookmarkSourceBrowser = _appSettings.Value.Stores.BookmarkSourceBrowser;
 
-        var shortcuts = _storeShortcutService.Resolve(_appSettings.Value.Stores);
-        vm.StoreShortcuts = new ObservableCollection<StoreShortcut>(shortcuts);
+            var shortcuts = _storeShortcutService.Resolve(_appSettings.Value.Stores);
+            vm.StoreShortcuts = new ObservableCollection<StoreShortcut>(shortcuts);
 
-        // Everything Store
-        var adapter = new EverythingQueryAdapter(_appSettings.Value.Stores.EverythingQuerySuffix);
-        vm.ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
-        vm.ExcludeSystemFilesWithEverything = adapter.IsSystemFilesExcluded;
-        vm.IncludeOnlyExecFilesWithEverything = adapter.SelectOnlyExecutable;
-        vm.ExcludeFilesInBinWithEverything = adapter.IsFilesInTrashBinExcluded;
+            // Everything Store
+            var adapter = new EverythingQueryAdapter(_appSettings.Value.Stores.EverythingQuerySuffix);
+            vm.ExcludeHiddenFilesWithEverything = adapter.IsHiddenFilesExcluded;
+            vm.ExcludeSystemFilesWithEverything = adapter.IsSystemFilesExcluded;
+            vm.IncludeOnlyExecFilesWithEverything = adapter.SelectOnlyExecutable;
+            vm.ExcludeFilesInBinWithEverything = adapter.IsFilesInTrashBinExcluded;
 
-        // Window section
-        vm.NotificationDisplayDuration = _appSettings.Value.Window.NotificationDisplayDuration;
-        vm.WindowBackdropStyle = _appSettings.Value.Window.BackdropStyle;
-        vm.DateTimeFormat = _appSettings.Value.Window.DateTimeFormat;
+            // Window section
+            vm.NotificationDisplayDuration = _appSettings.Value.Window.NotificationDisplayDuration;
+            vm.WindowBackdropStyle = _appSettings.Value.Window.BackdropStyle;
+            vm.DateTimeFormat = _appSettings.Value.Window.DateTimeFormat;
 
-        // Feature flags
-        FeatureFlags = [.. _appSettings.Value.FeatureFlags];
+            // Feature flags
+            vm.FeatureFlags = [.. _appSettings.Value.FeatureFlags];
 
-        // Resource Monitor
-        vm.CpuSmoothingIndex = _appSettings.Value.ResourceMonitor.CpuSmoothingIndex;
-        vm.RefreshRate = _appSettings.Value.ResourceMonitor.RefreshRate;
+            // Resource Monitor
+            vm.CpuSmoothingIndex = _appSettings.Value.ResourceMonitor.CpuSmoothingIndex;
+            vm.RefreshRate = _appSettings.Value.ResourceMonitor.RefreshRate;
 
-        // Process launch
-        vm.EarlyExitCheckDelay = _appSettings.Value.ProcessLaunch.EarlyExitCheckDelay;
-        vm.SlowStartupThreshold = _appSettings.Value.ProcessLaunch.SlowStartupThreshold;
-        vm.StartupTimeout = _appSettings.Value.ProcessLaunch.StartupTimeout;
+            // Process launch
+            vm.EarlyExitCheckDelay = _appSettings.Value.ProcessLaunch.EarlyExitCheckDelay;
+            vm.SlowStartupThreshold = _appSettings.Value.ProcessLaunch.SlowStartupThreshold;
+            vm.StartupTimeout = _appSettings.Value.ProcessLaunch.StartupTimeout;
 
-        // Miscellaneous
-        var token = _appSettings.Value.Github.Token;
-        vm.ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : _enigma.Decrypt(token!);
+            // Miscellaneous
+            var token = _appSettings.Value.Github.Token;
+            vm.ApiToken = token.IsNullOrWhiteSpace() ? string.Empty : _enigma.Decrypt(token!);
+        }
     }
 
     public bool SaveSettings(ApplicationSettingsViewModel vm)
