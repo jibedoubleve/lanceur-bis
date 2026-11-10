@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -8,10 +8,10 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Humanizer" Version="3.0.10"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="11.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="11.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0" />
         <PackageReference Include="NCalcSync" Version="7.4.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.*"/>
         <PackageReference Include="NLua" Version="1.7.9"/>
