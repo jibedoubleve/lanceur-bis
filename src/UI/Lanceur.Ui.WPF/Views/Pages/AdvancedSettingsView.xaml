@@ -1,0 +1,115 @@
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.AdvancedSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Advanced"
+    d:Width="800"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Lanceur.Ui.WPF;component/Xaml/SettingsStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,15">
+            <!--  DIAGNOSTICS  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Diagnostics" />
+
+            <ui:CardControl Icon="{ui:SymbolIcon NoteBookError24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Minimum log level" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Lowest level of messages written to the logs. Lower levels give more detail. Requires a restart." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ComboBox ItemsSource="{Binding LogLevels}" SelectedItem="{Binding SelectedLogLevel}" />
+            </ui:CardControl>
+
+            <!--  STARTUP TRACKING  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Alias startup tracking" />
+
+            <ui:CardExpander Icon="{ui:SymbolIcon Rocket24}" IsExpanded="False">
+                <ui:CardExpander.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Startup delays" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Delays used to follow the launch of an alias, in milliseconds." />
+                    </StackPanel>
+                </ui:CardExpander.Header>
+
+                <StackPanel>
+                    <ui:CardControl Icon="{ui:SymbolIcon HourglassHalf24}">
+                        <ui:CardControl.Header>
+                            <StackPanel>
+                                <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Slow startup notification delay" />
+                                <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                              Text="Time after which a &quot;Starting…&quot; notification is shown while the application is still loading." />
+                            </StackPanel>
+                        </ui:CardControl.Header>
+                        <ui:NumberBox
+                            LargeChange="1000"
+                            Minimum="0"
+                            SmallChange="100"
+                            Value="{Binding SlowStartupThreshold, UpdateSourceTrigger=PropertyChanged}" />
+                    </ui:CardControl>
+
+                    <ui:CardControl Icon="{ui:SymbolIcon Timer24}">
+                        <ui:CardControl.Header>
+                            <StackPanel>
+                                <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Startup timeout" />
+                                <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                              Text="Maximum time to wait for the application to be ready. Past this delay, a warning is shown." />
+                            </StackPanel>
+                        </ui:CardControl.Header>
+                        <ui:NumberBox
+                            LargeChange="5000"
+                            Minimum="0"
+                            SmallChange="1000"
+                            Value="{Binding StartupTimeout, UpdateSourceTrigger=PropertyChanged}" />
+                    </ui:CardControl>
+
+                    <ui:CardControl Icon="{ui:SymbolIcon ArrowSync24}">
+                        <ui:CardControl.Header>
+                            <StackPanel>
+                                <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Closed-instance check delay" />
+                                <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                              Text="When the application was already running, time to wait before checking that an instance is still running. Increase it if an application closes slowly and the launch is lost without a warning." />
+                            </StackPanel>
+                        </ui:CardControl.Header>
+                        <ui:NumberBox
+                            LargeChange="5000"
+                            Minimum="0"
+                            SmallChange="1000"
+                            Value="{Binding EarlyExitCheckDelay, UpdateSourceTrigger=PropertyChanged}" />
+                    </ui:CardControl>
+                </StackPanel>
+            </ui:CardExpander>
+
+            <!--  INTEGRATIONS  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Integrations" />
+
+            <ui:CardControl Icon="{ui:SymbolIcon PersonKey20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="GitHub API token" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Token from your GitHub account, used among other things to create issues." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:PasswordBox
+                    MinWidth="300"
+                    Password="{Binding ApiToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PlaceholderText="Enter your API token" />
+            </ui:CardControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

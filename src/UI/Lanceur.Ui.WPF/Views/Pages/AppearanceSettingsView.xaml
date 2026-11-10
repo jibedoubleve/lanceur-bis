@@ -1,0 +1,73 @@
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.AppearanceSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Appearance"
+    d:Width="800"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Lanceur.Ui.WPF;component/Xaml/SettingsStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <x:Array x:Key="WindowBackdropStyles" Type="{x:Type sys:String}">
+                <sys:String>Acrylic</sys:String>
+                <sys:String>Auto</sys:String>
+                <sys:String>Mica</sys:String>
+                <sys:String>None</sys:String>
+                <sys:String>Tabbed</sys:String>
+            </x:Array>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,15">
+            <!--  WINDOW  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Window" />
+
+            <ui:CardControl Icon="{ui:SymbolIcon Color24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Backdrop effect" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Material applied to the window background. Mica: subtle transparency. Acrylic: stronger blur. Tabbed: effect suited to tabbed windows. Auto: chosen by Windows. None: no effect." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ComboBox ItemsSource="{StaticResource WindowBackdropStyles}"
+                          SelectedItem="{Binding WindowBackdropStyle}" />
+            </ui:CardControl>
+
+            <!--  SEARCH BOX  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Search box" />
+
+            <ui:CardControl Icon="{ui:SymbolIcon Settings24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Show settings button" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Displays a button that opens the settings from the search box." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding IsSettingsButtonEnabled}" />
+            </ui:CardControl>
+
+            <ui:CardControl Icon="{ui:SymbolIcon Pin24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Always show status bar" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Keeps the status bar visible, even when there are no results to display." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding IsStatusBarAlwaysVisible, UpdateSourceTrigger=PropertyChanged}" />
+            </ui:CardControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

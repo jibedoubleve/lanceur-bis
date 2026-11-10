@@ -1,0 +1,126 @@
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.SearchBoxSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:constants="clr-namespace:Lanceur.Core.Constants;assembly=Lanceur.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Search box"
+    d:Width="800"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Lanceur.Ui.WPF;component/Xaml/SettingsStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,15">
+            <!--  BEHAVIOUR  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Behaviour" />
+
+            <ui:CardControl Icon="{ui:SymbolIcon Timer24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Search delay" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Time to wait after the last keystroke before searching, in milliseconds." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Value="{Binding SearchDelay, UpdateSourceTrigger=PropertyChanged}" />
+            </ui:CardControl>
+
+            <ui:CardControl Icon="{ui:SymbolIcon ClipboardBulletListLtr20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Show all results on open" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Lists all results as soon as the search box appears, before anything is typed." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding ShowResult}" />
+            </ui:CardControl>
+
+            <ui:CardControl Icon="{ui:SymbolIcon Search24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Show last query on open" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Fills the search box with the previous query when it appears." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding ShowLastQuery}" />
+            </ui:CardControl>
+
+            <ui:CardControl Icon="{ui:SymbolIcon SlideHide24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Hot key toggles visibility" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Pressing the hot key again hides the search box." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding ToggleVisibility}" />
+            </ui:CardControl>
+
+            <ui:CardControl
+                DataContext="{Binding FeatureFlags, Converter={StaticResource FeatureFlagByNameConverter}, ConverterParameter={x:Static constants:Features.AdditionalParameterAlwaysActive}}"
+                Icon="{ui:SymbolIcon PanelSeparateWindow20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Additional parameters always active" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Shows additional parameter results without having to type ':'." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding Enabled}" />
+            </ui:CardControl>
+
+            <!--  RESOURCE MONITOR  -->
+            <ui:TextBlock Style="{StaticResource SettingSection}" Text="Resource monitor" />
+
+            <ui:CardControl
+                DataContext="{Binding FeatureFlags, Converter={StaticResource FeatureFlagByNameConverter}, ConverterParameter={x:Static constants:Features.ResourceDisplay}}"
+                Icon="{ui:SymbolIcon Gauge24}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Show resource monitor" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Displays CPU and memory usage in the search box." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding Enabled}" />
+            </ui:CardControl>
+
+            <ui:CardControl Icon="{ui:SymbolIcon Timer24}" IsEnabled="{Binding IsResourceMonitorEnabled}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="Refresh rate" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="How often CPU and memory usage are updated, in milliseconds." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox
+                    LargeChange="1000"
+                    SmallChange="100"
+                    Value="{Binding RefreshRate, UpdateSourceTrigger=PropertyChanged}" />
+            </ui:CardControl>
+
+            <ui:CardControl Icon="{ui:SymbolIcon BezierCurveSquare20}" IsEnabled="{Binding IsResourceMonitorEnabled}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <ui:TextBlock Style="{StaticResource SettingTitle}" Text="CPU smoothing" />
+                        <ui:TextBlock Style="{StaticResource SettingDescription}"
+                                      Text="Higher values give a more stable average but react more slowly to sudden changes." />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Value="{Binding CpuSmoothingIndex, UpdateSourceTrigger=PropertyChanged}" />
+            </ui:CardControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,45 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <!--  Shared by the application settings pages  -->
+
+    <!--  Section header  -->
+    <Style x:Key="SettingSection" TargetType="{x:Type ui:TextBlock}">
+        <Setter Property="Margin" Value="10,15,5,5" />
+        <Setter Property="FontTypography" Value="BodyStrong" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <!--  Setting title (first line of a card header)  -->
+    <Style x:Key="SettingTitle" TargetType="{x:Type ui:TextBlock}">
+        <Setter Property="FontTypography" Value="Body" />
+    </Style>
+
+    <!--  Setting description (second line of a card header)  -->
+    <Style x:Key="SettingDescription" TargetType="{x:Type ui:TextBlock}">
+        <Setter Property="FontTypography" Value="Caption" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type ui:CardControl}}" TargetType="{x:Type ui:CardControl}">
+        <Setter Property="Margin" Value="5,5,15,0" />
+    </Style>
+    <Style BasedOn="{StaticResource {x:Type ui:CardExpander}}" TargetType="{x:Type ui:CardExpander}">
+        <Setter Property="Margin" Value="5,5,15,0" />
+    </Style>
+    <Style BasedOn="{StaticResource {x:Type ui:TextBox}}" TargetType="{x:Type ui:TextBox}">
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+    <Style BasedOn="{StaticResource {x:Type ComboBox}}" TargetType="{x:Type ComboBox}">
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+    <Style BasedOn="{StaticResource {x:Type ui:PasswordBox}}" TargetType="{x:Type ui:PasswordBox}">
+        <Setter Property="Padding" Value="8,4" />
+    </Style>
+    <Style BasedOn="{StaticResource {x:Type ui:ToggleSwitch}}" TargetType="{x:Type ui:ToggleSwitch}">
+        <Setter Property="OnContent" Value="On" />
+        <Setter Property="OffContent" Value="Off" />
+    </Style>
+</ResourceDictionary>
