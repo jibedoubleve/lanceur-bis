@@ -55,7 +55,7 @@ jobs:
           # The branch is protected: issue links go through a PR to merge manually.
           # [skip ci] in the title keeps the squash-merge from triggering a release.
           - name: Open a PR with the issue URLs inserted into TODOs
-            uses: peter-evans/create-pull-request@v7
+            uses: peter-evans/create-pull-request@v8
             with:
                 branch: todo/issue-links-${{ github.ref_name }}
                 commit-message: "(chore) Add GitHub issue links to REFACTOR comments [skip ci]"
