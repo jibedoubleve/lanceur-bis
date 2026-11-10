@@ -6,6 +6,10 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <ItemGroup>
+        <!-- Same shared framework as Lanceur.Ui.WPF, so its packages are pruned the same way -->
+        <FrameworkReference Include="Microsoft.WindowsDesktop.App"/>
+    </ItemGroup>
+    <ItemGroup>
         <EmbeddedResource Include="Libraries\Scripts\invalid_script.sql"/>
         <EmbeddedResource Include="Libraries\Scripts\script-0.2.1.sql"/>
         <EmbeddedResource Include="Libraries\Scripts\script-0.2.sql"/>
