@@ -31,8 +31,6 @@ public sealed class SearchServiceTest : TestBase
 {
     #region Fields
 
-    private readonly ILoggerFactory _testLoggerFactory;
-
     private const string SqlCreateAlias = """
                                           insert into alias (id, file_name, arguments) values (1000, '@multi@', '@alias2@@alias3');
                                           insert into alias_name (id, id_alias, name) values (1000, 1000, 'alias1');
@@ -43,6 +41,8 @@ public sealed class SearchServiceTest : TestBase
                                           insert into alias (id, file_name, arguments) values (3000, 'arg', 'c:\dummy\dummy.exe');
                                           insert into alias_name (id, id_alias, name) values (3000, 3000, 'alias3');
                                           """;
+
+    private readonly ILoggerFactory _testLoggerFactory;
 
     #endregion
 
@@ -55,35 +55,38 @@ public sealed class SearchServiceTest : TestBase
 
     #region Methods
 
-    #region Helpers for incremental filtering tests
-
-    private static IStoreService BuildStoreServiceWithResults(
-        IEnumerable<QueryResult> searchResults,
-        IEnumerable<QueryResult>? getAllResults = null
-    )
+    [Fact]
+    public void When_alias_has_negative_counter_Then_usage_is_ignored()
     {
-        var store = Substitute.For<IStoreService>();
-        store.Orchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
-        store.Search(Arg.Any<Cmdline>()).Returns(searchResults);
-        store.GetAll().Returns(getAllResults ?? []);
-        return store;
-    }
+        /*
+         * Create a new alias with usage set to -1
+         * Execute it 4 times
+         * Check counter is still -1
+         */
+        OutputHelper.Arrange();
+        var sql = new SqlBuilder()
+                  .AppendAlias(a => a.WithSynonyms("a", "b"))
+                  .ToSql();
 
-    private SearchService BuildSearchServiceForIncrementalFilterTest(IStoreService storeService)
-    {
-        var sc = new ServiceCollection();
-        sc.AddLoggingForTests(OutputHelper)
-          .AddMockSingleton<IMacroAliasExpanderService>((_, mock) => {
-              mock.Expand(Arg.Any<QueryResult[]>()).Returns(x => x.Arg<QueryResult[]>());
-              return mock;
-          })
-          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
-          .AddTransient<SearchService>();
-        sc.AddSingleton(storeService);
-        return sc.BuildServiceProvider().GetRequiredService<SearchService>();
-    }
+        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
+        var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
+        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
 
-    #endregion
+        var repository = new SQLiteAliasRepository(
+            connectionMgr,
+            logger,
+            new DbActionFactory(logger)
+        );
+
+        OutputHelper.Act();
+
+        for (var i = 0; i < 5; i++) repository.SetUsage(alias);
+
+        OutputHelper.Assert();
+        const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
+
+        connectionMgr.WithConnection(conn => conn.ExecuteScalar<int>(sqlCount)).ShouldBe(0);
+    }
 
     [Fact]
     public async Task When_first_search_Then_stores_are_queried()
@@ -101,47 +104,48 @@ public sealed class SearchServiceTest : TestBase
     }
 
     [Fact]
-    public async Task When_query_refines_previous_Then_stores_are_not_queried_again()
+    public async Task When_macro_is_misconfigured_Then_it_is_excluded_from_result()
     {
         // ARRANGE
-        QueryResult[] storeResults =
-        [
-            new AliasQueryResult { Name = "foo" },
-            new AliasQueryResult { Name = "foobar" },
-            new AliasQueryResult { Name = "baz" }
-        ];
-        var store = new FakeStore(
-            new StoreOrchestrationFactory(),
-            Substitute.For<ISection<StoreSection>>(),
-            cmdline => cmdline.Parameters
+        const string sql = SqlCreateAlias +
+                           """
+                           insert into alias (id, file_name) values (4000, '@zzzz@');
+                           insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');
+                           """;
+
+        using var db = BuildFreshDb(sql);
+        using var conn = new DbSingleConnectionManager(db);
+
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddMockSingleton<IThumbnailService>()
+                         .AddLoggingForTests(OutputHelper)
+                         .AddSingleton<IStoreOrchestrationFactory>(
+                             new StoreOrchestrationFactory()
+                         )
+                         .AddSingleton<ILoggerFactory, LoggerFactory>()
+                         .AddSingleton<IMacroAliasExpanderService, MacroAliasExpanderService>()
+                         .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
+                         .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
+                         .AddSingleton<IDbConnection, SQLiteConnection>()
+                         .AddSingleton<SearchService>()
+                         .AddSingleton<AssemblySource>()
+                         .AddSingleton<IDbActionFactory, DbActionFactory>()
+                         .AddStoreServicesMockContext();
+
+        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
+        serviceCollection.AddLoggingForTests(OutputHelper);
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+
+        // ACT
+        var service = serviceProvider.GetService<SearchService>()!;
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("z"));
+
+        // ASSERT
+        Assert.Multiple(
+            () => result.Count.ShouldBeGreaterThan(0),
+            () => result[0].Name.ShouldBe("No result found")
         );
-        store.SeedResultSet(storeResults);
-        
-        var service = BuildSearchServiceForIncrementalFilterTest(store);
-
-        // ACT
-        List<QueryResult> result = [];
-        await service.SearchAsync(result, new Cmdline("app", "f"));
-        await service.SearchAsync(result, new Cmdline("app", "fo"));
-
-        // ASSERT
-        store.SearchCallCount.ShouldBe(1);
-    }
-
-    [Fact]
-    public async Task When_query_is_different_from_previous_Then_stores_are_queried_again()
-    {
-        // ARRANGE
-        var store = BuildStoreServiceWithResults([]);
-        var service = BuildSearchServiceForIncrementalFilterTest(store);
-
-        // ACT
-        List<QueryResult> result = [];
-        await service.SearchAsync(result, new Cmdline("app", "fo"));
-        await service.SearchAsync(result, new Cmdline("app", "bar"));
-
-        // ASSERT
-        store.Received(2).Search(Arg.Any<Cmdline>());
     }
 
     [Fact]
@@ -181,34 +185,19 @@ public sealed class SearchServiceTest : TestBase
     }
 
     [Fact]
-    public async Task When_query_refines_previous_Then_non_matching_results_are_pruned()
+    public async Task When_query_is_different_from_previous_Then_stores_are_queried_again()
     {
         // ARRANGE
-        QueryResult[] storeResults =
-        [
-            new AliasQueryResult { Name = "foo" },
-            new AliasQueryResult { Name = "foobar" },
-            new AliasQueryResult { Name = "baz" }
-        ];
-        var store = new FakeStore(
-            new StoreOrchestrationFactory(),
-            Substitute.For<ISection<StoreSection>>(),
-            cmdline => cmdline.Parameters
-        );
-        store.SeedResultSet(storeResults);
-        
+        var store = BuildStoreServiceWithResults([]);
         var service = BuildSearchServiceForIncrementalFilterTest(store);
 
         // ACT
         List<QueryResult> result = [];
-        await service.SearchAsync(result, new Cmdline("app", "f"));
-        await service.SearchAsync(result, new Cmdline("app", "foo"));
+        await service.SearchAsync(result, new Cmdline("app", "fo"));
+        await service.SearchAsync(result, new Cmdline("app", "bar"));
 
         // ASSERT
-        result.ShouldSatisfyAllConditions(
-            r => r.Count.ShouldBe(2),
-            r => r.ShouldAllBe(x => x.Name.StartsWith("foo"))
-        );
+        store.Received(2).Search(Arg.Any<Cmdline>());
     }
 
     [Fact]
@@ -240,88 +229,69 @@ public sealed class SearchServiceTest : TestBase
 
         // ACT
         List<QueryResult> result = [];
-        await service.SearchAsync(result, Cmdline.Empty, doesReturnAllIfEmpty: true);
+        await service.SearchAsync(result, Cmdline.Empty, true);
 
         // ASSERT
         result.Count.ShouldBe(2);
     }
 
     [Fact]
-    public void When_alias_has_negative_counter_Then_usage_is_ignored()
+    public async Task When_query_refines_previous_Then_non_matching_results_are_pruned()
     {
-        /*
-         * Create a new alias with usage set to -1
-         * Execute it 4 times
-         * Check counter is still -1
-         */
-        OutputHelper.Arrange();
-        var sql = new SqlBuilder()
-                  .AppendAlias(a => a.WithSynonyms("a", "b"))
-                  .ToSql();
-
-        var connectionMgr = new DbSingleConnectionManager(BuildFreshDb(sql));
-        var logger = new MicrosoftLoggingLoggerFactory(OutputHelper);
-        QueryResult alias = new AliasQueryResult { Id = 1, Name = "a", Count = -1 };
-
-        var repository = new SQLiteAliasRepository(
-            connectionMgr,
-            logger,
-            new DbActionFactory(logger)
+        // ARRANGE
+        QueryResult[] storeResults =
+        [
+            new AliasQueryResult { Name = "foo" },
+            new AliasQueryResult { Name = "foobar" },
+            new AliasQueryResult { Name = "baz" }
+        ];
+        var store = new FakeStore(
+            new StoreOrchestrationFactory(),
+            Substitute.For<ISection<StoreSection>>(),
+            cmdline => cmdline.Parameters
         );
+        store.SeedResultSet(storeResults);
 
-        OutputHelper.Act();
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
 
-        for (var i = 0; i < 5; i++) repository.SetUsage(alias);
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, new Cmdline("app", "f"));
+        await service.SearchAsync(result, new Cmdline("app", "foo"));
 
-        OutputHelper.Assert();
-        const string sqlCount = "select count(*) from alias_usage where id_alias = 1";
-
-        connectionMgr.WithConnection(conn => conn.ExecuteScalar<int>(sqlCount)).ShouldBe(0);
+        // ASSERT
+        result.ShouldSatisfyAllConditions(
+            r => r.Count.ShouldBe(2),
+            r => r.ShouldAllBe(x => x.Name.StartsWith("foo"))
+        );
     }
 
     [Fact]
-    public async Task When_macro_is_misconfigured_Then_it_is_excluded_from_result()
+    public async Task When_query_refines_previous_Then_stores_are_not_queried_again()
     {
         // ARRANGE
-        const string sql = SqlCreateAlias +
-                           """
-                           insert into alias (id, file_name) values (4000, '@zzzz@');
-                           insert into alias_name (id, id_alias, name) values (4000, 4000, 'zz');
-                           """;
+        QueryResult[] storeResults =
+        [
+            new AliasQueryResult { Name = "foo" },
+            new AliasQueryResult { Name = "foobar" },
+            new AliasQueryResult { Name = "baz" }
+        ];
+        var store = new FakeStore(
+            new StoreOrchestrationFactory(),
+            Substitute.For<ISection<StoreSection>>(),
+            cmdline => cmdline.Parameters
+        );
+        store.SeedResultSet(storeResults);
 
-        using var db = BuildFreshDb(sql);
-        using var conn = new DbSingleConnectionManager(db);
+        var service = BuildSearchServiceForIncrementalFilterTest(store);
 
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddMockSingleton<IThumbnailService>()
-                         .AddLoggingForTests(OutputHelper)
-                         .AddSingleton<IStoreOrchestrationFactory>(
-                             new StoreOrchestrationFactory()
-                         )
-                         .AddSingleton<ILoggerFactory, LoggerFactory>()
-                         .AddSingleton<IMacroAliasExpanderService, MacroAliasExpanderService>()
-                         .AddSingleton<IAliasRepository, SQLiteAliasRepository>()
-                         .AddSingleton<IDbConnectionManager, DbSingleConnectionManager>()
-                         .AddSingleton<IDbConnection, SQLiteConnection>()
-                         .AddSingleton<SearchService>()
-                         .AddSingleton<AssemblySource>()
-                         .AddSingleton<IDbActionFactory, DbActionFactory>()
-                         .AddStoreServicesMockContext();
-
-        serviceCollection.TryAddEnumerable(ServiceDescriptor.Singleton<IStoreService, AliasStore>());
-        serviceCollection.AddLoggingForTests(OutputHelper);
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        
         // ACT
-        var service = serviceProvider.GetService<SearchService>()!;
         List<QueryResult> result = [];
-        await service.SearchAsync(result, new Cmdline("z"));
+        await service.SearchAsync(result, new Cmdline("app", "f"));
+        await service.SearchAsync(result, new Cmdline("app", "fo"));
 
         // ASSERT
-        Assert.Multiple(
-            () => result.Count.ShouldBeGreaterThan(0),
-            () => result[0].Name.ShouldBe("No result found")
-        );
+        store.SearchCallCount.ShouldBe(1);
     }
 
     [Fact]
@@ -467,6 +437,36 @@ public sealed class SearchServiceTest : TestBase
             r => r.Count.ShouldBe(2),
             r => r[0].Name.ShouldBe("u")
         );
+    }
+
+    #endregion
+
+    #region Helpers for incremental filtering tests
+
+    private static IStoreService BuildStoreServiceWithResults(
+        IEnumerable<QueryResult> searchResults,
+        IEnumerable<QueryResult>? getAllResults = null
+    )
+    {
+        var store = Substitute.For<IStoreService>();
+        store.Orchestration.Returns(new StoreOrchestrationFactory().SharedAlwaysActive());
+        store.Search(Arg.Any<Cmdline>()).Returns(searchResults);
+        store.GetAll().Returns(getAllResults ?? []);
+        return store;
+    }
+
+    private SearchService BuildSearchServiceForIncrementalFilterTest(IStoreService storeService)
+    {
+        var sc = new ServiceCollection();
+        sc.AddLoggingForTests(OutputHelper)
+          .AddMockSingleton<IMacroAliasExpanderService>((_, mock) => {
+              mock.Expand(Arg.Any<QueryResult[]>()).Returns(x => x.Arg<QueryResult[]>());
+              return mock;
+          })
+          .AddSingleton<IStoreOrchestrationFactory, StoreOrchestrationFactory>()
+          .AddTransient<SearchService>();
+        sc.AddSingleton(storeService);
+        return sc.BuildServiceProvider().GetRequiredService<SearchService>();
     }
 
     #endregion

@@ -54,7 +54,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         string previous, string current, bool isPrunable)
     {
         var store = BuildAdditionalParametersStore();
-        
+
         store.CanPruneResult(
             Cmdline.Parse(previous),
             Cmdline.Parse(current)
@@ -155,6 +155,21 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     }
 
     [Fact]
+    public async Task When_query_is_empty_Then_previous_results_are_removed_from_destination()
+    {
+        // ARRANGE
+        var store = BuildStoreServiceWithResults([]);
+        var service = BuildSearchService(store);
+        List<QueryResult> result = [new AliasQueryResult { Name = "existing" }];
+
+        // ACT
+        await service.SearchAsync(result, Cmdline.Empty);
+
+        // ASSERT
+        result.ShouldNotContain(x => x.Name == "existing");
+    }
+
+    [Fact]
     public async Task When_query_is_empty_and_doesReturnAllIfEmpty_Then_all_results_are_returned()
     {
         // ARRANGE
@@ -175,21 +190,6 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     }
 
     [Fact]
-    public async Task When_query_is_empty_Then_previous_results_are_removed_from_destination()
-    {
-        // ARRANGE
-        var store = BuildStoreServiceWithResults([]);
-        var service = BuildSearchService(store);
-        List<QueryResult> result = [new AliasQueryResult { Name = "existing" }];
-
-        // ACT
-        await service.SearchAsync(result, Cmdline.Empty);
-
-        // ASSERT
-        result.ShouldNotContain(x => x.Name == "existing");
-    }
-
-    [Fact]
     public async Task When_query_is_identical_to_previous_Then_stores_are_not_queried_again()
     {
         // ARRANGE
@@ -201,23 +201,6 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         List<QueryResult> result = [];
         await service.SearchAsync(result, "fo");
         await service.SearchAsync(result, "fo");
-
-        // ASSERT
-        store.SearchCallCount.ShouldBe(1);
-    }
-
-    [Fact]
-    public async Task When_query_refines_previous_case_insensitive_Then_stores_are_not_queried_again()
-    {
-        // ARRANGE
-        var store = BuildTestStore();
-        store.SeedResultSet([new AliasQueryResult { Name = "foo" }]);
-        var service = BuildSearchService(store);
-
-        // ACT
-        List<QueryResult> result = [];
-        await service.SearchAsync(result, "foo");
-        await service.SearchAsync(result, "FOO");
 
         // ASSERT
         store.SearchCallCount.ShouldBe(1);
@@ -263,6 +246,23 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         List<QueryResult> result = [];
         await service.SearchAsync(result, "f");
         await service.SearchAsync(result, "fo");
+
+        // ASSERT
+        store.SearchCallCount.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task When_query_refines_previous_case_insensitive_Then_stores_are_not_queried_again()
+    {
+        // ARRANGE
+        var store = BuildTestStore();
+        store.SeedResultSet([new AliasQueryResult { Name = "foo" }]);
+        var service = BuildSearchService(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, "foo");
+        await service.SearchAsync(result, "FOO");
 
         // ASSERT
         store.SearchCallCount.ShouldBe(1);
@@ -432,7 +432,7 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         var destination = new List<QueryResult>
         {
             new AliasQueryResult { Name = "rider:foobar" },
-            new AliasQueryResult { Name = "rider:foobaz" },
+            new AliasQueryResult { Name = "rider:foobaz" }
         };
 
         store.PruneResult(destination, Cmdline.Parse(previousQuery), "rider:foo");
@@ -577,7 +577,8 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         storeSection.Value.Returns(
             new StoreSection
             {
-                StoreShortcuts = [new() { StoreType = typeof(SteamGameStore).FullName, AliasOverride = "%" }]
+                StoreShortcuts =
+                    [new StoreShortcut { StoreType = typeof(SteamGameStore).FullName, AliasOverride = "%" }]
             }
         );
 
@@ -631,7 +632,8 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
         storeSection.Value.Returns(
             new StoreSection
             {
-                StoreShortcuts = [new() { StoreType = typeof(SteamGameStore).FullName, AliasOverride = "%" }]
+                StoreShortcuts =
+                    [new StoreShortcut { StoreType = typeof(SteamGameStore).FullName, AliasOverride = "%" }]
             }
         );
 
@@ -667,14 +669,15 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     #region AdditionalParametersStore - Functional
 
     [Fact]
-    public async Task When_additional_params_query_refines_from_empty_parameter_Then_non_matching_results_are_removed_to_delete()
+    public async Task
+        When_additional_params_query_refines_from_empty_parameter_Then_non_matching_results_are_removed_to_delete()
     {
         // ARRANGE
         var aliasRepo = Substitute.For<IAliasRepository>();
         aliasRepo.SearchAliasWithAdditionalParameters(Arg.Any<string>()).Returns([
-            new AliasQueryResult { Name = "r:apple" },   // starts with "a" → kept
-            new AliasQueryResult { Name = "r:avocado" },  // does not start with "a" → removed
-            new AliasQueryResult { Name = "r:banana" }  // starts with "a" → kept
+            new AliasQueryResult { Name = "r:apple" }, // starts with "a" → kept
+            new AliasQueryResult { Name = "r:avocado" }, // does not start with "a" → removed
+            new AliasQueryResult { Name = "r:banana" } // starts with "a" → kept
         ]);
         var featureFlags = Substitute.For<IFeatureFlagService>();
         featureFlags.IsEnabled(Arg.Any<string>()).Returns(false);
@@ -689,8 +692,8 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
 
         // ACT
         List<QueryResult> result = [];
-        await service.SearchAsync(result, "r:");   // full search → all 3 aliases
-        await service.SearchAsync(result, "r:a");  // refinement → should prune
+        await service.SearchAsync(result, "r:"); // full search → all 3 aliases
+        await service.SearchAsync(result, "r:a"); // refinement → should prune
 
         // ASSERT
         result.ShouldSatisfyAllConditions(

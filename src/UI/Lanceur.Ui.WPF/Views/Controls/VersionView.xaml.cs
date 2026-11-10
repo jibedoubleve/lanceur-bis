@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using Lanceur.Core.Constants;
 using Lanceur.SharedKernel.IoC;
 using Lanceur.SharedKernel.Utils;

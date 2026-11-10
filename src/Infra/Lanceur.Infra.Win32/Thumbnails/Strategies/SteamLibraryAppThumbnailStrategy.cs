@@ -72,7 +72,8 @@ public sealed class SteamLibraryAppThumbnailStrategy : ThumbnailStrategy
     }
 
     /// <inheritdoc />
-    protected override async Task<bool> UpdateThumbnailCoreAsync(AliasQueryResult alias, CancellationToken cancellationToken)
+    protected override async Task<bool> UpdateThumbnailCoreAsync(
+        AliasQueryResult alias, CancellationToken cancellationToken)
     {
         if (!alias.IsSteamGame()) { return false; }
 
@@ -90,7 +91,7 @@ public sealed class SteamLibraryAppThumbnailStrategy : ThumbnailStrategy
 
         var thumbnail = alias.ResolveThumbnailAbsolutePath();
 
-        if (!File.Exists(thumbnail) && !await SaveThumbnailAsync(response, thumbnail)) { return  true; }
+        if (!File.Exists(thumbnail) && !await SaveThumbnailAsync(response, thumbnail)) { return true; }
 
         alias.Thumbnail = thumbnail;
         _aliasManagementService.UpdateThumbnail(alias);

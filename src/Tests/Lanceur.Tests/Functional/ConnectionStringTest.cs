@@ -57,7 +57,7 @@ public sealed class ConnectionStringTest
         // Arrange
         var config = Substitute.For<ISection<DatabaseSection>>();
         config.Value.Returns(new DatabaseSection { DbPath = "lkj" });
-        
+
         var cs = new ConnectionString(config, CreateLogger());
 
         // Act

@@ -79,24 +79,6 @@ public sealed class CalculatorServiceTest
     }
 
     [Theory]
-    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceTest))]
-    public void When_function_has_no_number_Then_validation_regex_does_not_match(string operation)
-    {
-        var sp = new ServiceCollection().AddLoggingForTests(_output)
-                                        .AddSingleton<NCalcCalculatorService>()
-                                        .BuildServiceProvider();
-        var calculator = sp.GetService<NCalcCalculatorService>();
-
-        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
-
-
-        var regex = calculator!.ValidationRegex;
-
-        _output.WriteLine($"Expression: {operation}");
-        regex.IsMatch(operation).ShouldBeFalse("'operation' is invalid");
-    }
-
-    [Theory]
     [InlineData("lkj")]
     public void When_expression_is_invalid_Then_result_is_error(string expression)
     {
@@ -131,6 +113,24 @@ public sealed class CalculatorServiceTest
             r => r.IsError.ShouldBeFalse(),
             r => r.Result.ShouldBe(expected)
         );
+    }
+
+    [Theory]
+    [MemberData(nameof(GetMathFunctions), MemberType = typeof(CalculatorServiceTest))]
+    public void When_function_has_no_number_Then_validation_regex_does_not_match(string operation)
+    {
+        var sp = new ServiceCollection().AddLoggingForTests(_output)
+                                        .AddSingleton<NCalcCalculatorService>()
+                                        .BuildServiceProvider();
+        var calculator = sp.GetService<NCalcCalculatorService>();
+
+        _output.WriteLine($"Regex: {calculator!.ValidationRegex}");
+
+
+        var regex = calculator!.ValidationRegex;
+
+        _output.WriteLine($"Expression: {operation}");
+        regex.IsMatch(operation).ShouldBeFalse("'operation' is invalid");
     }
 
     [Theory]

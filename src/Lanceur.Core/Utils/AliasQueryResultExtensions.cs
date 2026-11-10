@@ -15,8 +15,10 @@ public static partial class AliasQueryResultExtensions
         if (alias.FileName is null) { return 0; }
 
         var match = SteamGameRegex().Match(alias.FileName);
-        return match.Success 
-               && int.TryParse(match.Groups[1].Value, out var id) ? id : 0;
+        return match.Success
+               && int.TryParse(match.Groups[1].Value, out var id)
+            ? id
+            : 0;
     }
 
     public static bool IsSteamGame(this AliasQueryResult alias)

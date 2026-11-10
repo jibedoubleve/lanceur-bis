@@ -21,6 +21,60 @@ public sealed class LuaManagerTest
 
     #region Methods
 
+    [Fact]
+    public void When_script_does_not_compile_Then_result_has_exception_and_empty_context()
+    {
+        // arrange
+        const string url = "https://random.url.com";
+        const string luaScript = "this is a failing script";
+
+        var result = LuaManager.ExecuteScript(
+            new Script
+            {
+                Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = "unhandled_case" }
+            }
+        );
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Exception.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldBeEmpty(),
+            r => r.Context.Parameters.ShouldBeEmpty()
+        );
+    }
+
+    [Fact]
+    public void When_script_does_not_return_context_Then_original_context_is_kept()
+    {
+        // arrange
+        const string url = "https://random.url.com";
+        const string parameters = "unhandled_case";
+        const string luaScript = "return 145";
+
+        var result = LuaManager.ExecuteScript(
+            new Script { Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = parameters } }
+        );
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Context.ShouldNotBeNull(),
+            r => r.Context.FileName.ShouldBe(url),
+            r => r.Context.Parameters.ShouldBe(parameters)
+        );
+    }
+
+    [Fact]
+    public void When_script_is_null_Then_result_has_non_null_context()
+    {
+        var result = LuaManager.ExecuteScript(
+            new Script { Code = null, Context = new ScriptContext() }
+        );
+        result.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeNull(),
+            r => r.Context.ShouldNotBeNull(),
+            r => r.Context!.FileName.ShouldNotBeNull(),
+            r => r.Context!.Parameters.ShouldNotBeNull()
+        );
+    }
+
     [Theory]
     [InlineData("", "")]
     [InlineData("dev", "output_dev")]
@@ -84,60 +138,6 @@ public sealed class LuaManagerTest
             r => r.ShouldNotBeNull(),
             r => r.Context.FileName.ShouldBe(url),
             r => r.Context.Parameters.ShouldBe(expectedParameter)
-        );
-    }
-
-    [Fact]
-    public void When_script_is_null_Then_result_has_non_null_context()
-    {
-        var result = LuaManager.ExecuteScript(
-            new Script { Code = null, Context = new ScriptContext() }
-        );
-        result.ShouldSatisfyAllConditions(
-            r => r.ShouldNotBeNull(),
-            r => r.Context.ShouldNotBeNull(),
-            r => r.Context!.FileName.ShouldNotBeNull(),
-            r => r.Context!.Parameters.ShouldNotBeNull()
-        );
-    }
-
-    [Fact]
-    public void When_script_does_not_compile_Then_result_has_exception_and_empty_context()
-    {
-        // arrange
-        const string url = "https://random.url.com";
-        const string luaScript = "this is a failing script";
-
-        var result = LuaManager.ExecuteScript(
-            new Script
-            {
-                Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = "unhandled_case" }
-            }
-        );
-        result.ShouldSatisfyAllConditions(
-            r => r.ShouldNotBeNull(),
-            r => r.Exception.ShouldNotBeNull(),
-            r => r.Context.FileName.ShouldBeEmpty(),
-            r => r.Context.Parameters.ShouldBeEmpty()
-        );
-    }
-
-    [Fact]
-    public void When_script_does_not_return_context_Then_original_context_is_kept()
-    {
-        // arrange
-        const string url = "https://random.url.com";
-        const string parameters = "unhandled_case";
-        const string luaScript = "return 145";
-
-        var result = LuaManager.ExecuteScript(
-            new Script { Code = luaScript, Context = new ScriptContext { FileName = url, Parameters = parameters } }
-        );
-        result.ShouldSatisfyAllConditions(
-            r => r.ShouldNotBeNull(),
-            r => r.Context.ShouldNotBeNull(),
-            r => r.Context.FileName.ShouldBe(url),
-            r => r.Context.Parameters.ShouldBe(parameters)
         );
     }
 

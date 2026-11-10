@@ -2,7 +2,6 @@ using Dapper;
 using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Models;
 using Lanceur.Core.Repositories;
-using Lanceur.Core.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.SharedKernel.Extensions;
 using Newtonsoft.Json;

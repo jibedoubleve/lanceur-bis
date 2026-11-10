@@ -22,8 +22,8 @@ public class AliasQueryResult : ExecutableQueryResult, IElevated
 
     public int Delay { get; set; }
 
-    public override string DescriptionDisplay 
-        => Description.IsNullOrEmpty() 
+    public override string DescriptionDisplay
+        => Description.IsNullOrEmpty()
             ? FileName ?? string.Empty
             : Description ?? string.Empty;
 

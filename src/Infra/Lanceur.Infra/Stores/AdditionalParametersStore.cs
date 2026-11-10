@@ -42,9 +42,6 @@ public sealed partial class AdditionalParametersStore : StoreBase, IStoreService
 
     #region Properties
 
-    [GeneratedRegex("(.*):(.*)")]
-    private static partial Regex GetShortcutRegex();
-
     /// <inheritdoc cref="IStoreService.IsOverridable" />
     public override bool IsOverridable => false;
 
@@ -57,6 +54,9 @@ public sealed partial class AdditionalParametersStore : StoreBase, IStoreService
     #endregion
 
     #region Methods
+
+    [GeneratedRegex("(.*):(.*)")]
+    private static partial Regex GetShortcutRegex();
 
     private static bool IsRefinementOf(string value, string check)
         => !IsUnfiltered(check)

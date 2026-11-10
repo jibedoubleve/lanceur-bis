@@ -44,7 +44,7 @@ public sealed class SteamGameStoreTest
             [
                 new StoreShortcut
                 {
-                    StoreType    = typeof(SteamGameStore).FullName,
+                    StoreType = typeof(SteamGameStore).FullName,
                     AliasOverride = shortcutOverride
                 }
             ];
@@ -102,36 +102,6 @@ public sealed class SteamGameStoreTest
                                        .ShouldBeTrue();
 
     [Fact]
-    public void When_shortcut_is_overridden_without_capture_group_Then_CanPruneResult_is_false_for_filtered_query()
-    {
-        // ARRANGE - simulate a shortcut stored by the buggy ConvertBack (no capture group)
-        const string storedShortcutWithoutCaptureGroup = @"^\s{0,}\&.*";
-        var store = GetStore(SteamServiceWith(), shortcutOverride: storedShortcutWithoutCaptureGroup);
-
-        var previous = Cmdline.Parse("& half");
-        var current  = Cmdline.Parse("& half-life");
-
-        // ACT & ASSERT - "half-life" contains "half" → pruning should be allowed.
-        // With the bug, IsUnfiltered("& half") incorrectly returns true because Groups[1] is always
-        // empty when there is no capture group, so CanPruneResult returns false.
-        store.CanPruneResult(previous, current).ShouldBeTrue();
-    }
-
-    [Fact]
-    public void When_shortcut_is_overridden_with_capture_group_Then_CanPruneResult_allows_pruning()
-    {
-        // ARRANGE - shortcut stored by the fixed ConvertBack (with capture group)
-        const string storedShortcutWithCaptureGroup = @"^\s{0,}\&(.*)";
-        var store = GetStore(SteamServiceWith(), shortcutOverride: storedShortcutWithCaptureGroup);
-
-        var previous = Cmdline.Parse("& half");
-        var current  = Cmdline.Parse("& half-life");
-
-        // ACT & ASSERT - pruning must be allowed: "half-life" is a refinement of "half"
-        store.CanPruneResult(previous, current).ShouldBeTrue();
-    }
-
-    [Fact]
     public void When_search_Then_hydrate_usage_is_called()
     {
         // ARRANGE
@@ -184,6 +154,36 @@ public sealed class SteamGameStoreTest
             r => r.Length.ShouldBe(1),
             r => r[0].FileName.ShouldBe("steam://run/440")
         );
+    }
+
+    [Fact]
+    public void When_shortcut_is_overridden_with_capture_group_Then_CanPruneResult_allows_pruning()
+    {
+        // ARRANGE - shortcut stored by the fixed ConvertBack (with capture group)
+        const string storedShortcutWithCaptureGroup = @"^\s{0,}\&(.*)";
+        var store = GetStore(SteamServiceWith(), shortcutOverride: storedShortcutWithCaptureGroup);
+
+        var previous = Cmdline.Parse("& half");
+        var current = Cmdline.Parse("& half-life");
+
+        // ACT & ASSERT - pruning must be allowed: "half-life" is a refinement of "half"
+        store.CanPruneResult(previous, current).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void When_shortcut_is_overridden_without_capture_group_Then_CanPruneResult_is_false_for_filtered_query()
+    {
+        // ARRANGE - simulate a shortcut stored by the buggy ConvertBack (no capture group)
+        const string storedShortcutWithoutCaptureGroup = @"^\s{0,}\&.*";
+        var store = GetStore(SteamServiceWith(), shortcutOverride: storedShortcutWithoutCaptureGroup);
+
+        var previous = Cmdline.Parse("& half");
+        var current = Cmdline.Parse("& half-life");
+
+        // ACT & ASSERT - "half-life" contains "half" → pruning should be allowed.
+        // With the bug, IsUnfiltered("& half") incorrectly returns true because Groups[1] is always
+        // empty when there is no capture group, so CanPruneResult returns false.
+        store.CanPruneResult(previous, current).ShouldBeTrue();
     }
 
     #endregion

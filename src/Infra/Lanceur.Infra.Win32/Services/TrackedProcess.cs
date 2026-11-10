@@ -64,6 +64,7 @@ internal sealed class TrackedProcess : ITrackedProcess
 
     /// <inheritdoc />
     public int Id => _process.Id;
+
     #endregion
 
     #region Methods

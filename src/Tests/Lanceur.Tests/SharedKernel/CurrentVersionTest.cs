@@ -8,16 +8,6 @@ public sealed class CurrentVersionTest
 {
     #region Methods
 
-    [Theory]
-    [MemberData(nameof(FeedCreateCurrentVersionFromFullVersion))]
-    public void When_parsing_full_version_Then_version_suffix_and_commit_are_extracted(string fullVersion, string version, string suffix, string commit) =>
-        CurrentVersion.FromFullVersion(fullVersion)
-                      .ShouldSatisfyAllConditions(
-                          v => v.Commit.ShouldBe(commit),
-                          v => v.Version.ShouldBe(new Version(version)),
-                          v => v.Suffix.ShouldBe(suffix)
-                      );
-
     public static IEnumerable<object[]> FeedCreateCurrentVersionFromFullVersion()
     {
         yield return
@@ -37,6 +27,17 @@ public sealed class CurrentVersionTest
         yield return ["3.4.0", "3.4.0", "", ""];
         yield return ["", "0.0.0", "", ""];
     }
+
+    [Theory]
+    [MemberData(nameof(FeedCreateCurrentVersionFromFullVersion))]
+    public void When_parsing_full_version_Then_version_suffix_and_commit_are_extracted(
+        string fullVersion, string version, string suffix, string commit) =>
+        CurrentVersion.FromFullVersion(fullVersion)
+                      .ShouldSatisfyAllConditions(
+                          v => v.Commit.ShouldBe(commit),
+                          v => v.Version.ShouldBe(new Version(version)),
+                          v => v.Suffix.ShouldBe(suffix)
+                      );
 
     #endregion
 }

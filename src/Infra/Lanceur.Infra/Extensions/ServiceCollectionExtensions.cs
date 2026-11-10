@@ -13,9 +13,10 @@ namespace Lanceur.Infra.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    #region Methods
+
     public static IServiceCollection AddInfraServices(this IServiceCollection serviceCollection)
     {
-
         serviceCollection.AddTransient<IAliasValidationService, AliasValidationService>()
                          .AddTransient<IAliasManagementService, AliasManagementService>()
                          .AddTransient<ISearchService, SearchService>()
@@ -36,4 +37,6 @@ public static class ServiceCollectionExtensions
                          .AddMacros();
         return serviceCollection;
     }
+
+    #endregion
 }

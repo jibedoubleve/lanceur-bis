@@ -46,6 +46,7 @@ public sealed class SQLiteVersionService : SQLiteRepositoryBase, IDataStoreVersi
                     throw new InvalidOperationException(
                         "Cannot set the current version ot the application because no connection exists");
                 }
+
                 tx.Connection.Execute(exists ? Sql.UpdateDbVersion.Format(version) : Sql.SetDbVersion.Format(version));
             }
         );

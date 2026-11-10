@@ -6,7 +6,6 @@ using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.ReservedAliases;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Serilog.Core;
 using Serilog.Events;

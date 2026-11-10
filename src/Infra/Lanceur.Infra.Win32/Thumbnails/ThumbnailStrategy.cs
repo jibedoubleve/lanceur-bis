@@ -70,7 +70,7 @@ public abstract class ThumbnailStrategy : IThumbnailStrategy
                 alias.Name,
                 path
             );
-            alias.Thumbnail ??=  path;
+            alias.Thumbnail ??= path;
             return true;
         }
 

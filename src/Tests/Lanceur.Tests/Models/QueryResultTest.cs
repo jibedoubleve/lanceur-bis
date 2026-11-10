@@ -10,6 +10,12 @@ public sealed class QueryResultTest
     #region Methods
 
     [Fact]
+    public void When_created_Then_count_is_zero() => new TestQueryResult().Count.ShouldBe(0);
+
+    [Fact]
+    public void When_created_Then_description_is_null() => new TestQueryResult().Description.ShouldBeNull();
+
+    [Fact]
     public void When_created_Then_name_is_empty() => new TestQueryResult().Name.ShouldBeEmpty();
 
     [Fact]
@@ -23,7 +29,8 @@ public sealed class QueryResultTest
     [InlineData(null, "un", "un")]
     [InlineData("un", null, "un")]
     [InlineData(null, null, "")]
-    public void When_description_is_missing_Then_file_name_is_displayed(string description, string fileName, string expected)
+    public void When_description_is_missing_Then_file_name_is_displayed(
+        string description, string fileName, string expected)
     {
         // ARRANGE
         var queryResult = new AliasQueryResult { Description = description, FileName = fileName };
@@ -31,9 +38,6 @@ public sealed class QueryResultTest
         // ACT && ASSERT
         queryResult.DescriptionDisplay.ShouldBe(expected);
     }
-
-    [Fact]
-    public void When_created_Then_description_is_null() => new TestQueryResult().Description.ShouldBeNull();
 
     [Theory]
     [InlineData("un, deux,trois,quatre,cinq", 5)]
@@ -55,9 +59,6 @@ public sealed class QueryResultTest
             n => Assert.All(n, x => x.ShouldNotEndWith(" "))
         );
     }
-
-    [Fact]
-    public void When_created_Then_count_is_zero() => new TestQueryResult().Count.ShouldBe(0);
 
     #endregion
 

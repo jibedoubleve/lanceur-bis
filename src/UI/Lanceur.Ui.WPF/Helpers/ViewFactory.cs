@@ -1,4 +1,3 @@
-using Lanceur.Core.Configuration;
 using Lanceur.Core.Models;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;

@@ -63,7 +63,7 @@ public sealed class SteamGameStore : StoreBase, IStoreService
 
     private static bool IsRefinementOf(string candidate, string searchKey)
         => candidate.Contains(searchKey, StringComparison.InvariantCultureIgnoreCase);
-    
+
     private static string PropertySelector(Cmdline query) => query.Parameters;
 
     /// <inheritdoc cref="CanPruneResult" />

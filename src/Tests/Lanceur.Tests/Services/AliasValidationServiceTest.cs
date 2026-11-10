@@ -24,7 +24,7 @@ public sealed class AliasValidationServiceTest
         shortcutService.Resolve(Arg.Any<StoreSection>())
                        .Returns(shortcuts.Select(s => new StoreShortcut { AliasOverride = s }));
 
-        return new(repository, shortcutService, Substitute.For<ISection<StoreSection>>());
+        return new AliasValidationService(repository, shortcutService, Substitute.For<ISection<StoreSection>>());
     }
 
     [Theory]
@@ -48,7 +48,10 @@ public sealed class AliasValidationServiceTest
     [InlineData("st")] // "st" is an invalid override, the store does not use it
     public void When_alias_name_is_not_a_store_shortcut_Then_alias_is_valid(string names)
     {
-        var service = BuildService("&", ":", "st", null);
+        var service = BuildService("&",
+            ":",
+            "st",
+            null);
         var alias = new AliasQueryResult { Name = names, Synonyms = names, FileName = "notepad.exe" };
 
         service.IsValid(alias)

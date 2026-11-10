@@ -8,7 +8,7 @@ public sealed class DisplayQueryResult : QueryResult
     {
         Name = name;
         Description = description ?? string.Empty;
-        if (iconKind is not null) { base.Icon = iconKind; }
+        if (iconKind is not null) { Icon = iconKind; }
     }
 
     #endregion

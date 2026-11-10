@@ -32,22 +32,6 @@ public sealed class SectionTest : TestBase
     }
 
     [Fact]
-    public void When_provider_reloads_after_value_is_cached_Then_modification_is_visible_in_provider()
-    {
-        // arrange
-        var provider = CreateProvider();
-        var section = new Section<WindowSection>([provider]);
-        _ = section.Value; // prime the cache
-
-        // act - provider.Load() replaces _current; section._value becomes detached
-        provider.Load();
-        section.Value.NotificationDisplayDuration = 99;
-
-        // assert - the modification must be reachable through the provider
-        provider.Value.Window.NotificationDisplayDuration.ShouldBe(99);
-    }
-
-    [Fact]
     public void When_provider_reloads_Then_all_section_references_remain_consistent()
     {
         // arrange
@@ -78,6 +62,22 @@ public sealed class SectionTest : TestBase
 
         // assert - section.Value must point to the new provider state, not the detached one
         ReferenceEquals(section.Value, provider.Value.Window).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void When_provider_reloads_after_value_is_cached_Then_modification_is_visible_in_provider()
+    {
+        // arrange
+        var provider = CreateProvider();
+        var section = new Section<WindowSection>([provider]);
+        _ = section.Value; // prime the cache
+
+        // act - provider.Load() replaces _current; section._value becomes detached
+        provider.Load();
+        section.Value.NotificationDisplayDuration = 99;
+
+        // assert - the modification must be reachable through the provider
+        provider.Value.Window.NotificationDisplayDuration.ShouldBe(99);
     }
 
     [Fact]

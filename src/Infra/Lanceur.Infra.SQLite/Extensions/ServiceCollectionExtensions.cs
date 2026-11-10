@@ -1,16 +1,15 @@
 using System.Data;
 using System.Data.SQLite;
-using Lanceur.Core.Configuration.Configurations;
 using Lanceur.Core.Repositories;
 using Lanceur.Core.Services;
 using Lanceur.Core.Utils;
+using Lanceur.Infra.SQLite.ConnectionStrings;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.DbActions;
 using Lanceur.Infra.SQLite.Repositories;
 using Lanceur.Scripts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Lanceur.Infra.SQLite.ConnectionStrings;
 
 namespace Lanceur.Infra.SQLite.Extensions;
 

@@ -1,5 +1,4 @@
 using Lanceur.Core.Configuration;
-using Lanceur.Core.Configuration.Sections;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Services;
 using Octokit;
@@ -10,12 +9,13 @@ public sealed class GithubService : IGithubService
 {
     #region Fields
 
-    private readonly GitHubClient _client;
-    private readonly IUserGlobalNotificationService _notificationService;
-    private readonly string _tag;
     private const string GithubUrl = "https://github.com/jibedoubleve/lanceur-bis/issues/";
     private const string Owner = "jibedoubleve";
     private const string Repository = "lanceur-bis";
+
+    private readonly GitHubClient _client;
+    private readonly IUserGlobalNotificationService _notificationService;
+    private readonly string _tag;
 
     #endregion
 

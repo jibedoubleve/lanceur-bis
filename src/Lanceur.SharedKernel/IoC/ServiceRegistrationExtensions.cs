@@ -1,7 +1,6 @@
 using System.Reflection;
 using Lanceur.SharedKernel.Utils;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Lanceur.SharedKernel.IoC;
 
