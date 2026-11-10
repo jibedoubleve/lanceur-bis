@@ -6,9 +6,10 @@
              mc:Ignorable="d"
              MinWidth="800">
     <StackPanel>
-        <Label Content="Override shortcut" Target="TbAliasOverride" />
-        <TextBox Text="{Binding AliasOverride, Converter={StaticResource StoreOrchestrationToStringConverter}}"
-                 Margin="0,0,0,10"
-                 x:Name="TbAliasOverride" />
+        <Label Content="Override shortcut" Target="{Binding ElementName=CbAliasOverride}" />
+        <ComboBox x:Name="CbAliasOverride"
+                  Margin="0,0,0,10"
+                  ItemsSource="{Binding AvailableShortcuts}"
+                  SelectedItem="{Binding SelectedShortcut}" />
     </StackPanel>
 </UserControl>
