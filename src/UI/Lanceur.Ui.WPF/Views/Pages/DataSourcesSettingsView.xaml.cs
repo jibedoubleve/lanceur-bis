@@ -8,7 +8,7 @@ using Microsoft.Win32;
 namespace Lanceur.Ui.WPF.Views.Pages;
 
 [Singleton]
-public partial class ApplicationSettingsView
+public partial class DataSourcesSettingsView
 {
     #region Fields
 
@@ -18,7 +18,7 @@ public partial class ApplicationSettingsView
 
     #region Constructors
 
-    public ApplicationSettingsView(
+    public DataSourcesSettingsView(
         ApplicationSettingsViewModel viewModel,
         IUserNotificationService userNotification
     )
