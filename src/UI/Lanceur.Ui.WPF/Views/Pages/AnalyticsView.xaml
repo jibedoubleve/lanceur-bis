@@ -1,79 +1,88 @@
-<Page x:Class="Lanceur.Ui.WPF.Views.Pages.AnalyticsView"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
-      xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
-      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-      xmlns:p="clr-namespace:Lanceur.Ui.Core.ViewModels.Pages;assembly=Lanceur.Ui.Core"
-      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-      mc:Ignorable="d"
-      Title="HistoryView">
+<Page
+    x:Class="Lanceur.Ui.WPF.Views.Pages.AnalyticsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="clr-namespace:Lanceur.Ui.WPF.Views.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="HistoryView"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    mc:Ignorable="d">
     <interactivity:Interaction.Triggers>
         <interactivity:EventTrigger EventName="Loaded">
-            <interactivity:InvokeCommandAction
-                Command="{Binding RefreshMonthlyHistoryCommand}" />
+            <interactivity:InvokeCommandAction Command="{Binding LoadedCommand}" />
         </interactivity:EventTrigger>
     </interactivity:Interaction.Triggers>
-    <Grid>
+    <Grid Margin="0,0,0,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Menu>
-            <MenuItem Header="Daily history" Command="{Binding RefreshDailyHistoryCommand}"
-                      Icon="{ui:SymbolIcon CalendarDay24}"
-                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
-                            ConverterParameter={x:Static p:PlotType.DailyHistory}}"
-                      Click="OnClickMenu" />
 
-            <MenuItem Header="Monthly history" Command="{Binding RefreshMonthlyHistoryCommand}"
-                      Visibility="{Binding IsMonthlyVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      Icon="{ui:SymbolIcon CalendarMonth24}"
-                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
-                            ConverterParameter={x:Static p:PlotType.MonthlyHistory}}"
-                      Click="OnClickMenu" />
-
-            <MenuItem Header="Yearly history" Command="{Binding RefreshYearlyHistoryCommand}"
-                      Visibility="{Binding IsYearlyVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      Icon="{ui:SymbolIcon CalendarInfo20}"
-                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
-                            ConverterParameter={x:Static p:PlotType.YearlyHistory}}"
-                      Click="OnClickMenu" />
-
-
-            <Separator Margin="5,3,5,3" />
-
-            <MenuItem Header="Usage by day of week" Command="{Binding RefreshUsageByDayOfWeekCommand}"
-                      Icon="{ui:SymbolIcon ShiftsDay24}"
-                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
-                            ConverterParameter={x:Static p:PlotType.UsageByDayOfWeek}}"
-                      Click="OnClickMenu" />
-
-            <MenuItem Header="Usage by hour" Command="{Binding RefreshUsageByHourOfDayCommand}"
-                      Icon="{ui:SymbolIcon Shifts24}"
-                      IsEnabled="{Binding CurrentPlotType, Converter={StaticResource InvertPlotTypeToBooleanConverter},
-                            ConverterParameter={x:Static p:PlotType.UsageByHourOfDay}}"
-                      Click="OnClickMenu" />
-        </Menu>
-        <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <StackPanel Margin="5" Orientation="Horizontal">
-                <Label Content="Year to display" VerticalAlignment="Center" Margin="5,5,15,5" />
-                <ComboBox ItemsSource="{Binding Years}" Margin="0,5,5,5" SelectedIndex="0" x:Name="CbYears">
+        <WrapPanel Grid.Row="0" Margin="5,5,15,10">
+            <StackPanel Margin="0,0,16,0" Orientation="Horizontal">
+                <Label
+                    Margin="0,0,8,0"
+                    VerticalAlignment="Center"
+                    Target="{Binding ElementName=CbCharts}">
+                    _Chart
+                </Label>
+                <ComboBox
+                    x:Name="CbCharts"
+                    MinWidth="200"
+                    DisplayMemberPath="Title"
+                    ItemsSource="{Binding Charts}"
+                    SelectedIndex="0"
+                    SelectedItem="{Binding SelectedChart}">
                     <interactivity:Interaction.Triggers>
                         <interactivity:EventTrigger EventName="SelectionChanged">
-                            <interactivity:InvokeCommandAction Command="{Binding SelectYearCommand}"
-                                                               CommandParameter="{Binding ElementName=CbYears, Path=SelectedItem}" />
+                            <interactivity:InvokeCommandAction
+                                Command="{Binding DataContext.LoadChartCommand,
+                                                  RelativeSource={RelativeSource AncestorType=Page}}" />
                         </interactivity:EventTrigger>
                     </interactivity:Interaction.Triggers>
                 </ComboBox>
             </StackPanel>
-            <sp:WpfPlot x:Name="HistoryPlot" Grid.Row="1" />
-        </Grid>
+            <ItemsControl ItemsSource="{Binding Filters}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,0,16,0" Orientation="Horizontal">
+                            <Label
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center"
+                                Content="{Binding Title}" />
+                            <ComboBox
+                                x:Name="CbFilters"
+                                MinWidth="200"
+                                IsEditable="{Binding IsSearchable}"
+                                IsTextSearchEnabled="True"
+                                TextSearch.TextPath="Key"
+                                DisplayMemberPath="Key"
+                                SelectedValuePath="Value"
+                                ItemsSource="{Binding Options}"
+                                SelectedValue="{Binding CurrentOption, UpdateSourceTrigger=PropertyChanged}"
+                                SelectedIndex="0">
+                                <interactivity:Interaction.Triggers>
+                                    <interactivity:EventTrigger EventName="SelectionChanged">
+                                        <interactivity:InvokeCommandAction
+                                            Command="{Binding DataContext.LoadChartCommand,
+                                                              RelativeSource={RelativeSource AncestorType=Page}}" />
+                                    </interactivity:EventTrigger>
+                                </interactivity:Interaction.Triggers>
+                            </ComboBox>
+                        </StackPanel>
+
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </WrapPanel>
+
+        <c:ChartView Grid.Row="1" Chart="{Binding SelectedChartData}" />
     </Grid>
 </Page>

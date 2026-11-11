@@ -1,0 +1,22 @@
+{
+    "id": "a76aa15e-47c0-4efa-88ed-d14e3921913e",
+    "order": 5,
+    "title": "Usage by hour of day",
+    "xLabel": "Hours",
+    "xKind": "text",
+    "yLabel": "Usage",
+    "chartType": "bar",
+    "sqlSource": "history_hour_of_day.sql",
+    "filters": [
+        {
+            "title": "Year to display",
+            "paramName": "year",
+            "sqlSource": "filter_year.sql"
+        },
+        {
+            "title": "Aliases to display",
+            "paramName": "idalias",
+            "sqlSource": "filter_alias.sql"
+        }
+    ]
+}
