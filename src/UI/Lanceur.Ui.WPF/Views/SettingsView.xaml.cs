@@ -172,7 +172,7 @@ public partial class SettingsView : INavigationWindow
         _logger.LogWarning(
             "This navigation to {Page} is obsolete. Use {NewNavigator} instead",
             pageType,
-            nameof(PageNavigator.NavigateToSettings)
+            nameof(ISettingsNavigationService)
         );
         return PageNavigationView.Navigate(pageType);
     }

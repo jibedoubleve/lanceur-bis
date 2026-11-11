@@ -2,14 +2,26 @@ using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Constants;
 using Lanceur.Core.Models;
-using Lanceur.Infra.Win32.Helpers;
+using Lanceur.Core.Services;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 [ReservedAlias("logs")]
 [Description("Open the directory containing the log files")]
 public sealed class ShowLogs : SelfExecutableQueryResult
 {
+    #region Fields
+
+    private readonly IProcessLauncher _processLauncher;
+
+    #endregion
+
+    #region Constructors
+
+    public ShowLogs(IProcessLauncher processLauncher) => _processLauncher = processLauncher;
+
+    #endregion
+
     #region Properties
 
     public override string Icon => "Book24";
@@ -20,7 +32,7 @@ public sealed class ShowLogs : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        WindowsShell.StartExplorer(Paths.LogRepository);
+        _processLauncher.Open(Paths.LogRepository);
         return NoResultAsync;
     }
 

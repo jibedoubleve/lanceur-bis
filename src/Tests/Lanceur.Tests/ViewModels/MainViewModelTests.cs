@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Web.Bookmarks;
-using Bogus.Platform;
 using CommunityToolkit.Mvvm.Messaging;
 using Dapper;
 using Lanceur.Core;
@@ -21,10 +20,10 @@ using Lanceur.Tests.Tools.Helpers;
 using Lanceur.Tests.Tools.SQL;
 using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Messages;
+using Lanceur.Ui.Core.ReservedAliases;
+using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels;
-using Lanceur.Ui.WPF.ReservedAliases;
-using Lanceur.Ui.WPF.Views;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -66,7 +65,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                              new AssemblySource
                              {
                                  MacroSource = Assembly.GetExecutingAssembly(),
-                                 ReservedKeywordSource = typeof(MainView).GetAssembly()
+                                 ReservedKeywordSource = typeof(QuitAlias).Assembly
                              }
                          )
                          .AddMockSingleton<IBookmarkRepositoryFactory>()
@@ -75,6 +74,7 @@ public sealed class MainViewModelTests : ViewModelTester<MainViewModel>
                          .AddSingleton<IDbActionFactory, DbActionFactory>()
                          .AddMockSingleton<ISettingsProvider<ApplicationSettings>>()
                          .AddMockSingleton<IThumbnailService>()
+                         .AddMockSingleton<IViewFactory>()
                          .AddMockSingleton<IUserDialogueService>()
                          .AddMockSingleton<IUserGlobalNotificationService>()
                          .AddMockSingleton<IUserNotificationService>()

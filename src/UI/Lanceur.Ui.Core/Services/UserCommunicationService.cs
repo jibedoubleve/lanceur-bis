@@ -1,6 +1,6 @@
 using Lanceur.Core.Services;
 
-namespace Lanceur.Ui.WPF.Services;
+namespace Lanceur.Ui.Core.Services;
 
 /// <inheritdoc />
 public sealed class UserCommunicationService : IUserCommunicationService

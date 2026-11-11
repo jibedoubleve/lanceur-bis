@@ -19,7 +19,7 @@ using Lanceur.Tests.Tools.ViewModels;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Lanceur.Ui.Core.ViewModels.Pages;
-using Lanceur.Ui.WPF.Services;
+using Lanceur.Ui.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Shouldly;

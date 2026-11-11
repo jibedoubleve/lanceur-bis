@@ -5,7 +5,6 @@ using Lanceur.Core.Managers;
 using Lanceur.Core.Models;
 using Lanceur.Core.Services;
 using Lanceur.Infra.Stores;
-using Lanceur.Ui.WPF.Converters;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -57,36 +56,6 @@ public sealed class StoreOrchestrationTests
     public void When_checking_store_shortcut_Then_only_a_single_special_character_is_valid(
         string? shortcut, bool expected)
         => CmdlineManager.IsSpecialCharacter(shortcut).ShouldBe(expected);
-
-    [Theory]
-    [InlineData(".")]
-    [InlineData("")]
-    [InlineData("m")]
-    public void When_convert_back_value_Then_same_value_returned(string input)
-    {
-        var converter = new StoreOrchestrationToStringConverter();
-
-        converter.ConvertBack(input,
-                     null!,
-                     null,
-                     null!)
-                 .ShouldBe(input);
-    }
-
-    [Theory]
-    [InlineData(@"^\s{0,}\..*", ".")]
-    [InlineData(@"^\s{0,}.*", "")]
-    [InlineData(@"^\s{0,}m.*", "m")]
-    public void When_converting_old_regex_Then_shortcut_is_returned_for_retro_compatibility(string input, string output)
-    {
-        var converter = new StoreOrchestrationToStringConverter();
-
-        converter.Convert(input,
-                     null!,
-                     null,
-                     null!)
-                 .ShouldBe(output);
-    }
 
     [Fact]
     public void When_store_is_always_inactive_but_shortcut_override_exists_in_settings_Then_store_should_be_inactive()

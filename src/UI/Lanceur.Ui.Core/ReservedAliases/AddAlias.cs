@@ -1,12 +1,12 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 using Lanceur.Ui.Core.Messages;
-using Lanceur.Ui.WPF.Helpers;
-using Lanceur.Ui.WPF.Views.Pages;
+using Lanceur.Core.Services;
+using Lanceur.Ui.Core.ViewModels.Pages;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 [ReservedAlias("add")]
 [Description("Add a new alias")]
@@ -14,13 +14,13 @@ public sealed class AddAlias : SelfExecutableQueryResult
 {
     #region Fields
 
-    private readonly PageNavigator _navigator;
+    private readonly ISettingsNavigationService _navigator;
 
     #endregion
 
     #region Constructors
 
-    public AddAlias(IServiceProvider serviceProvider) => _navigator = new PageNavigator(serviceProvider);
+    public AddAlias(ISettingsNavigationService navigator) => _navigator = navigator;
 
     #endregion
 
@@ -34,7 +34,7 @@ public sealed class AddAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        _navigator.NavigateToSettings<KeywordsView>();
+        _navigator.NavigateTo<KeywordsViewModel>();
         WeakReferenceMessenger.Default.Send(new AddAliasMessage(cmdline));
         return NoResultAsync;
     }

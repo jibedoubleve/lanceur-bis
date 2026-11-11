@@ -4,7 +4,7 @@ using Lanceur.Core.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 public static class ReservedAliasesRegistrationExtension
 {

@@ -1,10 +1,11 @@
+using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Lanceur.Infra.Win32.Extensions;
 using Shouldly;
 using Xunit;
 
-namespace Lanceur.Tests.Functional;
+namespace Lanceur.Tests.Ui.Functional;
 
 public sealed class ThumbnailTest
 {

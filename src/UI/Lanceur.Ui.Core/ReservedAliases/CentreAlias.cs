@@ -1,16 +1,15 @@
 using System.ComponentModel;
-using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Lanceur.Core;
 using Lanceur.Core.Configuration;
 using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
-using Lanceur.Infra.Win32.Extensions;
+using Lanceur.Core.Services;
 using Lanceur.Ui.Core.Messages;
 using Microsoft.Extensions.Logging;
 using Coordinate = Lanceur.Core.Models.Coordinate;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 [ReservedAlias("centre")]
 [Description("Centre Lanceur in the middle of the screen.")]
@@ -21,15 +20,21 @@ public sealed class CentreAlias : SelfExecutableQueryResult
     private readonly ILogger<CentreAlias> _logger;
 
     private readonly IWriteableSection<WindowSection> _settings;
+    private readonly IApplicationShellService _shell;
 
     #endregion
 
     #region Constructors
 
-    public CentreAlias(ILoggerFactory loggerFactory, IWriteableSection<WindowSection> settings)
+    public CentreAlias(
+        ILoggerFactory loggerFactory,
+        IWriteableSection<WindowSection> settings,
+        IApplicationShellService shell
+    )
     {
         _logger = loggerFactory.CreateLogger<CentreAlias>();
         _settings = settings;
+        _shell = shell;
     }
 
     #endregion
@@ -51,7 +56,7 @@ public sealed class CentreAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        var coordinate = Application.Current.MainWindow!.GetCenterCoordinate();
+        var coordinate = _shell.GetMainWindowCentre();
         _logger.LogInformation(
             "Put window at default position. (x: {X} - y: {Y})",
             coordinate.X,

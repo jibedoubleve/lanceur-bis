@@ -1,4 +1,5 @@
-using ScottPlot;
+using Bogus;
+
 
 namespace Lanceur.Tests.Tools.Helpers;
 
@@ -9,6 +10,12 @@ namespace Lanceur.Tests.Tools.Helpers;
 /// </summary>
 public static class Any
 {
+    #region Fields
+
+    private static readonly Randomizer Randomizer = new();
+
+    #endregion
+
     #region Methods
 
     /// <summary>
@@ -22,7 +29,7 @@ public static class Any
     /// </summary>
     /// <param name="size">The number of characters in the generated string.</param>
     /// <returns>A random string of the given length.</returns>
-    public static string String(int size) => Generate.RandomString(size);
+    public static string String(int size) => Randomizer.AlphaNumeric(size);
 
     #endregion
 }

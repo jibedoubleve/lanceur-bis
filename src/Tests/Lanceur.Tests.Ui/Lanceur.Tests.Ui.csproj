@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <UseWpf>True</UseWpf>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.1" />
+        <PackageReference Include="NSubstitute" Version="6.2.0"/>
+        <PackageReference Include="Shouldly" Version="4.3.0"/>
+        <PackageReference Include="xunit.v3.core" Version="4.0.3"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Xunit.StaFact" Version="4.0.24"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj"/>
+        <ProjectReference Include="..\Lanceur.Tests.Tools\Lanceur.Tests.Tools.csproj"/>
+    </ItemGroup>
+</Project>

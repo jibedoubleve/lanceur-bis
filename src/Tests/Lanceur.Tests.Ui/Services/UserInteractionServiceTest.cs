@@ -5,7 +5,7 @@ using Lanceur.Ui.WPF.Services;
 using Shouldly;
 using Xunit;
 
-namespace Lanceur.Tests.Services;
+namespace Lanceur.Tests.Ui.Services;
 
 public sealed class UserInteractionServiceTest : IDisposable
 {

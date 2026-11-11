@@ -11,8 +11,8 @@ using Lanceur.Infra.Stores;
 using Lanceur.Tests.Tooling.ReservedAliases;
 using Lanceur.Tests.Tools.Extensions;
 using Lanceur.Tests.Tools.ReservedAliases;
-using Lanceur.Ui.WPF.ReservedAliases;
-using Lanceur.Ui.WPF.Views;
+using Lanceur.Ui.Core.ReservedAliases;
+using Lanceur.Ui.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Shouldly;
@@ -50,6 +50,10 @@ public sealed class ReservedKeywordsStoreTest
                               .AddMockSingleton<IUserDialogueService>()
                               .AddMockSingleton<IUserNotificationService>()
                               .AddMockSingleton<IWriteableSection<WindowSection>>()
+                              .AddMockSingleton<ISettingsNavigationService>()
+                              .AddMockSingleton<IApplicationShellService>()
+                              .AddMockSingleton<IProcessLauncher>()
+                              .AddMockSingleton<IViewFactory>()
                               .AddLoggingForTests(_output)
                               .AddReservedAliases(type)
                               .AddMockConfigurationSections()
@@ -69,7 +73,7 @@ public sealed class ReservedKeywordsStoreTest
     public void When_search_Then_ReservedAlias_exists_in_store_by_default(string criterion)
     {
         var repository = Substitute.For<IAliasRepository>();
-        var store = GetStore(repository, typeof(MainView));
+        var store = GetStore(repository, typeof(QuitAlias));
         var query = new Cmdline(criterion);
 
         store.Search(query).Count().ShouldBe(1);

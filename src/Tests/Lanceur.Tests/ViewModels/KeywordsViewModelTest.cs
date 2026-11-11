@@ -14,7 +14,7 @@ using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.Utils.Watchdogs;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Lanceur.Ui.Core.ViewModels.Pages;
-using Lanceur.Ui.WPF.Services;
+using Lanceur.Ui.Core.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;

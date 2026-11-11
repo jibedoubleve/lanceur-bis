@@ -1,4 +1,5 @@
 using Lanceur.Core.Models;
+using Lanceur.SharedKernel.Utils;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.Core.ViewModels.Controls;
 using Lanceur.Ui.WPF.Views.Controls;
@@ -17,6 +18,7 @@ public sealed class ViewFactory : IViewFactory
                 "The view model cannot be null."
             ),
             AdditionalParameter vm                  => new AdditionalParameterView(vm),
+            CurrentVersion vm                       => new VersionView(vm),
             MultipleAdditionalParameterViewModel vm => new MultipleAdditionalParameterView(vm),
             NumericSelectorViewModel vm             => new NumericSelectorControl(vm),
             ReportConfigurationViewModel vm         => new ReportConfigurationView(vm),
