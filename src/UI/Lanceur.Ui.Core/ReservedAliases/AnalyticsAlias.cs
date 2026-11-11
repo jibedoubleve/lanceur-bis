@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Ui.WPF.Helpers;
-using Lanceur.Ui.WPF.Views.Pages;
+using Lanceur.Core.Services;
+using Lanceur.Ui.Core.ViewModels.Pages;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 [ReservedAlias("stat")]
 [Description("Shows analytics about the usage of Lanceur")]
@@ -12,13 +12,13 @@ public sealed class AnalyticsAlias : SelfExecutableQueryResult
 {
     #region Fields
 
-    private readonly PageNavigator _navigator;
+    private readonly ISettingsNavigationService _navigator;
 
     #endregion
 
     #region Constructors
 
-    public AnalyticsAlias(IServiceProvider serviceProvider) => _navigator = new PageNavigator(serviceProvider);
+    public AnalyticsAlias(ISettingsNavigationService navigator) => _navigator = navigator;
 
     #endregion
 
@@ -32,7 +32,7 @@ public sealed class AnalyticsAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        _navigator.NavigateToSettings<AnalyticsView>();
+        _navigator.NavigateTo<AnalyticsViewModel>();
         return NoResultAsync;
     }
 

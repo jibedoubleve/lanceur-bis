@@ -5,9 +5,10 @@ using Lanceur.Infra.Macros;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.Win32.Services;
 using Lanceur.SharedKernel.IoC;
+using Lanceur.Ui.Core.ReservedAliases;
+using Lanceur.Ui.Core.Services;
 using Lanceur.Ui.Core.Utils;
 using Lanceur.Ui.WPF.Helpers;
-using Lanceur.Ui.WPF.ReservedAliases;
 using Lanceur.Ui.WPF.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui;
@@ -29,6 +30,8 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IUserNotificationService, UserNotificationService>()
                          .AddSingleton<IViewFactory, ViewFactory>()
                          .AddSingleton<IHotKeyService, HotKeyService>()
+                         .AddSingleton<ISettingsNavigationService, SettingsNavigationService>()
+                         .AddSingleton<IApplicationShellService, ApplicationShellService>()
                          .AddSingleton<IUserCommunicationService, UserCommunicationService>()
                          .AddSingleton<IReleaseService, ReleaseService>()
                          .AddTransient<LazyLoadedSynchronisationContext>()

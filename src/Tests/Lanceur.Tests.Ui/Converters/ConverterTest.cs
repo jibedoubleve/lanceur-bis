@@ -6,7 +6,7 @@ using Lanceur.Ui.WPF.Converters;
 using Shouldly;
 using Xunit;
 
-namespace Lanceur.Tests.Ui;
+namespace Lanceur.Tests.Ui.Converters;
 
 public sealed class ConverterTest
 {
@@ -52,6 +52,36 @@ public sealed class ConverterTest
 
         // ASSERT
         restored.ShouldBe(shortcut);
+    }
+
+    [Theory]
+    [InlineData(".")]
+    [InlineData("")]
+    [InlineData("m")]
+    public void When_convert_back_value_Then_same_value_returned(string input)
+    {
+        var converter = new StoreOrchestrationToStringConverter();
+
+        converter.ConvertBack(input,
+                     null!,
+                     null,
+                     null!)
+                 .ShouldBe(input);
+    }
+
+    [Theory]
+    [InlineData(@"^\s{0,}\..*", ".")]
+    [InlineData(@"^\s{0,}.*", "")]
+    [InlineData(@"^\s{0,}m.*", "m")]
+    public void When_converting_old_regex_Then_shortcut_is_returned_for_retro_compatibility(string input, string output)
+    {
+        var converter = new StoreOrchestrationToStringConverter();
+
+        converter.Convert(input,
+                     null!,
+                     null,
+                     null!)
+                 .ShouldBe(output);
     }
 
     [Theory]

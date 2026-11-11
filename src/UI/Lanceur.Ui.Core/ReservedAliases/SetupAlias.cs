@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Ui.WPF.Helpers;
-using Lanceur.Ui.WPF.Views.Pages;
+using Lanceur.Core.Services;
+using Lanceur.Ui.Core.ViewModels.Pages;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 [ReservedAlias("setup")]
 [Description("Open the setup page")]
@@ -12,13 +12,13 @@ public sealed class SetupAlias : SelfExecutableQueryResult
 {
     #region Fields
 
-    private readonly PageNavigator _navigator;
+    private readonly ISettingsNavigationService _navigator;
 
     #endregion
 
     #region Constructors
 
-    public SetupAlias(IServiceProvider serviceProvider) => _navigator = new PageNavigator(serviceProvider);
+    public SetupAlias(ISettingsNavigationService navigator) => _navigator = navigator;
 
     #endregion
 
@@ -32,7 +32,7 @@ public sealed class SetupAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        _navigator.NavigateToSettings<KeywordsView>();
+        _navigator.NavigateTo<KeywordsViewModel>();
         return NoResultAsync;
     }
 

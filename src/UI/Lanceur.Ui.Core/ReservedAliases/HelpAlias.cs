@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
-using Lanceur.Infra.Win32.Helpers;
+using Lanceur.Core.Services;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 [ReservedAlias("help")]
 [Description("Open help page")]
@@ -12,6 +12,14 @@ public sealed class HelpAlias : SelfExecutableQueryResult
     #region Fields
 
     private const string Url = "https://jibedoubleve.github.io/lanceur-bis/";
+
+    private readonly IProcessLauncher _processLauncher;
+
+    #endregion
+
+    #region Constructors
+
+    public HelpAlias(IProcessLauncher processLauncher) => _processLauncher = processLauncher;
 
     #endregion
 
@@ -25,7 +33,7 @@ public sealed class HelpAlias : SelfExecutableQueryResult
 
     public override Task<IEnumerable<QueryResult>> ExecuteAsync(Cmdline? cmdline = null)
     {
-        WindowsShell.StartExplorer(Url);
+        _processLauncher.Open(Url);
         return NoResultAsync;
     }
 

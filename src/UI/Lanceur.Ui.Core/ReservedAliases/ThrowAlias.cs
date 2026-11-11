@@ -3,7 +3,7 @@ using System.ComponentModel;
 using Lanceur.Core;
 using Lanceur.Core.Models;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 /// <summary>
 ///     This keyword is only visible in debug mode. The sole prurpose of this keyword is to throw an exception

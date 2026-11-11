@@ -6,10 +6,6 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <!-- Same shared framework as Lanceur.Ui.WPF, so its packages are pruned the same way -->
-        <FrameworkReference Include="Microsoft.WindowsDesktop.App"/>
-    </ItemGroup>
-    <ItemGroup>
         <EmbeddedResource Include="Libraries\Scripts\invalid_script.sql"/>
         <EmbeddedResource Include="Libraries\Scripts\script-0.2.1.sql"/>
         <EmbeddedResource Include="Libraries\Scripts\script-0.2.sql"/>
@@ -26,7 +22,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Xunit.StaFact" Version="4.0.24"/>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Lanceur.Core\Lanceur.Core.csproj"/>
@@ -37,7 +32,6 @@
         <ProjectReference Include="..\..\Lanceur.SharedKernel\Lanceur.SharedKernel.csproj"/>
         <ProjectReference Include="..\..\Libraries\System.SQLite.Updater\System.SQLite.Updater.csproj"/>
         <ProjectReference Include="..\..\UI\Lanceur.Ui.Core\Lanceur.Ui.Core.csproj"/>
-        <ProjectReference Include="..\..\UI\Lanceur.Ui.WPF\Lanceur.Ui.WPF.csproj"/>
         <ProjectReference Include="..\Lanceur.Tests.Tools\Lanceur.Tests.Tools.csproj"/>
     </ItemGroup>
 </Project>

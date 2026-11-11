@@ -6,7 +6,7 @@ using Lanceur.Core.Configuration.Sections.Application;
 using Lanceur.Core.Models;
 using Microsoft.Extensions.Logging;
 
-namespace Lanceur.Ui.WPF.ReservedAliases;
+namespace Lanceur.Ui.Core.ReservedAliases;
 
 [ReservedAlias("clrbm")]
 [Description("Clears or invalidates the bookmark cache to ensure fresh data.")]

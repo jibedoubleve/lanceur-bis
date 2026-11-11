@@ -18,7 +18,9 @@ public static class FakeWpfServicesExtension
                             .AddMockSingleton<IUserNotificationService>()
                             .AddMockSingleton<IUserCommunicationService>()
                             .AddMockSingleton<IViewFactory>()
-                            .AddMockSingleton<IAppRestartService>();
+                            .AddMockSingleton<IAppRestartService>()
+                            .AddMockSingleton<ISettingsNavigationService>()
+                            .AddMockSingleton<IApplicationShellService>();
 
     #endregion
 }
