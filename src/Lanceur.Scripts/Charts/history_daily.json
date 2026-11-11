@@ -1,0 +1,22 @@
+{
+    "id": "16bbc7ea-71ec-4991-a882-53cb85185441",
+    "order": 1,
+    "title": "Daily history",
+    "xLabel": "Date",
+    "xKind": "date",
+    "yLabel": "Usage",
+    "chartType": "bar",
+    "sqlSource": "history_daily.sql",
+    "filters": [
+        {
+            "title": "Year to display",
+            "paramName": "year",
+            "sqlSource": "filter_year.sql"
+        },
+        {
+            "title": "Aliases to display",
+            "paramName": "idalias",
+            "sqlSource": "filter_alias.sql"
+        }
+    ]
+}

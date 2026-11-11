@@ -1,0 +1,22 @@
+{
+    "id": "a05b71e4-cab8-4419-a271-5517754156c7",
+    "order": 2,
+    "title": "Monthly history",
+    "xLabel": "Month Year",
+    "xKind": "date",
+    "yLabel": "Usage",
+    "chartType": "bar", 
+    "sqlSource": "history_monthly.sql", 
+    "filters": [ 
+        {
+            "title": "Year to display", 
+            "paramName": "year", 
+            "sqlSource": "filter_year.sql"
+        },
+        {
+            "title": "Aliases to display",
+            "paramName": "idalias",
+            "sqlSource": "filter_alias.sql"
+        }
+    ]
+}

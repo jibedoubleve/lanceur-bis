@@ -1,0 +1,6 @@
+<UserControl x:Class="Lanceur.Ui.WPF.Views.Controls.ChartView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF">
+    <sp:WpfPlot x:Name="Plot" />
+</UserControl>
