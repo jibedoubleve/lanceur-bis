@@ -23,34 +23,17 @@ public partial class UsageCalendarView
             if (referenceDate is null) { return; }
 
             var days = referenceDate.GetDaysOfMonth();
-            var history = viewModel.GetHistoryOfMonth(referenceDate).ToArray();
-            foreach (var item in history)
+            var history = viewModel.GetHistoryOfMonth(referenceDate);
+            foreach (var item in history.Days)
             {
                 days.Remove(item);
             }
 
-            calendar.SelectedDate = SelectDate(history);
+            calendar.SelectedDate = history.DefaultDate;
 
             UsageCalendar.BlackoutDates.Clear();
             UsageCalendar.BlackoutDates.AddRange(days.Select(x => new CalendarDateRange(x)));
         }
-    }
-
-    #endregion
-
-    #region Methods
-
-    /// <summary>
-    ///     Selects the date to display from a month's alias-usage history.
-    ///     Returns today's date if it is the most recent entry in <paramref name="history" />;
-    ///     otherwise returns the earliest recorded date in the month.
-    /// </summary>
-    private static DateTime? SelectDate(DateTime[] history)
-    {
-        var max = history.Max();
-        return max.Date == DateTime.Today
-            ? max
-            : history.FirstOrDefault();
     }
 
     #endregion

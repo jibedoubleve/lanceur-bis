@@ -88,11 +88,24 @@ public partial class UsageCalendarViewModel : ObservableObject
             _logger.LogWarning(ex, "Failed to load thumbnail for alias id {IdAlias}", queryResult.Id);
         }
     }
-
-    public IEnumerable<DateTime> GetHistoryOfMonth(DateTime? selectedDay)
-        => selectedDay is not null
-            ? _aliasRepository.GetDaysWithHistory(selectedDay.Value)
-            : [];
-
+    
+    public MonthHistory GetHistoryOfMonth(DateTime? selectedDay)
+    {
+        var history = selectedDay is not null
+                 ? _aliasRepository.GetDaysWithHistory(selectedDay.Value).ToArray()
+                 : [];
+        return new MonthHistory(
+            SelectDate(history),
+            history
+        );
+        
+        static DateTime SelectDate(IReadOnlyCollection<DateTime> history)
+        {
+            var max = history.Max();
+            return max.Date == DateTime.Today
+                ? max
+                : history.FirstOrDefault();
+        }
+    }
     #endregion
 }
