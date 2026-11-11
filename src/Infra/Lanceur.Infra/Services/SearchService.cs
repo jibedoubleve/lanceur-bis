@@ -58,44 +58,6 @@ public sealed class SearchService : ISearchService
                currentStores.All(store => store.CanPruneResult(previousQuery, currentQuery));
     }
 
-    private async Task DispatchSearchAsync(
-        IList<QueryResult> destination, Cmdline currentQuery, bool doesReturnAllIfEmpty)
-    {
-        using var measurement = _logger.WarnIfSlow(this);
-        if (doesReturnAllIfEmpty && currentQuery.IsEmpty())
-        {
-            destination.ReplaceWith(
-                await GetAllAsync()
-            );
-            return;
-        }
-
-        if (currentQuery.IsEmpty())
-        {
-            destination.Clear();
-            return;
-        }
-
-        if (CanPrune(_previousQuery, currentQuery))
-        {
-            _logger.LogTrace(
-                "Query {NewQuery} refines {OldQuery}; pruning existing results instead of searching stores",
-                currentQuery.ToString(),
-                _previousQuery?.ToString() ?? "<EMPTY>"
-            );
-
-            //CanPrune guarantees the _previousQuery is not null
-            PruneResults(destination, _previousQuery!, currentQuery);
-            return;
-        }
-
-        _logger.LogTrace(
-            "Execute a full search for query {Query}",
-            currentQuery
-        );
-        await SearchInStoreAsync(destination, currentQuery);
-    }
-
     private IEnumerable<QueryResult> FormatForDisplay(QueryResult[] collection)
     {
         // Upgrade alias to executable macros (if any) 
@@ -188,7 +150,40 @@ public sealed class SearchService : ISearchService
     /// <inheritdoc />
     public async Task SearchAsync(IList<QueryResult> destination, Cmdline query, bool doesReturnAllIfEmpty = false)
     {
-        await DispatchSearchAsync(destination, query, doesReturnAllIfEmpty);
+        using var measurement = _logger.WarnIfSlow(this);
+        if (doesReturnAllIfEmpty && query.IsEmpty())
+        {
+            destination.ReplaceWith(
+                await GetAllAsync()
+            );
+            return;
+        }
+
+        if (query.IsEmpty())
+        {
+            destination.Clear();
+            return;
+        }
+
+        if (CanPrune(_previousQuery, query))
+        {
+            _logger.LogTrace(
+                "Query {NewQuery} refines {OldQuery}; pruning existing results instead of searching stores",
+                query.ToString(),
+                _previousQuery?.ToString() ?? "<EMPTY>"
+            );
+
+            //CanPrune guarantees the _previousQuery is not null
+            PruneResults(destination, _previousQuery!, query);
+            return;
+        }
+
+        _logger.LogTrace(
+            "Execute a full search for query {Query}",
+            query
+        );
+        await SearchInStoreAsync(destination, query);
+
         _previousQuery = query;
     }
 
