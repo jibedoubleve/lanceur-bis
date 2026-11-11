@@ -23,7 +23,4 @@
         </Compile>
         <Compile Remove="Repositories\FeatureFlags\Features.cs"/>
     </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Repositories\FeatureFlags\"/>
-    </ItemGroup>
 </Project>

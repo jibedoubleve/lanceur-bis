@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
                          .AddSingleton<IFavIconHttpClient, FavIconHttpClient>()
                          .AddTransient<IEverythingApi, EverythingApi>()
                          .AddTransient<IBookmarkRepositoryFactory, BookmarkRepositoryFactory>()
+                         .AddTransient<IChartDefinitionService, ChartDefinitionService>()
                          .AddStores()
                          .AddMacros();
         return serviceCollection;
