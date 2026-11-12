@@ -5,6 +5,7 @@ using StackExchange.Profiling.Data;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
+//refactor: SQLiteLoggerDbProfiler is not used it should be removed
 public sealed class SQLiteLoggerDbProfiler : LoggerDbProfiler
 {
     #region Fields
