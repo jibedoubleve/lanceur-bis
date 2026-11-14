@@ -1,0 +1,22 @@
+{
+    "id": "2da41241-66b2-436e-a907-df0e4db4bad8",
+    "order": 4,
+    "title": "Usage by day of week",
+    "xLabel": "Days",
+    "xKind": "text",
+    "yLabel": "Usage",
+    "chartType": "bar",
+    "sqlSource": "history_day_of_week.sql",
+    "filters": [
+        {
+            "title": "Year to display",
+            "paramName": "year",
+            "sqlSource": "filter_year.sql"
+        },
+        {
+            "title": "Aliases to display",
+            "paramName": "idalias",
+            "sqlSource": "filter_alias.sql"
+        }
+    ]
+}

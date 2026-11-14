@@ -6,6 +6,7 @@ using StackExchange.Profiling.Data;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
+// refactor: SQLiteProfiledConnectionFactory is not used, it should be removed
 public sealed class SQLiteProfiledConnectionFactory : IDbConnectionFactory
 {
     #region Fields

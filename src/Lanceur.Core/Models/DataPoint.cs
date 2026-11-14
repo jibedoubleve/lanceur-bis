@@ -1,6 +1,6 @@
 ﻿namespace Lanceur.Core.Models;
 
-public record DataPoint<Tx, Ty>
+public sealed record DataPoint<Tx, Ty>
 {
     #region Properties
 
