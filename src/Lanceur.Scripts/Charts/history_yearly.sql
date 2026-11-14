@@ -7,7 +7,7 @@ where
         @year is null
         or ( -- Use the interval allow to use the index for time_stamp
         time_stamp >= printf('%04d-01-01', @year)
-        and time_stamp <  printf('%04d-12-31', @year + 1)
+        and time_stamp <  printf('%04d-01-01', @year + 1)
     )) and (
         @idalias is null
         or id_alias = @idalias
