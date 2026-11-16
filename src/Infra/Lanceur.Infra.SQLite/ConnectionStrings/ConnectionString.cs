@@ -26,9 +26,9 @@ public sealed class ConnectionString : BaseConnectionString, IConnectionString
 
         if (databaseSection.Value.DbPath.IsNullOrWhiteSpace())
         {
-            throw new ArgumentNullException(
-                nameof(databaseSection.Value.DbPath),
-                "Database path should have a value"
+            throw new ArgumentException(
+                "Database path should have a value",
+                nameof(databaseSection.Value.DbPath)
             );
         }
 

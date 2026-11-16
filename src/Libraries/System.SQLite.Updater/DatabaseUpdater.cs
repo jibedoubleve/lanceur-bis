@@ -29,11 +29,21 @@ public sealed class DatabaseUpdater
 
     #region Methods
 
+    /// <remarks>
+    ///     Foreign keys are disabled while the scripts run: historical scripts rebuild tables and delete
+    ///     rows in an order that would violate referential integrity. The previous setting is restored afterwards.
+    /// </remarks>
     private void ExecuteScript(IEnumerable<string> scripts)
     {
-        foreach (var script in scripts)
+        var foreignKeysEnabled = _db.ExecuteScalar<bool>("pragma foreign_keys;");
+        _db.Execute("pragma foreign_keys = off;");
+        try
         {
-            _db.Execute(script);
+            foreach (var script in scripts) { _db.Execute(script); }
+        }
+        finally
+        {
+            if (foreignKeysEnabled) { _db.Execute("pragma foreign_keys = on;"); }
         }
     }
 
