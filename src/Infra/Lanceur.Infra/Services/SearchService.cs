@@ -151,6 +151,11 @@ public sealed class SearchService : ISearchService
     public async Task SearchAsync(IList<QueryResult> destination, Cmdline query, bool doesReturnAllIfEmpty = false)
     {
         using var measurement = _logger.WarnIfSlow(this);
+
+        // Update the previous query upfront so every exit path below keeps it in sync.
+        var previousQuery = _previousQuery;
+        _previousQuery = query;
+
         if (doesReturnAllIfEmpty && query.IsEmpty())
         {
             destination.ReplaceWith(
@@ -165,16 +170,16 @@ public sealed class SearchService : ISearchService
             return;
         }
 
-        if (CanPrune(_previousQuery, query))
+        if (CanPrune(previousQuery, query))
         {
             _logger.LogTrace(
                 "Query {NewQuery} refines {OldQuery}; pruning existing results instead of searching stores",
                 query.ToString(),
-                _previousQuery?.ToString() ?? "<EMPTY>"
+                previousQuery?.ToString() ?? "<EMPTY>"
             );
 
-            //CanPrune guarantees the _previousQuery is not null
-            PruneResults(destination, _previousQuery!, query);
+            //CanPrune guarantees the previousQuery is not null
+            PruneResults(destination, previousQuery!, query);
             return;
         }
 
@@ -183,8 +188,6 @@ public sealed class SearchService : ISearchService
             query
         );
         await SearchInStoreAsync(destination, query);
-
-        _previousQuery = query;
     }
 
     #endregion
