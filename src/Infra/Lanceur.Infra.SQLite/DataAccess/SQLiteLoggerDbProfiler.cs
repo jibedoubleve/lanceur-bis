@@ -6,6 +6,7 @@ using StackExchange.Profiling.Data;
 namespace Lanceur.Infra.SQLite.DataAccess;
 
 //refactor: SQLiteLoggerDbProfiler is not used it should be removed
+//Issue URL: https://github.com/jibedoubleve/lanceur-bis/issues/1522
 public sealed class SQLiteLoggerDbProfiler : LoggerDbProfiler
 {
     #region Fields
