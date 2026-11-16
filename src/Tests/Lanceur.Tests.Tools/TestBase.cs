@@ -10,7 +10,6 @@ using Lanceur.Tests.Tools.Logging;
 using Lanceur.Tests.Tools.SQL;
 using MartinCostello.Logging.XUnit;
 using Microsoft.Extensions.Logging;
-using StackExchange.Profiling.Data;
 using Xunit;
 
 namespace Lanceur.Tests.Tools;
@@ -27,19 +26,11 @@ public abstract class TestBase
 
     #region Constructors
 
-    protected TestBase(ITestOutputHelper outputHelper)
-    {
-        SqlProfiler = new DbProfiler(outputHelper);
-        OutputHelper = outputHelper;
-    }
+    protected TestBase(ITestOutputHelper outputHelper) => OutputHelper = outputHelper;
 
     #endregion
 
     #region Properties
-
-    private static bool IsProfilingSql => false;
-
-    private DbProfiler SqlProfiler { get; }
 
     protected ILoggerFactory LoggerFactory
     {
@@ -83,12 +74,7 @@ public abstract class TestBase
 
     protected IDbConnection BuildConnection(string? connectionString = null)
     {
-        if (IsProfilingSql) { SqlProfiler.IsActive = true; }
-
-        var connection = new ProfiledDbConnection(
-            new SQLiteConnection(connectionString ?? InMemoryConnectionString),
-            SqlProfiler
-        );
+        var connection = new SQLiteConnection(connectionString ?? InMemoryConnectionString);
 
         OutputHelper.WriteLine($"Connection string: '{connection.ConnectionString}'");
         connection.Open();

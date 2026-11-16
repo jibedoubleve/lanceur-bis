@@ -34,7 +34,6 @@ public static class ServiceCollectionExtensions
                 .AddTransient<IAliasRepository, SQLiteAliasRepository>()
                 .AddTransient<IConnectionString, ConnectionString>()
                 .AddTransient<IDbConnectionManager, DbMultiConnectionManager>()
-                .AddTransient<IDbConnectionFactory, SQLiteProfiledConnectionFactory>()
                 .AddTransient<IFeatureFlagRepository, SQLiteFeatureFlagRepository>()
                 .AddTransient<IChartDefinitionRepository, SQLiteChartDefinitionRepository>()
                 .AddTransient<IDataStoreVersionService, SQLiteVersionService>();
