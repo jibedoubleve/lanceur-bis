@@ -9,6 +9,9 @@
         <Company>JB Wautier</Company>
         <Product>Lanceur</Product>
         <LangVersion>latest</LangVersion>
+        <!-- #1518: ShellExecute loads shell extensions that host the .NET Framework CLR,
+             which is not CET-compatible and makes the process crash (fast-fail 0x30). -->
+        <CETCompat>false</CETCompat>
     </PropertyGroup>
     <ItemGroup>
         <Page Update="Views\MainView.xaml">
