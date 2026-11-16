@@ -231,6 +231,27 @@ public sealed class SearchServiceTestIncrementalFilters(ITestOutputHelper output
     }
 
     [Fact]
+    public async Task When_deleting_back_to_previous_query_Then_results_are_displayed_again()
+    {
+        // ARRANGE
+        // Regression (#1515): _previousQuery was not updated after a pruning. Typing "a", "az"
+        // then deleting back to "a" was treated as a refinement of "a" and pruned the
+        // (empty) results of "az" instead of performing a full search.
+        var store = BuildTestStore();
+        store.SeedResultSet([new AliasQueryResult { Name = "abc" }]);
+        var service = BuildSearchService(store);
+
+        // ACT
+        List<QueryResult> result = [];
+        await service.SearchAsync(result, "a");
+        await service.SearchAsync(result, "az");
+        await service.SearchAsync(result, "a");
+
+        // ASSERT
+        result.ShouldContain(x => x.Name == "abc");
+    }
+
+    [Fact]
     public async Task When_query_refines_previous_Then_stores_are_not_queried_again()
     {
         // ARRANGE
