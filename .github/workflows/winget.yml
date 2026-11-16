@@ -1,0 +1,13 @@
+name: Publish to WinGet
+on:
+  release:
+    types: [released]
+jobs:
+  winget:
+    runs-on: windows-latest
+    steps:
+      - uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: jbwautier.lanceur
+          installers-regex: '\.setup\.exe$'
+          token: ${{ secrets.WINGET_TOKEN }}
