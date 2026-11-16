@@ -11,15 +11,10 @@
     d:DesignHeight="800"
     d:DesignWidth="800"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ScrollViewer.CanContentScroll="False"
     mc:Ignorable="d">
     <Page.Resources>
         <conv:DivideByConverter x:Key="DivideBy200Converter" Divider="200" />
-        <CollectionViewSource x:Key="AliasCollectionViewSource" Source="{Binding Aliases}">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription Converter="{StaticResource DivideBy200Converter}" PropertyName="Count" />
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
-
     </Page.Resources>
     <interactivity:Interaction.Triggers>
         <interactivity:EventTrigger EventName="Loaded">
@@ -57,40 +52,24 @@
             CanUserReorderColumns="False"
             GridLinesVisibility="Vertical"
             HeadersVisibility="none"
-            ItemsSource="{Binding Source={StaticResource AliasCollectionViewSource}}"
-            VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+            ItemsSource="{Binding Aliases}"
             VirtualizingPanel.VirtualizationMode="Recycling">
-            <DataGrid.GroupStyle>
-                <GroupStyle>
-                    <GroupStyle.ContainerStyle>
-                        <Style TargetType="{x:Type GroupItem}">
-                            <Setter Property="Margin" Value="0,0,0,5" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type GroupItem}">
-                                        <HeaderedContentControl
-                                            Margin="5"
-                                            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                                            Foreground="{DynamicResource AccentTextFillColorTertiaryBrush}">
-                                            <HeaderedContentControl.Header>
-                                                <Grid Margin="15">
-                                                    <Label Panel.ZIndex="10" />
-                                                    <ui:RatingControl Value="{Binding Name}" />
-                                                </Grid>
-                                            </HeaderedContentControl.Header>
-                                            <HeaderedContentControl.Content>
-                                                <ItemsPresenter />
-                                            </HeaderedContentControl.Content>
-                                        </HeaderedContentControl>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </GroupStyle.ContainerStyle>
-                </GroupStyle>
-            </DataGrid.GroupStyle>
 
             <ui:DataGrid.Columns>
+
+                <!--  RATING  -->
+                <DataGridTemplateColumn Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:RatingControl
+                                Margin="10,5"
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource AccentTextFillColorTertiaryBrush}"
+                                IsHitTestVisible="False"
+                                Value="{Binding Count, Mode=OneWay, Converter={StaticResource DivideBy200Converter}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
                 <!--  ICON  -->
                 <DataGridTemplateColumn Width="60">
