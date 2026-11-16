@@ -7,6 +7,7 @@ using StackExchange.Profiling.Data;
 namespace Lanceur.Infra.SQLite.DataAccess;
 
 // refactor: SQLiteProfiledConnectionFactory is not used, it should be removed
+// Issue URL: https://github.com/jibedoubleve/lanceur-bis/issues/1523
 public sealed class SQLiteProfiledConnectionFactory : IDbConnectionFactory
 {
     #region Fields
