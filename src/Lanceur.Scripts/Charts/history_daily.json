@@ -1,6 +1,6 @@
 {
     "id": "16bbc7ea-71ec-4991-a882-53cb85185441",
-    "order": 1,
+    "order": 10,
     "title": "Daily history",
     "xLabel": "Date",
     "xKind": "date",

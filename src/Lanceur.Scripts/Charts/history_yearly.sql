@@ -1,6 +1,6 @@
 select
     date(time_stamp, 'start of year') as x,
-    count(*)                           as y
+    count(*)                          as y
 from alias_usage
 where
     (

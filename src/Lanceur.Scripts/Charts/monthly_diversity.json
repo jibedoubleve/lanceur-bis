@@ -1,0 +1,17 @@
+{
+    "id": "0eaf7d4c-4eda-464d-b8b2-5ee7d80b8c12",
+    "order": 60,
+    "title":"Monthly diversity",
+    "xLabel": "Days",
+    "xKind": "date",
+    "yLabel": "Usage",
+    "chartType": "bar",
+    "sqlSource": "monthly_diversity.sql",
+    "filters": [
+        {
+            "title": "Year to display",
+            "paramName": "year",
+            "sqlSource": "filter_year.sql"
+        }
+    ]
+}
