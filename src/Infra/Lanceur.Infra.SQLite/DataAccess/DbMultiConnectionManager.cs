@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using System.Data.SQLite;
+using Lanceur.Core.Utils;
 
 namespace Lanceur.Infra.SQLite.DataAccess;
 
@@ -6,24 +8,29 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
 {
     #region Fields
 
-    private readonly IDbConnectionFactory _connectionFactory;
+    private readonly IConnectionString _connectionString;
 
     #endregion
 
     #region Constructors
 
-    public DbMultiConnectionManager(IDbConnectionFactory connectionFactory) => _connectionFactory = connectionFactory;
+    public DbMultiConnectionManager(IConnectionString connectionString) => _connectionString = connectionString;
 
     #endregion
 
     #region Methods
 
-    public void Dispose() { /* Release managed resources here */ }
+    private IDbConnection CreateConnection() => new SQLiteConnection(_connectionString.ToString());
+
+    public void Dispose()
+    {
+        /* Release managed resources here */
+    }
 
     /// <inheritdoc />
     public TReturn WithConnection<TReturn>(Func<IDbConnection, TReturn> action)
     {
-        using var conn = _connectionFactory.CreateConnection();
+        using var conn = CreateConnection();
         if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         return action(conn);
@@ -32,7 +39,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public void WithConnection(Action<IDbConnection> action)
     {
-        using var conn = _connectionFactory.CreateConnection();
+        using var conn = CreateConnection();
         if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         action(conn);
@@ -49,7 +56,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public TReturn WithinTransaction<TReturn>(Func<IDbTransaction, TReturn> action)
     {
-        using var conn = _connectionFactory.CreateConnection();
+        using var conn = CreateConnection();
         if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
@@ -69,7 +76,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public TContext WithinTransaction<TContext>(Func<IDbTransaction, TContext, TContext> action, TContext context)
     {
-        using var conn = _connectionFactory.CreateConnection();
+        using var conn = CreateConnection();
         if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
@@ -89,7 +96,7 @@ public sealed class DbMultiConnectionManager : IDbConnectionManager
     /// <inheritdoc />
     public void WithinTransaction<TContext>(Action<IDbTransaction, TContext> action, TContext context)
     {
-        using var conn = _connectionFactory.CreateConnection();
+        using var conn = CreateConnection();
         if (conn.State != ConnectionState.Open) { conn.Open(); }
 
         using var tx = conn.BeginTransaction(IsolationLevel.ReadCommitted);
