@@ -1,6 +1,6 @@
 {
     "id": "2da41241-66b2-436e-a907-df0e4db4bad8",
-    "order": 4,
+    "order": 40,
     "title": "Usage by day of week",
     "xLabel": "Days",
     "xKind": "text",

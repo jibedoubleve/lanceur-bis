@@ -97,12 +97,14 @@ public class SQLiteChartDefinitionRepository : SQLiteRepositoryBase, IChartDefin
         return Db.WithConnection(c => {
             var raw = c.Query<RawPoint>(descriptor.Sql, parameters)
                        .ToList();
+            
+            Validate(descriptorId, raw);
 
             return raw.Select((p, i) => new ChartPoint
             {
-                X = ToKind(p.X, descriptor.XKind, i),
-                Y = (long)p.Y,
-                Label = ToLabel(p.X, descriptor.XKind)
+                X = ToKind(p.X!, descriptor.XKind, i),
+                Y = (long)p.Y!,
+                Label = ToLabel(p.X!, descriptor.XKind)
             }).ToList();
         });
 
@@ -117,6 +119,16 @@ public class SQLiteChartDefinitionRepository : SQLiteRepositoryBase, IChartDefin
                 "text"    => fallback,
                 _         => throw new NotSupportedException($"Unknown kind: {xKind}")
             };
+
+        static void Validate(Guid id, IEnumerable<RawPoint> raw)
+        {
+            if (raw.Any(r => r.X is null || r.Y is null))
+            {
+                throw new InvalidDataException(
+                    $"Chart '{id}': the SQL query returned rows with a null X or Y. " +
+                    "Did you alias the columns 'as x' and 'as y'?");
+            }
+        }
     }
 
     public IDictionary<string, object?> FetchFilter(ChartFilterDefinition filter)
@@ -137,8 +149,8 @@ public class SQLiteChartDefinitionRepository : SQLiteRepositoryBase, IChartDefin
     {
         #region Properties
 
-        public required object X { get; init; }
-        public required object Y { get; init; }
+        public required object? X { get; init; }
+        public required object? Y { get; init; }
 
         #endregion
     }

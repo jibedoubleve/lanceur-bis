@@ -1,0 +1,17 @@
+{
+    "id": "1422e36c-1fd6-4f66-ba45-8ccfd140651a",
+    "order": 70,
+    "title":"Monthly adoption",
+    "xLabel": "Days",
+    "xKind": "date",
+    "yLabel": "Usage",
+    "chartType": "bar",
+    "sqlSource": "monthly_adoptions.sql",
+    "filters": [
+        {
+            "title": "Year to display",
+            "paramName": "year",
+            "sqlSource": "filter_year.sql"
+        }
+    ]
+}
