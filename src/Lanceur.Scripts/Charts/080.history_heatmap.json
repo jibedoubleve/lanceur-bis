@@ -1,0 +1,23 @@
+{
+    "id": "cdbf5bcc-c01a-49f2-9bc7-5e608be44983",
+    "order": 80,
+    "title": "Usage by day and hour",
+    "xLabel": "Hours",
+    "xKind": "text",
+    "seriesLabel": "Day of week",
+    "yLabel":"Usage",
+    "chartType": "heatmap",
+    "sqlSource": "history_heatmap.sql",
+    "filters": [ 
+        {
+            "title": "Year to display",
+            "paramName": "year",
+            "sqlSource": "filter_year.sql"
+        },
+        {
+            "title": "Aliases to display",
+            "paramName": "idalias",
+            "sqlSource": "filter_alias.sql"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "id": "1cb81d50-5012-4842-a7b0-56240efc0ab3",
+    "order": 90,
+    "title": "Dormant aliases",
+    "xLabel": "Last usage",
+    "xKind": "text",
+    "yLabel": "Aliases",
+    "chartType": "pie",
+    "sqlSource": "dormant_aliases.sql"
+}

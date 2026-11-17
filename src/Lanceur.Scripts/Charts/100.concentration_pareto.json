@@ -1,0 +1,17 @@
+{
+    "id": "e0ec8b5c-8e82-4acd-9c5e-9fe5a352b9f8",
+    "order": 100,
+    "title": "Concentration (Pareto)",
+    "sqlSource": "concentration_pareto.sql",
+    "xLabel": "Top N aliases",
+    "xKind": "numeric",
+    "yLabel": "Cumulative share of launches (%)",
+    "chartType": "line",
+    "filters": [
+        {
+            "title": "Year to display",
+            "paramName": "year",
+            "sqlSource": "filter_year.sql"
+        }
+    ]
+}

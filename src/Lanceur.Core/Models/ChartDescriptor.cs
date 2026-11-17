@@ -7,12 +7,14 @@ public sealed record ChartDescriptor
 {
     #region Properties
 
+    public required ChartType ChartType { get; init; }
     public required IReadOnlyCollection<ChartFilter> Filters { get; init; }
     public required Guid Id { get; init; }
+    public string? SeriesLabel { get; init; }
     public required string Title { get; init; }
     public required AxisKind XAxisKind { get; init; }
-    public required string XLabel { get; init; }
-    public required string YLabel { get; init; }
+    public string? XLabel { get; init; }
+    public string? YLabel { get; init; }
 
     #endregion
 }

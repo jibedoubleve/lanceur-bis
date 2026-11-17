@@ -48,6 +48,8 @@ public class ChartDefinitionService : IChartDefinitionService
             {
                 Id = definition.Id,
                 Title = definition.Title,
+                ChartType = definition.ChartType,
+                SeriesLabel = definition.SeriesLabel,
                 XLabel = definition.XLabel,
                 YLabel = definition.YLabel,
                 XAxisKind = ToKind(definition),
