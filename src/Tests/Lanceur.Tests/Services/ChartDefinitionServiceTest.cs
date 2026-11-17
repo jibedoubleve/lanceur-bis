@@ -1,11 +1,14 @@
 using System.Globalization;
+using Lanceur.Core.Models;
 using Lanceur.Core.Utils;
 using Lanceur.Infra.Services;
 using Lanceur.Infra.SQLite.DataAccess;
 using Lanceur.Infra.SQLite.Repositories;
+using Lanceur.Scripts;
 using Lanceur.Tests.Tools;
 using Lanceur.Tests.Tools.SQL;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using NSubstitute;
 using Shouldly;
 using Xunit;
@@ -17,12 +20,15 @@ public class ChartDefinitionServiceTest(ITestOutputHelper output) : TestBase(out
     #region Fields
 
     private const string DayOfWeekChartId = "2da41241-66b2-436e-a907-df0e4db4bad8";
+    private const string DormantAliasesChartId = "1cb81d50-5012-4842-a7b0-56240efc0ab3";
+    private const string HeatmapChartId = "cdbf5bcc-c01a-49f2-9bc7-5e608be44983";
     private const string HistoryDailyChartId = "16bbc7ea-71ec-4991-a882-53cb85185441";
     private const string HistoryMonthlyChartId = "a05b71e4-cab8-4419-a271-5517754156c7";
     private const string HistoryYearlyChartId = "6023bb84-9c69-4823-a22f-4e0497714c2d";
     private const string HourOfDayChartId = "a76aa15e-47c0-4efa-88ed-d14e3921913e";
     private const string MonthlyAdoptionsChartId = "1422e36c-1fd6-4f66-ba45-8ccfd140651a";
     private const string MonthlyDiversityChartId = "0eaf7d4c-4eda-464d-b8b2-5ee7d80b8c12";
+    private const string UsageByKindChartId = "9e196769-aeb9-43c9-bf43-71a5b5eb9da8";
 
     #endregion
 
@@ -30,6 +36,26 @@ public class ChartDefinitionServiceTest(ITestOutputHelper output) : TestBase(out
 
     public static TheoryData<string> ChartIds
         => [.. BuildChartDefinitionRepository().FetchChartDefinitions().Select(d => d.Id.ToString())];
+
+    /// <summary>
+    ///     Charts with a fixed set of categories (buckets, days and hours...): every category is returned,
+    ///     with a value of 0 when there is no usage.
+    /// </summary>
+    private static string[] ZeroFilledCharts => [DormantAliasesChartId, HeatmapChartId];
+
+    public static TheoryData<string> ZeroFilledChartIds => [.. ZeroFilledCharts];
+
+    /// <summary>
+    ///     Charts returning a point only for the data found in the database.
+    /// </summary>
+    public static TheoryData<string> DataDrivenChartIds
+        =>
+        [
+            .. BuildChartDefinitionRepository()
+               .FetchChartDefinitions()
+               .Select(d => d.Id.ToString())
+               .Except(ZeroFilledCharts)
+        ];
 
     /// <summary>
     ///     Charts whose Y is the number of usages, hence share the same filtering rules.
@@ -47,7 +73,8 @@ public class ChartDefinitionServiceTest(ITestOutputHelper output) : TestBase(out
             Substitute.For<ILogger<SQLiteChartDefinitionRepository>>()
         );
 
-    private ChartDefinitionService BuildChartDefinitionService(SqlBuilder sqlBuilder, IConnectionString? connectionString = null)
+    private ChartDefinitionService BuildChartDefinitionService(
+        SqlBuilder sqlBuilder, IConnectionString? connectionString = null)
     {
         var conn = connectionString ?? ConnectionStringFactory.InMemory;
         var scope = GetConnectionManager(sqlBuilder, conn.ToString());
@@ -119,7 +146,7 @@ public class ChartDefinitionServiceTest(ITestOutputHelper output) : TestBase(out
     }
 
     [Theory]
-    [MemberData(nameof(ChartIds))]
+    [MemberData(nameof(DataDrivenChartIds))]
     public void When_database_is_empty_Then_chart_has_no_points(string chartId)
     {
         // arrange
@@ -130,6 +157,23 @@ public class ChartDefinitionServiceTest(ITestOutputHelper output) : TestBase(out
 
         // assert
         points.ShouldBeEmpty();
+    }
+
+    [Theory]
+    [MemberData(nameof(ZeroFilledChartIds))]
+    public void When_database_is_empty_Then_every_category_is_zero(string chartId)
+    {
+        // arrange
+        var service = BuildChartDefinitionService(new SqlBuilder());
+
+        // act
+        var points = service.FetchChartPoints(Guid.Parse(chartId), Filters());
+
+        // assert
+        points.ShouldSatisfyAllConditions(
+            p => p.ShouldNotBeEmpty(),
+            p => p.ShouldAllBe(x => x.Y == 0)
+        );
     }
 
     [Fact]
@@ -231,6 +275,35 @@ public class ChartDefinitionServiceTest(ITestOutputHelper output) : TestBase(out
     }
 
     [Fact]
+    public void When_loading_chart_definitions_Then_every_chart_declares_a_known_chart_type()
+    {
+        // arrange
+        // A missing chart type isn't an error when deserialising: the chart would silently become a bar chart
+        var resources = ScriptRepository.Asm
+                                        .GetManifestResourceNames()
+                                        .Where(n => n.StartsWith("Lanceur.Scripts.Charts") && n.EndsWith(".json"))
+                                        .ToArray();
+
+        // act
+        var invalid = resources.Where(r => !Enum.TryParse<ChartType>(ReadChartType(r), true, out _))
+                               .ToArray();
+
+        // assert
+        resources.ShouldSatisfyAllConditions(
+            r => r.ShouldNotBeEmpty(),
+            _ => invalid.ShouldBeEmpty()
+        );
+        return;
+
+        static string? ReadChartType(string resource)
+        {
+            using var stream = ScriptRepository.Asm.GetManifestResourceStream(resource)!;
+            using var reader = new StreamReader(stream);
+            return JObject.Parse(reader.ReadToEnd()).Value<string>("chartType");
+        }
+    }
+
+    [Fact]
     public void When_loading_chart_definitions_Then_ids_and_orders_are_unique()
     {
         // act
@@ -257,6 +330,39 @@ public class ChartDefinitionServiceTest(ITestOutputHelper output) : TestBase(out
             d => d.ShouldAllBe(x => !string.IsNullOrWhiteSpace(x.XKind)),
             d => d.ShouldAllBe(x => !string.IsNullOrWhiteSpace(x.XLabel)),
             d => d.ShouldAllBe(x => !string.IsNullOrWhiteSpace(x.YLabel))
+        );
+    }
+
+    [Theory]
+    [InlineData("steam://rungameid/123", "Steam games")]
+    [InlineData("https://www.google.com", "Websites")]
+    [InlineData("HTTP://www.google.com", "Websites")]
+    [InlineData("www.google.com", "Websites")]
+    [InlineData("google.com/maps", "Websites")]
+    [InlineData(@"C:\Users\me\Favorites\google.url", "Websites")]
+    [InlineData("package:Microsoft.WindowsCalculator", "Store apps")]
+    [InlineData(@"C:\Program Files\App\app.exe", "Applications")]
+    [InlineData(@"\\server\share\app.exe", "Applications")]
+    [InlineData("cmd.exe", "Applications")]
+    [InlineData("services.msc", "Applications")]
+    [InlineData("@guid@", "Macros")]
+    [InlineData("setup", "Lanceur commands")]
+    public void When_showing_usage_by_kind_Then_each_launch_is_classified_by_its_target(string fileName, string kind)
+    {
+        // arrange
+        var sql = new SqlBuilder()
+            .AppendAlias(a => a.WithSynonyms("alias1")
+                               .WithFileName(fileName)
+                               .WithUsage("2024-03-04 10:00"));
+        var service = BuildChartDefinitionService(sql);
+
+        // act
+        var points = service.FetchChartPoints(Guid.Parse(UsageByKindChartId), Filters());
+
+        // assert
+        points.ShouldSatisfyAllConditions(
+            p => p.Select(x => x.Label).ShouldBe([kind]),
+            p => p.Select(x => x.Y).ShouldBe([1d])
         );
     }
 

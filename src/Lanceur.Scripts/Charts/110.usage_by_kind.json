@@ -1,0 +1,17 @@
+{
+    "id": "9e196769-aeb9-43c9-bf43-71a5b5eb9da8",
+    "order": 110,
+    "title": "Launches by target type",
+    "sqlSource": "usage_by_kind.sql",
+    "xLabel": "Target type",
+    "xKind": "text",
+    "yLabel": "Launches",
+    "chartType": "pie",
+    "filters": [
+        {
+            "title": "Year to display",
+            "paramName": "year",
+            "sqlSource": "filter_year.sql"
+        }
+    ]
+}

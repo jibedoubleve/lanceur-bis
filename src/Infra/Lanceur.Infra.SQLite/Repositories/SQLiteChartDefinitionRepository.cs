@@ -97,18 +97,19 @@ public class SQLiteChartDefinitionRepository : SQLiteRepositoryBase, IChartDefin
         return Db.WithConnection(c => {
             var raw = c.Query<RawPoint>(descriptor.Sql, parameters)
                        .ToList();
-            
+
             Validate(descriptorId, raw);
 
             return raw.Select((p, i) => new ChartPoint
             {
                 X = ToKind(p.X!, descriptor.XKind, i),
-                Y = (long)p.Y!,
-                Label = ToLabel(p.X!, descriptor.XKind)
+                Y = Convert.ToDouble(p.Y!, CultureInfo.InvariantCulture),
+                Label = ToLabel(p.X!, descriptor.XKind),
+                Serie = p.Serie?.ToString()
             }).ToList();
         });
 
-        static string? ToLabel(object value, string xKind) 
+        static string? ToLabel(object value, string xKind)
             => xKind.ToLowerInvariant() == "text" ? value.ToString() : null;
 
         static double ToKind(object value, string xKind, int fallback)
@@ -149,6 +150,7 @@ public class SQLiteChartDefinitionRepository : SQLiteRepositoryBase, IChartDefin
     {
         #region Properties
 
+        public required string? Serie { get; init; }
         public required object? X { get; init; }
         public required object? Y { get; init; }
 
