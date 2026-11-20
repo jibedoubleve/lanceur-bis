@@ -6,7 +6,7 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Dapper" Version="2.1.89"/>
+        <PackageReference Include="Dapper" Version="2.1.100"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0" />
         <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119"/>
     </ItemGroup>
